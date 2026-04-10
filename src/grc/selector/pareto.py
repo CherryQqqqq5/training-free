@@ -5,6 +5,8 @@ import shutil
 from pathlib import Path
 from typing import Dict
 
+import yaml
+
 
 MAXIMIZE_KEYS = ("acc",)
 MINIMIZE_KEYS = ("cost", "latency", "regression")
@@ -71,30 +73,42 @@ def write_selection_outputs(
     active_dir: str | None,
     out_path: str | None,
 ) -> None:
+    patch_id = None
+    source = Path(rule_path) if rule_path else None
+
     if out_path:
         out_file = Path(out_path)
         out_file.parent.mkdir(parents=True, exist_ok=True)
         out_file.write_text(json.dumps(decision, ensure_ascii=False, indent=2), encoding="utf-8")
 
     if candidate_dir:
-        candidate_file = Path(candidate_dir) / "accept.json"
+        candidate_path = Path(candidate_dir)
+        candidate_file = candidate_path / "accept.json"
         candidate_file.parent.mkdir(parents=True, exist_ok=True)
         candidate_file.write_text(json.dumps(decision, ensure_ascii=False, indent=2), encoding="utf-8")
+        patch_id = candidate_path.name
 
-    if not rule_path:
+    if not source or not source.exists():
         return
 
-    source = Path(rule_path)
-    if not source.exists():
-        return
+    if patch_id is None:
+        patch_id = source.stem
+        try:
+            patch_data = yaml.safe_load(source.read_text(encoding="utf-8")) or {}
+            patch_id = str(patch_data.get("patch_id") or patch_id)
+        except Exception:
+            pass
 
     target_root = accepted_dir if decision.get("accept") else rejected_dir
     if target_root:
-        target = Path(target_root) / source.name
-        target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(source, target)
+        target_dir = Path(target_root) / patch_id
+        if candidate_dir and Path(candidate_dir).exists():
+            shutil.copytree(Path(candidate_dir), target_dir, dirs_exist_ok=True)
+        else:
+            target_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, target_dir / "rule.yaml")
 
     if decision.get("accept") and active_dir:
-        target = Path(active_dir) / source.name
+        target = Path(active_dir) / f"{patch_id}.yaml"
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source, target)

@@ -9,12 +9,24 @@ RUN_ROOT="${2:-${REPO_ROOT}/outputs/bfcl_v4/baseline}"
 PORT="${3:-8011}"
 TEST_CATEGORY="${4:-${GRC_BFCL_TEST_CATEGORY}}"
 CONFIG_PATH="${5:-${REPO_ROOT}/configs/runtime.yaml}"
-RULES_DIR="${6:-${REPO_ROOT}/rules/active}"
+RULES_DIR="${6:-${REPO_ROOT}/rules/baseline_empty}"
 TRACE_DIR="${7:-${RUN_ROOT}/traces}"
 ARTIFACT_DIR="${8:-${RUN_ROOT}/artifacts}"
 BFCL_ROOT="${RUN_ROOT}/bfcl"
 
 mkdir -p "${BFCL_ROOT}" "${TRACE_DIR}" "${ARTIFACT_DIR}"
+mkdir -p "${RULES_DIR}"
+
+if [[ "${GRC_ALLOW_DIRTY_BASELINE_RULES:-0}" != "1" ]]; then
+  mapfile -t BASELINE_RULE_FILES < <(find "${RULES_DIR}" -maxdepth 1 -type f -name '*.yaml' | sort)
+  if [[ "${#BASELINE_RULE_FILES[@]}" -gt 0 ]]; then
+    echo "baseline rules dir must be empty of YAML patches: ${RULES_DIR}" >&2
+    printf 'found baseline rule files:\n' >&2
+    printf '  %s\n' "${BASELINE_RULE_FILES[@]}" >&2
+    exit 1
+  fi
+fi
+
 export BFCL_PROJECT_ROOT="${BFCL_ROOT}"
 export LOCAL_SERVER_ENDPOINT=127.0.0.1
 export LOCAL_SERVER_PORT="${PORT}"

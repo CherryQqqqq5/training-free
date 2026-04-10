@@ -19,10 +19,16 @@ def create_app(config_path: str, rules_dir: str, trace_dir: str) -> FastAPI:
     engine = RuleEngine(rules_dir)
     trace_store = TraceStore(trace_dir)
 
-    upstream_base_url = cfg["upstream"]["base_url"].rstrip("/")
-    upstream_api_key_env = cfg["upstream"]["api_key_env"]
-    upstream_model = cfg["upstream"].get("model")
+    upstream_cfg = cfg["upstream"]
+    upstream_base_url = os.environ.get("GRC_UPSTREAM_BASE_URL", upstream_cfg["base_url"]).rstrip("/")
+    upstream_api_key_env = os.environ.get("GRC_UPSTREAM_API_KEY_ENV", upstream_cfg["api_key_env"])
+    upstream_model = os.environ.get("GRC_UPSTREAM_MODEL", upstream_cfg.get("model"))
     timeout_sec = cfg.get("timeout_sec", 120)
+
+    if not upstream_base_url or "YOUR_UPSTREAM_OPENAI_COMPATIBLE_ENDPOINT" in upstream_base_url:
+        raise ValueError(
+            "upstream.base_url is not configured; set GRC_UPSTREAM_BASE_URL or update configs/runtime.yaml"
+        )
 
     app = FastAPI()
 
@@ -32,8 +38,8 @@ def create_app(config_path: str, rules_dir: str, trace_dir: str) -> FastAPI:
 
     @app.post("/v1/chat/completions")
     async def chat_completions(request: Request) -> JSONResponse:
-        req_json = await request.json()
-        req_json = engine.apply_request(req_json)
+        original_req_json = await request.json()
+        req_json, request_patches = engine.apply_request(original_req_json)
 
         if upstream_model:
             req_json["model"] = upstream_model
@@ -57,10 +63,11 @@ def create_app(config_path: str, rules_dir: str, trace_dir: str) -> FastAPI:
             elapsed_ms = round((time.perf_counter() - started_at) * 1000, 3)
 
         raw_json = resp.json()
-        final_json, repairs, validation = engine.apply_response(req_json, raw_json)
+        final_json, repairs, validation = engine.apply_response(req_json, raw_json, request_patches=request_patches)
 
         trace_store.write(
             {
+                "request_original": original_req_json,
                 "request": req_json,
                 "raw_response": raw_json,
                 "final_response": final_json,

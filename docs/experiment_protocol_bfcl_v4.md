@@ -13,8 +13,9 @@ These values are pinned in [`configs/bfcl_v4_phase1.env`](/Users/cherry/Document
 - upstream protocol: OpenAI-compatible `v1/chat/completions`
 - default upstream model: `gpt-4o-2024-11-20-FC`
 - runtime config: [`configs/runtime.yaml`](/Users/cherry/Documents/trainingfree/configs/runtime.yaml)
+- recommended override path: `GRC_UPSTREAM_BASE_URL`
 
-`base_url` and API key env var are operator supplied, but Phase-1 runs must keep evaluator version, model id, and endpoint protocol fixed across baseline and candidate runs.
+`base_url` and API key env var are operator supplied, but Phase-1 runs must keep evaluator version, model id, and endpoint protocol fixed across baseline and candidate runs. The proxy now accepts `GRC_UPSTREAM_BASE_URL` so runs do not require editing the tracked config file.
 
 ## Suite Selection
 
@@ -30,8 +31,14 @@ This keeps baseline and patched runs aligned without hard-coding a partial subse
 
 - baseline: [`scripts/run_bfcl_v4_baseline.sh`](/Users/cherry/Documents/trainingfree/scripts/run_bfcl_v4_baseline.sh)
 - candidate: [`scripts/run_bfcl_v4_patch.sh`](/Users/cherry/Documents/trainingfree/scripts/run_bfcl_v4_patch.sh)
+- smoke: [`scripts/run_phase1_smoke.sh`](/Users/cherry/Documents/trainingfree/scripts/run_phase1_smoke.sh)
 - aggregate: [`scripts/aggregate_bfcl_metrics.py`](/Users/cherry/Documents/trainingfree/scripts/aggregate_bfcl_metrics.py)
 - ablation loop: [`scripts/run_phase1_ablation.sh`](/Users/cherry/Documents/trainingfree/scripts/run_phase1_ablation.sh)
+
+Baseline cleanliness rule:
+
+- default baseline rules dir is `rules/baseline_empty/`
+- baseline runner fails if that directory contains any YAML patch unless `GRC_ALLOW_DIRTY_BASELINE_RULES=1`
 
 Each run must emit:
 
@@ -43,6 +50,12 @@ Each candidate directory must additionally contain:
 
 - `rule.yaml`
 - `accept.json`
+
+Archive rule:
+
+- accepted candidates are copied to `rules/accepted/<patch_id>/`
+- rejected candidates are copied to `rules/rejected/<patch_id>/`
+- active accepted runtime rules are materialized as `rules/active/<patch_id>.yaml`
 
 ## Aggregation
 

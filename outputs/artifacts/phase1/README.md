@@ -13,3 +13,8 @@ Expected generated files per candidate:
 - `repairs.jsonl`
 - `failure_summary.json`
 - `accept.json`
+
+Expected archive layout after selection:
+
+- `rules/accepted/<patch_id>/...` or `rules/rejected/<patch_id>/...`
+- `rules/active/<patch_id>.yaml` for accepted runtime activation

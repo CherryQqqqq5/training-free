@@ -72,11 +72,11 @@ class RuleEngine:
         # Preserve order while dropping duplicates.
         return list(dict.fromkeys(fragment for fragment in fragments if fragment))
 
-    def apply_request(self, request_json: Dict[str, Any]) -> Dict[str, Any]:
+    def apply_request(self, request_json: Dict[str, Any]) -> Tuple[Dict[str, Any], List[str]]:
         patched = copy.deepcopy(request_json)
         fragments = self._collect_prompt_fragments(patched)
         if not fragments:
-            return patched
+            return patched, []
 
         system_text = "[Golden Rule Compiler]\n" + "\n".join(f"- {fragment}" for fragment in fragments)
         messages = list(patched.get("messages", []))
@@ -87,7 +87,8 @@ class RuleEngine:
         else:
             messages.insert(0, {"role": "system", "content": system_text})
         patched["messages"] = messages
-        return patched
+        request_patches = [f"prompt_injector:{fragment}" for fragment in fragments]
+        return patched, request_patches
 
     def _apply_fallback(self, message: Dict[str, Any], tool_calls: List[Dict[str, Any]], index: int, issues: List[ValidationIssue], rule_hits: List[Rule]) -> bool:
         if not issues:
@@ -117,11 +118,13 @@ class RuleEngine:
         self,
         request_json: Dict[str, Any],
         response_json: Dict[str, Any],
+        request_patches: List[str] | None = None,
     ) -> Tuple[Dict[str, Any], List[Dict[str, Any]], ValidationRecord]:
         final_response = copy.deepcopy(response_json)
         tool_schema_map = self._tool_schema_map(request_json)
         all_repairs: List[Dict[str, Any]] = []
         validation = ValidationRecord()
+        validation.request_patches = list(request_patches or [])
 
         for choice in final_response.get("choices", []):
             msg = choice.get("message", {})

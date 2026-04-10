@@ -25,7 +25,7 @@ bash "${REPO_ROOT}/scripts/run_bfcl_v4_baseline.sh" \
   "8011" \
   "${TEST_CATEGORY}" \
   "${REPO_ROOT}/configs/runtime.yaml" \
-  "${REPO_ROOT}/rules/active" \
+  "${REPO_ROOT}/rules/baseline_empty" \
   "${BASELINE_ROOT}/traces" \
   "${BASELINE_ROOT}/artifacts"
 

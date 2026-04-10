@@ -47,6 +47,13 @@ Set your upstream endpoint in `configs/runtime.yaml`, then run the Phase-1 basel
 bash scripts/run_bfcl_v4_baseline.sh
 ```
 
+Run the pre-BFCL smoke first if you want to verify proxy, upstream connectivity, trace shape, and aggregator discovery without launching a full benchmark:
+
+```bash
+export GRC_UPSTREAM_BASE_URL="https://your-endpoint.example/v1"
+bash scripts/run_phase1_smoke.sh
+```
+
 Compile a candidate from the baseline traces:
 
 ```bash
@@ -85,6 +92,7 @@ bash scripts/run_phase1_ablation.sh
 ## Layout
 
 - `configs/bfcl_v4_phase1.env`: pinned evaluator/model protocol
+- `rules/baseline_empty/`: enforced empty rule set for clean baseline runs
 - `rules/seeds/`: tracked seed rules
 - `rules/candidates/`: per-candidate evidence directories
 - `rules/accepted/`: selector-approved rules
@@ -94,5 +102,6 @@ bash scripts/run_phase1_ablation.sh
 ## Notes
 
 - `configs/runtime.yaml` still requires a real upstream endpoint and API key env var.
+- `GRC_UPSTREAM_BASE_URL` can override `configs/runtime.yaml`, so the repo no longer requires editing tracked config just to point at an endpoint.
 - The BFCL runner omits `--test-category` by default so the evaluator can run its default full-suite selection.
 - `scripts/aggregate_bfcl_metrics.py` uses heuristic BFCL metric discovery because evaluator output filenames can vary across installs.
