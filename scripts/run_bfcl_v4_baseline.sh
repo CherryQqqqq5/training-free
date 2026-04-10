@@ -56,8 +56,11 @@ if [[ "${GRC_START_PROXY:-1}" == "1" ]]; then
   done
 fi
 
-GENERATE_ARGS=(generate --model "${MODEL_NAME}" --run-ids --skip-server-setup --num-threads "${GRC_BFCL_NUM_THREADS}")
+GENERATE_ARGS=(generate --model "${MODEL_NAME}" --skip-server-setup --num-threads "${GRC_BFCL_NUM_THREADS}")
 EVAL_ARGS=(evaluate --model "${MODEL_NAME}")
+if [[ "${GRC_BFCL_USE_RUN_IDS:-0}" == "1" ]]; then
+  GENERATE_ARGS+=(--run-ids)
+fi
 if [[ -n "${TEST_CATEGORY}" ]]; then
   GENERATE_ARGS+=(--test-category "${TEST_CATEGORY}")
   EVAL_ARGS+=(--test-category "${TEST_CATEGORY}")

@@ -42,6 +42,9 @@ class PromptInjectionSpec(BaseModel):
 class ToolGuardSpec(BaseModel):
     enabled: bool = True
     on_violation: str = "record"
+    on_unknown_tool: str = "record"
+    on_empty_tool_call: str = "record"
+    assistant_message: Optional[str] = None
 
 
 class VerificationContract(BaseModel):
@@ -56,6 +59,7 @@ class VerificationContract(BaseModel):
 class FallbackRoutingSpec(BaseModel):
     strategy: str = "record_only"
     assistant_message: Optional[str] = None
+    on_issue_kinds: List[str] = Field(default_factory=list)
 
 
 class RetentionPolicy(BaseModel):

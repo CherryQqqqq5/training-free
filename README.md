@@ -104,4 +104,5 @@ bash scripts/run_phase1_ablation.sh
 - `configs/runtime.yaml` still requires a real upstream endpoint and API key env var.
 - `GRC_UPSTREAM_BASE_URL` can override `configs/runtime.yaml`, so the repo no longer requires editing tracked config just to point at an endpoint.
 - The BFCL runner omits `--test-category` by default so the evaluator can run its default full-suite selection.
+- `--run-ids` is now opt-in via `GRC_BFCL_USE_RUN_IDS=1`; default runs no longer implicitly depend on `test_case_ids_to_generate.json`.
 - `scripts/aggregate_bfcl_metrics.py` uses heuristic BFCL metric discovery because evaluator output filenames can vary across installs.

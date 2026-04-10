@@ -18,6 +18,7 @@ from grc.types import (
     PromptInjectionSpec,
     Rule,
     RuleAction,
+    ToolGuardSpec,
     ToolSanitizerSpec,
     VerificationContract,
 )
@@ -90,6 +91,118 @@ def _failure_summary(failure_irs: List[FailureIR], total_failures: int, patch_id
     }
 
 
+def _guard_action_for_failure_ir(failure_ir: FailureIR) -> str:
+    error_types = set(failure_ir.error_types)
+    if "wrong_tool_name" in error_types:
+        return "drop"
+    if "empty_tool_call" in error_types:
+        return "assistant_message"
+    return "record"
+
+
+def _fallback_for_failure_ir(failure_ir: FailureIR) -> FallbackRoutingSpec:
+    error_types = set(failure_ir.error_types)
+    if "wrong_tool_name" in error_types:
+        return FallbackRoutingSpec(
+            strategy="assistant_message",
+            assistant_message="Tool call removed because it did not match any tool exposed in the request.",
+            on_issue_kinds=["tool_guard_violation", "wrong_tool_name"],
+        )
+    if "empty_tool_call" in error_types:
+        return FallbackRoutingSpec(
+            strategy="assistant_message",
+            assistant_message="No valid tool call was emitted for the available tool set.",
+            on_issue_kinds=["empty_tool_call"],
+        )
+    if {"invalid_json_args", "non_object_args"} & error_types:
+        return FallbackRoutingSpec(
+            strategy="drop_tool_call",
+            on_issue_kinds=["invalid_json_args", "non_object_args"],
+        )
+    if {"missing_required", "type_mismatch", "unknown_field"} & error_types:
+        return FallbackRoutingSpec(
+            strategy="drop_tool_call",
+            on_issue_kinds=["missing_required", "type_mismatch", "unknown_field", "repair_budget_exceeded"],
+        )
+    return FallbackRoutingSpec(strategy="record_only", on_issue_kinds=sorted(error_types))
+
+
+def _verification_contract_for_failure_ir(failure_ir: FailureIR) -> VerificationContract:
+    error_types = set(failure_ir.error_types)
+    contract = VerificationContract()
+    if "wrong_tool_name" in error_types:
+        contract.require_known_tool = True
+    if "non_object_args" in error_types:
+        contract.require_object_args = True
+    if "missing_required" in error_types:
+        contract.require_required_fields = True
+    if "unknown_field" in error_types:
+        contract.require_known_fields = True
+    if "type_mismatch" in error_types:
+        contract.require_type_match = True
+    if {"invalid_json_args", "non_object_args", "type_mismatch", "unknown_field"} & error_types:
+        contract.max_repairs = 2
+    return contract
+
+
+def _prompt_fragments(tool_name: str, failure_ir: FailureIR) -> List[str]:
+    fragments = [
+        (
+            f"When calling `{tool_name}`, emit a JSON object with only schema-defined fields. "
+            "Prefer exact required fields and schema-compatible scalar types."
+        )
+    ]
+    error_types = set(failure_ir.error_types)
+    if "missing_required" in error_types:
+        fragments.append(f"For `{tool_name}`, always include all required fields before emitting the tool call.")
+    if "type_mismatch" in error_types:
+        fragments.append(f"For `{tool_name}`, match scalar JSON types exactly instead of relying on coercion.")
+    if "unknown_field" in error_types:
+        fragments.append(f"For `{tool_name}`, do not invent extra keys outside the declared schema.")
+    return fragments
+
+
+def _build_global_guard_rule(grouped: DefaultDict[str, List[FailureCase]]) -> Rule | None:
+    global_failures = grouped.get("__none__", [])
+    if not global_failures:
+        return None
+
+    error_types = sorted({case.error_type for case in global_failures})
+    categories = sorted({case.category for case in global_failures if case.category})
+    failure_ir = FailureIR(
+        failure_id="failure_ir_global_tool_guard",
+        tool_name="__none__",
+        error_types=error_types,
+        field_names=[],
+        expected_types={},
+        categories=categories,
+        evidence_count=len(global_failures),
+        trace_ids=sorted({case.trace_id for case in global_failures}),
+    )
+    guard_action = _guard_action_for_failure_ir(failure_ir)
+    fallback = _fallback_for_failure_ir(failure_ir)
+
+    return Rule(
+        rule_id="rule_global_tool_guard_v1",
+        priority=100,
+        enabled=True,
+        trigger=MatchSpec(error_types=error_types, category_patterns=categories),
+        scope=PatchScope(tool_names=[], patch_sites=["tool_guard", "verification_hook", "fallback_router"]),
+        action=RuleAction(
+            tool_guard=ToolGuardSpec(
+                enabled=True,
+                on_violation=guard_action,
+                on_unknown_tool=guard_action,
+                on_empty_tool_call="assistant_message" if "empty_tool_call" in error_types else "record",
+                assistant_message=fallback.assistant_message or "Invalid tool emission removed by guard.",
+            ),
+            verification=_verification_contract_for_failure_ir(failure_ir),
+            fallback_router=fallback,
+        ),
+        validation_contract=_verification_contract_for_failure_ir(failure_ir),
+    )
+
+
 def compile_patch(
     failure_jsonl: str,
     out_path: str,
@@ -104,6 +217,9 @@ def compile_patch(
     rules: List[Rule] = []
     failure_irs = _build_failure_ir(grouped)
     failure_ir_map = {item.tool_name: item for item in failure_irs}
+    global_guard_rule = _build_global_guard_rule(grouped)
+    if global_guard_rule is not None:
+        rules.append(global_guard_rule)
 
     for tool_name, failures in grouped.items():
         if tool_name == "__none__":
@@ -129,12 +245,10 @@ def compile_patch(
         )
 
         failure_ir = failure_ir_map[tool_name]
-        prompt_fragments = [
-            (
-                f"When calling `{tool_name}`, emit a JSON object with only schema-defined fields. "
-                "Prefer exact required fields and schema-compatible scalar types."
-            )
-        ]
+        prompt_fragments = _prompt_fragments(tool_name, failure_ir)
+        guard_action = _guard_action_for_failure_ir(failure_ir)
+        fallback = _fallback_for_failure_ir(failure_ir)
+        verification = _verification_contract_for_failure_ir(failure_ir)
         rules.append(
             Rule(
                 rule_id=f"rule_{tool_name}_arg_sanitizer_v1",
@@ -149,11 +263,18 @@ def compile_patch(
                 action=RuleAction(
                     prompt_fragments=prompt_fragments,
                     prompt_injection=PromptInjectionSpec(fragments=prompt_fragments),
+                    tool_guard=ToolGuardSpec(
+                        enabled=True,
+                        on_violation=guard_action,
+                        on_unknown_tool=guard_action,
+                        on_empty_tool_call="record",
+                        assistant_message=fallback.assistant_message,
+                    ),
                     arg_sanitizer={tool_name: spec},
-                    verification=VerificationContract(),
-                    fallback_router=FallbackRoutingSpec(strategy="record_only"),
+                    verification=verification,
+                    fallback_router=fallback,
                 ),
-                validation_contract=VerificationContract(),
+                validation_contract=verification,
             )
         )
 

@@ -8,7 +8,14 @@ import yaml
 
 from grc.runtime.sanitizer import sanitize_tool_call
 from grc.runtime.validator import validate_tool_arguments
-from grc.types import PatchBundle, Rule, ToolSanitizerSpec, ValidationIssue, ValidationRecord, VerificationContract
+from grc.types import (
+    PatchBundle,
+    Rule,
+    ToolSanitizerSpec,
+    ValidationIssue,
+    ValidationRecord,
+    VerificationContract,
+)
 from grc.utils.jsonfix import parse_loose_json
 
 
@@ -56,9 +63,12 @@ class RuleEngine:
             names = rule.trigger.tool_names
             if tool_name is None and not names:
                 matched.append(rule)
-            elif tool_name is not None and (not names or tool_name in names):
+            elif tool_name is not None and names and tool_name in names:
                 matched.append(rule)
         return matched
+
+    def _matched_global_rules(self) -> List[Rule]:
+        return [rule for rule in self.rules if not rule.trigger.tool_names]
 
     def _collect_prompt_fragments(self, request_json: Dict[str, Any]) -> List[str]:
         fragments: List[str] = []
@@ -96,6 +106,9 @@ class RuleEngine:
 
         for rule in rule_hits:
             strategy = rule.action.fallback_router.strategy
+            scoped_issue_kinds = set(rule.action.fallback_router.on_issue_kinds)
+            if scoped_issue_kinds and not any(issue.kind in scoped_issue_kinds for issue in issues):
+                continue
             if strategy == "drop_tool_call":
                 tool_calls.pop(index)
                 return True
@@ -105,6 +118,51 @@ class RuleEngine:
                 existing = message.get("content") or ""
                 message["content"] = f"{existing}\n{fallback_message}".strip()
                 return True
+        return False
+
+    def _tool_guard_action(self, rule_hits: List[Rule], issue_kind: str) -> str:
+        for rule in rule_hits:
+            guard = rule.action.tool_guard
+            if not guard.enabled:
+                continue
+            if issue_kind == "empty_tool_call":
+                return guard.on_empty_tool_call
+            if issue_kind in {"tool_guard_violation", "wrong_tool_name"}:
+                return guard.on_unknown_tool
+            return guard.on_violation
+        return "record"
+
+    def _apply_tool_guard(self, message: Dict[str, Any], tool_calls: List[Dict[str, Any]], index: int, issues: List[ValidationIssue], rule_hits: List[Rule]) -> bool:
+        if not issues:
+            return False
+
+        action = self._tool_guard_action(rule_hits, issues[0].kind)
+        if action == "drop":
+            tool_calls.pop(index)
+            return True
+        if action == "assistant_message":
+            tool_calls.pop(index)
+            fallback_message = None
+            for rule in rule_hits:
+                if rule.action.tool_guard.assistant_message:
+                    fallback_message = rule.action.tool_guard.assistant_message
+                    break
+            existing = message.get("content") or ""
+            message["content"] = f"{existing}\n{fallback_message or 'Invalid tool call removed by tool guard.'}".strip()
+            return True
+        return False
+
+    def _apply_empty_tool_guard(self, message: Dict[str, Any], issues: List[ValidationIssue], rule_hits: List[Rule]) -> bool:
+        action = self._tool_guard_action(rule_hits, issues[0].kind) if issues else "record"
+        if action == "assistant_message":
+            fallback_message = None
+            for rule in rule_hits:
+                if rule.action.tool_guard.assistant_message:
+                    fallback_message = rule.action.tool_guard.assistant_message
+                    break
+            existing = message.get("content") or ""
+            message["content"] = f"{existing}\n{fallback_message or 'No valid tool call was emitted.'}".strip()
+            return True
         return False
 
     def _verification_contract(self, rule_hits: List[Rule]) -> VerificationContract:
@@ -129,27 +187,49 @@ class RuleEngine:
         for choice in final_response.get("choices", []):
             msg = choice.get("message", {})
             tool_calls = list(msg.get("tool_calls", []))
+            global_rule_hits = self._matched_global_rules()
+            if request_json.get("tools") and not tool_calls:
+                issues = [ValidationIssue(kind="empty_tool_call", message="no tool call emitted for tool-enabled request")]
+                validation.issues.extend(issues)
+                validation.rule_hits.extend(rule.rule_id for rule in global_rule_hits)
+                guarded = self._apply_empty_tool_guard(msg, issues, global_rule_hits)
+                validation.fallback_applied = validation.fallback_applied or guarded
+                if not guarded:
+                    applied = self._apply_fallback(msg, tool_calls, 0, issues, global_rule_hits)
+                    validation.fallback_applied = validation.fallback_applied or applied
             for index in range(len(tool_calls) - 1, -1, -1):
                 tool_call = tool_calls[index]
                 name = tool_call.get("function", {}).get("name")
                 if not name:
-                    validation.issues.append(
-                        ValidationIssue(kind="wrong_tool_name", message="tool call missing function name")
-                    )
+                    issues = [ValidationIssue(kind="wrong_tool_name", message="tool call missing function name")]
+                    validation.issues.extend(issues)
+                    validation.rule_hits.extend(rule.rule_id for rule in global_rule_hits)
+                    guarded = self._apply_tool_guard(msg, tool_calls, index, issues, global_rule_hits)
+                    validation.fallback_applied = validation.fallback_applied or guarded
+                    if not guarded:
+                        applied = self._apply_fallback(msg, tool_calls, index, issues, global_rule_hits)
+                        validation.fallback_applied = validation.fallback_applied or applied
                     continue
 
                 rule_hits = self._matched_rules(name)
                 validation.rule_hits.extend(rule.rule_id for rule in rule_hits)
                 schema = tool_schema_map.get(name, {})
                 if not schema:
-                    validation.issues.append(
+                    issues = [
                         ValidationIssue(
                             kind="tool_guard_violation",
                             tool_name=name,
                             message=f"tool `{name}` not found in request schema",
                         )
-                    )
-                    applied = self._apply_fallback(msg, tool_calls, index, validation.issues[-1:], rule_hits)
+                    ]
+                    validation.issues.extend(issues)
+                    effective_rule_hits = rule_hits or global_rule_hits
+                    validation.rule_hits.extend(rule.rule_id for rule in effective_rule_hits)
+                    guarded = self._apply_tool_guard(msg, tool_calls, index, issues, effective_rule_hits)
+                    validation.fallback_applied = validation.fallback_applied or guarded
+                    if guarded:
+                        continue
+                    applied = self._apply_fallback(msg, tool_calls, index, issues, effective_rule_hits)
                     validation.fallback_applied = validation.fallback_applied or applied
                     continue
 

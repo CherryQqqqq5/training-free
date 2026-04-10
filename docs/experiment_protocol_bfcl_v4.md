@@ -23,9 +23,10 @@ Phase-1 is BFCL-first and should prefer the evaluator default full suite. The ne
 
 - default: evaluator default full-suite execution
 - allowed override: set `GRC_BFCL_TEST_CATEGORY` only for subset ablations
+- `--run-ids` is disabled by default; enable it only by setting `GRC_BFCL_USE_RUN_IDS=1`
 - reporting rule: every run must record the exact category string used in `metrics.json`
 
-This keeps baseline and patched runs aligned without hard-coding a partial subset into the repo.
+This keeps baseline and patched runs aligned without hard-coding a partial subset into the repo or accidentally switching into `test_case_ids_to_generate.json` mode.
 
 ## Official Runners
 

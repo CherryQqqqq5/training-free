@@ -45,10 +45,10 @@ Phase-1 patch sites are deterministic:
 The compiler does not mutate BFCL internals. It compiles `RuleIR` into an external harness patch bundle consumed by the proxy runtime:
 
 - request-side prompt injection
-- response-side tool guard
-- response-side argument sanitizer
-- response-side verification hook
-- response-side fallback routing metadata
+- response-side tool guard synthesized from unknown-tool and empty-tool evidence
+- response-side argument sanitizer synthesized from schema failures
+- response-side verification hook synthesized from observed failure classes
+- response-side fallback routing synthesized from guard / validation failure patterns
 
 The concrete artifact is a YAML `PatchBundle` plus candidate-side metadata files such as `failure_summary.json` and `accept.json`.
 
