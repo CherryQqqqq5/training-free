@@ -31,6 +31,7 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
         data = json.loads(path.read_text(encoding="utf-8"))
         req = data.get("request", {})
         raw = data.get("raw_response", {})
+        validation = data.get("validation", {})
         tools = req.get("tools", [])
         tool_map = {
             tool["function"]["name"]: tool["function"].get("parameters", {})
@@ -147,5 +148,16 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
                             )
                         )
 
-    return failures
+        for issue in validation.get("issues", []):
+            failures.append(
+                FailureCase(
+                    trace_id=path.stem,
+                    turn_index=0,
+                    tool_name=issue.get("tool_name") or "__none__",
+                    error_type=issue.get("kind", "validation_issue"),
+                    field_name=issue.get("field"),
+                    category="verification_hook",
+                )
+            )
 
+    return failures

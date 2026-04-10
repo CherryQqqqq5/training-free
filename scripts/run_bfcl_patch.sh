@@ -1,26 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-MODEL_NAME="${1:-gpt-4o-2024-11-20-FC}"
-TEST_CATEGORY="${2:-simple,parallel,live_multiple,multi_turn_base}"
-ROOT="${3:-$PWD/outputs/bfcl/patch}"
+REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+MODEL_NAME="${1:-}"
+TEST_CATEGORY="${2:-}"
+RUN_ROOT="${3:-${REPO_ROOT}/outputs/bfcl/patch}"
 PORT="${4:-8011}"
 
-export BFCL_PROJECT_ROOT="${ROOT}"
-mkdir -p "${BFCL_PROJECT_ROOT}"
-
-export LOCAL_SERVER_ENDPOINT=127.0.0.1
-export LOCAL_SERVER_PORT="${PORT}"
-
-bfcl generate \
-  --model "${MODEL_NAME}" \
-  --test-category "${TEST_CATEGORY}" \
-  --run-ids \
-  --skip-server-setup \
-  --num-threads 1
-
-bfcl evaluate \
-  --model "${MODEL_NAME}" \
-  --test-category "${TEST_CATEGORY}" \
-  --partial-eval
-
+bash "${REPO_ROOT}/scripts/run_bfcl_v4_patch.sh" \
+  "${MODEL_NAME}" \
+  "${RUN_ROOT}" \
+  "${PORT}" \
+  "${TEST_CATEGORY}"

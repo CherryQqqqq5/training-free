@@ -1,37 +1,30 @@
 # Golden Rule Compiler
 
-BFCL-first Golden Rule Compiler MVP.
+BFCL-first Golden Rule Compiler Phase-1 scaffold.
 
-This repository keeps the official BFCL evaluation flow intact and adds an external OpenAI-compatible harness proxy plus a minimal compiler / selector loop.
+This repository keeps the BFCL evaluator external, runs an OpenAI-compatible harness proxy, and compiles trace evidence into deterministic multi-site harness patches.
 
-## Scope of v1
+## Phase-1 Scope
 
-v1 only does the following:
+Phase-1 now includes:
 
-1. Proxy BFCL `chat.completions` requests to an upstream OpenAI-compatible endpoint.
-2. Repair `tool_calls[].function.arguments` with a constrained argument sanitizer.
-3. Record traces, mine failures, compile a YAML patch, and run a simple selector.
+1. BFCL-first baseline and candidate runners with a pinned evaluator protocol.
+2. Explicit compiler IR: `FailureTrace -> FailureIR -> RuleIR -> PatchBundle -> ValidationRecord`.
+3. Deterministic multi-site runtime hooks across request-side prompt injection and response-side tool guard, argument sanitizer, verification hook, and fallback metadata.
+4. Filesystem-backed candidate lifecycle under `rules/candidates/`, `rules/accepted/`, and `rules/rejected/`.
+5. Standardized artifact outputs: `metrics.json`, `repairs.jsonl`, `failure_summary.json`, `accept.json`.
 
-v1 intentionally does not:
+Phase-1 still does not:
 
 1. Modify BFCL evaluator internals.
-2. Do prompt evolution.
-3. Search over multi-site patches.
-4. Use a learned selector.
+2. Search code-space harness candidates.
+3. Use a learned proposer or selector.
+4. Implement full Meta-Harness search over historical candidates.
 
-## Layout
+## Docs
 
-```text
-golden-rule-compiler/
-├── pyproject.toml
-├── README.md
-├── .env.example
-├── configs/
-├── rules/
-├── scripts/
-├── src/grc/
-└── outputs/
-```
+- Method: [docs/golden_rule_onepager.md](/Users/cherry/Documents/trainingfree/docs/golden_rule_onepager.md)
+- Protocol: [docs/experiment_protocol_bfcl_v4.md](/Users/cherry/Documents/trainingfree/docs/experiment_protocol_bfcl_v4.md)
 
 ## Quickstart
 
@@ -42,54 +35,64 @@ pip install -U pip
 pip install -e .
 ```
 
-Install BFCL separately:
+Install BFCL and copy the pinned protocol env:
 
 ```bash
 bash scripts/install_bfcl.sh
 ```
 
-Start the proxy:
+Set your upstream endpoint in `configs/runtime.yaml`, then run the Phase-1 baseline:
 
 ```bash
-source .venv/bin/activate
-grc serve \
-  --config configs/runtime.yaml \
-  --rules-dir rules/active \
-  --trace-dir outputs/traces/baseline
+bash scripts/run_bfcl_v4_baseline.sh
 ```
 
-Run BFCL baseline:
-
-```bash
-bash scripts/run_bfcl_baseline.sh
-```
-
-Mine failures and compile a patch:
+Compile a candidate from the baseline traces:
 
 ```bash
 grc mine \
-  --trace-dir outputs/traces/baseline \
+  --trace-dir outputs/bfcl_v4/baseline/traces \
   --out outputs/reports/failures.jsonl
 
 grc compile \
   --failures outputs/reports/failures.jsonl \
-  --out rules/active/001_arg_repair.yaml
+  --out rules/candidates/patch_auto_001/rule.yaml \
+  --patch-id patch_auto_001 \
+  --candidate-dir rules/candidates/patch_auto_001
 ```
 
-Run the patched loop:
+Run the candidate and aggregate its artifacts into the candidate directory:
 
 ```bash
-grc serve \
-  --config configs/runtime.yaml \
-  --rules-dir rules/active \
-  --trace-dir outputs/traces/patch
-
-bash scripts/run_bfcl_patch.sh
+bash scripts/run_bfcl_v4_patch.sh \
+  gpt-4o-2024-11-20-FC \
+  outputs/bfcl_v4/patch \
+  8012 \
+  "" \
+  configs/runtime.yaml \
+  rules/candidates/patch_auto_001 \
+  outputs/bfcl_v4/patch/traces \
+  rules/candidates/patch_auto_001 \
+  outputs/bfcl_v4/baseline/artifacts/metrics.json
 ```
+
+Or run the full Phase-1 ablation loop:
+
+```bash
+bash scripts/run_phase1_ablation.sh
+```
+
+## Layout
+
+- `configs/bfcl_v4_phase1.env`: pinned evaluator/model protocol
+- `rules/seeds/`: tracked seed rules
+- `rules/candidates/`: per-candidate evidence directories
+- `rules/accepted/`: selector-approved rules
+- `rules/rejected/`: selector-rejected rules
+- `outputs/artifacts/phase1/`: tracked artifact templates
 
 ## Notes
 
-- `configs/runtime.yaml` must be updated with your upstream endpoint before use.
-- `outputs/` is kept in the repo so the directory structure exists, but generated artifacts are ignored by git.
-- The current selector is intentionally simple and expects reduced metrics JSON inputs.
-
+- `configs/runtime.yaml` still requires a real upstream endpoint and API key env var.
+- The BFCL runner omits `--test-category` by default so the evaluator can run its default full-suite selection.
+- `scripts/aggregate_bfcl_metrics.py` uses heuristic BFCL metric discovery because evaluator output filenames can vary across installs.

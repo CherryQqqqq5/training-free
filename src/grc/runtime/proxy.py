@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import time
 from pathlib import Path
 from typing import Any, Dict
 
@@ -47,14 +48,16 @@ def create_app(config_path: str, rules_dir: str, trace_dir: str) -> FastAPI:
         }
 
         async with httpx.AsyncClient(timeout=timeout_sec) as client:
+            started_at = time.perf_counter()
             resp = await client.post(
                 f"{upstream_base_url}/chat/completions",
                 headers=headers,
                 json=req_json,
             )
+            elapsed_ms = round((time.perf_counter() - started_at) * 1000, 3)
 
         raw_json = resp.json()
-        final_json, repairs = engine.apply_response(req_json, raw_json)
+        final_json, repairs, validation = engine.apply_response(req_json, raw_json)
 
         trace_store.write(
             {
@@ -62,10 +65,11 @@ def create_app(config_path: str, rules_dir: str, trace_dir: str) -> FastAPI:
                 "raw_response": raw_json,
                 "final_response": final_json,
                 "repairs": repairs,
+                "validation": validation.model_dump(mode="json"),
                 "status_code": resp.status_code,
+                "latency_ms": elapsed_ms,
             }
         )
         return JSONResponse(content=final_json, status_code=resp.status_code)
 
     return app
-

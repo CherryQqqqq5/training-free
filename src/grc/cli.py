@@ -4,12 +4,6 @@ import json
 from pathlib import Path
 
 import typer
-import uvicorn
-
-from grc.compiler.mine import mine_failures
-from grc.compiler.trace_to_patch import compile_patch
-from grc.runtime.proxy import create_app
-from grc.selector.pareto import select_patch
 
 app = typer.Typer(no_args_is_help=True)
 
@@ -22,6 +16,9 @@ def serve(
     host: str = typer.Option("0.0.0.0", "--host"),
     port: int = typer.Option(8011, "--port"),
 ) -> None:
+    import uvicorn
+    from grc.runtime.proxy import create_app
+
     uvicorn.run(create_app(config, rules_dir, trace_dir), host=host, port=port)
 
 
@@ -30,6 +27,8 @@ def mine(
     trace_dir: str = typer.Option(..., "--trace-dir"),
     out: str = typer.Option(..., "--out"),
 ) -> None:
+    from grc.compiler.mine import mine_failures
+
     failures = mine_failures(trace_dir)
     Path(out).parent.mkdir(parents=True, exist_ok=True)
     with open(out, "w", encoding="utf-8") as handle:
@@ -43,8 +42,11 @@ def compile(
     failures: str = typer.Option(..., "--failures"),
     out: str = typer.Option(..., "--out"),
     patch_id: str = typer.Option("patch_auto_001", "--patch-id"),
+    candidate_dir: str | None = typer.Option(None, "--candidate-dir"),
 ) -> None:
-    compile_patch(failures, out, patch_id=patch_id)
+    from grc.compiler.trace_to_patch import compile_patch
+
+    compile_patch(failures, out, patch_id=patch_id, candidate_dir=candidate_dir)
     print(f"wrote patch -> {out}")
 
 
@@ -52,11 +54,19 @@ def compile(
 def select(
     baseline_metrics: str = typer.Option(..., "--baseline-metrics"),
     candidate_metrics: str = typer.Option(..., "--candidate-metrics"),
+    candidate_dir: str | None = typer.Option(None, "--candidate-dir"),
+    rule_path: str | None = typer.Option(None, "--rule-path"),
+    accepted_dir: str | None = typer.Option(None, "--accepted-dir"),
+    rejected_dir: str | None = typer.Option(None, "--rejected-dir"),
+    active_dir: str | None = typer.Option(None, "--active-dir"),
+    out: str | None = typer.Option(None, "--out"),
 ) -> None:
+    from grc.selector.pareto import select_patch, write_selection_outputs
+
     decision = select_patch(baseline_metrics, candidate_metrics)
+    write_selection_outputs(decision, candidate_dir, rule_path, accepted_dir, rejected_dir, active_dir, out)
     print(json.dumps(decision, ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":
     app()
-
