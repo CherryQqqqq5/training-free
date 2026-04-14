@@ -2,6 +2,37 @@
 __pycache__/
 *.pyc
 .DS_Store
+
+# Local secrets (templates like .env.example stay tracked)
+.env
+.env.local
+.env.*.local
+
+# Python tooling / packaging
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Experiment & ML run artifacts (large; keep on disk, not in git)
+wandb/
+mlruns/
+lightning_logs/
+/checkpoints/
+/runs/
+
+# IDE / OS
+.idea/
+Thumbs.db
+
+# Tracked output tree: ignore bulk outputs but keep small templates under outputs/artifacts/
 outputs/
 !outputs/
 !outputs/**/
