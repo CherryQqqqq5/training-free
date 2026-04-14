@@ -1,0 +1,180 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"MBTI.analyse\",\n        \"description\": \"Analyse personality based on the Myers-Briggs Type Indicator (MBTI) which sorts for preferences and generates a 4-letter personality type. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"thinking_vs_feeling\": {\n                    \"type\": \"string\",\n                    \"description\": \"Preference of user between thinking and feeling.\"\n                },\n                \"introverted_vs_extroverted\": {\n                    \"type\": \"string\",\n                    \"description\": \"Preference of user between introverted and extroverted.\"\n                },\n                \"judging_vs_perceiving\": {\n                    \"type\": \"string\",\n                    \"description\": \"Preference of user between judging and perceiving.\"\n                },\n                \"sensing_vs_intuition\": {\n                    \"type\": \"string\",\n                    \"description\": \"Preference of user between sensing and intuition.\"\n                }\n            },\n            \"required\": [\n                \"thinking_vs_feeling\",\n                \"introverted_vs_extroverted\",\n                \"judging_vs_perceiving\",\n                \"sensing_vs_intuition\"\n            ]\n        }\n    },\n    {\n        \"name\": \"five_factor_model.analyse\",\n        \"description\": \"Analyse personality based on the five-factor model, also known as the Big Five, which measures openness, conscientiousness, extraversion, agreeableness, and neuroticism. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"talkative\": {\n                    \"type\": \"boolean\",\n                    \"description\": \"Indicates if the user is talkative.\"\n                },\n                \"nervous\": {\n                    \"type\": \"boolean\",\n                    \"description\": \"Indicates if the user gets nervous easily.\"\n                },\n                \"artistic_interests\": {\n                    \"type\": \"boolean\",\n                    \"description\": \"Indicates if the user has many artistic interests.\"\n                },\n                \"lazy\": {\n                    \"type\": \"boolean\",\n                    \"description\": \"Indicates if the user tends to be lazy.\"\n                },\n                \"forgiving\": {\n                    \"type\": \"boolean\",\n                    \"description\": \"Indicates if the user is forgiving.\"\n                }\n            },\n            \"required\": [\n                \"talkative\",\n                \"nervous\",\n                \"artistic_interests\",\n                \"lazy\",\n                \"forgiving\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "Determine my personality type based on the five factor model with given information: I'm talkative, gets nervous easily, has few artistic interests, tend to be lazy and has a forgiving nature."
+      }
+    ],
+    "model": "gpt-4o-2024-11-20",
+    "store": false,
+    "temperature": 0.001
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"MBTI.analyse\",\n        \"description\": \"Analyse personality based on the Myers-Briggs Type Indicator (MBTI) which sorts for preferences and generates a 4-letter personality type. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"thinking_vs_feeling\": {\n                    \"type\": \"string\",\n                    \"description\": \"Preference of user between thinking and feeling.\"\n                },\n                \"introverted_vs_extroverted\": {\n                    \"type\": \"string\",\n                    \"description\": \"Preference of user between introverted and extroverted.\"\n                },\n                \"judging_vs_perceiving\": {\n                    \"type\": \"string\",\n                    \"description\": \"Preference of user between judging and perceiving.\"\n                },\n                \"sensing_vs_intuition\": {\n                    \"type\": \"string\",\n                    \"description\": \"Preference of user between sensing and intuition.\"\n                }\n            },\n            \"required\": [\n                \"thinking_vs_feeling\",\n                \"introverted_vs_extroverted\",\n                \"judging_vs_perceiving\",\n                \"sensing_vs_intuition\"\n            ]\n        }\n    },\n    {\n        \"name\": \"five_factor_model.analyse\",\n        \"description\": \"Analyse personality based on the five-factor model, also known as the Big Five, which measures openness, conscientiousness, extraversion, agreeableness, and neuroticism. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"talkative\": {\n                    \"type\": \"boolean\",\n                    \"description\": \"Indicates if the user is talkative.\"\n                },\n                \"nervous\": {\n                    \"type\": \"boolean\",\n                    \"description\": \"Indicates if the user gets nervous easily.\"\n                },\n                \"artistic_interests\": {\n                    \"type\": \"boolean\",\n                    \"description\": \"Indicates if the user has many artistic interests.\"\n                },\n                \"lazy\": {\n                    \"type\": \"boolean\",\n                    \"description\": \"Indicates if the user tends to be lazy.\"\n                },\n                \"forgiving\": {\n                    \"type\": \"boolean\",\n                    \"description\": \"Indicates if the user is forgiving.\"\n                }\n            },\n            \"required\": [\n                \"talkative\",\n                \"nervous\",\n                \"artistic_interests\",\n                \"lazy\",\n                \"forgiving\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "Determine my personality type based on the five factor model with given information: I'm talkative, gets nervous easily, has few artistic interests, tend to be lazy and has a forgiving nature."
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776144603-H2QM0fL0WyggYMT4E0fw",
+    "object": "chat.completion",
+    "created": 1776144603,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[five_factor_model.analyse(talkative=True, nervous=True, artistic_interests=False, lazy=True, forgiving=True)]",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 774,
+      "completion_tokens": 25,
+      "total_tokens": 799,
+      "cost": 0.0021643875,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00218625,
+        "upstream_inference_prompt_cost": 0.00181125,
+        "upstream_inference_completions_cost": 0.000375
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776144603-H2QM0fL0WyggYMT4E0fw",
+    "object": "response",
+    "created_at": 1776144604,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "[five_factor_model.analyse(talkative=True, nervous=True, artistic_interests=False, lazy=True, forgiving=True)]"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 774,
+      "completion_tokens": 25,
+      "total_tokens": 799,
+      "cost": 0.0021643875,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00218625,
+        "upstream_inference_prompt_cost": 0.00181125,
+        "upstream_inference_completions_cost": 0.000375
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776144603-H2QM0fL0WyggYMT4E0fw",
+    "object": "chat.completion",
+    "created": 1776144603,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[five_factor_model.analyse(talkative=True, nervous=True, artistic_interests=False, lazy=True, forgiving=True)]",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": []
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 774,
+      "completion_tokens": 25,
+      "total_tokens": 799,
+      "cost": 0.0021643875,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00218625,
+        "upstream_inference_prompt_cost": 0.00181125,
+        "upstream_inference_completions_cost": 0.000375
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1717.077,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "22f8b078-3e81-4e0c-9020-142e2d0fb317"
+}

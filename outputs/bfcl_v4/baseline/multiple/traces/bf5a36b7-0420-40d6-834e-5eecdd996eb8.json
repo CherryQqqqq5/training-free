@@ -1,0 +1,180 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"finance.property_depreciation\",\n        \"description\": \"Calculates the depreciated value of a property given its initial cost, depreciation rate, and the number of years. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"initial_cost\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The initial cost of the property.\"\n                },\n                \"depreciation_rate\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The annual depreciation rate in percentage.\"\n                },\n                \"years\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The number of years for which to calculate the depreciation.\"\n                },\n                \"monthly\": {\n                    \"type\": \"boolean\",\n                    \"description\": \"If set to true, it will calculate monthly depreciation instead of annually. (optional)\",\n                    \"default\": false\n                }\n            },\n            \"required\": [\n                \"initial_cost\",\n                \"depreciation_rate\",\n                \"years\"\n            ]\n        }\n    },\n    {\n        \"name\": \"finance.loan_repayment\",\n        \"description\": \"Calculates the monthly repayment for a loan. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"loan_amount\": {\n                    \"type\": \"float\",\n                    \"description\": \"The amount borrowed or loaned.\"\n                },\n                \"interest_rate\": {\n                    \"type\": \"float\",\n                    \"description\": \"The annual interest rate.\"\n                },\n                \"loan_term\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The term of the loan in years.\"\n                }\n            },\n            \"required\": [\n                \"loan_amount\",\n                \"interest_rate\",\n                \"loan_term\"\n            ]\n        }\n    },\n    {\n        \"name\": \"finance.inflation_adjustment\",\n        \"description\": \"Adjusts a sum of money for inflation based on the consumer price index (CPI). Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"initial_sum\": {\n                    \"type\": \"float\",\n                    \"description\": \"The initial sum of money.\"\n                },\n                \"years\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The number of years over which inflation is calculated.\"\n                },\n                \"inflation_rate\": {\n                    \"type\": \"float\",\n                    \"description\": \"The annual rate of inflation. Default 0.0\"\n                }\n            },\n            \"required\": [\n                \"initial_sum\",\n                \"years\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "Calculate the depreciated value of a property costing $200,000 with an annual depreciation rate of 3% for 5 years."
+      }
+    ],
+    "model": "gpt-4o-2024-11-20",
+    "store": false,
+    "temperature": 0.001
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"finance.property_depreciation\",\n        \"description\": \"Calculates the depreciated value of a property given its initial cost, depreciation rate, and the number of years. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"initial_cost\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The initial cost of the property.\"\n                },\n                \"depreciation_rate\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The annual depreciation rate in percentage.\"\n                },\n                \"years\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The number of years for which to calculate the depreciation.\"\n                },\n                \"monthly\": {\n                    \"type\": \"boolean\",\n                    \"description\": \"If set to true, it will calculate monthly depreciation instead of annually. (optional)\",\n                    \"default\": false\n                }\n            },\n            \"required\": [\n                \"initial_cost\",\n                \"depreciation_rate\",\n                \"years\"\n            ]\n        }\n    },\n    {\n        \"name\": \"finance.loan_repayment\",\n        \"description\": \"Calculates the monthly repayment for a loan. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"loan_amount\": {\n                    \"type\": \"float\",\n                    \"description\": \"The amount borrowed or loaned.\"\n                },\n                \"interest_rate\": {\n                    \"type\": \"float\",\n                    \"description\": \"The annual interest rate.\"\n                },\n                \"loan_term\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The term of the loan in years.\"\n                }\n            },\n            \"required\": [\n                \"loan_amount\",\n                \"interest_rate\",\n                \"loan_term\"\n            ]\n        }\n    },\n    {\n        \"name\": \"finance.inflation_adjustment\",\n        \"description\": \"Adjusts a sum of money for inflation based on the consumer price index (CPI). Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"initial_sum\": {\n                    \"type\": \"float\",\n                    \"description\": \"The initial sum of money.\"\n                },\n                \"years\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The number of years over which inflation is calculated.\"\n                },\n                \"inflation_rate\": {\n                    \"type\": \"float\",\n                    \"description\": \"The annual rate of inflation. Default 0.0\"\n                }\n            },\n            \"required\": [\n                \"initial_sum\",\n                \"years\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "Calculate the depreciated value of a property costing $200,000 with an annual depreciation rate of 3% for 5 years."
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776144467-mRxod0NXcXQoLgJjGEbS",
+    "object": "chat.completion",
+    "created": 1776144467,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[finance.property_depreciation(initial_cost=200000, depreciation_rate=3, years=5)]",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 819,
+      "completion_tokens": 21,
+      "total_tokens": 840,
+      "cost": 0.0022386375,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00226125,
+        "upstream_inference_prompt_cost": 0.00194625,
+        "upstream_inference_completions_cost": 0.000315
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776144467-mRxod0NXcXQoLgJjGEbS",
+    "object": "response",
+    "created_at": 1776144468,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "[finance.property_depreciation(initial_cost=200000, depreciation_rate=3, years=5)]"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 819,
+      "completion_tokens": 21,
+      "total_tokens": 840,
+      "cost": 0.0022386375,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00226125,
+        "upstream_inference_prompt_cost": 0.00194625,
+        "upstream_inference_completions_cost": 0.000315
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776144467-mRxod0NXcXQoLgJjGEbS",
+    "object": "chat.completion",
+    "created": 1776144467,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[finance.property_depreciation(initial_cost=200000, depreciation_rate=3, years=5)]",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": []
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 819,
+      "completion_tokens": 21,
+      "total_tokens": 840,
+      "cost": 0.0022386375,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00226125,
+        "upstream_inference_prompt_cost": 0.00194625,
+        "upstream_inference_completions_cost": 0.000315
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1791.084,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "bf5a36b7-0420-40d6-834e-5eecdd996eb8"
+}

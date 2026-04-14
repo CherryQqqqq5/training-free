@@ -1,0 +1,180 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"solve_quadratic_equation\",\n        \"description\": \"Function solves the quadratic equation and returns its roots. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"a\": {\n                    \"type\": \"integer\",\n                    \"description\": \"Coefficient of x squared\"\n                },\n                \"b\": {\n                    \"type\": \"integer\",\n                    \"description\": \"Coefficient of x\"\n                },\n                \"c\": {\n                    \"type\": \"integer\",\n                    \"description\": \"Constant term in the quadratic equation\"\n                }\n            },\n            \"required\": [\n                \"a\",\n                \"b\",\n                \"c\"\n            ]\n        }\n    },\n    {\n        \"name\": \"portfolio_future_value\",\n        \"description\": \"Calculate the future value of an investment in a specific stock based on the invested amount, expected annual return and number of years. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"stock\": {\n                    \"type\": \"string\",\n                    \"description\": \"The ticker symbol of the stock.\"\n                },\n                \"invested_amount\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The invested amount in USD.\"\n                },\n                \"expected_annual_return\": {\n                    \"type\": \"float\",\n                    \"description\": \"The expected annual return on investment as a decimal. E.g. 5% = 0.05\"\n                },\n                \"years\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The number of years for which the investment is made.\"\n                }\n            },\n            \"required\": [\n                \"stock\",\n                \"invested_amount\",\n                \"expected_annual_return\",\n                \"years\"\n            ]\n        }\n    },\n    {\n        \"name\": \"get_stock_info\",\n        \"description\": \"Retrieves information about a specific stock based on company's name. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"company_name\": {\n                    \"type\": \"string\",\n                    \"description\": \"The name of the company.\"\n                },\n                \"detail_level\": {\n                    \"type\": \"string\",\n                    \"description\": \"Level of detail for stock information. Can be 'summary' or 'detailed'.\"\n                },\n                \"market\": {\n                    \"type\": \"string\",\n                    \"description\": \"The stock market of interest. Default is 'NASDAQ'\"\n                }\n            },\n            \"required\": [\n                \"company_name\",\n                \"detail_level\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "\"Could you help me with the following tasks? First, I want to know the future value of my investment in the stock with the ticker symbol 'AAPL'. I have invested $5000 in it and I am expecting an annual return of 7% (0.07). I plan to hold this investment for 10 years. Second, I am interested in getting detailed information about the company 'Microsoft'. I want this information from the 'NASDAQ' stock market. Lastly, I have a quadratic equation with coefficients a=5, b=-20, and c=15. Could you solve this equation for me and provide the roots?\""
+      }
+    ],
+    "model": "gpt-4o-2024-11-20",
+    "store": false,
+    "temperature": 0.001
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"solve_quadratic_equation\",\n        \"description\": \"Function solves the quadratic equation and returns its roots. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"a\": {\n                    \"type\": \"integer\",\n                    \"description\": \"Coefficient of x squared\"\n                },\n                \"b\": {\n                    \"type\": \"integer\",\n                    \"description\": \"Coefficient of x\"\n                },\n                \"c\": {\n                    \"type\": \"integer\",\n                    \"description\": \"Constant term in the quadratic equation\"\n                }\n            },\n            \"required\": [\n                \"a\",\n                \"b\",\n                \"c\"\n            ]\n        }\n    },\n    {\n        \"name\": \"portfolio_future_value\",\n        \"description\": \"Calculate the future value of an investment in a specific stock based on the invested amount, expected annual return and number of years. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"stock\": {\n                    \"type\": \"string\",\n                    \"description\": \"The ticker symbol of the stock.\"\n                },\n                \"invested_amount\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The invested amount in USD.\"\n                },\n                \"expected_annual_return\": {\n                    \"type\": \"float\",\n                    \"description\": \"The expected annual return on investment as a decimal. E.g. 5% = 0.05\"\n                },\n                \"years\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The number of years for which the investment is made.\"\n                }\n            },\n            \"required\": [\n                \"stock\",\n                \"invested_amount\",\n                \"expected_annual_return\",\n                \"years\"\n            ]\n        }\n    },\n    {\n        \"name\": \"get_stock_info\",\n        \"description\": \"Retrieves information about a specific stock based on company's name. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"company_name\": {\n                    \"type\": \"string\",\n                    \"description\": \"The name of the company.\"\n                },\n                \"detail_level\": {\n                    \"type\": \"string\",\n                    \"description\": \"Level of detail for stock information. Can be 'summary' or 'detailed'.\"\n                },\n                \"market\": {\n                    \"type\": \"string\",\n                    \"description\": \"The stock market of interest. Default is 'NASDAQ'\"\n                }\n            },\n            \"required\": [\n                \"company_name\",\n                \"detail_level\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "\"Could you help me with the following tasks? First, I want to know the future value of my investment in the stock with the ticker symbol 'AAPL'. I have invested $5000 in it and I am expecting an annual return of 7% (0.07). I plan to hold this investment for 10 years. Second, I am interested in getting detailed information about the company 'Microsoft'. I want this information from the 'NASDAQ' stock market. Lastly, I have a quadratic equation with coefficients a=5, b=-20, and c=15. Could you solve this equation for me and provide the roots?\""
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776146331-LBeckMKJ0FIZc1Qi7Iuy",
+    "object": "chat.completion",
+    "created": 1776146331,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[portfolio_future_value(stock=\"AAPL\", invested_amount=5000, expected_annual_return=0.07, years=10), get_stock_info(company_name=\"Microsoft\", detail_level=\"detailed\", market=\"NASDAQ\"), solve_quadratic_equation(a=5, b=-20, c=15)]",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 917,
+      "completion_tokens": 62,
+      "total_tokens": 979,
+      "cost": 0.003630825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 6,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0036675,
+        "upstream_inference_prompt_cost": 0.0027375,
+        "upstream_inference_completions_cost": 0.00093
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776146331-LBeckMKJ0FIZc1Qi7Iuy",
+    "object": "response",
+    "created_at": 1776146334,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "[portfolio_future_value(stock=\"AAPL\", invested_amount=5000, expected_annual_return=0.07, years=10), get_stock_info(company_name=\"Microsoft\", detail_level=\"detailed\", market=\"NASDAQ\"), solve_quadratic_equation(a=5, b=-20, c=15)]"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 917,
+      "completion_tokens": 62,
+      "total_tokens": 979,
+      "cost": 0.003630825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 6,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0036675,
+        "upstream_inference_prompt_cost": 0.0027375,
+        "upstream_inference_completions_cost": 0.00093
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776146331-LBeckMKJ0FIZc1Qi7Iuy",
+    "object": "chat.completion",
+    "created": 1776146331,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[portfolio_future_value(stock=\"AAPL\", invested_amount=5000, expected_annual_return=0.07, years=10), get_stock_info(company_name=\"Microsoft\", detail_level=\"detailed\", market=\"NASDAQ\"), solve_quadratic_equation(a=5, b=-20, c=15)]",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": []
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 917,
+      "completion_tokens": 62,
+      "total_tokens": 979,
+      "cost": 0.003630825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 6,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0036675,
+        "upstream_inference_prompt_cost": 0.0027375,
+        "upstream_inference_completions_cost": 0.00093
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2719.459,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "09b8d291-6512-4ce3-ad27-9b881715c6ed"
+}

@@ -1,0 +1,180 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"game_scores.get\",\n        \"description\": \"Retrieve scores and rankings based on player\\u2019s performance in a certain game. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"game\": {\n                    \"type\": \"string\",\n                    \"description\": \"The name of the game.\"\n                },\n                \"platform\": {\n                    \"type\": \"string\",\n                    \"description\": \"The gaming platform e.g. Xbox, Playstation, PC\"\n                },\n                \"level\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The level of the game for which you want to retrieve the scores.\"\n                },\n                \"player\": {\n                    \"type\": \"string\",\n                    \"description\": \"The name of the player for whom you want to retrieve scores. Default ''\",\n                    \"optional\": true\n                }\n            },\n            \"required\": [\n                \"game\",\n                \"platform\",\n                \"level\"\n            ]\n        }\n    },\n    {\n        \"name\": \"game_rewards.get\",\n        \"description\": \"Retrieve information about different types of rewards that you can receive when playing a certain game. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"game\": {\n                    \"type\": \"string\",\n                    \"description\": \"The name of the game.\"\n                },\n                \"platform\": {\n                    \"type\": \"string\",\n                    \"description\": \"The gaming platform e.g. Xbox, Playstation, PC\"\n                },\n                \"mission\": {\n                    \"type\": \"string\",\n                    \"description\": \"The mission for which you want to know the rewards. Default to ''\",\n                    \"optional\": true\n                },\n                \"trophy\": {\n                    \"type\": \"string\",\n                    \"description\": \"The trophy level for which you want to know the rewards. Default to ''\",\n                    \"optional\": true\n                }\n            },\n            \"required\": [\n                \"game\",\n                \"platform\"\n            ]\n        }\n    },\n    {\n        \"name\": \"game_missions.list\",\n        \"description\": \"List all missions for a certain game. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"game\": {\n                    \"type\": \"string\",\n                    \"description\": \"The name of the game.\"\n                }\n            },\n            \"required\": [\n                \"game\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "Find out the rewards for playing Fortnite on Playstation platform with different missions and trophies"
+      }
+    ],
+    "model": "gpt-4o-2024-11-20",
+    "store": false,
+    "temperature": 0.001
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"game_scores.get\",\n        \"description\": \"Retrieve scores and rankings based on player\\u2019s performance in a certain game. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"game\": {\n                    \"type\": \"string\",\n                    \"description\": \"The name of the game.\"\n                },\n                \"platform\": {\n                    \"type\": \"string\",\n                    \"description\": \"The gaming platform e.g. Xbox, Playstation, PC\"\n                },\n                \"level\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The level of the game for which you want to retrieve the scores.\"\n                },\n                \"player\": {\n                    \"type\": \"string\",\n                    \"description\": \"The name of the player for whom you want to retrieve scores. Default ''\",\n                    \"optional\": true\n                }\n            },\n            \"required\": [\n                \"game\",\n                \"platform\",\n                \"level\"\n            ]\n        }\n    },\n    {\n        \"name\": \"game_rewards.get\",\n        \"description\": \"Retrieve information about different types of rewards that you can receive when playing a certain game. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"game\": {\n                    \"type\": \"string\",\n                    \"description\": \"The name of the game.\"\n                },\n                \"platform\": {\n                    \"type\": \"string\",\n                    \"description\": \"The gaming platform e.g. Xbox, Playstation, PC\"\n                },\n                \"mission\": {\n                    \"type\": \"string\",\n                    \"description\": \"The mission for which you want to know the rewards. Default to ''\",\n                    \"optional\": true\n                },\n                \"trophy\": {\n                    \"type\": \"string\",\n                    \"description\": \"The trophy level for which you want to know the rewards. Default to ''\",\n                    \"optional\": true\n                }\n            },\n            \"required\": [\n                \"game\",\n                \"platform\"\n            ]\n        }\n    },\n    {\n        \"name\": \"game_missions.list\",\n        \"description\": \"List all missions for a certain game. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"game\": {\n                    \"type\": \"string\",\n                    \"description\": \"The name of the game.\"\n                }\n            },\n            \"required\": [\n                \"game\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "Find out the rewards for playing Fortnite on Playstation platform with different missions and trophies"
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776144497-lXDbv67hD3IDeAxEz0dz",
+    "object": "chat.completion",
+    "created": 1776144497,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[game_rewards.get(game=\"Fortnite\", platform=\"Playstation\", mission=\"\", trophy=\"\"),\n game_rewards.get(game=\"Fortnite\", platform=\"Playstation\", mission=\"Battle Royale\", trophy=\"\"),\n game_rewards.get(game=\"Fortnite\", platform=\"Playstation\", mission=\"Save the World\", trophy=\"\"),\n game_rewards.get(game=\"Fortnite\", platform=\"Playstation\", mission=\"\", trophy=\"Victory Royale\"),\n game_rewards.get(game=\"Fortnite\", platform=\"Playstation\", mission=\"\", trophy=\"Epic Win\")]",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 778,
+      "completion_tokens": 102,
+      "total_tokens": 880,
+      "cost": 0.0033197175,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00335325,
+        "upstream_inference_prompt_cost": 0.00182325,
+        "upstream_inference_completions_cost": 0.00153
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776144497-lXDbv67hD3IDeAxEz0dz",
+    "object": "response",
+    "created_at": 1776144500,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "[game_rewards.get(game=\"Fortnite\", platform=\"Playstation\", mission=\"\", trophy=\"\"),\n game_rewards.get(game=\"Fortnite\", platform=\"Playstation\", mission=\"Battle Royale\", trophy=\"\"),\n game_rewards.get(game=\"Fortnite\", platform=\"Playstation\", mission=\"Save the World\", trophy=\"\"),\n game_rewards.get(game=\"Fortnite\", platform=\"Playstation\", mission=\"\", trophy=\"Victory Royale\"),\n game_rewards.get(game=\"Fortnite\", platform=\"Playstation\", mission=\"\", trophy=\"Epic Win\")]"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 778,
+      "completion_tokens": 102,
+      "total_tokens": 880,
+      "cost": 0.0033197175,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00335325,
+        "upstream_inference_prompt_cost": 0.00182325,
+        "upstream_inference_completions_cost": 0.00153
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776144497-lXDbv67hD3IDeAxEz0dz",
+    "object": "chat.completion",
+    "created": 1776144497,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[game_rewards.get(game=\"Fortnite\", platform=\"Playstation\", mission=\"\", trophy=\"\"),\n game_rewards.get(game=\"Fortnite\", platform=\"Playstation\", mission=\"Battle Royale\", trophy=\"\"),\n game_rewards.get(game=\"Fortnite\", platform=\"Playstation\", mission=\"Save the World\", trophy=\"\"),\n game_rewards.get(game=\"Fortnite\", platform=\"Playstation\", mission=\"\", trophy=\"Victory Royale\"),\n game_rewards.get(game=\"Fortnite\", platform=\"Playstation\", mission=\"\", trophy=\"Epic Win\")]",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": []
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 778,
+      "completion_tokens": 102,
+      "total_tokens": 880,
+      "cost": 0.0033197175,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00335325,
+        "upstream_inference_prompt_cost": 0.00182325,
+        "upstream_inference_completions_cost": 0.00153
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 3351.376,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "f2b96578-9fbd-4ff8-b2d4-2edeaef09753"
+}

@@ -1,0 +1,180 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"supermarket.find_in_city\",\n        \"description\": \"Find all supermarkets in a given city. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"city\": {\n                    \"type\": \"string\",\n                    \"description\": \"The city to locate supermarkets in.\"\n                },\n                \"state\": {\n                    \"type\": \"string\",\n                    \"description\": \"The state to further narrow down the search.\"\n                },\n                \"openNow\": {\n                    \"type\": \"boolean\",\n                    \"description\": \"If true, returns only supermarkets that are currently open. Default to true\"\n                }\n            },\n            \"required\": [\n                \"city\",\n                \"state\"\n            ]\n        }\n    },\n    {\n        \"name\": \"sightseeing.popular_in_city\",\n        \"description\": \"Find the most popular sightseeing place in a given city. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"city\": {\n                    \"type\": \"string\",\n                    \"description\": \"The city to find sightseeing in.\"\n                },\n                \"state\": {\n                    \"type\": \"string\",\n                    \"description\": \"The state to further narrow down the search.\"\n                },\n                \"kidsFriendly\": {\n                    \"type\": \"boolean\",\n                    \"description\": \"If true, returns only kids friendly sightseeing places.Default to true\"\n                }\n            },\n            \"required\": [\n                \"city\",\n                \"state\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "Locate all supermarkets in Los Angeles and find the most popular site seeing place in Miami."
+      }
+    ],
+    "model": "gpt-4o-2024-11-20",
+    "store": false,
+    "temperature": 0.001
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"supermarket.find_in_city\",\n        \"description\": \"Find all supermarkets in a given city. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"city\": {\n                    \"type\": \"string\",\n                    \"description\": \"The city to locate supermarkets in.\"\n                },\n                \"state\": {\n                    \"type\": \"string\",\n                    \"description\": \"The state to further narrow down the search.\"\n                },\n                \"openNow\": {\n                    \"type\": \"boolean\",\n                    \"description\": \"If true, returns only supermarkets that are currently open. Default to true\"\n                }\n            },\n            \"required\": [\n                \"city\",\n                \"state\"\n            ]\n        }\n    },\n    {\n        \"name\": \"sightseeing.popular_in_city\",\n        \"description\": \"Find the most popular sightseeing place in a given city. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"city\": {\n                    \"type\": \"string\",\n                    \"description\": \"The city to find sightseeing in.\"\n                },\n                \"state\": {\n                    \"type\": \"string\",\n                    \"description\": \"The state to further narrow down the search.\"\n                },\n                \"kidsFriendly\": {\n                    \"type\": \"boolean\",\n                    \"description\": \"If true, returns only kids friendly sightseeing places.Default to true\"\n                }\n            },\n            \"required\": [\n                \"city\",\n                \"state\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "Locate all supermarkets in Los Angeles and find the most popular site seeing place in Miami."
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776146097-FgbPNVU9aLgvp6ChgsJI",
+    "object": "chat.completion",
+    "created": 1776146097,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[supermarket.find_in_city(city=\"Los Angeles\", state=\"CA\", openNow=True), sightseeing.popular_in_city(city=\"Miami\", state=\"FL\", kidsFriendly=True)]",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 580,
+      "completion_tokens": 37,
+      "total_tokens": 617,
+      "cost": 0.0017664075,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00178425,
+        "upstream_inference_prompt_cost": 0.00122925,
+        "upstream_inference_completions_cost": 0.000555
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776146097-FgbPNVU9aLgvp6ChgsJI",
+    "object": "response",
+    "created_at": 1776146098,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "[supermarket.find_in_city(city=\"Los Angeles\", state=\"CA\", openNow=True), sightseeing.popular_in_city(city=\"Miami\", state=\"FL\", kidsFriendly=True)]"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 580,
+      "completion_tokens": 37,
+      "total_tokens": 617,
+      "cost": 0.0017664075,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00178425,
+        "upstream_inference_prompt_cost": 0.00122925,
+        "upstream_inference_completions_cost": 0.000555
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776146097-FgbPNVU9aLgvp6ChgsJI",
+    "object": "chat.completion",
+    "created": 1776146097,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[supermarket.find_in_city(city=\"Los Angeles\", state=\"CA\", openNow=True), sightseeing.popular_in_city(city=\"Miami\", state=\"FL\", kidsFriendly=True)]",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": []
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 580,
+      "completion_tokens": 37,
+      "total_tokens": 617,
+      "cost": 0.0017664075,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00178425,
+        "upstream_inference_prompt_cost": 0.00122925,
+        "upstream_inference_completions_cost": 0.000555
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1783.557,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "59736f5a-a8f7-4e38-965c-fbcf10cba3f2"
+}

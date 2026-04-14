@@ -1,0 +1,180 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"law_case_search\",\n        \"description\": \"Search and retrieve law cases based on the topic, timeline, and location. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"topic\": {\n                    \"type\": \"string\",\n                    \"description\": \"The subject matter of the case.\"\n                },\n                \"year_range\": {\n                    \"type\": \"array\",\n                    \"items\": {\n                        \"type\": \"integer\"\n                    },\n                    \"description\": \"The start and end year for searching cases.\"\n                },\n                \"location\": {\n                    \"type\": \"string\",\n                    \"description\": \"The location where the case is being heard.\"\n                },\n                \"judicial_system\": {\n                    \"type\": \"string\",\n                    \"description\": \"The specific judicial system in which to search (e.g. 'federal', 'state').\",\n                    \"default\": \"all\"\n                }\n            },\n            \"required\": [\n                \"topic\",\n                \"year_range\",\n                \"location\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "Find state law cases related to land disputes in the past 5 years from 2015 to 2021 in New York."
+      }
+    ],
+    "model": "gpt-4o-2024-11-20",
+    "store": false,
+    "temperature": 0.001
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"law_case_search\",\n        \"description\": \"Search and retrieve law cases based on the topic, timeline, and location. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"topic\": {\n                    \"type\": \"string\",\n                    \"description\": \"The subject matter of the case.\"\n                },\n                \"year_range\": {\n                    \"type\": \"array\",\n                    \"items\": {\n                        \"type\": \"integer\"\n                    },\n                    \"description\": \"The start and end year for searching cases.\"\n                },\n                \"location\": {\n                    \"type\": \"string\",\n                    \"description\": \"The location where the case is being heard.\"\n                },\n                \"judicial_system\": {\n                    \"type\": \"string\",\n                    \"description\": \"The specific judicial system in which to search (e.g. 'federal', 'state').\",\n                    \"default\": \"all\"\n                }\n            },\n            \"required\": [\n                \"topic\",\n                \"year_range\",\n                \"location\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "Find state law cases related to land disputes in the past 5 years from 2015 to 2021 in New York."
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776143899-VQsXuMJ8EfqfytO8r6hR",
+    "object": "chat.completion",
+    "created": 1776143899,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[law_case_search(topic=\"land disputes\", year_range=[2015, 2021], location=\"New York\", judicial_system=\"state\")]",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 485,
+      "completion_tokens": 29,
+      "total_tokens": 514,
+      "cost": 0.0013654575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00137925,
+        "upstream_inference_prompt_cost": 0.00094425,
+        "upstream_inference_completions_cost": 0.000435
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776143899-VQsXuMJ8EfqfytO8r6hR",
+    "object": "response",
+    "created_at": 1776143901,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "[law_case_search(topic=\"land disputes\", year_range=[2015, 2021], location=\"New York\", judicial_system=\"state\")]"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 485,
+      "completion_tokens": 29,
+      "total_tokens": 514,
+      "cost": 0.0013654575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00137925,
+        "upstream_inference_prompt_cost": 0.00094425,
+        "upstream_inference_completions_cost": 0.000435
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776143899-VQsXuMJ8EfqfytO8r6hR",
+    "object": "chat.completion",
+    "created": 1776143899,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[law_case_search(topic=\"land disputes\", year_range=[2015, 2021], location=\"New York\", judicial_system=\"state\")]",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": []
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 485,
+      "completion_tokens": 29,
+      "total_tokens": 514,
+      "cost": 0.0013654575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00137925,
+        "upstream_inference_prompt_cost": 0.00094425,
+        "upstream_inference_completions_cost": 0.000435
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1769.15,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "1b46db71-bbbb-4601-8b45-46c6d9c41c75"
+}

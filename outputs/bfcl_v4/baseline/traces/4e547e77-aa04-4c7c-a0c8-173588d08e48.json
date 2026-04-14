@@ -1,0 +1,180 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"calculate_compound_interest\",\n        \"description\": \"Calculate compound interest for an initial principal amount. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"principal\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The principal amount that the interest is applied to.\"\n                },\n                \"rate\": {\n                    \"type\": \"float\",\n                    \"description\": \"The annual interest rate. Enter as a decimal. E.g, 5% is 0.05\"\n                },\n                \"time\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The time the money is invested for in years.\"\n                },\n                \"n\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The number of times that interest is compounded per time period. Default is 1.\"\n                }\n            },\n            \"required\": [\n                \"principal\",\n                \"rate\",\n                \"time\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "Calculate the compound interest for an initial principal amount of $10000, with an annual interest rate of 5% and the number of times interest applied per time period is 4 and the time the money is invested for 10 years."
+      }
+    ],
+    "model": "gpt-4o-2024-11-20",
+    "store": false,
+    "temperature": 0.001
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"calculate_compound_interest\",\n        \"description\": \"Calculate compound interest for an initial principal amount. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"principal\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The principal amount that the interest is applied to.\"\n                },\n                \"rate\": {\n                    \"type\": \"float\",\n                    \"description\": \"The annual interest rate. Enter as a decimal. E.g, 5% is 0.05\"\n                },\n                \"time\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The time the money is invested for in years.\"\n                },\n                \"n\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The number of times that interest is compounded per time period. Default is 1.\"\n                }\n            },\n            \"required\": [\n                \"principal\",\n                \"rate\",\n                \"time\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "Calculate the compound interest for an initial principal amount of $10000, with an annual interest rate of 5% and the number of times interest applied per time period is 4 and the time the money is invested for 10 years."
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776147150-VEvkGZiwcyjt3zPfTECc",
+    "object": "chat.completion",
+    "created": 1776147150,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[calculate_compound_interest(principal=10000, rate=0.05, time=10, n=4)]",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 492,
+      "completion_tokens": 25,
+      "total_tokens": 517,
+      "cost": 0.00132462,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 228,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001338,
+        "upstream_inference_prompt_cost": 0.000963,
+        "upstream_inference_completions_cost": 0.000375
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776147150-VEvkGZiwcyjt3zPfTECc",
+    "object": "response",
+    "created_at": 1776147151,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "[calculate_compound_interest(principal=10000, rate=0.05, time=10, n=4)]"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 492,
+      "completion_tokens": 25,
+      "total_tokens": 517,
+      "cost": 0.00132462,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 228,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001338,
+        "upstream_inference_prompt_cost": 0.000963,
+        "upstream_inference_completions_cost": 0.000375
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776147150-VEvkGZiwcyjt3zPfTECc",
+    "object": "chat.completion",
+    "created": 1776147150,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[calculate_compound_interest(principal=10000, rate=0.05, time=10, n=4)]",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": []
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 492,
+      "completion_tokens": 25,
+      "total_tokens": 517,
+      "cost": 0.00132462,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 228,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001338,
+        "upstream_inference_prompt_cost": 0.000963,
+        "upstream_inference_completions_cost": 0.000375
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1718.352,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "4e547e77-aa04-4c7c-a0c8-173588d08e48"
+}
