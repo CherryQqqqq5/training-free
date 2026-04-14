@@ -16,11 +16,95 @@ METRIC_FILE_HINTS = ("metric", "score", "result", "summary", "eval")
 
 
 def load_json(path: Path) -> Any:
+    text = path.read_text(encoding="utf-8")
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        return json.loads(text)
     except Exception:
-        return None
+        pass
 
+    decoder = json.JSONDecoder()
+    idx = 0
+    values = []
+    n = len(text)
+    while idx < n:
+        while idx < n and text[idx].isspace():
+            idx += 1
+        if idx >= n:
+            break
+        try:
+            value, next_idx = decoder.raw_decode(text, idx)
+        except Exception:
+            break
+        values.append(value)
+        idx = next_idx
+    if values:
+        return values
+    return None
+
+
+def _extract_subset_metrics_from_summary(data: Dict[str, Any]) -> Dict[str, float]:
+    subsets: Dict[str, float] = {}
+    for key, value in data.items():
+        k = str(key).lower()
+        if not isinstance(value, (int, float)):
+            continue
+        if "acc" in k and any(
+            token in k
+            for token in (
+                "non-live simple ast",
+                "non-live multiple ast",
+                "non-live parallel multiple ast",
+                "multi turn miss param",
+                "multi turn base",
+                "multi turn miss func",
+                "multi turn long context",
+                "live simple ast",
+                "live multiple ast",
+            )
+        ):
+            subsets[key] = float(value)
+    return subsets
+
+
+def _discover_from_object(data: Any) -> Tuple[Dict[str, float], Dict[str, float], int]:
+    overall: Dict[str, float] = {}
+    subsets: Dict[str, float] = {}
+    hits = 0
+
+    if isinstance(data, dict):
+        for key, value in data.items():
+            lowered = str(key).lower()
+            if lowered in OVERALL_ACC_KEYS and isinstance(value, (int, float)):
+                overall["acc"] = float(value)
+                hits += 1
+            elif lowered in OVERALL_COST_KEYS and isinstance(value, (int, float)):
+                overall["cost"] = float(value)
+                hits += 1
+            elif lowered in OVERALL_LATENCY_KEYS and isinstance(value, (int, float)):
+                overall["latency"] = float(value)
+                hits += 1
+            elif lowered in SUBSET_CONTAINER_KEYS and isinstance(value, dict):
+                for subset, score in value.items():
+                    if isinstance(score, (int, float)):
+                        subsets[str(subset)] = float(score)
+                        hits += 1
+        summary_subsets = _extract_subset_metrics_from_summary(data)
+        if summary_subsets:
+            subsets.update(summary_subsets)
+            hits += len(summary_subsets)
+
+    for key, value in flatten_numeric_metrics(data):
+        leaf = key.split(".")[-1]
+        if leaf in OVERALL_ACC_KEYS and "acc" not in overall:
+            overall["acc"] = value
+            hits += 1
+        elif leaf in OVERALL_COST_KEYS and "cost" not in overall:
+            overall["cost"] = value
+            hits += 1
+        elif leaf in OVERALL_LATENCY_KEYS and "latency" not in overall:
+            overall["latency"] = value
+            hits += 1
+    return overall, subsets, hits
 
 def flatten_numeric_metrics(data: Any, prefix: str = "") -> Iterable[Tuple[str, float]]:
     if isinstance(data, dict):
@@ -46,35 +130,13 @@ def discover_bfcl_metrics(root: Path) -> Tuple[Dict[str, float], Dict[str, float
             continue
 
         hits = 0
-        if isinstance(data, dict):
-            for key, value in data.items():
-                lowered = str(key).lower()
-                if lowered in OVERALL_ACC_KEYS and isinstance(value, (int, float)):
-                    overall["acc"] = float(value)
-                    hits += 1
-                elif lowered in OVERALL_COST_KEYS and isinstance(value, (int, float)):
-                    overall["cost"] = float(value)
-                    hits += 1
-                elif lowered in OVERALL_LATENCY_KEYS and isinstance(value, (int, float)):
-                    overall["latency"] = float(value)
-                    hits += 1
-                elif lowered in SUBSET_CONTAINER_KEYS and isinstance(value, dict):
-                    for subset, score in value.items():
-                        if isinstance(score, (int, float)):
-                            subsets[str(subset)] = float(score)
-                            hits += 1
-
-        for key, value in flatten_numeric_metrics(data):
-            leaf = key.split(".")[-1]
-            if leaf in OVERALL_ACC_KEYS and "acc" not in overall:
-                overall["acc"] = value
-                hits += 1
-            elif leaf in OVERALL_COST_KEYS and "cost" not in overall:
-                overall["cost"] = value
-                hits += 1
-            elif leaf in OVERALL_LATENCY_KEYS and "latency" not in overall:
-                overall["latency"] = value
-                hits += 1
+        objects = data if isinstance(data, list) else [data]
+        for obj in objects:
+            discovered_overall, discovered_subsets, obj_hits = _discover_from_object(obj)
+            hits += obj_hits
+            for k, v in discovered_overall.items():
+                overall.setdefault(k, v)
+            subsets.update(discovered_subsets)
 
         if hits:
             sources.append(str(path))

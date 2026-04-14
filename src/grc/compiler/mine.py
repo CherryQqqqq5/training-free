@@ -6,6 +6,7 @@ from typing import Any, List
 
 from grc.types import FailureCase
 from grc.utils.jsonfix import parse_loose_json
+from grc.utils.text_tool_calls import looks_like_terminal_natural_language, parse_text_tool_calls
 
 
 def _python_matches_json_type(value: Any, expected: str) -> bool:
@@ -42,6 +43,14 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
         for choice in raw.get("choices", []):
             msg = choice.get("message", {})
             tool_calls = msg.get("tool_calls", [])
+            if req.get("tools") and not tool_calls:
+                parsed = parse_text_tool_calls(msg.get("content", ""))
+                if parsed:
+                    for call in parsed:
+                        fn = call.get("function", {})
+                        if isinstance(fn.get("arguments"), dict):
+                            fn["arguments"] = json.dumps(fn["arguments"], ensure_ascii=False)
+                    tool_calls = parsed
 
             if req.get("tools") and not tool_calls:
                 failures.append(
@@ -49,7 +58,9 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
                         trace_id=path.stem,
                         turn_index=0,
                         tool_name="__none__",
-                        error_type="empty_tool_call",
+                        error_type="natural_language_termination"
+                        if looks_like_terminal_natural_language(msg.get("content", ""))
+                        else "empty_tool_call",
                     )
                 )
 

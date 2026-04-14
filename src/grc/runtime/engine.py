@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import json
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
@@ -17,6 +18,7 @@ from grc.types import (
     VerificationContract,
 )
 from grc.utils.jsonfix import parse_loose_json
+from grc.utils.text_tool_calls import looks_like_terminal_natural_language, parse_text_tool_calls
 
 
 class RuleEngine:
@@ -187,9 +189,27 @@ class RuleEngine:
         for choice in final_response.get("choices", []):
             msg = choice.get("message", {})
             tool_calls = list(msg.get("tool_calls", []))
+            if request_json.get("tools") and not tool_calls:
+                text_calls = parse_text_tool_calls(msg.get("content", ""))
+                if text_calls:
+                    # Bring BFCL prompting-style textual calls into the same tool_call pipeline.
+                    for call in text_calls:
+                        fn = call.get("function", {})
+                        if isinstance(fn.get("arguments"), dict):
+                            fn["arguments"] = json.dumps(fn["arguments"], ensure_ascii=False)
+                    tool_calls = text_calls
+                    msg["tool_calls"] = tool_calls
             global_rule_hits = self._matched_global_rules()
             if request_json.get("tools") and not tool_calls:
-                issues = [ValidationIssue(kind="empty_tool_call", message="no tool call emitted for tool-enabled request")]
+                if looks_like_terminal_natural_language(msg.get("content", "")):
+                    issues = [
+                        ValidationIssue(
+                            kind="natural_language_termination",
+                            message="assistant ended turn with natural language without tool call",
+                        )
+                    ]
+                else:
+                    issues = [ValidationIssue(kind="empty_tool_call", message="no tool call emitted for tool-enabled request")]
                 validation.issues.extend(issues)
                 validation.rule_hits.extend(rule.rule_id for rule in global_rule_hits)
                 guarded = self._apply_empty_tool_guard(msg, issues, global_rule_hits)
