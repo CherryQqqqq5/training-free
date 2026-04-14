@@ -1,0 +1,180 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"thermo.calculate_energy\",\n        \"description\": \"Calculate the energy required or released during a phase change using mass, the phase transition temperature and the specific latent heat. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"mass\": {\n                    \"type\": \"integer\",\n                    \"description\": \"Mass of the substance in grams.\"\n                },\n                \"phase_transition\": {\n                    \"type\": \"string\",\n                    \"description\": \"Phase transition. Can be 'melting', 'freezing', 'vaporization', 'condensation'.\"\n                },\n                \"substance\": {\n                    \"type\": \"string\",\n                    \"description\": \"The substance which is undergoing phase change, default is 'water'\"\n                }\n            },\n            \"required\": [\n                \"mass\",\n                \"phase_transition\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "Calculate the energy (in Joules) absorbed or released during the phase change of 100g of water from liquid to steam at its boiling point."
+      }
+    ],
+    "model": "gpt-4o-2024-11-20",
+    "store": false,
+    "temperature": 0.001
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"thermo.calculate_energy\",\n        \"description\": \"Calculate the energy required or released during a phase change using mass, the phase transition temperature and the specific latent heat. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"mass\": {\n                    \"type\": \"integer\",\n                    \"description\": \"Mass of the substance in grams.\"\n                },\n                \"phase_transition\": {\n                    \"type\": \"string\",\n                    \"description\": \"Phase transition. Can be 'melting', 'freezing', 'vaporization', 'condensation'.\"\n                },\n                \"substance\": {\n                    \"type\": \"string\",\n                    \"description\": \"The substance which is undergoing phase change, default is 'water'\"\n                }\n            },\n            \"required\": [\n                \"mass\",\n                \"phase_transition\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "Calculate the energy (in Joules) absorbed or released during the phase change of 100g of water from liquid to steam at its boiling point."
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776139362-7Dtu6oI8f1UN7Bt60H7A",
+    "object": "chat.completion",
+    "created": 1776139362,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[thermo.calculate_energy(mass=100, phase_transition=\"vaporization\", substance=\"water\")]",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 452,
+      "completion_tokens": 21,
+      "total_tokens": 473,
+      "cost": 0.0011486475,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00116025,
+        "upstream_inference_prompt_cost": 0.00084525,
+        "upstream_inference_completions_cost": 0.000315
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776139362-7Dtu6oI8f1UN7Bt60H7A",
+    "object": "response",
+    "created_at": 1776139363,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "[thermo.calculate_energy(mass=100, phase_transition=\"vaporization\", substance=\"water\")]"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 452,
+      "completion_tokens": 21,
+      "total_tokens": 473,
+      "cost": 0.0011486475,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00116025,
+        "upstream_inference_prompt_cost": 0.00084525,
+        "upstream_inference_completions_cost": 0.000315
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776139362-7Dtu6oI8f1UN7Bt60H7A",
+    "object": "chat.completion",
+    "created": 1776139362,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[thermo.calculate_energy(mass=100, phase_transition=\"vaporization\", substance=\"water\")]",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": []
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 452,
+      "completion_tokens": 21,
+      "total_tokens": 473,
+      "cost": 0.0011486475,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00116025,
+        "upstream_inference_prompt_cost": 0.00084525,
+        "upstream_inference_completions_cost": 0.000315
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1693.92,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "197e6e50-18b8-4edd-921b-a8a41b91194e"
+}

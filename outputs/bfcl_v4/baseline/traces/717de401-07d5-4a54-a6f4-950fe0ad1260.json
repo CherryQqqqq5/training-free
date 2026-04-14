@@ -1,0 +1,180 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"travel_itinerary_generator\",\n        \"description\": \"Generate a travel itinerary based on specific destination, duration and daily budget, with preferred exploration type. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"destination\": {\n                    \"type\": \"string\",\n                    \"description\": \"Destination city of the trip.\"\n                },\n                \"days\": {\n                    \"type\": \"integer\",\n                    \"description\": \"Number of days for the trip.\"\n                },\n                \"daily_budget\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The maximum daily budget for the trip.\"\n                },\n                \"exploration_type\": {\n                    \"type\": \"string\",\n                    \"enum\": [\n                        \"nature\",\n                        \"urban\",\n                        \"history\",\n                        \"culture\"\n                    ],\n                    \"description\": \"The preferred exploration type.\",\n                    \"default\": \"urban\"\n                }\n            },\n            \"required\": [\n                \"destination\",\n                \"days\",\n                \"daily_budget\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "Create an itinerary for a 7 days trip to Tokyo with daily budgets not exceeding $100 and prefer exploring nature."
+      }
+    ],
+    "model": "gpt-4o-2024-11-20",
+    "store": false,
+    "temperature": 0.001
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"travel_itinerary_generator\",\n        \"description\": \"Generate a travel itinerary based on specific destination, duration and daily budget, with preferred exploration type. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"destination\": {\n                    \"type\": \"string\",\n                    \"description\": \"Destination city of the trip.\"\n                },\n                \"days\": {\n                    \"type\": \"integer\",\n                    \"description\": \"Number of days for the trip.\"\n                },\n                \"daily_budget\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The maximum daily budget for the trip.\"\n                },\n                \"exploration_type\": {\n                    \"type\": \"string\",\n                    \"enum\": [\n                        \"nature\",\n                        \"urban\",\n                        \"history\",\n                        \"culture\"\n                    ],\n                    \"description\": \"The preferred exploration type.\",\n                    \"default\": \"urban\"\n                }\n            },\n            \"required\": [\n                \"destination\",\n                \"days\",\n                \"daily_budget\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "Create an itinerary for a 7 days trip to Tokyo with daily budgets not exceeding $100 and prefer exploring nature."
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776136513-tiDKltPKNPOb1yYNZyyH",
+    "object": "chat.completion",
+    "created": 1776136513,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[travel_itinerary_generator(destination=\"Tokyo\", days=7, daily_budget=100, exploration_type=\"nature\")]",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 478,
+      "completion_tokens": 23,
+      "total_tokens": 501,
+      "cost": 0.0012555675,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00126825,
+        "upstream_inference_prompt_cost": 0.00092325,
+        "upstream_inference_completions_cost": 0.000345
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776136513-tiDKltPKNPOb1yYNZyyH",
+    "object": "response",
+    "created_at": 1776136514,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "[travel_itinerary_generator(destination=\"Tokyo\", days=7, daily_budget=100, exploration_type=\"nature\")]"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 478,
+      "completion_tokens": 23,
+      "total_tokens": 501,
+      "cost": 0.0012555675,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00126825,
+        "upstream_inference_prompt_cost": 0.00092325,
+        "upstream_inference_completions_cost": 0.000345
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776136513-tiDKltPKNPOb1yYNZyyH",
+    "object": "chat.completion",
+    "created": 1776136513,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[travel_itinerary_generator(destination=\"Tokyo\", days=7, daily_budget=100, exploration_type=\"nature\")]",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": []
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 478,
+      "completion_tokens": 23,
+      "total_tokens": 501,
+      "cost": 0.0012555675,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00126825,
+        "upstream_inference_prompt_cost": 0.00092325,
+        "upstream_inference_completions_cost": 0.000345
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1530.49,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "717de401-07d5-4a54-a6f4-950fe0ad1260"
+}

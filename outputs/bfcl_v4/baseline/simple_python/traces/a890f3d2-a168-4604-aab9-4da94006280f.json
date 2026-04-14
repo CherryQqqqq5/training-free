@@ -1,0 +1,180 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"recipe_search\",\n        \"description\": \"Search for a cooking recipe based on specific dietary needs and time constraint. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"diet\": {\n                    \"type\": \"array\",\n                    \"items\": {\n                        \"type\": \"string\",\n                        \"enum\": [\n                            \"Gluten Free\",\n                            \"Dairy Free\",\n                            \"Vegan\",\n                            \"Vegetarian\"\n                        ]\n                    },\n                    \"description\": \"Specific dietary need.\"\n                },\n                \"time_limit\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The maximum time to prepare the recipe in minutes. Default is 60 minutes.\"\n                },\n                \"dish\": {\n                    \"type\": \"string\",\n                    \"description\": \"The name of the dish to search for. Default is not use if not specified.\"\n                }\n            },\n            \"required\": [\n                \"dish\",\n                \"diet\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "Find a gluten-free cookie recipe that takes less than 30 minutes to prepare."
+      }
+    ],
+    "model": "gpt-4o-2024-11-20",
+    "store": false,
+    "temperature": 0.001
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"recipe_search\",\n        \"description\": \"Search for a cooking recipe based on specific dietary needs and time constraint. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"diet\": {\n                    \"type\": \"array\",\n                    \"items\": {\n                        \"type\": \"string\",\n                        \"enum\": [\n                            \"Gluten Free\",\n                            \"Dairy Free\",\n                            \"Vegan\",\n                            \"Vegetarian\"\n                        ]\n                    },\n                    \"description\": \"Specific dietary need.\"\n                },\n                \"time_limit\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The maximum time to prepare the recipe in minutes. Default is 60 minutes.\"\n                },\n                \"dish\": {\n                    \"type\": \"string\",\n                    \"description\": \"The name of the dish to search for. Default is not use if not specified.\"\n                }\n            },\n            \"required\": [\n                \"dish\",\n                \"diet\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "Find a gluten-free cookie recipe that takes less than 30 minutes to prepare."
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776140013-2rjhHAu0Y78dNHW7dmtw",
+    "object": "chat.completion",
+    "created": 1776140013,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[recipe_search(diet=[\"Gluten Free\"], time_limit=30, dish=\"cookie\")]",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 462,
+      "completion_tokens": 19,
+      "total_tokens": 481,
+      "cost": 0.00114642,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 228,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001158,
+        "upstream_inference_prompt_cost": 0.000873,
+        "upstream_inference_completions_cost": 0.000285
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776140013-2rjhHAu0Y78dNHW7dmtw",
+    "object": "response",
+    "created_at": 1776140015,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "[recipe_search(diet=[\"Gluten Free\"], time_limit=30, dish=\"cookie\")]"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 462,
+      "completion_tokens": 19,
+      "total_tokens": 481,
+      "cost": 0.00114642,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 228,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001158,
+        "upstream_inference_prompt_cost": 0.000873,
+        "upstream_inference_completions_cost": 0.000285
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776140013-2rjhHAu0Y78dNHW7dmtw",
+    "object": "chat.completion",
+    "created": 1776140013,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[recipe_search(diet=[\"Gluten Free\"], time_limit=30, dish=\"cookie\")]",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": []
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 462,
+      "completion_tokens": 19,
+      "total_tokens": 481,
+      "cost": 0.00114642,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 228,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001158,
+        "upstream_inference_prompt_cost": 0.000873,
+        "upstream_inference_completions_cost": 0.000285
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1618.846,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "a890f3d2-a168-4604-aab9-4da94006280f"
+}

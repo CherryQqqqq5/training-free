@@ -1,0 +1,180 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"criminal_history.check_felonies\",\n        \"description\": \"This function checks if an individual has any prior felony convictions based on their full name and birth date. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"full_name\": {\n                    \"type\": \"string\",\n                    \"description\": \"The full name of the individual.\"\n                },\n                \"birth_date\": {\n                    \"type\": \"string\",\n                    \"description\": \"The birth date of the individual. Must be in MM-DD-YYYY format.\"\n                },\n                \"state\": {\n                    \"type\": \"string\",\n                    \"description\": \"The state to search the criminal record in. Default to 'None', which the function will search across all states.\"\n                }\n            },\n            \"required\": [\n                \"full_name\",\n                \"birth_date\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "Find out if an individual John Doe with a birthday 01-01-1980 has any prior felony convictions in California."
+      }
+    ],
+    "model": "gpt-4o-2024-11-20",
+    "store": false,
+    "temperature": 0.001
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"criminal_history.check_felonies\",\n        \"description\": \"This function checks if an individual has any prior felony convictions based on their full name and birth date. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"full_name\": {\n                    \"type\": \"string\",\n                    \"description\": \"The full name of the individual.\"\n                },\n                \"birth_date\": {\n                    \"type\": \"string\",\n                    \"description\": \"The birth date of the individual. Must be in MM-DD-YYYY format.\"\n                },\n                \"state\": {\n                    \"type\": \"string\",\n                    \"description\": \"The state to search the criminal record in. Default to 'None', which the function will search across all states.\"\n                }\n            },\n            \"required\": [\n                \"full_name\",\n                \"birth_date\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "Find out if an individual John Doe with a birthday 01-01-1980 has any prior felony convictions in California."
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776139597-IVPInZNnpFPJ2ZLkJjj6",
+    "object": "chat.completion",
+    "created": 1776139597,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[criminal_history.check_felonies(full_name=\"John Doe\", birth_date=\"01-01-1980\", state=\"California\")]",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 450,
+      "completion_tokens": 27,
+      "total_tokens": 477,
+      "cost": 0.0012318075,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00124425,
+        "upstream_inference_prompt_cost": 0.00083925,
+        "upstream_inference_completions_cost": 0.000405
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776139597-IVPInZNnpFPJ2ZLkJjj6",
+    "object": "response",
+    "created_at": 1776139598,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "[criminal_history.check_felonies(full_name=\"John Doe\", birth_date=\"01-01-1980\", state=\"California\")]"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 450,
+      "completion_tokens": 27,
+      "total_tokens": 477,
+      "cost": 0.0012318075,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00124425,
+        "upstream_inference_prompt_cost": 0.00083925,
+        "upstream_inference_completions_cost": 0.000405
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776139597-IVPInZNnpFPJ2ZLkJjj6",
+    "object": "chat.completion",
+    "created": 1776139597,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[criminal_history.check_felonies(full_name=\"John Doe\", birth_date=\"01-01-1980\", state=\"California\")]",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": []
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 450,
+      "completion_tokens": 27,
+      "total_tokens": 477,
+      "cost": 0.0012318075,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00124425,
+        "upstream_inference_prompt_cost": 0.00083925,
+        "upstream_inference_completions_cost": 0.000405
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1938.498,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "b2e81512-1d92-4047-a449-04de5f487b04"
+}

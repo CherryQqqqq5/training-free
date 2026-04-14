@@ -1,0 +1,180 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"games.reviews.find\",\n        \"description\": \"Find reviews for a specific game. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"game\": {\n                    \"type\": \"string\",\n                    \"description\": \"The name of the game.\"\n                },\n                \"region\": {\n                    \"type\": \"string\",\n                    \"description\": \"The region where the reviews are coming from (optional, default is 'global')\"\n                }\n            },\n            \"required\": [\n                \"game\"\n            ]\n        }\n    },\n    {\n        \"name\": \"games.update.find\",\n        \"description\": \"Find the latest updates or patches for a specific game on a specified gaming platform. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"game\": {\n                    \"type\": \"string\",\n                    \"description\": \"The name of the game.\"\n                },\n                \"platform\": {\n                    \"type\": \"string\",\n                    \"description\": \"The gaming platform, e.g. Xbox, Playstation, PC.\"\n                },\n                \"region\": {\n                    \"type\": \"string\",\n                    \"description\": \"The region of the update (optional, default is 'global')\"\n                }\n            },\n            \"required\": [\n                \"game\",\n                \"platform\"\n            ]\n        }\n    },\n    {\n        \"name\": \"games.price.find\",\n        \"description\": \"Find the current price for a specific game on a specified gaming platform. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"game\": {\n                    \"type\": \"string\",\n                    \"description\": \"The name of the game.\"\n                },\n                \"platform\": {\n                    \"type\": \"string\",\n                    \"description\": \"The gaming platform, e.g. Xbox, Playstation, PC.\"\n                }\n            },\n            \"required\": [\n                \"game\",\n                \"platform\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "Find the latest update or patch for the game 'Cyberpunk 2077' on Xbox platform."
+      }
+    ],
+    "model": "gpt-4o-2024-11-20",
+    "store": false,
+    "temperature": 0.001
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"games.reviews.find\",\n        \"description\": \"Find reviews for a specific game. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"game\": {\n                    \"type\": \"string\",\n                    \"description\": \"The name of the game.\"\n                },\n                \"region\": {\n                    \"type\": \"string\",\n                    \"description\": \"The region where the reviews are coming from (optional, default is 'global')\"\n                }\n            },\n            \"required\": [\n                \"game\"\n            ]\n        }\n    },\n    {\n        \"name\": \"games.update.find\",\n        \"description\": \"Find the latest updates or patches for a specific game on a specified gaming platform. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"game\": {\n                    \"type\": \"string\",\n                    \"description\": \"The name of the game.\"\n                },\n                \"platform\": {\n                    \"type\": \"string\",\n                    \"description\": \"The gaming platform, e.g. Xbox, Playstation, PC.\"\n                },\n                \"region\": {\n                    \"type\": \"string\",\n                    \"description\": \"The region of the update (optional, default is 'global')\"\n                }\n            },\n            \"required\": [\n                \"game\",\n                \"platform\"\n            ]\n        }\n    },\n    {\n        \"name\": \"games.price.find\",\n        \"description\": \"Find the current price for a specific game on a specified gaming platform. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"game\": {\n                    \"type\": \"string\",\n                    \"description\": \"The name of the game.\"\n                },\n                \"platform\": {\n                    \"type\": \"string\",\n                    \"description\": \"The gaming platform, e.g. Xbox, Playstation, PC.\"\n                }\n            },\n            \"required\": [\n                \"game\",\n                \"platform\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "Find the latest update or patch for the game 'Cyberpunk 2077' on Xbox platform."
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776140827-D4Ol3iV06klehRc07XJ9",
+    "object": "chat.completion",
+    "created": 1776140827,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[games.update.find(game=\"Cyberpunk 2077\", platform=\"Xbox\")]",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 687,
+      "completion_tokens": 16,
+      "total_tokens": 703,
+      "cost": 0.0017723475,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00179025,
+        "upstream_inference_prompt_cost": 0.00155025,
+        "upstream_inference_completions_cost": 0.00024
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776140827-D4Ol3iV06klehRc07XJ9",
+    "object": "response",
+    "created_at": 1776140828,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "[games.update.find(game=\"Cyberpunk 2077\", platform=\"Xbox\")]"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 687,
+      "completion_tokens": 16,
+      "total_tokens": 703,
+      "cost": 0.0017723475,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00179025,
+        "upstream_inference_prompt_cost": 0.00155025,
+        "upstream_inference_completions_cost": 0.00024
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776140827-D4Ol3iV06klehRc07XJ9",
+    "object": "chat.completion",
+    "created": 1776140827,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[games.update.find(game=\"Cyberpunk 2077\", platform=\"Xbox\")]",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": []
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 687,
+      "completion_tokens": 16,
+      "total_tokens": 703,
+      "cost": 0.0017723475,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00179025,
+        "upstream_inference_prompt_cost": 0.00155025,
+        "upstream_inference_completions_cost": 0.00024
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1615.958,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "15e7f310-bc53-4bef-bf87-14934e924c8c"
+}

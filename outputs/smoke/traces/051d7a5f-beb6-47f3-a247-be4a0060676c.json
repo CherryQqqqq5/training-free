@@ -1,0 +1,89 @@
+{
+  "request_original": {
+    "model": "smoke-model",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Say hello"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "echo",
+          "description": "Echo text",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "text"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "request": {
+    "model": "gpt-4o-2024-11-20-FC",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Say hello"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "echo",
+          "description": "Echo text",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "text"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "error": {
+      "message": "gpt-4o-2024-11-20-FC is not a valid model ID",
+      "code": 400
+    },
+    "user_id": "user_2orsh05y5y5xw5GGP8W1QWXPNop"
+  },
+  "final_response": {
+    "error": {
+      "message": "gpt-4o-2024-11-20-FC is not a valid model ID",
+      "code": 400
+    },
+    "user_id": "user_2orsh05y5y5xw5GGP8W1QWXPNop"
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 400,
+  "latency_ms": 1038.967,
+  "upstream_profile": "openrouter",
+  "upstream_model": "gpt-4o-2024-11-20-FC",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "trace_id": "051d7a5f-beb6-47f3-a247-be4a0060676c"
+}
