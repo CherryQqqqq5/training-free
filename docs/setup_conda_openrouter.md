@@ -102,4 +102,5 @@ bash scripts/run_bfcl_v4_baseline.sh "${GRC_UPSTREAM_MODEL}"
 
 - **`missing env var: OPENROUTER_API_KEY`**：未 export 密钥，或 shell 与运行脚本的会话不一致。  
 - **`upstream.base_url is not configured`**：`GRC_UPSTREAM_PROFILE` 未设为 `openrouter` 或 profile 未加载；检查是否已 `source configs/bfcl_v4_phase1.env`。  
+- **`httpx.ConnectError` / `[Errno 111] Connection refused`（指向本机）**：`bfcl` 在连本地 `grc` 代理时失败。常见原因：(1) 代理未启动或已退出，查看 `/tmp/grc_baseline_proxy.log` 或 `/tmp/grc_patch_proxy.log`；(2) **端口不一致**：`run_bfcl_v4_patch.sh` 默认在本机 **8012** 起代理，而 `bfcl_eval` 拷贝的 `.env` 常写死 **8011**。当前 `run_bfcl_v4_baseline.sh` / `run_bfcl_v4_patch.sh` 会在启动代理时导出 `OPENAI_BASE_URL=http://127.0.0.1:<端口>/v1`，请使用仓库内最新脚本；若仍失败，检查 `${BFCL_PROJECT_ROOT}/.env` 是否把 `OPENAI_BASE_URL` 设成与当前 `LOCAL_SERVER_PORT` 冲突的地址（可注释掉该行后重试）。  
 - **Novacode**：若以后能访问 Novacode，执行 `export GRC_UPSTREAM_PROFILE=novacode` 并配置 `NOVACODE_*` 即可，无需改代码。
