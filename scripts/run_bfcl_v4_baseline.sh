@@ -24,6 +24,18 @@ grc_wait_proxy_healthy() {
   return 1
 }
 
+bfcl_fix_result_layout() {
+  local bfcl_root="$1"
+  local nested_result_dir="${bfcl_root}/${bfcl_root}/result"
+  local canonical_result_dir="${bfcl_root}/result"
+  if [[ ! -d "${nested_result_dir}" ]]; then
+    return 0
+  fi
+  mkdir -p "${canonical_result_dir}"
+  cp -R "${nested_result_dir}/." "${canonical_result_dir}/"
+  echo "fixed bfcl result layout: ${nested_result_dir} -> ${canonical_result_dir}" >&2
+}
+
 MODEL_NAME="${1:-${GRC_UPSTREAM_MODEL}}"
 RUN_ROOT="${2:-${REPO_ROOT}/outputs/bfcl_v4/baseline}"
 PORT="${3:-8011}"
@@ -93,6 +105,7 @@ if [[ "${GRC_BFCL_PARTIAL_EVAL}" == "1" ]]; then
 fi
 
 bfcl "${GENERATE_ARGS[@]}"
+bfcl_fix_result_layout "${BFCL_ROOT}"
 bfcl "${EVAL_ARGS[@]}"
 
 python "${REPO_ROOT}/scripts/aggregate_bfcl_metrics.py" \
