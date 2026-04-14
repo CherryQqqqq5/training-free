@@ -23,34 +23,52 @@ Phase-1 still does not:
 
 ## Docs
 
-- Method: [docs/golden_rule_onepager.md](/Users/cherry/Documents/trainingfree/docs/golden_rule_onepager.md)
-- Protocol: [docs/experiment_protocol_bfcl_v4.md](/Users/cherry/Documents/trainingfree/docs/experiment_protocol_bfcl_v4.md)
+- Conda + OpenRouter setup: [docs/setup_conda_openrouter.md](docs/setup_conda_openrouter.md)
+- Method: [docs/golden_rule_onepager.md](docs/golden_rule_onepager.md) (includes roadmap ↔ IR field map)
+- Failure taxonomy: [docs/failure_taxonomy.md](docs/failure_taxonomy.md) (`error_type` / issue `kind` vocabulary)
+- Protocol: [docs/experiment_protocol_bfcl_v4.md](docs/experiment_protocol_bfcl_v4.md)
 
 ## Quickstart
+
+**Conda + OpenRouter only** (typical lab server): follow [docs/setup_conda_openrouter.md](docs/setup_conda_openrouter.md) in order—`conda activate tf`, `pip install -e .` + `bfcl-eval`, `bash scripts/init_bfcl_project_root.sh`, then `source configs/bfcl_v4_phase1.env` and `source configs/bfcl_v4_openrouter.env`, export `OPENROUTER_API_KEY` (and referer), run `run_phase1_smoke.sh` then baseline.
+
+**venv workflow** (local machine):
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -U pip
 pip install -e .
-```
-
-Install BFCL and copy the pinned protocol env:
-
-```bash
 bash scripts/install_bfcl.sh
 ```
 
-Set your upstream endpoint in `configs/runtime.yaml`, then run the Phase-1 baseline:
+For conda, skip `install_bfcl.sh` (it creates a conflicting `.venv`) and use `init_bfcl_project_root.sh` after installing deps.
+
+Default upstream profile is **OpenRouter** (`configs/runtime.yaml`, `configs/bfcl_v4_phase1.env`). For Novacode:
 
 ```bash
-bash scripts/run_bfcl_v4_baseline.sh
+export GRC_UPSTREAM_PROFILE=novacode
+export NOVACODE_BASE_URL="https://your-novacode-endpoint/v1"
+export NOVACODE_API_KEY="..."
 ```
 
-Run the pre-BFCL smoke first if you want to verify proxy, upstream connectivity, trace shape, and aggregator discovery without launching a full benchmark:
+Run the Phase-1 baseline (model id must match your OpenRouter model when using OpenRouter):
 
 ```bash
-export GRC_UPSTREAM_BASE_URL="https://your-endpoint.example/v1"
+source configs/bfcl_v4_phase1.env
+source configs/bfcl_v4_openrouter.env
+export OPENROUTER_API_KEY="..."
+export OPENROUTER_HTTP_REFERER="https://your-lab.example"
+bash scripts/run_bfcl_v4_baseline.sh "${GRC_UPSTREAM_MODEL}"
+```
+
+Pre-BFCL smoke (proxy + upstream + trace shape):
+
+```bash
+source configs/bfcl_v4_phase1.env
+source configs/bfcl_v4_openrouter.env
+export OPENROUTER_API_KEY="..."
+export OPENROUTER_HTTP_REFERER="https://your-lab.example"
 bash scripts/run_phase1_smoke.sh
 ```
 
@@ -72,7 +90,7 @@ Run the candidate and aggregate its artifacts into the candidate directory:
 
 ```bash
 bash scripts/run_bfcl_v4_patch.sh \
-  gpt-4o-2024-11-20-FC \
+  "${GRC_UPSTREAM_MODEL}" \
   outputs/bfcl_v4/patch \
   8012 \
   "" \
@@ -103,6 +121,7 @@ bash scripts/run_phase1_ablation.sh
 
 - `configs/runtime.yaml` still requires a real upstream endpoint and API key env var.
 - `GRC_UPSTREAM_BASE_URL` can override `configs/runtime.yaml`, so the repo no longer requires editing tracked config just to point at an endpoint.
+- `GRC_UPSTREAM_PROFILE=openrouter|novacode` selects a relay preset; default is `openrouter` (`grok-3`); `novacode` defaults to `gpt-5.4`.
 - The BFCL runner omits `--test-category` by default so the evaluator can run its default full-suite selection.
 - `--run-ids` is now opt-in via `GRC_BFCL_USE_RUN_IDS=1`; default runs no longer implicitly depend on `test_case_ids_to_generate.json`.
 - `scripts/aggregate_bfcl_metrics.py` uses heuristic BFCL metric discovery because evaluator output filenames can vary across installs.

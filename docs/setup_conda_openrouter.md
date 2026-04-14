@@ -1,0 +1,105 @@
+# Conda + OpenRouter 环境配置（按顺序执行）
+
+适用于：已创建 conda 环境 `tf`、服务器无法访问 OpenAI、仅能通过 [OpenRouter](https://openrouter.ai/) 访问模型。
+
+仓库根目录以下记为 `$REPO`（例如 `/cephfs/qiuyn/training-free`）。
+
+---
+
+## 1. 进入仓库并激活 conda
+
+```bash
+cd "$REPO"
+conda activate tf
+python -V   # 建议 >= 3.10
+```
+
+---
+
+## 2. 安装 Python 依赖（在 `tf` 内，不要用 `scripts/install_bfcl.sh` 创建 `.venv`）
+
+`install_bfcl.sh` 会新建 `.venv`，与 conda 冲突。在已激活的 `tf` 中执行：
+
+```bash
+pip install -U pip
+pip install -e .
+pip install "bfcl-eval==2025.12.17"
+```
+
+确认命令可用：
+
+```bash
+which grc
+which bfcl
+```
+
+---
+
+## 3. 初始化 BFCL 评测目录（`.env` 与用例列表）
+
+```bash
+bash scripts/init_bfcl_project_root.sh
+```
+
+会在 `outputs/bfcl_v4/baseline/bfcl/` 写入从 `bfcl_eval` 包拷贝的 `.env` 与 `test_case_ids_to_generate.json`。  
+BFCL 通过本机 `grc` 代理调模型，一般**不必**在 BFCL 的 `.env` 里填 OpenAI；若评测报错缺变量，再打开该 `.env` 按 `bfcl-eval` 文档补全（多数场景只需保证 `LOCAL_SERVER_*` 由运行脚本导出）。
+
+---
+
+## 4. 每次实验前加载协议与 OpenRouter 环境变量
+
+```bash
+cd "$REPO"
+conda activate tf
+source configs/bfcl_v4_phase1.env
+source configs/bfcl_v4_openrouter.env
+
+export OPENROUTER_API_KEY="sk-or-v1-..."
+export OPENROUTER_HTTP_REFERER="https://你的实验室或机构域名"
+export OPENROUTER_X_TITLE="training-free"
+```
+
+模型 ID 须为 OpenRouter 上存在的名称（默认 `grok-3`，与 `configs/bfcl_v4_phase1.env` 中 openrouter 分支一致）。更换模型时：
+
+```bash
+export GRC_UPSTREAM_MODEL="anthropic/claude-3.5-sonnet"
+```
+
+**跑 BFCL 时**，`run_bfcl_v4_baseline.sh` 的第一个参数也是传给 `bfcl` 的 `--model`，请与 `GRC_UPSTREAM_MODEL` 保持一致，例如：
+
+```bash
+bash scripts/run_bfcl_v4_baseline.sh "${GRC_UPSTREAM_MODEL}"
+```
+
+---
+
+## 5. 连通性检查（推荐）
+
+```bash
+bash scripts/run_phase1_smoke.sh
+```
+
+成功则说明本机 `grc` 代理可访问 OpenRouter 并完成一次 `chat.completions` 链路。
+
+---
+
+## 6. 正式基线
+
+```bash
+bash scripts/run_bfcl_v4_baseline.sh "${GRC_UPSTREAM_MODEL}"
+```
+
+全量时间较长；可先子集：
+
+```bash
+export GRC_BFCL_TEST_CATEGORY="你的类别"
+bash scripts/run_bfcl_v4_baseline.sh "${GRC_UPSTREAM_MODEL}"
+```
+
+---
+
+## 常见问题
+
+- **`missing env var: OPENROUTER_API_KEY`**：未 export 密钥，或 shell 与运行脚本的会话不一致。  
+- **`upstream.base_url is not configured`**：`GRC_UPSTREAM_PROFILE` 未设为 `openrouter` 或 profile 未加载；检查是否已 `source configs/bfcl_v4_phase1.env`。  
+- **Novacode**：若以后能访问 Novacode，执行 `export GRC_UPSTREAM_PROFILE=novacode` 并配置 `NOVACODE_*` 即可，无需改代码。

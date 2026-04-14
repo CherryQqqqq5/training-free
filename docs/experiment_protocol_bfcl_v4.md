@@ -1,5 +1,7 @@
 # BFCL V4 Phase-1 Protocol
 
+Failure attribution vocabulary (`error_type` / issue `kind`) is fixed for Phase-1 reporting in [failure_taxonomy.md](failure_taxonomy.md).
+
 ## Fixed Evaluator
 
 - evaluator package: `bfcl-eval==2025.12.17`
@@ -11,11 +13,17 @@ These values are pinned in [`configs/bfcl_v4_phase1.env`](/Users/cherry/Document
 ## Fixed Upstream Configuration
 
 - upstream protocol: OpenAI-compatible `v1/chat/completions`
-- default upstream model: `gpt-4o-2024-11-20-FC`
+- default upstream relay profile: `openrouter` (override with `GRC_UPSTREAM_PROFILE=novacode` if needed)
+- default upstream model: `gpt-5.4`
 - runtime config: [`configs/runtime.yaml`](/Users/cherry/Documents/trainingfree/configs/runtime.yaml)
 - recommended override path: `GRC_UPSTREAM_BASE_URL`
 
-`base_url` and API key env var are operator supplied, but Phase-1 runs must keep evaluator version, model id, and endpoint protocol fixed across baseline and candidate runs. The proxy now accepts `GRC_UPSTREAM_BASE_URL` so runs do not require editing the tracked config file.
+`base_url` and API key env var are operator supplied, but Phase-1 runs must keep evaluator version, model id, and endpoint protocol fixed across baseline and candidate runs. The proxy now accepts relay profiles:
+
+- `novacode`: default `gpt-5.4`
+- `openrouter`: default `grok-3`
+
+The proxy accepts `GRC_UPSTREAM_PROFILE`, `GRC_UPSTREAM_BASE_URL`, and provider-specific env vars so runs do not require editing the tracked config file.
 
 ## Suite Selection
 
