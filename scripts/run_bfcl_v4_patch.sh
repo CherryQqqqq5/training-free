@@ -4,6 +4,24 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 source "${REPO_ROOT}/configs/bfcl_v4_phase1.env"
 
+grc_wait_proxy_healthy() {
+  local port="$1"
+  local log_path="$2"
+  local i
+  for i in $(seq 1 60); do
+    if curl -fsS "http://127.0.0.1:${port}/health" >/dev/null 2>&1; then
+      return 0
+    fi
+    sleep 1
+  done
+  echo "error: grc proxy did not respond on http://127.0.0.1:${port}/health within 60s" >&2
+  echo "       check server log: ${log_path}" >&2
+  if [[ -f "${log_path}" ]]; then
+    tail -n 80 "${log_path}" >&2 || true
+  fi
+  return 1
+}
+
 MODEL_NAME="${1:-${GRC_UPSTREAM_MODEL}}"
 RUN_ROOT="${2:-${REPO_ROOT}/outputs/bfcl_v4/patch}"
 PORT="${3:-8012}"
@@ -19,6 +37,8 @@ mkdir -p "${BFCL_ROOT}" "${TRACE_DIR}" "${ARTIFACT_DIR}"
 export BFCL_PROJECT_ROOT="${BFCL_ROOT}"
 export LOCAL_SERVER_ENDPOINT=http://127.0.0.1
 export LOCAL_SERVER_PORT="${PORT}"
+export OPENAI_BASE_URL="http://127.0.0.1:${PORT}/v1"
+export OPENAI_API_KEY="${OPENAI_API_KEY:-dummy}"
 
 PROXY_PID=""
 cleanup() {
@@ -28,21 +48,22 @@ cleanup() {
 }
 trap cleanup EXIT
 
+PROXY_LOG="${GRC_PROXY_LOG:-/tmp/grc_patch_proxy.log}"
 if [[ "${GRC_START_PROXY:-1}" == "1" ]]; then
   grc serve \
     --config "${CONFIG_PATH}" \
     --rules-dir "${RULES_DIR}" \
     --trace-dir "${TRACE_DIR}" \
     --port "${PORT}" \
-    >/tmp/grc_patch_proxy.log 2>&1 &
+    >"${PROXY_LOG}" 2>&1 &
   PROXY_PID=$!
-
-  for _ in $(seq 1 40); do
-    if curl -fsS "http://127.0.0.1:${PORT}/health" >/dev/null; then
-      break
-    fi
-    sleep 1
-  done
+  if ! grc_wait_proxy_healthy "${PORT}" "${PROXY_LOG}"; then
+    exit 1
+  fi
+  if ! kill -0 "${PROXY_PID}" 2>/dev/null; then
+    echo "error: grc serve process exited before inference (pid ${PROXY_PID})" >&2
+    exit 1
+  fi
 fi
 
 GENERATE_ARGS=(generate --model "${MODEL_NAME}" --skip-server-setup --num-threads "${GRC_BFCL_NUM_THREADS}")

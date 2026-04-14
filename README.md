@@ -107,6 +107,12 @@ Or run the full Phase-1 ablation loop:
 bash scripts/run_phase1_ablation.sh
 ```
 
+Four BFCL categories in one loop (`simple_python`, `multiple`, `parallel_multiple`, `multi_turn_miss_param`):
+
+```bash
+bash scripts/run_phase1_four_subset_e2e.sh "${GRC_UPSTREAM_MODEL}"
+```
+
 ## Layout
 
 - `configs/bfcl_v4_phase1.env`: pinned evaluator/model protocol
