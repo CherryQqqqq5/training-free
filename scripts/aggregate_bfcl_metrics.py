@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import json
+import re
 from collections import Counter
 from pathlib import Path
 from typing import Any, Dict, Iterable, Tuple
@@ -13,13 +15,222 @@ OVERALL_COST_KEYS = {"cost", "total_cost", "usd_cost", "request_cost"}
 OVERALL_LATENCY_KEYS = {"latency", "latency_ms", "avg_latency_ms", "mean_latency_ms"}
 SUBSET_CONTAINER_KEYS = {"subsets", "per_subset", "subset_scores", "category_scores", "metrics_by_subset"}
 METRIC_FILE_HINTS = ("metric", "score", "result", "summary", "eval")
+CSV_METRIC_SUFFIXES = {".csv", ".tsv"}
+NON_METRIC_HEADERS = {"rank", "model", "model link", "organization", "license"}
+OVERALL_CSV_ACC_HEADERS = {"overall acc", "overall accuracy", "overall score"}
+OVERALL_CSV_COST_HEADERS = {"total cost", "total cost $", "cost", "request cost"}
+OVERALL_CSV_LATENCY_HEADERS = {"latency mean", "latency mean s", "latency", "latency s"}
+OVERALL_CSV_SKIP_HEADERS = NON_METRIC_HEADERS | {
+    "latency standard deviation",
+    "latency standard deviation s",
+    "latency 95th percentile",
+    "latency 95th percentile s",
+}
+CSV_CONTEXT_PREFIXES = {
+    "data_non_live": "non_live",
+    "data_multi_turn": "multi_turn",
+    "data_live": "live",
+    "data_web_search": "web_search",
+    "data_memory": "memory",
+    "data_format_sensitivity": "format_sensitivity",
+    "data_agentic": "agentic",
+}
+
+
+def _metric_source_priority(path: Path) -> tuple[int, str]:
+    path_str = str(path).lower()
+    if path.suffix.lower() in CSV_METRIC_SUFFIXES:
+        if "data_overall" in path_str:
+            return (0, path_str)
+        return (1, path_str)
+    if "summary" in path_str or "metric" in path_str:
+        return (2, path_str)
+    return (3, path_str)
 
 
 def load_json(path: Path) -> Any:
+    text = path.read_text(encoding="utf-8")
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        return json.loads(text)
     except Exception:
+        pass
+
+    decoder = json.JSONDecoder()
+    idx = 0
+    values = []
+    n = len(text)
+    while idx < n:
+        while idx < n and text[idx].isspace():
+            idx += 1
+        if idx >= n:
+            break
+        try:
+            value, next_idx = decoder.raw_decode(text, idx)
+        except Exception:
+            break
+        values.append(value)
+        idx = next_idx
+    if values:
+        return values
+    return None
+
+
+def _normalize_label(text: str) -> str:
+    return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9]+", " ", text.lower())).strip()
+
+
+def _parse_numeric_token(value: Any) -> float | None:
+    if isinstance(value, bool):
         return None
+    if isinstance(value, (int, float)):
+        return float(value)
+    if not isinstance(value, str):
+        return None
+
+    stripped = value.strip()
+    if not stripped or stripped.lower() in {"n/a", "na", "none", "null", "-"}:
+        return None
+
+    token = stripped.removesuffix("%").replace(",", "").strip()
+    try:
+        return float(token)
+    except ValueError:
+        return None
+
+
+def _csv_context_prefix(path: Path) -> str | None:
+    stem = path.stem.lower()
+    for marker, prefix in CSV_CONTEXT_PREFIXES.items():
+        if marker in stem:
+            return prefix
+    return None
+
+
+def _canonical_subset_key(header: str, context_prefix: str | None = None) -> str | None:
+    normalized = _normalize_label(header)
+    if not normalized or normalized in NON_METRIC_HEADERS:
+        return None
+
+    if context_prefix is None:
+        if normalized in OVERALL_CSV_SKIP_HEADERS:
+            return None
+        if normalized in OVERALL_CSV_ACC_HEADERS | OVERALL_CSV_COST_HEADERS | OVERALL_CSV_LATENCY_HEADERS:
+            return None
+        key = normalized
+    else:
+        context_words = context_prefix.replace("_", " ")
+        if normalized.startswith(f"{context_words} "):
+            key = normalized
+        elif normalized == "overall acc":
+            key = f"{context_words} overall acc"
+        else:
+            key = f"{context_words} {normalized}"
+    return key.replace(" ", "_")
+
+
+def _extract_subset_metrics_from_summary(data: Dict[str, Any]) -> Dict[str, float]:
+    subsets: Dict[str, float] = {}
+    for key, value in data.items():
+        normalized = _normalize_label(str(key))
+        if not isinstance(value, (int, float)) or normalized in OVERALL_ACC_KEYS | OVERALL_COST_KEYS | OVERALL_LATENCY_KEYS:
+            continue
+        subset_key = _canonical_subset_key(str(key))
+        if subset_key:
+            subsets[subset_key] = float(value)
+    return subsets
+
+
+def _discover_from_object(data: Any) -> Tuple[Dict[str, float], Dict[str, float], int]:
+    overall: Dict[str, float] = {}
+    subsets: Dict[str, float] = {}
+    hits = 0
+
+    if isinstance(data, dict):
+        for key, value in data.items():
+            lowered = str(key).lower()
+            if lowered in OVERALL_ACC_KEYS and isinstance(value, (int, float)):
+                overall["acc"] = float(value)
+                hits += 1
+            elif lowered in OVERALL_COST_KEYS and isinstance(value, (int, float)):
+                overall["cost"] = float(value)
+                hits += 1
+            elif lowered in OVERALL_LATENCY_KEYS and isinstance(value, (int, float)):
+                overall["latency"] = float(value)
+                hits += 1
+            elif lowered in SUBSET_CONTAINER_KEYS and isinstance(value, dict):
+                for subset, score in value.items():
+                    if isinstance(score, (int, float)):
+                        subsets[str(subset)] = float(score)
+                        hits += 1
+        summary_subsets = _extract_subset_metrics_from_summary(data)
+        if summary_subsets:
+            subsets.update(summary_subsets)
+            hits += len(summary_subsets)
+
+    for key, value in flatten_numeric_metrics(data):
+        leaf = key.split(".")[-1]
+        if leaf in OVERALL_ACC_KEYS and "acc" not in overall:
+            overall["acc"] = value
+            hits += 1
+        elif leaf in OVERALL_COST_KEYS and "cost" not in overall:
+            overall["cost"] = value
+            hits += 1
+        elif leaf in OVERALL_LATENCY_KEYS and "latency" not in overall:
+            overall["latency"] = value
+            hits += 1
+    return overall, subsets, hits
+
+
+def _discover_from_csv(path: Path) -> Tuple[Dict[str, float], Dict[str, float], int]:
+    overall: Dict[str, float] = {}
+    subsets: Dict[str, float] = {}
+    hits = 0
+    delimiter = "\t" if path.suffix.lower() == ".tsv" else ","
+
+    try:
+        with path.open("r", encoding="utf-8", newline="") as handle:
+            reader = csv.DictReader(handle, delimiter=delimiter)
+            rows = [row for row in reader if row and any(str(value).strip() for value in row.values())]
+    except Exception:
+        return overall, subsets, hits
+
+    if not rows:
+        return overall, subsets, hits
+
+    row = max(
+        rows,
+        key=lambda item: sum(
+            1 for value in item.values() if isinstance(value, str) and value.strip() and value.strip().lower() not in {"n/a", "na"}
+        ),
+    )
+    context_prefix = _csv_context_prefix(path)
+
+    for header, raw_value in row.items():
+        number = _parse_numeric_token(raw_value)
+        if number is None:
+            continue
+        normalized = _normalize_label(header)
+
+        if context_prefix is None:
+            if normalized in OVERALL_CSV_ACC_HEADERS:
+                overall["acc"] = number
+                hits += 1
+                continue
+            if normalized in OVERALL_CSV_COST_HEADERS:
+                overall["cost"] = number
+                hits += 1
+                continue
+            if normalized in OVERALL_CSV_LATENCY_HEADERS:
+                overall["latency"] = number * 1000.0
+                hits += 1
+                continue
+
+        subset_key = _canonical_subset_key(header, context_prefix)
+        if subset_key:
+            subsets[subset_key] = number
+            hits += 1
+
+    return overall, subsets, hits
 
 
 def flatten_numeric_metrics(data: Any, prefix: str = "") -> Iterable[Tuple[str, float]]:
@@ -39,42 +250,34 @@ def discover_bfcl_metrics(root: Path) -> Tuple[Dict[str, float], Dict[str, float
     subsets: Dict[str, float] = {}
     sources: list[str] = []
 
-    candidates = sorted(path for path in root.rglob("*.json") if any(hint in path.name.lower() for hint in METRIC_FILE_HINTS))
+    candidates = sorted(
+        (
+            path
+            for path in root.rglob("*")
+            if path.is_file()
+            and path.suffix.lower() in {".json", *CSV_METRIC_SUFFIXES}
+            and any(hint in str(path).lower() for hint in METRIC_FILE_HINTS)
+        ),
+        key=_metric_source_priority,
+    )
     for path in candidates:
-        data = load_json(path)
-        if data is None:
-            continue
-
         hits = 0
-        if isinstance(data, dict):
-            for key, value in data.items():
-                lowered = str(key).lower()
-                if lowered in OVERALL_ACC_KEYS and isinstance(value, (int, float)):
-                    overall["acc"] = float(value)
-                    hits += 1
-                elif lowered in OVERALL_COST_KEYS and isinstance(value, (int, float)):
-                    overall["cost"] = float(value)
-                    hits += 1
-                elif lowered in OVERALL_LATENCY_KEYS and isinstance(value, (int, float)):
-                    overall["latency"] = float(value)
-                    hits += 1
-                elif lowered in SUBSET_CONTAINER_KEYS and isinstance(value, dict):
-                    for subset, score in value.items():
-                        if isinstance(score, (int, float)):
-                            subsets[str(subset)] = float(score)
-                            hits += 1
-
-        for key, value in flatten_numeric_metrics(data):
-            leaf = key.split(".")[-1]
-            if leaf in OVERALL_ACC_KEYS and "acc" not in overall:
-                overall["acc"] = value
-                hits += 1
-            elif leaf in OVERALL_COST_KEYS and "cost" not in overall:
-                overall["cost"] = value
-                hits += 1
-            elif leaf in OVERALL_LATENCY_KEYS and "latency" not in overall:
-                overall["latency"] = value
-                hits += 1
+        if path.suffix.lower() in CSV_METRIC_SUFFIXES:
+            discovered_overall, discovered_subsets, hits = _discover_from_csv(path)
+            for key, value in discovered_overall.items():
+                overall.setdefault(key, value)
+            subsets.update(discovered_subsets)
+        else:
+            data = load_json(path)
+            if data is None:
+                continue
+            objects = data if isinstance(data, list) else [data]
+            for obj in objects:
+                discovered_overall, discovered_subsets, obj_hits = _discover_from_object(obj)
+                hits += obj_hits
+                for key, value in discovered_overall.items():
+                    overall.setdefault(key, value)
+                subsets.update(discovered_subsets)
 
         if hits:
             sources.append(str(path))
