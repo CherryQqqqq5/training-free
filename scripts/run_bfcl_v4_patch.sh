@@ -34,7 +34,19 @@ bfcl_fix_result_layout() {
   echo "fixed bfcl result layout: ${nested_result_dir} -> ${canonical_result_dir}" >&2
 }
 
-MODEL_NAME="${1:-${GRC_UPSTREAM_MODEL}}"
+validate_model_split() {
+  if [[ -z "${BFCL_MODEL}" ]]; then
+    echo "error: BFCL model alias is empty; set GRC_BFCL_MODEL or pass it as arg1" >&2
+    exit 2
+  fi
+  if [[ "${GRC_UPSTREAM_PROFILE:-}" == "openrouter" && "${GRC_UPSTREAM_MODEL:-}" == *-FC ]]; then
+    echo "error: GRC_UPSTREAM_MODEL=${GRC_UPSTREAM_MODEL} looks like a BFCL alias, not an OpenRouter model route" >&2
+    echo "       use GRC_BFCL_MODEL=${BFCL_MODEL} for bfcl --model and set GRC_UPSTREAM_MODEL to an OpenRouter route such as x-ai/grok-3-beta" >&2
+    exit 2
+  fi
+}
+
+BFCL_MODEL="${1:-${GRC_BFCL_MODEL}}"
 RUN_ROOT="${2:-${REPO_ROOT}/outputs/bfcl_v4/patch}"
 PORT="${3:-8012}"
 TEST_CATEGORY="${4:-${GRC_BFCL_TEST_CATEGORY}}"
@@ -44,6 +56,8 @@ TRACE_DIR="${7:-${RUN_ROOT}/traces}"
 ARTIFACT_DIR="${8:-${RUN_ROOT}/artifacts}"
 BASELINE_METRICS="${9:-}"
 BFCL_ROOT="${RUN_ROOT}/bfcl"
+
+validate_model_split
 
 mkdir -p "${BFCL_ROOT}" "${TRACE_DIR}" "${ARTIFACT_DIR}"
 export BFCL_PROJECT_ROOT="${BFCL_ROOT}"
@@ -78,8 +92,8 @@ if [[ "${GRC_START_PROXY:-1}" == "1" ]]; then
   fi
 fi
 
-GENERATE_ARGS=(generate --model "${MODEL_NAME}" --skip-server-setup --num-threads "${GRC_BFCL_NUM_THREADS}")
-EVAL_ARGS=(evaluate --model "${MODEL_NAME}")
+GENERATE_ARGS=(generate --model "${BFCL_MODEL}" --skip-server-setup --num-threads "${GRC_BFCL_NUM_THREADS}")
+EVAL_ARGS=(evaluate --model "${BFCL_MODEL}")
 if [[ "${GRC_BFCL_USE_RUN_IDS:-0}" == "1" ]]; then
   GENERATE_ARGS+=(--run-ids)
 fi
@@ -103,7 +117,7 @@ AGGREGATE_ARGS=(
   --failure-summary-out "${ARTIFACT_DIR}/failure_summary.json"
   --label "candidate"
   --protocol-id "${GRC_PROTOCOL_ID}"
-  --model "${MODEL_NAME}"
+  --model "${BFCL_MODEL}"
   --test-category "${TEST_CATEGORY}"
 )
 if [[ -n "${BASELINE_METRICS}" ]]; then

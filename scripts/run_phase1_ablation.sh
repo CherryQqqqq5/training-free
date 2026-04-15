@@ -7,7 +7,7 @@ source "${REPO_ROOT}/configs/bfcl_v4_phase1.env"
 RUN_ID="${1:-$(date +%Y%m%d_%H%M%S)}"
 PATCH_ID="${2:-patch_${RUN_ID}}"
 TEST_CATEGORY="${3:-${GRC_BFCL_TEST_CATEGORY}}"
-MODEL_NAME="${4:-${GRC_UPSTREAM_MODEL}}"
+BFCL_MODEL="${4:-${GRC_BFCL_MODEL}}"
 
 BASELINE_ROOT="${REPO_ROOT}/outputs/bfcl_v4/baseline/${RUN_ID}"
 PATCH_ROOT="${REPO_ROOT}/outputs/bfcl_v4/patch/${RUN_ID}"
@@ -20,7 +20,7 @@ CANDIDATE_METRICS="${CANDIDATE_DIR}/metrics.json"
 mkdir -p "${REPO_ROOT}/rules/candidates" "${REPO_ROOT}/rules/accepted" "${REPO_ROOT}/rules/rejected" "${REPO_ROOT}/rules/active"
 
 bash "${REPO_ROOT}/scripts/run_bfcl_v4_baseline.sh" \
-  "${MODEL_NAME}" \
+  "${BFCL_MODEL}" \
   "${BASELINE_ROOT}" \
   "8011" \
   "${TEST_CATEGORY}" \
@@ -37,7 +37,7 @@ grc compile \
   --candidate-dir "${CANDIDATE_DIR}"
 
 bash "${REPO_ROOT}/scripts/run_bfcl_v4_patch.sh" \
-  "${MODEL_NAME}" \
+  "${BFCL_MODEL}" \
   "${PATCH_ROOT}" \
   "8012" \
   "${TEST_CATEGORY}" \

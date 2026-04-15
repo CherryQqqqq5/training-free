@@ -30,7 +30,7 @@ Phase-1 still does not:
 
 ## Quickstart
 
-**Conda + OpenRouter only** (typical lab server): follow [docs/setup_conda_openrouter.md](docs/setup_conda_openrouter.md) in order—`conda activate tf`, `pip install -e .` + `bfcl-eval`, `bash scripts/init_bfcl_project_root.sh`, then `source configs/bfcl_v4_phase1.env` and `source configs/bfcl_v4_openrouter.env`, export `OPENROUTER_API_KEY` (and referer), run `run_phase1_smoke.sh` then baseline.
+**Conda + OpenRouter only** (typical lab server): follow [docs/setup_conda_openrouter.md](docs/setup_conda_openrouter.md) in order—`conda activate tf`, `pip install -e .` + `bfcl-eval`, `bash scripts/init_bfcl_project_root.sh`, then `source configs/bfcl_v4_phase1.env` and `source configs/bfcl_v4_openrouter.env`, export `OPENROUTER_API_KEY` (and referer), run `run_phase1_smoke.sh` then baseline. Keep `GRC_BFCL_MODEL` as a BFCL-supported evaluator alias and `GRC_UPSTREAM_MODEL` as the real OpenRouter route.
 
 **venv workflow** (local machine):
 
@@ -59,7 +59,7 @@ source configs/bfcl_v4_phase1.env
 source configs/bfcl_v4_openrouter.env
 export OPENROUTER_API_KEY="..."
 export OPENROUTER_HTTP_REFERER="https://your-lab.example"
-bash scripts/run_bfcl_v4_baseline.sh "${GRC_UPSTREAM_MODEL}"
+bash scripts/run_bfcl_v4_baseline.sh "${GRC_BFCL_MODEL}"
 ```
 
 Pre-BFCL smoke (proxy + upstream + trace shape):
@@ -90,7 +90,7 @@ Run the candidate and aggregate its artifacts into the candidate directory:
 
 ```bash
 bash scripts/run_bfcl_v4_patch.sh \
-  "${GRC_UPSTREAM_MODEL}" \
+  "${GRC_BFCL_MODEL}" \
   outputs/bfcl_v4/patch \
   8012 \
   "" \
@@ -110,7 +110,7 @@ bash scripts/run_phase1_ablation.sh
 Four BFCL categories in one loop (`simple_python`, `multiple`, `parallel_multiple`, `multi_turn_miss_param`):
 
 ```bash
-bash scripts/run_phase1_four_subset_e2e.sh "${GRC_UPSTREAM_MODEL}"
+bash scripts/run_phase1_four_subset_e2e.sh "${GRC_BFCL_MODEL}"
 ```
 
 ## Layout
@@ -127,7 +127,9 @@ bash scripts/run_phase1_four_subset_e2e.sh "${GRC_UPSTREAM_MODEL}"
 
 - `configs/runtime.yaml` still requires a real upstream endpoint and API key env var.
 - `GRC_UPSTREAM_BASE_URL` can override `configs/runtime.yaml`, so the repo no longer requires editing tracked config just to point at an endpoint.
-- `GRC_UPSTREAM_PROFILE=openrouter|novacode` selects a relay preset; default is `openrouter` (`grok-3`); `novacode` defaults to `gpt-5.4`.
+- `GRC_BFCL_MODEL` is the BFCL evaluator alias passed to `bfcl --model`; default is `gpt-4o-mini-2024-07-18-FC`.
+- `GRC_UPSTREAM_PROFILE=openrouter|novacode` selects a relay preset; default is `openrouter` (`x-ai/grok-3-beta`); `novacode` defaults to `gpt-5.4`.
+- `GRC_UPSTREAM_MODEL` is the actual provider route used by `grc serve`; do not set it to a BFCL `*-FC` alias.
 - The BFCL runner omits `--test-category` by default so the evaluator can run its default full-suite selection.
 - `--run-ids` is now opt-in via `GRC_BFCL_USE_RUN_IDS=1`; default runs no longer implicitly depend on `test_case_ids_to_generate.json`.
 - `scripts/aggregate_bfcl_metrics.py` uses heuristic BFCL metric discovery because evaluator output filenames can vary across installs.

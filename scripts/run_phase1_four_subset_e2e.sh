@@ -10,7 +10,7 @@ if [[ -f "${REPO_ROOT}/configs/bfcl_v4_openrouter.env" ]]; then
   source "${REPO_ROOT}/configs/bfcl_v4_openrouter.env"
 fi
 
-MODEL_NAME="${1:-${GRC_UPSTREAM_MODEL}}"
+BFCL_MODEL="${1:-${GRC_BFCL_MODEL}}"
 RUN_ID="${2:-phase1_four}"
 
 CATEGORIES=(simple_python multiple parallel_multiple multi_turn_miss_param)
@@ -31,7 +31,7 @@ for CAT in "${CATEGORIES[@]}"; do
   CANDIDATE_METRICS="${CANDIDATE_DIR}/metrics.json"
 
   bash "${REPO_ROOT}/scripts/run_bfcl_v4_baseline.sh" \
-    "${MODEL_NAME}" \
+    "${BFCL_MODEL}" \
     "${BASELINE_ROOT}" \
     "8011" \
     "${CAT}" \
@@ -48,7 +48,7 @@ for CAT in "${CATEGORIES[@]}"; do
     --candidate-dir "${CANDIDATE_DIR}"
 
   bash "${REPO_ROOT}/scripts/run_bfcl_v4_patch.sh" \
-    "${MODEL_NAME}" \
+    "${BFCL_MODEL}" \
     "${PATCH_ROOT}" \
     "8012" \
     "${CAT}" \

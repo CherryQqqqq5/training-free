@@ -59,16 +59,21 @@ export OPENROUTER_HTTP_REFERER="https://你的实验室或机构域名"
 export OPENROUTER_X_TITLE="training-free"
 ```
 
-模型 ID 须为 OpenRouter 上存在的名称（默认 `grok-3`，与 `configs/bfcl_v4_phase1.env` 中 openrouter 分支一致）。更换模型时：
+模型变量分两层，不能混用：
+
+- `GRC_BFCL_MODEL`：传给 `bfcl --model` 的 evaluator alias，必须存在于 `bfcl_eval.constants.model_config.MODEL_CONFIG_MAPPING`，默认 `gpt-4o-mini-2024-07-18-FC`。
+- `GRC_UPSTREAM_MODEL`：`grc serve` 实际转发到 OpenRouter 的模型路由，默认 `x-ai/grok-3-beta`。
+
+更换 OpenRouter 实际上游模型时：
 
 ```bash
 export GRC_UPSTREAM_MODEL="anthropic/claude-3.5-sonnet"
 ```
 
-**跑 BFCL 时**，`run_bfcl_v4_baseline.sh` 的第一个参数也是传给 `bfcl` 的 `--model`，请与 `GRC_UPSTREAM_MODEL` 保持一致，例如：
+**跑 BFCL 时**，`run_bfcl_v4_baseline.sh` 的第一个参数传给 `bfcl` 的 `--model`，应使用 `GRC_BFCL_MODEL`，不要传 OpenRouter route：
 
 ```bash
-bash scripts/run_bfcl_v4_baseline.sh "${GRC_UPSTREAM_MODEL}"
+bash scripts/run_bfcl_v4_baseline.sh "${GRC_BFCL_MODEL}"
 ```
 
 ---
@@ -86,14 +91,14 @@ bash scripts/run_phase1_smoke.sh
 ## 6. 正式基线
 
 ```bash
-bash scripts/run_bfcl_v4_baseline.sh "${GRC_UPSTREAM_MODEL}"
+bash scripts/run_bfcl_v4_baseline.sh "${GRC_BFCL_MODEL}"
 ```
 
 全量时间较长；可先子集：
 
 ```bash
 export GRC_BFCL_TEST_CATEGORY="你的类别"
-bash scripts/run_bfcl_v4_baseline.sh "${GRC_UPSTREAM_MODEL}"
+bash scripts/run_bfcl_v4_baseline.sh "${GRC_BFCL_MODEL}"
 ```
 
 ---
