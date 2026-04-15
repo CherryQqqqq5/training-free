@@ -73,7 +73,7 @@ Rerun cleanliness rule:
 
 - BFCL runners clean the current run's `bfcl/result`, `bfcl/score`, and `traces` by default before generation.
 - Set `GRC_BFCL_CLEAN_RUN=0` only when intentionally resuming/debugging a run.
-- Generation uses `--allow-overwrite` so stale BFCL rows do not pollute subset evaluation.
+- Generation/evaluation pass explicit `--result-dir` and `--score-dir` under the run root and use `--allow-overwrite` so stale BFCL rows do not pollute subset evaluation.
 
 ## Aggregation
 

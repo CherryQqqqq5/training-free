@@ -67,6 +67,8 @@ TRACE_DIR="${7:-${RUN_ROOT}/traces}"
 ARTIFACT_DIR="${8:-${RUN_ROOT}/artifacts}"
 BASELINE_METRICS="${9:-}"
 BFCL_ROOT="${RUN_ROOT}/bfcl"
+BFCL_RESULT_DIR="${BFCL_ROOT}/result"
+BFCL_SCORE_DIR="${BFCL_ROOT}/score"
 
 validate_model_split
 clean_run_state
@@ -104,8 +106,20 @@ if [[ "${GRC_START_PROXY:-1}" == "1" ]]; then
   fi
 fi
 
-GENERATE_ARGS=(generate --model "${BFCL_MODEL}" --skip-server-setup --num-threads "${GRC_BFCL_NUM_THREADS}" --allow-overwrite)
-EVAL_ARGS=(evaluate --model "${BFCL_MODEL}")
+GENERATE_ARGS=(
+  generate
+  --model "${BFCL_MODEL}"
+  --skip-server-setup
+  --num-threads "${GRC_BFCL_NUM_THREADS}"
+  --result-dir "${BFCL_RESULT_DIR}"
+  --allow-overwrite
+)
+EVAL_ARGS=(
+  evaluate
+  --model "${BFCL_MODEL}"
+  --result-dir "${BFCL_RESULT_DIR}"
+  --score-dir "${BFCL_SCORE_DIR}"
+)
 if [[ "${GRC_BFCL_USE_RUN_IDS:-0}" == "1" ]]; then
   GENERATE_ARGS+=(--run-ids)
 fi
