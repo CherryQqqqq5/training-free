@@ -46,6 +46,17 @@ validate_model_split() {
   fi
 }
 
+clean_run_state() {
+  if [[ "${GRC_BFCL_CLEAN_RUN:-1}" != "1" ]]; then
+    return 0
+  fi
+  rm -rf \
+    "${BFCL_ROOT}/result" \
+    "${BFCL_ROOT}/score" \
+    "${BFCL_ROOT:?}/${BFCL_ROOT#/}/result" \
+    "${TRACE_DIR}"
+}
+
 BFCL_MODEL="${1:-${GRC_BFCL_MODEL}}"
 RUN_ROOT="${2:-${REPO_ROOT}/outputs/bfcl_v4/patch}"
 PORT="${3:-8012}"
@@ -58,6 +69,7 @@ BASELINE_METRICS="${9:-}"
 BFCL_ROOT="${RUN_ROOT}/bfcl"
 
 validate_model_split
+clean_run_state
 
 mkdir -p "${BFCL_ROOT}" "${TRACE_DIR}" "${ARTIFACT_DIR}"
 export BFCL_PROJECT_ROOT="${BFCL_ROOT}"
@@ -92,7 +104,7 @@ if [[ "${GRC_START_PROXY:-1}" == "1" ]]; then
   fi
 fi
 
-GENERATE_ARGS=(generate --model "${BFCL_MODEL}" --skip-server-setup --num-threads "${GRC_BFCL_NUM_THREADS}")
+GENERATE_ARGS=(generate --model "${BFCL_MODEL}" --skip-server-setup --num-threads "${GRC_BFCL_NUM_THREADS}" --allow-overwrite)
 EVAL_ARGS=(evaluate --model "${BFCL_MODEL}")
 if [[ "${GRC_BFCL_USE_RUN_IDS:-0}" == "1" ]]; then
   GENERATE_ARGS+=(--run-ids)

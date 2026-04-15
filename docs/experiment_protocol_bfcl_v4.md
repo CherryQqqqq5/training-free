@@ -69,6 +69,12 @@ Archive rule:
 - rejected candidates are copied to `rules/rejected/<patch_id>/`
 - active accepted runtime rules are materialized as `rules/active/<patch_id>.yaml`
 
+Rerun cleanliness rule:
+
+- BFCL runners clean the current run's `bfcl/result`, `bfcl/score`, and `traces` by default before generation.
+- Set `GRC_BFCL_CLEAN_RUN=0` only when intentionally resuming/debugging a run.
+- Generation uses `--allow-overwrite` so stale BFCL rows do not pollute subset evaluation.
+
 ## Aggregation
 
 Phase-1 aggregation records:
