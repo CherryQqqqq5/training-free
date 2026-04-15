@@ -1,0 +1,180 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"calculate_daily_water_intake\",\n        \"description\": \"Calculate the recommended daily water intake for a person based on their weight. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"weight\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The weight of the person in kilograms.\"\n                },\n                \"activity_level\": {\n                    \"type\": \"string\",\n                    \"description\": \"The level of physical activity of the person. Default is 'moderate'.\"\n                },\n                \"climate\": {\n                    \"type\": \"string\",\n                    \"description\": \"The climate of the area where the person lives. Default is 'temperate'.\"\n                }\n            },\n            \"required\": [\n                \"weight\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "Calculate the required water daily intake for a person with weight 70 kg."
+      }
+    ],
+    "model": "gpt-4o-2024-11-20",
+    "store": false,
+    "temperature": 0.001
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"calculate_daily_water_intake\",\n        \"description\": \"Calculate the recommended daily water intake for a person based on their weight. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"weight\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The weight of the person in kilograms.\"\n                },\n                \"activity_level\": {\n                    \"type\": \"string\",\n                    \"description\": \"The level of physical activity of the person. Default is 'moderate'.\"\n                },\n                \"climate\": {\n                    \"type\": \"string\",\n                    \"description\": \"The climate of the area where the person lives. Default is 'temperate'.\"\n                }\n            },\n            \"required\": [\n                \"weight\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "Calculate the required water daily intake for a person with weight 70 kg."
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776147291-49Lz1qsQBBG5ZiF5XwoP",
+    "object": "chat.completion",
+    "created": 1776147291,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[calculate_daily_water_intake(weight=70)]",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 420,
+      "completion_tokens": 10,
+      "total_tokens": 430,
+      "cost": 0.00088803,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 228,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.000897,
+        "upstream_inference_prompt_cost": 0.000747,
+        "upstream_inference_completions_cost": 0.00015
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776147291-49Lz1qsQBBG5ZiF5XwoP",
+    "object": "response",
+    "created_at": 1776147292,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "[calculate_daily_water_intake(weight=70)]"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 420,
+      "completion_tokens": 10,
+      "total_tokens": 430,
+      "cost": 0.00088803,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 228,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.000897,
+        "upstream_inference_prompt_cost": 0.000747,
+        "upstream_inference_completions_cost": 0.00015
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776147291-49Lz1qsQBBG5ZiF5XwoP",
+    "object": "chat.completion",
+    "created": 1776147291,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[calculate_daily_water_intake(weight=70)]",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": []
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 420,
+      "completion_tokens": 10,
+      "total_tokens": 430,
+      "cost": 0.00088803,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 228,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.000897,
+        "upstream_inference_prompt_cost": 0.000747,
+        "upstream_inference_completions_cost": 0.00015
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1685.822,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "29b8b1df-fc7f-4835-8d5e-f80e681172ab"
+}

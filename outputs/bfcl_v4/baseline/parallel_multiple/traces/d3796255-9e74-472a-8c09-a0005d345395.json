@@ -1,0 +1,180 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"stock_invest.calculate_investment_cost\",\n        \"description\": \"Calculate the cost of investing in a specific number of shares from a given company. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"company\": {\n                    \"type\": \"string\",\n                    \"description\": \"The company that you want to invest in.\"\n                },\n                \"shares\": {\n                    \"type\": \"integer\",\n                    \"description\": \"Number of shares to invest.\"\n                }\n            },\n            \"required\": [\n                \"company\",\n                \"shares\"\n            ]\n        }\n    },\n    {\n        \"name\": \"stock_invest.calculate_dividend_payout\",\n        \"description\": \"Calculate the total dividend payout for a specific number of shares with known dividend per share. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"shares\": {\n                    \"type\": \"integer\",\n                    \"description\": \"Number of shares to calculate dividends.\"\n                },\n                \"dividend_per_share\": {\n                    \"type\": \"float\",\n                    \"description\": \"Known dividend per share.\"\n                }\n            },\n            \"required\": [\n                \"shares\",\n                \"dividend_per_share\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "How much would it cost me to invest in 50 shares of Apple's stock right now? Also calculate the total dividend payout if each share returns $1.30 as dividend."
+      }
+    ],
+    "model": "gpt-4o-2024-11-20",
+    "store": false,
+    "temperature": 0.001
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"stock_invest.calculate_investment_cost\",\n        \"description\": \"Calculate the cost of investing in a specific number of shares from a given company. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"company\": {\n                    \"type\": \"string\",\n                    \"description\": \"The company that you want to invest in.\"\n                },\n                \"shares\": {\n                    \"type\": \"integer\",\n                    \"description\": \"Number of shares to invest.\"\n                }\n            },\n            \"required\": [\n                \"company\",\n                \"shares\"\n            ]\n        }\n    },\n    {\n        \"name\": \"stock_invest.calculate_dividend_payout\",\n        \"description\": \"Calculate the total dividend payout for a specific number of shares with known dividend per share. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"shares\": {\n                    \"type\": \"integer\",\n                    \"description\": \"Number of shares to calculate dividends.\"\n                },\n                \"dividend_per_share\": {\n                    \"type\": \"float\",\n                    \"description\": \"Known dividend per share.\"\n                }\n            },\n            \"required\": [\n                \"shares\",\n                \"dividend_per_share\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "How much would it cost me to invest in 50 shares of Apple's stock right now? Also calculate the total dividend payout if each share returns $1.30 as dividend."
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776145383-aXeKwRUV631mOF1Oh7oa",
+    "object": "chat.completion",
+    "created": 1776145383,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[stock_invest.calculate_investment_cost(company=\"Apple\", shares=50), stock_invest.calculate_dividend_payout(shares=50, dividend_per_share=1.30)]",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 547,
+      "completion_tokens": 37,
+      "total_tokens": 584,
+      "cost": 0.0016683975,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00168525,
+        "upstream_inference_prompt_cost": 0.00113025,
+        "upstream_inference_completions_cost": 0.000555
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776145383-aXeKwRUV631mOF1Oh7oa",
+    "object": "response",
+    "created_at": 1776145384,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "[stock_invest.calculate_investment_cost(company=\"Apple\", shares=50), stock_invest.calculate_dividend_payout(shares=50, dividend_per_share=1.30)]"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 547,
+      "completion_tokens": 37,
+      "total_tokens": 584,
+      "cost": 0.0016683975,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00168525,
+        "upstream_inference_prompt_cost": 0.00113025,
+        "upstream_inference_completions_cost": 0.000555
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776145383-aXeKwRUV631mOF1Oh7oa",
+    "object": "chat.completion",
+    "created": 1776145383,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[stock_invest.calculate_investment_cost(company=\"Apple\", shares=50), stock_invest.calculate_dividend_payout(shares=50, dividend_per_share=1.30)]",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": []
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 547,
+      "completion_tokens": 37,
+      "total_tokens": 584,
+      "cost": 0.0016683975,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00168525,
+        "upstream_inference_prompt_cost": 0.00113025,
+        "upstream_inference_completions_cost": 0.000555
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1826.168,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "d3796255-9e74-472a-8c09-a0005d345395"
+}

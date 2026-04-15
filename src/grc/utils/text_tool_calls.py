@@ -64,10 +64,10 @@ def _parse_value(raw: str) -> Any:
 def parse_text_tool_calls(content: str) -> List[Dict[str, Any]]:
     if not isinstance(content, str):
         return []
-    m = _CALL_BLOCK_RE.search(content.strip())
-    if not m:
+    match = _CALL_BLOCK_RE.search(content.strip())
+    if not match:
         return []
-    inner = m.group(1).strip()
+    inner = match.group(1).strip()
     if not inner:
         return []
 

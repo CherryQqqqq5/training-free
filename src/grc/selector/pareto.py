@@ -3,9 +3,12 @@ from __future__ import annotations
 import json
 import shutil
 from pathlib import Path
-from typing import Dict
+from typing import Any, Dict
 
-import yaml
+try:
+    import yaml
+except ModuleNotFoundError:
+    yaml = None
 
 
 MAXIMIZE_KEYS = ("acc",)
@@ -28,9 +31,81 @@ def dominates(a: Dict[str, float], b: Dict[str, float]) -> bool:
     return maximize_ok and minimize_ok and strict
 
 
+def _load_json(path: Path) -> Dict[str, Any]:
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def _load_yaml(path: Path) -> Dict[str, Any]:
+    if yaml is None:
+        data: Dict[str, Any] = {}
+        active_list_key: str | None = None
+        for raw_line in path.read_text(encoding="utf-8").splitlines():
+            line = raw_line.rstrip()
+            if not line or line.lstrip().startswith("#"):
+                continue
+            if not raw_line.startswith(" ") and ":" in line:
+                key, value = line.split(":", 1)
+                key = key.strip()
+                value = value.strip()
+                if value == "[]":
+                    data[key] = []
+                    active_list_key = None
+                elif value == "":
+                    data[key] = []
+                    active_list_key = key
+                elif value.isdigit():
+                    data[key] = int(value)
+                    active_list_key = None
+                else:
+                    data[key] = value.strip("'\"")
+                    active_list_key = None
+                continue
+            if active_list_key and line.lstrip().startswith("-"):
+                data.setdefault(active_list_key, []).append(line.lstrip()[1:].strip())
+        return data
+    try:
+        data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    except Exception:
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def _artifact_validity(metrics: Dict[str, Any], metrics_path: Path) -> list[str]:
+    issues: list[str] = []
+    metric_sources = metrics.get("metric_sources")
+    if not isinstance(metric_sources, list) or not any(str(item).strip() for item in metric_sources):
+        issues.append("metric_sources empty")
+
+    artifact_dir = metrics_path.parent
+
+    failure_summary_path = artifact_dir / "failure_summary.json"
+    if failure_summary_path.exists():
+        failure_summary = _load_json(failure_summary_path)
+        trace_count = failure_summary.get("trace_count")
+        if trace_count is None or float(trace_count) <= 0:
+            issues.append("trace_count <= 0")
+
+    rule_path = artifact_dir / "rule.yaml"
+    if rule_path.exists():
+        rule_data = _load_yaml(rule_path)
+        if float(rule_data.get("source_failure_count") or 0) <= 0:
+            issues.append("source_failure_count <= 0")
+        rules = rule_data.get("rules")
+        if not isinstance(rules, list) or not rules:
+            issues.append("rules empty")
+
+    return issues
+
+
 def select_patch(baseline_path: str, candidate_path: str) -> Dict[str, object]:
-    baseline = json.loads(Path(baseline_path).read_text(encoding="utf-8"))
-    candidate = json.loads(Path(candidate_path).read_text(encoding="utf-8"))
+    baseline_file = Path(baseline_path)
+    candidate_file = Path(candidate_path)
+    baseline = _load_json(baseline_file)
+    candidate = _load_json(candidate_file)
 
     subset_regressions = []
     baseline_subsets = baseline.get("subsets", {}) if isinstance(baseline, dict) else {}
@@ -50,18 +125,34 @@ def select_patch(baseline_path: str, candidate_path: str) -> Dict[str, object]:
     regression = sum(item["baseline"] - item["candidate"] for item in subset_regressions)
     candidate["regression"] = max(_metric_value(candidate, "regression"), regression)
 
-    decision = {
-        "accept": dominates(candidate, baseline),
+    baseline_issues = _artifact_validity(baseline, baseline_file)
+    candidate_issues = _artifact_validity(candidate, candidate_file)
+    baseline_valid = not baseline_issues
+    candidate_valid = not candidate_issues
+
+    if not baseline_valid or not candidate_valid:
+        blockers = []
+        if not baseline_valid:
+            blockers.append(f"baseline invalid: {', '.join(baseline_issues)}")
+        if not candidate_valid:
+            blockers.append(f"candidate invalid: {', '.join(candidate_issues)}")
+        accept = False
+        reason = "selection blocked: " + "; ".join(blockers)
+    else:
+        accept = dominates(candidate, baseline)
+        reason = "candidate dominates baseline on Pareto criteria" if accept else "candidate does not dominate baseline"
+
+    return {
+        "accept": accept,
         "baseline": baseline,
         "candidate": candidate,
-        "reason": "",
+        "baseline_valid": baseline_valid,
+        "candidate_valid": candidate_valid,
+        "baseline_validity_issues": baseline_issues,
+        "candidate_validity_issues": candidate_issues,
+        "reason": reason,
         "subset_regressions": subset_regressions,
     }
-    if decision["accept"]:
-        decision["reason"] = "candidate dominates baseline on Pareto criteria"
-    else:
-        decision["reason"] = "candidate does not dominate baseline"
-    return decision
 
 
 def write_selection_outputs(
@@ -73,6 +164,12 @@ def write_selection_outputs(
     active_dir: str | None,
     out_path: str | None,
 ) -> None:
+    def remove_path(path: Path) -> None:
+        if path.is_dir():
+            shutil.rmtree(path)
+        elif path.exists():
+            path.unlink()
+
     patch_id = None
     source = Path(rule_path) if rule_path else None
 
@@ -94,7 +191,7 @@ def write_selection_outputs(
     if patch_id is None:
         patch_id = source.stem
         try:
-            patch_data = yaml.safe_load(source.read_text(encoding="utf-8")) or {}
+            patch_data = _load_yaml(source)
             patch_id = str(patch_data.get("patch_id") or patch_id)
         except Exception:
             pass
@@ -108,7 +205,17 @@ def write_selection_outputs(
             target_dir.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source, target_dir / "rule.yaml")
 
+    if accepted_dir and rejected_dir:
+        stale_root = rejected_dir if decision.get("accept") else accepted_dir
+        stale_dir = Path(stale_root) / patch_id
+        if stale_dir.exists():
+            remove_path(stale_dir)
+
     if decision.get("accept") and active_dir:
         target = Path(active_dir) / f"{patch_id}.yaml"
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source, target)
+    elif active_dir:
+        stale_active = Path(active_dir) / f"{patch_id}.yaml"
+        if stale_active.exists():
+            remove_path(stale_active)

@@ -1,0 +1,180 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"convert_currency\",\n        \"description\": \"Converts an amount from a particular currency to another currency. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"base_currency\": {\n                    \"type\": \"string\",\n                    \"description\": \"The base currency in which the original amount is present.\"\n                },\n                \"target_currency\": {\n                    \"type\": \"string\",\n                    \"description\": \"The currency to which you want to convert.\"\n                },\n                \"amount\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The amount you want to convert.\"\n                }\n            },\n            \"required\": [\n                \"base_currency\",\n                \"target_currency\",\n                \"amount\"\n            ]\n        }\n    },\n    {\n        \"name\": \"map_service.get_directions\",\n        \"description\": \"Retrieve directions from a starting location to an ending location, including options for route preferences. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"start\": {\n                    \"type\": \"string\",\n                    \"description\": \"Starting location for the route.\"\n                },\n                \"end\": {\n                    \"type\": \"string\",\n                    \"description\": \"Ending location for the route.\"\n                },\n                \"avoid\": {\n                    \"type\": \"array\",\n                    \"items\": {\n                        \"type\": \"string\",\n                        \"enum\": [\n                            \"tolls\",\n                            \"highways\",\n                            \"ferries\"\n                        ]\n                    },\n                    \"description\": \"Route features to avoid. Default is none if not specified.\"\n                }\n            },\n            \"required\": [\n                \"start\",\n                \"end\"\n            ]\n        }\n    },\n    {\n        \"name\": \"ecology.get_turtle_population\",\n        \"description\": \"Get the population and species of turtles in a specific location. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"location\": {\n                    \"type\": \"string\",\n                    \"description\": \"The name of the location.\"\n                },\n                \"year\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The year of the data requested. Default is 2023 if not specified.\"\n                },\n                \"species\": {\n                    \"type\": \"boolean\",\n                    \"description\": \"Whether to include species information. Default is false. (optional)\"\n                }\n            },\n            \"required\": [\n                \"location\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "\"Could you help me with a few tasks? First, I need to convert 5000 Euros to US dollars. After that, I would like to know the population of turtles in Galapagos Islands in the year 2018, and also include the species information. Then, I need to plan a trip from New York to Los Angeles, but I want to avoid tolls and ferries. Finally, I need to convert 3000 British Pounds to Japanese Yen.\""
+      }
+    ],
+    "model": "gpt-4o-2024-11-20",
+    "store": false,
+    "temperature": 0.001
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"convert_currency\",\n        \"description\": \"Converts an amount from a particular currency to another currency. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"base_currency\": {\n                    \"type\": \"string\",\n                    \"description\": \"The base currency in which the original amount is present.\"\n                },\n                \"target_currency\": {\n                    \"type\": \"string\",\n                    \"description\": \"The currency to which you want to convert.\"\n                },\n                \"amount\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The amount you want to convert.\"\n                }\n            },\n            \"required\": [\n                \"base_currency\",\n                \"target_currency\",\n                \"amount\"\n            ]\n        }\n    },\n    {\n        \"name\": \"map_service.get_directions\",\n        \"description\": \"Retrieve directions from a starting location to an ending location, including options for route preferences. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"start\": {\n                    \"type\": \"string\",\n                    \"description\": \"Starting location for the route.\"\n                },\n                \"end\": {\n                    \"type\": \"string\",\n                    \"description\": \"Ending location for the route.\"\n                },\n                \"avoid\": {\n                    \"type\": \"array\",\n                    \"items\": {\n                        \"type\": \"string\",\n                        \"enum\": [\n                            \"tolls\",\n                            \"highways\",\n                            \"ferries\"\n                        ]\n                    },\n                    \"description\": \"Route features to avoid. Default is none if not specified.\"\n                }\n            },\n            \"required\": [\n                \"start\",\n                \"end\"\n            ]\n        }\n    },\n    {\n        \"name\": \"ecology.get_turtle_population\",\n        \"description\": \"Get the population and species of turtles in a specific location. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"location\": {\n                    \"type\": \"string\",\n                    \"description\": \"The name of the location.\"\n                },\n                \"year\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The year of the data requested. Default is 2023 if not specified.\"\n                },\n                \"species\": {\n                    \"type\": \"boolean\",\n                    \"description\": \"Whether to include species information. Default is false. (optional)\"\n                }\n            },\n            \"required\": [\n                \"location\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "\"Could you help me with a few tasks? First, I need to convert 5000 Euros to US dollars. After that, I would like to know the population of turtles in Galapagos Islands in the year 2018, and also include the species information. Then, I need to plan a trip from New York to Los Angeles, but I want to avoid tolls and ferries. Finally, I need to convert 3000 British Pounds to Japanese Yen.\""
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776146452-iB3ZA2NEv3xKSKT1A8UG",
+    "object": "chat.completion",
+    "created": 1776146452,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[convert_currency(base_currency=\"EUR\", target_currency=\"USD\", amount=5000), ecology.get_turtle_population(location=\"Galapagos Islands\", year=2018, species=True), map_service.get_directions(start=\"New York\", end=\"Los Angeles\", avoid=[\"tolls\", \"ferries\"]), convert_currency(base_currency=\"GBP\", target_currency=\"JPY\", amount=3000)]",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 865,
+      "completion_tokens": 80,
+      "total_tokens": 945,
+      "cost": 0.003743685,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 6,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0037815,
+        "upstream_inference_prompt_cost": 0.0025815,
+        "upstream_inference_completions_cost": 0.0012
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776146452-iB3ZA2NEv3xKSKT1A8UG",
+    "object": "response",
+    "created_at": 1776146454,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "[convert_currency(base_currency=\"EUR\", target_currency=\"USD\", amount=5000), ecology.get_turtle_population(location=\"Galapagos Islands\", year=2018, species=True), map_service.get_directions(start=\"New York\", end=\"Los Angeles\", avoid=[\"tolls\", \"ferries\"]), convert_currency(base_currency=\"GBP\", target_currency=\"JPY\", amount=3000)]"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 865,
+      "completion_tokens": 80,
+      "total_tokens": 945,
+      "cost": 0.003743685,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 6,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0037815,
+        "upstream_inference_prompt_cost": 0.0025815,
+        "upstream_inference_completions_cost": 0.0012
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776146452-iB3ZA2NEv3xKSKT1A8UG",
+    "object": "chat.completion",
+    "created": 1776146452,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[convert_currency(base_currency=\"EUR\", target_currency=\"USD\", amount=5000), ecology.get_turtle_population(location=\"Galapagos Islands\", year=2018, species=True), map_service.get_directions(start=\"New York\", end=\"Los Angeles\", avoid=[\"tolls\", \"ferries\"]), convert_currency(base_currency=\"GBP\", target_currency=\"JPY\", amount=3000)]",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": []
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 865,
+      "completion_tokens": 80,
+      "total_tokens": 945,
+      "cost": 0.003743685,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 6,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0037815,
+        "upstream_inference_prompt_cost": 0.0025815,
+        "upstream_inference_completions_cost": 0.0012
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2787.393,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "a06dd981-fc46-4a37-b642-0d2fae5a834c"
+}

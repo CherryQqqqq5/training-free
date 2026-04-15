@@ -1,0 +1,180 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"basketball_scores.get_scores\",\n        \"description\": \"Retrieve basketball scores for a specific team and league within a certain range of rounds. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"team\": {\n                    \"type\": \"string\",\n                    \"description\": \"The basketball team whose scores are to be retrieved.\"\n                },\n                \"league\": {\n                    \"type\": \"string\",\n                    \"description\": \"The league in which the team competes.\"\n                },\n                \"rounds\": {\n                    \"type\": \"integer\",\n                    \"description\": \"Number of past rounds for which to retrieve the scores.\"\n                }\n            },\n            \"required\": [\n                \"team\",\n                \"league\",\n                \"rounds\"\n            ]\n        }\n    },\n    {\n        \"name\": \"soccer_scores.get_scores\",\n        \"description\": \"Retrieve soccer scores for a specific team and league within a certain range of rounds. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"team\": {\n                    \"type\": \"string\",\n                    \"description\": \"The soccer team whose scores are to be retrieved.\"\n                },\n                \"league\": {\n                    \"type\": \"string\",\n                    \"description\": \"The league in which the team competes.\"\n                },\n                \"rounds\": {\n                    \"type\": \"integer\",\n                    \"description\": \"Number of past rounds for which to retrieve the scores.\"\n                }\n            },\n            \"required\": [\n                \"team\",\n                \"league\",\n                \"rounds\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "\"Can you tell me the scores for the Manchester United soccer team in the English Premier League for the last 5 rounds and also the scores for the Los Angeles Lakers basketball team in the NBA for the last 7 rounds?\""
+      }
+    ],
+    "model": "gpt-4o-2024-11-20",
+    "store": false,
+    "temperature": 0.001
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"basketball_scores.get_scores\",\n        \"description\": \"Retrieve basketball scores for a specific team and league within a certain range of rounds. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"team\": {\n                    \"type\": \"string\",\n                    \"description\": \"The basketball team whose scores are to be retrieved.\"\n                },\n                \"league\": {\n                    \"type\": \"string\",\n                    \"description\": \"The league in which the team competes.\"\n                },\n                \"rounds\": {\n                    \"type\": \"integer\",\n                    \"description\": \"Number of past rounds for which to retrieve the scores.\"\n                }\n            },\n            \"required\": [\n                \"team\",\n                \"league\",\n                \"rounds\"\n            ]\n        }\n    },\n    {\n        \"name\": \"soccer_scores.get_scores\",\n        \"description\": \"Retrieve soccer scores for a specific team and league within a certain range of rounds. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"team\": {\n                    \"type\": \"string\",\n                    \"description\": \"The soccer team whose scores are to be retrieved.\"\n                },\n                \"league\": {\n                    \"type\": \"string\",\n                    \"description\": \"The league in which the team competes.\"\n                },\n                \"rounds\": {\n                    \"type\": \"integer\",\n                    \"description\": \"Number of past rounds for which to retrieve the scores.\"\n                }\n            },\n            \"required\": [\n                \"team\",\n                \"league\",\n                \"rounds\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "\"Can you tell me the scores for the Manchester United soccer team in the English Premier League for the last 5 rounds and also the scores for the Los Angeles Lakers basketball team in the NBA for the last 7 rounds?\""
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776146304-vKWAHzEfmGH92J5ghkxd",
+    "object": "chat.completion",
+    "created": 1776146304,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[soccer_scores.get_scores(team=\"Manchester United\", league=\"English Premier League\", rounds=5), basketball_scores.get_scores(team=\"Los Angeles Lakers\", league=\"NBA\", rounds=7)]",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 626,
+      "completion_tokens": 39,
+      "total_tokens": 665,
+      "cost": 0.0019327275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00195225,
+        "upstream_inference_prompt_cost": 0.00136725,
+        "upstream_inference_completions_cost": 0.000585
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776146304-vKWAHzEfmGH92J5ghkxd",
+    "object": "response",
+    "created_at": 1776146306,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "[soccer_scores.get_scores(team=\"Manchester United\", league=\"English Premier League\", rounds=5), basketball_scores.get_scores(team=\"Los Angeles Lakers\", league=\"NBA\", rounds=7)]"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 626,
+      "completion_tokens": 39,
+      "total_tokens": 665,
+      "cost": 0.0019327275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00195225,
+        "upstream_inference_prompt_cost": 0.00136725,
+        "upstream_inference_completions_cost": 0.000585
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776146304-vKWAHzEfmGH92J5ghkxd",
+    "object": "chat.completion",
+    "created": 1776146304,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[soccer_scores.get_scores(team=\"Manchester United\", league=\"English Premier League\", rounds=5), basketball_scores.get_scores(team=\"Los Angeles Lakers\", league=\"NBA\", rounds=7)]",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": []
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 626,
+      "completion_tokens": 39,
+      "total_tokens": 665,
+      "cost": 0.0019327275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00195225,
+        "upstream_inference_prompt_cost": 0.00136725,
+        "upstream_inference_completions_cost": 0.000585
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2313.891,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "3b082eac-6694-45e8-8cec-d1bcd5009ede"
+}

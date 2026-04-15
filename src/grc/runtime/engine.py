@@ -192,7 +192,6 @@ class RuleEngine:
             if request_json.get("tools") and not tool_calls:
                 text_calls = parse_text_tool_calls(msg.get("content", ""))
                 if text_calls:
-                    # Bring BFCL prompting-style textual calls into the same tool_call pipeline.
                     for call in text_calls:
                         fn = call.get("function", {})
                         if isinstance(fn.get("arguments"), dict):

@@ -1,0 +1,180 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"locate_tallest_mountains\",\n        \"description\": \"Find the tallest mountains within a specified radius of a location. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"location\": {\n                    \"type\": \"string\",\n                    \"description\": \"The city from which to calculate distance.\"\n                },\n                \"radius\": {\n                    \"type\": \"float\",\n                    \"description\": \"The radius within which to find mountains, measured in kilometers.\"\n                },\n                \"amount\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The number of mountains to find, listed from tallest to smallest.\"\n                }\n            },\n            \"required\": [\n                \"location\",\n                \"radius\",\n                \"amount\"\n            ]\n        }\n    },\n    {\n        \"name\": \"calculate_entropy_change\",\n        \"description\": \"Calculate the entropy change for an isothermal and reversible process. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"initial_temp\": {\n                    \"type\": \"float\",\n                    \"description\": \"The initial temperature in Kelvin.\"\n                },\n                \"final_temp\": {\n                    \"type\": \"float\",\n                    \"description\": \"The final temperature in Kelvin.\"\n                },\n                \"heat_capacity\": {\n                    \"type\": \"float\",\n                    \"description\": \"The heat capacity in J/K.\"\n                },\n                \"isothermal\": {\n                    \"type\": \"boolean\",\n                    \"description\": \"Whether the process is isothermal. Default is True.\"\n                }\n            },\n            \"required\": [\n                \"initial_temp\",\n                \"final_temp\",\n                \"heat_capacity\"\n            ]\n        }\n    },\n    {\n        \"name\": \"get_event_date\",\n        \"description\": \"Retrieve the date of a historical event. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"event\": {\n                    \"type\": \"string\",\n                    \"description\": \"The name of the historical event.\"\n                },\n                \"location\": {\n                    \"type\": \"string\",\n                    \"description\": \"Location where the event took place. Defaults to global if not specified\"\n                }\n            },\n            \"required\": [\n                \"event\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "When was the signing of the Treaty of Lisbon?"
+      }
+    ],
+    "model": "gpt-4o-2024-11-20",
+    "store": false,
+    "temperature": 0.001
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"locate_tallest_mountains\",\n        \"description\": \"Find the tallest mountains within a specified radius of a location. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"location\": {\n                    \"type\": \"string\",\n                    \"description\": \"The city from which to calculate distance.\"\n                },\n                \"radius\": {\n                    \"type\": \"float\",\n                    \"description\": \"The radius within which to find mountains, measured in kilometers.\"\n                },\n                \"amount\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The number of mountains to find, listed from tallest to smallest.\"\n                }\n            },\n            \"required\": [\n                \"location\",\n                \"radius\",\n                \"amount\"\n            ]\n        }\n    },\n    {\n        \"name\": \"calculate_entropy_change\",\n        \"description\": \"Calculate the entropy change for an isothermal and reversible process. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"initial_temp\": {\n                    \"type\": \"float\",\n                    \"description\": \"The initial temperature in Kelvin.\"\n                },\n                \"final_temp\": {\n                    \"type\": \"float\",\n                    \"description\": \"The final temperature in Kelvin.\"\n                },\n                \"heat_capacity\": {\n                    \"type\": \"float\",\n                    \"description\": \"The heat capacity in J/K.\"\n                },\n                \"isothermal\": {\n                    \"type\": \"boolean\",\n                    \"description\": \"Whether the process is isothermal. Default is True.\"\n                }\n            },\n            \"required\": [\n                \"initial_temp\",\n                \"final_temp\",\n                \"heat_capacity\"\n            ]\n        }\n    },\n    {\n        \"name\": \"get_event_date\",\n        \"description\": \"Retrieve the date of a historical event. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"event\": {\n                    \"type\": \"string\",\n                    \"description\": \"The name of the historical event.\"\n                },\n                \"location\": {\n                    \"type\": \"string\",\n                    \"description\": \"Location where the event took place. Defaults to global if not specified\"\n                }\n            },\n            \"required\": [\n                \"event\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "When was the signing of the Treaty of Lisbon?"
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776145209-IW840b58wfMj3ZNkmIEZ",
+    "object": "chat.completion",
+    "created": 1776145209,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[get_event_date(event=\"Treaty of Lisbon\")]",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 736,
+      "completion_tokens": 11,
+      "total_tokens": 747,
+      "cost": 0.0018436275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00186225,
+        "upstream_inference_prompt_cost": 0.00169725,
+        "upstream_inference_completions_cost": 0.000165
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776145209-IW840b58wfMj3ZNkmIEZ",
+    "object": "response",
+    "created_at": 1776145211,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "[get_event_date(event=\"Treaty of Lisbon\")]"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 736,
+      "completion_tokens": 11,
+      "total_tokens": 747,
+      "cost": 0.0018436275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00186225,
+        "upstream_inference_prompt_cost": 0.00169725,
+        "upstream_inference_completions_cost": 0.000165
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776145209-IW840b58wfMj3ZNkmIEZ",
+    "object": "chat.completion",
+    "created": 1776145209,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[get_event_date(event=\"Treaty of Lisbon\")]",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": []
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 736,
+      "completion_tokens": 11,
+      "total_tokens": 747,
+      "cost": 0.0018436275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00186225,
+        "upstream_inference_prompt_cost": 0.00169725,
+        "upstream_inference_completions_cost": 0.000165
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2896.874,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "9d48a090-9b25-43f3-af74-100bb9bb3fa9"
+}

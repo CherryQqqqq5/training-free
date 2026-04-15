@@ -1,0 +1,180 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"flight_ticket_pricing.get\",\n        \"description\": \"Get pricing for a specific type of flight ticket for specified number of passengers. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"airline\": {\n                    \"type\": \"string\",\n                    \"description\": \"The name of the airline.\"\n                },\n                \"flightClass\": {\n                    \"type\": \"string\",\n                    \"description\": \"Class of the flight.\"\n                },\n                \"passengers\": {\n                    \"type\": \"integer\",\n                    \"description\": \"Number of passengers.\"\n                }\n            },\n            \"required\": [\n                \"airline\",\n                \"flightClass\",\n                \"passengers\"\n            ]\n        }\n    },\n    {\n        \"name\": \"car_rental_pricing.get\",\n        \"description\": \"Get pricing for a specific type of rental car for a specified number of days. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"rentalCompany\": {\n                    \"type\": \"string\",\n                    \"description\": \"The name of the rental company.\"\n                },\n                \"carType\": {\n                    \"type\": \"string\",\n                    \"description\": \"Type of the car to be rented.\"\n                },\n                \"days\": {\n                    \"type\": \"integer\",\n                    \"description\": \"Number of days to rent the car.\"\n                }\n            },\n            \"required\": [\n                \"rentalCompany\",\n                \"carType\",\n                \"days\"\n            ]\n        }\n    },\n    {\n        \"name\": \"hotel_room_pricing.get\",\n        \"description\": \"Get pricing for a specific type of hotel room for specified number of nights. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"hotelName\": {\n                    \"type\": \"string\",\n                    \"description\": \"The name of the hotel e.g. Hilton New York\"\n                },\n                \"roomType\": {\n                    \"type\": \"string\",\n                    \"description\": \"Type of the room to be booked.\"\n                },\n                \"nights\": {\n                    \"type\": \"integer\",\n                    \"description\": \"Number of nights to book the room for.\"\n                }\n            },\n            \"required\": [\n                \"hotelName\",\n                \"roomType\",\n                \"nights\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "\"Could you help me plan my vacation? I need to know the total cost. First, I'm considering staying at the Hilton New York for 5 nights in a deluxe room. Could you tell me how much that would cost? Second, I'm thinking of renting a sedan from Enterprise for 10 days. How much would that be? Lastly, I'm planning to fly with Delta Airlines in business class. There will be 3 of us. Can you tell me the total flight cost?\""
+      }
+    ],
+    "model": "gpt-4o-2024-11-20",
+    "store": false,
+    "temperature": 0.001
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"flight_ticket_pricing.get\",\n        \"description\": \"Get pricing for a specific type of flight ticket for specified number of passengers. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"airline\": {\n                    \"type\": \"string\",\n                    \"description\": \"The name of the airline.\"\n                },\n                \"flightClass\": {\n                    \"type\": \"string\",\n                    \"description\": \"Class of the flight.\"\n                },\n                \"passengers\": {\n                    \"type\": \"integer\",\n                    \"description\": \"Number of passengers.\"\n                }\n            },\n            \"required\": [\n                \"airline\",\n                \"flightClass\",\n                \"passengers\"\n            ]\n        }\n    },\n    {\n        \"name\": \"car_rental_pricing.get\",\n        \"description\": \"Get pricing for a specific type of rental car for a specified number of days. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"rentalCompany\": {\n                    \"type\": \"string\",\n                    \"description\": \"The name of the rental company.\"\n                },\n                \"carType\": {\n                    \"type\": \"string\",\n                    \"description\": \"Type of the car to be rented.\"\n                },\n                \"days\": {\n                    \"type\": \"integer\",\n                    \"description\": \"Number of days to rent the car.\"\n                }\n            },\n            \"required\": [\n                \"rentalCompany\",\n                \"carType\",\n                \"days\"\n            ]\n        }\n    },\n    {\n        \"name\": \"hotel_room_pricing.get\",\n        \"description\": \"Get pricing for a specific type of hotel room for specified number of nights. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"hotelName\": {\n                    \"type\": \"string\",\n                    \"description\": \"The name of the hotel e.g. Hilton New York\"\n                },\n                \"roomType\": {\n                    \"type\": \"string\",\n                    \"description\": \"Type of the room to be booked.\"\n                },\n                \"nights\": {\n                    \"type\": \"integer\",\n                    \"description\": \"Number of nights to book the room for.\"\n                }\n            },\n            \"required\": [\n                \"hotelName\",\n                \"roomType\",\n                \"nights\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "\"Could you help me plan my vacation? I need to know the total cost. First, I'm considering staying at the Hilton New York for 5 nights in a deluxe room. Could you tell me how much that would cost? Second, I'm thinking of renting a sedan from Enterprise for 10 days. How much would that be? Lastly, I'm planning to fly with Delta Airlines in business class. There will be 3 of us. Can you tell me the total flight cost?\""
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776145808-GersxD3wMNxWL7GtPmH6",
+    "object": "chat.completion",
+    "created": 1776145808,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[hotel_room_pricing.get(hotelName=\"Hilton New York\", roomType=\"deluxe\", nights=5), car_rental_pricing.get(rentalCompany=\"Enterprise\", carType=\"sedan\", days=10), flight_ticket_pricing.get(airline=\"Delta Airlines\", flightClass=\"business\", passengers=3)]",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 843,
+      "completion_tokens": 67,
+      "total_tokens": 910,
+      "cost": 0.0029930175,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00302325,
+        "upstream_inference_prompt_cost": 0.00201825,
+        "upstream_inference_completions_cost": 0.001005
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776145808-GersxD3wMNxWL7GtPmH6",
+    "object": "response",
+    "created_at": 1776145810,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "[hotel_room_pricing.get(hotelName=\"Hilton New York\", roomType=\"deluxe\", nights=5), car_rental_pricing.get(rentalCompany=\"Enterprise\", carType=\"sedan\", days=10), flight_ticket_pricing.get(airline=\"Delta Airlines\", flightClass=\"business\", passengers=3)]"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 843,
+      "completion_tokens": 67,
+      "total_tokens": 910,
+      "cost": 0.0029930175,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00302325,
+        "upstream_inference_prompt_cost": 0.00201825,
+        "upstream_inference_completions_cost": 0.001005
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776145808-GersxD3wMNxWL7GtPmH6",
+    "object": "chat.completion",
+    "created": 1776145808,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[hotel_room_pricing.get(hotelName=\"Hilton New York\", roomType=\"deluxe\", nights=5), car_rental_pricing.get(rentalCompany=\"Enterprise\", carType=\"sedan\", days=10), flight_ticket_pricing.get(airline=\"Delta Airlines\", flightClass=\"business\", passengers=3)]",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": []
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 843,
+      "completion_tokens": 67,
+      "total_tokens": 910,
+      "cost": 0.0029930175,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 227,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00302325,
+        "upstream_inference_prompt_cost": 0.00201825,
+        "upstream_inference_completions_cost": 0.001005
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2373.533,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "30afbb5c-a57a-4816-b536-b36d28d682db"
+}

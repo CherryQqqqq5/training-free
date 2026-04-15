@@ -67,16 +67,15 @@ def validate_tool_arguments(
                 )
             )
         description = str(properties.get(field, {}).get("description", "")).lower()
-        if isinstance(value, str):
-            if "cannot be path" in description and ("/" in value or "\\" in value):
-                issues.append(
-                    ValidationIssue(
-                        kind="semantic_constraint_violation",
-                        tool_name=tool_name,
-                        field=field,
-                        message=f"field `{field}` violates description constraint: cannot be path",
-                    )
+        if isinstance(value, str) and "cannot be path" in description and ("/" in value or "\\" in value):
+            issues.append(
+                ValidationIssue(
+                    kind="semantic_constraint_violation",
+                    tool_name=tool_name,
+                    field=field,
+                    message=f"field `{field}` violates description constraint: cannot be path",
                 )
+            )
 
     if contract.max_repairs is not None and repair_count > contract.max_repairs:
         issues.append(

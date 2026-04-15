@@ -1,0 +1,180 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"calculate_electric_field_strength\",\n        \"description\": \"Calculate the electric field strength at a certain distance from a point charge. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"charge\": {\n                    \"type\": \"float\",\n                    \"description\": \"The charge in Coulombs.\"\n                },\n                \"distance\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The distance from the charge in meters.\"\n                },\n                \"medium\": {\n                    \"type\": \"string\",\n                    \"description\": \"The medium in which the charge and the point of calculation is located. Default is 'vacuum'.\"\n                }\n            },\n            \"required\": [\n                \"charge\",\n                \"distance\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "Calculate the electric field strength 4 meters away from a charge of 0.01 Coulombs."
+      }
+    ],
+    "model": "gpt-4o-2024-11-20",
+    "store": false,
+    "temperature": 0.001
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "developer",
+        "content": "You are an expert in composing functions.You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose. If none of the functions can be used, point it out. If the given question lacks the parameters required by the function, also point it out.\n\nYou should only return the function calls in your response.\n\nIf you decide to invoke any of the function(s), you MUST put it in the format of [func_name1(params_name1=params_value1, params_name2=params_value2...), func_name2(params)].  You SHOULD NOT include any other text in the response.\n\nAt each turn, you should try your best to complete the tasks requested by the user within the current turn. Continue to output functions to call until you have fulfilled the user's request to the best of your ability. Once you have no more functions to call, the system will consider the current turn complete and proceed to the next turn or task.\n\nHere is a list of functions in json format that you can invoke.\n[\n    {\n        \"name\": \"calculate_electric_field_strength\",\n        \"description\": \"Calculate the electric field strength at a certain distance from a point charge. Note that the provided function is in Python 3 syntax.\",\n        \"parameters\": {\n            \"type\": \"dict\",\n            \"properties\": {\n                \"charge\": {\n                    \"type\": \"float\",\n                    \"description\": \"The charge in Coulombs.\"\n                },\n                \"distance\": {\n                    \"type\": \"integer\",\n                    \"description\": \"The distance from the charge in meters.\"\n                },\n                \"medium\": {\n                    \"type\": \"string\",\n                    \"description\": \"The medium in which the charge and the point of calculation is located. Default is 'vacuum'.\"\n                }\n            },\n            \"required\": [\n                \"charge\",\n                \"distance\"\n            ]\n        }\n    }\n]\n"
+      },
+      {
+        "role": "user",
+        "content": "Calculate the electric field strength 4 meters away from a charge of 0.01 Coulombs."
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776146972-QngY6JGMaPPFXKwdnFOu",
+    "object": "chat.completion",
+    "created": 1776146972,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[calculate_electric_field_strength(charge=0.01, distance=4)]",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 423,
+      "completion_tokens": 17,
+      "total_tokens": 440,
+      "cost": 0.0014976225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 5,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00151275,
+        "upstream_inference_prompt_cost": 0.00125775,
+        "upstream_inference_completions_cost": 0.000255
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776146972-QngY6JGMaPPFXKwdnFOu",
+    "object": "response",
+    "created_at": 1776146974,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "[calculate_electric_field_strength(charge=0.01, distance=4)]"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 423,
+      "completion_tokens": 17,
+      "total_tokens": 440,
+      "cost": 0.0014976225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 5,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00151275,
+        "upstream_inference_prompt_cost": 0.00125775,
+        "upstream_inference_completions_cost": 0.000255
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776146972-QngY6JGMaPPFXKwdnFOu",
+    "object": "chat.completion",
+    "created": 1776146972,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "[calculate_electric_field_strength(charge=0.01, distance=4)]",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": []
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 423,
+      "completion_tokens": 17,
+      "total_tokens": 440,
+      "cost": 0.0014976225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 5,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00151275,
+        "upstream_inference_prompt_cost": 0.00125775,
+        "upstream_inference_completions_cost": 0.000255
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1978.731,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "3b850dec-250c-4f4e-bf11-67be5814d09c"
+}
