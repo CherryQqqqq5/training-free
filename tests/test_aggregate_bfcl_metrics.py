@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -49,6 +51,52 @@ class AggregateBfclMetricsTests(unittest.TestCase):
         self.assertEqual(subsets["json_stream_subset"], 4.0)
         self.assertTrue(any(path.endswith("data_overall.csv") for path in sources))
         self.assertTrue(any(path.endswith("summary.json") for path in sources))
+
+    def test_result_json_latency_is_normalized_to_ms_via_trace_summary_fallback(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            bfcl_root = root / "bfcl"
+            trace_dir = root / "traces"
+            artifacts_dir = root / "artifacts"
+            result_dir = bfcl_root / "result"
+            result_dir.mkdir(parents=True)
+            trace_dir.mkdir(parents=True)
+            artifacts_dir.mkdir(parents=True)
+
+            (result_dir / "BFCL_v4_demo_result.json").write_text(
+                '{"id":"demo_0","result":"x","latency":2.5}\n',
+                encoding="utf-8",
+            )
+            (trace_dir / "trace.json").write_text(
+                '{"trace_id":"trace","status_code":200,"latency_ms":2500.0,"validation":{"issues":[]}}\n',
+                encoding="utf-8",
+            )
+
+            out = artifacts_dir / "metrics.json"
+            repairs = artifacts_dir / "repairs.jsonl"
+            summary = artifacts_dir / "failure_summary.json"
+            result = subprocess.run(
+                [
+                    "python",
+                    "scripts/aggregate_bfcl_metrics.py",
+                    "--bfcl-root",
+                    str(bfcl_root),
+                    "--trace-dir",
+                    str(trace_dir),
+                    "--out",
+                    str(out),
+                    "--repairs-out",
+                    str(repairs),
+                    "--failure-summary-out",
+                    str(summary),
+                ],
+                cwd=Path(__file__).resolve().parents[1],
+                check=False,
+            )
+            self.assertEqual(result.returncode, 0)
+            metrics = json.loads(out.read_text(encoding="utf-8"))
+
+        self.assertEqual(metrics["latency"], 2500.0)
 
 
 if __name__ == "__main__":

@@ -378,6 +378,9 @@ def main() -> None:
     overall, subsets, metric_sources = discover_bfcl_metrics(bfcl_root)
     repairs, failure_summary = trace_summary(trace_dir)
     regression = compute_regression(Path(args.baseline_metrics), subsets) if args.baseline_metrics else 0.0
+    latency = overall.get("latency", failure_summary["mean_latency_ms"])
+    if latency and latency < 100 and failure_summary["mean_latency_ms"] >= 100:
+        latency *= 1000.0
 
     metrics = {
         "label": args.label,
@@ -386,7 +389,7 @@ def main() -> None:
         "test_category": args.test_category,
         "acc": overall.get("acc", 0.0),
         "cost": overall.get("cost", 0.0),
-        "latency": overall.get("latency", failure_summary["mean_latency_ms"]),
+        "latency": latency,
         "regression": regression,
         "repair_count": failure_summary["repair_count"],
         "validation_issue_count": failure_summary["validation_issue_count"],

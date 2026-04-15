@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from grc.selector.pareto import select_patch
+from grc.selector.pareto import select_patch, write_selection_outputs
 
 
 class ParetoSelectionTests(unittest.TestCase):
@@ -99,6 +99,41 @@ class ParetoSelectionTests(unittest.TestCase):
         self.assertTrue(decision["candidate_valid"])
         self.assertTrue(decision["accept"])
         self.assertEqual(decision["reason"], "candidate dominates baseline on Pareto criteria")
+
+    def test_write_selection_outputs_removes_stale_accepted_and_active_on_reject(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            candidate_dir = root / "patch_sync_001"
+            accepted_dir = root / "accepted"
+            rejected_dir = root / "rejected"
+            active_dir = root / "active"
+            candidate_dir.mkdir()
+            accepted_dir.mkdir()
+            rejected_dir.mkdir()
+            active_dir.mkdir()
+
+            rule_path = candidate_dir / "rule.yaml"
+            rule_path.write_text("patch_id: patch_sync_001\nrules:\n  - rule_id: rule_ok\nsource_failure_count: 1\n", encoding="utf-8")
+            (candidate_dir / "metrics.json").write_text("{}", encoding="utf-8")
+
+            stale_accepted = accepted_dir / "patch_sync_001"
+            stale_accepted.mkdir()
+            (stale_accepted / "rule.yaml").write_text("stale", encoding="utf-8")
+            stale_active = active_dir / "patch_sync_001.yaml"
+            stale_active.write_text("stale", encoding="utf-8")
+
+            write_selection_outputs(
+                {"accept": False},
+                str(candidate_dir),
+                str(rule_path),
+                str(accepted_dir),
+                str(rejected_dir),
+                str(active_dir),
+                None,
+            )
+            self.assertFalse(stale_accepted.exists())
+            self.assertFalse(stale_active.exists())
+            self.assertTrue((rejected_dir / "patch_sync_001").exists())
 
 
 if __name__ == "__main__":

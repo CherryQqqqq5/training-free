@@ -164,6 +164,12 @@ def write_selection_outputs(
     active_dir: str | None,
     out_path: str | None,
 ) -> None:
+    def remove_path(path: Path) -> None:
+        if path.is_dir():
+            shutil.rmtree(path)
+        elif path.exists():
+            path.unlink()
+
     patch_id = None
     source = Path(rule_path) if rule_path else None
 
@@ -199,7 +205,17 @@ def write_selection_outputs(
             target_dir.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source, target_dir / "rule.yaml")
 
+    if accepted_dir and rejected_dir:
+        stale_root = rejected_dir if decision.get("accept") else accepted_dir
+        stale_dir = Path(stale_root) / patch_id
+        if stale_dir.exists():
+            remove_path(stale_dir)
+
     if decision.get("accept") and active_dir:
         target = Path(active_dir) / f"{patch_id}.yaml"
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source, target)
+    elif active_dir:
+        stale_active = Path(active_dir) / f"{patch_id}.yaml"
+        if stale_active.exists():
+            remove_path(stale_active)

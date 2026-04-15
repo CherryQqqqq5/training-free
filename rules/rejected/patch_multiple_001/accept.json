@@ -5,15 +5,35 @@
     "protocol_id": "bfcl_v4_phase1",
     "model": "openrouter__grok-3-beta",
     "test_category": "multiple",
-    "acc": 0.0,
+    "acc": 2.38,
     "cost": 0.0,
-    "latency": 2015.948,
+    "latency": 2180.0,
     "regression": 0.0,
     "repair_count": 0,
     "validation_issue_count": 0,
     "fallback_count": 0,
-    "subsets": {},
-    "metric_sources": [],
+    "subsets": {
+      "non_live_multiple_ast": 95.0,
+      "live_acc": 0.0,
+      "multi_turn_acc": 0.0,
+      "agentic_overall_acc": 0.0,
+      "live_overall_acc": 0.0,
+      "multi_turn_overall_acc": 0.0,
+      "non_live_overall_acc": 23.75,
+      "correct_count": 190.0,
+      "total_count": 200.0,
+      "valid": 0.0
+    },
+    "metric_sources": [
+      "outputs/bfcl_v4/baseline/multiple/bfcl/score/data_overall.csv",
+      "outputs/bfcl_v4/baseline/multiple/bfcl/score/data_agentic.csv",
+      "outputs/bfcl_v4/baseline/multiple/bfcl/score/data_live.csv",
+      "outputs/bfcl_v4/baseline/multiple/bfcl/score/data_multi_turn.csv",
+      "outputs/bfcl_v4/baseline/multiple/bfcl/score/data_non_live.csv",
+      "outputs/bfcl_v4/baseline/multiple/bfcl/outputs/bfcl_v4/baseline/multiple/bfcl/result/openrouter__grok-3-beta/non_live/BFCL_v4_multiple_result.json",
+      "outputs/bfcl_v4/baseline/multiple/bfcl/result/openrouter__grok-3-beta/non_live/BFCL_v4_multiple_result.json",
+      "outputs/bfcl_v4/baseline/multiple/bfcl/score/openrouter__grok-3-beta/non_live/BFCL_v4_multiple_score.json"
+    ],
     "bfcl_root": "outputs/bfcl_v4/baseline/multiple/bfcl",
     "trace_dir": "outputs/bfcl_v4/baseline/multiple/traces"
   },
@@ -24,16 +44,26 @@
     "test_category": "multiple",
     "acc": 0.0,
     "cost": 0.0,
-    "latency": 2018.746,
+    "latency": 2880.028247833252,
     "regression": 0.0,
     "repair_count": 0,
     "validation_issue_count": 0,
     "fallback_count": 0,
     "subsets": {},
-    "metric_sources": [],
+    "metric_sources": [
+      "outputs/bfcl_v4/patch/multiple/bfcl/outputs/bfcl_v4/patch/multiple/bfcl/result/openrouter__grok-3-beta/non_live/BFCL_v4_multiple_result.json",
+      "outputs/bfcl_v4/patch/multiple/bfcl/result/openrouter__grok-3-beta/non_live/BFCL_v4_multiple_result.json"
+    ],
     "bfcl_root": "outputs/bfcl_v4/patch/multiple/bfcl",
     "trace_dir": "outputs/bfcl_v4/patch/multiple/traces"
   },
-  "reason": "candidate does not dominate baseline",
+  "baseline_valid": true,
+  "candidate_valid": false,
+  "baseline_validity_issues": [],
+  "candidate_validity_issues": [
+    "source_failure_count <= 0",
+    "rules empty"
+  ],
+  "reason": "selection blocked: candidate invalid: source_failure_count <= 0, rules empty",
   "subset_regressions": []
 }
