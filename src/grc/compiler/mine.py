@@ -7,7 +7,11 @@ from typing import Any, List
 
 from grc.types import FailureCase
 from grc.utils.jsonfix import parse_loose_json
-from grc.utils.text_tool_calls import looks_like_terminal_natural_language, parse_text_tool_calls
+from grc.utils.text_tool_calls import (
+    looks_like_clarification_request,
+    looks_like_terminal_natural_language,
+    parse_text_tool_calls,
+)
 
 _FUNCTION_LIST_MARKER_RE = re.compile(
     r"Here is a list of functions in json format that you can invoke\.\n(\[.*\])\s*$",
@@ -155,6 +159,16 @@ def _python_matches_json_type(value: Any, expected: str) -> bool:
     return True
 
 
+def _inferred_no_tool_call_kind(content: Any) -> str | None:
+    if not isinstance(content, str):
+        return None
+    if looks_like_terminal_natural_language(content):
+        return "natural_language_termination"
+    if looks_like_clarification_request(content):
+        return "clarification_request"
+    return "empty_tool_call"
+
+
 def mine_failures(trace_dir: str) -> List[FailureCase]:
     failures: List[FailureCase] = []
 
@@ -165,6 +179,7 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
         validation = data.get("validation", {})
         tool_map = _tool_schema_map(data)
         seen_failure_keys: set[tuple[str, int, str, str, str | None]] = set()
+        inferred_no_tool_call_kind: str | None = None
 
         def record_failure(case: FailureCase) -> None:
             # Validation issues can mirror failures already inferable from the raw response.
@@ -188,16 +203,16 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
                     tool_calls = parsed
 
             if tool_map and not tool_calls:
-                record_failure(
-                    FailureCase(
-                        trace_id=path.stem,
-                        turn_index=0,
-                        tool_name="__none__",
-                        error_type="natural_language_termination"
-                        if looks_like_terminal_natural_language(msg.get("content", ""))
-                        else "empty_tool_call",
+                inferred_no_tool_call_kind = _inferred_no_tool_call_kind(msg.get("content", ""))
+                if inferred_no_tool_call_kind != "clarification_request":
+                    record_failure(
+                        FailureCase(
+                            trace_id=path.stem,
+                            turn_index=0,
+                            tool_name="__none__",
+                            error_type=inferred_no_tool_call_kind or "empty_tool_call",
+                        )
                     )
-                )
 
             for turn_idx, tool_call in enumerate(tool_calls):
                 name = tool_call.get("function", {}).get("name")
@@ -295,12 +310,17 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
                         )
 
         for issue in validation.get("issues", []):
+            issue_kind = issue.get("kind", "validation_issue")
+            if issue_kind == "clarification_request":
+                continue
+            if issue_kind == "empty_tool_call" and inferred_no_tool_call_kind == "clarification_request":
+                continue
             record_failure(
                 FailureCase(
                     trace_id=path.stem,
                     turn_index=0,
                     tool_name=issue.get("tool_name") or "__none__",
-                    error_type=issue.get("kind", "validation_issue"),
+                    error_type=issue_kind,
                     field_name=issue.get("field"),
                     category="verification_hook",
                 )

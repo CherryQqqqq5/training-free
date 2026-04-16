@@ -18,7 +18,11 @@ from grc.types import (
     VerificationContract,
 )
 from grc.utils.jsonfix import parse_loose_json
-from grc.utils.text_tool_calls import looks_like_terminal_natural_language, parse_text_tool_calls
+from grc.utils.text_tool_calls import (
+    looks_like_clarification_request,
+    looks_like_terminal_natural_language,
+    parse_text_tool_calls,
+)
 
 
 class RuleEngine:
@@ -123,6 +127,8 @@ class RuleEngine:
         return False
 
     def _tool_guard_action(self, rule_hits: List[Rule], issue_kind: str) -> str:
+        if issue_kind == "clarification_request":
+            return "record"
         for rule in rule_hits:
             guard = rule.action.tool_guard
             if not guard.enabled:
@@ -200,22 +206,31 @@ class RuleEngine:
                     msg["tool_calls"] = tool_calls
             global_rule_hits = self._matched_global_rules()
             if request_json.get("tools") and not tool_calls:
-                if looks_like_terminal_natural_language(msg.get("content", "")):
+                content = msg.get("content", "")
+                if looks_like_terminal_natural_language(content):
                     issues = [
                         ValidationIssue(
                             kind="natural_language_termination",
                             message="assistant ended turn with natural language without tool call",
                         )
                     ]
+                elif looks_like_clarification_request(content):
+                    issues = [
+                        ValidationIssue(
+                            kind="clarification_request",
+                            message="assistant requested missing user parameters before tool invocation",
+                        )
+                    ]
                 else:
                     issues = [ValidationIssue(kind="empty_tool_call", message="no tool call emitted for tool-enabled request")]
                 validation.issues.extend(issues)
                 validation.rule_hits.extend(rule.rule_id for rule in global_rule_hits)
-                guarded = self._apply_empty_tool_guard(msg, issues, global_rule_hits)
-                validation.fallback_applied = validation.fallback_applied or guarded
-                if not guarded:
-                    applied = self._apply_fallback(msg, tool_calls, 0, issues, global_rule_hits)
-                    validation.fallback_applied = validation.fallback_applied or applied
+                if issues[0].kind != "clarification_request":
+                    guarded = self._apply_empty_tool_guard(msg, issues, global_rule_hits)
+                    validation.fallback_applied = validation.fallback_applied or guarded
+                    if not guarded:
+                        applied = self._apply_fallback(msg, tool_calls, 0, issues, global_rule_hits)
+                        validation.fallback_applied = validation.fallback_applied or applied
             for index in range(len(tool_calls) - 1, -1, -1):
                 tool_call = tool_calls[index]
                 name = tool_call.get("function", {}).get("name")

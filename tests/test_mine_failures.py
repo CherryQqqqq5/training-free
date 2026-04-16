@@ -27,6 +27,48 @@ Here is a list of functions in json format that you can invoke.
 
 
 class MineFailuresTests(unittest.TestCase):
+    def test_ignores_prompt_backed_clarification_request(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            trace_path = root / "trace.json"
+            trace_path.write_text(
+                json.dumps(
+                    {
+                        "request": {
+                            "model": "demo-model",
+                            "messages": [{"role": "developer", "content": PROMPT_WITH_FUNCTIONS}],
+                        },
+                        "request_original": {
+                            "model": "demo-model",
+                            "input": [{"role": "developer", "content": PROMPT_WITH_FUNCTIONS}],
+                        },
+                        "raw_response": {
+                            "choices": [
+                                {
+                                    "message": {
+                                        "role": "assistant",
+                                        "content": "Could you please provide the city information before I look up the weather?",
+                                    }
+                                }
+                            ]
+                        },
+                        "validation": {
+                            "issues": [
+                                {
+                                    "kind": "empty_tool_call",
+                                    "tool_name": None,
+                                }
+                            ]
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            failures = mine_failures(str(root))
+
+        self.assertEqual(failures, [])
+
     def test_dedupes_validation_issue_when_raw_implies_same_failure(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

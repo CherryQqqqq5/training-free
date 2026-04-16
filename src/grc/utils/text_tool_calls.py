@@ -6,6 +6,40 @@ from typing import Any, Dict, List
 
 
 _CALL_BLOCK_RE = re.compile(r"\[(.*)\]", re.DOTALL)
+_CLARIFICATION_REQUEST_RE = re.compile(
+    r"("
+    r"could you (please )?(provide|tell me|specify)"
+    r"|please (provide|tell me|specify)"
+    r"|i still need"
+    r"|i need (a bit more information|the|your)"
+    r"|missing from your request"
+    r"|once i have that information"
+    r")",
+    re.IGNORECASE,
+)
+_CLARIFICATION_PARAM_RE = re.compile(
+    r"("
+    r"stock symbol"
+    r"|company name"
+    r"|symbol of the stock"
+    r"|zip code"
+    r"|zip codes"
+    r"|full address"
+    r"|full addresses"
+    r"|city"
+    r"|city and state"
+    r"|state"
+    r"|current location"
+    r"|starting point"
+    r"|sector"
+    r"|location"
+    r"|address"
+    r"|information"
+    r"|details"
+    r"|parameter"
+    r")",
+    re.IGNORECASE,
+)
 
 
 def _split_top_level(text: str, sep: str = ",") -> List[str]:
@@ -119,3 +153,14 @@ def looks_like_terminal_natural_language(content: str) -> bool:
         "nothing else to do",
     )
     return any(marker in lowered for marker in terminal_markers)
+
+
+def looks_like_clarification_request(content: str) -> bool:
+    if not isinstance(content, str):
+        return False
+    lowered = content.strip().lower()
+    if not lowered:
+        return False
+    if not _CLARIFICATION_REQUEST_RE.search(lowered):
+        return False
+    return bool(_CLARIFICATION_PARAM_RE.search(lowered))
