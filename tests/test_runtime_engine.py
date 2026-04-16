@@ -6,10 +6,17 @@ import tempfile
 import types
 import unittest
 
-if "yaml" not in sys.modules:
+_INJECTED_YAML_STUB = False
+try:
+    import yaml as _yaml  # noqa: F401
+except ModuleNotFoundError:
     sys.modules["yaml"] = types.SimpleNamespace(safe_load=lambda _: {})
+    _INJECTED_YAML_STUB = True
 
 from grc.runtime.engine import RuleEngine
+
+if _INJECTED_YAML_STUB:
+    sys.modules.pop("yaml", None)
 
 
 class RuntimeEngineTests(unittest.TestCase):
