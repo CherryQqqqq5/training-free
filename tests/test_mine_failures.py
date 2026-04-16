@@ -27,6 +27,54 @@ Here is a list of functions in json format that you can invoke.
 
 
 class MineFailuresTests(unittest.TestCase):
+    def test_mines_from_tool_schema_snapshot_without_prompt_marker(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            trace_path = root / "trace.json"
+            trace_path.write_text(
+                json.dumps(
+                    {
+                        "request": {"model": "demo-model"},
+                        "request_original": {"model": "demo-model"},
+                        "tool_schema_snapshot": {
+                            "lookup_weather": {
+                                "type": "dict",
+                                "properties": {
+                                    "city": {"type": "string"},
+                                    "days": {"type": "int"},
+                                },
+                                "required": ["city"],
+                            }
+                        },
+                        "raw_response": {
+                            "choices": [
+                                {
+                                    "message": {
+                                        "role": "assistant",
+                                        "content": json.dumps(
+                                            {
+                                                "action": "lookup_weather",
+                                                "action_input": {"city": "Shanghai", "days": "3"},
+                                            }
+                                        ),
+                                    }
+                                }
+                            ]
+                        },
+                        "validation": {"issues": []},
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            failures = mine_failures(str(root))
+
+        self.assertEqual(len(failures), 1)
+        self.assertEqual(failures[0].error_type, "type_mismatch")
+        self.assertEqual(failures[0].tool_name, "lookup_weather")
+        self.assertEqual(failures[0].field_name, "days")
+        self.assertEqual(failures[0].expected_type, "integer")
+
     def test_ignores_prompt_backed_file_name_clarification_request(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

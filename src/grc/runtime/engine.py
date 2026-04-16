@@ -22,6 +22,7 @@ from grc.utils.text_tool_calls import (
     classify_no_tool_call_content,
     parse_text_tool_calls,
 )
+from grc.utils.tool_schema import tool_map_from_tools_payload
 
 
 class RuleEngine:
@@ -44,14 +45,7 @@ class RuleEngine:
         return sorted((rule for rule in rules if rule.enabled), key=lambda item: item.priority, reverse=True)
 
     def _tool_schema_map(self, request_json: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
-        tool_map: Dict[str, Dict[str, Any]] = {}
-        for tool in request_json.get("tools", []):
-            fn = tool.get("function", {})
-            name = fn.get("name")
-            params = fn.get("parameters", {})
-            if name:
-                tool_map[name] = params
-        return tool_map
+        return tool_map_from_tools_payload(request_json.get("tools", []))
 
     def _matched_sanitizer(self, tool_name: str) -> ToolSanitizerSpec | None:
         for rule in self.rules:

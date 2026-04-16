@@ -12,6 +12,7 @@ from fastapi.responses import JSONResponse
 
 from grc.runtime.engine import RuleEngine
 from grc.runtime.trace_store import TraceStore
+from grc.utils.tool_schema import tool_map_from_tools_payload
 
 
 def _responses_content_to_text(content: Any) -> str:
@@ -237,11 +238,13 @@ def create_app(config_path: str, rules_dir: str, trace_dir: str) -> FastAPI:
 
         raw_json = resp.json()
         final_json, repairs, validation = engine.apply_response(req_json, raw_json, request_patches=request_patches)
+        tool_schema_snapshot = tool_map_from_tools_payload(req_json.get("tools", []))
 
         trace_store.write(
             {
                 "request_original": original_req_json,
                 "request": req_json,
+                "tool_schema_snapshot": tool_schema_snapshot,
                 "raw_response": raw_json,
                 "final_response": final_json,
                 "repairs": repairs,
@@ -293,12 +296,14 @@ def create_app(config_path: str, rules_dir: str, trace_dir: str) -> FastAPI:
             elapsed_ms = round((time.perf_counter() - started_at) * 1000, 3)
 
         raw_json = resp.json()
+        tool_schema_snapshot = tool_map_from_tools_payload(req_json.get("tools", []))
         if resp.status_code >= 400:
             # Keep upstream error payload untouched so BFCL can surface root cause.
             trace_store.write(
                 {
                     "request_original": original_req_json,
                     "request": req_json,
+                    "tool_schema_snapshot": tool_schema_snapshot,
                     "raw_response": raw_json,
                     "final_response": raw_json,
                     "repairs": [],
@@ -320,6 +325,7 @@ def create_app(config_path: str, rules_dir: str, trace_dir: str) -> FastAPI:
             {
                 "request_original": original_req_json,
                 "request": req_json,
+                "tool_schema_snapshot": tool_schema_snapshot,
                 "raw_response": raw_json,
                 "final_response": final_responses_json,
                 "final_chat_response": final_chat_json,

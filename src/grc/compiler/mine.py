@@ -11,61 +11,12 @@ from grc.utils.text_tool_calls import (
     classify_no_tool_call_content,
     parse_text_tool_calls,
 )
+from grc.utils.tool_schema import normalize_tool_schema_snapshot, tool_map_from_tools_payload
 
 _FUNCTION_LIST_MARKER_RE = re.compile(
     r"Here is a list of functions in json format that you can invoke\.\n(\[.*\])\s*$",
     re.DOTALL,
 )
-
-
-def _normalize_schema_type(value: Any) -> Any:
-    if not isinstance(value, str):
-        return value
-    lowered = value.strip().lower()
-    aliases = {
-        "dict": "object",
-        "str": "string",
-        "int": "integer",
-        "float": "number",
-        "bool": "boolean",
-        "list": "array",
-    }
-    return aliases.get(lowered, lowered)
-
-
-def _normalize_schema(schema: Any) -> Any:
-    if isinstance(schema, dict):
-        normalized = {key: _normalize_schema(value) for key, value in schema.items()}
-        if "type" in normalized:
-            normalized["type"] = _normalize_schema_type(normalized["type"])
-        return normalized
-    if isinstance(schema, list):
-        return [_normalize_schema(item) for item in schema]
-    return schema
-
-
-def _tool_map_from_tools_payload(tools: Any) -> dict[str, dict[str, Any]]:
-    tool_map: dict[str, dict[str, Any]] = {}
-    if not isinstance(tools, list):
-        return tool_map
-
-    for tool in tools:
-        if not isinstance(tool, dict):
-            continue
-
-        if "function" in tool and isinstance(tool.get("function"), dict):
-            fn = tool["function"]
-            name = fn.get("name")
-            params = fn.get("parameters", {})
-        else:
-            name = tool.get("name")
-            params = tool.get("parameters", {})
-
-        if isinstance(name, str) and name:
-            tool_map[name] = _normalize_schema(params) if isinstance(params, dict) else {}
-
-    return tool_map
-
 
 def _extract_tools_from_prompt_text(text: Any) -> dict[str, dict[str, Any]]:
     if not isinstance(text, str):
@@ -80,7 +31,7 @@ def _extract_tools_from_prompt_text(text: Any) -> dict[str, dict[str, Any]]:
     except Exception:
         return {}
 
-    return _tool_map_from_tools_payload(functions)
+    return tool_map_from_tools_payload(functions)
 
 
 def _tool_map_from_messages(messages: Any) -> dict[str, dict[str, Any]]:
@@ -128,9 +79,10 @@ def _tool_schema_map(data: dict[str, Any]) -> dict[str, dict[str, Any]]:
     request_original = data.get("request_original", {})
 
     candidates = (
-        _tool_map_from_tools_payload(req.get("tools") if isinstance(req, dict) else None),
+        normalize_tool_schema_snapshot(data.get("tool_schema_snapshot")),
+        tool_map_from_tools_payload(req.get("tools") if isinstance(req, dict) else None),
         _tool_map_from_messages(req.get("messages") if isinstance(req, dict) else None),
-        _tool_map_from_tools_payload(request_original.get("tools") if isinstance(request_original, dict) else None),
+        tool_map_from_tools_payload(request_original.get("tools") if isinstance(request_original, dict) else None),
         _tool_map_from_messages(request_original.get("messages") if isinstance(request_original, dict) else None),
         _tool_map_from_responses_input(request_original.get("input") if isinstance(request_original, dict) else None),
     )

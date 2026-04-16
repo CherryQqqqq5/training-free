@@ -20,6 +20,31 @@ if _INJECTED_YAML_STUB:
 
 
 class RuntimeEngineTests(unittest.TestCase):
+    def test_engine_normalizes_tool_schema_types_from_request_tools(self) -> None:
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir)
+            request = {
+                "model": "demo-model",
+                "tools": [
+                    {
+                        "type": "function",
+                        "function": {
+                            "name": "lookup_weather",
+                            "parameters": {
+                                "type": "dict",
+                                "properties": {"days": {"type": "int"}},
+                                "required": [],
+                            },
+                        },
+                    }
+                ],
+            }
+
+            schema_map = engine._tool_schema_map(request)
+
+        self.assertEqual(schema_map["lookup_weather"]["type"], "object")
+        self.assertEqual(schema_map["lookup_weather"]["properties"]["days"]["type"], "integer")
+
     def test_unsupported_request_is_not_marked_as_empty_tool_call(self) -> None:
         with tempfile.TemporaryDirectory() as rules_dir:
             engine = RuleEngine(rules_dir)
