@@ -189,7 +189,7 @@ def _resolve_upstream_config(cfg: Dict[str, Any]) -> Dict[str, Any]:
 
 def create_app(config_path: str, rules_dir: str, trace_dir: str) -> FastAPI:
     cfg = yaml.safe_load(Path(config_path).read_text(encoding="utf-8"))
-    engine = RuleEngine(rules_dir)
+    engine = RuleEngine(rules_dir, runtime_policy=cfg.get("runtime_policy"))
     trace_store = TraceStore(trace_dir)
 
     upstream_cfg = _resolve_upstream_config(cfg)

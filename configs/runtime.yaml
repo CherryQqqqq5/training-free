@@ -1,5 +1,15 @@
 timeout_sec: 120
 
+runtime_policy:
+  # Keep BFCL online experiments conservative: mine/trace can classify finer no-tool
+  # categories, but runtime should not rewrite responses for these classes by default.
+  record_only_no_tool_kinds:
+    - clarification_request
+    - unsupported_request
+    - hallucinated_completion
+    - malformed_output
+    - natural_language_termination
+
 upstream:
   # Matches GRC_UPSTREAM_PROFILE default; use novacode profile in YAML + env if needed.
   active_profile: "openrouter"

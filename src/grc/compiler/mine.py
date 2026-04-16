@@ -110,12 +110,6 @@ def _python_matches_json_type(value: Any, expected: str) -> bool:
     return True
 
 
-def _inferred_no_tool_call_kind(content: Any) -> str | None:
-    if not isinstance(content, str):
-        return None
-    return classify_no_tool_call_content(content)
-
-
 def mine_failures(trace_dir: str) -> List[FailureCase]:
     failures: List[FailureCase] = []
 
@@ -153,7 +147,7 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
                     tool_calls = parsed
 
             if not tool_calls and not parsed:
-                inferred_no_tool_call_kind = _inferred_no_tool_call_kind(msg.get("content", ""))
+                inferred_no_tool_call_kind = classify_no_tool_call_content(msg.get("content", ""), tool_map)
 
             if tool_map and not tool_calls:
                 if inferred_no_tool_call_kind != "clarification_request":

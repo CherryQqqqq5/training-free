@@ -24,40 +24,8 @@ _CLARIFICATION_REQUEST_RE = re.compile(
     r")",
     re.IGNORECASE,
 )
-_CLARIFICATION_PARAM_RE = re.compile(
-    r"("
-    r"stock symbol"
-    r"|company name"
-    r"|company"
-    r"|name or symbol"
-    r"|symbol of the stock"
-    r"|ticker"
-    r"|zip code"
-    r"|zip codes"
-    r"|full address"
-    r"|full addresses"
-    r"|city"
-    r"|city and state"
-    r"|state"
-    r"|current location"
-    r"|starting point"
-    r"|sector"
-    r"|location"
-    r"|target currency"
-    r"|currency"
-    r"|file name"
-    r"|name of the file"
-    r"|personal details"
-    r"|traveler information"
-    r"|first name"
-    r"|last name"
-    r"|date of birth"
-    r"|passport number"
-    r"|address"
-    r"|information"
-    r"|details"
-    r"|parameter"
-    r")",
+_GENERIC_CLARIFICATION_PARAM_RE = re.compile(
+    r"(information|details|parameter|parameters|field|fields|value|values)",
     re.IGNORECASE,
 )
 _UNSUPPORTED_REQUEST_RE = re.compile(
@@ -83,6 +51,12 @@ _HALLUCINATED_COMPLETION_RE = re.compile(
     r")",
     re.IGNORECASE,
 )
+_REQUESTED_SLOT_RE = re.compile(
+    r"(?:provide|tell me|specify|need to know|require)(?:\s+(?:the|your|a|an|specific))?\s+([a-z0-9][a-z0-9\s'_-]{1,100})",
+    re.IGNORECASE,
+)
+_NON_WORD_SEP_RE = re.compile(r"[_/\\-]+")
+_WHITESPACE_RE = re.compile(r"\s+")
 
 
 def _split_top_level(text: str, sep: str = ",") -> List[str]:
@@ -269,7 +243,89 @@ def looks_like_malformed_output(content: str) -> bool:
     return len(stripped) <= 3 and not any(ch.isalnum() for ch in stripped)
 
 
-def looks_like_clarification_request(content: str) -> bool:
+def _normalize_hint_text(text: str) -> str:
+    lowered = _NON_WORD_SEP_RE.sub(" ", text.strip().lower())
+    lowered = re.sub(r"[^a-z0-9\s]", " ", lowered)
+    return _WHITESPACE_RE.sub(" ", lowered).strip()
+
+
+def _schema_hint_phrases(tool_schema_map: Dict[str, Dict[str, Any]] | None) -> set[str]:
+    if not isinstance(tool_schema_map, dict):
+        return set()
+
+    hints: set[str] = set()
+    for schema in tool_schema_map.values():
+        if not isinstance(schema, dict):
+            continue
+        properties = schema.get("properties", {})
+        if not isinstance(properties, dict):
+            continue
+        for field_name, spec in properties.items():
+            if isinstance(field_name, str):
+                normalized_field = _normalize_hint_text(field_name)
+                if normalized_field:
+                    hints.add(normalized_field)
+            if isinstance(spec, dict):
+                description = spec.get("description")
+                if isinstance(description, str):
+                    normalized_description = _normalize_hint_text(description)
+                    if normalized_description:
+                        hints.add(normalized_description)
+    return hints
+
+
+def _content_mentions_schema_hint(content: str, tool_schema_map: Dict[str, Dict[str, Any]] | None) -> bool:
+    normalized_content = _normalize_hint_text(content)
+    if not normalized_content:
+        return False
+
+    content_tokens = set(normalized_content.split())
+    hints = _schema_hint_phrases(tool_schema_map)
+    if not hints:
+        return False
+
+    for hint in hints:
+        if len(hint) < 3:
+            continue
+        if hint in normalized_content:
+            return True
+        hint_tokens = hint.split()
+        if 1 <= len(hint_tokens) <= 4 and all(token in content_tokens for token in hint_tokens):
+            return True
+    return False
+
+
+def _requested_slot_phrase(content: str) -> str:
+    if not isinstance(content, str):
+        return ""
+    match = _REQUESTED_SLOT_RE.search(content.strip().lower())
+    if not match:
+        return ""
+    phrase = match.group(1)
+    for delimiter in (
+        " before ",
+        " once ",
+        " so ",
+        " to proceed",
+        " to move",
+        " to continue",
+        " to complete",
+        " to display",
+        " to look",
+        " to calculate",
+        " you'd ",
+        " you would ",
+        ".",
+        "?",
+        "!",
+        ",",
+    ):
+        if delimiter in phrase:
+            phrase = phrase.split(delimiter, 1)[0]
+    return _normalize_hint_text(phrase)
+
+
+def looks_like_clarification_request(content: str, tool_schema_map: Dict[str, Dict[str, Any]] | None = None) -> bool:
     if not isinstance(content, str):
         return False
     lowered = content.strip().lower()
@@ -277,7 +333,14 @@ def looks_like_clarification_request(content: str) -> bool:
         return False
     if not _CLARIFICATION_REQUEST_RE.search(lowered):
         return False
-    return bool(_CLARIFICATION_PARAM_RE.search(lowered))
+    has_schema_hints = bool(_schema_hint_phrases(tool_schema_map))
+    if _content_mentions_schema_hint(content, tool_schema_map):
+        return True
+    if has_schema_hints:
+        return False
+    if _requested_slot_phrase(content):
+        return True
+    return bool(_GENERIC_CLARIFICATION_PARAM_RE.search(lowered))
 
 
 def looks_like_unsupported_request(content: str) -> bool:
@@ -298,7 +361,7 @@ def looks_like_hallucinated_completion(content: str) -> bool:
     return bool(_HALLUCINATED_COMPLETION_RE.search(lowered))
 
 
-def classify_no_tool_call_content(content: str) -> str:
+def classify_no_tool_call_content(content: str, tool_schema_map: Dict[str, Dict[str, Any]] | None = None) -> str:
     if looks_like_terminal_natural_language(content):
         return "natural_language_termination"
     if looks_like_malformed_output(content):
@@ -307,6 +370,6 @@ def classify_no_tool_call_content(content: str) -> str:
         return "hallucinated_completion"
     if looks_like_unsupported_request(content):
         return "unsupported_request"
-    if looks_like_clarification_request(content):
+    if looks_like_clarification_request(content, tool_schema_map=tool_schema_map):
         return "clarification_request"
     return "empty_tool_call"

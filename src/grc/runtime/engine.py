@@ -26,8 +26,20 @@ from grc.utils.tool_schema import tool_map_from_tools_payload
 
 
 class RuleEngine:
-    def __init__(self, rules_dir: str):
+    def __init__(self, rules_dir: str, runtime_policy: Dict[str, Any] | None = None):
         self.rules_dir = Path(rules_dir)
+        self.runtime_policy = dict(runtime_policy or {})
+        configured_record_only = self.runtime_policy.get("record_only_no_tool_kinds")
+        if isinstance(configured_record_only, list) and configured_record_only:
+            self.record_only_no_tool_kinds = {str(item) for item in configured_record_only if str(item).strip()}
+        else:
+            self.record_only_no_tool_kinds = {
+                "clarification_request",
+                "unsupported_request",
+                "hallucinated_completion",
+                "malformed_output",
+                "natural_language_termination",
+            }
         self.rules: List[Rule] = self._load_rules()
 
     def _load_rules(self) -> List[Rule]:
@@ -205,7 +217,7 @@ class RuleEngine:
             global_rule_hits = self._matched_global_rules()
             if request_json.get("tools") and not tool_calls:
                 content = msg.get("content", "")
-                issue_kind = classify_no_tool_call_content(content)
+                issue_kind = classify_no_tool_call_content(content, tool_schema_map)
                 issue_messages = {
                     "natural_language_termination": "assistant ended turn with natural language without tool call",
                     "clarification_request": "assistant requested missing user parameters before tool invocation",
@@ -217,7 +229,7 @@ class RuleEngine:
                 issues = [ValidationIssue(kind=issue_kind, message=issue_messages[issue_kind])]
                 validation.issues.extend(issues)
                 validation.rule_hits.extend(rule.rule_id for rule in global_rule_hits)
-                if issues[0].kind not in {"clarification_request", "unsupported_request"}:
+                if issues[0].kind not in self.record_only_no_tool_kinds:
                     guarded = self._apply_empty_tool_guard(msg, issues, global_rule_hits)
                     validation.fallback_applied = validation.fallback_applied or guarded
                     if not guarded:

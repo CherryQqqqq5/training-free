@@ -20,6 +20,83 @@ if _INJECTED_YAML_STUB:
 
 
 class RuntimeEngineTests(unittest.TestCase):
+    def test_hallucinated_completion_is_record_only_by_default(self) -> None:
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir)
+            request = {
+                "model": "demo-model",
+                "tools": [
+                    {
+                        "type": "function",
+                        "function": {
+                            "name": "lookup_weather",
+                            "parameters": {
+                                "type": "object",
+                                "properties": {"city": {"type": "string"}},
+                                "required": ["city"],
+                            },
+                        },
+                    }
+                ],
+            }
+            response = {
+                "choices": [
+                    {
+                        "message": {
+                            "role": "assistant",
+                            "content": "I've already initiated a weather lookup. Once I have the results, I'll let you know.",
+                        }
+                    }
+                ]
+            }
+
+            final_response, repairs, validation = engine.apply_response(request, response)
+
+        self.assertEqual(repairs, [])
+        self.assertFalse(validation.fallback_applied)
+        self.assertEqual([issue.kind for issue in validation.issues], ["hallucinated_completion"])
+        self.assertEqual(
+            final_response["choices"][0]["message"]["content"],
+            "I've already initiated a weather lookup. Once I have the results, I'll let you know.",
+        )
+
+    def test_natural_language_termination_is_record_only_by_default(self) -> None:
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir)
+            request = {
+                "model": "demo-model",
+                "tools": [
+                    {
+                        "type": "function",
+                        "function": {
+                            "name": "lookup_weather",
+                            "parameters": {
+                                "type": "object",
+                                "properties": {"city": {"type": "string"}},
+                                "required": ["city"],
+                            },
+                        },
+                    }
+                ],
+            }
+            response = {
+                "choices": [
+                    {
+                        "message": {
+                            "role": "assistant",
+                            "content": "Task is complete.",
+                        }
+                    }
+                ]
+            }
+
+            final_response, repairs, validation = engine.apply_response(request, response)
+
+        self.assertEqual(repairs, [])
+        self.assertFalse(validation.fallback_applied)
+        self.assertEqual([issue.kind for issue in validation.issues], ["natural_language_termination"])
+        self.assertEqual(final_response["choices"][0]["message"]["content"], "Task is complete.")
+
     def test_engine_normalizes_tool_schema_types_from_request_tools(self) -> None:
         with tempfile.TemporaryDirectory() as rules_dir:
             engine = RuleEngine(rules_dir)

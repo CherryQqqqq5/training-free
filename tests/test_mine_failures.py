@@ -25,6 +25,22 @@ Here is a list of functions in json format that you can invoke.
   }
 ]"""
 
+PROMPT_WITH_FILE_TOOL = """You are an expert in composing functions.
+Here is a list of functions in json format that you can invoke.
+[
+  {
+    "name": "cat",
+    "description": "Display a file from the current directory.",
+    "parameters": {
+      "type": "dict",
+      "properties": {
+        "file_name": {"type": "string"}
+      },
+      "required": ["file_name"]
+    }
+  }
+]"""
+
 
 class MineFailuresTests(unittest.TestCase):
     def test_mines_from_tool_schema_snapshot_without_prompt_marker(self) -> None:
@@ -84,6 +100,41 @@ class MineFailuresTests(unittest.TestCase):
                     {
                         "request": {
                             "model": "demo-model",
+                            "messages": [{"role": "developer", "content": PROMPT_WITH_FILE_TOOL}],
+                        },
+                        "request_original": {
+                            "model": "demo-model",
+                            "input": [{"role": "developer", "content": PROMPT_WITH_FILE_TOOL}],
+                        },
+                        "raw_response": {
+                            "choices": [
+                                {
+                                    "message": {
+                                        "role": "assistant",
+                                        "content": "Could you please provide the name of the file you'd like me to display?",
+                                    }
+                                }
+                            ]
+                        },
+                        "validation": {"issues": []},
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            failures = mine_failures(str(root))
+
+        self.assertEqual(failures, [])
+
+    def test_does_not_treat_unrelated_file_name_request_as_clarification(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            trace_path = root / "trace.json"
+            trace_path.write_text(
+                json.dumps(
+                    {
+                        "request": {
+                            "model": "demo-model",
                             "messages": [{"role": "developer", "content": PROMPT_WITH_FUNCTIONS}],
                         },
                         "request_original": {
@@ -108,7 +159,8 @@ class MineFailuresTests(unittest.TestCase):
 
             failures = mine_failures(str(root))
 
-        self.assertEqual(failures, [])
+        self.assertEqual(len(failures), 1)
+        self.assertEqual(failures[0].error_type, "empty_tool_call")
 
     def test_ignores_validation_empty_tool_call_when_raw_has_json_action_block_without_prompt(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
