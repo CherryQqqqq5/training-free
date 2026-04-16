@@ -1,0 +1,428 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Could you please help me with the following tasks? First, I have two groups of data points: group1 consists of [12, 15, 18, 22, 25] and group2 consists of [20, 23, 26, 29, 32]. I want to run a two-sample t-test on these groups with the assumption that they have equal variance. Second, I'm currently in Boston, MA and I'm craving for some Sushi. Could you find the closest sushi restaurant that has a Patio and Wi-Fi? Lastly, I've recently taken up painting as a hobby and I'm curious about the common personality traits associated with it. Could you retrieve the top 5 personality traits of people who enjoy painting?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "run_two_sample_ttest",
+        "description": "Runs a two sample t-test for two given data groups. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "group1": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "First group of data points."
+            },
+            "group2": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "Second group of data points."
+            },
+            "equal_variance": {
+              "type": "boolean",
+              "description": "Assumption about whether the two samples have equal variance.",
+              "default": true
+            }
+          },
+          "required": [
+            "group1",
+            "group2"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "restaurant_search_find_closest",
+        "description": "Locate the closest sushi restaurant based on certain criteria, such as the presence of a patio. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city, for instance Boston, MA"
+            },
+            "cuisine": {
+              "type": "string",
+              "description": "Type of food like Sushi."
+            },
+            "amenities": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Patio",
+                  "Wi-Fi",
+                  "Happy Hour",
+                  "Wheelchair Accessible"
+                ]
+              },
+              "description": "Preferred amenities in the restaurant. Default is none if not specified."
+            }
+          },
+          "required": [
+            "location",
+            "cuisine"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "get_personality_traits",
+        "description": "Retrieve the common personality traits of people based on their hobbies or activities. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "hobby": {
+              "type": "string",
+              "description": "The hobby or activity of interest."
+            },
+            "trait_count": {
+              "type": "integer",
+              "description": "The number of top traits to return, default is 5"
+            }
+          },
+          "required": [
+            "hobby"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Could you please help me with the following tasks? First, I have two groups of data points: group1 consists of [12, 15, 18, 22, 25] and group2 consists of [20, 23, 26, 29, 32]. I want to run a two-sample t-test on these groups with the assumption that they have equal variance. Second, I'm currently in Boston, MA and I'm craving for some Sushi. Could you find the closest sushi restaurant that has a Patio and Wi-Fi? Lastly, I've recently taken up painting as a hobby and I'm curious about the common personality traits associated with it. Could you retrieve the top 5 personality traits of people who enjoy painting?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "run_two_sample_ttest",
+          "description": "Runs a two sample t-test for two given data groups. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "group1": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "First group of data points."
+              },
+              "group2": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "Second group of data points."
+              },
+              "equal_variance": {
+                "type": "boolean",
+                "description": "Assumption about whether the two samples have equal variance.",
+                "default": true
+              }
+            },
+            "required": [
+              "group1",
+              "group2"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "restaurant_search_find_closest",
+          "description": "Locate the closest sushi restaurant based on certain criteria, such as the presence of a patio. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city, for instance Boston, MA"
+              },
+              "cuisine": {
+                "type": "string",
+                "description": "Type of food like Sushi."
+              },
+              "amenities": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "Patio",
+                    "Wi-Fi",
+                    "Happy Hour",
+                    "Wheelchair Accessible"
+                  ]
+                },
+                "description": "Preferred amenities in the restaurant. Default is none if not specified."
+              }
+            },
+            "required": [
+              "location",
+              "cuisine"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "get_personality_traits",
+          "description": "Retrieve the common personality traits of people based on their hobbies or activities. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "hobby": {
+                "type": "string",
+                "description": "The hobby or activity of interest."
+              },
+              "trait_count": {
+                "type": "integer",
+                "description": "The number of top traits to return, default is 5"
+              }
+            },
+            "required": [
+              "hobby"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241871-tIpIAZK4l1QQfBv95wDm",
+    "object": "chat.completion",
+    "created": 1776241871,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_85181370",
+              "function": {
+                "name": "run_two_sample_ttest",
+                "arguments": "{\"group1\":[12,15,18,22,25],\"group2\":[20,23,26,29,32],\"equal_variance\":true}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_27573474",
+              "function": {
+                "name": "restaurant_search_find_closest",
+                "arguments": "{\"location\":\"Boston, MA\",\"cuisine\":\"Sushi\",\"amenities\":[\"Patio\",\"Wi-Fi\"]}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_16991689",
+              "function": {
+                "name": "get_personality_traits",
+                "arguments": "{\"hobby\":\"painting\",\"trait_count\":5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 718,
+      "completion_tokens": 153,
+      "total_tokens": 871,
+      "cost": 0.0039389625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00397875,
+        "upstream_inference_prompt_cost": 0.00168375,
+        "upstream_inference_completions_cost": 0.002295
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241871-tIpIAZK4l1QQfBv95wDm",
+    "object": "response",
+    "created_at": 1776241874,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_85181370",
+        "call_id": "call_85181370",
+        "name": "run_two_sample_ttest",
+        "arguments": "{\"group1\":[12,15,18,22,25],\"group2\":[20,23,26,29,32],\"equal_variance\":true}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_27573474",
+        "call_id": "call_27573474",
+        "name": "restaurant_search_find_closest",
+        "arguments": "{\"location\":\"Boston, MA\",\"cuisine\":\"Sushi\",\"amenities\":[\"Patio\",\"Wi-Fi\"]}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_16991689",
+        "call_id": "call_16991689",
+        "name": "get_personality_traits",
+        "arguments": "{\"hobby\":\"painting\",\"trait_count\":5}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 718,
+      "completion_tokens": 153,
+      "total_tokens": 871,
+      "cost": 0.0039389625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00397875,
+        "upstream_inference_prompt_cost": 0.00168375,
+        "upstream_inference_completions_cost": 0.002295
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241871-tIpIAZK4l1QQfBv95wDm",
+    "object": "chat.completion",
+    "created": 1776241871,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_85181370",
+              "function": {
+                "name": "run_two_sample_ttest",
+                "arguments": "{\"group1\":[12,15,18,22,25],\"group2\":[20,23,26,29,32],\"equal_variance\":true}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_27573474",
+              "function": {
+                "name": "restaurant_search_find_closest",
+                "arguments": "{\"location\":\"Boston, MA\",\"cuisine\":\"Sushi\",\"amenities\":[\"Patio\",\"Wi-Fi\"]}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_16991689",
+              "function": {
+                "name": "get_personality_traits",
+                "arguments": "{\"hobby\":\"painting\",\"trait_count\":5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 718,
+      "completion_tokens": 153,
+      "total_tokens": 871,
+      "cost": 0.0039389625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00397875,
+        "upstream_inference_prompt_cost": 0.00168375,
+        "upstream_inference_completions_cost": 0.002295
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 3093.661,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "12db6767-2a64-49a6-b46e-ff15d9803395"
+}

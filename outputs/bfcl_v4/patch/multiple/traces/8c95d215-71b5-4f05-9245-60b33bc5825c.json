@@ -1,0 +1,306 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find me the number of active players in the game 'World of Warcraft' in 2020."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "video_games_get_player_count",
+        "description": "Retrieves the number of active players for a specified video game and year. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "game_title": {
+              "type": "string",
+              "description": "The title of the video game."
+            },
+            "year": {
+              "type": "integer",
+              "description": "The year in question."
+            },
+            "platform": {
+              "type": "string",
+              "optional": true,
+              "description": "The gaming platform (e.g. 'PC', 'Xbox', 'Playstation'). Default ''"
+            }
+          },
+          "required": [
+            "game_title",
+            "year"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "video_games_get_sales",
+        "description": "Retrieves the sales figures for a specified video game and year. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "game_title": {
+              "type": "string",
+              "description": "The title of the video game."
+            },
+            "year": {
+              "type": "integer",
+              "description": "The year in question."
+            },
+            "platform": {
+              "type": "string",
+              "optional": true,
+              "description": "The gaming platform (e.g. 'PC', 'Xbox', 'Playstation'). Default ''"
+            }
+          },
+          "required": [
+            "game_title",
+            "year"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find me the number of active players in the game 'World of Warcraft' in 2020."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "video_games_get_player_count",
+          "description": "Retrieves the number of active players for a specified video game and year. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "game_title": {
+                "type": "string",
+                "description": "The title of the video game."
+              },
+              "year": {
+                "type": "integer",
+                "description": "The year in question."
+              },
+              "platform": {
+                "type": "string",
+                "optional": true,
+                "description": "The gaming platform (e.g. 'PC', 'Xbox', 'Playstation'). Default ''"
+              }
+            },
+            "required": [
+              "game_title",
+              "year"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "video_games_get_sales",
+          "description": "Retrieves the sales figures for a specified video game and year. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "game_title": {
+                "type": "string",
+                "description": "The title of the video game."
+              },
+              "year": {
+                "type": "integer",
+                "description": "The year in question."
+              },
+              "platform": {
+                "type": "string",
+                "optional": true,
+                "description": "The gaming platform (e.g. 'PC', 'Xbox', 'Playstation'). Default ''"
+              }
+            },
+            "required": [
+              "game_title",
+              "year"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240148-oKtgP3SJ6umO1DsH0J5g",
+    "object": "chat.completion",
+    "created": 1776240148,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_18802802",
+              "function": {
+                "name": "video_games_get_player_count",
+                "arguments": "{\"game_title\":\"World of Warcraft\",\"year\":2020}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 473,
+      "completion_tokens": 38,
+      "total_tokens": 511,
+      "cost": 0.0015035625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00151875,
+        "upstream_inference_prompt_cost": 0.00094875,
+        "upstream_inference_completions_cost": 0.00057
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240148-oKtgP3SJ6umO1DsH0J5g",
+    "object": "response",
+    "created_at": 1776240149,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_18802802",
+        "call_id": "call_18802802",
+        "name": "video_games_get_player_count",
+        "arguments": "{\"game_title\":\"World of Warcraft\",\"year\":2020}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 473,
+      "completion_tokens": 38,
+      "total_tokens": 511,
+      "cost": 0.0015035625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00151875,
+        "upstream_inference_prompt_cost": 0.00094875,
+        "upstream_inference_completions_cost": 0.00057
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240148-oKtgP3SJ6umO1DsH0J5g",
+    "object": "chat.completion",
+    "created": 1776240148,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_18802802",
+              "function": {
+                "name": "video_games_get_player_count",
+                "arguments": "{\"game_title\":\"World of Warcraft\",\"year\":2020}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 473,
+      "completion_tokens": 38,
+      "total_tokens": 511,
+      "cost": 0.0015035625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00151875,
+        "upstream_inference_prompt_cost": 0.00094875,
+        "upstream_inference_completions_cost": 0.00057
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2069.624,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "8c95d215-71b5-4f05-9245-60b33bc5825c"
+}

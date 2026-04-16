@@ -1,0 +1,310 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the volume of a cone with radius 4 and height 7."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "geometry_calculate_cone_volume",
+        "description": "Calculate the volume of a cone given the radius and height. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "radius": {
+              "type": "integer",
+              "description": "Radius of the cone base."
+            },
+            "height": {
+              "type": "integer",
+              "description": "Height of the cone."
+            },
+            "round_off": {
+              "type": "integer",
+              "description": "Number of decimal places to round off the answer. Default 0"
+            }
+          },
+          "required": [
+            "radius",
+            "height"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "physics_calculate_cone_mass",
+        "description": "Calculate the mass of a cone given the radius, height, and density. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "radius": {
+              "type": "number",
+              "description": "Radius of the cone base. This is a float type value.",
+              "format": "float"
+            },
+            "height": {
+              "type": "number",
+              "description": "Height of the cone. This is a float type value.",
+              "format": "float"
+            },
+            "density": {
+              "type": "number",
+              "description": "Density of the material the cone is made of. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "radius",
+            "height",
+            "density"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the volume of a cone with radius 4 and height 7."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "geometry_calculate_cone_volume",
+          "description": "Calculate the volume of a cone given the radius and height. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "radius": {
+                "type": "integer",
+                "description": "Radius of the cone base."
+              },
+              "height": {
+                "type": "integer",
+                "description": "Height of the cone."
+              },
+              "round_off": {
+                "type": "integer",
+                "description": "Number of decimal places to round off the answer. Default 0"
+              }
+            },
+            "required": [
+              "radius",
+              "height"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "physics_calculate_cone_mass",
+          "description": "Calculate the mass of a cone given the radius, height, and density. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "radius": {
+                "type": "number",
+                "description": "Radius of the cone base. This is a float type value.",
+                "format": "float"
+              },
+              "height": {
+                "type": "number",
+                "description": "Height of the cone. This is a float type value.",
+                "format": "float"
+              },
+              "density": {
+                "type": "number",
+                "description": "Density of the material the cone is made of. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "radius",
+              "height",
+              "density"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239518-dBU20D4xoeWDkj101OCn",
+    "object": "chat.completion",
+    "created": 1776239518,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_29938995",
+              "function": {
+                "name": "geometry_calculate_cone_volume",
+                "arguments": "{\"radius\":4,\"height\":7,\"round_off\":0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 474,
+      "completion_tokens": 42,
+      "total_tokens": 516,
+      "cost": 0.001563705,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0015795,
+        "upstream_inference_prompt_cost": 0.0009495,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239518-dBU20D4xoeWDkj101OCn",
+    "object": "response",
+    "created_at": 1776239519,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_29938995",
+        "call_id": "call_29938995",
+        "name": "geometry_calculate_cone_volume",
+        "arguments": "{\"radius\":4,\"height\":7,\"round_off\":0}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 474,
+      "completion_tokens": 42,
+      "total_tokens": 516,
+      "cost": 0.001563705,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0015795,
+        "upstream_inference_prompt_cost": 0.0009495,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239518-dBU20D4xoeWDkj101OCn",
+    "object": "chat.completion",
+    "created": 1776239518,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_29938995",
+              "function": {
+                "name": "geometry_calculate_cone_volume",
+                "arguments": "{\"radius\":4,\"height\":7,\"round_off\":0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 474,
+      "completion_tokens": 42,
+      "total_tokens": 516,
+      "cost": 0.001563705,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0015795,
+        "upstream_inference_prompt_cost": 0.0009495,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2201.802,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "f739130b-339e-4075-ad85-b67d0d51a56c"
+}

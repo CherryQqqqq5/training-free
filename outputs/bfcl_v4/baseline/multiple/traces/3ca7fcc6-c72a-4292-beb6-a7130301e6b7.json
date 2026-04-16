@@ -1,0 +1,390 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Search for ongoing lawsuits related to the company 'Google' filed after January 1, 2021 in California."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "lawsuit_search",
+        "description": "Search for lawsuits related to a specific company within a specific date range and location. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "company": {
+              "type": "string",
+              "description": "The company related to the lawsuit."
+            },
+            "start_date": {
+              "type": "string",
+              "description": "Start of the date range for when the lawsuit was filed."
+            },
+            "location": {
+              "type": "string",
+              "description": "Location where the lawsuit was filed."
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "ongoing",
+                "settled",
+                "dismissed"
+              ],
+              "description": "The status of the lawsuit. Default is 'ongoing'."
+            }
+          },
+          "required": [
+            "company",
+            "start_date",
+            "location"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "walmart_check_price",
+        "description": "Calculate total price for given items and their quantities at Walmart. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of items to be priced."
+            },
+            "quantities": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "Quantity of each item corresponding to the items list."
+            },
+            "store_location": {
+              "type": "string",
+              "description": "The store location for specific pricing (optional). Default is 'USA'."
+            }
+          },
+          "required": [
+            "items",
+            "quantities"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "event_finder_find_upcoming",
+        "description": "Find upcoming events of a specific genre in a given location. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city and state where the search will take place, e.g. New York, NY."
+            },
+            "genre": {
+              "type": "string",
+              "description": "The genre of events."
+            },
+            "days_ahead": {
+              "type": "integer",
+              "description": "The number of days from now to include in the search.",
+              "default": 7
+            }
+          },
+          "required": [
+            "location",
+            "genre"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Search for ongoing lawsuits related to the company 'Google' filed after January 1, 2021 in California."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "lawsuit_search",
+          "description": "Search for lawsuits related to a specific company within a specific date range and location. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "company": {
+                "type": "string",
+                "description": "The company related to the lawsuit."
+              },
+              "start_date": {
+                "type": "string",
+                "description": "Start of the date range for when the lawsuit was filed."
+              },
+              "location": {
+                "type": "string",
+                "description": "Location where the lawsuit was filed."
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "ongoing",
+                  "settled",
+                  "dismissed"
+                ],
+                "description": "The status of the lawsuit. Default is 'ongoing'."
+              }
+            },
+            "required": [
+              "company",
+              "start_date",
+              "location"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "walmart_check_price",
+          "description": "Calculate total price for given items and their quantities at Walmart. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "List of items to be priced."
+              },
+              "quantities": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "Quantity of each item corresponding to the items list."
+              },
+              "store_location": {
+                "type": "string",
+                "description": "The store location for specific pricing (optional). Default is 'USA'."
+              }
+            },
+            "required": [
+              "items",
+              "quantities"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "event_finder_find_upcoming",
+          "description": "Find upcoming events of a specific genre in a given location. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city and state where the search will take place, e.g. New York, NY."
+              },
+              "genre": {
+                "type": "string",
+                "description": "The genre of events."
+              },
+              "days_ahead": {
+                "type": "integer",
+                "description": "The number of days from now to include in the search.",
+                "default": 7
+              }
+            },
+            "required": [
+              "location",
+              "genre"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239755-RTArQjoC8vb6pTahz61I",
+    "object": "chat.completion",
+    "created": 1776239755,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_95296115",
+              "function": {
+                "name": "lawsuit_search",
+                "arguments": "{\"company\":\"Google\",\"start_date\":\"2021-01-01\",\"location\":\"California\",\"status\":\"ongoing\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 631,
+      "completion_tokens": 51,
+      "total_tokens": 682,
+      "cost": 0.0021658725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00218775,
+        "upstream_inference_prompt_cost": 0.00142275,
+        "upstream_inference_completions_cost": 0.000765
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239755-RTArQjoC8vb6pTahz61I",
+    "object": "response",
+    "created_at": 1776239756,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_95296115",
+        "call_id": "call_95296115",
+        "name": "lawsuit_search",
+        "arguments": "{\"company\":\"Google\",\"start_date\":\"2021-01-01\",\"location\":\"California\",\"status\":\"ongoing\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 631,
+      "completion_tokens": 51,
+      "total_tokens": 682,
+      "cost": 0.0021658725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00218775,
+        "upstream_inference_prompt_cost": 0.00142275,
+        "upstream_inference_completions_cost": 0.000765
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239755-RTArQjoC8vb6pTahz61I",
+    "object": "chat.completion",
+    "created": 1776239755,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_95296115",
+              "function": {
+                "name": "lawsuit_search",
+                "arguments": "{\"company\":\"Google\",\"start_date\":\"2021-01-01\",\"location\":\"California\",\"status\":\"ongoing\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 631,
+      "completion_tokens": 51,
+      "total_tokens": 682,
+      "cost": 0.0021658725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00218775,
+        "upstream_inference_prompt_cost": 0.00142275,
+        "upstream_inference_completions_cost": 0.000765
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2133.749,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "3ca7fcc6-c72a-4292-beb6-a7130301e6b7"
+}

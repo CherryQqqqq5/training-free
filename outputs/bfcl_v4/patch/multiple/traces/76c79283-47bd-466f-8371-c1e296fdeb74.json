@@ -1,0 +1,338 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find the latest update or patch for the game 'Cyberpunk 2077' on Xbox platform."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "games_reviews_find",
+        "description": "Find reviews for a specific game. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "game": {
+              "type": "string",
+              "description": "The name of the game."
+            },
+            "region": {
+              "type": "string",
+              "description": "The region where the reviews are coming from (optional, default is 'global')"
+            }
+          },
+          "required": [
+            "game"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "games_update_find",
+        "description": "Find the latest updates or patches for a specific game on a specified gaming platform. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "game": {
+              "type": "string",
+              "description": "The name of the game."
+            },
+            "platform": {
+              "type": "string",
+              "description": "The gaming platform, e.g. Xbox, Playstation, PC."
+            },
+            "region": {
+              "type": "string",
+              "description": "The region of the update (optional, default is 'global')"
+            }
+          },
+          "required": [
+            "game",
+            "platform"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "games_price_find",
+        "description": "Find the current price for a specific game on a specified gaming platform. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "game": {
+              "type": "string",
+              "description": "The name of the game."
+            },
+            "platform": {
+              "type": "string",
+              "description": "The gaming platform, e.g. Xbox, Playstation, PC."
+            }
+          },
+          "required": [
+            "game",
+            "platform"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find the latest update or patch for the game 'Cyberpunk 2077' on Xbox platform."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "games_reviews_find",
+          "description": "Find reviews for a specific game. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "game": {
+                "type": "string",
+                "description": "The name of the game."
+              },
+              "region": {
+                "type": "string",
+                "description": "The region where the reviews are coming from (optional, default is 'global')"
+              }
+            },
+            "required": [
+              "game"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "games_update_find",
+          "description": "Find the latest updates or patches for a specific game on a specified gaming platform. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "game": {
+                "type": "string",
+                "description": "The name of the game."
+              },
+              "platform": {
+                "type": "string",
+                "description": "The gaming platform, e.g. Xbox, Playstation, PC."
+              },
+              "region": {
+                "type": "string",
+                "description": "The region of the update (optional, default is 'global')"
+              }
+            },
+            "required": [
+              "game",
+              "platform"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "games_price_find",
+          "description": "Find the current price for a specific game on a specified gaming platform. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "game": {
+                "type": "string",
+                "description": "The name of the game."
+              },
+              "platform": {
+                "type": "string",
+                "description": "The gaming platform, e.g. Xbox, Playstation, PC."
+              }
+            },
+            "required": [
+              "game",
+              "platform"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240146-gkOoNTl0sA0Y64FqjGqd",
+    "object": "chat.completion",
+    "created": 1776240146,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_11268971",
+              "function": {
+                "name": "games_update_find",
+                "arguments": "{\"game\":\"Cyberpunk 2077\",\"platform\":\"Xbox\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 525,
+      "completion_tokens": 37,
+      "total_tokens": 562,
+      "cost": 0.0016431525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00165975,
+        "upstream_inference_prompt_cost": 0.00110475,
+        "upstream_inference_completions_cost": 0.000555
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240146-gkOoNTl0sA0Y64FqjGqd",
+    "object": "response",
+    "created_at": 1776240147,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_11268971",
+        "call_id": "call_11268971",
+        "name": "games_update_find",
+        "arguments": "{\"game\":\"Cyberpunk 2077\",\"platform\":\"Xbox\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 525,
+      "completion_tokens": 37,
+      "total_tokens": 562,
+      "cost": 0.0016431525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00165975,
+        "upstream_inference_prompt_cost": 0.00110475,
+        "upstream_inference_completions_cost": 0.000555
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240146-gkOoNTl0sA0Y64FqjGqd",
+    "object": "chat.completion",
+    "created": 1776240146,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_11268971",
+              "function": {
+                "name": "games_update_find",
+                "arguments": "{\"game\":\"Cyberpunk 2077\",\"platform\":\"Xbox\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 525,
+      "completion_tokens": 37,
+      "total_tokens": 562,
+      "cost": 0.0016431525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00165975,
+        "upstream_inference_prompt_cost": 0.00110475,
+        "upstream_inference_completions_cost": 0.000555
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1767.006,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "76c79283-47bd-466f-8371-c1e296fdeb74"
+}

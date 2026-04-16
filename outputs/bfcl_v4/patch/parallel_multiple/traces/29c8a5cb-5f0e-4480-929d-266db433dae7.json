@@ -1,0 +1,319 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the volume of a cuboid with a height of 10m, a width of 5m, and a depth of 8m. And find out the volume of a sphere with a radius of 4m."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calcVolume_cuboid",
+        "description": "Calculates the volume of a cuboid. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "height": {
+              "type": "number",
+              "description": "The height of the cuboid. This is a float type value.",
+              "format": "float"
+            },
+            "width": {
+              "type": "number",
+              "description": "The width of the cuboid. This is a float type value.",
+              "format": "float"
+            },
+            "depth": {
+              "type": "number",
+              "description": "The depth of the cuboid. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "height",
+            "width",
+            "depth"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "calcVolume_sphere",
+        "description": "Calculates the volume of a sphere. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "radius": {
+              "type": "number",
+              "description": "The radius of the sphere. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "radius"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the volume of a cuboid with a height of 10m, a width of 5m, and a depth of 8m. And find out the volume of a sphere with a radius of 4m."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calcVolume_cuboid",
+          "description": "Calculates the volume of a cuboid. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "height": {
+                "type": "number",
+                "description": "The height of the cuboid. This is a float type value.",
+                "format": "float"
+              },
+              "width": {
+                "type": "number",
+                "description": "The width of the cuboid. This is a float type value.",
+                "format": "float"
+              },
+              "depth": {
+                "type": "number",
+                "description": "The depth of the cuboid. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "height",
+              "width",
+              "depth"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "calcVolume_sphere",
+          "description": "Calculates the volume of a sphere. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "radius": {
+                "type": "number",
+                "description": "The radius of the sphere. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "radius"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241459-7IOzkuVB1siPzmX0SL9v",
+    "object": "chat.completion",
+    "created": 1776241459,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_45954565",
+              "function": {
+                "name": "calcVolume_cuboid",
+                "arguments": "{\"height\":10.0,\"width\":5.0,\"depth\":8.0}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_60527307",
+              "function": {
+                "name": "calcVolume_sphere",
+                "arguments": "{\"radius\":4.0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 462,
+      "completion_tokens": 74,
+      "total_tokens": 536,
+      "cost": 0.0024643575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00248925,
+        "upstream_inference_prompt_cost": 0.00137925,
+        "upstream_inference_completions_cost": 0.00111
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241459-7IOzkuVB1siPzmX0SL9v",
+    "object": "response",
+    "created_at": 1776241460,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_45954565",
+        "call_id": "call_45954565",
+        "name": "calcVolume_cuboid",
+        "arguments": "{\"height\":10.0,\"width\":5.0,\"depth\":8.0}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_60527307",
+        "call_id": "call_60527307",
+        "name": "calcVolume_sphere",
+        "arguments": "{\"radius\":4.0}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 462,
+      "completion_tokens": 74,
+      "total_tokens": 536,
+      "cost": 0.0024643575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00248925,
+        "upstream_inference_prompt_cost": 0.00137925,
+        "upstream_inference_completions_cost": 0.00111
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241459-7IOzkuVB1siPzmX0SL9v",
+    "object": "chat.completion",
+    "created": 1776241459,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_45954565",
+              "function": {
+                "name": "calcVolume_cuboid",
+                "arguments": "{\"height\":10.0,\"width\":5.0,\"depth\":8.0}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_60527307",
+              "function": {
+                "name": "calcVolume_sphere",
+                "arguments": "{\"radius\":4.0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 462,
+      "completion_tokens": 74,
+      "total_tokens": 536,
+      "cost": 0.0024643575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00248925,
+        "upstream_inference_prompt_cost": 0.00137925,
+        "upstream_inference_completions_cost": 0.00111
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2206.269,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "29c8a5cb-5f0e-4480-929d-266db433dae7"
+}

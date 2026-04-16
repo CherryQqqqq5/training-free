@@ -1,0 +1,250 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Get the highest rated sushi restaurant in Boston, that opens on Sundays."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "get_restaurant",
+        "description": "Retrieve highest rated restaurant given cuisine, location, and a condition. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "cuisine": {
+              "type": "string",
+              "description": "Cuisine of the restaurant."
+            },
+            "location": {
+              "type": "string",
+              "description": "City where restaurant is located."
+            },
+            "condition": {
+              "type": "string",
+              "description": "Condition to be met by the restaurant (e.g., operating days, amenities, etc.)"
+            }
+          },
+          "required": [
+            "cuisine",
+            "location",
+            "condition"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Get the highest rated sushi restaurant in Boston, that opens on Sundays."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_restaurant",
+          "description": "Retrieve highest rated restaurant given cuisine, location, and a condition. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "cuisine": {
+                "type": "string",
+                "description": "Cuisine of the restaurant."
+              },
+              "location": {
+                "type": "string",
+                "description": "City where restaurant is located."
+              },
+              "condition": {
+                "type": "string",
+                "description": "Condition to be met by the restaurant (e.g., operating days, amenities, etc.)"
+              }
+            },
+            "required": [
+              "cuisine",
+              "location",
+              "condition"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776237829-SCoDFni87WT1cPvOh7Cp",
+    "object": "chat.completion",
+    "created": 1776237829,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_83841239",
+              "function": {
+                "name": "get_restaurant",
+                "arguments": "{\"cuisine\":\"sushi\",\"location\":\"Boston\",\"condition\":\"opens on Sundays\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 341,
+      "completion_tokens": 43,
+      "total_tokens": 384,
+      "cost": 0.00089397,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 340,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.000903,
+        "upstream_inference_prompt_cost": 0.000258,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776237829-SCoDFni87WT1cPvOh7Cp",
+    "object": "response",
+    "created_at": 1776237830,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_83841239",
+        "call_id": "call_83841239",
+        "name": "get_restaurant",
+        "arguments": "{\"cuisine\":\"sushi\",\"location\":\"Boston\",\"condition\":\"opens on Sundays\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 341,
+      "completion_tokens": 43,
+      "total_tokens": 384,
+      "cost": 0.00089397,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 340,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.000903,
+        "upstream_inference_prompt_cost": 0.000258,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776237829-SCoDFni87WT1cPvOh7Cp",
+    "object": "chat.completion",
+    "created": 1776237829,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_83841239",
+              "function": {
+                "name": "get_restaurant",
+                "arguments": "{\"cuisine\":\"sushi\",\"location\":\"Boston\",\"condition\":\"opens on Sundays\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 341,
+      "completion_tokens": 43,
+      "total_tokens": 384,
+      "cost": 0.00089397,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 340,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.000903,
+        "upstream_inference_prompt_cost": 0.000258,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1543.053,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "ad6d375c-92ef-4de9-8fc4-baa13dd0090c"
+}

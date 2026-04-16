@@ -1,0 +1,452 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the neuronal activity based on synaptic input rate of 200 and weight 0.5 and decay rate of 0.1."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_electrostatic_potential",
+        "description": "Calculate the electrostatic potential between two charged bodies using the principle of Coulomb's Law. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "charge1": {
+              "type": "number",
+              "description": "The quantity of charge on the first body. This is a float type value.",
+              "format": "float"
+            },
+            "charge2": {
+              "type": "number",
+              "description": "The quantity of charge on the second body. This is a float type value.",
+              "format": "float"
+            },
+            "distance": {
+              "type": "number",
+              "description": "The distance between the two bodies. This is a float type value.",
+              "format": "float"
+            },
+            "constant": {
+              "type": "number",
+              "description": "The value of the electrostatic constant. Default is 898755178.73 This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "charge1",
+            "charge2",
+            "distance"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "calculate_neuronal_activity",
+        "description": "Calculate the neuronal activity (rate of firing) based on a given input synaptic rate, weight of inputs, and decay rate. Higher input or weight increases firing rate and higher decay rate decreases it. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "input_synaptic_rate": {
+              "type": "integer",
+              "description": "The synaptic input rate, usually represented as number of inputs per second."
+            },
+            "weight": {
+              "type": "number",
+              "description": "The weight of the input, denoting its influence on the neuron's state. Default is 1.0. This is a float type value.",
+              "format": "float"
+            },
+            "decay_rate": {
+              "type": "number",
+              "description": "The rate at which the neuron's potential decays in the absence of inputs. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "input_synaptic_rate",
+            "decay_rate"
+          ],
+          "optional": [
+            "weight"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "calculate_displacement",
+        "description": "Calculates the displacement of an object in motion given initial velocity, time, and acceleration. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "initial_velocity": {
+              "type": "number",
+              "description": "The initial velocity of the object in m/s. This is a float type value.",
+              "format": "float"
+            },
+            "time": {
+              "type": "integer",
+              "description": "The time in seconds that the object has been in motion."
+            },
+            "acceleration": {
+              "type": "number",
+              "description": "The acceleration of the object in m/s^2. This is a float type value.",
+              "default": 0,
+              "format": "float"
+            }
+          },
+          "required": [
+            "initial_velocity",
+            "time"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "grocery_store_find_best",
+        "description": "Find the closest high-rated grocery stores based on certain product availability. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "my_location": {
+              "type": "string",
+              "description": "The current location of the user."
+            },
+            "rating": {
+              "type": "number",
+              "description": "The minimum required store rating. Default is 0.0. This is a float type value.",
+              "format": "float"
+            },
+            "products": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Required products in a list."
+            }
+          },
+          "required": [
+            "my_location",
+            "products"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the neuronal activity based on synaptic input rate of 200 and weight 0.5 and decay rate of 0.1."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_electrostatic_potential",
+          "description": "Calculate the electrostatic potential between two charged bodies using the principle of Coulomb's Law. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "charge1": {
+                "type": "number",
+                "description": "The quantity of charge on the first body. This is a float type value.",
+                "format": "float"
+              },
+              "charge2": {
+                "type": "number",
+                "description": "The quantity of charge on the second body. This is a float type value.",
+                "format": "float"
+              },
+              "distance": {
+                "type": "number",
+                "description": "The distance between the two bodies. This is a float type value.",
+                "format": "float"
+              },
+              "constant": {
+                "type": "number",
+                "description": "The value of the electrostatic constant. Default is 898755178.73 This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "charge1",
+              "charge2",
+              "distance"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_neuronal_activity",
+          "description": "Calculate the neuronal activity (rate of firing) based on a given input synaptic rate, weight of inputs, and decay rate. Higher input or weight increases firing rate and higher decay rate decreases it. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "input_synaptic_rate": {
+                "type": "integer",
+                "description": "The synaptic input rate, usually represented as number of inputs per second."
+              },
+              "weight": {
+                "type": "number",
+                "description": "The weight of the input, denoting its influence on the neuron's state. Default is 1.0. This is a float type value.",
+                "format": "float"
+              },
+              "decay_rate": {
+                "type": "number",
+                "description": "The rate at which the neuron's potential decays in the absence of inputs. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "input_synaptic_rate",
+              "decay_rate"
+            ],
+            "optional": [
+              "weight"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_displacement",
+          "description": "Calculates the displacement of an object in motion given initial velocity, time, and acceleration. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "initial_velocity": {
+                "type": "number",
+                "description": "The initial velocity of the object in m/s. This is a float type value.",
+                "format": "float"
+              },
+              "time": {
+                "type": "integer",
+                "description": "The time in seconds that the object has been in motion."
+              },
+              "acceleration": {
+                "type": "number",
+                "description": "The acceleration of the object in m/s^2. This is a float type value.",
+                "default": 0,
+                "format": "float"
+              }
+            },
+            "required": [
+              "initial_velocity",
+              "time"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "grocery_store_find_best",
+          "description": "Find the closest high-rated grocery stores based on certain product availability. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "my_location": {
+                "type": "string",
+                "description": "The current location of the user."
+              },
+              "rating": {
+                "type": "number",
+                "description": "The minimum required store rating. Default is 0.0. This is a float type value.",
+                "format": "float"
+              },
+              "products": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Required products in a list."
+              }
+            },
+            "required": [
+              "my_location",
+              "products"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239793-6qWl0IrtbTztaDYKnfxI",
+    "object": "chat.completion",
+    "created": 1776239793,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_80849802",
+              "function": {
+                "name": "calculate_neuronal_activity",
+                "arguments": "{\"input_synaptic_rate\":200,\"weight\":0.5,\"decay_rate\":0.1}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 884,
+      "completion_tokens": 48,
+      "total_tokens": 932,
+      "cost": 0.0028727325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00290175,
+        "upstream_inference_prompt_cost": 0.00218175,
+        "upstream_inference_completions_cost": 0.00072
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239793-6qWl0IrtbTztaDYKnfxI",
+    "object": "response",
+    "created_at": 1776239794,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_80849802",
+        "call_id": "call_80849802",
+        "name": "calculate_neuronal_activity",
+        "arguments": "{\"input_synaptic_rate\":200,\"weight\":0.5,\"decay_rate\":0.1}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 884,
+      "completion_tokens": 48,
+      "total_tokens": 932,
+      "cost": 0.0028727325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00290175,
+        "upstream_inference_prompt_cost": 0.00218175,
+        "upstream_inference_completions_cost": 0.00072
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239793-6qWl0IrtbTztaDYKnfxI",
+    "object": "chat.completion",
+    "created": 1776239793,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_80849802",
+              "function": {
+                "name": "calculate_neuronal_activity",
+                "arguments": "{\"input_synaptic_rate\":200,\"weight\":0.5,\"decay_rate\":0.1}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 884,
+      "completion_tokens": 48,
+      "total_tokens": 932,
+      "cost": 0.0028727325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00290175,
+        "upstream_inference_prompt_cost": 0.00218175,
+        "upstream_inference_completions_cost": 0.00072
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2277.023,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "181c3446-be6e-4781-869f-050f6a0d693a"
+}

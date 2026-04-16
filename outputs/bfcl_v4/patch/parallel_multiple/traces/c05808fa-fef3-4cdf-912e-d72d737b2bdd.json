@@ -1,0 +1,304 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Can you first find me a vegan, main course recipe that can be prepared within 30 minutes? After that, could you please retrieve the details of the scientific discovery of Gravity using the most accepted method? Once done, I would also like to know about the discovery of the Higgs Boson particle using the same method. Lastly, could you find me a gluten-free dessert recipe that can be prepared within 45 minutes?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "find_recipe",
+        "description": "Find a recipe based on the dietary restrictions, recipe type, and time constraints. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "dietary_restrictions": {
+              "type": "string",
+              "description": "Dietary restrictions e.g. vegan, vegetarian, gluten free, dairy free."
+            },
+            "recipe_type": {
+              "type": "string",
+              "description": "Type of the recipe. E.g. dessert, main course, breakfast."
+            },
+            "time": {
+              "type": "integer",
+              "description": "Time limit in minutes to prep the meal."
+            }
+          },
+          "required": [
+            "dietary_restrictions",
+            "recipe_type",
+            "time"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "science_history_get_discovery_details",
+        "description": "Retrieve the details of a scientific discovery based on the discovery name. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "discovery": {
+              "type": "string",
+              "description": "The name of the discovery, e.g. Gravity"
+            },
+            "method_used": {
+              "type": "string",
+              "description": "The method used for the discovery, default value is 'default' which gives the most accepted method."
+            }
+          },
+          "required": [
+            "discovery"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Can you first find me a vegan, main course recipe that can be prepared within 30 minutes? After that, could you please retrieve the details of the scientific discovery of Gravity using the most accepted method? Once done, I would also like to know about the discovery of the Higgs Boson particle using the same method. Lastly, could you find me a gluten-free dessert recipe that can be prepared within 45 minutes?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "find_recipe",
+          "description": "Find a recipe based on the dietary restrictions, recipe type, and time constraints. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "dietary_restrictions": {
+                "type": "string",
+                "description": "Dietary restrictions e.g. vegan, vegetarian, gluten free, dairy free."
+              },
+              "recipe_type": {
+                "type": "string",
+                "description": "Type of the recipe. E.g. dessert, main course, breakfast."
+              },
+              "time": {
+                "type": "integer",
+                "description": "Time limit in minutes to prep the meal."
+              }
+            },
+            "required": [
+              "dietary_restrictions",
+              "recipe_type",
+              "time"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "science_history_get_discovery_details",
+          "description": "Retrieve the details of a scientific discovery based on the discovery name. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "discovery": {
+                "type": "string",
+                "description": "The name of the discovery, e.g. Gravity"
+              },
+              "method_used": {
+                "type": "string",
+                "description": "The method used for the discovery, default value is 'default' which gives the most accepted method."
+              }
+            },
+            "required": [
+              "discovery"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776242031-ZF75xTT0KtQpKvf9dyLi",
+    "object": "chat.completion",
+    "created": 1776242031,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'll start by finding a vegan main course recipe that can be prepared within 30 minutes. Once that's done, I'll retrieve the details of the scientific discovery of Gravity using the most accepted method, followed by the discovery of the Higgs Boson particle using the same method. Lastly, I'll find a gluten-free dessert recipe that can be prepared within 45 minutes.",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_97033880",
+              "function": {
+                "name": "find_recipe",
+                "arguments": "{\"dietary_restrictions\":\"vegan\",\"recipe_type\":\"main course\",\"time\":30}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 534,
+      "completion_tokens": 113,
+      "total_tokens": 647,
+      "cost": 0.0032573475,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00329025,
+        "upstream_inference_prompt_cost": 0.00159525,
+        "upstream_inference_completions_cost": 0.001695
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776242031-ZF75xTT0KtQpKvf9dyLi",
+    "object": "response",
+    "created_at": 1776242032,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'll start by finding a vegan main course recipe that can be prepared within 30 minutes. Once that's done, I'll retrieve the details of the scientific discovery of Gravity using the most accepted method, followed by the discovery of the Higgs Boson particle using the same method. Lastly, I'll find a gluten-free dessert recipe that can be prepared within 45 minutes."
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_97033880",
+        "call_id": "call_97033880",
+        "name": "find_recipe",
+        "arguments": "{\"dietary_restrictions\":\"vegan\",\"recipe_type\":\"main course\",\"time\":30}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 534,
+      "completion_tokens": 113,
+      "total_tokens": 647,
+      "cost": 0.0032573475,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00329025,
+        "upstream_inference_prompt_cost": 0.00159525,
+        "upstream_inference_completions_cost": 0.001695
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776242031-ZF75xTT0KtQpKvf9dyLi",
+    "object": "chat.completion",
+    "created": 1776242031,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'll start by finding a vegan main course recipe that can be prepared within 30 minutes. Once that's done, I'll retrieve the details of the scientific discovery of Gravity using the most accepted method, followed by the discovery of the Higgs Boson particle using the same method. Lastly, I'll find a gluten-free dessert recipe that can be prepared within 45 minutes.",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_97033880",
+              "function": {
+                "name": "find_recipe",
+                "arguments": "{\"dietary_restrictions\":\"vegan\",\"recipe_type\":\"main course\",\"time\":30}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 534,
+      "completion_tokens": 113,
+      "total_tokens": 647,
+      "cost": 0.0032573475,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00329025,
+        "upstream_inference_prompt_cost": 0.00159525,
+        "upstream_inference_completions_cost": 0.001695
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2420.608,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "c05808fa-fef3-4cdf-912e-d72d737b2bdd"
+}

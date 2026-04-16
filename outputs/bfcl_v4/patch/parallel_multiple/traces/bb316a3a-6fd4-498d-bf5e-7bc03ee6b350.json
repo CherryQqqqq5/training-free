@@ -1,0 +1,418 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Imagine you are planning a trip to Mars. You weigh 75 kilograms on Earth and you are curious about how much you would weigh on Mars. After your trip to Mars, you plan to visit Japan. You have 5000 US dollars and you want to know how much it would be in Japanese Yen. During your stay in Japan, you come across a beautiful antique vase that is 24 inches tall, but you are more familiar with measurements in centimeters. How tall is the vase in centimeters?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_weight_in_space",
+        "description": "Calculate your weight on different planets given your weight on earth Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "weight_earth_kg": {
+              "type": "number",
+              "description": "Your weight on Earth in Kilograms. This is a float type value.",
+              "format": "float"
+            },
+            "planet": {
+              "type": "string",
+              "description": "The planet you want to know your weight on."
+            }
+          },
+          "required": [
+            "weight_earth_kg",
+            "planet"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "currency_conversion",
+        "description": "Convert a value from one currency to another. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number",
+              "description": "The amount to be converted. This is a float type value.",
+              "format": "float"
+            },
+            "from_currency": {
+              "type": "string",
+              "description": "The currency to convert from."
+            },
+            "to_currency": {
+              "type": "string",
+              "description": "The currency to convert to."
+            }
+          },
+          "required": [
+            "amount",
+            "from_currency",
+            "to_currency"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "unit_conversion_convert",
+        "description": "Convert a value from one unit to another. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "number",
+              "description": "The value to be converted. This is a float type value.",
+              "format": "float"
+            },
+            "from_unit": {
+              "type": "string",
+              "description": "The unit to convert from."
+            },
+            "to_unit": {
+              "type": "string",
+              "description": "The unit to convert to."
+            }
+          },
+          "required": [
+            "value",
+            "from_unit",
+            "to_unit"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Imagine you are planning a trip to Mars. You weigh 75 kilograms on Earth and you are curious about how much you would weigh on Mars. After your trip to Mars, you plan to visit Japan. You have 5000 US dollars and you want to know how much it would be in Japanese Yen. During your stay in Japan, you come across a beautiful antique vase that is 24 inches tall, but you are more familiar with measurements in centimeters. How tall is the vase in centimeters?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_weight_in_space",
+          "description": "Calculate your weight on different planets given your weight on earth Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "weight_earth_kg": {
+                "type": "number",
+                "description": "Your weight on Earth in Kilograms. This is a float type value.",
+                "format": "float"
+              },
+              "planet": {
+                "type": "string",
+                "description": "The planet you want to know your weight on."
+              }
+            },
+            "required": [
+              "weight_earth_kg",
+              "planet"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "currency_conversion",
+          "description": "Convert a value from one currency to another. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "number",
+                "description": "The amount to be converted. This is a float type value.",
+                "format": "float"
+              },
+              "from_currency": {
+                "type": "string",
+                "description": "The currency to convert from."
+              },
+              "to_currency": {
+                "type": "string",
+                "description": "The currency to convert to."
+              }
+            },
+            "required": [
+              "amount",
+              "from_currency",
+              "to_currency"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "unit_conversion_convert",
+          "description": "Convert a value from one unit to another. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "number",
+                "description": "The value to be converted. This is a float type value.",
+                "format": "float"
+              },
+              "from_unit": {
+                "type": "string",
+                "description": "The unit to convert from."
+              },
+              "to_unit": {
+                "type": "string",
+                "description": "The unit to convert to."
+              }
+            },
+            "required": [
+              "value",
+              "from_unit",
+              "to_unit"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241621-np8s8kOY3ufJWIL9RKFi",
+    "object": "chat.completion",
+    "created": 1776241621,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "Let's address each part of your query step by step.\n\n1. For your weight on Mars:\n2. For the currency conversion from USD to Japanese Yen:\n3. For the height conversion of the vase from inches to centimeters:\nI'll provide the results for each of these calculations once the function calls are processed.",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_39045795",
+              "function": {
+                "name": "calculate_weight_in_space",
+                "arguments": "{\"weight_earth_kg\":75.0,\"planet\":\"Mars\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_75287481",
+              "function": {
+                "name": "currency_conversion",
+                "arguments": "{\"amount\":5000.0,\"from_currency\":\"USD\",\"to_currency\":\"JPY\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_70599681",
+              "function": {
+                "name": "unit_conversion_convert",
+                "arguments": "{\"value\":24.0,\"from_unit\":\"inches\",\"to_unit\":\"centimeters\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 640,
+      "completion_tokens": 189,
+      "total_tokens": 829,
+      "cost": 0.004239675,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0042825,
+        "upstream_inference_prompt_cost": 0.0014475,
+        "upstream_inference_completions_cost": 0.002835
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241621-np8s8kOY3ufJWIL9RKFi",
+    "object": "response",
+    "created_at": 1776241623,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "Let's address each part of your query step by step.\n\n1. For your weight on Mars:\n2. For the currency conversion from USD to Japanese Yen:\n3. For the height conversion of the vase from inches to centimeters:\nI'll provide the results for each of these calculations once the function calls are processed."
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_39045795",
+        "call_id": "call_39045795",
+        "name": "calculate_weight_in_space",
+        "arguments": "{\"weight_earth_kg\":75.0,\"planet\":\"Mars\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_75287481",
+        "call_id": "call_75287481",
+        "name": "currency_conversion",
+        "arguments": "{\"amount\":5000.0,\"from_currency\":\"USD\",\"to_currency\":\"JPY\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_70599681",
+        "call_id": "call_70599681",
+        "name": "unit_conversion_convert",
+        "arguments": "{\"value\":24.0,\"from_unit\":\"inches\",\"to_unit\":\"centimeters\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 640,
+      "completion_tokens": 189,
+      "total_tokens": 829,
+      "cost": 0.004239675,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0042825,
+        "upstream_inference_prompt_cost": 0.0014475,
+        "upstream_inference_completions_cost": 0.002835
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241621-np8s8kOY3ufJWIL9RKFi",
+    "object": "chat.completion",
+    "created": 1776241621,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "Let's address each part of your query step by step.\n\n1. For your weight on Mars:\n2. For the currency conversion from USD to Japanese Yen:\n3. For the height conversion of the vase from inches to centimeters:\nI'll provide the results for each of these calculations once the function calls are processed.",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_39045795",
+              "function": {
+                "name": "calculate_weight_in_space",
+                "arguments": "{\"weight_earth_kg\":75.0,\"planet\":\"Mars\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_75287481",
+              "function": {
+                "name": "currency_conversion",
+                "arguments": "{\"amount\":5000.0,\"from_currency\":\"USD\",\"to_currency\":\"JPY\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_70599681",
+              "function": {
+                "name": "unit_conversion_convert",
+                "arguments": "{\"value\":24.0,\"from_unit\":\"inches\",\"to_unit\":\"centimeters\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 640,
+      "completion_tokens": 189,
+      "total_tokens": 829,
+      "cost": 0.004239675,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0042825,
+        "upstream_inference_prompt_cost": 0.0014475,
+        "upstream_inference_completions_cost": 0.002835
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 3281.332,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "bb316a3a-6fd4-498d-bf5e-7bc03ee6b350"
+}

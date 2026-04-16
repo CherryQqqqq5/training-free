@@ -1,0 +1,250 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Who was the victim in the case docket numbered 2022/AL2562 in California?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "get_case_info",
+        "description": "Retrieve case details using a specific case docket number and court location. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "docket": {
+              "type": "string",
+              "description": "Docket number for the specific court case."
+            },
+            "court": {
+              "type": "string",
+              "description": "Court in which the case was heard."
+            },
+            "info_type": {
+              "type": "string",
+              "description": "Specify the information type needed for the case. i.e., victim, accused, verdict etc."
+            }
+          },
+          "required": [
+            "docket",
+            "court",
+            "info_type"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Who was the victim in the case docket numbered 2022/AL2562 in California?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_case_info",
+          "description": "Retrieve case details using a specific case docket number and court location. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "docket": {
+                "type": "string",
+                "description": "Docket number for the specific court case."
+              },
+              "court": {
+                "type": "string",
+                "description": "Court in which the case was heard."
+              },
+              "info_type": {
+                "type": "string",
+                "description": "Specify the information type needed for the case. i.e., victim, accused, verdict etc."
+              }
+            },
+            "required": [
+              "docket",
+              "court",
+              "info_type"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776237974-QYRLxxnOnxnAYmsmPls1",
+    "object": "chat.completion",
+    "created": 1776237974,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_45050355",
+              "function": {
+                "name": "get_case_info",
+                "arguments": "{\"docket\":\"2022/AL2562\",\"court\":\"California\",\"info_type\":\"victim\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 355,
+      "completion_tokens": 46,
+      "total_tokens": 401,
+      "cost": 0.001269675,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0012825,
+        "upstream_inference_prompt_cost": 0.0005925,
+        "upstream_inference_completions_cost": 0.00069
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776237974-QYRLxxnOnxnAYmsmPls1",
+    "object": "response",
+    "created_at": 1776237975,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_45050355",
+        "call_id": "call_45050355",
+        "name": "get_case_info",
+        "arguments": "{\"docket\":\"2022/AL2562\",\"court\":\"California\",\"info_type\":\"victim\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 355,
+      "completion_tokens": 46,
+      "total_tokens": 401,
+      "cost": 0.001269675,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0012825,
+        "upstream_inference_prompt_cost": 0.0005925,
+        "upstream_inference_completions_cost": 0.00069
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776237974-QYRLxxnOnxnAYmsmPls1",
+    "object": "chat.completion",
+    "created": 1776237974,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_45050355",
+              "function": {
+                "name": "get_case_info",
+                "arguments": "{\"docket\":\"2022/AL2562\",\"court\":\"California\",\"info_type\":\"victim\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 355,
+      "completion_tokens": 46,
+      "total_tokens": 401,
+      "cost": 0.001269675,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0012825,
+        "upstream_inference_prompt_cost": 0.0005925,
+        "upstream_inference_completions_cost": 0.00069
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1786.783,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "3acb212d-a812-43d2-9662-28d603a8787b"
+}

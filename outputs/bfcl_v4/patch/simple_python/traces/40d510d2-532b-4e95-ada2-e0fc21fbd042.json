@@ -1,0 +1,270 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Check the amount of protein, calories and carbs in an avocado from Walmart."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "grocery_info_nutritional_info",
+        "description": "Retrieve nutritional information for a given food item from a particular store Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "store": {
+              "type": "string",
+              "description": "The store where the item is available"
+            },
+            "food": {
+              "type": "string",
+              "description": "Food item for which information is needed."
+            },
+            "information": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Protein",
+                  "Calories",
+                  "Carbohydrates",
+                  "Fat",
+                  "Fiber"
+                ]
+              },
+              "description": "Nutritional details required."
+            }
+          },
+          "required": [
+            "store",
+            "food",
+            "information"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Check the amount of protein, calories and carbs in an avocado from Walmart."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "grocery_info_nutritional_info",
+          "description": "Retrieve nutritional information for a given food item from a particular store Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "store": {
+                "type": "string",
+                "description": "The store where the item is available"
+              },
+              "food": {
+                "type": "string",
+                "description": "Food item for which information is needed."
+              },
+              "information": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "Protein",
+                    "Calories",
+                    "Carbohydrates",
+                    "Fat",
+                    "Fiber"
+                  ]
+                },
+                "description": "Nutritional details required."
+              }
+            },
+            "required": [
+              "store",
+              "food",
+              "information"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239333-dzORUh20V1xaRjs3yEIF",
+    "object": "chat.completion",
+    "created": 1776239333,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_74132967",
+              "function": {
+                "name": "grocery_info_nutritional_info",
+                "arguments": "{\"store\":\"Walmart\",\"food\":\"avocado\",\"information\":[\"Protein\",\"Calories\",\"Carbohydrates\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 354,
+      "completion_tokens": 53,
+      "total_tokens": 407,
+      "cost": 0.0013728825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00138675,
+        "upstream_inference_prompt_cost": 0.00059175,
+        "upstream_inference_completions_cost": 0.000795
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239333-dzORUh20V1xaRjs3yEIF",
+    "object": "response",
+    "created_at": 1776239335,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_74132967",
+        "call_id": "call_74132967",
+        "name": "grocery_info_nutritional_info",
+        "arguments": "{\"store\":\"Walmart\",\"food\":\"avocado\",\"information\":[\"Protein\",\"Calories\",\"Carbohydrates\"]}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 354,
+      "completion_tokens": 53,
+      "total_tokens": 407,
+      "cost": 0.0013728825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00138675,
+        "upstream_inference_prompt_cost": 0.00059175,
+        "upstream_inference_completions_cost": 0.000795
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239333-dzORUh20V1xaRjs3yEIF",
+    "object": "chat.completion",
+    "created": 1776239333,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_74132967",
+              "function": {
+                "name": "grocery_info_nutritional_info",
+                "arguments": "{\"store\":\"Walmart\",\"food\":\"avocado\",\"information\":[\"Protein\",\"Calories\",\"Carbohydrates\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 354,
+      "completion_tokens": 53,
+      "total_tokens": 407,
+      "cost": 0.0013728825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00138675,
+        "upstream_inference_prompt_cost": 0.00059175,
+        "upstream_inference_completions_cost": 0.000795
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2279.625,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "40d510d2-532b-4e95-ada2-e0fc21fbd042"
+}

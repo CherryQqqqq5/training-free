@@ -1,0 +1,270 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Check if any Hilton Hotel is available for two adults in Paris from 2023 April 4th to April 8th?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "hilton_hotel_check_availability",
+        "description": "Check hotel availability for a specific location and time frame. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city where you want to check hotel availability."
+            },
+            "check_in_date": {
+              "type": "string",
+              "description": "The check-in date in the format YYYY-MM-DD."
+            },
+            "check_out_date": {
+              "type": "string",
+              "description": "The check-out date in the format YYYY-MM-DD."
+            },
+            "no_of_adults": {
+              "type": "integer",
+              "description": "The number of adults for the hotel booking."
+            },
+            "hotel_chain": {
+              "type": "string",
+              "description": "The hotel chain where you want to book the hotel.",
+              "default": "Hilton"
+            }
+          },
+          "required": [
+            "location",
+            "check_in_date",
+            "check_out_date",
+            "no_of_adults"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Check if any Hilton Hotel is available for two adults in Paris from 2023 April 4th to April 8th?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "hilton_hotel_check_availability",
+          "description": "Check hotel availability for a specific location and time frame. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city where you want to check hotel availability."
+              },
+              "check_in_date": {
+                "type": "string",
+                "description": "The check-in date in the format YYYY-MM-DD."
+              },
+              "check_out_date": {
+                "type": "string",
+                "description": "The check-out date in the format YYYY-MM-DD."
+              },
+              "no_of_adults": {
+                "type": "integer",
+                "description": "The number of adults for the hotel booking."
+              },
+              "hotel_chain": {
+                "type": "string",
+                "description": "The hotel chain where you want to book the hotel.",
+                "default": "Hilton"
+              }
+            },
+            "required": [
+              "location",
+              "check_in_date",
+              "check_out_date",
+              "no_of_adults"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239347-9jtTtOHESE9xA0t6DIzz",
+    "object": "chat.completion",
+    "created": 1776239347,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_46382641",
+              "function": {
+                "name": "hilton_hotel_check_availability",
+                "arguments": "{\"location\":\"Paris\",\"check_in_date\":\"2023-04-04\",\"check_out_date\":\"2023-04-08\",\"no_of_adults\":2}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 415,
+      "completion_tokens": 65,
+      "total_tokens": 480,
+      "cost": 0.0017322525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00174975,
+        "upstream_inference_prompt_cost": 0.00077475,
+        "upstream_inference_completions_cost": 0.000975
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239347-9jtTtOHESE9xA0t6DIzz",
+    "object": "response",
+    "created_at": 1776239349,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_46382641",
+        "call_id": "call_46382641",
+        "name": "hilton_hotel_check_availability",
+        "arguments": "{\"location\":\"Paris\",\"check_in_date\":\"2023-04-04\",\"check_out_date\":\"2023-04-08\",\"no_of_adults\":2}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 415,
+      "completion_tokens": 65,
+      "total_tokens": 480,
+      "cost": 0.0017322525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00174975,
+        "upstream_inference_prompt_cost": 0.00077475,
+        "upstream_inference_completions_cost": 0.000975
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239347-9jtTtOHESE9xA0t6DIzz",
+    "object": "chat.completion",
+    "created": 1776239347,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_46382641",
+              "function": {
+                "name": "hilton_hotel_check_availability",
+                "arguments": "{\"location\":\"Paris\",\"check_in_date\":\"2023-04-04\",\"check_out_date\":\"2023-04-08\",\"no_of_adults\":2}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 415,
+      "completion_tokens": 65,
+      "total_tokens": 480,
+      "cost": 0.0017322525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00174975,
+        "upstream_inference_prompt_cost": 0.00077475,
+        "upstream_inference_completions_cost": 0.000975
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2093.027,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "6008c369-ca93-4e07-b737-e80a7cad54ef"
+}

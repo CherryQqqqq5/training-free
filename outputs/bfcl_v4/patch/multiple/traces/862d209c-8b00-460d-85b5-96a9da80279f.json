@@ -1,0 +1,364 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "What is the probability of getting a full house in poker?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "poker_probability_full_house",
+        "description": "Calculate the probability of getting a full house in a poker game. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "deck_size": {
+              "type": "integer",
+              "description": "The size of the deck. Default is 52."
+            },
+            "hand_size": {
+              "type": "integer",
+              "description": "The size of the hand. Default is 5."
+            }
+          },
+          "required": [
+            "deck_size",
+            "hand_size"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "hospital_locate",
+        "description": "Locate nearby hospitals based on location and radius. Options to include specific departments are available. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city and state, e.g. Denver, CO"
+            },
+            "radius": {
+              "type": "integer",
+              "description": "The radius within which you want to find the hospital in kms."
+            },
+            "department": {
+              "type": "string",
+              "description": "Specific department within the hospital. Default is ''.",
+              "enum": [
+                "General Medicine",
+                "Emergency",
+                "Pediatrics",
+                "Cardiology",
+                "Orthopedics"
+              ]
+            }
+          },
+          "required": [
+            "location",
+            "radius"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "find_recipe",
+        "description": "Find a recipe based on the dietary restrictions, recipe type, and time constraints. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "dietary_restrictions": {
+              "type": "string",
+              "description": "Dietary restrictions e.g. vegan, vegetarian, gluten free, dairy free."
+            },
+            "recipe_type": {
+              "type": "string",
+              "description": "Type of the recipe. E.g. dessert, main course, breakfast."
+            },
+            "time": {
+              "type": "integer",
+              "description": "Time limit in minutes to prep the meal."
+            }
+          },
+          "required": [
+            "dietary_restrictions",
+            "recipe_type",
+            "time"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What is the probability of getting a full house in poker?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "poker_probability_full_house",
+          "description": "Calculate the probability of getting a full house in a poker game. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "deck_size": {
+                "type": "integer",
+                "description": "The size of the deck. Default is 52."
+              },
+              "hand_size": {
+                "type": "integer",
+                "description": "The size of the hand. Default is 5."
+              }
+            },
+            "required": [
+              "deck_size",
+              "hand_size"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "hospital_locate",
+          "description": "Locate nearby hospitals based on location and radius. Options to include specific departments are available. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city and state, e.g. Denver, CO"
+              },
+              "radius": {
+                "type": "integer",
+                "description": "The radius within which you want to find the hospital in kms."
+              },
+              "department": {
+                "type": "string",
+                "description": "Specific department within the hospital. Default is ''.",
+                "enum": [
+                  "General Medicine",
+                  "Emergency",
+                  "Pediatrics",
+                  "Cardiology",
+                  "Orthopedics"
+                ]
+              }
+            },
+            "required": [
+              "location",
+              "radius"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "find_recipe",
+          "description": "Find a recipe based on the dietary restrictions, recipe type, and time constraints. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "dietary_restrictions": {
+                "type": "string",
+                "description": "Dietary restrictions e.g. vegan, vegetarian, gluten free, dairy free."
+              },
+              "recipe_type": {
+                "type": "string",
+                "description": "Type of the recipe. E.g. dessert, main course, breakfast."
+              },
+              "time": {
+                "type": "integer",
+                "description": "Time limit in minutes to prep the meal."
+              }
+            },
+            "required": [
+              "dietary_restrictions",
+              "recipe_type",
+              "time"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240340-yt1jRqcaJ0IYK3FLcyrM",
+    "object": "chat.completion",
+    "created": 1776240340,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_98441365",
+              "function": {
+                "name": "poker_probability_full_house",
+                "arguments": "{\"deck_size\":52,\"hand_size\":5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 593,
+      "completion_tokens": 36,
+      "total_tokens": 629,
+      "cost": 0.0018302625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00184875,
+        "upstream_inference_prompt_cost": 0.00130875,
+        "upstream_inference_completions_cost": 0.00054
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240340-yt1jRqcaJ0IYK3FLcyrM",
+    "object": "response",
+    "created_at": 1776240342,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_98441365",
+        "call_id": "call_98441365",
+        "name": "poker_probability_full_house",
+        "arguments": "{\"deck_size\":52,\"hand_size\":5}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 593,
+      "completion_tokens": 36,
+      "total_tokens": 629,
+      "cost": 0.0018302625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00184875,
+        "upstream_inference_prompt_cost": 0.00130875,
+        "upstream_inference_completions_cost": 0.00054
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240340-yt1jRqcaJ0IYK3FLcyrM",
+    "object": "chat.completion",
+    "created": 1776240340,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_98441365",
+              "function": {
+                "name": "poker_probability_full_house",
+                "arguments": "{\"deck_size\":52,\"hand_size\":5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 593,
+      "completion_tokens": 36,
+      "total_tokens": 629,
+      "cost": 0.0018302625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00184875,
+        "upstream_inference_prompt_cost": 0.00130875,
+        "upstream_inference_completions_cost": 0.00054
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2260.91,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "862d209c-8b00-460d-85b5-96a9da80279f"
+}

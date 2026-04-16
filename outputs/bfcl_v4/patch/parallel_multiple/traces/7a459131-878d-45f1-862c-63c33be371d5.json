@@ -1,0 +1,331 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Imagine you are a music producer and you are working on a new song. You want to generate a music scale progression in the key of 'D' with a tempo of 120 BPM, where each note lasts for 2 beats. You are considering using a 'minor' scale type for this progression. After creating this, you decide to take a break and solve a math problem. You want to find the highest common factor of the numbers 456 and 123. Can you generate the music scale progression and solve the math problem?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "music_generator_generate_scale_progression",
+        "description": "Generate a music scale progression in a specific key with a given tempo and duration. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "The key in which to generate the scale progression."
+            },
+            "tempo": {
+              "type": "integer",
+              "description": "The tempo of the scale progression in BPM."
+            },
+            "duration": {
+              "type": "integer",
+              "description": "The duration of each note in beats."
+            },
+            "scale_type": {
+              "type": "string",
+              "default": "major",
+              "description": "The type of scale to generate. Defaults to 'major'."
+            }
+          },
+          "required": [
+            "key",
+            "tempo",
+            "duration"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "math_hcf",
+        "description": "Calculate the highest common factor of two numbers. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "number1": {
+              "type": "integer",
+              "description": "First number."
+            },
+            "number2": {
+              "type": "integer",
+              "description": "Second number."
+            }
+          },
+          "required": [
+            "number1",
+            "number2"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Imagine you are a music producer and you are working on a new song. You want to generate a music scale progression in the key of 'D' with a tempo of 120 BPM, where each note lasts for 2 beats. You are considering using a 'minor' scale type for this progression. After creating this, you decide to take a break and solve a math problem. You want to find the highest common factor of the numbers 456 and 123. Can you generate the music scale progression and solve the math problem?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "music_generator_generate_scale_progression",
+          "description": "Generate a music scale progression in a specific key with a given tempo and duration. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The key in which to generate the scale progression."
+              },
+              "tempo": {
+                "type": "integer",
+                "description": "The tempo of the scale progression in BPM."
+              },
+              "duration": {
+                "type": "integer",
+                "description": "The duration of each note in beats."
+              },
+              "scale_type": {
+                "type": "string",
+                "default": "major",
+                "description": "The type of scale to generate. Defaults to 'major'."
+              }
+            },
+            "required": [
+              "key",
+              "tempo",
+              "duration"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "math_hcf",
+          "description": "Calculate the highest common factor of two numbers. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "number1": {
+                "type": "integer",
+                "description": "First number."
+              },
+              "number2": {
+                "type": "integer",
+                "description": "Second number."
+              }
+            },
+            "required": [
+              "number1",
+              "number2"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241755-WKISGn4XmJafZ3cQYRdR",
+    "object": "chat.completion",
+    "created": 1776241755,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_77825437",
+              "function": {
+                "name": "music_generator_generate_scale_progression",
+                "arguments": "{\"key\":\"D\",\"tempo\":120,\"duration\":2,\"scale_type\":\"minor\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_08658337",
+              "function": {
+                "name": "math_hcf",
+                "arguments": "{\"number1\":456,\"number2\":123}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 541,
+      "completion_tokens": 83,
+      "total_tokens": 624,
+      "cost": 0.0023737725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00239775,
+        "upstream_inference_prompt_cost": 0.00115275,
+        "upstream_inference_completions_cost": 0.001245
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241755-WKISGn4XmJafZ3cQYRdR",
+    "object": "response",
+    "created_at": 1776241757,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_77825437",
+        "call_id": "call_77825437",
+        "name": "music_generator_generate_scale_progression",
+        "arguments": "{\"key\":\"D\",\"tempo\":120,\"duration\":2,\"scale_type\":\"minor\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_08658337",
+        "call_id": "call_08658337",
+        "name": "math_hcf",
+        "arguments": "{\"number1\":456,\"number2\":123}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 541,
+      "completion_tokens": 83,
+      "total_tokens": 624,
+      "cost": 0.0023737725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00239775,
+        "upstream_inference_prompt_cost": 0.00115275,
+        "upstream_inference_completions_cost": 0.001245
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241755-WKISGn4XmJafZ3cQYRdR",
+    "object": "chat.completion",
+    "created": 1776241755,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_77825437",
+              "function": {
+                "name": "music_generator_generate_scale_progression",
+                "arguments": "{\"key\":\"D\",\"tempo\":120,\"duration\":2,\"scale_type\":\"minor\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_08658337",
+              "function": {
+                "name": "math_hcf",
+                "arguments": "{\"number1\":456,\"number2\":123}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 541,
+      "completion_tokens": 83,
+      "total_tokens": 624,
+      "cost": 0.0023737725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00239775,
+        "upstream_inference_prompt_cost": 0.00115275,
+        "upstream_inference_completions_cost": 0.001245
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2037.898,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "7a459131-878d-45f1-862c-63c33be371d5"
+}

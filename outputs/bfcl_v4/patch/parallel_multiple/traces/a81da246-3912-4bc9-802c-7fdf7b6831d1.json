@@ -1,0 +1,479 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Can you help me with a few things? First, I'm interested in a court case with the docket number 12345 that was registered in Dallas, TX. Could you retrieve the details about this case for me? I don't need the full text of the case ruling. Second, I'm curious about the current classical chess rating of a player named Magnus Carlsen. Could you fetch that for me? Third, I'm trying to remember the date of the historical event known as the Battle of Gettysburg. Do you know when that took place? Lastly, I'm working on a physics problem and need to calculate the final speed of an object. The object was dropped from a height of 100 meters with an initial velocity of 0 m/s. The gravitational acceleration is 9.8 m/s^2. Can you help me calculate the final speed?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "chess_rating",
+        "description": "Fetches the current chess rating of a given player Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "player_name": {
+              "type": "string",
+              "description": "The full name of the chess player."
+            },
+            "variant": {
+              "type": "string",
+              "description": "The variant of chess for which rating is requested (e.g., 'classical', 'blitz', 'bullet'). Default is 'classical'."
+            }
+          },
+          "required": [
+            "player_name"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "court_case_search",
+        "description": "Retrieves details about a court case using its docket number and location. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "docket_number": {
+              "type": "string",
+              "description": "The docket number for the case."
+            },
+            "location": {
+              "type": "string",
+              "description": "The location where the case is registered, in the format: city, state, e.g., Dallas, TX."
+            },
+            "full_text": {
+              "type": "boolean",
+              "default": false,
+              "description": "Option to return the full text of the case ruling."
+            }
+          },
+          "required": [
+            "docket_number",
+            "location"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "get_event_date",
+        "description": "Retrieve the date of a historical event. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "event": {
+              "type": "string",
+              "description": "The name of the historical event."
+            },
+            "location": {
+              "type": "string",
+              "description": "Location where the event took place. Defaults to global if not specified"
+            }
+          },
+          "required": [
+            "event"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "calculate_final_speed",
+        "description": "Calculate the final speed of an object dropped from a certain height without air resistance. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "initial_velocity": {
+              "type": "integer",
+              "description": "The initial velocity of the object."
+            },
+            "height": {
+              "type": "integer",
+              "description": "The height from which the object is dropped."
+            },
+            "gravity": {
+              "type": "number",
+              "description": "The gravitational acceleration. Default is 9.8 m/s^2. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "initial_velocity",
+            "height"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Can you help me with a few things? First, I'm interested in a court case with the docket number 12345 that was registered in Dallas, TX. Could you retrieve the details about this case for me? I don't need the full text of the case ruling. Second, I'm curious about the current classical chess rating of a player named Magnus Carlsen. Could you fetch that for me? Third, I'm trying to remember the date of the historical event known as the Battle of Gettysburg. Do you know when that took place? Lastly, I'm working on a physics problem and need to calculate the final speed of an object. The object was dropped from a height of 100 meters with an initial velocity of 0 m/s. The gravitational acceleration is 9.8 m/s^2. Can you help me calculate the final speed?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "chess_rating",
+          "description": "Fetches the current chess rating of a given player Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "player_name": {
+                "type": "string",
+                "description": "The full name of the chess player."
+              },
+              "variant": {
+                "type": "string",
+                "description": "The variant of chess for which rating is requested (e.g., 'classical', 'blitz', 'bullet'). Default is 'classical'."
+              }
+            },
+            "required": [
+              "player_name"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "court_case_search",
+          "description": "Retrieves details about a court case using its docket number and location. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "docket_number": {
+                "type": "string",
+                "description": "The docket number for the case."
+              },
+              "location": {
+                "type": "string",
+                "description": "The location where the case is registered, in the format: city, state, e.g., Dallas, TX."
+              },
+              "full_text": {
+                "type": "boolean",
+                "default": false,
+                "description": "Option to return the full text of the case ruling."
+              }
+            },
+            "required": [
+              "docket_number",
+              "location"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "get_event_date",
+          "description": "Retrieve the date of a historical event. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "event": {
+                "type": "string",
+                "description": "The name of the historical event."
+              },
+              "location": {
+                "type": "string",
+                "description": "Location where the event took place. Defaults to global if not specified"
+              }
+            },
+            "required": [
+              "event"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_final_speed",
+          "description": "Calculate the final speed of an object dropped from a certain height without air resistance. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "initial_velocity": {
+                "type": "integer",
+                "description": "The initial velocity of the object."
+              },
+              "height": {
+                "type": "integer",
+                "description": "The height from which the object is dropped."
+              },
+              "gravity": {
+                "type": "number",
+                "description": "The gravitational acceleration. Default is 9.8 m/s^2. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "initial_velocity",
+              "height"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241787-QP9FowEjRlWjmUIavsj6",
+    "object": "chat.completion",
+    "created": 1776241787,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to assist with all your requests. Let's address each one systematically by using the available functions to retrieve the information or perform the calculations needed.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_10104001",
+              "function": {
+                "name": "court_case_search",
+                "arguments": "{\"docket_number\":\"12345\",\"location\":\"Dallas, TX\",\"full_text\":false}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_70354614",
+              "function": {
+                "name": "chess_rating",
+                "arguments": "{\"player_name\":\"Magnus Carlsen\",\"variant\":\"classical\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_28895289",
+              "function": {
+                "name": "get_event_date",
+                "arguments": "{\"event\":\"Battle of Gettysburg\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_04753797",
+              "function": {
+                "name": "calculate_final_speed",
+                "arguments": "{\"initial_velocity\":0,\"height\":100,\"gravity\":9.8}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 828,
+      "completion_tokens": 178,
+      "total_tokens": 1006,
+      "cost": 0.0050957775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00514725,
+        "upstream_inference_prompt_cost": 0.00247725,
+        "upstream_inference_completions_cost": 0.00267
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241787-QP9FowEjRlWjmUIavsj6",
+    "object": "response",
+    "created_at": 1776241790,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'm happy to assist with all your requests. Let's address each one systematically by using the available functions to retrieve the information or perform the calculations needed.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_10104001",
+        "call_id": "call_10104001",
+        "name": "court_case_search",
+        "arguments": "{\"docket_number\":\"12345\",\"location\":\"Dallas, TX\",\"full_text\":false}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_70354614",
+        "call_id": "call_70354614",
+        "name": "chess_rating",
+        "arguments": "{\"player_name\":\"Magnus Carlsen\",\"variant\":\"classical\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_28895289",
+        "call_id": "call_28895289",
+        "name": "get_event_date",
+        "arguments": "{\"event\":\"Battle of Gettysburg\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_04753797",
+        "call_id": "call_04753797",
+        "name": "calculate_final_speed",
+        "arguments": "{\"initial_velocity\":0,\"height\":100,\"gravity\":9.8}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 828,
+      "completion_tokens": 178,
+      "total_tokens": 1006,
+      "cost": 0.0050957775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00514725,
+        "upstream_inference_prompt_cost": 0.00247725,
+        "upstream_inference_completions_cost": 0.00267
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241787-QP9FowEjRlWjmUIavsj6",
+    "object": "chat.completion",
+    "created": 1776241787,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to assist with all your requests. Let's address each one systematically by using the available functions to retrieve the information or perform the calculations needed.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_10104001",
+              "function": {
+                "name": "court_case_search",
+                "arguments": "{\"docket_number\":\"12345\",\"location\":\"Dallas, TX\",\"full_text\":false}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_70354614",
+              "function": {
+                "name": "chess_rating",
+                "arguments": "{\"player_name\":\"Magnus Carlsen\",\"variant\":\"classical\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_28895289",
+              "function": {
+                "name": "get_event_date",
+                "arguments": "{\"event\":\"Battle of Gettysburg\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_04753797",
+              "function": {
+                "name": "calculate_final_speed",
+                "arguments": "{\"initial_velocity\":0,\"height\":100,\"gravity\":9.8}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 828,
+      "completion_tokens": 178,
+      "total_tokens": 1006,
+      "cost": 0.0050957775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00514725,
+        "upstream_inference_prompt_cost": 0.00247725,
+        "upstream_inference_completions_cost": 0.00267
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2973.643,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "a81da246-3912-4bc9-802c-7fdf7b6831d1"
+}

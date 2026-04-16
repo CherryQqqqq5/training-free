@@ -1,0 +1,260 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Check the total price for three pumpkins and two dozen eggs at Walmart."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "walmart_check_price",
+        "description": "Calculate total price for given items and their quantities at Walmart. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of items to be priced."
+            },
+            "quantities": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "Quantity of each item corresponding to the items list."
+            },
+            "store_location": {
+              "type": "string",
+              "description": "The store location for specific pricing (optional). Default to all if not specified."
+            }
+          },
+          "required": [
+            "items",
+            "quantities"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Check the total price for three pumpkins and two dozen eggs at Walmart."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "walmart_check_price",
+          "description": "Calculate total price for given items and their quantities at Walmart. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "List of items to be priced."
+              },
+              "quantities": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "Quantity of each item corresponding to the items list."
+              },
+              "store_location": {
+                "type": "string",
+                "description": "The store location for specific pricing (optional). Default to all if not specified."
+              }
+            },
+            "required": [
+              "items",
+              "quantities"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239336-5LPdibeZpPGAXU9lYnED",
+    "object": "chat.completion",
+    "created": 1776239336,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_15721397",
+              "function": {
+                "name": "walmart_check_price",
+                "arguments": "{\"items\":[\"pumpkins\",\"dozen eggs\"],\"quantities\":[3,2]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 356,
+      "completion_tokens": 44,
+      "total_tokens": 400,
+      "cost": 0.0012451725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00125775,
+        "upstream_inference_prompt_cost": 0.00059775,
+        "upstream_inference_completions_cost": 0.00066
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239336-5LPdibeZpPGAXU9lYnED",
+    "object": "response",
+    "created_at": 1776239337,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_15721397",
+        "call_id": "call_15721397",
+        "name": "walmart_check_price",
+        "arguments": "{\"items\":[\"pumpkins\",\"dozen eggs\"],\"quantities\":[3,2]}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 356,
+      "completion_tokens": 44,
+      "total_tokens": 400,
+      "cost": 0.0012451725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00125775,
+        "upstream_inference_prompt_cost": 0.00059775,
+        "upstream_inference_completions_cost": 0.00066
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239336-5LPdibeZpPGAXU9lYnED",
+    "object": "chat.completion",
+    "created": 1776239336,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_15721397",
+              "function": {
+                "name": "walmart_check_price",
+                "arguments": "{\"items\":[\"pumpkins\",\"dozen eggs\"],\"quantities\":[3,2]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 356,
+      "completion_tokens": 44,
+      "total_tokens": 400,
+      "cost": 0.0012451725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00125775,
+        "upstream_inference_prompt_cost": 0.00059775,
+        "upstream_inference_completions_cost": 0.00066
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2066.359,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "9e2508d1-f649-46fd-b385-bebcd573eb9a"
+}

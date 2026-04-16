@@ -1,0 +1,252 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the balance of a mutual fund given a total investment of $50000 with a 5% annual yield after 3 years."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_mutual_fund_balance",
+        "description": "Calculate the final balance of a mutual fund investment based on the total initial investment, annual yield rate and the time period. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "investment_amount": {
+              "type": "integer",
+              "description": "The initial total amount invested in the fund."
+            },
+            "annual_yield": {
+              "type": "number",
+              "description": "The annual yield rate of the fund. This is a float type value.",
+              "format": "float"
+            },
+            "years": {
+              "type": "integer",
+              "description": "The period of time for the fund to mature."
+            }
+          },
+          "required": [
+            "investment_amount",
+            "annual_yield",
+            "years"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the balance of a mutual fund given a total investment of $50000 with a 5% annual yield after 3 years."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_mutual_fund_balance",
+          "description": "Calculate the final balance of a mutual fund investment based on the total initial investment, annual yield rate and the time period. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "investment_amount": {
+                "type": "integer",
+                "description": "The initial total amount invested in the fund."
+              },
+              "annual_yield": {
+                "type": "number",
+                "description": "The annual yield rate of the fund. This is a float type value.",
+                "format": "float"
+              },
+              "years": {
+                "type": "integer",
+                "description": "The period of time for the fund to mature."
+              }
+            },
+            "required": [
+              "investment_amount",
+              "annual_yield",
+              "years"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776237959-jAYs7VCvc7e2HfrtzJv3",
+    "object": "chat.completion",
+    "created": 1776237959,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_47630169",
+              "function": {
+                "name": "calculate_mutual_fund_balance",
+                "arguments": "{\"investment_amount\":50000,\"annual_yield\":0.05,\"years\":3}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 380,
+      "completion_tokens": 47,
+      "total_tokens": 427,
+      "cost": 0.001358775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0013725,
+        "upstream_inference_prompt_cost": 0.0006675,
+        "upstream_inference_completions_cost": 0.000705
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776237959-jAYs7VCvc7e2HfrtzJv3",
+    "object": "response",
+    "created_at": 1776237960,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_47630169",
+        "call_id": "call_47630169",
+        "name": "calculate_mutual_fund_balance",
+        "arguments": "{\"investment_amount\":50000,\"annual_yield\":0.05,\"years\":3}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 380,
+      "completion_tokens": 47,
+      "total_tokens": 427,
+      "cost": 0.001358775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0013725,
+        "upstream_inference_prompt_cost": 0.0006675,
+        "upstream_inference_completions_cost": 0.000705
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776237959-jAYs7VCvc7e2HfrtzJv3",
+    "object": "chat.completion",
+    "created": 1776237959,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_47630169",
+              "function": {
+                "name": "calculate_mutual_fund_balance",
+                "arguments": "{\"investment_amount\":50000,\"annual_yield\":0.05,\"years\":3}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 380,
+      "completion_tokens": 47,
+      "total_tokens": 427,
+      "cost": 0.001358775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0013725,
+        "upstream_inference_prompt_cost": 0.0006675,
+        "upstream_inference_completions_cost": 0.000705
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1809.293,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "d1eeb3de-494b-411a-81db-e5e2dc68f63e"
+}

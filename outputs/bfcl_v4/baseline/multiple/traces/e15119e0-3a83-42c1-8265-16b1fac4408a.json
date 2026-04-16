@@ -1,0 +1,310 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find a ride from New York to Philadelphia with maximum cost of $50"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "grocery_delivery_order",
+        "description": "Order grocery items from a specific location with optional delivery price limit Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The location of the grocery store"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of items to order"
+            },
+            "max_delivery_cost": {
+              "type": "number",
+              "description": "The maximum delivery cost. It is optional. Default 1000000 This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "location",
+            "items"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "ride_hailing_get_rides",
+        "description": "Find ride from source to destination with an optional cost limit Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "description": "The starting point of the journey"
+            },
+            "destination": {
+              "type": "string",
+              "description": "The endpoint of the journey"
+            },
+            "max_cost": {
+              "type": "integer",
+              "description": "The maximum cost of the ride. It is optional. Default is 1000000"
+            }
+          },
+          "required": [
+            "source",
+            "destination"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find a ride from New York to Philadelphia with maximum cost of $50"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "grocery_delivery_order",
+          "description": "Order grocery items from a specific location with optional delivery price limit Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The location of the grocery store"
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "List of items to order"
+              },
+              "max_delivery_cost": {
+                "type": "number",
+                "description": "The maximum delivery cost. It is optional. Default 1000000 This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "location",
+              "items"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "ride_hailing_get_rides",
+          "description": "Find ride from source to destination with an optional cost limit Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "source": {
+                "type": "string",
+                "description": "The starting point of the journey"
+              },
+              "destination": {
+                "type": "string",
+                "description": "The endpoint of the journey"
+              },
+              "max_cost": {
+                "type": "integer",
+                "description": "The maximum cost of the ride. It is optional. Default is 1000000"
+              }
+            },
+            "required": [
+              "source",
+              "destination"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239534-H44ZQldqT9FULAPHAKgc",
+    "object": "chat.completion",
+    "created": 1776239534,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_30496400",
+              "function": {
+                "name": "ride_hailing_get_rides",
+                "arguments": "{\"source\":\"New York\",\"destination\":\"Philadelphia\",\"max_cost\":50}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 461,
+      "completion_tokens": 43,
+      "total_tokens": 504,
+      "cost": 0.0020010375,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00202125,
+        "upstream_inference_prompt_cost": 0.00137625,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239534-H44ZQldqT9FULAPHAKgc",
+    "object": "response",
+    "created_at": 1776239536,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_30496400",
+        "call_id": "call_30496400",
+        "name": "ride_hailing_get_rides",
+        "arguments": "{\"source\":\"New York\",\"destination\":\"Philadelphia\",\"max_cost\":50}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 461,
+      "completion_tokens": 43,
+      "total_tokens": 504,
+      "cost": 0.0020010375,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00202125,
+        "upstream_inference_prompt_cost": 0.00137625,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239534-H44ZQldqT9FULAPHAKgc",
+    "object": "chat.completion",
+    "created": 1776239534,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_30496400",
+              "function": {
+                "name": "ride_hailing_get_rides",
+                "arguments": "{\"source\":\"New York\",\"destination\":\"Philadelphia\",\"max_cost\":50}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 461,
+      "completion_tokens": 43,
+      "total_tokens": 504,
+      "cost": 0.0020010375,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00202125,
+        "upstream_inference_prompt_cost": 0.00137625,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2185.643,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "e15119e0-3a83-42c1-8265-16b1fac4408a"
+}

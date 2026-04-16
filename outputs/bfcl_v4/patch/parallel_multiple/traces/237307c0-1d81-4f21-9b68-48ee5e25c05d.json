@@ -1,0 +1,353 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Imagine you are a chemist working in a lab. You have two samples of the same gas. The first sample has a quantity of 5 moles and is at a temperature of 300 Kelvin. The second sample has a quantity of 3 moles and is at a temperature of 500 Kelvin. You decide to mix these two samples together. What would be the final temperature of the mixture? \n\nLater, you obtain another gas sample with a quantity of 4 moles. You know that the molar mass of this gas is 16 g/mol. Can you calculate the mass of this gas sample?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_final_temperature",
+        "description": "Calculate the final temperature when different quantities of the same gas at different temperatures are mixed. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "quantity1": {
+              "type": "number",
+              "description": "The quantity of the first sample of gas. This is a float type value.",
+              "format": "float"
+            },
+            "temperature1": {
+              "type": "number",
+              "description": "The temperature of the first sample of gas. This is a float type value.",
+              "format": "float"
+            },
+            "quantity2": {
+              "type": "number",
+              "description": "The quantity of the second sample of gas. This is a float type value.",
+              "format": "float"
+            },
+            "temperature2": {
+              "type": "number",
+              "description": "The temperature of the second sample of gas. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "quantity1",
+            "temperature1",
+            "quantity2",
+            "temperature2"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "calculate_mass",
+        "description": "Calculate the mass of a gas given its quantity and molar mass. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "quantity": {
+              "type": "number",
+              "description": "The quantity of the gas. This is a float type value.",
+              "format": "float"
+            },
+            "molar_mass": {
+              "type": "number",
+              "description": "The molar mass of the gas. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "quantity",
+            "molar_mass"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Imagine you are a chemist working in a lab. You have two samples of the same gas. The first sample has a quantity of 5 moles and is at a temperature of 300 Kelvin. The second sample has a quantity of 3 moles and is at a temperature of 500 Kelvin. You decide to mix these two samples together. What would be the final temperature of the mixture? \n\nLater, you obtain another gas sample with a quantity of 4 moles. You know that the molar mass of this gas is 16 g/mol. Can you calculate the mass of this gas sample?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_final_temperature",
+          "description": "Calculate the final temperature when different quantities of the same gas at different temperatures are mixed. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "quantity1": {
+                "type": "number",
+                "description": "The quantity of the first sample of gas. This is a float type value.",
+                "format": "float"
+              },
+              "temperature1": {
+                "type": "number",
+                "description": "The temperature of the first sample of gas. This is a float type value.",
+                "format": "float"
+              },
+              "quantity2": {
+                "type": "number",
+                "description": "The quantity of the second sample of gas. This is a float type value.",
+                "format": "float"
+              },
+              "temperature2": {
+                "type": "number",
+                "description": "The temperature of the second sample of gas. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "quantity1",
+              "temperature1",
+              "quantity2",
+              "temperature2"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_mass",
+          "description": "Calculate the mass of a gas given its quantity and molar mass. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "quantity": {
+                "type": "number",
+                "description": "The quantity of the gas. This is a float type value.",
+                "format": "float"
+              },
+              "molar_mass": {
+                "type": "number",
+                "description": "The molar mass of the gas. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "quantity",
+              "molar_mass"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241614-BGeI7xaVeE4Ekpu6f384",
+    "object": "chat.completion",
+    "created": 1776241614,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "Let me help you with both calculations.\n\nFor the first part regarding the mixing of two gas samples, I can calculate the final temperature of the mixture.\n\nFor the second part about calculating the mass of the gas sample, I can help with that as well.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_21964035",
+              "function": {
+                "name": "calculate_final_temperature",
+                "arguments": "{\"quantity1\":5.0,\"temperature1\":300.0,\"quantity2\":3.0,\"temperature2\":500.0}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_58429662",
+              "function": {
+                "name": "calculate_mass",
+                "arguments": "{\"quantity\":4.0,\"molar_mass\":16.0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 622,
+      "completion_tokens": 144,
+      "total_tokens": 766,
+      "cost": 0.0035201925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00355575,
+        "upstream_inference_prompt_cost": 0.00139575,
+        "upstream_inference_completions_cost": 0.00216
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241614-BGeI7xaVeE4Ekpu6f384",
+    "object": "response",
+    "created_at": 1776241616,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "Let me help you with both calculations.\n\nFor the first part regarding the mixing of two gas samples, I can calculate the final temperature of the mixture.\n\nFor the second part about calculating the mass of the gas sample, I can help with that as well.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_21964035",
+        "call_id": "call_21964035",
+        "name": "calculate_final_temperature",
+        "arguments": "{\"quantity1\":5.0,\"temperature1\":300.0,\"quantity2\":3.0,\"temperature2\":500.0}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_58429662",
+        "call_id": "call_58429662",
+        "name": "calculate_mass",
+        "arguments": "{\"quantity\":4.0,\"molar_mass\":16.0}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 622,
+      "completion_tokens": 144,
+      "total_tokens": 766,
+      "cost": 0.0035201925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00355575,
+        "upstream_inference_prompt_cost": 0.00139575,
+        "upstream_inference_completions_cost": 0.00216
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241614-BGeI7xaVeE4Ekpu6f384",
+    "object": "chat.completion",
+    "created": 1776241614,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "Let me help you with both calculations.\n\nFor the first part regarding the mixing of two gas samples, I can calculate the final temperature of the mixture.\n\nFor the second part about calculating the mass of the gas sample, I can help with that as well.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_21964035",
+              "function": {
+                "name": "calculate_final_temperature",
+                "arguments": "{\"quantity1\":5.0,\"temperature1\":300.0,\"quantity2\":3.0,\"temperature2\":500.0}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_58429662",
+              "function": {
+                "name": "calculate_mass",
+                "arguments": "{\"quantity\":4.0,\"molar_mass\":16.0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 622,
+      "completion_tokens": 144,
+      "total_tokens": 766,
+      "cost": 0.0035201925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00355575,
+        "upstream_inference_prompt_cost": 0.00139575,
+        "upstream_inference_completions_cost": 0.00216
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2697.898,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "237307c0-1d81-4f21-9b68-48ee5e25c05d"
+}

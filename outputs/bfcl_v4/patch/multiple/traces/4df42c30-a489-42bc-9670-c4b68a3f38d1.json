@@ -1,0 +1,424 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find me the most recent art sculpture by James Plensa with detailed description."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "get_zodiac_compatibility",
+        "description": "Retrieve the compatibility score between two Zodiac signs. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "sign1": {
+              "type": "string",
+              "description": "The first Zodiac sign."
+            },
+            "sign2": {
+              "type": "string",
+              "description": "The second Zodiac sign."
+            },
+            "scale": {
+              "type": "string",
+              "enum": [
+                "percentage",
+                "0-10 scale"
+              ],
+              "description": "The scale on which compatibility should be shown. Default is 'percentage'."
+            }
+          },
+          "required": [
+            "sign1",
+            "sign2"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "local_nursery_find",
+        "description": "Locate local nurseries based on location and plant types availability. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city or locality where the nursery needs to be located."
+            },
+            "plant_types": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Annual",
+                  "Perennial",
+                  "Shrub",
+                  "Tree",
+                  "Herbs",
+                  "Fruits"
+                ]
+              },
+              "description": "Type of plants the nursery should provide."
+            }
+          },
+          "required": [
+            "location",
+            "plant_types"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "get_sculpture_info",
+        "description": "Retrieves the most recent artwork by a specified artist with its detailed description. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "artist_name": {
+              "type": "string",
+              "description": "The name of the artist."
+            },
+            "detail": {
+              "type": "boolean",
+              "description": "If True, it provides detailed description of the sculpture. Defaults to False."
+            }
+          },
+          "required": [
+            "artist_name"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "monarch_getMonarchOfYear",
+        "description": "Retrieve the monarch of a specific location during a specified year. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The location (e.g., country) whose monarch needs to be found."
+            },
+            "year": {
+              "type": "integer",
+              "description": "The year to search the monarch."
+            },
+            "fullName": {
+              "type": "boolean",
+              "default": "false",
+              "description": "If true, returns the full name and title of the monarch."
+            }
+          },
+          "required": [
+            "location",
+            "year"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find me the most recent art sculpture by James Plensa with detailed description."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_zodiac_compatibility",
+          "description": "Retrieve the compatibility score between two Zodiac signs. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "sign1": {
+                "type": "string",
+                "description": "The first Zodiac sign."
+              },
+              "sign2": {
+                "type": "string",
+                "description": "The second Zodiac sign."
+              },
+              "scale": {
+                "type": "string",
+                "enum": [
+                  "percentage",
+                  "0-10 scale"
+                ],
+                "description": "The scale on which compatibility should be shown. Default is 'percentage'."
+              }
+            },
+            "required": [
+              "sign1",
+              "sign2"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "local_nursery_find",
+          "description": "Locate local nurseries based on location and plant types availability. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city or locality where the nursery needs to be located."
+              },
+              "plant_types": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "Annual",
+                    "Perennial",
+                    "Shrub",
+                    "Tree",
+                    "Herbs",
+                    "Fruits"
+                  ]
+                },
+                "description": "Type of plants the nursery should provide."
+              }
+            },
+            "required": [
+              "location",
+              "plant_types"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "get_sculpture_info",
+          "description": "Retrieves the most recent artwork by a specified artist with its detailed description. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "artist_name": {
+                "type": "string",
+                "description": "The name of the artist."
+              },
+              "detail": {
+                "type": "boolean",
+                "description": "If True, it provides detailed description of the sculpture. Defaults to False."
+              }
+            },
+            "required": [
+              "artist_name"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "monarch_getMonarchOfYear",
+          "description": "Retrieve the monarch of a specific location during a specified year. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The location (e.g., country) whose monarch needs to be found."
+              },
+              "year": {
+                "type": "integer",
+                "description": "The year to search the monarch."
+              },
+              "fullName": {
+                "type": "boolean",
+                "default": "false",
+                "description": "If true, returns the full name and title of the monarch."
+              }
+            },
+            "required": [
+              "location",
+              "year"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240301-B7Is5Z8d4yLrcClrecuL",
+    "object": "chat.completion",
+    "created": 1776240301,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_18129750",
+              "function": {
+                "name": "get_sculpture_info",
+                "arguments": "{\"artist_name\":\"James Plensa\",\"detail\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 684,
+      "completion_tokens": 37,
+      "total_tokens": 721,
+      "cost": 0.0010595475,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 683,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00107025,
+        "upstream_inference_prompt_cost": 0.00051525,
+        "upstream_inference_completions_cost": 0.000555
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240301-B7Is5Z8d4yLrcClrecuL",
+    "object": "response",
+    "created_at": 1776240302,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_18129750",
+        "call_id": "call_18129750",
+        "name": "get_sculpture_info",
+        "arguments": "{\"artist_name\":\"James Plensa\",\"detail\":true}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 684,
+      "completion_tokens": 37,
+      "total_tokens": 721,
+      "cost": 0.0010595475,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 683,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00107025,
+        "upstream_inference_prompt_cost": 0.00051525,
+        "upstream_inference_completions_cost": 0.000555
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240301-B7Is5Z8d4yLrcClrecuL",
+    "object": "chat.completion",
+    "created": 1776240301,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_18129750",
+              "function": {
+                "name": "get_sculpture_info",
+                "arguments": "{\"artist_name\":\"James Plensa\",\"detail\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 684,
+      "completion_tokens": 37,
+      "total_tokens": 721,
+      "cost": 0.0010595475,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 683,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00107025,
+        "upstream_inference_prompt_cost": 0.00051525,
+        "upstream_inference_completions_cost": 0.000555
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1669.591,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "4df42c30-a489-42bc-9670-c4b68a3f38d1"
+}

@@ -1,0 +1,362 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Could you provide me with the following information about the NBA league: the record for the most points scored by a single player in one game, including the player's name, points scored, and game date; the record for the most points scored by a single player in one season, including the player's name, points scored, and season; and the record for the most points scored by a player in his career, including the player's name, total points scored, and career span?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "sports_data_basketball_most_points_single_game",
+        "description": "Returns the record for the most points scored by a single player in one game of NBA, including the player name, points scored, and game date. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "league": {
+              "type": "string",
+              "description": "The specific basketball league for which to fetch the record. In this case, 'NBA'."
+            }
+          },
+          "required": [
+            "league"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "sports_data_basketball_most_points_career",
+        "description": "Returns the record for the most points scored by a player in his career in NBA, including the player name, total points scored, and career span. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "league": {
+              "type": "string",
+              "description": "The specific basketball league for which to fetch the record. In this case, 'NBA'."
+            }
+          },
+          "required": [
+            "league"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "sports_data_basketball_most_points_single_season",
+        "description": "Returns the record for the most points scored by a single player in one season of NBA, including the player name, points scored, and season. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "league": {
+              "type": "string",
+              "description": "The specific basketball league for which to fetch the record. In this case, 'NBA'."
+            }
+          },
+          "required": [
+            "league"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Could you provide me with the following information about the NBA league: the record for the most points scored by a single player in one game, including the player's name, points scored, and game date; the record for the most points scored by a single player in one season, including the player's name, points scored, and season; and the record for the most points scored by a player in his career, including the player's name, total points scored, and career span?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "sports_data_basketball_most_points_single_game",
+          "description": "Returns the record for the most points scored by a single player in one game of NBA, including the player name, points scored, and game date. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "league": {
+                "type": "string",
+                "description": "The specific basketball league for which to fetch the record. In this case, 'NBA'."
+              }
+            },
+            "required": [
+              "league"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "sports_data_basketball_most_points_career",
+          "description": "Returns the record for the most points scored by a player in his career in NBA, including the player name, total points scored, and career span. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "league": {
+                "type": "string",
+                "description": "The specific basketball league for which to fetch the record. In this case, 'NBA'."
+              }
+            },
+            "required": [
+              "league"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "sports_data_basketball_most_points_single_season",
+          "description": "Returns the record for the most points scored by a single player in one season of NBA, including the player name, points scored, and season. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "league": {
+                "type": "string",
+                "description": "The specific basketball league for which to fetch the record. In this case, 'NBA'."
+              }
+            },
+            "required": [
+              "league"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241553-grgBRQZFi7LtVVBWOoHB",
+    "object": "chat.completion",
+    "created": 1776241553,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'll retrieve the information you requested about NBA records. Let me fetch the data for each of the categories you've mentioned.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_26717449",
+              "function": {
+                "name": "sports_data_basketball_most_points_single_game",
+                "arguments": "{\"league\":\"NBA\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_15841261",
+              "function": {
+                "name": "sports_data_basketball_most_points_single_season",
+                "arguments": "{\"league\":\"NBA\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_10502782",
+              "function": {
+                "name": "sports_data_basketball_most_points_career",
+                "arguments": "{\"league\":\"NBA\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 614,
+      "completion_tokens": 122,
+      "total_tokens": 736,
+      "cost": 0.0031697325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00320175,
+        "upstream_inference_prompt_cost": 0.00137175,
+        "upstream_inference_completions_cost": 0.00183
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241553-grgBRQZFi7LtVVBWOoHB",
+    "object": "response",
+    "created_at": 1776241555,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'll retrieve the information you requested about NBA records. Let me fetch the data for each of the categories you've mentioned.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_26717449",
+        "call_id": "call_26717449",
+        "name": "sports_data_basketball_most_points_single_game",
+        "arguments": "{\"league\":\"NBA\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_15841261",
+        "call_id": "call_15841261",
+        "name": "sports_data_basketball_most_points_single_season",
+        "arguments": "{\"league\":\"NBA\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_10502782",
+        "call_id": "call_10502782",
+        "name": "sports_data_basketball_most_points_career",
+        "arguments": "{\"league\":\"NBA\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 614,
+      "completion_tokens": 122,
+      "total_tokens": 736,
+      "cost": 0.0031697325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00320175,
+        "upstream_inference_prompt_cost": 0.00137175,
+        "upstream_inference_completions_cost": 0.00183
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241553-grgBRQZFi7LtVVBWOoHB",
+    "object": "chat.completion",
+    "created": 1776241553,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'll retrieve the information you requested about NBA records. Let me fetch the data for each of the categories you've mentioned.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_26717449",
+              "function": {
+                "name": "sports_data_basketball_most_points_single_game",
+                "arguments": "{\"league\":\"NBA\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_15841261",
+              "function": {
+                "name": "sports_data_basketball_most_points_single_season",
+                "arguments": "{\"league\":\"NBA\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_10502782",
+              "function": {
+                "name": "sports_data_basketball_most_points_career",
+                "arguments": "{\"league\":\"NBA\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 614,
+      "completion_tokens": 122,
+      "total_tokens": 736,
+      "cost": 0.0031697325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00320175,
+        "upstream_inference_prompt_cost": 0.00137175,
+        "upstream_inference_completions_cost": 0.00183
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2763.429,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "29bccbbb-ace4-4858-904f-ba78eb5b41da"
+}

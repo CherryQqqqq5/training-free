@@ -1,0 +1,329 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Design a house with 3 bedrooms, 2 bathrooms and a garden. Also, design an office with 5 rooms and a large meeting room"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "office_designer_design",
+        "description": "Design an office space based on specific requirements Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "rooms": {
+              "type": "integer",
+              "description": "Number of rooms in the office."
+            },
+            "meeting_room": {
+              "type": "string",
+              "enum": [
+                "small",
+                "medium",
+                "large"
+              ],
+              "description": "Size of the meeting room"
+            }
+          },
+          "required": [
+            "rooms",
+            "meeting_room"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "house_designer_design",
+        "description": "Design a house based on specific criteria Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "bedrooms": {
+              "type": "integer",
+              "description": "Number of bedrooms desired."
+            },
+            "bathrooms": {
+              "type": "integer",
+              "description": "Number of bathrooms needed."
+            },
+            "garden": {
+              "type": "boolean",
+              "description": "Does the house need a garden? Default is False"
+            }
+          },
+          "required": [
+            "bedrooms",
+            "bathrooms"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Design a house with 3 bedrooms, 2 bathrooms and a garden. Also, design an office with 5 rooms and a large meeting room"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "office_designer_design",
+          "description": "Design an office space based on specific requirements Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "rooms": {
+                "type": "integer",
+                "description": "Number of rooms in the office."
+              },
+              "meeting_room": {
+                "type": "string",
+                "enum": [
+                  "small",
+                  "medium",
+                  "large"
+                ],
+                "description": "Size of the meeting room"
+              }
+            },
+            "required": [
+              "rooms",
+              "meeting_room"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "house_designer_design",
+          "description": "Design a house based on specific criteria Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "bedrooms": {
+                "type": "integer",
+                "description": "Number of bedrooms desired."
+              },
+              "bathrooms": {
+                "type": "integer",
+                "description": "Number of bathrooms needed."
+              },
+              "garden": {
+                "type": "boolean",
+                "description": "Does the house need a garden? Default is False"
+              }
+            },
+            "required": [
+              "bedrooms",
+              "bathrooms"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240598-P5oeUz8KKDT6BqYNGSag",
+    "object": "chat.completion",
+    "created": 1776240598,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_33233701",
+              "function": {
+                "name": "house_designer_design",
+                "arguments": "{\"bedrooms\":3,\"bathrooms\":2,\"garden\":true}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_50767994",
+              "function": {
+                "name": "office_designer_design",
+                "arguments": "{\"rooms\":5,\"meeting_room\":\"large\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 431,
+      "completion_tokens": 75,
+      "total_tokens": 506,
+      "cost": 0.0019282725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00194775,
+        "upstream_inference_prompt_cost": 0.00082275,
+        "upstream_inference_completions_cost": 0.001125
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240598-P5oeUz8KKDT6BqYNGSag",
+    "object": "response",
+    "created_at": 1776240600,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_33233701",
+        "call_id": "call_33233701",
+        "name": "house_designer_design",
+        "arguments": "{\"bedrooms\":3,\"bathrooms\":2,\"garden\":true}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_50767994",
+        "call_id": "call_50767994",
+        "name": "office_designer_design",
+        "arguments": "{\"rooms\":5,\"meeting_room\":\"large\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 431,
+      "completion_tokens": 75,
+      "total_tokens": 506,
+      "cost": 0.0019282725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00194775,
+        "upstream_inference_prompt_cost": 0.00082275,
+        "upstream_inference_completions_cost": 0.001125
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240598-P5oeUz8KKDT6BqYNGSag",
+    "object": "chat.completion",
+    "created": 1776240598,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_33233701",
+              "function": {
+                "name": "house_designer_design",
+                "arguments": "{\"bedrooms\":3,\"bathrooms\":2,\"garden\":true}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_50767994",
+              "function": {
+                "name": "office_designer_design",
+                "arguments": "{\"rooms\":5,\"meeting_room\":\"large\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 431,
+      "completion_tokens": 75,
+      "total_tokens": 506,
+      "cost": 0.0019282725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00194775,
+        "upstream_inference_prompt_cost": 0.00082275,
+        "upstream_inference_completions_cost": 0.001125
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2240.42,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "55e93a3a-fcb4-44e7-a97a-e5ae5dbec02f"
+}

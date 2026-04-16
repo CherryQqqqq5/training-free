@@ -1,0 +1,410 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Can you help me find a property in San Francisco, CA that is a condo with 2 bedrooms and fits within my budget range of $500,000 to $800,000? After that, could you also provide an estimated value for a villa in Los Angeles, CA with 3 bedrooms that is 5 years old? Lastly, I would also like to know the estimated value of an apartment in New York, NY with 1 bedroom that is 10 years old.\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "property_valuation_get",
+        "description": "Get estimated value of a property based on location, specifications and age Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "City and state where the property is located, e.g. San Diego, CA."
+            },
+            "propertyType": {
+              "type": "string",
+              "description": "Type of property such as villa, condo, apartment, etc."
+            },
+            "bedrooms": {
+              "type": "integer",
+              "description": "Number of bedrooms required in the property."
+            },
+            "age": {
+              "type": "integer",
+              "description": "Age of the property in years."
+            }
+          },
+          "required": [
+            "location",
+            "propertyType",
+            "bedrooms",
+            "age"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "realestate_find_properties",
+        "description": "Find properties based on location, budget, and specifications Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "City and state where the property is located, e.g. San Diego, CA."
+            },
+            "propertyType": {
+              "type": "string",
+              "description": "Type of property such as villa, condo, apartment, etc."
+            },
+            "bedrooms": {
+              "type": "integer",
+              "description": "Number of bedrooms required in the property."
+            },
+            "budget": {
+              "type": "object",
+              "properties": {
+                "min": {
+                  "type": "number",
+                  "description": "Minimum budget limit. This is a float type value.",
+                  "format": "float"
+                },
+                "max": {
+                  "type": "number",
+                  "description": "Maximum budget limit. This is a float type value.",
+                  "format": "float"
+                }
+              },
+              "description": "Budget range for the property."
+            }
+          },
+          "required": [
+            "location",
+            "propertyType",
+            "bedrooms",
+            "budget"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Can you help me find a property in San Francisco, CA that is a condo with 2 bedrooms and fits within my budget range of $500,000 to $800,000? After that, could you also provide an estimated value for a villa in Los Angeles, CA with 3 bedrooms that is 5 years old? Lastly, I would also like to know the estimated value of an apartment in New York, NY with 1 bedroom that is 10 years old.\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "property_valuation_get",
+          "description": "Get estimated value of a property based on location, specifications and age Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "City and state where the property is located, e.g. San Diego, CA."
+              },
+              "propertyType": {
+                "type": "string",
+                "description": "Type of property such as villa, condo, apartment, etc."
+              },
+              "bedrooms": {
+                "type": "integer",
+                "description": "Number of bedrooms required in the property."
+              },
+              "age": {
+                "type": "integer",
+                "description": "Age of the property in years."
+              }
+            },
+            "required": [
+              "location",
+              "propertyType",
+              "bedrooms",
+              "age"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "realestate_find_properties",
+          "description": "Find properties based on location, budget, and specifications Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "City and state where the property is located, e.g. San Diego, CA."
+              },
+              "propertyType": {
+                "type": "string",
+                "description": "Type of property such as villa, condo, apartment, etc."
+              },
+              "bedrooms": {
+                "type": "integer",
+                "description": "Number of bedrooms required in the property."
+              },
+              "budget": {
+                "type": "object",
+                "properties": {
+                  "min": {
+                    "type": "number",
+                    "description": "Minimum budget limit. This is a float type value.",
+                    "format": "float"
+                  },
+                  "max": {
+                    "type": "number",
+                    "description": "Maximum budget limit. This is a float type value.",
+                    "format": "float"
+                  }
+                },
+                "description": "Budget range for the property."
+              }
+            },
+            "required": [
+              "location",
+              "propertyType",
+              "bedrooms",
+              "budget"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240677-9MNUVlWJn2X2K4RTwpaJ",
+    "object": "chat.completion",
+    "created": 1776240677,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to assist with your requests. Let's start by finding a property in San Francisco, CA that matches your criteria.\n\nNext, I'll get the estimated value for a villa in Los Angeles, CA.\n\nLastly, I'll retrieve the estimated value for an apartment in New York, NY.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_52499843",
+              "function": {
+                "name": "realestate_find_properties",
+                "arguments": "{\"location\":\"San Francisco, CA\",\"propertyType\":\"condo\",\"bedrooms\":2,\"budget\":{\"min\":500000,\"max\":800000}}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_51683667",
+              "function": {
+                "name": "property_valuation_get",
+                "arguments": "{\"location\":\"Los Angeles, CA\",\"propertyType\":\"villa\",\"bedrooms\":3,\"age\":5}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_56538954",
+              "function": {
+                "name": "property_valuation_get",
+                "arguments": "{\"location\":\"New York, NY\",\"propertyType\":\"apartment\",\"bedrooms\":1,\"age\":10}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 645,
+      "completion_tokens": 220,
+      "total_tokens": 865,
+      "cost": 0.0047171025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00476475,
+        "upstream_inference_prompt_cost": 0.00146475,
+        "upstream_inference_completions_cost": 0.0033
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240677-9MNUVlWJn2X2K4RTwpaJ",
+    "object": "response",
+    "created_at": 1776240680,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'm happy to assist with your requests. Let's start by finding a property in San Francisco, CA that matches your criteria.\n\nNext, I'll get the estimated value for a villa in Los Angeles, CA.\n\nLastly, I'll retrieve the estimated value for an apartment in New York, NY.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_52499843",
+        "call_id": "call_52499843",
+        "name": "realestate_find_properties",
+        "arguments": "{\"location\":\"San Francisco, CA\",\"propertyType\":\"condo\",\"bedrooms\":2,\"budget\":{\"min\":500000,\"max\":800000}}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_51683667",
+        "call_id": "call_51683667",
+        "name": "property_valuation_get",
+        "arguments": "{\"location\":\"Los Angeles, CA\",\"propertyType\":\"villa\",\"bedrooms\":3,\"age\":5}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_56538954",
+        "call_id": "call_56538954",
+        "name": "property_valuation_get",
+        "arguments": "{\"location\":\"New York, NY\",\"propertyType\":\"apartment\",\"bedrooms\":1,\"age\":10}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 645,
+      "completion_tokens": 220,
+      "total_tokens": 865,
+      "cost": 0.0047171025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00476475,
+        "upstream_inference_prompt_cost": 0.00146475,
+        "upstream_inference_completions_cost": 0.0033
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240677-9MNUVlWJn2X2K4RTwpaJ",
+    "object": "chat.completion",
+    "created": 1776240677,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to assist with your requests. Let's start by finding a property in San Francisco, CA that matches your criteria.\n\nNext, I'll get the estimated value for a villa in Los Angeles, CA.\n\nLastly, I'll retrieve the estimated value for an apartment in New York, NY.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_52499843",
+              "function": {
+                "name": "realestate_find_properties",
+                "arguments": "{\"location\":\"San Francisco, CA\",\"propertyType\":\"condo\",\"bedrooms\":2,\"budget\":{\"min\":500000,\"max\":800000}}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_51683667",
+              "function": {
+                "name": "property_valuation_get",
+                "arguments": "{\"location\":\"Los Angeles, CA\",\"propertyType\":\"villa\",\"bedrooms\":3,\"age\":5}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_56538954",
+              "function": {
+                "name": "property_valuation_get",
+                "arguments": "{\"location\":\"New York, NY\",\"propertyType\":\"apartment\",\"bedrooms\":1,\"age\":10}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 645,
+      "completion_tokens": 220,
+      "total_tokens": 865,
+      "cost": 0.0047171025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00476475,
+        "upstream_inference_prompt_cost": 0.00146475,
+        "upstream_inference_completions_cost": 0.0033
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 5070.315,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "785eca05-12a0-4188-956b-d78743c4c7cd"
+}

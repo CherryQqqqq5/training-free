@@ -1,0 +1,240 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Who discovered the neutron? Give me detail information."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "get_discoverer",
+        "description": "Get the person or team who made a particular scientific discovery Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "discovery": {
+              "type": "string",
+              "description": "The discovery for which the discoverer's information is needed."
+            },
+            "detail": {
+              "type": "boolean",
+              "description": "Optional flag to get additional details about the discoverer, such as birth date and nationality. Defaults to false."
+            }
+          },
+          "required": [
+            "discovery",
+            "detail"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Who discovered the neutron? Give me detail information."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_discoverer",
+          "description": "Get the person or team who made a particular scientific discovery Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "discovery": {
+                "type": "string",
+                "description": "The discovery for which the discoverer's information is needed."
+              },
+              "detail": {
+                "type": "boolean",
+                "description": "Optional flag to get additional details about the discoverer, such as birth date and nationality. Defaults to false."
+              }
+            },
+            "required": [
+              "discovery",
+              "detail"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776238151-8aLcvQBYBvHe0xcOADvK",
+    "object": "chat.completion",
+    "created": 1776238151,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_70672933",
+              "function": {
+                "name": "get_discoverer",
+                "arguments": "{\"discovery\":\"neutron\",\"detail\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 327,
+      "completion_tokens": 33,
+      "total_tokens": 360,
+      "cost": 0.000993465,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0010035,
+        "upstream_inference_prompt_cost": 0.0005085,
+        "upstream_inference_completions_cost": 0.000495
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776238151-8aLcvQBYBvHe0xcOADvK",
+    "object": "response",
+    "created_at": 1776238152,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_70672933",
+        "call_id": "call_70672933",
+        "name": "get_discoverer",
+        "arguments": "{\"discovery\":\"neutron\",\"detail\":true}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 327,
+      "completion_tokens": 33,
+      "total_tokens": 360,
+      "cost": 0.000993465,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0010035,
+        "upstream_inference_prompt_cost": 0.0005085,
+        "upstream_inference_completions_cost": 0.000495
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776238151-8aLcvQBYBvHe0xcOADvK",
+    "object": "chat.completion",
+    "created": 1776238151,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_70672933",
+              "function": {
+                "name": "get_discoverer",
+                "arguments": "{\"discovery\":\"neutron\",\"detail\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 327,
+      "completion_tokens": 33,
+      "total_tokens": 360,
+      "cost": 0.000993465,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0010035,
+        "upstream_inference_prompt_cost": 0.0005085,
+        "upstream_inference_completions_cost": 0.000495
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2121.296,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "71940eac-1927-4d66-ae6f-411401859176"
+}

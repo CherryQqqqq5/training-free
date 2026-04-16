@@ -1,0 +1,426 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Imagine you are planning your finances and you want to calculate the future value of your investments. You have an initial investment of $5000, an annual rate of return of 7%, and you plan to invest for 10 years. Additionally, you will be making regular contributions of $200. After calculating the future value, you want to visualize your annual returns over the past 10 years. The returns are as follows: [7, 8, 9, 6, 7, 8, 10, 9, 8, 7] and you want to create a histogram with 5 bins to better understand the distribution of returns. Later, you decide to take a break and engage in some art. You want to mix two primary paint colors, blue and yellow, and adjust the resulting color's lightness level to 70%. Can you calculate the future value of your investment, create the histogram, and mix the paint colors accordingly?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "create_histogram",
+        "description": "Create a histogram based on provided data. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "The data for which histogram needs to be plotted."
+            },
+            "bins": {
+              "type": "integer",
+              "description": "The number of equal-width bins in the range. Default is 10."
+            }
+          },
+          "required": [
+            "data",
+            "bins"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "mix_paint_color",
+        "description": "Combine two primary paint colors and adjust the resulting color's lightness level. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "color1": {
+              "type": "string",
+              "description": "The first primary color to be mixed."
+            },
+            "color2": {
+              "type": "string",
+              "description": "The second primary color to be mixed."
+            },
+            "lightness": {
+              "type": "integer",
+              "description": "The desired lightness level of the resulting color in percentage. The default level is set to 50."
+            }
+          },
+          "required": [
+            "color1",
+            "color2"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "finance_calculate_future_value",
+        "description": "Calculate the future value of an investment given an initial investment, annual rate of return, and a time frame. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "initial_investment": {
+              "type": "integer",
+              "description": "The initial investment amount."
+            },
+            "rate_of_return": {
+              "type": "number",
+              "description": "The annual rate of return. This is a float type value.",
+              "format": "float"
+            },
+            "years": {
+              "type": "integer",
+              "description": "The time frame of the investment in years."
+            },
+            "contribution": {
+              "type": "integer",
+              "description": "Optional: Additional regular contributions. Default is 0."
+            }
+          },
+          "required": [
+            "initial_investment",
+            "rate_of_return",
+            "years"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Imagine you are planning your finances and you want to calculate the future value of your investments. You have an initial investment of $5000, an annual rate of return of 7%, and you plan to invest for 10 years. Additionally, you will be making regular contributions of $200. After calculating the future value, you want to visualize your annual returns over the past 10 years. The returns are as follows: [7, 8, 9, 6, 7, 8, 10, 9, 8, 7] and you want to create a histogram with 5 bins to better understand the distribution of returns. Later, you decide to take a break and engage in some art. You want to mix two primary paint colors, blue and yellow, and adjust the resulting color's lightness level to 70%. Can you calculate the future value of your investment, create the histogram, and mix the paint colors accordingly?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "create_histogram",
+          "description": "Create a histogram based on provided data. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "The data for which histogram needs to be plotted."
+              },
+              "bins": {
+                "type": "integer",
+                "description": "The number of equal-width bins in the range. Default is 10."
+              }
+            },
+            "required": [
+              "data",
+              "bins"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "mix_paint_color",
+          "description": "Combine two primary paint colors and adjust the resulting color's lightness level. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "color1": {
+                "type": "string",
+                "description": "The first primary color to be mixed."
+              },
+              "color2": {
+                "type": "string",
+                "description": "The second primary color to be mixed."
+              },
+              "lightness": {
+                "type": "integer",
+                "description": "The desired lightness level of the resulting color in percentage. The default level is set to 50."
+              }
+            },
+            "required": [
+              "color1",
+              "color2"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "finance_calculate_future_value",
+          "description": "Calculate the future value of an investment given an initial investment, annual rate of return, and a time frame. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "initial_investment": {
+                "type": "integer",
+                "description": "The initial investment amount."
+              },
+              "rate_of_return": {
+                "type": "number",
+                "description": "The annual rate of return. This is a float type value.",
+                "format": "float"
+              },
+              "years": {
+                "type": "integer",
+                "description": "The time frame of the investment in years."
+              },
+              "contribution": {
+                "type": "integer",
+                "description": "Optional: Additional regular contributions. Default is 0."
+              }
+            },
+            "required": [
+              "initial_investment",
+              "rate_of_return",
+              "years"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241115-L0eWfe3H4T1BmhniKl1X",
+    "object": "chat.completion",
+    "created": 1776241115,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "Let's tackle each part of your request step by step.\n\nFirst, I'll calculate the future value of your investment with the given parameters.\n\nNext, I'll create a histogram to visualize the distribution of your annual returns over the past 10 years with 5 bins.\n\nFinally, I'll mix the two primary paint colors, blue and yellow, and adjust the lightness level to 70%.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_28785263",
+              "function": {
+                "name": "finance_calculate_future_value",
+                "arguments": "{\"initial_investment\":5000,\"rate_of_return\":0.07,\"years\":10,\"contribution\":200}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_95769103",
+              "function": {
+                "name": "create_histogram",
+                "arguments": "{\"data\":[7,8,9,6,7,8,10,9,8,7],\"bins\":5}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_46187302",
+              "function": {
+                "name": "mix_paint_color",
+                "arguments": "{\"color1\":\"blue\",\"color2\":\"yellow\",\"lightness\":70}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 779,
+      "completion_tokens": 227,
+      "total_tokens": 1006,
+      "cost": 0.0056778975,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00573525,
+        "upstream_inference_prompt_cost": 0.00233025,
+        "upstream_inference_completions_cost": 0.003405
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241115-L0eWfe3H4T1BmhniKl1X",
+    "object": "response",
+    "created_at": 1776241120,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "Let's tackle each part of your request step by step.\n\nFirst, I'll calculate the future value of your investment with the given parameters.\n\nNext, I'll create a histogram to visualize the distribution of your annual returns over the past 10 years with 5 bins.\n\nFinally, I'll mix the two primary paint colors, blue and yellow, and adjust the lightness level to 70%.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_28785263",
+        "call_id": "call_28785263",
+        "name": "finance_calculate_future_value",
+        "arguments": "{\"initial_investment\":5000,\"rate_of_return\":0.07,\"years\":10,\"contribution\":200}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_95769103",
+        "call_id": "call_95769103",
+        "name": "create_histogram",
+        "arguments": "{\"data\":[7,8,9,6,7,8,10,9,8,7],\"bins\":5}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_46187302",
+        "call_id": "call_46187302",
+        "name": "mix_paint_color",
+        "arguments": "{\"color1\":\"blue\",\"color2\":\"yellow\",\"lightness\":70}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 779,
+      "completion_tokens": 227,
+      "total_tokens": 1006,
+      "cost": 0.0056778975,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00573525,
+        "upstream_inference_prompt_cost": 0.00233025,
+        "upstream_inference_completions_cost": 0.003405
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241115-L0eWfe3H4T1BmhniKl1X",
+    "object": "chat.completion",
+    "created": 1776241115,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "Let's tackle each part of your request step by step.\n\nFirst, I'll calculate the future value of your investment with the given parameters.\n\nNext, I'll create a histogram to visualize the distribution of your annual returns over the past 10 years with 5 bins.\n\nFinally, I'll mix the two primary paint colors, blue and yellow, and adjust the lightness level to 70%.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_28785263",
+              "function": {
+                "name": "finance_calculate_future_value",
+                "arguments": "{\"initial_investment\":5000,\"rate_of_return\":0.07,\"years\":10,\"contribution\":200}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_95769103",
+              "function": {
+                "name": "create_histogram",
+                "arguments": "{\"data\":[7,8,9,6,7,8,10,9,8,7],\"bins\":5}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_46187302",
+              "function": {
+                "name": "mix_paint_color",
+                "arguments": "{\"color1\":\"blue\",\"color2\":\"yellow\",\"lightness\":70}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 779,
+      "completion_tokens": 227,
+      "total_tokens": 1006,
+      "cost": 0.0056778975,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00573525,
+        "upstream_inference_prompt_cost": 0.00233025,
+        "upstream_inference_completions_cost": 0.003405
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 4619.995,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "1ddbdbb5-f20a-4bb9-b1df-3a09bb8d952a"
+}

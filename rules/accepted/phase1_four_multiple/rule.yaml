@@ -1,0 +1,58 @@
+patch_id: phase1_four_multiple
+rules:
+- rule_id: rule_global_tool_guard_v1
+  priority: 100
+  enabled: true
+  trigger:
+    tool_names: []
+    error_types:
+    - empty_tool_call
+    category_patterns:
+    - verification_hook
+  scope:
+    tool_names: []
+    patch_sites:
+    - tool_guard
+    - verification_hook
+    - fallback_router
+  action:
+    prompt_fragments: []
+    prompt_injection:
+      fragments: []
+      position: prepend_system
+    arg_sanitizer: {}
+    tool_guard:
+      enabled: true
+      on_violation: assistant_message
+      on_unknown_tool: assistant_message
+      on_empty_tool_call: assistant_message
+      assistant_message: No valid tool call was emitted for the available tool set.
+    verification:
+      require_known_tool: true
+      require_object_args: true
+      require_required_fields: true
+      require_known_fields: true
+      require_type_match: true
+      max_repairs: null
+    fallback_router:
+      strategy: assistant_message
+      assistant_message: No valid tool call was emitted for the available tool set.
+      on_issue_kinds:
+      - empty_tool_call
+  validation_contract:
+    require_known_tool: true
+    require_object_args: true
+    require_required_fields: true
+    require_known_fields: true
+    require_type_match: true
+    max_repairs: null
+  retention:
+    promote_to: rules/accepted
+    reject_to: rules/rejected
+    keep_in_candidates: true
+failure_ir: []
+source_failure_count: 2
+metadata:
+  compiler: trace_to_patch
+  failure_jsonl: /cephfs/qiuyn/training-free/outputs/reports/phase1_four_multiple_failures.jsonl
+  candidate_dir: /cephfs/qiuyn/training-free/rules/candidates/phase1_four_multiple

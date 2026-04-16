@@ -1,0 +1,376 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Imagine you are a sculptor working on a large project. You have two different types of materials available to you, each with a different density. The first material has a density of 5.2 g/cm^3 and the second material has a density of 7.8 g/cm^3. You are planning to create two identical cones, each with a base radius of 10 cm and a height of 30 cm. The first cone will be made from the first material and the second cone will be made from the second material. Can you calculate the volume of each cone, rounding off to 2 decimal places, and then calculate the mass of each cone using their respective densities?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "geometry_calculate_cone_volume",
+        "description": "Calculate the volume of a cone given the radius and height. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "radius": {
+              "type": "number",
+              "description": "Radius of the cone base. This is a float type value.",
+              "format": "float"
+            },
+            "height": {
+              "type": "number",
+              "description": "Height of the cone. This is a float type value.",
+              "format": "float"
+            },
+            "round_off": {
+              "type": "integer",
+              "description": "Number of decimal places to round off the answer.",
+              "default": 2
+            }
+          },
+          "required": [
+            "radius",
+            "height"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "physics_calculate_cone_mass",
+        "description": "Calculate the mass of a cone given the radius, height, and density. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "radius": {
+              "type": "number",
+              "description": "Radius of the cone base. This is a float type value.",
+              "format": "float"
+            },
+            "height": {
+              "type": "number",
+              "description": "Height of the cone. This is a float type value.",
+              "format": "float"
+            },
+            "density": {
+              "type": "number",
+              "description": "Density of the material the cone is made of. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "radius",
+            "height",
+            "density"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Imagine you are a sculptor working on a large project. You have two different types of materials available to you, each with a different density. The first material has a density of 5.2 g/cm^3 and the second material has a density of 7.8 g/cm^3. You are planning to create two identical cones, each with a base radius of 10 cm and a height of 30 cm. The first cone will be made from the first material and the second cone will be made from the second material. Can you calculate the volume of each cone, rounding off to 2 decimal places, and then calculate the mass of each cone using their respective densities?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "geometry_calculate_cone_volume",
+          "description": "Calculate the volume of a cone given the radius and height. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "radius": {
+                "type": "number",
+                "description": "Radius of the cone base. This is a float type value.",
+                "format": "float"
+              },
+              "height": {
+                "type": "number",
+                "description": "Height of the cone. This is a float type value.",
+                "format": "float"
+              },
+              "round_off": {
+                "type": "integer",
+                "description": "Number of decimal places to round off the answer.",
+                "default": 2
+              }
+            },
+            "required": [
+              "radius",
+              "height"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "physics_calculate_cone_mass",
+          "description": "Calculate the mass of a cone given the radius, height, and density. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "radius": {
+                "type": "number",
+                "description": "Radius of the cone base. This is a float type value.",
+                "format": "float"
+              },
+              "height": {
+                "type": "number",
+                "description": "Height of the cone. This is a float type value.",
+                "format": "float"
+              },
+              "density": {
+                "type": "number",
+                "description": "Density of the material the cone is made of. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "radius",
+              "height",
+              "density"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241583-dJiC0YiNAprS4LMXxIMm",
+    "object": "chat.completion",
+    "created": 1776241583,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "Let's start by calculating the volume of the cones. Since both cones have identical dimensions, the volume will be the same for both. I'll use the radius of 10 cm and height of 30 cm to calculate the volume, rounded to 2 decimal places.\n\nNext, I'll calculate the mass of each cone using their respective densities. For the first cone with a density of 5.2 g/cm³, and the second cone with a density of 7.8 g/cm³, using the same dimensions.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_88645753",
+              "function": {
+                "name": "geometry_calculate_cone_volume",
+                "arguments": "{\"radius\":10.0,\"height\":30.0,\"round_off\":2}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_18291956",
+              "function": {
+                "name": "physics_calculate_cone_mass",
+                "arguments": "{\"radius\":10.0,\"height\":30.0,\"density\":5.2}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_95671310",
+              "function": {
+                "name": "physics_calculate_cone_mass",
+                "arguments": "{\"radius\":10.0,\"height\":30.0,\"density\":7.8}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 618,
+      "completion_tokens": 243,
+      "total_tokens": 861,
+      "cost": 0.0049784625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00502875,
+        "upstream_inference_prompt_cost": 0.00138375,
+        "upstream_inference_completions_cost": 0.003645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241583-dJiC0YiNAprS4LMXxIMm",
+    "object": "response",
+    "created_at": 1776241586,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "Let's start by calculating the volume of the cones. Since both cones have identical dimensions, the volume will be the same for both. I'll use the radius of 10 cm and height of 30 cm to calculate the volume, rounded to 2 decimal places.\n\nNext, I'll calculate the mass of each cone using their respective densities. For the first cone with a density of 5.2 g/cm³, and the second cone with a density of 7.8 g/cm³, using the same dimensions.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_88645753",
+        "call_id": "call_88645753",
+        "name": "geometry_calculate_cone_volume",
+        "arguments": "{\"radius\":10.0,\"height\":30.0,\"round_off\":2}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_18291956",
+        "call_id": "call_18291956",
+        "name": "physics_calculate_cone_mass",
+        "arguments": "{\"radius\":10.0,\"height\":30.0,\"density\":5.2}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_95671310",
+        "call_id": "call_95671310",
+        "name": "physics_calculate_cone_mass",
+        "arguments": "{\"radius\":10.0,\"height\":30.0,\"density\":7.8}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 618,
+      "completion_tokens": 243,
+      "total_tokens": 861,
+      "cost": 0.0049784625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00502875,
+        "upstream_inference_prompt_cost": 0.00138375,
+        "upstream_inference_completions_cost": 0.003645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241583-dJiC0YiNAprS4LMXxIMm",
+    "object": "chat.completion",
+    "created": 1776241583,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "Let's start by calculating the volume of the cones. Since both cones have identical dimensions, the volume will be the same for both. I'll use the radius of 10 cm and height of 30 cm to calculate the volume, rounded to 2 decimal places.\n\nNext, I'll calculate the mass of each cone using their respective densities. For the first cone with a density of 5.2 g/cm³, and the second cone with a density of 7.8 g/cm³, using the same dimensions.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_88645753",
+              "function": {
+                "name": "geometry_calculate_cone_volume",
+                "arguments": "{\"radius\":10.0,\"height\":30.0,\"round_off\":2}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_18291956",
+              "function": {
+                "name": "physics_calculate_cone_mass",
+                "arguments": "{\"radius\":10.0,\"height\":30.0,\"density\":5.2}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_95671310",
+              "function": {
+                "name": "physics_calculate_cone_mass",
+                "arguments": "{\"radius\":10.0,\"height\":30.0,\"density\":7.8}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 618,
+      "completion_tokens": 243,
+      "total_tokens": 861,
+      "cost": 0.0049784625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00502875,
+        "upstream_inference_prompt_cost": 0.00138375,
+        "upstream_inference_completions_cost": 0.003645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 3581.812,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "8d5d69e2-6480-4adc-9cd1-2fa0a7df1600"
+}

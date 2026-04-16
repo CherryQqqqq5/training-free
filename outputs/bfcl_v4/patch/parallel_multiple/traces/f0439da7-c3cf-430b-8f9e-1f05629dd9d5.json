@@ -1,0 +1,426 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Can you help me plan my day? I want to start from my home in New York and go to a chess club named 'Knight Gambit' located in Boston. I want to take the fastest route. After that, I want to go to another chess club named 'Rook Corner' in Philadelphia, again taking the fastest route. Finally, I want to return home, but this time I want to take the shortest route. Can you also provide me with the details of the events hosted by both chess clubs?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "chess_club_details_find",
+        "description": "Provides details about a chess club, including location. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "The name of the chess club."
+            },
+            "city": {
+              "type": "string",
+              "description": "The city in which the chess club is located."
+            },
+            "event": {
+              "type": "string",
+              "description": "The event hosted by the club.",
+              "default": "null"
+            }
+          },
+          "required": [
+            "name",
+            "city"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "route_planner_calculate_route",
+        "description": "Determines the best route between two points. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "start": {
+              "type": "string",
+              "description": "The starting point of the journey."
+            },
+            "destination": {
+              "type": "string",
+              "description": "The destination of the journey."
+            },
+            "method": {
+              "type": "string",
+              "enum": [
+                "fastest",
+                "shortest",
+                "balanced"
+              ],
+              "description": "The method to use when calculating the route (default is 'fastest').",
+              "default": "fastest"
+            }
+          },
+          "required": [
+            "start",
+            "destination"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Can you help me plan my day? I want to start from my home in New York and go to a chess club named 'Knight Gambit' located in Boston. I want to take the fastest route. After that, I want to go to another chess club named 'Rook Corner' in Philadelphia, again taking the fastest route. Finally, I want to return home, but this time I want to take the shortest route. Can you also provide me with the details of the events hosted by both chess clubs?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "chess_club_details_find",
+          "description": "Provides details about a chess club, including location. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The name of the chess club."
+              },
+              "city": {
+                "type": "string",
+                "description": "The city in which the chess club is located."
+              },
+              "event": {
+                "type": "string",
+                "description": "The event hosted by the club.",
+                "default": "null"
+              }
+            },
+            "required": [
+              "name",
+              "city"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "route_planner_calculate_route",
+          "description": "Determines the best route between two points. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "start": {
+                "type": "string",
+                "description": "The starting point of the journey."
+              },
+              "destination": {
+                "type": "string",
+                "description": "The destination of the journey."
+              },
+              "method": {
+                "type": "string",
+                "enum": [
+                  "fastest",
+                  "shortest",
+                  "balanced"
+                ],
+                "description": "The method to use when calculating the route (default is 'fastest').",
+                "default": "fastest"
+              }
+            },
+            "required": [
+              "start",
+              "destination"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241559-8SOK3AFH5WM7hHt1Rpxd",
+    "object": "chat.completion",
+    "created": 1776241559,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help you plan your day. Let's organize your travel itinerary and gather details about the chess clubs you mentioned. I'll start by calculating the routes for your trips and then retrieve the event details for each chess club.\n\nFirst, let's plan the route from your home in New York to 'Knight Gambit' in Boston using the fastest method.\n\nNext, I'll plan the route from Boston to 'Rook Corner' in Philadelphia, also using the fastest method.\n\nThen, I'll plan the route back home to New York from Philadelphia using the shortest method.\n\nNow, let's gather details about the events hosted by 'Knight Gambit' in Boston.\n\nFinally, I'll get the details for 'Rook Corner' in Philadelphia.\n\nOnce I have the route information and club details, I'll compile everything into a comprehensive plan for your day. If there's anything else you need or if I require more specific information (like exact addresses for start or end points), I'll let you know!",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_49440415",
+              "function": {
+                "name": "route_planner_calculate_route",
+                "arguments": "{\"start\":\"New York\",\"destination\":\"Boston\",\"method\":\"fastest\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_51246380",
+              "function": {
+                "name": "route_planner_calculate_route",
+                "arguments": "{\"start\":\"Boston\",\"destination\":\"Philadelphia\",\"method\":\"fastest\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_40469486",
+              "function": {
+                "name": "route_planner_calculate_route",
+                "arguments": "{\"start\":\"Philadelphia\",\"destination\":\"New York\",\"method\":\"shortest\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_59707571",
+              "function": {
+                "name": "chess_club_details_find",
+                "arguments": "{\"name\":\"Knight Gambit\",\"city\":\"Boston\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 4,
+              "id": "call_84223860",
+              "function": {
+                "name": "chess_club_details_find",
+                "arguments": "{\"name\":\"Rook Corner\",\"city\":\"Philadelphia\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 546,
+      "completion_tokens": 394,
+      "total_tokens": 940,
+      "cost": 0.007004745,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0070755,
+        "upstream_inference_prompt_cost": 0.0011655,
+        "upstream_inference_completions_cost": 0.00591
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241559-8SOK3AFH5WM7hHt1Rpxd",
+    "object": "response",
+    "created_at": 1776241564,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'm happy to help you plan your day. Let's organize your travel itinerary and gather details about the chess clubs you mentioned. I'll start by calculating the routes for your trips and then retrieve the event details for each chess club.\n\nFirst, let's plan the route from your home in New York to 'Knight Gambit' in Boston using the fastest method.\n\nNext, I'll plan the route from Boston to 'Rook Corner' in Philadelphia, also using the fastest method.\n\nThen, I'll plan the route back home to New York from Philadelphia using the shortest method.\n\nNow, let's gather details about the events hosted by 'Knight Gambit' in Boston.\n\nFinally, I'll get the details for 'Rook Corner' in Philadelphia.\n\nOnce I have the route information and club details, I'll compile everything into a comprehensive plan for your day. If there's anything else you need or if I require more specific information (like exact addresses for start or end points), I'll let you know!"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_49440415",
+        "call_id": "call_49440415",
+        "name": "route_planner_calculate_route",
+        "arguments": "{\"start\":\"New York\",\"destination\":\"Boston\",\"method\":\"fastest\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_51246380",
+        "call_id": "call_51246380",
+        "name": "route_planner_calculate_route",
+        "arguments": "{\"start\":\"Boston\",\"destination\":\"Philadelphia\",\"method\":\"fastest\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_40469486",
+        "call_id": "call_40469486",
+        "name": "route_planner_calculate_route",
+        "arguments": "{\"start\":\"Philadelphia\",\"destination\":\"New York\",\"method\":\"shortest\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_59707571",
+        "call_id": "call_59707571",
+        "name": "chess_club_details_find",
+        "arguments": "{\"name\":\"Knight Gambit\",\"city\":\"Boston\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_84223860",
+        "call_id": "call_84223860",
+        "name": "chess_club_details_find",
+        "arguments": "{\"name\":\"Rook Corner\",\"city\":\"Philadelphia\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 546,
+      "completion_tokens": 394,
+      "total_tokens": 940,
+      "cost": 0.007004745,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0070755,
+        "upstream_inference_prompt_cost": 0.0011655,
+        "upstream_inference_completions_cost": 0.00591
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241559-8SOK3AFH5WM7hHt1Rpxd",
+    "object": "chat.completion",
+    "created": 1776241559,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help you plan your day. Let's organize your travel itinerary and gather details about the chess clubs you mentioned. I'll start by calculating the routes for your trips and then retrieve the event details for each chess club.\n\nFirst, let's plan the route from your home in New York to 'Knight Gambit' in Boston using the fastest method.\n\nNext, I'll plan the route from Boston to 'Rook Corner' in Philadelphia, also using the fastest method.\n\nThen, I'll plan the route back home to New York from Philadelphia using the shortest method.\n\nNow, let's gather details about the events hosted by 'Knight Gambit' in Boston.\n\nFinally, I'll get the details for 'Rook Corner' in Philadelphia.\n\nOnce I have the route information and club details, I'll compile everything into a comprehensive plan for your day. If there's anything else you need or if I require more specific information (like exact addresses for start or end points), I'll let you know!",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_49440415",
+              "function": {
+                "name": "route_planner_calculate_route",
+                "arguments": "{\"start\":\"New York\",\"destination\":\"Boston\",\"method\":\"fastest\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_51246380",
+              "function": {
+                "name": "route_planner_calculate_route",
+                "arguments": "{\"start\":\"Boston\",\"destination\":\"Philadelphia\",\"method\":\"fastest\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_40469486",
+              "function": {
+                "name": "route_planner_calculate_route",
+                "arguments": "{\"start\":\"Philadelphia\",\"destination\":\"New York\",\"method\":\"shortest\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_59707571",
+              "function": {
+                "name": "chess_club_details_find",
+                "arguments": "{\"name\":\"Knight Gambit\",\"city\":\"Boston\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 4,
+              "id": "call_84223860",
+              "function": {
+                "name": "chess_club_details_find",
+                "arguments": "{\"name\":\"Rook Corner\",\"city\":\"Philadelphia\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 546,
+      "completion_tokens": 394,
+      "total_tokens": 940,
+      "cost": 0.007004745,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0070755,
+        "upstream_inference_prompt_cost": 0.0011655,
+        "upstream_inference_completions_cost": 0.00591
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 5294.887,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "f0439da7-c3cf-430b-8f9e-1f05629dd9d5"
+}

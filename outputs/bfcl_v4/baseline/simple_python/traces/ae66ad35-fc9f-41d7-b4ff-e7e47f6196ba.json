@@ -1,0 +1,262 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Perform a hypothesis test for two independent samples with scores of Sample1: [22,33,42,12,34] and Sample2: [23,45,44,14,38] at a significance level of 0.05."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "hypothesis_testing_ttest_ind",
+        "description": "Conducts a hypothesis test for two independent samples. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "sample1": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "First set of observations (array of numbers)."
+            },
+            "sample2": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "Second set of observations (array of numbers)."
+            },
+            "significance_level": {
+              "type": "number",
+              "description": "Significance level of the test (default: 0.05) This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "sample1",
+            "sample2"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Perform a hypothesis test for two independent samples with scores of Sample1: [22,33,42,12,34] and Sample2: [23,45,44,14,38] at a significance level of 0.05."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "hypothesis_testing_ttest_ind",
+          "description": "Conducts a hypothesis test for two independent samples. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "sample1": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "First set of observations (array of numbers)."
+              },
+              "sample2": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "Second set of observations (array of numbers)."
+              },
+              "significance_level": {
+                "type": "number",
+                "description": "Significance level of the test (default: 0.05) This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "sample1",
+              "sample2"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776237888-pqOU7K8UDPXOFB7OCBan",
+    "object": "chat.completion",
+    "created": 1776237888,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_52652493",
+              "function": {
+                "name": "hypothesis_testing_ttest_ind",
+                "arguments": "{\"sample1\":[22,33,42,12,34],\"sample2\":[23,45,44,14,38],\"significance_level\":0.05}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 404,
+      "completion_tokens": 71,
+      "total_tokens": 475,
+      "cost": 0.0017886825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00180675,
+        "upstream_inference_prompt_cost": 0.00074175,
+        "upstream_inference_completions_cost": 0.001065
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776237888-pqOU7K8UDPXOFB7OCBan",
+    "object": "response",
+    "created_at": 1776237890,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_52652493",
+        "call_id": "call_52652493",
+        "name": "hypothesis_testing_ttest_ind",
+        "arguments": "{\"sample1\":[22,33,42,12,34],\"sample2\":[23,45,44,14,38],\"significance_level\":0.05}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 404,
+      "completion_tokens": 71,
+      "total_tokens": 475,
+      "cost": 0.0017886825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00180675,
+        "upstream_inference_prompt_cost": 0.00074175,
+        "upstream_inference_completions_cost": 0.001065
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776237888-pqOU7K8UDPXOFB7OCBan",
+    "object": "chat.completion",
+    "created": 1776237888,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_52652493",
+              "function": {
+                "name": "hypothesis_testing_ttest_ind",
+                "arguments": "{\"sample1\":[22,33,42,12,34],\"sample2\":[23,45,44,14,38],\"significance_level\":0.05}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 404,
+      "completion_tokens": 71,
+      "total_tokens": 475,
+      "cost": 0.0017886825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00180675,
+        "upstream_inference_prompt_cost": 0.00074175,
+        "upstream_inference_completions_cost": 0.001065
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1991.423,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "ae66ad35-fc9f-41d7-b4ff-e7e47f6196ba"
+}

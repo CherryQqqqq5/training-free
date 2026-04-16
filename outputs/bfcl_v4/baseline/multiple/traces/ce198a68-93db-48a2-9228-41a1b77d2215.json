@@ -1,0 +1,374 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Solve a quadratic equation where a=2, b=6, and c=5"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "get_stock_info",
+        "description": "Retrieves information about a specific stock based on company's name. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "company_name": {
+              "type": "string",
+              "description": "The name of the company."
+            },
+            "detail_level": {
+              "type": "string",
+              "description": "Level of detail for stock information. Can be 'summary' or 'detailed'."
+            },
+            "market": {
+              "type": "string",
+              "description": "The stock market of interest. Default is 'NASDAQ'"
+            }
+          },
+          "required": [
+            "company_name",
+            "detail_level"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "portfolio_future_value",
+        "description": "Calculate the future value of an investment in a specific stock based on the invested amount, expected annual return and number of years. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "stock": {
+              "type": "string",
+              "description": "The ticker symbol of the stock."
+            },
+            "invested_amount": {
+              "type": "number",
+              "description": "The invested amount in USD. This is a float type value.",
+              "format": "float"
+            },
+            "expected_annual_return": {
+              "type": "number",
+              "description": "The expected annual return on investment as a decimal. E.g. 5% = 0.05 This is a float type value.",
+              "format": "float"
+            },
+            "years": {
+              "type": "integer",
+              "description": "The number of years for which the investment is made."
+            }
+          },
+          "required": [
+            "stock",
+            "invested_amount",
+            "expected_annual_return",
+            "years"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "solve_quadratic_equation",
+        "description": "Function solves the quadratic equation and returns its roots. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "a": {
+              "type": "integer",
+              "description": "Coefficient of x squared"
+            },
+            "b": {
+              "type": "integer",
+              "description": "Coefficient of x"
+            },
+            "c": {
+              "type": "integer",
+              "description": "Constant term in the quadratic equation"
+            }
+          },
+          "required": [
+            "a",
+            "b",
+            "c"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Solve a quadratic equation where a=2, b=6, and c=5"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_stock_info",
+          "description": "Retrieves information about a specific stock based on company's name. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "company_name": {
+                "type": "string",
+                "description": "The name of the company."
+              },
+              "detail_level": {
+                "type": "string",
+                "description": "Level of detail for stock information. Can be 'summary' or 'detailed'."
+              },
+              "market": {
+                "type": "string",
+                "description": "The stock market of interest. Default is 'NASDAQ'"
+              }
+            },
+            "required": [
+              "company_name",
+              "detail_level"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "portfolio_future_value",
+          "description": "Calculate the future value of an investment in a specific stock based on the invested amount, expected annual return and number of years. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "stock": {
+                "type": "string",
+                "description": "The ticker symbol of the stock."
+              },
+              "invested_amount": {
+                "type": "number",
+                "description": "The invested amount in USD. This is a float type value.",
+                "format": "float"
+              },
+              "expected_annual_return": {
+                "type": "number",
+                "description": "The expected annual return on investment as a decimal. E.g. 5% = 0.05 This is a float type value.",
+                "format": "float"
+              },
+              "years": {
+                "type": "integer",
+                "description": "The number of years for which the investment is made."
+              }
+            },
+            "required": [
+              "stock",
+              "invested_amount",
+              "expected_annual_return",
+              "years"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "solve_quadratic_equation",
+          "description": "Function solves the quadratic equation and returns its roots. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "a": {
+                "type": "integer",
+                "description": "Coefficient of x squared"
+              },
+              "b": {
+                "type": "integer",
+                "description": "Coefficient of x"
+              },
+              "c": {
+                "type": "integer",
+                "description": "Constant term in the quadratic equation"
+              }
+            },
+            "required": [
+              "a",
+              "b",
+              "c"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239662-uzIxNCFmt8frVkzQapif",
+    "object": "chat.completion",
+    "created": 1776239662,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_98776876",
+              "function": {
+                "name": "solve_quadratic_equation",
+                "arguments": "{\"a\":2,\"b\":6,\"c\":5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 622,
+      "completion_tokens": 40,
+      "total_tokens": 662,
+      "cost": 0.001973565,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0019935,
+        "upstream_inference_prompt_cost": 0.0013935,
+        "upstream_inference_completions_cost": 0.0006
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239662-uzIxNCFmt8frVkzQapif",
+    "object": "response",
+    "created_at": 1776239664,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_98776876",
+        "call_id": "call_98776876",
+        "name": "solve_quadratic_equation",
+        "arguments": "{\"a\":2,\"b\":6,\"c\":5}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 622,
+      "completion_tokens": 40,
+      "total_tokens": 662,
+      "cost": 0.001973565,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0019935,
+        "upstream_inference_prompt_cost": 0.0013935,
+        "upstream_inference_completions_cost": 0.0006
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239662-uzIxNCFmt8frVkzQapif",
+    "object": "chat.completion",
+    "created": 1776239662,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_98776876",
+              "function": {
+                "name": "solve_quadratic_equation",
+                "arguments": "{\"a\":2,\"b\":6,\"c\":5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 622,
+      "completion_tokens": 40,
+      "total_tokens": 662,
+      "cost": 0.001973565,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0019935,
+        "upstream_inference_prompt_cost": 0.0013935,
+        "upstream_inference_completions_cost": 0.0006
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1878.298,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "ce198a68-93db-48a2-9228-41a1b77d2215"
+}

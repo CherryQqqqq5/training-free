@@ -1,0 +1,240 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Identify the protein sequence of a given human gene 'BRCA1'."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "get_protein_sequence",
+        "description": "Retrieve the protein sequence encoded by a human gene. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "gene": {
+              "type": "string",
+              "description": "The human gene of interest."
+            },
+            "species": {
+              "type": "string",
+              "description": "The species for which the gene is to be analyzed.",
+              "default": "Homo sapiens"
+            }
+          },
+          "required": [
+            "gene"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Identify the protein sequence of a given human gene 'BRCA1'."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_protein_sequence",
+          "description": "Retrieve the protein sequence encoded by a human gene. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "gene": {
+                "type": "string",
+                "description": "The human gene of interest."
+              },
+              "species": {
+                "type": "string",
+                "description": "The species for which the gene is to be analyzed.",
+                "default": "Homo sapiens"
+              }
+            },
+            "required": [
+              "gene"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776237756-WyoTmoED4ksLy6Sb3juu",
+    "object": "chat.completion",
+    "created": 1776237756,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_10484106",
+              "function": {
+                "name": "get_protein_sequence",
+                "arguments": "{\"gene\":\"BRCA1\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 317,
+      "completion_tokens": 30,
+      "total_tokens": 347,
+      "cost": 0.0013803075,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00139425,
+        "upstream_inference_prompt_cost": 0.00094425,
+        "upstream_inference_completions_cost": 0.00045
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776237756-WyoTmoED4ksLy6Sb3juu",
+    "object": "response",
+    "created_at": 1776237757,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_10484106",
+        "call_id": "call_10484106",
+        "name": "get_protein_sequence",
+        "arguments": "{\"gene\":\"BRCA1\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 317,
+      "completion_tokens": 30,
+      "total_tokens": 347,
+      "cost": 0.0013803075,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00139425,
+        "upstream_inference_prompt_cost": 0.00094425,
+        "upstream_inference_completions_cost": 0.00045
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776237756-WyoTmoED4ksLy6Sb3juu",
+    "object": "chat.completion",
+    "created": 1776237756,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_10484106",
+              "function": {
+                "name": "get_protein_sequence",
+                "arguments": "{\"gene\":\"BRCA1\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 317,
+      "completion_tokens": 30,
+      "total_tokens": 347,
+      "cost": 0.0013803075,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00139425,
+        "upstream_inference_prompt_cost": 0.00094425,
+        "upstream_inference_completions_cost": 0.00045
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1980.814,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "027b95a5-4fa4-421d-b71a-3cf922def47b"
+}

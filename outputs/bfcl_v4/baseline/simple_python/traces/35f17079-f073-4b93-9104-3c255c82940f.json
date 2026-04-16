@@ -1,0 +1,256 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Generate a customized law contract between John and Alice for rental agreement in California."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "generate_law_contract",
+        "description": "Generates a customized law contract given involved parties, contract type and location. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "parties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Parties involved in the contract."
+            },
+            "contract_type": {
+              "type": "string",
+              "description": "Type of the contract."
+            },
+            "location": {
+              "type": "string",
+              "description": "Location where the contract will be in effect."
+            }
+          },
+          "required": [
+            "parties",
+            "contract_type",
+            "location"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Generate a customized law contract between John and Alice for rental agreement in California."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "generate_law_contract",
+          "description": "Generates a customized law contract given involved parties, contract type and location. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "parties": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Parties involved in the contract."
+              },
+              "contract_type": {
+                "type": "string",
+                "description": "Type of the contract."
+              },
+              "location": {
+                "type": "string",
+                "description": "Location where the contract will be in effect."
+              }
+            },
+            "required": [
+              "parties",
+              "contract_type",
+              "location"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776237978-gKj9RSkmGqRkbuIbDLrS",
+    "object": "chat.completion",
+    "created": 1776237978,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_04640293",
+              "function": {
+                "name": "generate_law_contract",
+                "arguments": "{\"parties\":[\"John\",\"Alice\"],\"contract_type\":\"rental agreement\",\"location\":\"California\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 345,
+      "completion_tokens": 47,
+      "total_tokens": 392,
+      "cost": 0.0012570525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00126975,
+        "upstream_inference_prompt_cost": 0.00056475,
+        "upstream_inference_completions_cost": 0.000705
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776237978-gKj9RSkmGqRkbuIbDLrS",
+    "object": "response",
+    "created_at": 1776237980,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_04640293",
+        "call_id": "call_04640293",
+        "name": "generate_law_contract",
+        "arguments": "{\"parties\":[\"John\",\"Alice\"],\"contract_type\":\"rental agreement\",\"location\":\"California\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 345,
+      "completion_tokens": 47,
+      "total_tokens": 392,
+      "cost": 0.0012570525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00126975,
+        "upstream_inference_prompt_cost": 0.00056475,
+        "upstream_inference_completions_cost": 0.000705
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776237978-gKj9RSkmGqRkbuIbDLrS",
+    "object": "chat.completion",
+    "created": 1776237978,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_04640293",
+              "function": {
+                "name": "generate_law_contract",
+                "arguments": "{\"parties\":[\"John\",\"Alice\"],\"contract_type\":\"rental agreement\",\"location\":\"California\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 345,
+      "completion_tokens": 47,
+      "total_tokens": 392,
+      "cost": 0.0012570525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00126975,
+        "upstream_inference_prompt_cost": 0.00056475,
+        "upstream_inference_completions_cost": 0.000705
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1809.662,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "35f17079-f073-4b93-9104-3c255c82940f"
+}

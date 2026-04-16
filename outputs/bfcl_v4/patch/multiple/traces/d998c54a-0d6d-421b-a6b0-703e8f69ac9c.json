@@ -1,0 +1,308 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "I have 100 euro. How much is it in USD?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "unit_conversion",
+        "description": "Convert a value from one unit to another. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "number",
+              "description": "The value to be converted. This is a float type value.",
+              "format": "float"
+            },
+            "from_unit": {
+              "type": "string",
+              "description": "The unit to convert from."
+            },
+            "to_unit": {
+              "type": "string",
+              "description": "The unit to convert to."
+            }
+          },
+          "required": [
+            "value",
+            "from_unit",
+            "to_unit"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "currency_conversion",
+        "description": "Convert a value from one currency to another. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "integer",
+              "description": "The amount to be converted."
+            },
+            "from_currency": {
+              "type": "string",
+              "description": "The currency to convert from."
+            },
+            "to_currency": {
+              "type": "string",
+              "description": "The currency to convert to."
+            }
+          },
+          "required": [
+            "amount",
+            "from_currency",
+            "to_currency"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "I have 100 euro. How much is it in USD?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "unit_conversion",
+          "description": "Convert a value from one unit to another. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "number",
+                "description": "The value to be converted. This is a float type value.",
+                "format": "float"
+              },
+              "from_unit": {
+                "type": "string",
+                "description": "The unit to convert from."
+              },
+              "to_unit": {
+                "type": "string",
+                "description": "The unit to convert to."
+              }
+            },
+            "required": [
+              "value",
+              "from_unit",
+              "to_unit"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "currency_conversion",
+          "description": "Convert a value from one currency to another. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "integer",
+                "description": "The amount to be converted."
+              },
+              "from_currency": {
+                "type": "string",
+                "description": "The currency to convert from."
+              },
+              "to_currency": {
+                "type": "string",
+                "description": "The currency to convert to."
+              }
+            },
+            "required": [
+              "amount",
+              "from_currency",
+              "to_currency"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240071-oLmatzwt7NI3hD6hMtBX",
+    "object": "chat.completion",
+    "created": 1776240071,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_31669452",
+              "function": {
+                "name": "currency_conversion",
+                "arguments": "{\"amount\":100,\"from_currency\":\"EUR\",\"to_currency\":\"USD\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 435,
+      "completion_tokens": 40,
+      "total_tokens": 475,
+      "cost": 0.000919215,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 434,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0009285,
+        "upstream_inference_prompt_cost": 0.0003285,
+        "upstream_inference_completions_cost": 0.0006
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240071-oLmatzwt7NI3hD6hMtBX",
+    "object": "response",
+    "created_at": 1776240072,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_31669452",
+        "call_id": "call_31669452",
+        "name": "currency_conversion",
+        "arguments": "{\"amount\":100,\"from_currency\":\"EUR\",\"to_currency\":\"USD\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 435,
+      "completion_tokens": 40,
+      "total_tokens": 475,
+      "cost": 0.000919215,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 434,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0009285,
+        "upstream_inference_prompt_cost": 0.0003285,
+        "upstream_inference_completions_cost": 0.0006
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240071-oLmatzwt7NI3hD6hMtBX",
+    "object": "chat.completion",
+    "created": 1776240071,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_31669452",
+              "function": {
+                "name": "currency_conversion",
+                "arguments": "{\"amount\":100,\"from_currency\":\"EUR\",\"to_currency\":\"USD\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 435,
+      "completion_tokens": 40,
+      "total_tokens": 475,
+      "cost": 0.000919215,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 434,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0009285,
+        "upstream_inference_prompt_cost": 0.0003285,
+        "upstream_inference_completions_cost": 0.0006
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1771.785,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "d998c54a-0d6d-421b-a6b0-703e8f69ac9c"
+}

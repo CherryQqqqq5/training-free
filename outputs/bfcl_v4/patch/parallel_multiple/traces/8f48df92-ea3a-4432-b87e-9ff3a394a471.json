@@ -1,0 +1,356 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Could you first calculate the derivative of the function '3x^2 + 2x - 1' at the value of 2 where 'x' is the function variable, then calculate the derivative of the function '5y^3 - 4y + 2' at the value of 3 where 'y' is the function variable, and finally retrieve the strengths and weaknesses of the personality type 'INTJ'?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculus_derivative",
+        "description": "Compute the derivative of a function at a specific value. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "function": {
+              "type": "string",
+              "description": "The function to calculate the derivative of."
+            },
+            "value": {
+              "type": "integer",
+              "description": "The value where the derivative needs to be calculated at."
+            },
+            "function_variable": {
+              "type": "string",
+              "description": "The variable present in the function, for instance x or y, etc. Default is 'x'."
+            }
+          },
+          "required": [
+            "function",
+            "value"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "get_personality_traits",
+        "description": "Retrieve the personality traits for a specific personality type, including their strengths and weaknesses. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "description": "The personality type."
+            },
+            "traits": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "strengths",
+                  "weaknesses"
+                ]
+              },
+              "description": "List of traits to be retrieved, default is ['strengths', 'weaknesses']."
+            }
+          },
+          "required": [
+            "type"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Could you first calculate the derivative of the function '3x^2 + 2x - 1' at the value of 2 where 'x' is the function variable, then calculate the derivative of the function '5y^3 - 4y + 2' at the value of 3 where 'y' is the function variable, and finally retrieve the strengths and weaknesses of the personality type 'INTJ'?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculus_derivative",
+          "description": "Compute the derivative of a function at a specific value. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "function": {
+                "type": "string",
+                "description": "The function to calculate the derivative of."
+              },
+              "value": {
+                "type": "integer",
+                "description": "The value where the derivative needs to be calculated at."
+              },
+              "function_variable": {
+                "type": "string",
+                "description": "The variable present in the function, for instance x or y, etc. Default is 'x'."
+              }
+            },
+            "required": [
+              "function",
+              "value"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "get_personality_traits",
+          "description": "Retrieve the personality traits for a specific personality type, including their strengths and weaknesses. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "The personality type."
+              },
+              "traits": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "strengths",
+                    "weaknesses"
+                  ]
+                },
+                "description": "List of traits to be retrieved, default is ['strengths', 'weaknesses']."
+              }
+            },
+            "required": [
+              "type"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241753-Wf3KcBY94zLHtEpBAY5m",
+    "object": "chat.completion",
+    "created": 1776241753,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_18001452",
+              "function": {
+                "name": "calculus_derivative",
+                "arguments": "{\"function\":\"3*x**2 + 2*x - 1\",\"value\":2,\"function_variable\":\"x\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_73223781",
+              "function": {
+                "name": "calculus_derivative",
+                "arguments": "{\"function\":\"5*y**3 - 4*y + 2\",\"value\":3,\"function_variable\":\"y\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_49279405",
+              "function": {
+                "name": "get_personality_traits",
+                "arguments": "{\"type\":\"INTJ\",\"traits\":[\"strengths\",\"weaknesses\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 531,
+      "completion_tokens": 142,
+      "total_tokens": 673,
+      "cost": 0.0032202225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00325275,
+        "upstream_inference_prompt_cost": 0.00112275,
+        "upstream_inference_completions_cost": 0.00213
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241753-Wf3KcBY94zLHtEpBAY5m",
+    "object": "response",
+    "created_at": 1776241755,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_18001452",
+        "call_id": "call_18001452",
+        "name": "calculus_derivative",
+        "arguments": "{\"function\":\"3*x**2 + 2*x - 1\",\"value\":2,\"function_variable\":\"x\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_73223781",
+        "call_id": "call_73223781",
+        "name": "calculus_derivative",
+        "arguments": "{\"function\":\"5*y**3 - 4*y + 2\",\"value\":3,\"function_variable\":\"y\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_49279405",
+        "call_id": "call_49279405",
+        "name": "get_personality_traits",
+        "arguments": "{\"type\":\"INTJ\",\"traits\":[\"strengths\",\"weaknesses\"]}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 531,
+      "completion_tokens": 142,
+      "total_tokens": 673,
+      "cost": 0.0032202225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00325275,
+        "upstream_inference_prompt_cost": 0.00112275,
+        "upstream_inference_completions_cost": 0.00213
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241753-Wf3KcBY94zLHtEpBAY5m",
+    "object": "chat.completion",
+    "created": 1776241753,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_18001452",
+              "function": {
+                "name": "calculus_derivative",
+                "arguments": "{\"function\":\"3*x**2 + 2*x - 1\",\"value\":2,\"function_variable\":\"x\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_73223781",
+              "function": {
+                "name": "calculus_derivative",
+                "arguments": "{\"function\":\"5*y**3 - 4*y + 2\",\"value\":3,\"function_variable\":\"y\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_49279405",
+              "function": {
+                "name": "get_personality_traits",
+                "arguments": "{\"type\":\"INTJ\",\"traits\":[\"strengths\",\"weaknesses\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 531,
+      "completion_tokens": 142,
+      "total_tokens": 673,
+      "cost": 0.0032202225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00325275,
+        "upstream_inference_prompt_cost": 0.00112275,
+        "upstream_inference_completions_cost": 0.00213
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2557.052,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "8f48df92-ea3a-4432-b87e-9ff3a394a471"
+}

@@ -1,0 +1,341 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "What was the average life expectancy in the USA in the year 1900 and 1950? Additionally, what was the Gross Domestic Product (GDP) of the USA in these years?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "us_history_gdp",
+        "description": "Retrieves the Gross Domestic Product of the USA for a specific year. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "year": {
+              "type": "integer",
+              "description": "The year for which to retrieve GDP data."
+            }
+          },
+          "required": [
+            "year"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "us_history_life_expectancy",
+        "description": "Retrieves the average life expectancy of the USA for a specific year. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "year": {
+              "type": "integer",
+              "description": "The year for which to retrieve life expectancy."
+            }
+          },
+          "required": [
+            "year"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What was the average life expectancy in the USA in the year 1900 and 1950? Additionally, what was the Gross Domestic Product (GDP) of the USA in these years?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "us_history_gdp",
+          "description": "Retrieves the Gross Domestic Product of the USA for a specific year. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "year": {
+                "type": "integer",
+                "description": "The year for which to retrieve GDP data."
+              }
+            },
+            "required": [
+              "year"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "us_history_life_expectancy",
+          "description": "Retrieves the average life expectancy of the USA for a specific year. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "year": {
+                "type": "integer",
+                "description": "The year for which to retrieve life expectancy."
+              }
+            },
+            "required": [
+              "year"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241436-tkvbaTxO6CphOcPXvL9e",
+    "object": "chat.completion",
+    "created": 1776241436,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_76742448",
+              "function": {
+                "name": "us_history_life_expectancy",
+                "arguments": "{\"year\":1900}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_77960519",
+              "function": {
+                "name": "us_history_life_expectancy",
+                "arguments": "{\"year\":1950}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_00956224",
+              "function": {
+                "name": "us_history_gdp",
+                "arguments": "{\"year\":1900}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_05932983",
+              "function": {
+                "name": "us_history_gdp",
+                "arguments": "{\"year\":1950}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 395,
+      "completion_tokens": 114,
+      "total_tokens": 509,
+      "cost": 0.00286605,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.002895,
+        "upstream_inference_prompt_cost": 0.001185,
+        "upstream_inference_completions_cost": 0.00171
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241436-tkvbaTxO6CphOcPXvL9e",
+    "object": "response",
+    "created_at": 1776241441,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_76742448",
+        "call_id": "call_76742448",
+        "name": "us_history_life_expectancy",
+        "arguments": "{\"year\":1900}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_77960519",
+        "call_id": "call_77960519",
+        "name": "us_history_life_expectancy",
+        "arguments": "{\"year\":1950}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_00956224",
+        "call_id": "call_00956224",
+        "name": "us_history_gdp",
+        "arguments": "{\"year\":1900}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_05932983",
+        "call_id": "call_05932983",
+        "name": "us_history_gdp",
+        "arguments": "{\"year\":1950}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 395,
+      "completion_tokens": 114,
+      "total_tokens": 509,
+      "cost": 0.00286605,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.002895,
+        "upstream_inference_prompt_cost": 0.001185,
+        "upstream_inference_completions_cost": 0.00171
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241436-tkvbaTxO6CphOcPXvL9e",
+    "object": "chat.completion",
+    "created": 1776241436,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_76742448",
+              "function": {
+                "name": "us_history_life_expectancy",
+                "arguments": "{\"year\":1900}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_77960519",
+              "function": {
+                "name": "us_history_life_expectancy",
+                "arguments": "{\"year\":1950}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_00956224",
+              "function": {
+                "name": "us_history_gdp",
+                "arguments": "{\"year\":1900}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_05932983",
+              "function": {
+                "name": "us_history_gdp",
+                "arguments": "{\"year\":1950}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 395,
+      "completion_tokens": 114,
+      "total_tokens": 509,
+      "cost": 0.00286605,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.002895,
+        "upstream_inference_prompt_cost": 0.001185,
+        "upstream_inference_completions_cost": 0.00171
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 5991.337,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "080851f3-5b6f-44c4-a178-6757d02b7e3b"
+}

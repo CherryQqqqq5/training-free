@@ -1,0 +1,313 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Play the Game of life for 3 rounds starting from an empty board, then play chess where the 1st move is e4 and the 2nd move is e5."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "chess_play",
+        "description": "Makes moves in a chess game. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "moves": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of moves to play in the game."
+            }
+          },
+          "required": [
+            "moves"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "game_of_life_play",
+        "description": "Runs a round of game of life based on provided board. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "rounds": {
+              "type": "integer",
+              "description": "Number of rounds to play."
+            },
+            "start_board": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "Starting board of game, leave empty for random starting point."
+            }
+          },
+          "required": [
+            "rounds",
+            "start_board"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Play the Game of life for 3 rounds starting from an empty board, then play chess where the 1st move is e4 and the 2nd move is e5."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "chess_play",
+          "description": "Makes moves in a chess game. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "moves": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "List of moves to play in the game."
+              }
+            },
+            "required": [
+              "moves"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "game_of_life_play",
+          "description": "Runs a round of game of life based on provided board. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "rounds": {
+                "type": "integer",
+                "description": "Number of rounds to play."
+              },
+              "start_board": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "Starting board of game, leave empty for random starting point."
+              }
+            },
+            "required": [
+              "rounds",
+              "start_board"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241477-te9sTWVynDrYYQ3uhQ1k",
+    "object": "chat.completion",
+    "created": 1776241477,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_51514474",
+              "function": {
+                "name": "game_of_life_play",
+                "arguments": "{\"rounds\":3,\"start_board\":[]}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_68735396",
+              "function": {
+                "name": "chess_play",
+                "arguments": "{\"moves\":[\"e4\",\"e5\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 418,
+      "completion_tokens": 65,
+      "total_tokens": 483,
+      "cost": 0.0017411625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00175875,
+        "upstream_inference_prompt_cost": 0.00078375,
+        "upstream_inference_completions_cost": 0.000975
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241477-te9sTWVynDrYYQ3uhQ1k",
+    "object": "response",
+    "created_at": 1776241478,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_51514474",
+        "call_id": "call_51514474",
+        "name": "game_of_life_play",
+        "arguments": "{\"rounds\":3,\"start_board\":[]}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_68735396",
+        "call_id": "call_68735396",
+        "name": "chess_play",
+        "arguments": "{\"moves\":[\"e4\",\"e5\"]}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 418,
+      "completion_tokens": 65,
+      "total_tokens": 483,
+      "cost": 0.0017411625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00175875,
+        "upstream_inference_prompt_cost": 0.00078375,
+        "upstream_inference_completions_cost": 0.000975
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241477-te9sTWVynDrYYQ3uhQ1k",
+    "object": "chat.completion",
+    "created": 1776241477,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_51514474",
+              "function": {
+                "name": "game_of_life_play",
+                "arguments": "{\"rounds\":3,\"start_board\":[]}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_68735396",
+              "function": {
+                "name": "chess_play",
+                "arguments": "{\"moves\":[\"e4\",\"e5\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 418,
+      "completion_tokens": 65,
+      "total_tokens": 483,
+      "cost": 0.0017411625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00175875,
+        "upstream_inference_prompt_cost": 0.00078375,
+        "upstream_inference_completions_cost": 0.000975
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2471.525,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "eff92917-a631-45bf-89a3-ba0c99b312c9"
+}

@@ -1,0 +1,252 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the expected evolutionary fitness of a creature, with trait A contributing to 40% of the fitness and trait B contributing 60%, if trait A has a value of 0.8 and trait B a value of 0.7."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_fitness",
+        "description": "Calculate the expected evolutionary fitness of a creature based on the individual values and contributions of its traits. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "trait_values": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "description": "List of trait values, which are decimal numbers between 0 and 1, where 1 represents the trait maximally contributing to fitness."
+            },
+            "trait_contributions": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "description": "List of the percentage contributions of each trait to the overall fitness, which must sum to 1."
+            }
+          },
+          "required": [
+            "trait_values",
+            "trait_contributions"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the expected evolutionary fitness of a creature, with trait A contributing to 40% of the fitness and trait B contributing 60%, if trait A has a value of 0.8 and trait B a value of 0.7."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_fitness",
+          "description": "Calculate the expected evolutionary fitness of a creature based on the individual values and contributions of its traits. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "trait_values": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "description": "List of trait values, which are decimal numbers between 0 and 1, where 1 represents the trait maximally contributing to fitness."
+              },
+              "trait_contributions": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "description": "List of the percentage contributions of each trait to the overall fitness, which must sum to 1."
+              }
+            },
+            "required": [
+              "trait_values",
+              "trait_contributions"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776237790-Fs6LIKcnqykWEEgPcIYy",
+    "object": "chat.completion",
+    "created": 1776237790,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_13085853",
+              "function": {
+                "name": "calculate_fitness",
+                "arguments": "{\"trait_values\":[0.8,0.7],\"trait_contributions\":[0.4,0.6]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 405,
+      "completion_tokens": 50,
+      "total_tokens": 455,
+      "cost": 0.001477575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0014925,
+        "upstream_inference_prompt_cost": 0.0007425,
+        "upstream_inference_completions_cost": 0.00075
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776237790-Fs6LIKcnqykWEEgPcIYy",
+    "object": "response",
+    "created_at": 1776237791,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_13085853",
+        "call_id": "call_13085853",
+        "name": "calculate_fitness",
+        "arguments": "{\"trait_values\":[0.8,0.7],\"trait_contributions\":[0.4,0.6]}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 405,
+      "completion_tokens": 50,
+      "total_tokens": 455,
+      "cost": 0.001477575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0014925,
+        "upstream_inference_prompt_cost": 0.0007425,
+        "upstream_inference_completions_cost": 0.00075
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776237790-Fs6LIKcnqykWEEgPcIYy",
+    "object": "chat.completion",
+    "created": 1776237790,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_13085853",
+              "function": {
+                "name": "calculate_fitness",
+                "arguments": "{\"trait_values\":[0.8,0.7],\"trait_contributions\":[0.4,0.6]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 405,
+      "completion_tokens": 50,
+      "total_tokens": 455,
+      "cost": 0.001477575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0014925,
+        "upstream_inference_prompt_cost": 0.0007425,
+        "upstream_inference_completions_cost": 0.00075
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2087.192,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "73ff1fd8-020d-4891-b5e6-d7cbb439e1aa"
+}

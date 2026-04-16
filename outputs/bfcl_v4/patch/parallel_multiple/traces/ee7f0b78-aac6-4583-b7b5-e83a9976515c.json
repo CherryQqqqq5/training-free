@@ -1,0 +1,391 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Could you please help me with a couple of calculations? First, I need to find the greatest common divisor of 56 and 98 using the Euclidean algorithm. After that, I would like to know the greatest common divisor of 81 and 27, but this time using the binary algorithm. Once we have those, I need to calculate the least common multiple of 15 and 25 using the standard method. And finally, could you find the least common multiple of 21 and 14 using the reduced method?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_lcm",
+        "description": "Calculate the least common multiple (lcm) between two integers. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "num1": {
+              "type": "integer",
+              "description": "First number to calculate lcm for."
+            },
+            "num2": {
+              "type": "integer",
+              "description": "Second number to calculate lcm for."
+            },
+            "method": {
+              "type": "string",
+              "description": "The specific method to use in the calculation. Supported values: 'standard', 'reduced'",
+              "default": "standard"
+            }
+          },
+          "required": [
+            "num1",
+            "num2"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "calculate_gcd",
+        "description": "Calculate the greatest common divisor (gcd) between two integers. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "num1": {
+              "type": "integer",
+              "description": "First number to calculate gcd for."
+            },
+            "num2": {
+              "type": "integer",
+              "description": "Second number to calculate gcd for."
+            },
+            "algorithm": {
+              "type": "string",
+              "description": "The specific algorithm to use in the calculation. Supported values: 'euclidean', 'binary'",
+              "default": "euclidean"
+            }
+          },
+          "required": [
+            "num1",
+            "num2"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Could you please help me with a couple of calculations? First, I need to find the greatest common divisor of 56 and 98 using the Euclidean algorithm. After that, I would like to know the greatest common divisor of 81 and 27, but this time using the binary algorithm. Once we have those, I need to calculate the least common multiple of 15 and 25 using the standard method. And finally, could you find the least common multiple of 21 and 14 using the reduced method?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_lcm",
+          "description": "Calculate the least common multiple (lcm) between two integers. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "num1": {
+                "type": "integer",
+                "description": "First number to calculate lcm for."
+              },
+              "num2": {
+                "type": "integer",
+                "description": "Second number to calculate lcm for."
+              },
+              "method": {
+                "type": "string",
+                "description": "The specific method to use in the calculation. Supported values: 'standard', 'reduced'",
+                "default": "standard"
+              }
+            },
+            "required": [
+              "num1",
+              "num2"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_gcd",
+          "description": "Calculate the greatest common divisor (gcd) between two integers. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "num1": {
+                "type": "integer",
+                "description": "First number to calculate gcd for."
+              },
+              "num2": {
+                "type": "integer",
+                "description": "Second number to calculate gcd for."
+              },
+              "algorithm": {
+                "type": "string",
+                "description": "The specific algorithm to use in the calculation. Supported values: 'euclidean', 'binary'",
+                "default": "euclidean"
+              }
+            },
+            "required": [
+              "num1",
+              "num2"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241596-VNku2NTHvyH2oZ1lBeDw",
+    "object": "chat.completion",
+    "created": 1776241596,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help with those calculations. Let's tackle them one by one by calling the appropriate functions.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_33816218",
+              "function": {
+                "name": "calculate_gcd",
+                "arguments": "{\"num1\":56,\"num2\":98,\"algorithm\":\"euclidean\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_60937979",
+              "function": {
+                "name": "calculate_gcd",
+                "arguments": "{\"num1\":81,\"num2\":27,\"algorithm\":\"binary\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_96873141",
+              "function": {
+                "name": "calculate_lcm",
+                "arguments": "{\"num1\":15,\"num2\":25,\"method\":\"standard\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_75581523",
+              "function": {
+                "name": "calculate_lcm",
+                "arguments": "{\"num1\":21,\"num2\":14,\"method\":\"reduced\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 563,
+      "completion_tokens": 185,
+      "total_tokens": 748,
+      "cost": 0.0044126775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00445725,
+        "upstream_inference_prompt_cost": 0.00168225,
+        "upstream_inference_completions_cost": 0.002775
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241596-VNku2NTHvyH2oZ1lBeDw",
+    "object": "response",
+    "created_at": 1776241598,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'm happy to help with those calculations. Let's tackle them one by one by calling the appropriate functions.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_33816218",
+        "call_id": "call_33816218",
+        "name": "calculate_gcd",
+        "arguments": "{\"num1\":56,\"num2\":98,\"algorithm\":\"euclidean\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_60937979",
+        "call_id": "call_60937979",
+        "name": "calculate_gcd",
+        "arguments": "{\"num1\":81,\"num2\":27,\"algorithm\":\"binary\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_96873141",
+        "call_id": "call_96873141",
+        "name": "calculate_lcm",
+        "arguments": "{\"num1\":15,\"num2\":25,\"method\":\"standard\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_75581523",
+        "call_id": "call_75581523",
+        "name": "calculate_lcm",
+        "arguments": "{\"num1\":21,\"num2\":14,\"method\":\"reduced\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 563,
+      "completion_tokens": 185,
+      "total_tokens": 748,
+      "cost": 0.0044126775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00445725,
+        "upstream_inference_prompt_cost": 0.00168225,
+        "upstream_inference_completions_cost": 0.002775
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241596-VNku2NTHvyH2oZ1lBeDw",
+    "object": "chat.completion",
+    "created": 1776241596,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help with those calculations. Let's tackle them one by one by calling the appropriate functions.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_33816218",
+              "function": {
+                "name": "calculate_gcd",
+                "arguments": "{\"num1\":56,\"num2\":98,\"algorithm\":\"euclidean\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_60937979",
+              "function": {
+                "name": "calculate_gcd",
+                "arguments": "{\"num1\":81,\"num2\":27,\"algorithm\":\"binary\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_96873141",
+              "function": {
+                "name": "calculate_lcm",
+                "arguments": "{\"num1\":15,\"num2\":25,\"method\":\"standard\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_75581523",
+              "function": {
+                "name": "calculate_lcm",
+                "arguments": "{\"num1\":21,\"num2\":14,\"method\":\"reduced\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 563,
+      "completion_tokens": 185,
+      "total_tokens": 748,
+      "cost": 0.0044126775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00445725,
+        "upstream_inference_prompt_cost": 0.00168225,
+        "upstream_inference_completions_cost": 0.002775
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 3376.096,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "ee7f0b78-aac6-4583-b7b5-e83a9976515c"
+}

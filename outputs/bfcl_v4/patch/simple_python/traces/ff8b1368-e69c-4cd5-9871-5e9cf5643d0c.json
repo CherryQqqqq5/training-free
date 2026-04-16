@@ -1,0 +1,248 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Mix yellow and blue colors and adjust the lightness level to 60 percent."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "mix_paint_color",
+        "description": "Combine two primary paint colors and adjust the resulting color's lightness level. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "color1": {
+              "type": "string",
+              "description": "The first primary color to be mixed."
+            },
+            "color2": {
+              "type": "string",
+              "description": "The second primary color to be mixed."
+            },
+            "lightness": {
+              "type": "integer",
+              "description": "The desired lightness level of the resulting color in percentage. The default level is set to 50."
+            }
+          },
+          "required": [
+            "color1",
+            "color2"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Mix yellow and blue colors and adjust the lightness level to 60 percent."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "mix_paint_color",
+          "description": "Combine two primary paint colors and adjust the resulting color's lightness level. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "color1": {
+                "type": "string",
+                "description": "The first primary color to be mixed."
+              },
+              "color2": {
+                "type": "string",
+                "description": "The second primary color to be mixed."
+              },
+              "lightness": {
+                "type": "integer",
+                "description": "The desired lightness level of the resulting color in percentage. The default level is set to 50."
+              }
+            },
+            "required": [
+              "color1",
+              "color2"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239098-GtLftDRaXR1arW3heNej",
+    "object": "chat.completion",
+    "created": 1776239098,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_97295734",
+              "function": {
+                "name": "mix_paint_color",
+                "arguments": "{\"color1\":\"yellow\",\"color2\":\"blue\",\"lightness\":60}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 352,
+      "completion_tokens": 42,
+      "total_tokens": 394,
+      "cost": 0.0016624575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00167925,
+        "upstream_inference_prompt_cost": 0.00104925,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239098-GtLftDRaXR1arW3heNej",
+    "object": "response",
+    "created_at": 1776239099,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_97295734",
+        "call_id": "call_97295734",
+        "name": "mix_paint_color",
+        "arguments": "{\"color1\":\"yellow\",\"color2\":\"blue\",\"lightness\":60}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 352,
+      "completion_tokens": 42,
+      "total_tokens": 394,
+      "cost": 0.0016624575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00167925,
+        "upstream_inference_prompt_cost": 0.00104925,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239098-GtLftDRaXR1arW3heNej",
+    "object": "chat.completion",
+    "created": 1776239098,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_97295734",
+              "function": {
+                "name": "mix_paint_color",
+                "arguments": "{\"color1\":\"yellow\",\"color2\":\"blue\",\"lightness\":60}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 352,
+      "completion_tokens": 42,
+      "total_tokens": 394,
+      "cost": 0.0016624575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00167925,
+        "upstream_inference_prompt_cost": 0.00104925,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1600.55,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "ff8b1368-e69c-4cd5-9871-5e9cf5643d0c"
+}

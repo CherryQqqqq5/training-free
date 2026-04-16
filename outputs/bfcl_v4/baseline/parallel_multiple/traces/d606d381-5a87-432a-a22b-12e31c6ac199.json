@@ -1,0 +1,408 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Can you help me plan my trip to New York? I would like to visit a modern art installation, a park with a playground and a picnic area, and a popular monument. Could you find these for me?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "artwork_search_find",
+        "description": "Search for artworks based on type and location. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "description": "Type of the artwork. E.g., painting, sculpture, installation."
+            },
+            "location": {
+              "type": "string",
+              "description": "Location or city where the artwork is."
+            },
+            "era": {
+              "type": "string",
+              "description": "Time period of the artwork, can be 'contemporary', 'modern', 'renaissance', etc. Default is 'contemporary' if not specified.",
+              "optional": "True"
+            }
+          },
+          "required": [
+            "type",
+            "location"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "park_search_find",
+        "description": "Search for parks based on facilities and location. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "facilities": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of facilities in the park."
+            },
+            "location": {
+              "type": "string",
+              "description": "Location or city where the park is."
+            }
+          },
+          "required": [
+            "facilities",
+            "location"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "tourist_attraction_find",
+        "description": "Search for tourist attractions based on type and location. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "attractionType": {
+              "type": "string",
+              "description": "Type of the attraction. E.g., monument, museum, park."
+            },
+            "location": {
+              "type": "string",
+              "description": "Location or city where the attraction is."
+            }
+          },
+          "required": [
+            "attractionType",
+            "location"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Can you help me plan my trip to New York? I would like to visit a modern art installation, a park with a playground and a picnic area, and a popular monument. Could you find these for me?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "artwork_search_find",
+          "description": "Search for artworks based on type and location. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Type of the artwork. E.g., painting, sculpture, installation."
+              },
+              "location": {
+                "type": "string",
+                "description": "Location or city where the artwork is."
+              },
+              "era": {
+                "type": "string",
+                "description": "Time period of the artwork, can be 'contemporary', 'modern', 'renaissance', etc. Default is 'contemporary' if not specified.",
+                "optional": "True"
+              }
+            },
+            "required": [
+              "type",
+              "location"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "park_search_find",
+          "description": "Search for parks based on facilities and location. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "facilities": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "List of facilities in the park."
+              },
+              "location": {
+                "type": "string",
+                "description": "Location or city where the park is."
+              }
+            },
+            "required": [
+              "facilities",
+              "location"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "tourist_attraction_find",
+          "description": "Search for tourist attractions based on type and location. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "attractionType": {
+                "type": "string",
+                "description": "Type of the attraction. E.g., monument, museum, park."
+              },
+              "location": {
+                "type": "string",
+                "description": "Location or city where the attraction is."
+              }
+            },
+            "required": [
+              "attractionType",
+              "location"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240883-6Pw1uU98EDlSUKlQLZt0",
+    "object": "chat.completion",
+    "created": 1776240883,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'd be happy to help you plan your trip to New York. I'll search for a modern art installation, a park with a playground and picnic area, and a popular monument in the area. Let me start by looking up each of these for you.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_79677569",
+              "function": {
+                "name": "artwork_search_find",
+                "arguments": "{\"type\":\"installation\",\"location\":\"New York\",\"era\":\"modern\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_53495175",
+              "function": {
+                "name": "park_search_find",
+                "arguments": "{\"facilities\":[\"playground\",\"picnic area\"],\"location\":\"New York\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_60565877",
+              "function": {
+                "name": "tourist_attraction_find",
+                "arguments": "{\"attractionType\":\"monument\",\"location\":\"New York\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 577,
+      "completion_tokens": 171,
+      "total_tokens": 748,
+      "cost": 0.0037874925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00382575,
+        "upstream_inference_prompt_cost": 0.00126075,
+        "upstream_inference_completions_cost": 0.002565
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240883-6Pw1uU98EDlSUKlQLZt0",
+    "object": "response",
+    "created_at": 1776240886,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'd be happy to help you plan your trip to New York. I'll search for a modern art installation, a park with a playground and picnic area, and a popular monument in the area. Let me start by looking up each of these for you.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_79677569",
+        "call_id": "call_79677569",
+        "name": "artwork_search_find",
+        "arguments": "{\"type\":\"installation\",\"location\":\"New York\",\"era\":\"modern\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_53495175",
+        "call_id": "call_53495175",
+        "name": "park_search_find",
+        "arguments": "{\"facilities\":[\"playground\",\"picnic area\"],\"location\":\"New York\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_60565877",
+        "call_id": "call_60565877",
+        "name": "tourist_attraction_find",
+        "arguments": "{\"attractionType\":\"monument\",\"location\":\"New York\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 577,
+      "completion_tokens": 171,
+      "total_tokens": 748,
+      "cost": 0.0037874925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00382575,
+        "upstream_inference_prompt_cost": 0.00126075,
+        "upstream_inference_completions_cost": 0.002565
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240883-6Pw1uU98EDlSUKlQLZt0",
+    "object": "chat.completion",
+    "created": 1776240883,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'd be happy to help you plan your trip to New York. I'll search for a modern art installation, a park with a playground and picnic area, and a popular monument in the area. Let me start by looking up each of these for you.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_79677569",
+              "function": {
+                "name": "artwork_search_find",
+                "arguments": "{\"type\":\"installation\",\"location\":\"New York\",\"era\":\"modern\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_53495175",
+              "function": {
+                "name": "park_search_find",
+                "arguments": "{\"facilities\":[\"playground\",\"picnic area\"],\"location\":\"New York\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_60565877",
+              "function": {
+                "name": "tourist_attraction_find",
+                "arguments": "{\"attractionType\":\"monument\",\"location\":\"New York\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 577,
+      "completion_tokens": 171,
+      "total_tokens": 748,
+      "cost": 0.0037874925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00382575,
+        "upstream_inference_prompt_cost": 0.00126075,
+        "upstream_inference_completions_cost": 0.002565
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2998.953,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "d606d381-5a87-432a-a22b-12e31c6ac199"
+}

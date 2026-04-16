@@ -1,0 +1,424 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Can you help me plan a dinner? I am looking for a vegan main course recipe that can be prepared within 45 minutes. After dinner, we are planning to play a poker game, could you tell me the probability of getting a full house with a deck of 52 cards and a hand size of 5? Also, I am new to Denver, CO and would like to know the nearby hospitals within a radius of 10 kms, specifically those with an Emergency department.\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "find_recipe",
+        "description": "Find a recipe based on the dietary restrictions, recipe type, and time constraints. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "dietary_restrictions": {
+              "type": "string",
+              "description": "Dietary restrictions e.g. vegan, vegetarian, gluten free, dairy free."
+            },
+            "recipe_type": {
+              "type": "string",
+              "description": "Type of the recipe. E.g. dessert, main course, breakfast."
+            },
+            "time": {
+              "type": "integer",
+              "description": "Time limit in minutes to prep the meal."
+            }
+          },
+          "required": [
+            "dietary_restrictions",
+            "recipe_type",
+            "time"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "poker_probability_full_house",
+        "description": "Calculate the probability of getting a full house in a poker game. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "deck_size": {
+              "type": "integer",
+              "description": "The size of the deck. Default is 52."
+            },
+            "hand_size": {
+              "type": "integer",
+              "description": "The size of the hand. Default is 5."
+            }
+          },
+          "required": [
+            "deck_size",
+            "hand_size"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "hospital_locate",
+        "description": "Locate nearby hospitals based on location and radius. Options to include specific departments are available. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city and state, e.g. Denver, CO"
+            },
+            "radius": {
+              "type": "integer",
+              "description": "The radius within which you want to find the hospital in kms."
+            },
+            "department": {
+              "type": "string",
+              "description": "Specific department within the hospital. Default to none if not provided.",
+              "enum": [
+                "General Medicine",
+                "Emergency",
+                "Pediatrics",
+                "Cardiology",
+                "Orthopedics"
+              ]
+            }
+          },
+          "required": [
+            "location",
+            "radius"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Can you help me plan a dinner? I am looking for a vegan main course recipe that can be prepared within 45 minutes. After dinner, we are planning to play a poker game, could you tell me the probability of getting a full house with a deck of 52 cards and a hand size of 5? Also, I am new to Denver, CO and would like to know the nearby hospitals within a radius of 10 kms, specifically those with an Emergency department.\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "find_recipe",
+          "description": "Find a recipe based on the dietary restrictions, recipe type, and time constraints. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "dietary_restrictions": {
+                "type": "string",
+                "description": "Dietary restrictions e.g. vegan, vegetarian, gluten free, dairy free."
+              },
+              "recipe_type": {
+                "type": "string",
+                "description": "Type of the recipe. E.g. dessert, main course, breakfast."
+              },
+              "time": {
+                "type": "integer",
+                "description": "Time limit in minutes to prep the meal."
+              }
+            },
+            "required": [
+              "dietary_restrictions",
+              "recipe_type",
+              "time"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "poker_probability_full_house",
+          "description": "Calculate the probability of getting a full house in a poker game. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "deck_size": {
+                "type": "integer",
+                "description": "The size of the deck. Default is 52."
+              },
+              "hand_size": {
+                "type": "integer",
+                "description": "The size of the hand. Default is 5."
+              }
+            },
+            "required": [
+              "deck_size",
+              "hand_size"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "hospital_locate",
+          "description": "Locate nearby hospitals based on location and radius. Options to include specific departments are available. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city and state, e.g. Denver, CO"
+              },
+              "radius": {
+                "type": "integer",
+                "description": "The radius within which you want to find the hospital in kms."
+              },
+              "department": {
+                "type": "string",
+                "description": "Specific department within the hospital. Default to none if not provided.",
+                "enum": [
+                  "General Medicine",
+                  "Emergency",
+                  "Pediatrics",
+                  "Cardiology",
+                  "Orthopedics"
+                ]
+              }
+            },
+            "required": [
+              "location",
+              "radius"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241247-fQPTYmWkwUgLasU4b9RS",
+    "object": "chat.completion",
+    "created": 1776241247,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help you with planning your dinner and providing the information you need. Let's address each of your requests step by step.\n\nFor the vegan main course recipe that can be prepared within 45 minutes, I will use the `find_recipe` function. For the probability of getting a full house in poker with a deck of 52 cards and a hand size of 5, I will use the `poker_probability_full_house` function. Lastly, for locating nearby hospitals in Denver, CO within a 10 km radius with an Emergency department, I will use the `hospital_locate` function.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_80545845",
+              "function": {
+                "name": "find_recipe",
+                "arguments": "{\"dietary_restrictions\":\"vegan\",\"recipe_type\":\"main course\",\"time\":45}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_64087022",
+              "function": {
+                "name": "poker_probability_full_house",
+                "arguments": "{\"deck_size\":52,\"hand_size\":5}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_47699704",
+              "function": {
+                "name": "hospital_locate",
+                "arguments": "{\"location\":\"Denver, CO\",\"radius\":10,\"department\":\"Emergency\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 681,
+      "completion_tokens": 240,
+      "total_tokens": 921,
+      "cost": 0.0051210225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00517275,
+        "upstream_inference_prompt_cost": 0.00157275,
+        "upstream_inference_completions_cost": 0.0036
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241247-fQPTYmWkwUgLasU4b9RS",
+    "object": "response",
+    "created_at": 1776241250,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'm happy to help you with planning your dinner and providing the information you need. Let's address each of your requests step by step.\n\nFor the vegan main course recipe that can be prepared within 45 minutes, I will use the `find_recipe` function. For the probability of getting a full house in poker with a deck of 52 cards and a hand size of 5, I will use the `poker_probability_full_house` function. Lastly, for locating nearby hospitals in Denver, CO within a 10 km radius with an Emergency department, I will use the `hospital_locate` function.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_80545845",
+        "call_id": "call_80545845",
+        "name": "find_recipe",
+        "arguments": "{\"dietary_restrictions\":\"vegan\",\"recipe_type\":\"main course\",\"time\":45}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_64087022",
+        "call_id": "call_64087022",
+        "name": "poker_probability_full_house",
+        "arguments": "{\"deck_size\":52,\"hand_size\":5}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_47699704",
+        "call_id": "call_47699704",
+        "name": "hospital_locate",
+        "arguments": "{\"location\":\"Denver, CO\",\"radius\":10,\"department\":\"Emergency\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 681,
+      "completion_tokens": 240,
+      "total_tokens": 921,
+      "cost": 0.0051210225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00517275,
+        "upstream_inference_prompt_cost": 0.00157275,
+        "upstream_inference_completions_cost": 0.0036
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241247-fQPTYmWkwUgLasU4b9RS",
+    "object": "chat.completion",
+    "created": 1776241247,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help you with planning your dinner and providing the information you need. Let's address each of your requests step by step.\n\nFor the vegan main course recipe that can be prepared within 45 minutes, I will use the `find_recipe` function. For the probability of getting a full house in poker with a deck of 52 cards and a hand size of 5, I will use the `poker_probability_full_house` function. Lastly, for locating nearby hospitals in Denver, CO within a 10 km radius with an Emergency department, I will use the `hospital_locate` function.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_80545845",
+              "function": {
+                "name": "find_recipe",
+                "arguments": "{\"dietary_restrictions\":\"vegan\",\"recipe_type\":\"main course\",\"time\":45}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_64087022",
+              "function": {
+                "name": "poker_probability_full_house",
+                "arguments": "{\"deck_size\":52,\"hand_size\":5}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_47699704",
+              "function": {
+                "name": "hospital_locate",
+                "arguments": "{\"location\":\"Denver, CO\",\"radius\":10,\"department\":\"Emergency\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 681,
+      "completion_tokens": 240,
+      "total_tokens": 921,
+      "cost": 0.0051210225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00517275,
+        "upstream_inference_prompt_cost": 0.00157275,
+        "upstream_inference_completions_cost": 0.0036
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 3963.715,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "d81b8ef8-2048-4136-80d6-f0fb646a17ae"
+}

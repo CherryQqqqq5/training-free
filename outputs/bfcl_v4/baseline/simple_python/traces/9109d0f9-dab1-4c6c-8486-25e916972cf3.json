@@ -1,0 +1,252 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the cell density in a sample with an optical density of 0.6, where the experiment dilution is 5 times."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_cell_density",
+        "description": "Calculate the cell density of a biological sample based on its optical density and the experiment dilution. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "optical_density": {
+              "type": "number",
+              "description": "The optical density of the sample, usually obtained from a spectrophotometer reading. This is a float type value.",
+              "format": "float"
+            },
+            "dilution": {
+              "type": "integer",
+              "description": "The dilution factor applied during the experiment."
+            },
+            "calibration_factor": {
+              "type": "number",
+              "description": "The calibration factor to adjust the density, default value is 1e9 assuming cell density is in CFU/mL. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "optical_density",
+            "dilution"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the cell density in a sample with an optical density of 0.6, where the experiment dilution is 5 times."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_cell_density",
+          "description": "Calculate the cell density of a biological sample based on its optical density and the experiment dilution. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "optical_density": {
+                "type": "number",
+                "description": "The optical density of the sample, usually obtained from a spectrophotometer reading. This is a float type value.",
+                "format": "float"
+              },
+              "dilution": {
+                "type": "integer",
+                "description": "The dilution factor applied during the experiment."
+              },
+              "calibration_factor": {
+                "type": "number",
+                "description": "The calibration factor to adjust the density, default value is 1e9 assuming cell density is in CFU/mL. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "optical_density",
+              "dilution"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776237761-PuSWYcdneArNp1cHBd7o",
+    "object": "chat.completion",
+    "created": 1776237761,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_99946739",
+              "function": {
+                "name": "calculate_cell_density",
+                "arguments": "{\"optical_density\":0.6,\"dilution\":5,\"calibration_factor\":1000000000.0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 399,
+      "completion_tokens": 47,
+      "total_tokens": 446,
+      "cost": 0.001415205,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0014295,
+        "upstream_inference_prompt_cost": 0.0007245,
+        "upstream_inference_completions_cost": 0.000705
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776237761-PuSWYcdneArNp1cHBd7o",
+    "object": "response",
+    "created_at": 1776237762,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_99946739",
+        "call_id": "call_99946739",
+        "name": "calculate_cell_density",
+        "arguments": "{\"optical_density\":0.6,\"dilution\":5,\"calibration_factor\":1000000000.0}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 399,
+      "completion_tokens": 47,
+      "total_tokens": 446,
+      "cost": 0.001415205,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0014295,
+        "upstream_inference_prompt_cost": 0.0007245,
+        "upstream_inference_completions_cost": 0.000705
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776237761-PuSWYcdneArNp1cHBd7o",
+    "object": "chat.completion",
+    "created": 1776237761,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_99946739",
+              "function": {
+                "name": "calculate_cell_density",
+                "arguments": "{\"optical_density\":0.6,\"dilution\":5,\"calibration_factor\":1000000000.0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 399,
+      "completion_tokens": 47,
+      "total_tokens": 446,
+      "cost": 0.001415205,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0014295,
+        "upstream_inference_prompt_cost": 0.0007245,
+        "upstream_inference_completions_cost": 0.000705
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1596.893,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "9109d0f9-dab1-4c6c-8486-25e916972cf3"
+}

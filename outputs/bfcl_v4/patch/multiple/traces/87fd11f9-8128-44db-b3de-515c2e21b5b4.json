@@ -1,0 +1,351 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "How to assess the population growth in deer and their impact on woodland in Washington state over the past decade?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "wildlife_population_assess_growth",
+        "description": "Assesses the population growth of a specific species in a specified location over a period. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "species": {
+              "type": "string",
+              "description": "The species for which the growth is to be calculated."
+            },
+            "location": {
+              "type": "string",
+              "description": "The area where the species is present."
+            },
+            "duration": {
+              "type": "integer",
+              "description": "The time period for which the population growth should be calculated in years."
+            }
+          },
+          "required": [
+            "species",
+            "location",
+            "duration"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "ecological_impact_analyze",
+        "description": "Analyzes the impact of a species on a particular ecosystem. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "species": {
+              "type": "string",
+              "description": "The species whose impact is to be calculated."
+            },
+            "ecosystem": {
+              "type": "string",
+              "description": "The ecosystem being affected."
+            },
+            "location": {
+              "type": "string",
+              "description": "The area where the impact is analyzed."
+            },
+            "timeframe": {
+              "type": "integer",
+              "description": "The time period for which the impact analysis should be carried out in years.",
+              "default": 5
+            }
+          },
+          "required": [
+            "species",
+            "ecosystem",
+            "location"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "How to assess the population growth in deer and their impact on woodland in Washington state over the past decade?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "wildlife_population_assess_growth",
+          "description": "Assesses the population growth of a specific species in a specified location over a period. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "species": {
+                "type": "string",
+                "description": "The species for which the growth is to be calculated."
+              },
+              "location": {
+                "type": "string",
+                "description": "The area where the species is present."
+              },
+              "duration": {
+                "type": "integer",
+                "description": "The time period for which the population growth should be calculated in years."
+              }
+            },
+            "required": [
+              "species",
+              "location",
+              "duration"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "ecological_impact_analyze",
+          "description": "Analyzes the impact of a species on a particular ecosystem. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "species": {
+                "type": "string",
+                "description": "The species whose impact is to be calculated."
+              },
+              "ecosystem": {
+                "type": "string",
+                "description": "The ecosystem being affected."
+              },
+              "location": {
+                "type": "string",
+                "description": "The area where the impact is analyzed."
+              },
+              "timeframe": {
+                "type": "integer",
+                "description": "The time period for which the impact analysis should be carried out in years.",
+                "default": 5
+              }
+            },
+            "required": [
+              "species",
+              "ecosystem",
+              "location"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239973-PPbPNvs8N8YIELvNpyf8",
+    "object": "chat.completion",
+    "created": 1776239973,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "To assess the population growth of deer and their impact on woodland in Washington state over the past decade, I will use the available functions to address your request in two parts: population growth assessment and ecological impact analysis.\n\nFirst, I will call the function to assess the population growth of deer in Washington state over the past 10 years.\n\nNext, I will call the function to analyze the ecological impact of deer on the woodland ecosystem in Washington state over the same period.\n\nOnce the results from these function calls are available, I will provide you with a comprehensive summary of the population growth trends and the ecological impact of deer on the woodland ecosystem in Washington state over the past decade.",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_80742945",
+              "function": {
+                "name": "wildlife_population_assess_growth",
+                "arguments": "{\"species\":\"deer\",\"location\":\"Washington state\",\"duration\":10}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_99007649",
+              "function": {
+                "name": "ecological_impact_analyze",
+                "arguments": "{\"species\":\"deer\",\"ecosystem\":\"woodland\",\"location\":\"Washington state\",\"timeframe\":10}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 493,
+      "completion_tokens": 228,
+      "total_tokens": 721,
+      "cost": 0.0043844625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00442875,
+        "upstream_inference_prompt_cost": 0.00100875,
+        "upstream_inference_completions_cost": 0.00342
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239973-PPbPNvs8N8YIELvNpyf8",
+    "object": "response",
+    "created_at": 1776239976,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "To assess the population growth of deer and their impact on woodland in Washington state over the past decade, I will use the available functions to address your request in two parts: population growth assessment and ecological impact analysis.\n\nFirst, I will call the function to assess the population growth of deer in Washington state over the past 10 years.\n\nNext, I will call the function to analyze the ecological impact of deer on the woodland ecosystem in Washington state over the same period.\n\nOnce the results from these function calls are available, I will provide you with a comprehensive summary of the population growth trends and the ecological impact of deer on the woodland ecosystem in Washington state over the past decade."
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_80742945",
+        "call_id": "call_80742945",
+        "name": "wildlife_population_assess_growth",
+        "arguments": "{\"species\":\"deer\",\"location\":\"Washington state\",\"duration\":10}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_99007649",
+        "call_id": "call_99007649",
+        "name": "ecological_impact_analyze",
+        "arguments": "{\"species\":\"deer\",\"ecosystem\":\"woodland\",\"location\":\"Washington state\",\"timeframe\":10}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 493,
+      "completion_tokens": 228,
+      "total_tokens": 721,
+      "cost": 0.0043844625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00442875,
+        "upstream_inference_prompt_cost": 0.00100875,
+        "upstream_inference_completions_cost": 0.00342
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239973-PPbPNvs8N8YIELvNpyf8",
+    "object": "chat.completion",
+    "created": 1776239973,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "To assess the population growth of deer and their impact on woodland in Washington state over the past decade, I will use the available functions to address your request in two parts: population growth assessment and ecological impact analysis.\n\nFirst, I will call the function to assess the population growth of deer in Washington state over the past 10 years.\n\nNext, I will call the function to analyze the ecological impact of deer on the woodland ecosystem in Washington state over the same period.\n\nOnce the results from these function calls are available, I will provide you with a comprehensive summary of the population growth trends and the ecological impact of deer on the woodland ecosystem in Washington state over the past decade.",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_80742945",
+              "function": {
+                "name": "wildlife_population_assess_growth",
+                "arguments": "{\"species\":\"deer\",\"location\":\"Washington state\",\"duration\":10}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_99007649",
+              "function": {
+                "name": "ecological_impact_analyze",
+                "arguments": "{\"species\":\"deer\",\"ecosystem\":\"woodland\",\"location\":\"Washington state\",\"timeframe\":10}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 493,
+      "completion_tokens": 228,
+      "total_tokens": 721,
+      "cost": 0.0043844625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00442875,
+        "upstream_inference_prompt_cost": 0.00100875,
+        "upstream_inference_completions_cost": 0.00342
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 4058.92,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "87fd11f9-8128-44db-b3de-515c2e21b5b4"
+}

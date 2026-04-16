@@ -1,0 +1,264 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Predict whether a person with weight 150lbs and height 5ft 10in who is lightly active will get type 2 diabetes."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "diabetes_prediction",
+        "description": "Predict the likelihood of diabetes type 2 based on a person's weight and height. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "weight": {
+              "type": "integer",
+              "description": "Weight of the person in lbs."
+            },
+            "height": {
+              "type": "integer",
+              "description": "Height of the person in inches."
+            },
+            "activity_level": {
+              "type": "string",
+              "enum": [
+                "sedentary",
+                "lightly active",
+                "moderately active",
+                "very active",
+                "extra active"
+              ],
+              "description": "Physical activity level of the person."
+            }
+          },
+          "required": [
+            "weight",
+            "height",
+            "activity_level"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Predict whether a person with weight 150lbs and height 5ft 10in who is lightly active will get type 2 diabetes."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "diabetes_prediction",
+          "description": "Predict the likelihood of diabetes type 2 based on a person's weight and height. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "weight": {
+                "type": "integer",
+                "description": "Weight of the person in lbs."
+              },
+              "height": {
+                "type": "integer",
+                "description": "Height of the person in inches."
+              },
+              "activity_level": {
+                "type": "string",
+                "enum": [
+                  "sedentary",
+                  "lightly active",
+                  "moderately active",
+                  "very active",
+                  "extra active"
+                ],
+                "description": "Physical activity level of the person."
+              }
+            },
+            "required": [
+              "weight",
+              "height",
+              "activity_level"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776238690-9yFxKJ5cMbDHEvVCEVYE",
+    "object": "chat.completion",
+    "created": 1776238690,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_00604561",
+              "function": {
+                "name": "diabetes_prediction",
+                "arguments": "{\"weight\":150,\"height\":70,\"activity_level\":\"lightly active\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 369,
+      "completion_tokens": 42,
+      "total_tokens": 411,
+      "cost": 0.0012540825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00126675,
+        "upstream_inference_prompt_cost": 0.00063675,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776238690-9yFxKJ5cMbDHEvVCEVYE",
+    "object": "response",
+    "created_at": 1776238691,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_00604561",
+        "call_id": "call_00604561",
+        "name": "diabetes_prediction",
+        "arguments": "{\"weight\":150,\"height\":70,\"activity_level\":\"lightly active\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 369,
+      "completion_tokens": 42,
+      "total_tokens": 411,
+      "cost": 0.0012540825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00126675,
+        "upstream_inference_prompt_cost": 0.00063675,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776238690-9yFxKJ5cMbDHEvVCEVYE",
+    "object": "chat.completion",
+    "created": 1776238690,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_00604561",
+              "function": {
+                "name": "diabetes_prediction",
+                "arguments": "{\"weight\":150,\"height\":70,\"activity_level\":\"lightly active\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 369,
+      "completion_tokens": 42,
+      "total_tokens": 411,
+      "cost": 0.0012540825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00126675,
+        "upstream_inference_prompt_cost": 0.00063675,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1634.888,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "3972ee82-2d05-42bb-905d-3435e1343b09"
+}

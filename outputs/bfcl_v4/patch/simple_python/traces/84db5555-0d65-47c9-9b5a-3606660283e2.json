@@ -1,0 +1,252 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Predict the total expected profit of stocks XYZ in 5 years given I have invested $5000 and annual return rate is 7%."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "investment_predictProfit",
+        "description": "Predict the profit for given investment after specified number of years. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "investment_amount": {
+              "type": "integer",
+              "description": "The amount invested in dollars."
+            },
+            "annual_return": {
+              "type": "number",
+              "description": "The annual return rate of the investment. This is a float type value.",
+              "format": "float"
+            },
+            "years": {
+              "type": "integer",
+              "description": "The time period in years for which the investment is made."
+            }
+          },
+          "required": [
+            "investment_amount",
+            "annual_return",
+            "years"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Predict the total expected profit of stocks XYZ in 5 years given I have invested $5000 and annual return rate is 7%."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "investment_predictProfit",
+          "description": "Predict the profit for given investment after specified number of years. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "investment_amount": {
+                "type": "integer",
+                "description": "The amount invested in dollars."
+              },
+              "annual_return": {
+                "type": "number",
+                "description": "The annual return rate of the investment. This is a float type value.",
+                "format": "float"
+              },
+              "years": {
+                "type": "integer",
+                "description": "The time period in years for which the investment is made."
+              }
+            },
+            "required": [
+              "investment_amount",
+              "annual_return",
+              "years"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776238838-QsFKEeXvx3QT3jiNqg3O",
+    "object": "chat.completion",
+    "created": 1776238838,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_96009285",
+              "function": {
+                "name": "investment_predictProfit",
+                "arguments": "{\"investment_amount\":5000,\"annual_return\":0.07,\"years\":5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 362,
+      "completion_tokens": 43,
+      "total_tokens": 405,
+      "cost": 0.0012481425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00126075,
+        "upstream_inference_prompt_cost": 0.00061575,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776238838-QsFKEeXvx3QT3jiNqg3O",
+    "object": "response",
+    "created_at": 1776238840,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_96009285",
+        "call_id": "call_96009285",
+        "name": "investment_predictProfit",
+        "arguments": "{\"investment_amount\":5000,\"annual_return\":0.07,\"years\":5}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 362,
+      "completion_tokens": 43,
+      "total_tokens": 405,
+      "cost": 0.0012481425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00126075,
+        "upstream_inference_prompt_cost": 0.00061575,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776238838-QsFKEeXvx3QT3jiNqg3O",
+    "object": "chat.completion",
+    "created": 1776238838,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_96009285",
+              "function": {
+                "name": "investment_predictProfit",
+                "arguments": "{\"investment_amount\":5000,\"annual_return\":0.07,\"years\":5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 362,
+      "completion_tokens": 43,
+      "total_tokens": 405,
+      "cost": 0.0012481425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00126075,
+        "upstream_inference_prompt_cost": 0.00061575,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2179.496,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "84db5555-0d65-47c9-9b5a-3606660283e2"
+}

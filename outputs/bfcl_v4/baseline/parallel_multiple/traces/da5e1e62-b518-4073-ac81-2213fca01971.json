@@ -1,0 +1,318 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find all prime numbers between 50 and 150. Then get the fibonacci series upto 150."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "count_items",
+        "description": "Count the number of items in a collection. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "collection": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "The collection of items to count"
+            }
+          },
+          "required": [
+            "collection"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "find_prime_numbers",
+        "description": "Locate all prime numbers in a specific number range. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "start": {
+              "type": "integer",
+              "description": "The start of the number range"
+            },
+            "end": {
+              "type": "integer",
+              "description": "The end of the number range"
+            }
+          },
+          "required": [
+            "start",
+            "end"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "get_fibonacci_sequence",
+        "description": "Generate a Fibonacci sequence up to a specific number of items. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "count": {
+              "type": "integer",
+              "description": "The number of items to generate"
+            }
+          },
+          "required": [
+            "count"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find all prime numbers between 50 and 150. Then get the fibonacci series upto 150."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "count_items",
+          "description": "Count the number of items in a collection. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "collection": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "The collection of items to count"
+              }
+            },
+            "required": [
+              "collection"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "find_prime_numbers",
+          "description": "Locate all prime numbers in a specific number range. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "start": {
+                "type": "integer",
+                "description": "The start of the number range"
+              },
+              "end": {
+                "type": "integer",
+                "description": "The end of the number range"
+              }
+            },
+            "required": [
+              "start",
+              "end"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "get_fibonacci_sequence",
+          "description": "Generate a Fibonacci sequence up to a specific number of items. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "count": {
+                "type": "integer",
+                "description": "The number of items to generate"
+              }
+            },
+            "required": [
+              "count"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240461-aSFj0GXUQrC6BV6Q9eVj",
+    "object": "chat.completion",
+    "created": 1776240461,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_26869898",
+              "function": {
+                "name": "find_prime_numbers",
+                "arguments": "{\"start\":50,\"end\":150}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 449,
+      "completion_tokens": 32,
+      "total_tokens": 481,
+      "cost": 0.0018020475,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00182025,
+        "upstream_inference_prompt_cost": 0.00134025,
+        "upstream_inference_completions_cost": 0.00048
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240461-aSFj0GXUQrC6BV6Q9eVj",
+    "object": "response",
+    "created_at": 1776240463,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_26869898",
+        "call_id": "call_26869898",
+        "name": "find_prime_numbers",
+        "arguments": "{\"start\":50,\"end\":150}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 449,
+      "completion_tokens": 32,
+      "total_tokens": 481,
+      "cost": 0.0018020475,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00182025,
+        "upstream_inference_prompt_cost": 0.00134025,
+        "upstream_inference_completions_cost": 0.00048
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240461-aSFj0GXUQrC6BV6Q9eVj",
+    "object": "chat.completion",
+    "created": 1776240461,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_26869898",
+              "function": {
+                "name": "find_prime_numbers",
+                "arguments": "{\"start\":50,\"end\":150}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 449,
+      "completion_tokens": 32,
+      "total_tokens": 481,
+      "cost": 0.0018020475,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00182025,
+        "upstream_inference_prompt_cost": 0.00134025,
+        "upstream_inference_completions_cost": 0.00048
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1859.187,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "da5e1e62-b518-4073-ac81-2213fca01971"
+}

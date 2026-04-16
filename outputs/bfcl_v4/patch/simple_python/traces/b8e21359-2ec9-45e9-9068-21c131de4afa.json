@@ -1,0 +1,248 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "What will be the angle between the hour and minute hands of a clock at 6:30 PM?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_clock_angle",
+        "description": "Calculate the angle between the hour and minute hands of a clock at a given time. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "hours": {
+              "type": "integer",
+              "description": "The hour on the clock face."
+            },
+            "minutes": {
+              "type": "integer",
+              "description": "The minutes on the clock face."
+            },
+            "round_to": {
+              "type": "integer",
+              "description": "The number of decimal places to round the result to, default is 2."
+            }
+          },
+          "required": [
+            "hours",
+            "minutes"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What will be the angle between the hour and minute hands of a clock at 6:30 PM?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_clock_angle",
+          "description": "Calculate the angle between the hour and minute hands of a clock at a given time. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "hours": {
+                "type": "integer",
+                "description": "The hour on the clock face."
+              },
+              "minutes": {
+                "type": "integer",
+                "description": "The minutes on the clock face."
+              },
+              "round_to": {
+                "type": "integer",
+                "description": "The number of decimal places to round the result to, default is 2."
+              }
+            },
+            "required": [
+              "hours",
+              "minutes"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776238765-RnGCBL9IYCxKN2UMXzMb",
+    "object": "chat.completion",
+    "created": 1776238765,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_13123816",
+              "function": {
+                "name": "calculate_clock_angle",
+                "arguments": "{\"hours\":18,\"minutes\":30,\"round_to\":2}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 350,
+      "completion_tokens": 39,
+      "total_tokens": 389,
+      "cost": 0.0011531025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00116475,
+        "upstream_inference_prompt_cost": 0.00057975,
+        "upstream_inference_completions_cost": 0.000585
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776238765-RnGCBL9IYCxKN2UMXzMb",
+    "object": "response",
+    "created_at": 1776238766,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_13123816",
+        "call_id": "call_13123816",
+        "name": "calculate_clock_angle",
+        "arguments": "{\"hours\":18,\"minutes\":30,\"round_to\":2}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 350,
+      "completion_tokens": 39,
+      "total_tokens": 389,
+      "cost": 0.0011531025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00116475,
+        "upstream_inference_prompt_cost": 0.00057975,
+        "upstream_inference_completions_cost": 0.000585
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776238765-RnGCBL9IYCxKN2UMXzMb",
+    "object": "chat.completion",
+    "created": 1776238765,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_13123816",
+              "function": {
+                "name": "calculate_clock_angle",
+                "arguments": "{\"hours\":18,\"minutes\":30,\"round_to\":2}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 350,
+      "completion_tokens": 39,
+      "total_tokens": 389,
+      "cost": 0.0011531025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00116475,
+        "upstream_inference_prompt_cost": 0.00057975,
+        "upstream_inference_completions_cost": 0.000585
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1744.297,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "b8e21359-2ec9-45e9-9068-21c131de4afa"
+}

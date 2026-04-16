@@ -1,0 +1,336 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "What are the three great Schism in Christianity history?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "religion_history_get_councils",
+        "description": "Retrieves a list of major councils in a specified religion. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "religion": {
+              "type": "string",
+              "description": "Name of the religion for which to retrieve the councils."
+            },
+            "count": {
+              "type": "integer",
+              "description": "Number of top councils to retrieve.",
+              "default": 3
+            }
+          },
+          "required": [
+            "religion",
+            "count"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "religion_history_get_reformations",
+        "description": "Retrieves a list of major reformations in a specified religion. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "religion": {
+              "type": "string",
+              "description": "Name of the religion for which to retrieve the reformations."
+            },
+            "count": {
+              "type": "integer",
+              "description": "Number of top reformations to retrieve.",
+              "default": 3
+            }
+          },
+          "required": [
+            "religion",
+            "count"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "religion_history_get_schisms",
+        "description": "Retrieves a list of major schisms in a specified religion. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "religion": {
+              "type": "string",
+              "description": "Name of the religion for which to retrieve the schisms."
+            },
+            "count": {
+              "type": "integer",
+              "description": "Number of top schisms to retrieve."
+            }
+          },
+          "required": [
+            "religion",
+            "count"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What are the three great Schism in Christianity history?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "religion_history_get_councils",
+          "description": "Retrieves a list of major councils in a specified religion. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "religion": {
+                "type": "string",
+                "description": "Name of the religion for which to retrieve the councils."
+              },
+              "count": {
+                "type": "integer",
+                "description": "Number of top councils to retrieve.",
+                "default": 3
+              }
+            },
+            "required": [
+              "religion",
+              "count"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "religion_history_get_reformations",
+          "description": "Retrieves a list of major reformations in a specified religion. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "religion": {
+                "type": "string",
+                "description": "Name of the religion for which to retrieve the reformations."
+              },
+              "count": {
+                "type": "integer",
+                "description": "Number of top reformations to retrieve.",
+                "default": 3
+              }
+            },
+            "required": [
+              "religion",
+              "count"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "religion_history_get_schisms",
+          "description": "Retrieves a list of major schisms in a specified religion. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "religion": {
+                "type": "string",
+                "description": "Name of the religion for which to retrieve the schisms."
+              },
+              "count": {
+                "type": "integer",
+                "description": "Number of top schisms to retrieve."
+              }
+            },
+            "required": [
+              "religion",
+              "count"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239999-d7cU3KRo0A8loMZokL6v",
+    "object": "chat.completion",
+    "created": 1776239999,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_46832771",
+              "function": {
+                "name": "religion_history_get_schisms",
+                "arguments": "{\"religion\":\"Christianity\",\"count\":3}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 509,
+      "completion_tokens": 36,
+      "total_tokens": 545,
+      "cost": 0.0020396475,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00206025,
+        "upstream_inference_prompt_cost": 0.00152025,
+        "upstream_inference_completions_cost": 0.00054
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239999-d7cU3KRo0A8loMZokL6v",
+    "object": "response",
+    "created_at": 1776240000,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_46832771",
+        "call_id": "call_46832771",
+        "name": "religion_history_get_schisms",
+        "arguments": "{\"religion\":\"Christianity\",\"count\":3}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 509,
+      "completion_tokens": 36,
+      "total_tokens": 545,
+      "cost": 0.0020396475,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00206025,
+        "upstream_inference_prompt_cost": 0.00152025,
+        "upstream_inference_completions_cost": 0.00054
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239999-d7cU3KRo0A8loMZokL6v",
+    "object": "chat.completion",
+    "created": 1776239999,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_46832771",
+              "function": {
+                "name": "religion_history_get_schisms",
+                "arguments": "{\"religion\":\"Christianity\",\"count\":3}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 509,
+      "completion_tokens": 36,
+      "total_tokens": 545,
+      "cost": 0.0020396475,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00206025,
+        "upstream_inference_prompt_cost": 0.00152025,
+        "upstream_inference_completions_cost": 0.00054
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1823.158,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "8db0f52d-6363-428c-a188-fe7b8cc8a926"
+}

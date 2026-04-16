@@ -1,0 +1,358 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Get me the predictions of the evolutionary rate for Homo Sapiens for next 50 years using Darwin model"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "modify_painting",
+        "description": "Modify an existing painting's attributes such as size, medium, and color. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "size": {
+              "type": "string",
+              "description": "The size of the painting in inches, width by height."
+            },
+            "medium": {
+              "type": "string",
+              "description": "The medium of the painting, such as oil, acrylic, etc."
+            },
+            "dominant_color": {
+              "type": "string",
+              "description": "The dominant color of the painting. Default ''"
+            }
+          },
+          "required": [
+            "size",
+            "medium"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "prediction_evolution",
+        "description": "Predict the evolutionary rate for a specific species for a given timeframe. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "species": {
+              "type": "string",
+              "description": "The species that the evolution rate will be predicted for."
+            },
+            "years": {
+              "type": "integer",
+              "description": "Number of years for the prediction."
+            },
+            "model": {
+              "type": "string",
+              "description": "The model used to make the prediction, options: 'Darwin', 'Lamarck', default is 'Darwin'."
+            }
+          },
+          "required": [
+            "species",
+            "years"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "calculate_probability",
+        "description": "Calculate the probability of an event. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "total_outcomes": {
+              "type": "integer",
+              "description": "Total number of possible outcomes."
+            },
+            "favorable_outcomes": {
+              "type": "integer",
+              "description": "Number of outcomes considered as 'successful'."
+            },
+            "round_to": {
+              "type": "integer",
+              "description": "Number of decimal places to round the result to.",
+              "default": 2
+            }
+          },
+          "required": [
+            "total_outcomes",
+            "favorable_outcomes"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Get me the predictions of the evolutionary rate for Homo Sapiens for next 50 years using Darwin model"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "modify_painting",
+          "description": "Modify an existing painting's attributes such as size, medium, and color. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "size": {
+                "type": "string",
+                "description": "The size of the painting in inches, width by height."
+              },
+              "medium": {
+                "type": "string",
+                "description": "The medium of the painting, such as oil, acrylic, etc."
+              },
+              "dominant_color": {
+                "type": "string",
+                "description": "The dominant color of the painting. Default ''"
+              }
+            },
+            "required": [
+              "size",
+              "medium"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "prediction_evolution",
+          "description": "Predict the evolutionary rate for a specific species for a given timeframe. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "species": {
+                "type": "string",
+                "description": "The species that the evolution rate will be predicted for."
+              },
+              "years": {
+                "type": "integer",
+                "description": "Number of years for the prediction."
+              },
+              "model": {
+                "type": "string",
+                "description": "The model used to make the prediction, options: 'Darwin', 'Lamarck', default is 'Darwin'."
+              }
+            },
+            "required": [
+              "species",
+              "years"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_probability",
+          "description": "Calculate the probability of an event. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "total_outcomes": {
+                "type": "integer",
+                "description": "Total number of possible outcomes."
+              },
+              "favorable_outcomes": {
+                "type": "integer",
+                "description": "Number of outcomes considered as 'successful'."
+              },
+              "round_to": {
+                "type": "integer",
+                "description": "Number of decimal places to round the result to.",
+                "default": 2
+              }
+            },
+            "required": [
+              "total_outcomes",
+              "favorable_outcomes"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239703-0X7Gpzl3NaQBk1KHZvZl",
+    "object": "chat.completion",
+    "created": 1776239703,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_88648417",
+              "function": {
+                "name": "prediction_evolution",
+                "arguments": "{\"species\":\"Homo Sapiens\",\"years\":50,\"model\":\"Darwin\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 586,
+      "completion_tokens": 42,
+      "total_tokens": 628,
+      "cost": 0.0018985725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00191775,
+        "upstream_inference_prompt_cost": 0.00128775,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239703-0X7Gpzl3NaQBk1KHZvZl",
+    "object": "response",
+    "created_at": 1776239704,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_88648417",
+        "call_id": "call_88648417",
+        "name": "prediction_evolution",
+        "arguments": "{\"species\":\"Homo Sapiens\",\"years\":50,\"model\":\"Darwin\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 586,
+      "completion_tokens": 42,
+      "total_tokens": 628,
+      "cost": 0.0018985725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00191775,
+        "upstream_inference_prompt_cost": 0.00128775,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239703-0X7Gpzl3NaQBk1KHZvZl",
+    "object": "chat.completion",
+    "created": 1776239703,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_88648417",
+              "function": {
+                "name": "prediction_evolution",
+                "arguments": "{\"species\":\"Homo Sapiens\",\"years\":50,\"model\":\"Darwin\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 586,
+      "completion_tokens": 42,
+      "total_tokens": 628,
+      "cost": 0.0018985725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00191775,
+        "upstream_inference_prompt_cost": 0.00128775,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1789.049,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "8ed76c5c-7af4-426c-9c93-a5f9075a628d"
+}

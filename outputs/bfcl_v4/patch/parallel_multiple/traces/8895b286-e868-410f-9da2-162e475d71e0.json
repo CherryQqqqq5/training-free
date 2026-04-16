@@ -1,0 +1,353 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "How many steps do I need to walk in order to lose 500 calories and how much water do I need to intake today if I exercise for 2 hours?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "payment_calculation",
+        "description": "Calculate how much a person should pay given the items purchased and their quantities Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of items purchased."
+            },
+            "quantities": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "Quantity of each item purchased in correspondence with the previous items list."
+            }
+          },
+          "required": [
+            "items",
+            "quantities"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "steps_calorie_calculation",
+        "description": "Calculate how many steps you need to walk to burn a specified amount of calories. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "calorie": {
+              "type": "number",
+              "description": "The amount of calories to burn. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "calorie"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "hydration_calculator",
+        "description": "Calculate the amount of water to drink in a day given the hours of exercise. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "exercise_time": {
+              "type": "number",
+              "description": "The number of hours of exercise. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "exercise_time"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "How many steps do I need to walk in order to lose 500 calories and how much water do I need to intake today if I exercise for 2 hours?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "payment_calculation",
+          "description": "Calculate how much a person should pay given the items purchased and their quantities Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "List of items purchased."
+              },
+              "quantities": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "Quantity of each item purchased in correspondence with the previous items list."
+              }
+            },
+            "required": [
+              "items",
+              "quantities"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "steps_calorie_calculation",
+          "description": "Calculate how many steps you need to walk to burn a specified amount of calories. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "calorie": {
+                "type": "number",
+                "description": "The amount of calories to burn. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "calorie"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "hydration_calculator",
+          "description": "Calculate the amount of water to drink in a day given the hours of exercise. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "exercise_time": {
+                "type": "number",
+                "description": "The number of hours of exercise. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "exercise_time"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241381-UKGwkxBnEZPAMQWqy040",
+    "object": "chat.completion",
+    "created": 1776241381,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_37847566",
+              "function": {
+                "name": "steps_calorie_calculation",
+                "arguments": "{\"calorie\":500.0}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_64072762",
+              "function": {
+                "name": "hydration_calculator",
+                "arguments": "{\"exercise_time\":2.0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 517,
+      "completion_tokens": 60,
+      "total_tokens": 577,
+      "cost": 0.0019609425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00198075,
+        "upstream_inference_prompt_cost": 0.00108075,
+        "upstream_inference_completions_cost": 0.0009
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241381-UKGwkxBnEZPAMQWqy040",
+    "object": "response",
+    "created_at": 1776241383,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_37847566",
+        "call_id": "call_37847566",
+        "name": "steps_calorie_calculation",
+        "arguments": "{\"calorie\":500.0}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_64072762",
+        "call_id": "call_64072762",
+        "name": "hydration_calculator",
+        "arguments": "{\"exercise_time\":2.0}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 517,
+      "completion_tokens": 60,
+      "total_tokens": 577,
+      "cost": 0.0019609425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00198075,
+        "upstream_inference_prompt_cost": 0.00108075,
+        "upstream_inference_completions_cost": 0.0009
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241381-UKGwkxBnEZPAMQWqy040",
+    "object": "chat.completion",
+    "created": 1776241381,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_37847566",
+              "function": {
+                "name": "steps_calorie_calculation",
+                "arguments": "{\"calorie\":500.0}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_64072762",
+              "function": {
+                "name": "hydration_calculator",
+                "arguments": "{\"exercise_time\":2.0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 517,
+      "completion_tokens": 60,
+      "total_tokens": 577,
+      "cost": 0.0019609425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00198075,
+        "upstream_inference_prompt_cost": 0.00108075,
+        "upstream_inference_completions_cost": 0.0009
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2191.24,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "8895b286-e868-410f-9da2-162e475d71e0"
+}

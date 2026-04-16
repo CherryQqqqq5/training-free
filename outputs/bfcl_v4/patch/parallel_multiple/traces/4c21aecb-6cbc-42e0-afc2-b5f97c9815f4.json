@@ -1,0 +1,382 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Get temperature and humidity forecast for Boston, USA and precipitation forecast for Rome, Italy for next 10 days."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "weather_forecast_precipitation",
+        "description": "Retrieve a precipitation forecast for a specific location for a certain number of days. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city that you want to get the precipitation forecast for."
+            },
+            "days": {
+              "type": "integer",
+              "description": "Number of days for the forecast."
+            }
+          },
+          "required": [
+            "location",
+            "days"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "weather_forecast_humidity",
+        "description": "Retrieve a humidity forecast for a specific location for a certain number of days. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city that you want to get the humidity forecast for."
+            },
+            "days": {
+              "type": "integer",
+              "description": "Number of days for the forecast."
+            }
+          },
+          "required": [
+            "location",
+            "days"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "weather_forecast_temperature",
+        "description": "Retrieve a temperature forecast for a specific location for a certain number of days. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city that you want to get the temperature forecast for."
+            },
+            "days": {
+              "type": "integer",
+              "description": "Number of days for the forecast."
+            }
+          },
+          "required": [
+            "location",
+            "days"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Get temperature and humidity forecast for Boston, USA and precipitation forecast for Rome, Italy for next 10 days."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "weather_forecast_precipitation",
+          "description": "Retrieve a precipitation forecast for a specific location for a certain number of days. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city that you want to get the precipitation forecast for."
+              },
+              "days": {
+                "type": "integer",
+                "description": "Number of days for the forecast."
+              }
+            },
+            "required": [
+              "location",
+              "days"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "weather_forecast_humidity",
+          "description": "Retrieve a humidity forecast for a specific location for a certain number of days. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city that you want to get the humidity forecast for."
+              },
+              "days": {
+                "type": "integer",
+                "description": "Number of days for the forecast."
+              }
+            },
+            "required": [
+              "location",
+              "days"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "weather_forecast_temperature",
+          "description": "Retrieve a temperature forecast for a specific location for a certain number of days. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city that you want to get the temperature forecast for."
+              },
+              "days": {
+                "type": "integer",
+                "description": "Number of days for the forecast."
+              }
+            },
+            "required": [
+              "location",
+              "days"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241420-xdSV5wpAOwmffGB35TDK",
+    "object": "chat.completion",
+    "created": 1776241420,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_98101537",
+              "function": {
+                "name": "weather_forecast_temperature",
+                "arguments": "{\"location\":\"Boston, USA\",\"days\":10}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_51901795",
+              "function": {
+                "name": "weather_forecast_humidity",
+                "arguments": "{\"location\":\"Boston, USA\",\"days\":10}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_38599863",
+              "function": {
+                "name": "weather_forecast_precipitation",
+                "arguments": "{\"location\":\"Rome, Italy\",\"days\":10}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 515,
+      "completion_tokens": 105,
+      "total_tokens": 620,
+      "cost": 0.0030821175,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00311325,
+        "upstream_inference_prompt_cost": 0.00153825,
+        "upstream_inference_completions_cost": 0.001575
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241420-xdSV5wpAOwmffGB35TDK",
+    "object": "response",
+    "created_at": 1776241423,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_98101537",
+        "call_id": "call_98101537",
+        "name": "weather_forecast_temperature",
+        "arguments": "{\"location\":\"Boston, USA\",\"days\":10}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_51901795",
+        "call_id": "call_51901795",
+        "name": "weather_forecast_humidity",
+        "arguments": "{\"location\":\"Boston, USA\",\"days\":10}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_38599863",
+        "call_id": "call_38599863",
+        "name": "weather_forecast_precipitation",
+        "arguments": "{\"location\":\"Rome, Italy\",\"days\":10}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 515,
+      "completion_tokens": 105,
+      "total_tokens": 620,
+      "cost": 0.0030821175,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00311325,
+        "upstream_inference_prompt_cost": 0.00153825,
+        "upstream_inference_completions_cost": 0.001575
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241420-xdSV5wpAOwmffGB35TDK",
+    "object": "chat.completion",
+    "created": 1776241420,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_98101537",
+              "function": {
+                "name": "weather_forecast_temperature",
+                "arguments": "{\"location\":\"Boston, USA\",\"days\":10}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_51901795",
+              "function": {
+                "name": "weather_forecast_humidity",
+                "arguments": "{\"location\":\"Boston, USA\",\"days\":10}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_38599863",
+              "function": {
+                "name": "weather_forecast_precipitation",
+                "arguments": "{\"location\":\"Rome, Italy\",\"days\":10}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 515,
+      "completion_tokens": 105,
+      "total_tokens": 620,
+      "cost": 0.0030821175,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00311325,
+        "upstream_inference_prompt_cost": 0.00153825,
+        "upstream_inference_completions_cost": 0.001575
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 3050.928,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "4c21aecb-6cbc-42e0-afc2-b5f97c9815f4"
+}

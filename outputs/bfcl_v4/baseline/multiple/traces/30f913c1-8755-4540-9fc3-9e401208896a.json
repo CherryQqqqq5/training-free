@@ -1,0 +1,334 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the cosine similarity between vector A [3, 2, 1] and vector B [1, 2, 3]."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "cosine_similarity_calculate",
+        "description": "Calculate the cosine similarity between two vectors. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "vector1": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "The first vector for calculating cosine similarity."
+            },
+            "vector2": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "The second vector for calculating cosine similarity."
+            },
+            "rounding": {
+              "type": "integer",
+              "description": "Optional: The number of decimals to round off the result. Default 0"
+            }
+          },
+          "required": [
+            "vector1",
+            "vector2"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "correlation_calculate",
+        "description": "Calculate the correlation coefficient between two arrays of numbers. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "array1": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "The first array of numbers."
+            },
+            "array2": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "The second array of numbers."
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "pearson",
+                "spearman"
+              ],
+              "description": "Optional: The type of correlation coefficient to calculate. Default is 'pearson'."
+            }
+          },
+          "required": [
+            "array1",
+            "array2"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the cosine similarity between vector A [3, 2, 1] and vector B [1, 2, 3]."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "cosine_similarity_calculate",
+          "description": "Calculate the cosine similarity between two vectors. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "vector1": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "The first vector for calculating cosine similarity."
+              },
+              "vector2": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "The second vector for calculating cosine similarity."
+              },
+              "rounding": {
+                "type": "integer",
+                "description": "Optional: The number of decimals to round off the result. Default 0"
+              }
+            },
+            "required": [
+              "vector1",
+              "vector2"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "correlation_calculate",
+          "description": "Calculate the correlation coefficient between two arrays of numbers. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "array1": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "The first array of numbers."
+              },
+              "array2": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "The second array of numbers."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "pearson",
+                  "spearman"
+                ],
+                "description": "Optional: The type of correlation coefficient to calculate. Default is 'pearson'."
+              }
+            },
+            "required": [
+              "array1",
+              "array2"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239552-r9R39kp7Ty9mUFBeHqen",
+    "object": "chat.completion",
+    "created": 1776239552,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_58349189",
+              "function": {
+                "name": "cosine_similarity_calculate",
+                "arguments": "{\"vector1\":[3,2,1],\"vector2\":[1,2,3]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 497,
+      "completion_tokens": 49,
+      "total_tokens": 546,
+      "cost": 0.0017381925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00175575,
+        "upstream_inference_prompt_cost": 0.00102075,
+        "upstream_inference_completions_cost": 0.000735
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239552-r9R39kp7Ty9mUFBeHqen",
+    "object": "response",
+    "created_at": 1776239553,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_58349189",
+        "call_id": "call_58349189",
+        "name": "cosine_similarity_calculate",
+        "arguments": "{\"vector1\":[3,2,1],\"vector2\":[1,2,3]}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 497,
+      "completion_tokens": 49,
+      "total_tokens": 546,
+      "cost": 0.0017381925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00175575,
+        "upstream_inference_prompt_cost": 0.00102075,
+        "upstream_inference_completions_cost": 0.000735
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239552-r9R39kp7Ty9mUFBeHqen",
+    "object": "chat.completion",
+    "created": 1776239552,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_58349189",
+              "function": {
+                "name": "cosine_similarity_calculate",
+                "arguments": "{\"vector1\":[3,2,1],\"vector2\":[1,2,3]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 497,
+      "completion_tokens": 49,
+      "total_tokens": 546,
+      "cost": 0.0017381925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00175575,
+        "upstream_inference_prompt_cost": 0.00102075,
+        "upstream_inference_completions_cost": 0.000735
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2086.951,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "30f913c1-8755-4540-9fc3-9e401208896a"
+}

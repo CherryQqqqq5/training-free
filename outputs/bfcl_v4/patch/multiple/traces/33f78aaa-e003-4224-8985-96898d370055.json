@@ -1,0 +1,378 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Run a two sample T-test to compare the average of Group A [3, 4, 5, 6, 4] and Group B [7, 8, 9, 8, 7] assuming equal variance."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "restaurant_search_find_closest",
+        "description": "Locate the closest sushi restaurant based on certain criteria, such as the presence of a patio. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city, for instance Boston, MA"
+            },
+            "cuisine": {
+              "type": "string",
+              "description": "Type of food like Sushi."
+            },
+            "amenities": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Patio",
+                  "Wi-Fi",
+                  "Happy Hour",
+                  "Wheelchair Accessible"
+                ]
+              },
+              "description": "Preferred amenities in the restaurant. Default is empty array."
+            }
+          },
+          "required": [
+            "location",
+            "cuisine"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "run_two_sample_ttest",
+        "description": "Runs a two sample t-test for two given data groups. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "group1": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "First group of data points."
+            },
+            "group2": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "Second group of data points."
+            },
+            "equal_variance": {
+              "type": "boolean",
+              "description": "Assumption about whether the two samples have equal variance.",
+              "default": true
+            }
+          },
+          "required": [
+            "group1",
+            "group2"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "get_personality_traits",
+        "description": "Retrieve the common personality traits of people based on their hobbies or activities. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "hobby": {
+              "type": "string",
+              "description": "The hobby or activity of interest."
+            },
+            "trait_count": {
+              "type": "integer",
+              "description": "The number of top traits to return, default is 5"
+            }
+          },
+          "required": [
+            "hobby"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Run a two sample T-test to compare the average of Group A [3, 4, 5, 6, 4] and Group B [7, 8, 9, 8, 7] assuming equal variance."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "restaurant_search_find_closest",
+          "description": "Locate the closest sushi restaurant based on certain criteria, such as the presence of a patio. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city, for instance Boston, MA"
+              },
+              "cuisine": {
+                "type": "string",
+                "description": "Type of food like Sushi."
+              },
+              "amenities": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "Patio",
+                    "Wi-Fi",
+                    "Happy Hour",
+                    "Wheelchair Accessible"
+                  ]
+                },
+                "description": "Preferred amenities in the restaurant. Default is empty array."
+              }
+            },
+            "required": [
+              "location",
+              "cuisine"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "run_two_sample_ttest",
+          "description": "Runs a two sample t-test for two given data groups. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "group1": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "First group of data points."
+              },
+              "group2": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "Second group of data points."
+              },
+              "equal_variance": {
+                "type": "boolean",
+                "description": "Assumption about whether the two samples have equal variance.",
+                "default": true
+              }
+            },
+            "required": [
+              "group1",
+              "group2"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "get_personality_traits",
+          "description": "Retrieve the common personality traits of people based on their hobbies or activities. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "hobby": {
+                "type": "string",
+                "description": "The hobby or activity of interest."
+              },
+              "trait_count": {
+                "type": "integer",
+                "description": "The number of top traits to return, default is 5"
+              }
+            },
+            "required": [
+              "hobby"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240226-W1pFPQoeQFT4VklLHkgR",
+    "object": "chat.completion",
+    "created": 1776240226,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_41882668",
+              "function": {
+                "name": "run_two_sample_ttest",
+                "arguments": "{\"group1\":[3,4,5,6,4],\"group2\":[7,8,9,8,7],\"equal_variance\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 618,
+      "completion_tokens": 66,
+      "total_tokens": 684,
+      "cost": 0.0014411925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 617,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00145575,
+        "upstream_inference_prompt_cost": 0.00046575,
+        "upstream_inference_completions_cost": 0.00099
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240226-W1pFPQoeQFT4VklLHkgR",
+    "object": "response",
+    "created_at": 1776240227,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_41882668",
+        "call_id": "call_41882668",
+        "name": "run_two_sample_ttest",
+        "arguments": "{\"group1\":[3,4,5,6,4],\"group2\":[7,8,9,8,7],\"equal_variance\":true}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 618,
+      "completion_tokens": 66,
+      "total_tokens": 684,
+      "cost": 0.0014411925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 617,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00145575,
+        "upstream_inference_prompt_cost": 0.00046575,
+        "upstream_inference_completions_cost": 0.00099
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240226-W1pFPQoeQFT4VklLHkgR",
+    "object": "chat.completion",
+    "created": 1776240226,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_41882668",
+              "function": {
+                "name": "run_two_sample_ttest",
+                "arguments": "{\"group1\":[3,4,5,6,4],\"group2\":[7,8,9,8,7],\"equal_variance\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 618,
+      "completion_tokens": 66,
+      "total_tokens": 684,
+      "cost": 0.0014411925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 617,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00145575,
+        "upstream_inference_prompt_cost": 0.00046575,
+        "upstream_inference_completions_cost": 0.00099
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2307.182,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "33f78aaa-e003-4224-8985-96898d370055"
+}

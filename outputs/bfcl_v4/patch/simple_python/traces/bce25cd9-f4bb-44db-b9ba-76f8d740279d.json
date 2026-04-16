@@ -1,0 +1,288 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find me a classical concert this weekend in Los Angeles with cheap tickets."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "concert_search",
+        "description": "Locate a concert based on specific criteria like genre, location, and date. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "genre": {
+              "type": "string",
+              "description": "Genre of the concert."
+            },
+            "location": {
+              "type": "string",
+              "description": "City of the concert."
+            },
+            "date": {
+              "type": "string",
+              "description": "Date of the concert, e.g. this weekend, today, tomorrow.",
+              "enum": [
+                "this weekend",
+                "next weekend",
+                "this month",
+                "next month",
+                "today",
+                "tomorrow",
+                "the day after"
+              ]
+            },
+            "price_range": {
+              "type": "string",
+              "enum": [
+                "free",
+                "cheap",
+                "moderate",
+                "expensive"
+              ],
+              "description": "Expected price range of the concert tickets. Default is 'free'."
+            }
+          },
+          "required": [
+            "genre",
+            "location",
+            "date"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find me a classical concert this weekend in Los Angeles with cheap tickets."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "concert_search",
+          "description": "Locate a concert based on specific criteria like genre, location, and date. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "genre": {
+                "type": "string",
+                "description": "Genre of the concert."
+              },
+              "location": {
+                "type": "string",
+                "description": "City of the concert."
+              },
+              "date": {
+                "type": "string",
+                "description": "Date of the concert, e.g. this weekend, today, tomorrow.",
+                "enum": [
+                  "this weekend",
+                  "next weekend",
+                  "this month",
+                  "next month",
+                  "today",
+                  "tomorrow",
+                  "the day after"
+                ]
+              },
+              "price_range": {
+                "type": "string",
+                "enum": [
+                  "free",
+                  "cheap",
+                  "moderate",
+                  "expensive"
+                ],
+                "description": "Expected price range of the concert tickets. Default is 'free'."
+              }
+            },
+            "required": [
+              "genre",
+              "location",
+              "date"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239161-rtnV6GeFCGRKvSIYisUR",
+    "object": "chat.completion",
+    "created": 1776239161,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_51190148",
+              "function": {
+                "name": "concert_search",
+                "arguments": "{\"genre\":\"classical\",\"location\":\"Los Angeles\",\"date\":\"this weekend\",\"price_range\":\"cheap\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 393,
+      "completion_tokens": 47,
+      "total_tokens": 440,
+      "cost": 0.0018584775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00187725,
+        "upstream_inference_prompt_cost": 0.00117225,
+        "upstream_inference_completions_cost": 0.000705
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239161-rtnV6GeFCGRKvSIYisUR",
+    "object": "response",
+    "created_at": 1776239162,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_51190148",
+        "call_id": "call_51190148",
+        "name": "concert_search",
+        "arguments": "{\"genre\":\"classical\",\"location\":\"Los Angeles\",\"date\":\"this weekend\",\"price_range\":\"cheap\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 393,
+      "completion_tokens": 47,
+      "total_tokens": 440,
+      "cost": 0.0018584775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00187725,
+        "upstream_inference_prompt_cost": 0.00117225,
+        "upstream_inference_completions_cost": 0.000705
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239161-rtnV6GeFCGRKvSIYisUR",
+    "object": "chat.completion",
+    "created": 1776239161,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_51190148",
+              "function": {
+                "name": "concert_search",
+                "arguments": "{\"genre\":\"classical\",\"location\":\"Los Angeles\",\"date\":\"this weekend\",\"price_range\":\"cheap\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 393,
+      "completion_tokens": 47,
+      "total_tokens": 440,
+      "cost": 0.0018584775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00187725,
+        "upstream_inference_prompt_cost": 0.00117225,
+        "upstream_inference_completions_cost": 0.000705
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2076.953,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "bce25cd9-f4bb-44db-b9ba-76f8d740279d"
+}

@@ -1,0 +1,425 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Can you help me plan my upcoming trip? I need to know the estimated traffic from my home in San Francisco to my office in Palo Alto on a typical weekday. Also, I'm curious about the distance between these two locations. Furthermore, I'm planning a weekend getaway to Los Angeles, so I'd like to know the traffic estimate from Palo Alto to Los Angeles for the coming weekend. Lastly, could you provide me with a 5-day weather forecast for Los Angeles?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_distance",
+        "description": "Calculate distance between two locations. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "start_point": {
+              "type": "string",
+              "description": "Starting point of the journey."
+            },
+            "end_point": {
+              "type": "string",
+              "description": "Ending point of the journey."
+            }
+          },
+          "required": [
+            "start_point",
+            "end_point"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "weather_forecast",
+        "description": "Retrieve a weather forecast for a specific location and time frame. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city that you want to get the weather for."
+            },
+            "days": {
+              "type": "integer",
+              "description": "Number of days for the forecast."
+            }
+          },
+          "required": [
+            "location",
+            "days"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "traffic_estimate",
+        "description": "Estimate traffic from one location to another for a specific time period. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "start_location": {
+              "type": "string",
+              "description": "Starting location for the journey."
+            },
+            "end_location": {
+              "type": "string",
+              "description": "Ending location for the journey."
+            },
+            "time_period": {
+              "type": "string",
+              "description": "Specify a time frame to estimate the traffic, 'now' for current, 'weekend' for the coming weekend. Default is 'now'."
+            }
+          },
+          "required": [
+            "start_location",
+            "end_location"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Can you help me plan my upcoming trip? I need to know the estimated traffic from my home in San Francisco to my office in Palo Alto on a typical weekday. Also, I'm curious about the distance between these two locations. Furthermore, I'm planning a weekend getaway to Los Angeles, so I'd like to know the traffic estimate from Palo Alto to Los Angeles for the coming weekend. Lastly, could you provide me with a 5-day weather forecast for Los Angeles?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_distance",
+          "description": "Calculate distance between two locations. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "start_point": {
+                "type": "string",
+                "description": "Starting point of the journey."
+              },
+              "end_point": {
+                "type": "string",
+                "description": "Ending point of the journey."
+              }
+            },
+            "required": [
+              "start_point",
+              "end_point"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "weather_forecast",
+          "description": "Retrieve a weather forecast for a specific location and time frame. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city that you want to get the weather for."
+              },
+              "days": {
+                "type": "integer",
+                "description": "Number of days for the forecast."
+              }
+            },
+            "required": [
+              "location",
+              "days"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "traffic_estimate",
+          "description": "Estimate traffic from one location to another for a specific time period. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "start_location": {
+                "type": "string",
+                "description": "Starting location for the journey."
+              },
+              "end_location": {
+                "type": "string",
+                "description": "Ending location for the journey."
+              },
+              "time_period": {
+                "type": "string",
+                "description": "Specify a time frame to estimate the traffic, 'now' for current, 'weekend' for the coming weekend. Default is 'now'."
+              }
+            },
+            "required": [
+              "start_location",
+              "end_location"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241664-OHGJxgB6zHV6DcSaJ4Mr",
+    "object": "chat.completion",
+    "created": 1776241664,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help you plan your upcoming trip. Let's address each of your requests by utilizing the available functions to gather the necessary information.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_55917855",
+              "function": {
+                "name": "traffic_estimate",
+                "arguments": "{\"start_location\":\"San Francisco\",\"end_location\":\"Palo Alto\",\"time_period\":\"now\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_73718852",
+              "function": {
+                "name": "calculate_distance",
+                "arguments": "{\"start_point\":\"San Francisco\",\"end_point\":\"Palo Alto\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_65206128",
+              "function": {
+                "name": "traffic_estimate",
+                "arguments": "{\"start_location\":\"Palo Alto\",\"end_location\":\"Los Angeles\",\"time_period\":\"weekend\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_93204937",
+              "function": {
+                "name": "weather_forecast",
+                "arguments": "{\"location\":\"Los Angeles\",\"days\":5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 599,
+      "completion_tokens": 185,
+      "total_tokens": 784,
+      "cost": 0.0040607325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00410175,
+        "upstream_inference_prompt_cost": 0.00132675,
+        "upstream_inference_completions_cost": 0.002775
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241664-OHGJxgB6zHV6DcSaJ4Mr",
+    "object": "response",
+    "created_at": 1776241667,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'm happy to help you plan your upcoming trip. Let's address each of your requests by utilizing the available functions to gather the necessary information.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_55917855",
+        "call_id": "call_55917855",
+        "name": "traffic_estimate",
+        "arguments": "{\"start_location\":\"San Francisco\",\"end_location\":\"Palo Alto\",\"time_period\":\"now\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_73718852",
+        "call_id": "call_73718852",
+        "name": "calculate_distance",
+        "arguments": "{\"start_point\":\"San Francisco\",\"end_point\":\"Palo Alto\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_65206128",
+        "call_id": "call_65206128",
+        "name": "traffic_estimate",
+        "arguments": "{\"start_location\":\"Palo Alto\",\"end_location\":\"Los Angeles\",\"time_period\":\"weekend\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_93204937",
+        "call_id": "call_93204937",
+        "name": "weather_forecast",
+        "arguments": "{\"location\":\"Los Angeles\",\"days\":5}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 599,
+      "completion_tokens": 185,
+      "total_tokens": 784,
+      "cost": 0.0040607325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00410175,
+        "upstream_inference_prompt_cost": 0.00132675,
+        "upstream_inference_completions_cost": 0.002775
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241664-OHGJxgB6zHV6DcSaJ4Mr",
+    "object": "chat.completion",
+    "created": 1776241664,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help you plan your upcoming trip. Let's address each of your requests by utilizing the available functions to gather the necessary information.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_55917855",
+              "function": {
+                "name": "traffic_estimate",
+                "arguments": "{\"start_location\":\"San Francisco\",\"end_location\":\"Palo Alto\",\"time_period\":\"now\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_73718852",
+              "function": {
+                "name": "calculate_distance",
+                "arguments": "{\"start_point\":\"San Francisco\",\"end_point\":\"Palo Alto\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_65206128",
+              "function": {
+                "name": "traffic_estimate",
+                "arguments": "{\"start_location\":\"Palo Alto\",\"end_location\":\"Los Angeles\",\"time_period\":\"weekend\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_93204937",
+              "function": {
+                "name": "weather_forecast",
+                "arguments": "{\"location\":\"Los Angeles\",\"days\":5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 599,
+      "completion_tokens": 185,
+      "total_tokens": 784,
+      "cost": 0.0040607325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00410175,
+        "upstream_inference_prompt_cost": 0.00132675,
+        "upstream_inference_completions_cost": 0.002775
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 3162.409,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "94a11e38-329b-44cc-b08f-c1d4c6c1bab7"
+}

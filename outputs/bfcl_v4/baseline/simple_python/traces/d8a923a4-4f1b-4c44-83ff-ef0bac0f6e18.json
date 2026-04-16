@@ -1,0 +1,256 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Who won the basketball game between Lakers and Clippers on Jan 28, 2021?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "game_result_get_winner",
+        "description": "Get the winner of a specific basketball game. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "teams": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of two teams who played the game."
+            },
+            "date": {
+              "type": "string",
+              "description": "The date of the game, formatted as YYYY-MM-DD."
+            },
+            "venue": {
+              "type": "string",
+              "optional": true,
+              "description": "Optional: The venue of the game. Default is 'home'."
+            }
+          },
+          "required": [
+            "teams",
+            "date"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Who won the basketball game between Lakers and Clippers on Jan 28, 2021?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "game_result_get_winner",
+          "description": "Get the winner of a specific basketball game. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "teams": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "List of two teams who played the game."
+              },
+              "date": {
+                "type": "string",
+                "description": "The date of the game, formatted as YYYY-MM-DD."
+              },
+              "venue": {
+                "type": "string",
+                "optional": true,
+                "description": "Optional: The venue of the game. Default is 'home'."
+              }
+            },
+            "required": [
+              "teams",
+              "date"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776238287-OZo2aQL6UiAxe5rRl16i",
+    "object": "chat.completion",
+    "created": 1776238287,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_80499230",
+              "function": {
+                "name": "game_result_get_winner",
+                "arguments": "{\"teams\":[\"Lakers\",\"Clippers\"],\"date\":\"2021-01-28\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 355,
+      "completion_tokens": 45,
+      "total_tokens": 400,
+      "cost": 0.0012570525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00126975,
+        "upstream_inference_prompt_cost": 0.00059475,
+        "upstream_inference_completions_cost": 0.000675
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776238287-OZo2aQL6UiAxe5rRl16i",
+    "object": "response",
+    "created_at": 1776238288,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_80499230",
+        "call_id": "call_80499230",
+        "name": "game_result_get_winner",
+        "arguments": "{\"teams\":[\"Lakers\",\"Clippers\"],\"date\":\"2021-01-28\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 355,
+      "completion_tokens": 45,
+      "total_tokens": 400,
+      "cost": 0.0012570525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00126975,
+        "upstream_inference_prompt_cost": 0.00059475,
+        "upstream_inference_completions_cost": 0.000675
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776238287-OZo2aQL6UiAxe5rRl16i",
+    "object": "chat.completion",
+    "created": 1776238287,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_80499230",
+              "function": {
+                "name": "game_result_get_winner",
+                "arguments": "{\"teams\":[\"Lakers\",\"Clippers\"],\"date\":\"2021-01-28\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 355,
+      "completion_tokens": 45,
+      "total_tokens": 400,
+      "cost": 0.0012570525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00126975,
+        "upstream_inference_prompt_cost": 0.00059475,
+        "upstream_inference_completions_cost": 0.000675
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1844.102,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "d8a923a4-4f1b-4c44-83ff-ef0bac0f6e18"
+}

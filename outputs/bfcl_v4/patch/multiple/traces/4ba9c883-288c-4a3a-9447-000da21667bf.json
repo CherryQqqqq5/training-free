@@ -1,0 +1,310 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Play a song in C Major key at tempo 120 bpm."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "music_generate",
+        "description": "Generate a piece of music given a key, tempo, and time signature. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "The key of the piece, e.g., C Major."
+            },
+            "tempo": {
+              "type": "integer",
+              "description": "Tempo of the piece in beats per minute."
+            },
+            "time_signature": {
+              "type": "string",
+              "description": "Time signature of the piece, e.g., 4/4. Default '4/4'",
+              "optional": true
+            }
+          },
+          "required": [
+            "key",
+            "tempo"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "audio_generate",
+        "description": "Generate an audio signal given a frequency, amplitude, and duration. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "frequency": {
+              "type": "number",
+              "description": "Frequency of the audio signal in Hz. This is a float type value.",
+              "format": "float"
+            },
+            "amplitude": {
+              "type": "number",
+              "description": "Amplitude of the audio signal. This is a float type value.",
+              "format": "float"
+            },
+            "duration": {
+              "type": "integer",
+              "description": "Duration of the audio signal in seconds. Default 1",
+              "optional": true
+            }
+          },
+          "required": [
+            "frequency",
+            "amplitude"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Play a song in C Major key at tempo 120 bpm."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "music_generate",
+          "description": "Generate a piece of music given a key, tempo, and time signature. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The key of the piece, e.g., C Major."
+              },
+              "tempo": {
+                "type": "integer",
+                "description": "Tempo of the piece in beats per minute."
+              },
+              "time_signature": {
+                "type": "string",
+                "description": "Time signature of the piece, e.g., 4/4. Default '4/4'",
+                "optional": true
+              }
+            },
+            "required": [
+              "key",
+              "tempo"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "audio_generate",
+          "description": "Generate an audio signal given a frequency, amplitude, and duration. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "frequency": {
+                "type": "number",
+                "description": "Frequency of the audio signal in Hz. This is a float type value.",
+                "format": "float"
+              },
+              "amplitude": {
+                "type": "number",
+                "description": "Amplitude of the audio signal. This is a float type value.",
+                "format": "float"
+              },
+              "duration": {
+                "type": "integer",
+                "description": "Duration of the audio signal in seconds. Default 1",
+                "optional": true
+              }
+            },
+            "required": [
+              "frequency",
+              "amplitude"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240136-irb9SncUVsr7gNZ8U2AP",
+    "object": "chat.completion",
+    "created": 1776240136,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_11903123",
+              "function": {
+                "name": "music_generate",
+                "arguments": "{\"key\":\"C Major\",\"tempo\":120,\"time_signature\":\"4/4\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 484,
+      "completion_tokens": 42,
+      "total_tokens": 526,
+      "cost": 0.0020544975,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00207525,
+        "upstream_inference_prompt_cost": 0.00144525,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240136-irb9SncUVsr7gNZ8U2AP",
+    "object": "response",
+    "created_at": 1776240137,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_11903123",
+        "call_id": "call_11903123",
+        "name": "music_generate",
+        "arguments": "{\"key\":\"C Major\",\"tempo\":120,\"time_signature\":\"4/4\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 484,
+      "completion_tokens": 42,
+      "total_tokens": 526,
+      "cost": 0.0020544975,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00207525,
+        "upstream_inference_prompt_cost": 0.00144525,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240136-irb9SncUVsr7gNZ8U2AP",
+    "object": "chat.completion",
+    "created": 1776240136,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_11903123",
+              "function": {
+                "name": "music_generate",
+                "arguments": "{\"key\":\"C Major\",\"tempo\":120,\"time_signature\":\"4/4\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 484,
+      "completion_tokens": 42,
+      "total_tokens": 526,
+      "cost": 0.0020544975,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00207525,
+        "upstream_inference_prompt_cost": 0.00144525,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1679.893,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "4ba9c883-288c-4a3a-9447-000da21667bf"
+}

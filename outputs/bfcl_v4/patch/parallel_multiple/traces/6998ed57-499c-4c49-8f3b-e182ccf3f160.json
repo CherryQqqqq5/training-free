@@ -1,0 +1,339 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Perform Gaussian integral of the function exp(-x^2) from -2 to 2. Also calculate the definite integral from 0 to 3.1416 of sin(x)."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "math_gaussian_integral",
+        "description": "Perform Gaussian integration over the range of the function. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "function": {
+              "type": "string",
+              "description": "The function to integrate, given in terms of x."
+            },
+            "lower_limit": {
+              "type": "number",
+              "description": "The lower limit of the integral. This is a float type value.",
+              "format": "float"
+            },
+            "upper_limit": {
+              "type": "number",
+              "description": "The upper limit of the integral. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "function",
+            "lower_limit",
+            "upper_limit"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "math_definite_integral",
+        "description": "Calculate the definite integral of a function within specified bounds. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "function": {
+              "type": "string",
+              "description": "The function to integrate, given in terms of x."
+            },
+            "lower_limit": {
+              "type": "number",
+              "description": "The lower limit of the integral. This is a float type value.",
+              "format": "float"
+            },
+            "upper_limit": {
+              "type": "number",
+              "description": "The upper limit of the integral. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "function",
+            "lower_limit",
+            "upper_limit"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Perform Gaussian integral of the function exp(-x^2) from -2 to 2. Also calculate the definite integral from 0 to 3.1416 of sin(x)."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "math_gaussian_integral",
+          "description": "Perform Gaussian integration over the range of the function. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "function": {
+                "type": "string",
+                "description": "The function to integrate, given in terms of x."
+              },
+              "lower_limit": {
+                "type": "number",
+                "description": "The lower limit of the integral. This is a float type value.",
+                "format": "float"
+              },
+              "upper_limit": {
+                "type": "number",
+                "description": "The upper limit of the integral. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "function",
+              "lower_limit",
+              "upper_limit"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "math_definite_integral",
+          "description": "Calculate the definite integral of a function within specified bounds. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "function": {
+                "type": "string",
+                "description": "The function to integrate, given in terms of x."
+              },
+              "lower_limit": {
+                "type": "number",
+                "description": "The lower limit of the integral. This is a float type value.",
+                "format": "float"
+              },
+              "upper_limit": {
+                "type": "number",
+                "description": "The upper limit of the integral. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "function",
+              "lower_limit",
+              "upper_limit"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241386-YVSLjXAWSUQDw0r5nzk4",
+    "object": "chat.completion",
+    "created": 1776241386,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_03330424",
+              "function": {
+                "name": "math_gaussian_integral",
+                "arguments": "{\"function\":\"exp(-x**2)\",\"lower_limit\":-2.0,\"upper_limit\":2.0}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_65936036",
+              "function": {
+                "name": "math_definite_integral",
+                "arguments": "{\"function\":\"sin(x)\",\"lower_limit\":0.0,\"upper_limit\":3.1416}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 510,
+      "completion_tokens": 96,
+      "total_tokens": 606,
+      "cost": 0.0024747525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00249975,
+        "upstream_inference_prompt_cost": 0.00105975,
+        "upstream_inference_completions_cost": 0.00144
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241386-YVSLjXAWSUQDw0r5nzk4",
+    "object": "response",
+    "created_at": 1776241387,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_03330424",
+        "call_id": "call_03330424",
+        "name": "math_gaussian_integral",
+        "arguments": "{\"function\":\"exp(-x**2)\",\"lower_limit\":-2.0,\"upper_limit\":2.0}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_65936036",
+        "call_id": "call_65936036",
+        "name": "math_definite_integral",
+        "arguments": "{\"function\":\"sin(x)\",\"lower_limit\":0.0,\"upper_limit\":3.1416}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 510,
+      "completion_tokens": 96,
+      "total_tokens": 606,
+      "cost": 0.0024747525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00249975,
+        "upstream_inference_prompt_cost": 0.00105975,
+        "upstream_inference_completions_cost": 0.00144
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241386-YVSLjXAWSUQDw0r5nzk4",
+    "object": "chat.completion",
+    "created": 1776241386,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_03330424",
+              "function": {
+                "name": "math_gaussian_integral",
+                "arguments": "{\"function\":\"exp(-x**2)\",\"lower_limit\":-2.0,\"upper_limit\":2.0}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_65936036",
+              "function": {
+                "name": "math_definite_integral",
+                "arguments": "{\"function\":\"sin(x)\",\"lower_limit\":0.0,\"upper_limit\":3.1416}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 510,
+      "completion_tokens": 96,
+      "total_tokens": 606,
+      "cost": 0.0024747525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00249975,
+        "upstream_inference_prompt_cost": 0.00105975,
+        "upstream_inference_completions_cost": 0.00144
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1971.214,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "6998ed57-499c-4c49-8f3b-e182ccf3f160"
+}

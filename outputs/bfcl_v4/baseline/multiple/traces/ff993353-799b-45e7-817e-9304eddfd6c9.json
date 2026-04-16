@@ -1,0 +1,328 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Predict the house prices for next 5 years based on interest rates and unemployment rates."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "linear_regression",
+        "description": "Applies linear regression to a given set of independent variables to make a prediction. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "independent_var": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "The independent variables."
+            },
+            "dependent_var": {
+              "type": "string",
+              "description": "The dependent variable."
+            },
+            "forecast_period": {
+              "type": "integer",
+              "description": "The number of years to forecast the prices. Default 1",
+              "optional": true
+            }
+          },
+          "required": [
+            "independent_var",
+            "dependent_var"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "random_forest_regression",
+        "description": "Applies Random Forest Regression to a given set of independent variables to make a prediction. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "independent_var": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "The independent variables."
+            },
+            "dependent_var": {
+              "type": "string",
+              "description": "The dependent variable."
+            },
+            "n_estimators": {
+              "type": "integer",
+              "description": "The number of trees in the forest. Default 1",
+              "optional": true
+            },
+            "forecast_period": {
+              "type": "integer",
+              "description": "The number of years to forecast the prices. Default 1",
+              "optional": true
+            }
+          },
+          "required": [
+            "independent_var",
+            "dependent_var"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Predict the house prices for next 5 years based on interest rates and unemployment rates."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "linear_regression",
+          "description": "Applies linear regression to a given set of independent variables to make a prediction. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "independent_var": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "The independent variables."
+              },
+              "dependent_var": {
+                "type": "string",
+                "description": "The dependent variable."
+              },
+              "forecast_period": {
+                "type": "integer",
+                "description": "The number of years to forecast the prices. Default 1",
+                "optional": true
+              }
+            },
+            "required": [
+              "independent_var",
+              "dependent_var"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "random_forest_regression",
+          "description": "Applies Random Forest Regression to a given set of independent variables to make a prediction. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "independent_var": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "The independent variables."
+              },
+              "dependent_var": {
+                "type": "string",
+                "description": "The dependent variable."
+              },
+              "n_estimators": {
+                "type": "integer",
+                "description": "The number of trees in the forest. Default 1",
+                "optional": true
+              },
+              "forecast_period": {
+                "type": "integer",
+                "description": "The number of years to forecast the prices. Default 1",
+                "optional": true
+              }
+            },
+            "required": [
+              "independent_var",
+              "dependent_var"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239565-hYlf175N802ncmFxMXh2",
+    "object": "chat.completion",
+    "created": 1776239565,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_38619958",
+              "function": {
+                "name": "linear_regression",
+                "arguments": "{\"independent_var\":[\"interest rates\",\"unemployment rates\"],\"dependent_var\":\"house prices\",\"forecast_period\":5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 492,
+      "completion_tokens": 47,
+      "total_tokens": 539,
+      "cost": 0.0016936425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00171075,
+        "upstream_inference_prompt_cost": 0.00100575,
+        "upstream_inference_completions_cost": 0.000705
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239565-hYlf175N802ncmFxMXh2",
+    "object": "response",
+    "created_at": 1776239567,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_38619958",
+        "call_id": "call_38619958",
+        "name": "linear_regression",
+        "arguments": "{\"independent_var\":[\"interest rates\",\"unemployment rates\"],\"dependent_var\":\"house prices\",\"forecast_period\":5}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 492,
+      "completion_tokens": 47,
+      "total_tokens": 539,
+      "cost": 0.0016936425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00171075,
+        "upstream_inference_prompt_cost": 0.00100575,
+        "upstream_inference_completions_cost": 0.000705
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239565-hYlf175N802ncmFxMXh2",
+    "object": "chat.completion",
+    "created": 1776239565,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_38619958",
+              "function": {
+                "name": "linear_regression",
+                "arguments": "{\"independent_var\":[\"interest rates\",\"unemployment rates\"],\"dependent_var\":\"house prices\",\"forecast_period\":5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 492,
+      "completion_tokens": 47,
+      "total_tokens": 539,
+      "cost": 0.0016936425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00171075,
+        "upstream_inference_prompt_cost": 0.00100575,
+        "upstream_inference_completions_cost": 0.000705
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1815.731,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "ff993353-799b-45e7-817e-9304eddfd6c9"
+}

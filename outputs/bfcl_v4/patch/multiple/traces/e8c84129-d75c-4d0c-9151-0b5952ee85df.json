@@ -1,0 +1,462 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find a Card of rank 'Queen' and suit 'Hearts' in the deck."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "currency_exchange_convert",
+        "description": "Convert an amount from a base currency to a target currency based on the current exchange rate. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "base_currency": {
+              "type": "string",
+              "description": "The currency to convert from."
+            },
+            "target_currency": {
+              "type": "string",
+              "description": "The currency to convert to."
+            },
+            "amount": {
+              "type": "number",
+              "description": "The amount in base currency to convert This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "base_currency",
+            "target_currency",
+            "amount"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "local_nursery_find",
+        "description": "Locate local nurseries based on location and plant types availability. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city or locality where the nursery needs to be located."
+            },
+            "plant_types": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Annual",
+                  "Perennial",
+                  "Shrub",
+                  "Tree",
+                  "Herbs",
+                  "Fruits"
+                ]
+              },
+              "description": "Type of plants the nursery should provide."
+            }
+          },
+          "required": [
+            "location",
+            "plant_types"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "find_card_in_deck",
+        "description": "Locate a particular card in a deck based on rank and suit. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "rank": {
+              "type": "string",
+              "description": "Rank of the card (e.g. Ace, Two, King)."
+            },
+            "suit": {
+              "type": "string",
+              "description": "Suit of the card (e.g. Hearts, Spades, Diamonds, Clubs)."
+            },
+            "deck": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "rank": {
+                    "type": "string"
+                  },
+                  "suit": {
+                    "type": "string"
+                  }
+                }
+              },
+              "description": "Deck of cards. If not provided, the deck will be a standard 52 card deck by default"
+            }
+          },
+          "required": [
+            "rank",
+            "suit"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "recipe_unit_conversion",
+        "description": "Convert a value from one kitchen unit to another for cooking purposes. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "number",
+              "description": "The value to be converted. This is a float type value.",
+              "format": "float"
+            },
+            "from_unit": {
+              "type": "string",
+              "description": "The unit to convert from. Supports 'teaspoon', 'tablespoon', 'cup', etc."
+            },
+            "to_unit": {
+              "type": "string",
+              "description": "The unit to convert to. Supports 'teaspoon', 'tablespoon', 'cup', etc."
+            },
+            "precision": {
+              "type": "integer",
+              "description": "The precision to round the output to, in case of a non-integer result. Optional, default is 0."
+            }
+          },
+          "required": [
+            "value",
+            "from_unit",
+            "to_unit"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find a Card of rank 'Queen' and suit 'Hearts' in the deck."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "currency_exchange_convert",
+          "description": "Convert an amount from a base currency to a target currency based on the current exchange rate. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "base_currency": {
+                "type": "string",
+                "description": "The currency to convert from."
+              },
+              "target_currency": {
+                "type": "string",
+                "description": "The currency to convert to."
+              },
+              "amount": {
+                "type": "number",
+                "description": "The amount in base currency to convert This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "base_currency",
+              "target_currency",
+              "amount"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "local_nursery_find",
+          "description": "Locate local nurseries based on location and plant types availability. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city or locality where the nursery needs to be located."
+              },
+              "plant_types": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "Annual",
+                    "Perennial",
+                    "Shrub",
+                    "Tree",
+                    "Herbs",
+                    "Fruits"
+                  ]
+                },
+                "description": "Type of plants the nursery should provide."
+              }
+            },
+            "required": [
+              "location",
+              "plant_types"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "find_card_in_deck",
+          "description": "Locate a particular card in a deck based on rank and suit. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "rank": {
+                "type": "string",
+                "description": "Rank of the card (e.g. Ace, Two, King)."
+              },
+              "suit": {
+                "type": "string",
+                "description": "Suit of the card (e.g. Hearts, Spades, Diamonds, Clubs)."
+              },
+              "deck": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "rank": {
+                      "type": "string"
+                    },
+                    "suit": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "description": "Deck of cards. If not provided, the deck will be a standard 52 card deck by default"
+              }
+            },
+            "required": [
+              "rank",
+              "suit"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "recipe_unit_conversion",
+          "description": "Convert a value from one kitchen unit to another for cooking purposes. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "number",
+                "description": "The value to be converted. This is a float type value.",
+                "format": "float"
+              },
+              "from_unit": {
+                "type": "string",
+                "description": "The unit to convert from. Supports 'teaspoon', 'tablespoon', 'cup', etc."
+              },
+              "to_unit": {
+                "type": "string",
+                "description": "The unit to convert to. Supports 'teaspoon', 'tablespoon', 'cup', etc."
+              },
+              "precision": {
+                "type": "integer",
+                "description": "The precision to round the output to, in case of a non-integer result. Optional, default is 0."
+              }
+            },
+            "required": [
+              "value",
+              "from_unit",
+              "to_unit"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240338-KSRnvsf6zmKcdtzQoNd1",
+    "object": "chat.completion",
+    "created": 1776240338,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_72211821",
+              "function": {
+                "name": "find_card_in_deck",
+                "arguments": "{\"rank\":\"Queen\",\"suit\":\"Hearts\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 805,
+      "completion_tokens": 36,
+      "total_tokens": 841,
+      "cost": 0.0029187675,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00294825,
+        "upstream_inference_prompt_cost": 0.00240825,
+        "upstream_inference_completions_cost": 0.00054
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240338-KSRnvsf6zmKcdtzQoNd1",
+    "object": "response",
+    "created_at": 1776240339,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_72211821",
+        "call_id": "call_72211821",
+        "name": "find_card_in_deck",
+        "arguments": "{\"rank\":\"Queen\",\"suit\":\"Hearts\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 805,
+      "completion_tokens": 36,
+      "total_tokens": 841,
+      "cost": 0.0029187675,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00294825,
+        "upstream_inference_prompt_cost": 0.00240825,
+        "upstream_inference_completions_cost": 0.00054
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240338-KSRnvsf6zmKcdtzQoNd1",
+    "object": "chat.completion",
+    "created": 1776240338,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_72211821",
+              "function": {
+                "name": "find_card_in_deck",
+                "arguments": "{\"rank\":\"Queen\",\"suit\":\"Hearts\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 805,
+      "completion_tokens": 36,
+      "total_tokens": 841,
+      "cost": 0.0029187675,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00294825,
+        "upstream_inference_prompt_cost": 0.00240825,
+        "upstream_inference_completions_cost": 0.00054
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1548.405,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "e8c84129-d75c-4d0c-9151-0b5952ee85df"
+}

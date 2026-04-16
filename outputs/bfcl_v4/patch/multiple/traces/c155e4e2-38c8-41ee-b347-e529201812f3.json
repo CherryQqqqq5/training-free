@@ -1,0 +1,318 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "I want to generate a sound of 440Hz frequency for 5 seconds. What is the function and how can I use it?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "play_sound_wave",
+        "description": "This function is for playing a sound wave file. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "wave_file": {
+              "type": "string",
+              "description": "The filename of the sound wave file to be played."
+            },
+            "volume": {
+              "type": "number",
+              "description": "The volume level at which the sound is to be played (1 is 100%). This is a float type value.",
+              "default": 1,
+              "format": "float"
+            }
+          },
+          "required": [
+            "wave_file"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "generate_sound_wave",
+        "description": "This function is for generating a sinusoidal sound wave file of a certain frequency for a specific duration and save it to a WAV file. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "frequency": {
+              "type": "integer",
+              "description": "The frequency of the sound wave in Hz."
+            },
+            "duration": {
+              "type": "integer",
+              "description": "The duration of the sound in seconds."
+            },
+            "wave_type": {
+              "type": "string",
+              "enum": [
+                "sine",
+                "square",
+                "sawtooth"
+              ],
+              "description": "The waveform to be used to generate the sound.",
+              "default": "sine"
+            }
+          },
+          "required": [
+            "frequency",
+            "duration"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "I want to generate a sound of 440Hz frequency for 5 seconds. What is the function and how can I use it?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "play_sound_wave",
+          "description": "This function is for playing a sound wave file. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "wave_file": {
+                "type": "string",
+                "description": "The filename of the sound wave file to be played."
+              },
+              "volume": {
+                "type": "number",
+                "description": "The volume level at which the sound is to be played (1 is 100%). This is a float type value.",
+                "default": 1,
+                "format": "float"
+              }
+            },
+            "required": [
+              "wave_file"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "generate_sound_wave",
+          "description": "This function is for generating a sinusoidal sound wave file of a certain frequency for a specific duration and save it to a WAV file. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "frequency": {
+                "type": "integer",
+                "description": "The frequency of the sound wave in Hz."
+              },
+              "duration": {
+                "type": "integer",
+                "description": "The duration of the sound in seconds."
+              },
+              "wave_type": {
+                "type": "string",
+                "enum": [
+                  "sine",
+                  "square",
+                  "sawtooth"
+                ],
+                "description": "The waveform to be used to generate the sound.",
+                "default": "sine"
+              }
+            },
+            "required": [
+              "frequency",
+              "duration"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240003-oq74xk8VPjnVtUiTnMTq",
+    "object": "chat.completion",
+    "created": 1776240003,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "To generate a sound of 440Hz frequency for 5 seconds, you can use the `generate_sound_wave` function. This function allows you to create a sinusoidal sound wave with the specified frequency and duration, and it will save it to a WAV file.\n\nHere's how you can use it:\n\nI've called the function with the frequency set to 440Hz and the duration set to 5 seconds. By default, the waveform type is set to \"sine,\" but you can also choose \"square\" or \"sawtooth\" if you prefer a different sound profile. Let me know if you'd like to adjust the waveform type or if you have any other questions!",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_93349432",
+              "function": {
+                "name": "generate_sound_wave",
+                "arguments": "{\"frequency\":440,\"duration\":5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 486,
+      "completion_tokens": 165,
+      "total_tokens": 651,
+      "cost": 0.0034281225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00346275,
+        "upstream_inference_prompt_cost": 0.00098775,
+        "upstream_inference_completions_cost": 0.002475
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240003-oq74xk8VPjnVtUiTnMTq",
+    "object": "response",
+    "created_at": 1776240007,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "To generate a sound of 440Hz frequency for 5 seconds, you can use the `generate_sound_wave` function. This function allows you to create a sinusoidal sound wave with the specified frequency and duration, and it will save it to a WAV file.\n\nHere's how you can use it:\n\nI've called the function with the frequency set to 440Hz and the duration set to 5 seconds. By default, the waveform type is set to \"sine,\" but you can also choose \"square\" or \"sawtooth\" if you prefer a different sound profile. Let me know if you'd like to adjust the waveform type or if you have any other questions!"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_93349432",
+        "call_id": "call_93349432",
+        "name": "generate_sound_wave",
+        "arguments": "{\"frequency\":440,\"duration\":5}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 486,
+      "completion_tokens": 165,
+      "total_tokens": 651,
+      "cost": 0.0034281225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00346275,
+        "upstream_inference_prompt_cost": 0.00098775,
+        "upstream_inference_completions_cost": 0.002475
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240003-oq74xk8VPjnVtUiTnMTq",
+    "object": "chat.completion",
+    "created": 1776240003,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "To generate a sound of 440Hz frequency for 5 seconds, you can use the `generate_sound_wave` function. This function allows you to create a sinusoidal sound wave with the specified frequency and duration, and it will save it to a WAV file.\n\nHere's how you can use it:\n\nI've called the function with the frequency set to 440Hz and the duration set to 5 seconds. By default, the waveform type is set to \"sine,\" but you can also choose \"square\" or \"sawtooth\" if you prefer a different sound profile. Let me know if you'd like to adjust the waveform type or if you have any other questions!",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_93349432",
+              "function": {
+                "name": "generate_sound_wave",
+                "arguments": "{\"frequency\":440,\"duration\":5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 486,
+      "completion_tokens": 165,
+      "total_tokens": 651,
+      "cost": 0.0034281225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00346275,
+        "upstream_inference_prompt_cost": 0.00098775,
+        "upstream_inference_completions_cost": 0.002475
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 4714.376,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "c155e4e2-38c8-41ee-b347-e529201812f3"
+}

@@ -1,0 +1,361 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find how many cases and the judge handling a specific lawsuit for Pacific Gas and Electric and Tesla Inc."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "lawsuit_fetch_details",
+        "description": "Fetch the details of a lawsuit for a specific company. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "company_name": {
+              "type": "string",
+              "description": "The company involved in the lawsuit."
+            }
+          },
+          "required": [
+            "company_name"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "lawsuit_judge",
+        "description": "Fetch the judge handling a lawsuit for a specific company. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "company_name": {
+              "type": "string",
+              "description": "The company involved in the lawsuit."
+            },
+            "lawsuit_id": {
+              "type": "integer",
+              "description": "The ID number of the lawsuit. Default to 123",
+              "default": 123
+            }
+          },
+          "required": [
+            "company_name"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find how many cases and the judge handling a specific lawsuit for Pacific Gas and Electric and Tesla Inc."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "lawsuit_fetch_details",
+          "description": "Fetch the details of a lawsuit for a specific company. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "company_name": {
+                "type": "string",
+                "description": "The company involved in the lawsuit."
+              }
+            },
+            "required": [
+              "company_name"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "lawsuit_judge",
+          "description": "Fetch the judge handling a lawsuit for a specific company. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "company_name": {
+                "type": "string",
+                "description": "The company involved in the lawsuit."
+              },
+              "lawsuit_id": {
+                "type": "integer",
+                "description": "The ID number of the lawsuit. Default to 123",
+                "default": 123
+              }
+            },
+            "required": [
+              "company_name"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240559-jf88pOWrfxFqKiVlqExH",
+    "object": "chat.completion",
+    "created": 1776240559,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'll help you retrieve the information about lawsuits for Pacific Gas and Electric and Tesla Inc. Let's start by fetching the details of lawsuits for each company, and then get the judge information for a specific lawsuit.\n\nAdditionally, I'll fetch the judge information for a specific lawsuit for each company using the default lawsuit ID.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_88770582",
+              "function": {
+                "name": "lawsuit_fetch_details",
+                "arguments": "{\"company_name\":\"Pacific Gas and Electric\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_01890225",
+              "function": {
+                "name": "lawsuit_fetch_details",
+                "arguments": "{\"company_name\":\"Tesla Inc\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_06258606",
+              "function": {
+                "name": "lawsuit_judge",
+                "arguments": "{\"company_name\":\"Pacific Gas and Electric\",\"lawsuit_id\":123}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_90159024",
+              "function": {
+                "name": "lawsuit_judge",
+                "arguments": "{\"company_name\":\"Tesla Inc\",\"lawsuit_id\":123}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 396,
+      "completion_tokens": 198,
+      "total_tokens": 594,
+      "cost": 0.0036508725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00368775,
+        "upstream_inference_prompt_cost": 0.00071775,
+        "upstream_inference_completions_cost": 0.00297
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240559-jf88pOWrfxFqKiVlqExH",
+    "object": "response",
+    "created_at": 1776240564,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'll help you retrieve the information about lawsuits for Pacific Gas and Electric and Tesla Inc. Let's start by fetching the details of lawsuits for each company, and then get the judge information for a specific lawsuit.\n\nAdditionally, I'll fetch the judge information for a specific lawsuit for each company using the default lawsuit ID.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_88770582",
+        "call_id": "call_88770582",
+        "name": "lawsuit_fetch_details",
+        "arguments": "{\"company_name\":\"Pacific Gas and Electric\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_01890225",
+        "call_id": "call_01890225",
+        "name": "lawsuit_fetch_details",
+        "arguments": "{\"company_name\":\"Tesla Inc\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_06258606",
+        "call_id": "call_06258606",
+        "name": "lawsuit_judge",
+        "arguments": "{\"company_name\":\"Pacific Gas and Electric\",\"lawsuit_id\":123}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_90159024",
+        "call_id": "call_90159024",
+        "name": "lawsuit_judge",
+        "arguments": "{\"company_name\":\"Tesla Inc\",\"lawsuit_id\":123}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 396,
+      "completion_tokens": 198,
+      "total_tokens": 594,
+      "cost": 0.0036508725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00368775,
+        "upstream_inference_prompt_cost": 0.00071775,
+        "upstream_inference_completions_cost": 0.00297
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240559-jf88pOWrfxFqKiVlqExH",
+    "object": "chat.completion",
+    "created": 1776240559,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'll help you retrieve the information about lawsuits for Pacific Gas and Electric and Tesla Inc. Let's start by fetching the details of lawsuits for each company, and then get the judge information for a specific lawsuit.\n\nAdditionally, I'll fetch the judge information for a specific lawsuit for each company using the default lawsuit ID.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_88770582",
+              "function": {
+                "name": "lawsuit_fetch_details",
+                "arguments": "{\"company_name\":\"Pacific Gas and Electric\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_01890225",
+              "function": {
+                "name": "lawsuit_fetch_details",
+                "arguments": "{\"company_name\":\"Tesla Inc\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_06258606",
+              "function": {
+                "name": "lawsuit_judge",
+                "arguments": "{\"company_name\":\"Pacific Gas and Electric\",\"lawsuit_id\":123}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_90159024",
+              "function": {
+                "name": "lawsuit_judge",
+                "arguments": "{\"company_name\":\"Tesla Inc\",\"lawsuit_id\":123}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 396,
+      "completion_tokens": 198,
+      "total_tokens": 594,
+      "cost": 0.0036508725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00368775,
+        "upstream_inference_prompt_cost": 0.00071775,
+        "upstream_inference_completions_cost": 0.00297
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 5554.028,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "393030ad-f58a-4210-8cc5-1170cc4539fe"
+}

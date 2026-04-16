@@ -1,0 +1,346 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Get me information about Natural History Museum in London including timings, exhibitions, and accessibility."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "tourist_spot_info",
+        "description": "Retrieve information about a specific tourist spot. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "spot": {
+              "type": "string",
+              "description": "The name of the tourist spot you want to get information for."
+            },
+            "city": {
+              "type": "string",
+              "description": "The city where the tourist spot is located."
+            },
+            "details": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "timing",
+                  "attractions",
+                  "tickets",
+                  "accessibility",
+                  "history"
+                ]
+              },
+              "description": "Details of the tourist spot to get information on. For multiple details, separate them by comma.",
+              "default": "timing, attractions"
+            }
+          },
+          "required": [
+            "spot",
+            "city"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "museum_info",
+        "description": "Retrieve information about a specific museum. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "museum": {
+              "type": "string",
+              "description": "The name of the museum you want to get information for."
+            },
+            "city": {
+              "type": "string",
+              "description": "The city where the museum is located."
+            },
+            "features": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "timings",
+                  "exhibitions",
+                  "accessibility",
+                  "events",
+                  "history"
+                ]
+              },
+              "description": "Features of the museum to get information on. For multiple features, separate them by comma.",
+              "default": "timings, exhibitions"
+            }
+          },
+          "required": [
+            "museum",
+            "city"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Get me information about Natural History Museum in London including timings, exhibitions, and accessibility."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "tourist_spot_info",
+          "description": "Retrieve information about a specific tourist spot. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "spot": {
+                "type": "string",
+                "description": "The name of the tourist spot you want to get information for."
+              },
+              "city": {
+                "type": "string",
+                "description": "The city where the tourist spot is located."
+              },
+              "details": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "timing",
+                    "attractions",
+                    "tickets",
+                    "accessibility",
+                    "history"
+                  ]
+                },
+                "description": "Details of the tourist spot to get information on. For multiple details, separate them by comma.",
+                "default": "timing, attractions"
+              }
+            },
+            "required": [
+              "spot",
+              "city"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "museum_info",
+          "description": "Retrieve information about a specific museum. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "museum": {
+                "type": "string",
+                "description": "The name of the museum you want to get information for."
+              },
+              "city": {
+                "type": "string",
+                "description": "The city where the museum is located."
+              },
+              "features": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "timings",
+                    "exhibitions",
+                    "accessibility",
+                    "events",
+                    "history"
+                  ]
+                },
+                "description": "Features of the museum to get information on. For multiple features, separate them by comma.",
+                "default": "timings, exhibitions"
+              }
+            },
+            "required": [
+              "museum",
+              "city"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240128-zMLBbBuZ58APFM2anr1l",
+    "object": "chat.completion",
+    "created": 1776240128,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_64353016",
+              "function": {
+                "name": "museum_info",
+                "arguments": "{\"museum\":\"Natural History Museum\",\"city\":\"London\",\"features\":[\"timings\",\"exhibitions\",\"accessibility\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 511,
+      "completion_tokens": 49,
+      "total_tokens": 560,
+      "cost": 0.0017797725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00179775,
+        "upstream_inference_prompt_cost": 0.00106275,
+        "upstream_inference_completions_cost": 0.000735
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240128-zMLBbBuZ58APFM2anr1l",
+    "object": "response",
+    "created_at": 1776240130,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_64353016",
+        "call_id": "call_64353016",
+        "name": "museum_info",
+        "arguments": "{\"museum\":\"Natural History Museum\",\"city\":\"London\",\"features\":[\"timings\",\"exhibitions\",\"accessibility\"]}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 511,
+      "completion_tokens": 49,
+      "total_tokens": 560,
+      "cost": 0.0017797725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00179775,
+        "upstream_inference_prompt_cost": 0.00106275,
+        "upstream_inference_completions_cost": 0.000735
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240128-zMLBbBuZ58APFM2anr1l",
+    "object": "chat.completion",
+    "created": 1776240128,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_64353016",
+              "function": {
+                "name": "museum_info",
+                "arguments": "{\"museum\":\"Natural History Museum\",\"city\":\"London\",\"features\":[\"timings\",\"exhibitions\",\"accessibility\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 511,
+      "completion_tokens": 49,
+      "total_tokens": 560,
+      "cost": 0.0017797725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00179775,
+        "upstream_inference_prompt_cost": 0.00106275,
+        "upstream_inference_completions_cost": 0.000735
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2100.406,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "a02931e0-243e-4b82-a334-a54553622bc9"
+}

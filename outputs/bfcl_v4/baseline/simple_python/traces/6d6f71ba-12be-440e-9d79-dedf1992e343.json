@@ -1,0 +1,248 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Get me the predictions of the evolutionary rate for Homo Sapiens for next 50 years using Darwin model"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "prediction_evolution",
+        "description": "Predict the evolutionary rate for a specific species for a given timeframe. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "species": {
+              "type": "string",
+              "description": "The species that the evolution rate will be predicted for."
+            },
+            "years": {
+              "type": "integer",
+              "description": "Number of years for the prediction."
+            },
+            "model": {
+              "type": "string",
+              "description": "The model used to make the prediction, options: 'Darwin', 'Lamarck', default is 'Darwin'."
+            }
+          },
+          "required": [
+            "species",
+            "years"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Get me the predictions of the evolutionary rate for Homo Sapiens for next 50 years using Darwin model"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "prediction_evolution",
+          "description": "Predict the evolutionary rate for a specific species for a given timeframe. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "species": {
+                "type": "string",
+                "description": "The species that the evolution rate will be predicted for."
+              },
+              "years": {
+                "type": "integer",
+                "description": "Number of years for the prediction."
+              },
+              "model": {
+                "type": "string",
+                "description": "The model used to make the prediction, options: 'Darwin', 'Lamarck', default is 'Darwin'."
+              }
+            },
+            "required": [
+              "species",
+              "years"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776237798-gUNekjNxeZEidJA8Itff",
+    "object": "chat.completion",
+    "created": 1776237798,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_49770169",
+              "function": {
+                "name": "prediction_evolution",
+                "arguments": "{\"species\":\"Homo Sapiens\",\"years\":50,\"model\":\"Darwin\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 356,
+      "completion_tokens": 42,
+      "total_tokens": 398,
+      "cost": 0.0008902575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 355,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00089925,
+        "upstream_inference_prompt_cost": 0.00026925,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776237798-gUNekjNxeZEidJA8Itff",
+    "object": "response",
+    "created_at": 1776237800,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_49770169",
+        "call_id": "call_49770169",
+        "name": "prediction_evolution",
+        "arguments": "{\"species\":\"Homo Sapiens\",\"years\":50,\"model\":\"Darwin\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 356,
+      "completion_tokens": 42,
+      "total_tokens": 398,
+      "cost": 0.0008902575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 355,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00089925,
+        "upstream_inference_prompt_cost": 0.00026925,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776237798-gUNekjNxeZEidJA8Itff",
+    "object": "chat.completion",
+    "created": 1776237798,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_49770169",
+              "function": {
+                "name": "prediction_evolution",
+                "arguments": "{\"species\":\"Homo Sapiens\",\"years\":50,\"model\":\"Darwin\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 356,
+      "completion_tokens": 42,
+      "total_tokens": 398,
+      "cost": 0.0008902575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 355,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00089925,
+        "upstream_inference_prompt_cost": 0.00026925,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2078.859,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "6d6f71ba-12be-440e-9d79-dedf1992e343"
+}

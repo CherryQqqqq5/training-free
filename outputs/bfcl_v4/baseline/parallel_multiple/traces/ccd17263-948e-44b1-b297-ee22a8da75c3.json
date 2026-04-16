@@ -1,0 +1,304 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Can you provide me with the exhibition information for the Louvre museum for the next 3 months and then tell me about the best Italian and Chinese restaurants in the area of Paris?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "restaurant_info",
+        "description": "Get restaurant information for a specific area. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "Location for which to find restaurants."
+            },
+            "food_type": {
+              "type": "string",
+              "description": "Type of cuisine for which to find restaurants. Default is 'all' if not specified.",
+              "enum": [
+                "Italian",
+                "Chinese",
+                "Mexican",
+                "American"
+              ]
+            }
+          },
+          "required": [
+            "location"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "exhibition_info",
+        "description": "Get exhibition information for a specific museum. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "museum_name": {
+              "type": "string",
+              "description": "Name of the museum for which to find exhibitions."
+            },
+            "month": {
+              "type": "integer",
+              "description": "Number of upcoming months for which to retrieve exhibition details. Default is 1 if not specified."
+            }
+          },
+          "required": [
+            "museum_name"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Can you provide me with the exhibition information for the Louvre museum for the next 3 months and then tell me about the best Italian and Chinese restaurants in the area of Paris?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "restaurant_info",
+          "description": "Get restaurant information for a specific area. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "Location for which to find restaurants."
+              },
+              "food_type": {
+                "type": "string",
+                "description": "Type of cuisine for which to find restaurants. Default is 'all' if not specified.",
+                "enum": [
+                  "Italian",
+                  "Chinese",
+                  "Mexican",
+                  "American"
+                ]
+              }
+            },
+            "required": [
+              "location"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "exhibition_info",
+          "description": "Get exhibition information for a specific museum. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "museum_name": {
+                "type": "string",
+                "description": "Name of the museum for which to find exhibitions."
+              },
+              "month": {
+                "type": "integer",
+                "description": "Number of upcoming months for which to retrieve exhibition details. Default is 1 if not specified."
+              }
+            },
+            "required": [
+              "museum_name"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240887-NWDSBos4irbSLbwv3D1v",
+    "object": "chat.completion",
+    "created": 1776240887,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'll help you with both requests. Let's start by getting the exhibition information for the Louvre museum for the next 3 months, and then I'll assist with finding Italian and Chinese restaurants in Paris.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_63433899",
+              "function": {
+                "name": "exhibition_info",
+                "arguments": "{\"museum_name\":\"Louvre\",\"month\":3}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 444,
+      "completion_tokens": 72,
+      "total_tokens": 516,
+      "cost": 0.0023811975,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00240525,
+        "upstream_inference_prompt_cost": 0.00132525,
+        "upstream_inference_completions_cost": 0.00108
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240887-NWDSBos4irbSLbwv3D1v",
+    "object": "response",
+    "created_at": 1776240889,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'll help you with both requests. Let's start by getting the exhibition information for the Louvre museum for the next 3 months, and then I'll assist with finding Italian and Chinese restaurants in Paris.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_63433899",
+        "call_id": "call_63433899",
+        "name": "exhibition_info",
+        "arguments": "{\"museum_name\":\"Louvre\",\"month\":3}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 444,
+      "completion_tokens": 72,
+      "total_tokens": 516,
+      "cost": 0.0023811975,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00240525,
+        "upstream_inference_prompt_cost": 0.00132525,
+        "upstream_inference_completions_cost": 0.00108
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240887-NWDSBos4irbSLbwv3D1v",
+    "object": "chat.completion",
+    "created": 1776240887,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'll help you with both requests. Let's start by getting the exhibition information for the Louvre museum for the next 3 months, and then I'll assist with finding Italian and Chinese restaurants in Paris.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_63433899",
+              "function": {
+                "name": "exhibition_info",
+                "arguments": "{\"museum_name\":\"Louvre\",\"month\":3}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 444,
+      "completion_tokens": 72,
+      "total_tokens": 516,
+      "cost": 0.0023811975,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00240525,
+        "upstream_inference_prompt_cost": 0.00132525,
+        "upstream_inference_completions_cost": 0.00108
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 3378.802,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "ccd17263-948e-44b1-b297-ee22a8da75c3"
+}

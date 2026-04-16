@@ -1,0 +1,422 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Could you help me plan my vacation? I need to know the total cost. First, I'm considering staying at the Hilton New York for 5 nights in a deluxe room. Could you tell me how much that would cost? Second, I'm thinking of renting a sedan from Enterprise for 10 days. How much would that be? Lastly, I'm planning to fly with Delta Airlines in business class. There will be 3 of us. Can you tell me the total flight cost?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "flight_ticket_pricing_get",
+        "description": "Get pricing for a specific type of flight ticket for specified number of passengers. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "airline": {
+              "type": "string",
+              "description": "The name of the airline."
+            },
+            "flightClass": {
+              "type": "string",
+              "description": "Class of the flight."
+            },
+            "passengers": {
+              "type": "integer",
+              "description": "Number of passengers."
+            }
+          },
+          "required": [
+            "airline",
+            "flightClass",
+            "passengers"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "car_rental_pricing_get",
+        "description": "Get pricing for a specific type of rental car for a specified number of days. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "rentalCompany": {
+              "type": "string",
+              "description": "The name of the rental company."
+            },
+            "carType": {
+              "type": "string",
+              "description": "Type of the car to be rented."
+            },
+            "days": {
+              "type": "integer",
+              "description": "Number of days to rent the car."
+            }
+          },
+          "required": [
+            "rentalCompany",
+            "carType",
+            "days"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "hotel_room_pricing_get",
+        "description": "Get pricing for a specific type of hotel room for specified number of nights. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "hotelName": {
+              "type": "string",
+              "description": "The name of the hotel e.g. Hilton New York"
+            },
+            "roomType": {
+              "type": "string",
+              "description": "Type of the room to be booked."
+            },
+            "nights": {
+              "type": "integer",
+              "description": "Number of nights to book the room for."
+            }
+          },
+          "required": [
+            "hotelName",
+            "roomType",
+            "nights"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Could you help me plan my vacation? I need to know the total cost. First, I'm considering staying at the Hilton New York for 5 nights in a deluxe room. Could you tell me how much that would cost? Second, I'm thinking of renting a sedan from Enterprise for 10 days. How much would that be? Lastly, I'm planning to fly with Delta Airlines in business class. There will be 3 of us. Can you tell me the total flight cost?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "flight_ticket_pricing_get",
+          "description": "Get pricing for a specific type of flight ticket for specified number of passengers. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "airline": {
+                "type": "string",
+                "description": "The name of the airline."
+              },
+              "flightClass": {
+                "type": "string",
+                "description": "Class of the flight."
+              },
+              "passengers": {
+                "type": "integer",
+                "description": "Number of passengers."
+              }
+            },
+            "required": [
+              "airline",
+              "flightClass",
+              "passengers"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "car_rental_pricing_get",
+          "description": "Get pricing for a specific type of rental car for a specified number of days. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "rentalCompany": {
+                "type": "string",
+                "description": "The name of the rental company."
+              },
+              "carType": {
+                "type": "string",
+                "description": "Type of the car to be rented."
+              },
+              "days": {
+                "type": "integer",
+                "description": "Number of days to rent the car."
+              }
+            },
+            "required": [
+              "rentalCompany",
+              "carType",
+              "days"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "hotel_room_pricing_get",
+          "description": "Get pricing for a specific type of hotel room for specified number of nights. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "hotelName": {
+                "type": "string",
+                "description": "The name of the hotel e.g. Hilton New York"
+              },
+              "roomType": {
+                "type": "string",
+                "description": "Type of the room to be booked."
+              },
+              "nights": {
+                "type": "integer",
+                "description": "Number of nights to book the room for."
+              }
+            },
+            "required": [
+              "hotelName",
+              "roomType",
+              "nights"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241739-TuFC6gt83OukrtZOZAr9",
+    "object": "chat.completion",
+    "created": 1776241739,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help you plan your vacation and provide cost estimates for each part of your trip. Let's break this down and get the pricing information for your hotel stay, car rental, and flights.\n\nOnce I have the pricing information for each of these components, I'll be able to provide you with the details and calculate the total cost for your vacation.",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_80950688",
+              "function": {
+                "name": "hotel_room_pricing_get",
+                "arguments": "{\"hotelName\":\"Hilton New York\",\"roomType\":\"deluxe\",\"nights\":5}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_03747079",
+              "function": {
+                "name": "car_rental_pricing_get",
+                "arguments": "{\"rentalCompany\":\"Enterprise\",\"carType\":\"sedan\",\"days\":10}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_41126778",
+              "function": {
+                "name": "flight_ticket_pricing_get",
+                "arguments": "{\"airline\":\"Delta Airlines\",\"flightClass\":\"business\",\"passengers\":3}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 653,
+      "completion_tokens": 204,
+      "total_tokens": 857,
+      "cost": 0.0045032625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00454875,
+        "upstream_inference_prompt_cost": 0.00148875,
+        "upstream_inference_completions_cost": 0.00306
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241739-TuFC6gt83OukrtZOZAr9",
+    "object": "response",
+    "created_at": 1776241742,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'm happy to help you plan your vacation and provide cost estimates for each part of your trip. Let's break this down and get the pricing information for your hotel stay, car rental, and flights.\n\nOnce I have the pricing information for each of these components, I'll be able to provide you with the details and calculate the total cost for your vacation."
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_80950688",
+        "call_id": "call_80950688",
+        "name": "hotel_room_pricing_get",
+        "arguments": "{\"hotelName\":\"Hilton New York\",\"roomType\":\"deluxe\",\"nights\":5}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_03747079",
+        "call_id": "call_03747079",
+        "name": "car_rental_pricing_get",
+        "arguments": "{\"rentalCompany\":\"Enterprise\",\"carType\":\"sedan\",\"days\":10}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_41126778",
+        "call_id": "call_41126778",
+        "name": "flight_ticket_pricing_get",
+        "arguments": "{\"airline\":\"Delta Airlines\",\"flightClass\":\"business\",\"passengers\":3}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 653,
+      "completion_tokens": 204,
+      "total_tokens": 857,
+      "cost": 0.0045032625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00454875,
+        "upstream_inference_prompt_cost": 0.00148875,
+        "upstream_inference_completions_cost": 0.00306
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241739-TuFC6gt83OukrtZOZAr9",
+    "object": "chat.completion",
+    "created": 1776241739,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help you plan your vacation and provide cost estimates for each part of your trip. Let's break this down and get the pricing information for your hotel stay, car rental, and flights.\n\nOnce I have the pricing information for each of these components, I'll be able to provide you with the details and calculate the total cost for your vacation.",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_80950688",
+              "function": {
+                "name": "hotel_room_pricing_get",
+                "arguments": "{\"hotelName\":\"Hilton New York\",\"roomType\":\"deluxe\",\"nights\":5}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_03747079",
+              "function": {
+                "name": "car_rental_pricing_get",
+                "arguments": "{\"rentalCompany\":\"Enterprise\",\"carType\":\"sedan\",\"days\":10}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_41126778",
+              "function": {
+                "name": "flight_ticket_pricing_get",
+                "arguments": "{\"airline\":\"Delta Airlines\",\"flightClass\":\"business\",\"passengers\":3}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 653,
+      "completion_tokens": 204,
+      "total_tokens": 857,
+      "cost": 0.0045032625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00454875,
+        "upstream_inference_prompt_cost": 0.00148875,
+        "upstream_inference_completions_cost": 0.00306
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 3853.451,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "ed4ffc01-17fb-4685-b2b3-4fa670833b25"
+}

@@ -1,0 +1,316 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "What is the ranking of Manchester United in Premier League?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "sports_ranking",
+        "description": "Fetch the ranking of a specific sports team in a specific league Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "team": {
+              "type": "string",
+              "description": "The name of the team."
+            },
+            "league": {
+              "type": "string",
+              "description": "The name of the league."
+            },
+            "season": {
+              "type": "integer",
+              "description": "Optional parameter to specify the season, default is the current season, 2024"
+            }
+          },
+          "required": [
+            "team",
+            "league"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "calculate_compound_interest",
+        "description": "Calculates the compound interest of an investment over a given time period. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "principle": {
+              "type": "number",
+              "description": "The initial amount of the investment. This is a float type value.",
+              "format": "float"
+            },
+            "interest_rate": {
+              "type": "number",
+              "description": "The yearly interest rate of the investment. This is a float type value.",
+              "format": "float"
+            },
+            "time": {
+              "type": "integer",
+              "description": "The time, in years, the money is invested or borrowed for."
+            },
+            "compounds_per_year": {
+              "type": "integer",
+              "description": "The number of times the interest is compounded per year. Default is 1 (interest is compounded yearly)."
+            }
+          },
+          "required": [
+            "principle",
+            "interest_rate",
+            "time"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What is the ranking of Manchester United in Premier League?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "sports_ranking",
+          "description": "Fetch the ranking of a specific sports team in a specific league Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "team": {
+                "type": "string",
+                "description": "The name of the team."
+              },
+              "league": {
+                "type": "string",
+                "description": "The name of the league."
+              },
+              "season": {
+                "type": "integer",
+                "description": "Optional parameter to specify the season, default is the current season, 2024"
+              }
+            },
+            "required": [
+              "team",
+              "league"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_compound_interest",
+          "description": "Calculates the compound interest of an investment over a given time period. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "principle": {
+                "type": "number",
+                "description": "The initial amount of the investment. This is a float type value.",
+                "format": "float"
+              },
+              "interest_rate": {
+                "type": "number",
+                "description": "The yearly interest rate of the investment. This is a float type value.",
+                "format": "float"
+              },
+              "time": {
+                "type": "integer",
+                "description": "The time, in years, the money is invested or borrowed for."
+              },
+              "compounds_per_year": {
+                "type": "integer",
+                "description": "The number of times the interest is compounded per year. Default is 1 (interest is compounded yearly)."
+              }
+            },
+            "required": [
+              "principle",
+              "interest_rate",
+              "time"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239850-0BRkTtFCnr4mGkwWERiX",
+    "object": "chat.completion",
+    "created": 1776239850,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_04209966",
+              "function": {
+                "name": "sports_ranking",
+                "arguments": "{\"team\":\"Manchester United\",\"league\":\"Premier League\",\"season\":2024}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 41,
+      "total_tokens": 543,
+      "cost": 0.0016342425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00165075,
+        "upstream_inference_prompt_cost": 0.00103575,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239850-0BRkTtFCnr4mGkwWERiX",
+    "object": "response",
+    "created_at": 1776239852,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_04209966",
+        "call_id": "call_04209966",
+        "name": "sports_ranking",
+        "arguments": "{\"team\":\"Manchester United\",\"league\":\"Premier League\",\"season\":2024}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 41,
+      "total_tokens": 543,
+      "cost": 0.0016342425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00165075,
+        "upstream_inference_prompt_cost": 0.00103575,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239850-0BRkTtFCnr4mGkwWERiX",
+    "object": "chat.completion",
+    "created": 1776239850,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_04209966",
+              "function": {
+                "name": "sports_ranking",
+                "arguments": "{\"team\":\"Manchester United\",\"league\":\"Premier League\",\"season\":2024}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 41,
+      "total_tokens": 543,
+      "cost": 0.0016342425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00165075,
+        "upstream_inference_prompt_cost": 0.00103575,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1854.999,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "cbf30f53-c266-4f20-bebb-2c378509e350"
+}

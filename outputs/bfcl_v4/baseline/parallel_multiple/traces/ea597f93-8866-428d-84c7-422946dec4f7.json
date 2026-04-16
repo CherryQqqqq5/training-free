@@ -1,0 +1,405 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Could you please help me order a custom sculpture of a horse made from Marble that is 20 inches in size, then another sculpture of a dog made from Wood that is 15 inches in size, followed by a custom painting of a sunset with the main color being Red that is 30 inches in size, and finally a painting of a cityscape with the main color being Blue that is 25 inches in size?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "sculpture_create_custom",
+        "description": "Order a custom sculpture with your preferred material. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "item": {
+              "type": "string",
+              "description": "The subject of the sculpture, e.g. horse"
+            },
+            "material": {
+              "type": "string",
+              "enum": [
+                "Bronze",
+                "Marble",
+                "Terracotta",
+                "Wood",
+                "Stone"
+              ],
+              "description": "Preferred material for the sculpture."
+            },
+            "size": {
+              "type": "integer",
+              "description": "The desired size for the sculpture in inches. This parameter is optional. Default is 10 inches if not specified."
+            }
+          },
+          "required": [
+            "item",
+            "material"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "painting_create_custom",
+        "description": "Order a custom painting with your preferred color. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "subject": {
+              "type": "string",
+              "description": "The subject of the painting, e.g. horse"
+            },
+            "color": {
+              "type": "string",
+              "enum": [
+                "Red",
+                "Blue",
+                "Green",
+                "Yellow",
+                "Black"
+              ],
+              "description": "Preferred main color for the painting."
+            },
+            "size": {
+              "type": "integer",
+              "description": "The desired size for the painting in inches. This parameter is optional. Default is 20 inches if not specified."
+            }
+          },
+          "required": [
+            "subject",
+            "color"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Could you please help me order a custom sculpture of a horse made from Marble that is 20 inches in size, then another sculpture of a dog made from Wood that is 15 inches in size, followed by a custom painting of a sunset with the main color being Red that is 30 inches in size, and finally a painting of a cityscape with the main color being Blue that is 25 inches in size?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "sculpture_create_custom",
+          "description": "Order a custom sculpture with your preferred material. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "item": {
+                "type": "string",
+                "description": "The subject of the sculpture, e.g. horse"
+              },
+              "material": {
+                "type": "string",
+                "enum": [
+                  "Bronze",
+                  "Marble",
+                  "Terracotta",
+                  "Wood",
+                  "Stone"
+                ],
+                "description": "Preferred material for the sculpture."
+              },
+              "size": {
+                "type": "integer",
+                "description": "The desired size for the sculpture in inches. This parameter is optional. Default is 10 inches if not specified."
+              }
+            },
+            "required": [
+              "item",
+              "material"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "painting_create_custom",
+          "description": "Order a custom painting with your preferred color. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "subject": {
+                "type": "string",
+                "description": "The subject of the painting, e.g. horse"
+              },
+              "color": {
+                "type": "string",
+                "enum": [
+                  "Red",
+                  "Blue",
+                  "Green",
+                  "Yellow",
+                  "Black"
+                ],
+                "description": "Preferred main color for the painting."
+              },
+              "size": {
+                "type": "integer",
+                "description": "The desired size for the painting in inches. This parameter is optional. Default is 20 inches if not specified."
+              }
+            },
+            "required": [
+              "subject",
+              "color"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240879-FmSUqdRK6MKGoV9zXAeX",
+    "object": "chat.completion",
+    "created": 1776240879,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_11801244",
+              "function": {
+                "name": "sculpture_create_custom",
+                "arguments": "{\"item\":\"horse\",\"material\":\"Marble\",\"size\":20}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_29733011",
+              "function": {
+                "name": "sculpture_create_custom",
+                "arguments": "{\"item\":\"dog\",\"material\":\"Wood\",\"size\":15}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_81299446",
+              "function": {
+                "name": "painting_create_custom",
+                "arguments": "{\"subject\":\"sunset\",\"color\":\"Red\",\"size\":30}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_14889891",
+              "function": {
+                "name": "painting_create_custom",
+                "arguments": "{\"subject\":\"cityscape\",\"color\":\"Blue\",\"size\":25}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 560,
+      "completion_tokens": 161,
+      "total_tokens": 721,
+      "cost": 0.0040473675,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00408825,
+        "upstream_inference_prompt_cost": 0.00167325,
+        "upstream_inference_completions_cost": 0.002415
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240879-FmSUqdRK6MKGoV9zXAeX",
+    "object": "response",
+    "created_at": 1776240883,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_11801244",
+        "call_id": "call_11801244",
+        "name": "sculpture_create_custom",
+        "arguments": "{\"item\":\"horse\",\"material\":\"Marble\",\"size\":20}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_29733011",
+        "call_id": "call_29733011",
+        "name": "sculpture_create_custom",
+        "arguments": "{\"item\":\"dog\",\"material\":\"Wood\",\"size\":15}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_81299446",
+        "call_id": "call_81299446",
+        "name": "painting_create_custom",
+        "arguments": "{\"subject\":\"sunset\",\"color\":\"Red\",\"size\":30}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_14889891",
+        "call_id": "call_14889891",
+        "name": "painting_create_custom",
+        "arguments": "{\"subject\":\"cityscape\",\"color\":\"Blue\",\"size\":25}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 560,
+      "completion_tokens": 161,
+      "total_tokens": 721,
+      "cost": 0.0040473675,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00408825,
+        "upstream_inference_prompt_cost": 0.00167325,
+        "upstream_inference_completions_cost": 0.002415
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240879-FmSUqdRK6MKGoV9zXAeX",
+    "object": "chat.completion",
+    "created": 1776240879,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_11801244",
+              "function": {
+                "name": "sculpture_create_custom",
+                "arguments": "{\"item\":\"horse\",\"material\":\"Marble\",\"size\":20}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_29733011",
+              "function": {
+                "name": "sculpture_create_custom",
+                "arguments": "{\"item\":\"dog\",\"material\":\"Wood\",\"size\":15}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_81299446",
+              "function": {
+                "name": "painting_create_custom",
+                "arguments": "{\"subject\":\"sunset\",\"color\":\"Red\",\"size\":30}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_14889891",
+              "function": {
+                "name": "painting_create_custom",
+                "arguments": "{\"subject\":\"cityscape\",\"color\":\"Blue\",\"size\":25}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 560,
+      "completion_tokens": 161,
+      "total_tokens": 721,
+      "cost": 0.0040473675,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00408825,
+        "upstream_inference_prompt_cost": 0.00167325,
+        "upstream_inference_completions_cost": 0.002415
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 4424.627,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "ea597f93-8866-428d-84c7-422946dec4f7"
+}

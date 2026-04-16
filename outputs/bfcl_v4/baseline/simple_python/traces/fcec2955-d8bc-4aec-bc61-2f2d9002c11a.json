@@ -1,0 +1,240 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Give me the details of Criminal Law Amendment Act of 2013."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "get_act_details",
+        "description": "Retrieve the details of a particular legal act based on its name and year of amendment if any. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "act_name": {
+              "type": "string",
+              "description": "The name of the act."
+            },
+            "amendment_year": {
+              "type": "integer",
+              "description": "Year of amendment if any. If not provided, the latest amendment year will be considered."
+            }
+          },
+          "required": [
+            "act_name",
+            "amendment_year"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Give me the details of Criminal Law Amendment Act of 2013."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_act_details",
+          "description": "Retrieve the details of a particular legal act based on its name and year of amendment if any. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "act_name": {
+                "type": "string",
+                "description": "The name of the act."
+              },
+              "amendment_year": {
+                "type": "integer",
+                "description": "Year of amendment if any. If not provided, the latest amendment year will be considered."
+              }
+            },
+            "required": [
+              "act_name",
+              "amendment_year"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776237972-yRf4ZQAIE0WbxG9WGMQl",
+    "object": "chat.completion",
+    "created": 1776237972,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_30096382",
+              "function": {
+                "name": "get_act_details",
+                "arguments": "{\"act_name\":\"Criminal Law Amendment Act\",\"amendment_year\":2013}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 335,
+      "completion_tokens": 39,
+      "total_tokens": 374,
+      "cost": 0.001106325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0011175,
+        "upstream_inference_prompt_cost": 0.0005325,
+        "upstream_inference_completions_cost": 0.000585
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776237972-yRf4ZQAIE0WbxG9WGMQl",
+    "object": "response",
+    "created_at": 1776237973,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_30096382",
+        "call_id": "call_30096382",
+        "name": "get_act_details",
+        "arguments": "{\"act_name\":\"Criminal Law Amendment Act\",\"amendment_year\":2013}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 335,
+      "completion_tokens": 39,
+      "total_tokens": 374,
+      "cost": 0.001106325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0011175,
+        "upstream_inference_prompt_cost": 0.0005325,
+        "upstream_inference_completions_cost": 0.000585
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776237972-yRf4ZQAIE0WbxG9WGMQl",
+    "object": "chat.completion",
+    "created": 1776237972,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_30096382",
+              "function": {
+                "name": "get_act_details",
+                "arguments": "{\"act_name\":\"Criminal Law Amendment Act\",\"amendment_year\":2013}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 335,
+      "completion_tokens": 39,
+      "total_tokens": 374,
+      "cost": 0.001106325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0011175,
+        "upstream_inference_prompt_cost": 0.0005325,
+        "upstream_inference_completions_cost": 0.000585
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1781.499,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "fcec2955-d8bc-4aec-bc61-2f2d9002c11a"
+}

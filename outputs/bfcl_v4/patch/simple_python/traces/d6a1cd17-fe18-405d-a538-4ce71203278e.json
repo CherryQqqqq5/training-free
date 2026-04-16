@@ -1,0 +1,248 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find me the record of Tom Brady in the 2020 NFL season."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "nfl_data_player_record",
+        "description": "Retrieve the record of an NFL player in a specified season. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "player_name": {
+              "type": "string",
+              "description": "The name of the NFL player."
+            },
+            "season_year": {
+              "type": "integer",
+              "description": "The year of the NFL season."
+            },
+            "team": {
+              "type": "string",
+              "description": "The NFL team that the player played for in that season. Default is all teams if not specified."
+            }
+          },
+          "required": [
+            "player_name",
+            "season_year"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find me the record of Tom Brady in the 2020 NFL season."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "nfl_data_player_record",
+          "description": "Retrieve the record of an NFL player in a specified season. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "player_name": {
+                "type": "string",
+                "description": "The name of the NFL player."
+              },
+              "season_year": {
+                "type": "integer",
+                "description": "The year of the NFL season."
+              },
+              "team": {
+                "type": "string",
+                "description": "The NFL team that the player played for in that season. Default is all teams if not specified."
+              }
+            },
+            "required": [
+              "player_name",
+              "season_year"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239207-CEqEFXWkSYneh0q4TeOE",
+    "object": "chat.completion",
+    "created": 1776239207,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_86953873",
+              "function": {
+                "name": "nfl_data_player_record",
+                "arguments": "{\"player_name\":\"Tom Brady\",\"season_year\":2020}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 348,
+      "completion_tokens": 38,
+      "total_tokens": 386,
+      "cost": 0.0011323125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00114375,
+        "upstream_inference_prompt_cost": 0.00057375,
+        "upstream_inference_completions_cost": 0.00057
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239207-CEqEFXWkSYneh0q4TeOE",
+    "object": "response",
+    "created_at": 1776239208,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_86953873",
+        "call_id": "call_86953873",
+        "name": "nfl_data_player_record",
+        "arguments": "{\"player_name\":\"Tom Brady\",\"season_year\":2020}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 348,
+      "completion_tokens": 38,
+      "total_tokens": 386,
+      "cost": 0.0011323125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00114375,
+        "upstream_inference_prompt_cost": 0.00057375,
+        "upstream_inference_completions_cost": 0.00057
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239207-CEqEFXWkSYneh0q4TeOE",
+    "object": "chat.completion",
+    "created": 1776239207,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_86953873",
+              "function": {
+                "name": "nfl_data_player_record",
+                "arguments": "{\"player_name\":\"Tom Brady\",\"season_year\":2020}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 348,
+      "completion_tokens": 38,
+      "total_tokens": 386,
+      "cost": 0.0011323125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00114375,
+        "upstream_inference_prompt_cost": 0.00057375,
+        "upstream_inference_completions_cost": 0.00057
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1883.041,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "d6a1cd17-fe18-405d-a538-4ce71203278e"
+}

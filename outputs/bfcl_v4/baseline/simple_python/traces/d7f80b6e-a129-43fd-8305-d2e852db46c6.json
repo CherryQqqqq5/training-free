@@ -1,0 +1,240 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "What is the musical scale associated with C sharp major?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "musical_scale",
+        "description": "Get the musical scale of a specific key in music theory. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "The musical key for which the scale will be found."
+            },
+            "scale_type": {
+              "type": "string",
+              "default": "major",
+              "description": "The type of musical scale."
+            }
+          },
+          "required": [
+            "key"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What is the musical scale associated with C sharp major?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "musical_scale",
+          "description": "Get the musical scale of a specific key in music theory. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The musical key for which the scale will be found."
+              },
+              "scale_type": {
+                "type": "string",
+                "default": "major",
+                "description": "The type of musical scale."
+              }
+            },
+            "required": [
+              "key"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776238271-Nocd4KuTKnXcm1M3pWmF",
+    "object": "chat.completion",
+    "created": 1776238271,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_55266711",
+              "function": {
+                "name": "musical_scale",
+                "arguments": "{\"key\":\"C sharp\",\"scale_type\":\"major\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 315,
+      "completion_tokens": 35,
+      "total_tokens": 350,
+      "cost": 0.0009897525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00099975,
+        "upstream_inference_prompt_cost": 0.00047475,
+        "upstream_inference_completions_cost": 0.000525
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776238271-Nocd4KuTKnXcm1M3pWmF",
+    "object": "response",
+    "created_at": 1776238272,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_55266711",
+        "call_id": "call_55266711",
+        "name": "musical_scale",
+        "arguments": "{\"key\":\"C sharp\",\"scale_type\":\"major\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 315,
+      "completion_tokens": 35,
+      "total_tokens": 350,
+      "cost": 0.0009897525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00099975,
+        "upstream_inference_prompt_cost": 0.00047475,
+        "upstream_inference_completions_cost": 0.000525
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776238271-Nocd4KuTKnXcm1M3pWmF",
+    "object": "chat.completion",
+    "created": 1776238271,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_55266711",
+              "function": {
+                "name": "musical_scale",
+                "arguments": "{\"key\":\"C sharp\",\"scale_type\":\"major\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 315,
+      "completion_tokens": 35,
+      "total_tokens": 350,
+      "cost": 0.0009897525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00099975,
+        "upstream_inference_prompt_cost": 0.00047475,
+        "upstream_inference_completions_cost": 0.000525
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1567.025,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "d7f80b6e-a129-43fd-8305-d2e852db46c6"
+}

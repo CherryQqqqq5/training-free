@@ -1,0 +1,248 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the area of a triangle with base 6 and height 10."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "geometry_area_triangle",
+        "description": "Calculate the area of a triangle. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "base": {
+              "type": "integer",
+              "description": "The length of the base of the triangle."
+            },
+            "height": {
+              "type": "integer",
+              "description": "The height of the triangle from the base."
+            },
+            "unit": {
+              "type": "string",
+              "description": "The measurement unit for the area. Defaults to square meters."
+            }
+          },
+          "required": [
+            "base",
+            "height"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the area of a triangle with base 6 and height 10."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "geometry_area_triangle",
+          "description": "Calculate the area of a triangle. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "base": {
+                "type": "integer",
+                "description": "The length of the base of the triangle."
+              },
+              "height": {
+                "type": "integer",
+                "description": "The height of the triangle from the base."
+              },
+              "unit": {
+                "type": "string",
+                "description": "The measurement unit for the area. Defaults to square meters."
+              }
+            },
+            "required": [
+              "base",
+              "height"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776237856-W44q9IUOCF7KCGHGgKmt",
+    "object": "chat.completion",
+    "created": 1776237856,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_88968948",
+              "function": {
+                "name": "geometry_area_triangle",
+                "arguments": "{\"base\":6,\"height\":10,\"unit\":\"square meters\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 333,
+      "completion_tokens": 40,
+      "total_tokens": 373,
+      "cost": 0.00084348,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 332,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.000852,
+        "upstream_inference_prompt_cost": 0.000252,
+        "upstream_inference_completions_cost": 0.0006
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776237856-W44q9IUOCF7KCGHGgKmt",
+    "object": "response",
+    "created_at": 1776237857,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_88968948",
+        "call_id": "call_88968948",
+        "name": "geometry_area_triangle",
+        "arguments": "{\"base\":6,\"height\":10,\"unit\":\"square meters\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 333,
+      "completion_tokens": 40,
+      "total_tokens": 373,
+      "cost": 0.00084348,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 332,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.000852,
+        "upstream_inference_prompt_cost": 0.000252,
+        "upstream_inference_completions_cost": 0.0006
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776237856-W44q9IUOCF7KCGHGgKmt",
+    "object": "chat.completion",
+    "created": 1776237856,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_88968948",
+              "function": {
+                "name": "geometry_area_triangle",
+                "arguments": "{\"base\":6,\"height\":10,\"unit\":\"square meters\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 333,
+      "completion_tokens": 40,
+      "total_tokens": 373,
+      "cost": 0.00084348,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 332,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.000852,
+        "upstream_inference_prompt_cost": 0.000252,
+        "upstream_inference_completions_cost": 0.0006
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1588.819,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "f648ada9-91b5-40c8-a58f-fa336da0d24f"
+}

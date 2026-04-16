@@ -1,0 +1,399 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Can you help me with a couple of conversions? First, I have 5000 Euros that I want to convert into US Dollars using the latest exchange rate. Then, I have another 3000 Euros that I want to convert into British Pounds, but this time, I want to use the last known exchange rate. After that, I have a distance of 100 kilometers that I want to convert into miles. Lastly, I have a weight of 75 kilograms that I want to convert into pounds. Can you do these conversions for me?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "unit_conversion_convert",
+        "description": "Converts a value from one unit to another. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "integer",
+              "description": "The value to be converted."
+            },
+            "from_unit": {
+              "type": "string",
+              "description": "The unit to convert from."
+            },
+            "to_unit": {
+              "type": "string",
+              "description": "The unit to convert to."
+            }
+          },
+          "required": [
+            "value",
+            "from_unit",
+            "to_unit"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "currency_exchange_convert",
+        "description": "Converts a value from one currency to another using the latest exchange rate. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "integer",
+              "description": "The amount of money to be converted."
+            },
+            "from_currency": {
+              "type": "string",
+              "description": "The currency to convert from."
+            },
+            "to_currency": {
+              "type": "string",
+              "description": "The currency to convert to."
+            },
+            "live_conversion": {
+              "type": "boolean",
+              "description": "If true, use the latest exchange rate for conversion, else use the last known rate. Default is true."
+            }
+          },
+          "required": [
+            "amount",
+            "from_currency",
+            "to_currency"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Can you help me with a couple of conversions? First, I have 5000 Euros that I want to convert into US Dollars using the latest exchange rate. Then, I have another 3000 Euros that I want to convert into British Pounds, but this time, I want to use the last known exchange rate. After that, I have a distance of 100 kilometers that I want to convert into miles. Lastly, I have a weight of 75 kilograms that I want to convert into pounds. Can you do these conversions for me?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "unit_conversion_convert",
+          "description": "Converts a value from one unit to another. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "integer",
+                "description": "The value to be converted."
+              },
+              "from_unit": {
+                "type": "string",
+                "description": "The unit to convert from."
+              },
+              "to_unit": {
+                "type": "string",
+                "description": "The unit to convert to."
+              }
+            },
+            "required": [
+              "value",
+              "from_unit",
+              "to_unit"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "currency_exchange_convert",
+          "description": "Converts a value from one currency to another using the latest exchange rate. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "integer",
+                "description": "The amount of money to be converted."
+              },
+              "from_currency": {
+                "type": "string",
+                "description": "The currency to convert from."
+              },
+              "to_currency": {
+                "type": "string",
+                "description": "The currency to convert to."
+              },
+              "live_conversion": {
+                "type": "boolean",
+                "description": "If true, use the latest exchange rate for conversion, else use the last known rate. Default is true."
+              }
+            },
+            "required": [
+              "amount",
+              "from_currency",
+              "to_currency"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240951-LBkjJOvGYVxRDsZ8ebem",
+    "object": "chat.completion",
+    "created": 1776240951,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help with those conversions. Let's handle each one step by step.\n\nFor the currency conversions:\n- 5000 Euros to US Dollars using the latest exchange rate.\n- 3000 Euros to British Pounds using the last known exchange rate.\n\nFor the unit conversions:\n- 100 kilometers to miles.\n- 75 kilograms to pounds.\n\nI'll start with the currency conversions.\n\nNow, I'll proceed with the unit conversions.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_23166087",
+              "function": {
+                "name": "currency_exchange_convert",
+                "arguments": "{\"amount\":5000,\"from_currency\":\"EUR\",\"to_currency\":\"USD\",\"live_conversion\":true}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_15736072",
+              "function": {
+                "name": "currency_exchange_convert",
+                "arguments": "{\"amount\":3000,\"from_currency\":\"EUR\",\"to_currency\":\"GBP\",\"live_conversion\":false}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_92563121",
+              "function": {
+                "name": "unit_conversion_convert",
+                "arguments": "{\"value\":100,\"from_unit\":\"kilometers\",\"to_unit\":\"miles\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_83949322",
+              "function": {
+                "name": "unit_conversion_convert",
+                "arguments": "{\"value\":75,\"from_unit\":\"kilograms\",\"to_unit\":\"pounds\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 565,
+      "completion_tokens": 264,
+      "total_tokens": 829,
+      "cost": 0.0051329025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00518475,
+        "upstream_inference_prompt_cost": 0.00122475,
+        "upstream_inference_completions_cost": 0.00396
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240951-LBkjJOvGYVxRDsZ8ebem",
+    "object": "response",
+    "created_at": 1776240955,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'm happy to help with those conversions. Let's handle each one step by step.\n\nFor the currency conversions:\n- 5000 Euros to US Dollars using the latest exchange rate.\n- 3000 Euros to British Pounds using the last known exchange rate.\n\nFor the unit conversions:\n- 100 kilometers to miles.\n- 75 kilograms to pounds.\n\nI'll start with the currency conversions.\n\nNow, I'll proceed with the unit conversions.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_23166087",
+        "call_id": "call_23166087",
+        "name": "currency_exchange_convert",
+        "arguments": "{\"amount\":5000,\"from_currency\":\"EUR\",\"to_currency\":\"USD\",\"live_conversion\":true}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_15736072",
+        "call_id": "call_15736072",
+        "name": "currency_exchange_convert",
+        "arguments": "{\"amount\":3000,\"from_currency\":\"EUR\",\"to_currency\":\"GBP\",\"live_conversion\":false}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_92563121",
+        "call_id": "call_92563121",
+        "name": "unit_conversion_convert",
+        "arguments": "{\"value\":100,\"from_unit\":\"kilometers\",\"to_unit\":\"miles\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_83949322",
+        "call_id": "call_83949322",
+        "name": "unit_conversion_convert",
+        "arguments": "{\"value\":75,\"from_unit\":\"kilograms\",\"to_unit\":\"pounds\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 565,
+      "completion_tokens": 264,
+      "total_tokens": 829,
+      "cost": 0.0051329025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00518475,
+        "upstream_inference_prompt_cost": 0.00122475,
+        "upstream_inference_completions_cost": 0.00396
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240951-LBkjJOvGYVxRDsZ8ebem",
+    "object": "chat.completion",
+    "created": 1776240951,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help with those conversions. Let's handle each one step by step.\n\nFor the currency conversions:\n- 5000 Euros to US Dollars using the latest exchange rate.\n- 3000 Euros to British Pounds using the last known exchange rate.\n\nFor the unit conversions:\n- 100 kilometers to miles.\n- 75 kilograms to pounds.\n\nI'll start with the currency conversions.\n\nNow, I'll proceed with the unit conversions.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_23166087",
+              "function": {
+                "name": "currency_exchange_convert",
+                "arguments": "{\"amount\":5000,\"from_currency\":\"EUR\",\"to_currency\":\"USD\",\"live_conversion\":true}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_15736072",
+              "function": {
+                "name": "currency_exchange_convert",
+                "arguments": "{\"amount\":3000,\"from_currency\":\"EUR\",\"to_currency\":\"GBP\",\"live_conversion\":false}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_92563121",
+              "function": {
+                "name": "unit_conversion_convert",
+                "arguments": "{\"value\":100,\"from_unit\":\"kilometers\",\"to_unit\":\"miles\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_83949322",
+              "function": {
+                "name": "unit_conversion_convert",
+                "arguments": "{\"value\":75,\"from_unit\":\"kilograms\",\"to_unit\":\"pounds\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 565,
+      "completion_tokens": 264,
+      "total_tokens": 829,
+      "cost": 0.0051329025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00518475,
+        "upstream_inference_prompt_cost": 0.00122475,
+        "upstream_inference_completions_cost": 0.00396
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 4690.184,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "f123261b-6f80-4a91-9bb5-4265d2591b55"
+}

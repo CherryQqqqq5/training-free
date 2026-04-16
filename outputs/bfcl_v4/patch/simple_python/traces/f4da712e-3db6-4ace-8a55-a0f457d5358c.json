@@ -1,0 +1,276 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Provide key war events in German history from 1871 to 1945."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "history_get_key_events",
+        "description": "Retrieve key historical events within a specific period for a certain country. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "country": {
+              "type": "string",
+              "description": "The name of the country for which history is queried."
+            },
+            "start_year": {
+              "type": "integer",
+              "description": "Start year of the period for which history is queried."
+            },
+            "end_year": {
+              "type": "integer",
+              "description": "End year of the period for which history is queried."
+            },
+            "event_type": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "War",
+                  "Revolutions",
+                  "Diplomacy",
+                  "Economy"
+                ]
+              },
+              "description": "Types of event. Default to 'all', which all types will be considered."
+            }
+          },
+          "required": [
+            "country",
+            "start_year",
+            "end_year"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Provide key war events in German history from 1871 to 1945."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "history_get_key_events",
+          "description": "Retrieve key historical events within a specific period for a certain country. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "country": {
+                "type": "string",
+                "description": "The name of the country for which history is queried."
+              },
+              "start_year": {
+                "type": "integer",
+                "description": "Start year of the period for which history is queried."
+              },
+              "end_year": {
+                "type": "integer",
+                "description": "End year of the period for which history is queried."
+              },
+              "event_type": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "War",
+                    "Revolutions",
+                    "Diplomacy",
+                    "Economy"
+                  ]
+                },
+                "description": "Types of event. Default to 'all', which all types will be considered."
+              }
+            },
+            "required": [
+              "country",
+              "start_year",
+              "end_year"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239040-PFusyLyJzjHp1vyFXUuS",
+    "object": "chat.completion",
+    "created": 1776239040,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_04657902",
+              "function": {
+                "name": "history_get_key_events",
+                "arguments": "{\"country\":\"Germany\",\"start_year\":1871,\"end_year\":1945,\"event_type\":[\"War\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 396,
+      "completion_tokens": 51,
+      "total_tokens": 447,
+      "cost": 0.0014679225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00148275,
+        "upstream_inference_prompt_cost": 0.00071775,
+        "upstream_inference_completions_cost": 0.000765
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239040-PFusyLyJzjHp1vyFXUuS",
+    "object": "response",
+    "created_at": 1776239041,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_04657902",
+        "call_id": "call_04657902",
+        "name": "history_get_key_events",
+        "arguments": "{\"country\":\"Germany\",\"start_year\":1871,\"end_year\":1945,\"event_type\":[\"War\"]}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 396,
+      "completion_tokens": 51,
+      "total_tokens": 447,
+      "cost": 0.0014679225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00148275,
+        "upstream_inference_prompt_cost": 0.00071775,
+        "upstream_inference_completions_cost": 0.000765
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239040-PFusyLyJzjHp1vyFXUuS",
+    "object": "chat.completion",
+    "created": 1776239040,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_04657902",
+              "function": {
+                "name": "history_get_key_events",
+                "arguments": "{\"country\":\"Germany\",\"start_year\":1871,\"end_year\":1945,\"event_type\":[\"War\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 396,
+      "completion_tokens": 51,
+      "total_tokens": 447,
+      "cost": 0.0014679225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00148275,
+        "upstream_inference_prompt_cost": 0.00071775,
+        "upstream_inference_completions_cost": 0.000765
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1874.632,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "f4da712e-3db6-4ace-8a55-a0f457d5358c"
+}

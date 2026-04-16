@@ -1,0 +1,372 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find a Chinese restaurant near me in New York and suggest a high-rated of 4 Italian restaurant in Los Angeles. Then find a cheapest flight for round-trip from New York to Los Angeles"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "restaurant_search",
+        "description": "Find a restaurant in a specified location based on the cuisine and ratings. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city and state, e.g. New York, NY"
+            },
+            "cuisine": {
+              "type": "string",
+              "description": "The type of cuisine."
+            },
+            "rating": {
+              "type": "number",
+              "description": "The minimum rating. Default 1.0 This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "location",
+            "cuisine"
+          ],
+          "optional": [
+            "rating"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "flight_search",
+        "description": "Find flights between two cities. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "_from": {
+              "type": "string",
+              "description": "The departure city."
+            },
+            "to": {
+              "type": "string",
+              "description": "The destination city."
+            },
+            "type": {
+              "type": "string",
+              "description": "The type of flight e.g., one-way, round-trip"
+            }
+          },
+          "required": [
+            "_from",
+            "to",
+            "type"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find a Chinese restaurant near me in New York and suggest a high-rated of 4 Italian restaurant in Los Angeles. Then find a cheapest flight for round-trip from New York to Los Angeles"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "restaurant_search",
+          "description": "Find a restaurant in a specified location based on the cuisine and ratings. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city and state, e.g. New York, NY"
+              },
+              "cuisine": {
+                "type": "string",
+                "description": "The type of cuisine."
+              },
+              "rating": {
+                "type": "number",
+                "description": "The minimum rating. Default 1.0 This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "location",
+              "cuisine"
+            ],
+            "optional": [
+              "rating"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "flight_search",
+          "description": "Find flights between two cities. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "_from": {
+                "type": "string",
+                "description": "The departure city."
+              },
+              "to": {
+                "type": "string",
+                "description": "The destination city."
+              },
+              "type": {
+                "type": "string",
+                "description": "The type of flight e.g., one-way, round-trip"
+              }
+            },
+            "required": [
+              "_from",
+              "to",
+              "type"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241376-y2nBqE8w4GoNBVF4IIGY",
+    "object": "chat.completion",
+    "created": 1776241376,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'll help you with your requests. Let's handle them one by one.\n\nFor the Chinese restaurant in New York, I’ll need to make a function call to search for restaurants in that area. I’ll also search for a high-rated Italian restaurant in Los Angeles with a minimum rating of 4.0. Additionally, I can assist with finding a round-trip flight from New York to Los Angeles.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_81665520",
+              "function": {
+                "name": "restaurant_search",
+                "arguments": "{\"location\":\"New York, NY\",\"cuisine\":\"Chinese\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_62805530",
+              "function": {
+                "name": "restaurant_search",
+                "arguments": "{\"location\":\"Los Angeles, CA\",\"cuisine\":\"Italian\",\"rating\":4.0}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_38554621",
+              "function": {
+                "name": "flight_search",
+                "arguments": "{\"_from\":\"New York\",\"to\":\"Los Angeles\",\"type\":\"round-trip\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 468,
+      "completion_tokens": 200,
+      "total_tokens": 668,
+      "cost": 0.0038944125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00393375,
+        "upstream_inference_prompt_cost": 0.00093375,
+        "upstream_inference_completions_cost": 0.003
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241376-y2nBqE8w4GoNBVF4IIGY",
+    "object": "response",
+    "created_at": 1776241378,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'll help you with your requests. Let's handle them one by one.\n\nFor the Chinese restaurant in New York, I’ll need to make a function call to search for restaurants in that area. I’ll also search for a high-rated Italian restaurant in Los Angeles with a minimum rating of 4.0. Additionally, I can assist with finding a round-trip flight from New York to Los Angeles.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_81665520",
+        "call_id": "call_81665520",
+        "name": "restaurant_search",
+        "arguments": "{\"location\":\"New York, NY\",\"cuisine\":\"Chinese\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_62805530",
+        "call_id": "call_62805530",
+        "name": "restaurant_search",
+        "arguments": "{\"location\":\"Los Angeles, CA\",\"cuisine\":\"Italian\",\"rating\":4.0}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_38554621",
+        "call_id": "call_38554621",
+        "name": "flight_search",
+        "arguments": "{\"_from\":\"New York\",\"to\":\"Los Angeles\",\"type\":\"round-trip\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 468,
+      "completion_tokens": 200,
+      "total_tokens": 668,
+      "cost": 0.0038944125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00393375,
+        "upstream_inference_prompt_cost": 0.00093375,
+        "upstream_inference_completions_cost": 0.003
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241376-y2nBqE8w4GoNBVF4IIGY",
+    "object": "chat.completion",
+    "created": 1776241376,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'll help you with your requests. Let's handle them one by one.\n\nFor the Chinese restaurant in New York, I’ll need to make a function call to search for restaurants in that area. I’ll also search for a high-rated Italian restaurant in Los Angeles with a minimum rating of 4.0. Additionally, I can assist with finding a round-trip flight from New York to Los Angeles.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_81665520",
+              "function": {
+                "name": "restaurant_search",
+                "arguments": "{\"location\":\"New York, NY\",\"cuisine\":\"Chinese\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_62805530",
+              "function": {
+                "name": "restaurant_search",
+                "arguments": "{\"location\":\"Los Angeles, CA\",\"cuisine\":\"Italian\",\"rating\":4.0}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_38554621",
+              "function": {
+                "name": "flight_search",
+                "arguments": "{\"_from\":\"New York\",\"to\":\"Los Angeles\",\"type\":\"round-trip\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 468,
+      "completion_tokens": 200,
+      "total_tokens": 668,
+      "cost": 0.0038944125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00393375,
+        "upstream_inference_prompt_cost": 0.00093375,
+        "upstream_inference_completions_cost": 0.003
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 3079.692,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "48650f3d-d440-4a21-8969-5f0a177317f5"
+}

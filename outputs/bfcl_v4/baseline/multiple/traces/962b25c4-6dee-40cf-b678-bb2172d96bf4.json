@@ -1,0 +1,352 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the total quantity of paint needed to cover a wall of 30 feet by 12 feet using a specific brand that covers 400 square feet per gallon."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "prob_dist_binomial",
+        "description": "Compute the probability of having 'success' outcome from binomial distribution. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "trials": {
+              "type": "integer",
+              "description": "The number of independent experiments."
+            },
+            "successes": {
+              "type": "integer",
+              "description": "The number of success events."
+            },
+            "p": {
+              "type": "number",
+              "description": "The probability of success on any given trial, defaults to 0.5 This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "trials",
+            "successes"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "musical_scale",
+        "description": "Get the musical scale of a specific key in music theory. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "The musical key for which the scale will be found."
+            },
+            "scale_type": {
+              "type": "string",
+              "default": "major",
+              "description": "The type of musical scale."
+            }
+          },
+          "required": [
+            "key"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "calculate_paint_needed",
+        "description": "Calculate the amount of paint needed to cover a surface area based on the coverage rate of a specific paint brand. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "coverage_rate": {
+              "type": "integer",
+              "description": "The area in square feet that one gallon of paint can cover."
+            },
+            "length": {
+              "type": "integer",
+              "description": "Length of the wall to be painted in feet."
+            },
+            "height": {
+              "type": "integer",
+              "description": "Height of the wall to be painted in feet."
+            }
+          },
+          "required": [
+            "coverage_rate",
+            "length",
+            "height"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the total quantity of paint needed to cover a wall of 30 feet by 12 feet using a specific brand that covers 400 square feet per gallon."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "prob_dist_binomial",
+          "description": "Compute the probability of having 'success' outcome from binomial distribution. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "trials": {
+                "type": "integer",
+                "description": "The number of independent experiments."
+              },
+              "successes": {
+                "type": "integer",
+                "description": "The number of success events."
+              },
+              "p": {
+                "type": "number",
+                "description": "The probability of success on any given trial, defaults to 0.5 This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "trials",
+              "successes"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "musical_scale",
+          "description": "Get the musical scale of a specific key in music theory. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The musical key for which the scale will be found."
+              },
+              "scale_type": {
+                "type": "string",
+                "default": "major",
+                "description": "The type of musical scale."
+              }
+            },
+            "required": [
+              "key"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_paint_needed",
+          "description": "Calculate the amount of paint needed to cover a surface area based on the coverage rate of a specific paint brand. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "coverage_rate": {
+                "type": "integer",
+                "description": "The area in square feet that one gallon of paint can cover."
+              },
+              "length": {
+                "type": "integer",
+                "description": "Length of the wall to be painted in feet."
+              },
+              "height": {
+                "type": "integer",
+                "description": "Height of the wall to be painted in feet."
+              }
+            },
+            "required": [
+              "coverage_rate",
+              "length",
+              "height"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239815-O7AYRDOtGQzptg1WXSNR",
+    "object": "chat.completion",
+    "created": 1776239815,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_11522900",
+              "function": {
+                "name": "calculate_paint_needed",
+                "arguments": "{\"coverage_rate\":400,\"length\":30,\"height\":12}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 583,
+      "completion_tokens": 40,
+      "total_tokens": 623,
+      "cost": 0.0018599625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00187875,
+        "upstream_inference_prompt_cost": 0.00127875,
+        "upstream_inference_completions_cost": 0.0006
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239815-O7AYRDOtGQzptg1WXSNR",
+    "object": "response",
+    "created_at": 1776239816,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_11522900",
+        "call_id": "call_11522900",
+        "name": "calculate_paint_needed",
+        "arguments": "{\"coverage_rate\":400,\"length\":30,\"height\":12}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 583,
+      "completion_tokens": 40,
+      "total_tokens": 623,
+      "cost": 0.0018599625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00187875,
+        "upstream_inference_prompt_cost": 0.00127875,
+        "upstream_inference_completions_cost": 0.0006
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239815-O7AYRDOtGQzptg1WXSNR",
+    "object": "chat.completion",
+    "created": 1776239815,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_11522900",
+              "function": {
+                "name": "calculate_paint_needed",
+                "arguments": "{\"coverage_rate\":400,\"length\":30,\"height\":12}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 583,
+      "completion_tokens": 40,
+      "total_tokens": 623,
+      "cost": 0.0018599625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00187875,
+        "upstream_inference_prompt_cost": 0.00127875,
+        "upstream_inference_completions_cost": 0.0006
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2092.899,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "962b25c4-6dee-40cf-b678-bb2172d96bf4"
+}

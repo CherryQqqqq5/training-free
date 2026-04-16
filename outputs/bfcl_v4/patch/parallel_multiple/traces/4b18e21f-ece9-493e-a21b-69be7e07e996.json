@@ -1,0 +1,420 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Can you provide me with the current statistics for the basketball player LeBron James, specifically his points, assists, rebounds, and minutes played? Then, can you also provide the current statistics for the Los Angeles Lakers, including their total points, total assists, total rebounds, and win rate? After that, could you give me the detailed statistical data from the game between the Los Angeles Lakers and the Golden State Warriors that occurred on January 18, 2021, including total points, total assists, total rebounds, and turnovers?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "basketball_player_stats_get",
+        "description": "Get current statistics for a specified basketball player Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "player_name": {
+              "type": "string",
+              "description": "The name of the player."
+            },
+            "stats_fields": {
+              "type": "array",
+              "description": "List of statistical categories to be fetched, including points, assists, rebounds, minutes.",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "player_name",
+            "stats_fields"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "basketball_team_stats_get",
+        "description": "Get current statistics for a specific basketball team Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "team_name": {
+              "type": "string",
+              "description": "The name of the team."
+            },
+            "stats_fields": {
+              "type": "array",
+              "description": "List of statistical categories to be fetched, including total points, total assists, total rebounds, win rate.",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "team_name",
+            "stats_fields"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "basketball_game_stats_get",
+        "description": "Get the detailed statistical data from a specific basketball game Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "team1": {
+              "type": "string",
+              "description": "One of the competing teams in the game."
+            },
+            "team2": {
+              "type": "string",
+              "description": "One of the competing teams in the game."
+            },
+            "date": {
+              "type": "string",
+              "description": "The date when the game occurred."
+            },
+            "stats_fields": {
+              "type": "array",
+              "description": "List of statistical categories to be fetched, including total points, total assists, total rebounds, turnovers.",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "team1",
+            "team2",
+            "date",
+            "stats_fields"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Can you provide me with the current statistics for the basketball player LeBron James, specifically his points, assists, rebounds, and minutes played? Then, can you also provide the current statistics for the Los Angeles Lakers, including their total points, total assists, total rebounds, and win rate? After that, could you give me the detailed statistical data from the game between the Los Angeles Lakers and the Golden State Warriors that occurred on January 18, 2021, including total points, total assists, total rebounds, and turnovers?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "basketball_player_stats_get",
+          "description": "Get current statistics for a specified basketball player Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "player_name": {
+                "type": "string",
+                "description": "The name of the player."
+              },
+              "stats_fields": {
+                "type": "array",
+                "description": "List of statistical categories to be fetched, including points, assists, rebounds, minutes.",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "player_name",
+              "stats_fields"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "basketball_team_stats_get",
+          "description": "Get current statistics for a specific basketball team Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "team_name": {
+                "type": "string",
+                "description": "The name of the team."
+              },
+              "stats_fields": {
+                "type": "array",
+                "description": "List of statistical categories to be fetched, including total points, total assists, total rebounds, win rate.",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "team_name",
+              "stats_fields"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "basketball_game_stats_get",
+          "description": "Get the detailed statistical data from a specific basketball game Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "team1": {
+                "type": "string",
+                "description": "One of the competing teams in the game."
+              },
+              "team2": {
+                "type": "string",
+                "description": "One of the competing teams in the game."
+              },
+              "date": {
+                "type": "string",
+                "description": "The date when the game occurred."
+              },
+              "stats_fields": {
+                "type": "array",
+                "description": "List of statistical categories to be fetched, including total points, total assists, total rebounds, turnovers.",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "team1",
+              "team2",
+              "date",
+              "stats_fields"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241556-4GFULaDfFghE2dDsQpzP",
+    "object": "chat.completion",
+    "created": 1776241556,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_50210660",
+              "function": {
+                "name": "basketball_player_stats_get",
+                "arguments": "{\"player_name\":\"LeBron James\",\"stats_fields\":[\"points\",\"assists\",\"rebounds\",\"minutes\"]}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_40611098",
+              "function": {
+                "name": "basketball_team_stats_get",
+                "arguments": "{\"team_name\":\"Los Angeles Lakers\",\"stats_fields\":[\"total points\",\"total assists\",\"total rebounds\",\"win rate\"]}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_43416458",
+              "function": {
+                "name": "basketball_game_stats_get",
+                "arguments": "{\"team1\":\"Los Angeles Lakers\",\"team2\":\"Golden State Warriors\",\"date\":\"January 18, 2021\",\"stats_fields\":[\"total points\",\"total assists\",\"total rebounds\",\"turnovers\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 678,
+      "completion_tokens": 175,
+      "total_tokens": 853,
+      "cost": 0.0041468625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00418875,
+        "upstream_inference_prompt_cost": 0.00156375,
+        "upstream_inference_completions_cost": 0.002625
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241556-4GFULaDfFghE2dDsQpzP",
+    "object": "response",
+    "created_at": 1776241558,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_50210660",
+        "call_id": "call_50210660",
+        "name": "basketball_player_stats_get",
+        "arguments": "{\"player_name\":\"LeBron James\",\"stats_fields\":[\"points\",\"assists\",\"rebounds\",\"minutes\"]}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_40611098",
+        "call_id": "call_40611098",
+        "name": "basketball_team_stats_get",
+        "arguments": "{\"team_name\":\"Los Angeles Lakers\",\"stats_fields\":[\"total points\",\"total assists\",\"total rebounds\",\"win rate\"]}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_43416458",
+        "call_id": "call_43416458",
+        "name": "basketball_game_stats_get",
+        "arguments": "{\"team1\":\"Los Angeles Lakers\",\"team2\":\"Golden State Warriors\",\"date\":\"January 18, 2021\",\"stats_fields\":[\"total points\",\"total assists\",\"total rebounds\",\"turnovers\"]}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 678,
+      "completion_tokens": 175,
+      "total_tokens": 853,
+      "cost": 0.0041468625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00418875,
+        "upstream_inference_prompt_cost": 0.00156375,
+        "upstream_inference_completions_cost": 0.002625
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241556-4GFULaDfFghE2dDsQpzP",
+    "object": "chat.completion",
+    "created": 1776241556,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_50210660",
+              "function": {
+                "name": "basketball_player_stats_get",
+                "arguments": "{\"player_name\":\"LeBron James\",\"stats_fields\":[\"points\",\"assists\",\"rebounds\",\"minutes\"]}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_40611098",
+              "function": {
+                "name": "basketball_team_stats_get",
+                "arguments": "{\"team_name\":\"Los Angeles Lakers\",\"stats_fields\":[\"total points\",\"total assists\",\"total rebounds\",\"win rate\"]}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_43416458",
+              "function": {
+                "name": "basketball_game_stats_get",
+                "arguments": "{\"team1\":\"Los Angeles Lakers\",\"team2\":\"Golden State Warriors\",\"date\":\"January 18, 2021\",\"stats_fields\":[\"total points\",\"total assists\",\"total rebounds\",\"turnovers\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 678,
+      "completion_tokens": 175,
+      "total_tokens": 853,
+      "cost": 0.0041468625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00418875,
+        "upstream_inference_prompt_cost": 0.00156375,
+        "upstream_inference_completions_cost": 0.002625
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 3000.983,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "4b18e21f-ece9-493e-a21b-69be7e07e996"
+}

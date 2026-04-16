@@ -1,0 +1,250 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Get weather information for New York, USA for the next 3 days with details."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "weather_forecast_detailed",
+        "description": "Retrieve a detailed weather forecast for a specific city like Boston and time frame. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city that you want to get the weather for."
+            },
+            "days": {
+              "type": "integer",
+              "description": "Number of days for the forecast."
+            },
+            "details": {
+              "type": "boolean",
+              "description": "Provide detailed weather information or not.",
+              "default": false
+            }
+          },
+          "required": [
+            "location",
+            "days"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Get weather information for New York, USA for the next 3 days with details."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "weather_forecast_detailed",
+          "description": "Retrieve a detailed weather forecast for a specific city like Boston and time frame. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city that you want to get the weather for."
+              },
+              "days": {
+                "type": "integer",
+                "description": "Number of days for the forecast."
+              },
+              "details": {
+                "type": "boolean",
+                "description": "Provide detailed weather information or not.",
+                "default": false
+              }
+            },
+            "required": [
+              "location",
+              "days"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776238953-VnSQnXcQhTsZLFkxJBKB",
+    "object": "chat.completion",
+    "created": 1776238953,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_21653594",
+              "function": {
+                "name": "weather_forecast_detailed",
+                "arguments": "{\"location\":\"New York, USA\",\"days\":3,\"details\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 342,
+      "completion_tokens": 41,
+      "total_tokens": 383,
+      "cost": 0.0011590425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00117075,
+        "upstream_inference_prompt_cost": 0.00055575,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776238953-VnSQnXcQhTsZLFkxJBKB",
+    "object": "response",
+    "created_at": 1776238954,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_21653594",
+        "call_id": "call_21653594",
+        "name": "weather_forecast_detailed",
+        "arguments": "{\"location\":\"New York, USA\",\"days\":3,\"details\":true}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 342,
+      "completion_tokens": 41,
+      "total_tokens": 383,
+      "cost": 0.0011590425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00117075,
+        "upstream_inference_prompt_cost": 0.00055575,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776238953-VnSQnXcQhTsZLFkxJBKB",
+    "object": "chat.completion",
+    "created": 1776238953,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_21653594",
+              "function": {
+                "name": "weather_forecast_detailed",
+                "arguments": "{\"location\":\"New York, USA\",\"days\":3,\"details\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 342,
+      "completion_tokens": 41,
+      "total_tokens": 383,
+      "cost": 0.0011590425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00117075,
+        "upstream_inference_prompt_cost": 0.00055575,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1751.865,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "45727750-b2b5-4ffb-b6d5-8632e376e8de"
+}

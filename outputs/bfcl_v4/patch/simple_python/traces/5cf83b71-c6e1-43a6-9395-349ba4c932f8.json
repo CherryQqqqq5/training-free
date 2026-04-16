@@ -1,0 +1,252 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find the most followed person on twitter who tweets about psychology related to behaviour and group dynamics."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "social_media_analytics_most_followed",
+        "description": "Find the most followed Twitter user related to certain topics. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "topic": {
+              "type": "string",
+              "description": "The main topic of interest."
+            },
+            "sub_topics": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Sub-topics related to main topic. Default is empty."
+            },
+            "region": {
+              "type": "string",
+              "description": "Region of interest for twitter search. Default is 'all'."
+            }
+          },
+          "required": [
+            "topic"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find the most followed person on twitter who tweets about psychology related to behaviour and group dynamics."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "social_media_analytics_most_followed",
+          "description": "Find the most followed Twitter user related to certain topics. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "topic": {
+                "type": "string",
+                "description": "The main topic of interest."
+              },
+              "sub_topics": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Sub-topics related to main topic. Default is empty."
+              },
+              "region": {
+                "type": "string",
+                "description": "Region of interest for twitter search. Default is 'all'."
+              }
+            },
+            "required": [
+              "topic"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239026-se9NIvM7iWjBRRGdezSR",
+    "object": "chat.completion",
+    "created": 1776239026,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_43318445",
+              "function": {
+                "name": "social_media_analytics_most_followed",
+                "arguments": "{\"topic\":\"psychology\",\"sub_topics\":[\"behaviour\",\"group dynamics\"],\"region\":\"all\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 350,
+      "completion_tokens": 49,
+      "total_tokens": 399,
+      "cost": 0.0013016025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00131475,
+        "upstream_inference_prompt_cost": 0.00057975,
+        "upstream_inference_completions_cost": 0.000735
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239026-se9NIvM7iWjBRRGdezSR",
+    "object": "response",
+    "created_at": 1776239027,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_43318445",
+        "call_id": "call_43318445",
+        "name": "social_media_analytics_most_followed",
+        "arguments": "{\"topic\":\"psychology\",\"sub_topics\":[\"behaviour\",\"group dynamics\"],\"region\":\"all\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 350,
+      "completion_tokens": 49,
+      "total_tokens": 399,
+      "cost": 0.0013016025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00131475,
+        "upstream_inference_prompt_cost": 0.00057975,
+        "upstream_inference_completions_cost": 0.000735
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239026-se9NIvM7iWjBRRGdezSR",
+    "object": "chat.completion",
+    "created": 1776239026,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_43318445",
+              "function": {
+                "name": "social_media_analytics_most_followed",
+                "arguments": "{\"topic\":\"psychology\",\"sub_topics\":[\"behaviour\",\"group dynamics\"],\"region\":\"all\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 350,
+      "completion_tokens": 49,
+      "total_tokens": 399,
+      "cost": 0.0013016025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00131475,
+        "upstream_inference_prompt_cost": 0.00057975,
+        "upstream_inference_completions_cost": 0.000735
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2010.215,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "5cf83b71-c6e1-43a6-9395-349ba4c932f8"
+}

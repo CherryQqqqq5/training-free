@@ -1,0 +1,414 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Imagine you are a scientist studying the energy production of a certain type of bacteria. You have a sample of this bacteria that has consumed 5 moles of glucose (C6H12O6) and you know that the energy produced from glucose is typically 2800 kJ/mol. You also know that the bacteria's conversion efficiency, or the percentage of energy from glucose that is converted into biomass, is 10%. \n\nFirst, calculate the total energy produced by the bacteria from consuming the glucose. \n\nSecond, calculate the amount of biomass produced by the bacteria given the energy produced and the conversion efficiency. \n\nNow, imagine you are using this bacteria in a bioreactor to power a small machine. The machine needs to move a distance of 2 meters and you want to calculate the work done by the machine. \n\nThird, calculate the work done by the machine given the total energy produced by the bacteria and the distance the machine needs to move.\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "biological_calc_biomass",
+        "description": "Calculate the biomass from the energy given the energy conversion efficiency. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "energy": {
+              "type": "number",
+              "description": "The total energy produced. This is a float type value.",
+              "format": "float"
+            },
+            "efficiency": {
+              "type": "number",
+              "description": "The conversion efficiency, default value is 10%. This is a float type value.",
+              "default": 0.1,
+              "format": "float"
+            }
+          },
+          "required": [
+            "energy"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "biological_calc_energy",
+        "description": "Calculate energy from amount of substance based on its molecular composition. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "mols": {
+              "type": "number",
+              "description": "Amount of substance in moles. This is a float type value.",
+              "format": "float"
+            },
+            "substance": {
+              "type": "string",
+              "description": "The chemical formula of the substance."
+            },
+            "joules_per_mol": {
+              "type": "number",
+              "description": "The energy produced or required for the reaction, default value for glucose is 2800 kJ/mol This is a float type value.",
+              "default": 2800.0,
+              "format": "float"
+            }
+          },
+          "required": [
+            "mols",
+            "substance"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "physical_calc_work",
+        "description": "Calculate the work from energy. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "energy": {
+              "type": "number",
+              "description": "The total energy produced. This is a float type value.",
+              "format": "float"
+            },
+            "distance": {
+              "type": "number",
+              "description": "The distance over which the work is done. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "energy",
+            "distance"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Imagine you are a scientist studying the energy production of a certain type of bacteria. You have a sample of this bacteria that has consumed 5 moles of glucose (C6H12O6) and you know that the energy produced from glucose is typically 2800 kJ/mol. You also know that the bacteria's conversion efficiency, or the percentage of energy from glucose that is converted into biomass, is 10%. \n\nFirst, calculate the total energy produced by the bacteria from consuming the glucose. \n\nSecond, calculate the amount of biomass produced by the bacteria given the energy produced and the conversion efficiency. \n\nNow, imagine you are using this bacteria in a bioreactor to power a small machine. The machine needs to move a distance of 2 meters and you want to calculate the work done by the machine. \n\nThird, calculate the work done by the machine given the total energy produced by the bacteria and the distance the machine needs to move.\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "biological_calc_biomass",
+          "description": "Calculate the biomass from the energy given the energy conversion efficiency. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "energy": {
+                "type": "number",
+                "description": "The total energy produced. This is a float type value.",
+                "format": "float"
+              },
+              "efficiency": {
+                "type": "number",
+                "description": "The conversion efficiency, default value is 10%. This is a float type value.",
+                "default": 0.1,
+                "format": "float"
+              }
+            },
+            "required": [
+              "energy"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "biological_calc_energy",
+          "description": "Calculate energy from amount of substance based on its molecular composition. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "mols": {
+                "type": "number",
+                "description": "Amount of substance in moles. This is a float type value.",
+                "format": "float"
+              },
+              "substance": {
+                "type": "string",
+                "description": "The chemical formula of the substance."
+              },
+              "joules_per_mol": {
+                "type": "number",
+                "description": "The energy produced or required for the reaction, default value for glucose is 2800 kJ/mol This is a float type value.",
+                "default": 2800.0,
+                "format": "float"
+              }
+            },
+            "required": [
+              "mols",
+              "substance"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "physical_calc_work",
+          "description": "Calculate the work from energy. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "energy": {
+                "type": "number",
+                "description": "The total energy produced. This is a float type value.",
+                "format": "float"
+              },
+              "distance": {
+                "type": "number",
+                "description": "The distance over which the work is done. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "energy",
+              "distance"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241617-jaAVc7oYAxn7Tsp6EfbG",
+    "object": "chat.completion",
+    "created": 1776241617,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "Let me help you with these calculations step by step.\n\nFirst, I'll calculate the total energy produced by the bacteria from consuming 5 moles of glucose.\n\nSecond, I'll calculate the biomass produced given the energy and conversion efficiency of 10%.\n\nThird, I'll calculate the work done by the machine given the total energy produced and the distance of 2 meters.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_69976270",
+              "function": {
+                "name": "biological_calc_energy",
+                "arguments": "{\"mols\":5.0,\"substance\":\"C6H12O6\",\"joules_per_mol\":2800.0}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_20473454",
+              "function": {
+                "name": "biological_calc_biomass",
+                "arguments": "{\"energy\":14000.0,\"efficiency\":0.1}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_49761563",
+              "function": {
+                "name": "physical_calc_work",
+                "arguments": "{\"energy\":14000.0,\"distance\":2.0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 759,
+      "completion_tokens": 201,
+      "total_tokens": 960,
+      "cost": 0.0052323975,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00528525,
+        "upstream_inference_prompt_cost": 0.00227025,
+        "upstream_inference_completions_cost": 0.003015
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241617-jaAVc7oYAxn7Tsp6EfbG",
+    "object": "response",
+    "created_at": 1776241620,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "Let me help you with these calculations step by step.\n\nFirst, I'll calculate the total energy produced by the bacteria from consuming 5 moles of glucose.\n\nSecond, I'll calculate the biomass produced given the energy and conversion efficiency of 10%.\n\nThird, I'll calculate the work done by the machine given the total energy produced and the distance of 2 meters.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_69976270",
+        "call_id": "call_69976270",
+        "name": "biological_calc_energy",
+        "arguments": "{\"mols\":5.0,\"substance\":\"C6H12O6\",\"joules_per_mol\":2800.0}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_20473454",
+        "call_id": "call_20473454",
+        "name": "biological_calc_biomass",
+        "arguments": "{\"energy\":14000.0,\"efficiency\":0.1}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_49761563",
+        "call_id": "call_49761563",
+        "name": "physical_calc_work",
+        "arguments": "{\"energy\":14000.0,\"distance\":2.0}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 759,
+      "completion_tokens": 201,
+      "total_tokens": 960,
+      "cost": 0.0052323975,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00528525,
+        "upstream_inference_prompt_cost": 0.00227025,
+        "upstream_inference_completions_cost": 0.003015
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241617-jaAVc7oYAxn7Tsp6EfbG",
+    "object": "chat.completion",
+    "created": 1776241617,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "Let me help you with these calculations step by step.\n\nFirst, I'll calculate the total energy produced by the bacteria from consuming 5 moles of glucose.\n\nSecond, I'll calculate the biomass produced given the energy and conversion efficiency of 10%.\n\nThird, I'll calculate the work done by the machine given the total energy produced and the distance of 2 meters.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_69976270",
+              "function": {
+                "name": "biological_calc_energy",
+                "arguments": "{\"mols\":5.0,\"substance\":\"C6H12O6\",\"joules_per_mol\":2800.0}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_20473454",
+              "function": {
+                "name": "biological_calc_biomass",
+                "arguments": "{\"energy\":14000.0,\"efficiency\":0.1}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_49761563",
+              "function": {
+                "name": "physical_calc_work",
+                "arguments": "{\"energy\":14000.0,\"distance\":2.0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 759,
+      "completion_tokens": 201,
+      "total_tokens": 960,
+      "cost": 0.0052323975,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00528525,
+        "upstream_inference_prompt_cost": 0.00227025,
+        "upstream_inference_completions_cost": 0.003015
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 3295.468,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "e59f1a06-f781-49d3-9ea9-5ddeb2901480"
+}

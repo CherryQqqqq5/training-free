@@ -1,0 +1,338 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "What is the area of a rectangle with length 12 meters and width 5 meters?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "rectangle_area",
+        "description": "Calculate the area of a rectangle with given length and width Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "length": {
+              "type": "integer",
+              "description": "Length of the rectangle"
+            },
+            "width": {
+              "type": "integer",
+              "description": "Width of the rectangle"
+            }
+          },
+          "required": [
+            "length",
+            "width"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "circle_area",
+        "description": "Calculate the area of a circle with given radius Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "radius": {
+              "type": "number",
+              "description": "Radius of the circle This is a float type value.",
+              "format": "float"
+            },
+            "isDiameter": {
+              "type": "boolean",
+              "description": "Whether the given length is the diameter of the circle, default is false",
+              "default": false
+            }
+          },
+          "required": [
+            "radius"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "triangle_area",
+        "description": "Calculate the area of a triangle with given base and height Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "base": {
+              "type": "number",
+              "description": "Base of the triangle This is a float type value.",
+              "format": "float"
+            },
+            "height": {
+              "type": "number",
+              "description": "Height of the triangle This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "base",
+            "height"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What is the area of a rectangle with length 12 meters and width 5 meters?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "rectangle_area",
+          "description": "Calculate the area of a rectangle with given length and width Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "length": {
+                "type": "integer",
+                "description": "Length of the rectangle"
+              },
+              "width": {
+                "type": "integer",
+                "description": "Width of the rectangle"
+              }
+            },
+            "required": [
+              "length",
+              "width"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "circle_area",
+          "description": "Calculate the area of a circle with given radius Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "radius": {
+                "type": "number",
+                "description": "Radius of the circle This is a float type value.",
+                "format": "float"
+              },
+              "isDiameter": {
+                "type": "boolean",
+                "description": "Whether the given length is the diameter of the circle, default is false",
+                "default": false
+              }
+            },
+            "required": [
+              "radius"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "triangle_area",
+          "description": "Calculate the area of a triangle with given base and height Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "base": {
+                "type": "number",
+                "description": "Base of the triangle This is a float type value.",
+                "format": "float"
+              },
+              "height": {
+                "type": "number",
+                "description": "Height of the triangle This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "base",
+              "height"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239514-wCo9kvDgaJsGuQxc2RyW",
+    "object": "chat.completion",
+    "created": 1776239514,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_76366452",
+              "function": {
+                "name": "rectangle_area",
+                "arguments": "{\"length\":12,\"width\":5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 501,
+      "completion_tokens": 31,
+      "total_tokens": 532,
+      "cost": 0.0014827725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00149775,
+        "upstream_inference_prompt_cost": 0.00103275,
+        "upstream_inference_completions_cost": 0.000465
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239514-wCo9kvDgaJsGuQxc2RyW",
+    "object": "response",
+    "created_at": 1776239515,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_76366452",
+        "call_id": "call_76366452",
+        "name": "rectangle_area",
+        "arguments": "{\"length\":12,\"width\":5}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 501,
+      "completion_tokens": 31,
+      "total_tokens": 532,
+      "cost": 0.0014827725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00149775,
+        "upstream_inference_prompt_cost": 0.00103275,
+        "upstream_inference_completions_cost": 0.000465
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239514-wCo9kvDgaJsGuQxc2RyW",
+    "object": "chat.completion",
+    "created": 1776239514,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_76366452",
+              "function": {
+                "name": "rectangle_area",
+                "arguments": "{\"length\":12,\"width\":5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 501,
+      "completion_tokens": 31,
+      "total_tokens": 532,
+      "cost": 0.0014827725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00149775,
+        "upstream_inference_prompt_cost": 0.00103275,
+        "upstream_inference_completions_cost": 0.000465
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1759.43,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "5555da08-3de0-473f-b289-eeba3f823ee7"
+}

@@ -1,0 +1,302 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find out the historical dividend payments of Apple Inc for last five years."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "corporate_finance_dividend_data",
+        "description": "Get historical dividend data of a specific company within a particular duration. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "company": {
+              "type": "string",
+              "description": "The company that you want to get the dividend data for."
+            },
+            "years": {
+              "type": "integer",
+              "description": "Number of past years for which to retrieve the data."
+            },
+            "frequency": {
+              "type": "string",
+              "enum": [
+                "quarterly",
+                "annually"
+              ],
+              "description": "The frequency of the dividend payment. Default annually"
+            }
+          },
+          "required": [
+            "company",
+            "years"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "stock_market_data",
+        "description": "Retrieve stock market data for a specific company and time frame. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "company": {
+              "type": "string",
+              "description": "The company that you want to get the stock market data for."
+            },
+            "days": {
+              "type": "integer",
+              "description": "Number of past days for which to retrieve the data."
+            }
+          },
+          "required": [
+            "company",
+            "days"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find out the historical dividend payments of Apple Inc for last five years."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "corporate_finance_dividend_data",
+          "description": "Get historical dividend data of a specific company within a particular duration. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "company": {
+                "type": "string",
+                "description": "The company that you want to get the dividend data for."
+              },
+              "years": {
+                "type": "integer",
+                "description": "Number of past years for which to retrieve the data."
+              },
+              "frequency": {
+                "type": "string",
+                "enum": [
+                  "quarterly",
+                  "annually"
+                ],
+                "description": "The frequency of the dividend payment. Default annually"
+              }
+            },
+            "required": [
+              "company",
+              "years"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "stock_market_data",
+          "description": "Retrieve stock market data for a specific company and time frame. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "company": {
+                "type": "string",
+                "description": "The company that you want to get the stock market data for."
+              },
+              "days": {
+                "type": "integer",
+                "description": "Number of past days for which to retrieve the data."
+              }
+            },
+            "required": [
+              "company",
+              "days"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240075-3MG7a6VbB2bXrbOWFDKP",
+    "object": "chat.completion",
+    "created": 1776240075,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_37548187",
+              "function": {
+                "name": "corporate_finance_dividend_data",
+                "arguments": "{\"company\":\"Apple Inc\",\"years\":5,\"frequency\":\"annually\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 445,
+      "completion_tokens": 44,
+      "total_tokens": 489,
+      "cost": 0.0015095025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00152475,
+        "upstream_inference_prompt_cost": 0.00086475,
+        "upstream_inference_completions_cost": 0.00066
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240075-3MG7a6VbB2bXrbOWFDKP",
+    "object": "response",
+    "created_at": 1776240076,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_37548187",
+        "call_id": "call_37548187",
+        "name": "corporate_finance_dividend_data",
+        "arguments": "{\"company\":\"Apple Inc\",\"years\":5,\"frequency\":\"annually\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 445,
+      "completion_tokens": 44,
+      "total_tokens": 489,
+      "cost": 0.0015095025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00152475,
+        "upstream_inference_prompt_cost": 0.00086475,
+        "upstream_inference_completions_cost": 0.00066
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240075-3MG7a6VbB2bXrbOWFDKP",
+    "object": "chat.completion",
+    "created": 1776240075,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_37548187",
+              "function": {
+                "name": "corporate_finance_dividend_data",
+                "arguments": "{\"company\":\"Apple Inc\",\"years\":5,\"frequency\":\"annually\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 445,
+      "completion_tokens": 44,
+      "total_tokens": 489,
+      "cost": 0.0015095025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00152475,
+        "upstream_inference_prompt_cost": 0.00086475,
+        "upstream_inference_completions_cost": 0.00066
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1882.686,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "2721dd67-1476-4bad-8f61-172d1c146a08"
+}

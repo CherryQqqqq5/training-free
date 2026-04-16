@@ -1,0 +1,426 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Can you help me with a few things? First, I'm trying to calculate the area of a triangle that has a base of 12 meters and a height of 15 meters. I would like the result in square meters. Second, I'm curious about the inventor and year of invention of the 'Telephone'. Could you find that for me? Lastly, I'm planning a road trip and need directions from 'New York City' to 'Los Angeles'. I would like to avoid 'tolls' and 'highways'. Can you provide the best route for me?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "map_service_get_directions",
+        "description": "Retrieve directions from a starting location to an ending location, including options for route preferences. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "start": {
+              "type": "string",
+              "description": "Starting location for the route."
+            },
+            "end": {
+              "type": "string",
+              "description": "Ending location for the route."
+            },
+            "avoid": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "tolls",
+                  "highways",
+                  "ferries"
+                ]
+              },
+              "description": "Route features to avoid. Default is none if not specified."
+            }
+          },
+          "required": [
+            "start",
+            "end"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "geometry_area_triangle",
+        "description": "Calculate the area of a triangle. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "base": {
+              "type": "integer",
+              "description": "The length of the base of the triangle."
+            },
+            "height": {
+              "type": "integer",
+              "description": "The height of the triangle from the base."
+            },
+            "unit": {
+              "type": "string",
+              "description": "The measurement unit for the area. Defaults to square meters."
+            }
+          },
+          "required": [
+            "base",
+            "height"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "science_history_get_invention",
+        "description": "Retrieve the inventor and year of invention based on the invention's name. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "invention_name": {
+              "type": "string",
+              "description": "The name of the invention."
+            },
+            "want_year": {
+              "type": "boolean",
+              "default": false,
+              "description": "Return the year of invention if set to true."
+            }
+          },
+          "required": [
+            "invention_name",
+            "want_year"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Can you help me with a few things? First, I'm trying to calculate the area of a triangle that has a base of 12 meters and a height of 15 meters. I would like the result in square meters. Second, I'm curious about the inventor and year of invention of the 'Telephone'. Could you find that for me? Lastly, I'm planning a road trip and need directions from 'New York City' to 'Los Angeles'. I would like to avoid 'tolls' and 'highways'. Can you provide the best route for me?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "map_service_get_directions",
+          "description": "Retrieve directions from a starting location to an ending location, including options for route preferences. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "start": {
+                "type": "string",
+                "description": "Starting location for the route."
+              },
+              "end": {
+                "type": "string",
+                "description": "Ending location for the route."
+              },
+              "avoid": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "tolls",
+                    "highways",
+                    "ferries"
+                  ]
+                },
+                "description": "Route features to avoid. Default is none if not specified."
+              }
+            },
+            "required": [
+              "start",
+              "end"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "geometry_area_triangle",
+          "description": "Calculate the area of a triangle. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "base": {
+                "type": "integer",
+                "description": "The length of the base of the triangle."
+              },
+              "height": {
+                "type": "integer",
+                "description": "The height of the triangle from the base."
+              },
+              "unit": {
+                "type": "string",
+                "description": "The measurement unit for the area. Defaults to square meters."
+              }
+            },
+            "required": [
+              "base",
+              "height"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "science_history_get_invention",
+          "description": "Retrieve the inventor and year of invention based on the invention's name. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "invention_name": {
+                "type": "string",
+                "description": "The name of the invention."
+              },
+              "want_year": {
+                "type": "boolean",
+                "default": false,
+                "description": "Return the year of invention if set to true."
+              }
+            },
+            "required": [
+              "invention_name",
+              "want_year"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241065-qtAaSRq0mf1mL2WLvhnV",
+    "object": "chat.completion",
+    "created": 1776241065,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help with all your requests. Let's address each one step by step.\n\n1. For calculating the area of the triangle with a base of 12 meters and a height of 15 meters in square meters:\n2. For finding information about the inventor and year of invention of the Telephone:\n3. For getting directions from New York City to Los Angeles while avoiding tolls and highways:\nI'll provide the results for each of these as soon as the function calls are processed.",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_69806146",
+              "function": {
+                "name": "geometry_area_triangle",
+                "arguments": "{\"base\":12,\"height\":15,\"unit\":\"square meters\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_26781512",
+              "function": {
+                "name": "science_history_get_invention",
+                "arguments": "{\"invention_name\":\"Telephone\",\"want_year\":true}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_89079562",
+              "function": {
+                "name": "map_service_get_directions",
+                "arguments": "{\"start\":\"New York City\",\"end\":\"Los Angeles\",\"avoid\":[\"tolls\",\"highways\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 658,
+      "completion_tokens": 221,
+      "total_tokens": 879,
+      "cost": 0.0047705625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00481875,
+        "upstream_inference_prompt_cost": 0.00150375,
+        "upstream_inference_completions_cost": 0.003315
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241065-qtAaSRq0mf1mL2WLvhnV",
+    "object": "response",
+    "created_at": 1776241069,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'm happy to help with all your requests. Let's address each one step by step.\n\n1. For calculating the area of the triangle with a base of 12 meters and a height of 15 meters in square meters:\n2. For finding information about the inventor and year of invention of the Telephone:\n3. For getting directions from New York City to Los Angeles while avoiding tolls and highways:\nI'll provide the results for each of these as soon as the function calls are processed."
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_69806146",
+        "call_id": "call_69806146",
+        "name": "geometry_area_triangle",
+        "arguments": "{\"base\":12,\"height\":15,\"unit\":\"square meters\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_26781512",
+        "call_id": "call_26781512",
+        "name": "science_history_get_invention",
+        "arguments": "{\"invention_name\":\"Telephone\",\"want_year\":true}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_89079562",
+        "call_id": "call_89079562",
+        "name": "map_service_get_directions",
+        "arguments": "{\"start\":\"New York City\",\"end\":\"Los Angeles\",\"avoid\":[\"tolls\",\"highways\"]}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 658,
+      "completion_tokens": 221,
+      "total_tokens": 879,
+      "cost": 0.0047705625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00481875,
+        "upstream_inference_prompt_cost": 0.00150375,
+        "upstream_inference_completions_cost": 0.003315
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241065-qtAaSRq0mf1mL2WLvhnV",
+    "object": "chat.completion",
+    "created": 1776241065,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help with all your requests. Let's address each one step by step.\n\n1. For calculating the area of the triangle with a base of 12 meters and a height of 15 meters in square meters:\n2. For finding information about the inventor and year of invention of the Telephone:\n3. For getting directions from New York City to Los Angeles while avoiding tolls and highways:\nI'll provide the results for each of these as soon as the function calls are processed.",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_69806146",
+              "function": {
+                "name": "geometry_area_triangle",
+                "arguments": "{\"base\":12,\"height\":15,\"unit\":\"square meters\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_26781512",
+              "function": {
+                "name": "science_history_get_invention",
+                "arguments": "{\"invention_name\":\"Telephone\",\"want_year\":true}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_89079562",
+              "function": {
+                "name": "map_service_get_directions",
+                "arguments": "{\"start\":\"New York City\",\"end\":\"Los Angeles\",\"avoid\":[\"tolls\",\"highways\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 658,
+      "completion_tokens": 221,
+      "total_tokens": 879,
+      "cost": 0.0047705625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00481875,
+        "upstream_inference_prompt_cost": 0.00150375,
+        "upstream_inference_completions_cost": 0.003315
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 4467.438,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "38041f93-bd65-48fe-be4d-c324af48e3b5"
+}

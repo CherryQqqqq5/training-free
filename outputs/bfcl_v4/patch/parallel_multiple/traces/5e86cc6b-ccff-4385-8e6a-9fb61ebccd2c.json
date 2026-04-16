@@ -1,0 +1,415 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Could you please help me with a couple of calculations? I have two points in a 2D space, Point A with coordinates [3, 2] and Point B with coordinates [7, 5]. First, I would like to know the Euclidean distance between these two points, rounded to 2 decimal places. Then, I would like to find out the angle between these two points with respect to the x-axis, also rounded to 2 decimal places. After that, I have another set of points, Point C with coordinates [10, 8] and Point D with coordinates [14, 12]. Could you please calculate the Euclidean distance and the angle to the x-axis for these points as well, both rounded to 2 decimal places?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "angleToXAxis_calculate",
+        "description": "Calculate the angle between two points with respect to x-axis. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "pointA": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "Coordinates for Point A."
+            },
+            "pointB": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "Coordinates for Point B."
+            },
+            "rounding": {
+              "type": "integer",
+              "description": "Optional: The number of decimals to round off the result.",
+              "default": 2
+            }
+          },
+          "required": [
+            "pointA",
+            "pointB"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "EuclideanDistance_calculate",
+        "description": "Calculate the Euclidean distance between two points. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "pointA": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "Coordinates for Point A."
+            },
+            "pointB": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "Coordinates for Point B."
+            },
+            "rounding": {
+              "type": "integer",
+              "description": "Optional: The number of decimals to round off the result.",
+              "default": 2
+            }
+          },
+          "required": [
+            "pointA",
+            "pointB"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Could you please help me with a couple of calculations? I have two points in a 2D space, Point A with coordinates [3, 2] and Point B with coordinates [7, 5]. First, I would like to know the Euclidean distance between these two points, rounded to 2 decimal places. Then, I would like to find out the angle between these two points with respect to the x-axis, also rounded to 2 decimal places. After that, I have another set of points, Point C with coordinates [10, 8] and Point D with coordinates [14, 12]. Could you please calculate the Euclidean distance and the angle to the x-axis for these points as well, both rounded to 2 decimal places?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "angleToXAxis_calculate",
+          "description": "Calculate the angle between two points with respect to x-axis. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "pointA": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "Coordinates for Point A."
+              },
+              "pointB": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "Coordinates for Point B."
+              },
+              "rounding": {
+                "type": "integer",
+                "description": "Optional: The number of decimals to round off the result.",
+                "default": 2
+              }
+            },
+            "required": [
+              "pointA",
+              "pointB"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "EuclideanDistance_calculate",
+          "description": "Calculate the Euclidean distance between two points. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "pointA": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "Coordinates for Point A."
+              },
+              "pointB": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "Coordinates for Point B."
+              },
+              "rounding": {
+                "type": "integer",
+                "description": "Optional: The number of decimals to round off the result.",
+                "default": 2
+              }
+            },
+            "required": [
+              "pointA",
+              "pointB"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241503-4dSuyEIJU9OoEEfq6r4b",
+    "object": "chat.completion",
+    "created": 1776241503,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'll help you with these calculations. Let's handle the requests for each pair of points step by step.\n\nFirst, for Points A [3, 2] and B [7, 5], I'll calculate the Euclidean distance and the angle with respect to the x-axis.\n\nNext, for Points C [10, 8] and D [14, 12], I'll calculate the same metrics.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_02558443",
+              "function": {
+                "name": "EuclideanDistance_calculate",
+                "arguments": "{\"pointA\":[3,2],\"pointB\":[7,5],\"rounding\":2}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_56598191",
+              "function": {
+                "name": "angleToXAxis_calculate",
+                "arguments": "{\"pointA\":[3,2],\"pointB\":[7,5],\"rounding\":2}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_78441560",
+              "function": {
+                "name": "EuclideanDistance_calculate",
+                "arguments": "{\"pointA\":[10,8],\"pointB\":[14,12],\"rounding\":2}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_33765535",
+              "function": {
+                "name": "angleToXAxis_calculate",
+                "arguments": "{\"pointA\":[10,8],\"pointB\":[14,12],\"rounding\":2}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 608,
+      "completion_tokens": 271,
+      "total_tokens": 879,
+      "cost": 0.0053645625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00541875,
+        "upstream_inference_prompt_cost": 0.00135375,
+        "upstream_inference_completions_cost": 0.004065
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241503-4dSuyEIJU9OoEEfq6r4b",
+    "object": "response",
+    "created_at": 1776241507,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'll help you with these calculations. Let's handle the requests for each pair of points step by step.\n\nFirst, for Points A [3, 2] and B [7, 5], I'll calculate the Euclidean distance and the angle with respect to the x-axis.\n\nNext, for Points C [10, 8] and D [14, 12], I'll calculate the same metrics.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_02558443",
+        "call_id": "call_02558443",
+        "name": "EuclideanDistance_calculate",
+        "arguments": "{\"pointA\":[3,2],\"pointB\":[7,5],\"rounding\":2}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_56598191",
+        "call_id": "call_56598191",
+        "name": "angleToXAxis_calculate",
+        "arguments": "{\"pointA\":[3,2],\"pointB\":[7,5],\"rounding\":2}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_78441560",
+        "call_id": "call_78441560",
+        "name": "EuclideanDistance_calculate",
+        "arguments": "{\"pointA\":[10,8],\"pointB\":[14,12],\"rounding\":2}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_33765535",
+        "call_id": "call_33765535",
+        "name": "angleToXAxis_calculate",
+        "arguments": "{\"pointA\":[10,8],\"pointB\":[14,12],\"rounding\":2}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 608,
+      "completion_tokens": 271,
+      "total_tokens": 879,
+      "cost": 0.0053645625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00541875,
+        "upstream_inference_prompt_cost": 0.00135375,
+        "upstream_inference_completions_cost": 0.004065
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241503-4dSuyEIJU9OoEEfq6r4b",
+    "object": "chat.completion",
+    "created": 1776241503,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'll help you with these calculations. Let's handle the requests for each pair of points step by step.\n\nFirst, for Points A [3, 2] and B [7, 5], I'll calculate the Euclidean distance and the angle with respect to the x-axis.\n\nNext, for Points C [10, 8] and D [14, 12], I'll calculate the same metrics.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_02558443",
+              "function": {
+                "name": "EuclideanDistance_calculate",
+                "arguments": "{\"pointA\":[3,2],\"pointB\":[7,5],\"rounding\":2}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_56598191",
+              "function": {
+                "name": "angleToXAxis_calculate",
+                "arguments": "{\"pointA\":[3,2],\"pointB\":[7,5],\"rounding\":2}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_78441560",
+              "function": {
+                "name": "EuclideanDistance_calculate",
+                "arguments": "{\"pointA\":[10,8],\"pointB\":[14,12],\"rounding\":2}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_33765535",
+              "function": {
+                "name": "angleToXAxis_calculate",
+                "arguments": "{\"pointA\":[10,8],\"pointB\":[14,12],\"rounding\":2}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 608,
+      "completion_tokens": 271,
+      "total_tokens": 879,
+      "cost": 0.0053645625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00541875,
+        "upstream_inference_prompt_cost": 0.00135375,
+        "upstream_inference_completions_cost": 0.004065
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 4317.934,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "5e86cc6b-ccff-4385-8e6a-9fb61ebccd2c"
+}

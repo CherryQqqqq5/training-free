@@ -1,0 +1,274 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the compounded interest for an initial principal of $5000, annual interest rate of 5%, and compounding period of 10 years."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_compounded_interest",
+        "description": "Calculate the compounded interest for a given principal, interest rate, and period. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "principal": {
+              "type": "integer",
+              "description": "The initial principal."
+            },
+            "interest_rate": {
+              "type": "number",
+              "description": "The annual interest rate. This is a float type value.",
+              "format": "float"
+            },
+            "period": {
+              "type": "integer",
+              "description": "The period in years."
+            },
+            "compounding_frequency": {
+              "type": "string",
+              "description": "The frequency of compounding per year. Defaults to 'Annually'.",
+              "enum": [
+                "Annually",
+                "Semiannually",
+                "Quarterly",
+                "Monthly",
+                "Daily"
+              ]
+            }
+          },
+          "required": [
+            "principal",
+            "interest_rate",
+            "period"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the compounded interest for an initial principal of $5000, annual interest rate of 5%, and compounding period of 10 years."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_compounded_interest",
+          "description": "Calculate the compounded interest for a given principal, interest rate, and period. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "principal": {
+                "type": "integer",
+                "description": "The initial principal."
+              },
+              "interest_rate": {
+                "type": "number",
+                "description": "The annual interest rate. This is a float type value.",
+                "format": "float"
+              },
+              "period": {
+                "type": "integer",
+                "description": "The period in years."
+              },
+              "compounding_frequency": {
+                "type": "string",
+                "description": "The frequency of compounding per year. Defaults to 'Annually'.",
+                "enum": [
+                  "Annually",
+                  "Semiannually",
+                  "Quarterly",
+                  "Monthly",
+                  "Daily"
+                ]
+              }
+            },
+            "required": [
+              "principal",
+              "interest_rate",
+              "period"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776237943-SUbOBA4bxW3TzVfdQtZQ",
+    "object": "chat.completion",
+    "created": 1776237943,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_89427593",
+              "function": {
+                "name": "calculate_compounded_interest",
+                "arguments": "{\"principal\":5000,\"interest_rate\":5.0,\"period\":10,\"compounding_frequency\":\"Annually\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 394,
+      "completion_tokens": 53,
+      "total_tokens": 447,
+      "cost": 0.0014872275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 211,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00150225,
+        "upstream_inference_prompt_cost": 0.00070725,
+        "upstream_inference_completions_cost": 0.000795
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776237943-SUbOBA4bxW3TzVfdQtZQ",
+    "object": "response",
+    "created_at": 1776237944,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_89427593",
+        "call_id": "call_89427593",
+        "name": "calculate_compounded_interest",
+        "arguments": "{\"principal\":5000,\"interest_rate\":5.0,\"period\":10,\"compounding_frequency\":\"Annually\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 394,
+      "completion_tokens": 53,
+      "total_tokens": 447,
+      "cost": 0.0014872275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 211,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00150225,
+        "upstream_inference_prompt_cost": 0.00070725,
+        "upstream_inference_completions_cost": 0.000795
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776237943-SUbOBA4bxW3TzVfdQtZQ",
+    "object": "chat.completion",
+    "created": 1776237943,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_89427593",
+              "function": {
+                "name": "calculate_compounded_interest",
+                "arguments": "{\"principal\":5000,\"interest_rate\":5.0,\"period\":10,\"compounding_frequency\":\"Annually\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 394,
+      "completion_tokens": 53,
+      "total_tokens": 447,
+      "cost": 0.0014872275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 211,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00150225,
+        "upstream_inference_prompt_cost": 0.00070725,
+        "upstream_inference_completions_cost": 0.000795
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2072.04,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "eea26f60-04cd-49a9-8272-2493987dbf2f"
+}

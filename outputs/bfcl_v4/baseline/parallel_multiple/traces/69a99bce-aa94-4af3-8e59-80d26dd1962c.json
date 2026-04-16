@@ -1,0 +1,361 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Could you please analyze my personality based on the five-factor model and the Myers-Briggs Type Indicator (MBTI)? For the five-factor model, consider that I am quite talkative, I don't get nervous easily, I have many artistic interests, I am not lazy, and I am quite forgiving. For the MBTI, my preferences are more towards feeling than thinking, I am more extroverted than introverted, I lean more towards perceiving than judging, and I prefer intuition over sensing.\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "MBTI_analyse",
+        "description": "Analyse personality based on the Myers-Briggs Type Indicator (MBTI) which sorts for preferences and generates a 4-letter personality type. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "thinking_vs_feeling": {
+              "type": "string",
+              "description": "Preference of user between thinking and feeling."
+            },
+            "introverted_vs_extroverted": {
+              "type": "string",
+              "description": "Preference of user between introverted and extroverted."
+            },
+            "judging_vs_perceiving": {
+              "type": "string",
+              "description": "Preference of user between judging and perceiving."
+            },
+            "sensing_vs_intuition": {
+              "type": "string",
+              "description": "Preference of user between sensing and intuition."
+            }
+          },
+          "required": [
+            "thinking_vs_feeling",
+            "introverted_vs_extroverted",
+            "judging_vs_perceiving",
+            "sensing_vs_intuition"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "five_factor_model_analyse",
+        "description": "Analyse personality based on the five-factor model, also known as the Big Five, which measures openness, conscientiousness, extraversion, agreeableness, and neuroticism. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "talkative": {
+              "type": "boolean",
+              "description": "Indicates if the user is talkative."
+            },
+            "nervous": {
+              "type": "boolean",
+              "description": "Indicates if the user gets nervous easily."
+            },
+            "artistic_interests": {
+              "type": "boolean",
+              "description": "Indicates if the user has many artistic interests."
+            },
+            "lazy": {
+              "type": "boolean",
+              "description": "Indicates if the user tends to be lazy."
+            },
+            "forgiving": {
+              "type": "boolean",
+              "description": "Indicates if the user is forgiving."
+            }
+          },
+          "required": [
+            "talkative",
+            "nervous",
+            "artistic_interests",
+            "lazy",
+            "forgiving"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Could you please analyze my personality based on the five-factor model and the Myers-Briggs Type Indicator (MBTI)? For the five-factor model, consider that I am quite talkative, I don't get nervous easily, I have many artistic interests, I am not lazy, and I am quite forgiving. For the MBTI, my preferences are more towards feeling than thinking, I am more extroverted than introverted, I lean more towards perceiving than judging, and I prefer intuition over sensing.\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "MBTI_analyse",
+          "description": "Analyse personality based on the Myers-Briggs Type Indicator (MBTI) which sorts for preferences and generates a 4-letter personality type. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "thinking_vs_feeling": {
+                "type": "string",
+                "description": "Preference of user between thinking and feeling."
+              },
+              "introverted_vs_extroverted": {
+                "type": "string",
+                "description": "Preference of user between introverted and extroverted."
+              },
+              "judging_vs_perceiving": {
+                "type": "string",
+                "description": "Preference of user between judging and perceiving."
+              },
+              "sensing_vs_intuition": {
+                "type": "string",
+                "description": "Preference of user between sensing and intuition."
+              }
+            },
+            "required": [
+              "thinking_vs_feeling",
+              "introverted_vs_extroverted",
+              "judging_vs_perceiving",
+              "sensing_vs_intuition"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "five_factor_model_analyse",
+          "description": "Analyse personality based on the five-factor model, also known as the Big Five, which measures openness, conscientiousness, extraversion, agreeableness, and neuroticism. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "talkative": {
+                "type": "boolean",
+                "description": "Indicates if the user is talkative."
+              },
+              "nervous": {
+                "type": "boolean",
+                "description": "Indicates if the user gets nervous easily."
+              },
+              "artistic_interests": {
+                "type": "boolean",
+                "description": "Indicates if the user has many artistic interests."
+              },
+              "lazy": {
+                "type": "boolean",
+                "description": "Indicates if the user tends to be lazy."
+              },
+              "forgiving": {
+                "type": "boolean",
+                "description": "Indicates if the user is forgiving."
+              }
+            },
+            "required": [
+              "talkative",
+              "nervous",
+              "artistic_interests",
+              "lazy",
+              "forgiving"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240858-1wOtCNKRC4ltuGOHCntP",
+    "object": "chat.completion",
+    "created": 1776240858,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_22507392",
+              "function": {
+                "name": "five_factor_model_analyse",
+                "arguments": "{\"talkative\":true,\"nervous\":false,\"artistic_interests\":true,\"lazy\":false,\"forgiving\":true}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_07754913",
+              "function": {
+                "name": "MBTI_analyse",
+                "arguments": "{\"thinking_vs_feeling\":\"feeling\",\"introverted_vs_extroverted\":\"extroverted\",\"judging_vs_perceiving\":\"perceiving\",\"sensing_vs_intuition\":\"intuition\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 670,
+      "completion_tokens": 120,
+      "total_tokens": 790,
+      "cost": 0.0033063525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00333975,
+        "upstream_inference_prompt_cost": 0.00153975,
+        "upstream_inference_completions_cost": 0.0018
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240858-1wOtCNKRC4ltuGOHCntP",
+    "object": "response",
+    "created_at": 1776240860,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_22507392",
+        "call_id": "call_22507392",
+        "name": "five_factor_model_analyse",
+        "arguments": "{\"talkative\":true,\"nervous\":false,\"artistic_interests\":true,\"lazy\":false,\"forgiving\":true}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_07754913",
+        "call_id": "call_07754913",
+        "name": "MBTI_analyse",
+        "arguments": "{\"thinking_vs_feeling\":\"feeling\",\"introverted_vs_extroverted\":\"extroverted\",\"judging_vs_perceiving\":\"perceiving\",\"sensing_vs_intuition\":\"intuition\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 670,
+      "completion_tokens": 120,
+      "total_tokens": 790,
+      "cost": 0.0033063525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00333975,
+        "upstream_inference_prompt_cost": 0.00153975,
+        "upstream_inference_completions_cost": 0.0018
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240858-1wOtCNKRC4ltuGOHCntP",
+    "object": "chat.completion",
+    "created": 1776240858,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_22507392",
+              "function": {
+                "name": "five_factor_model_analyse",
+                "arguments": "{\"talkative\":true,\"nervous\":false,\"artistic_interests\":true,\"lazy\":false,\"forgiving\":true}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_07754913",
+              "function": {
+                "name": "MBTI_analyse",
+                "arguments": "{\"thinking_vs_feeling\":\"feeling\",\"introverted_vs_extroverted\":\"extroverted\",\"judging_vs_perceiving\":\"perceiving\",\"sensing_vs_intuition\":\"intuition\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 670,
+      "completion_tokens": 120,
+      "total_tokens": 790,
+      "cost": 0.0033063525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00333975,
+        "upstream_inference_prompt_cost": 0.00153975,
+        "upstream_inference_completions_cost": 0.0018
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 3025.841,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "69a99bce-aa94-4af3-8e59-80d26dd1962c"
+}

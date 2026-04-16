@@ -1,0 +1,250 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find the top chess players in New York with a rating above 2300."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "board_game_chess_get_top_players",
+        "description": "Find top chess players in a location based on rating. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city you want to find the players from."
+            },
+            "minimum_rating": {
+              "type": "integer",
+              "description": "Minimum rating to filter the players."
+            },
+            "number_of_players": {
+              "type": "integer",
+              "default": 10,
+              "description": "Number of players you want to retrieve, default value is 10"
+            }
+          },
+          "required": [
+            "location",
+            "minimum_rating"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find the top chess players in New York with a rating above 2300."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "board_game_chess_get_top_players",
+          "description": "Find top chess players in a location based on rating. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city you want to find the players from."
+              },
+              "minimum_rating": {
+                "type": "integer",
+                "description": "Minimum rating to filter the players."
+              },
+              "number_of_players": {
+                "type": "integer",
+                "default": 10,
+                "description": "Number of players you want to retrieve, default value is 10"
+              }
+            },
+            "required": [
+              "location",
+              "minimum_rating"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239249-nxTO32FpgqI08vIXV3wF",
+    "object": "chat.completion",
+    "created": 1776239249,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_83090175",
+              "function": {
+                "name": "board_game_chess_get_top_players",
+                "arguments": "{\"location\":\"New York\",\"minimum_rating\":2300,\"number_of_players\":10}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 350,
+      "completion_tokens": 47,
+      "total_tokens": 397,
+      "cost": 0.0012719025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00128475,
+        "upstream_inference_prompt_cost": 0.00057975,
+        "upstream_inference_completions_cost": 0.000705
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239249-nxTO32FpgqI08vIXV3wF",
+    "object": "response",
+    "created_at": 1776239250,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_83090175",
+        "call_id": "call_83090175",
+        "name": "board_game_chess_get_top_players",
+        "arguments": "{\"location\":\"New York\",\"minimum_rating\":2300,\"number_of_players\":10}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 350,
+      "completion_tokens": 47,
+      "total_tokens": 397,
+      "cost": 0.0012719025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00128475,
+        "upstream_inference_prompt_cost": 0.00057975,
+        "upstream_inference_completions_cost": 0.000705
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239249-nxTO32FpgqI08vIXV3wF",
+    "object": "chat.completion",
+    "created": 1776239249,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_83090175",
+              "function": {
+                "name": "board_game_chess_get_top_players",
+                "arguments": "{\"location\":\"New York\",\"minimum_rating\":2300,\"number_of_players\":10}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 350,
+      "completion_tokens": 47,
+      "total_tokens": 397,
+      "cost": 0.0012719025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00128475,
+        "upstream_inference_prompt_cost": 0.00057975,
+        "upstream_inference_completions_cost": 0.000705
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1625.532,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "f2279eab-e253-4cc0-bd95-82e60fcbc2b4"
+}

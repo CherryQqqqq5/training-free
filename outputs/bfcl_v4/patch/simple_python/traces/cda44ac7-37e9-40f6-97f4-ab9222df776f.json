@@ -1,0 +1,246 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find the top five organic bananas brands on the basis of rating from Whole Foods store."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "whole_foods_find_top_brands",
+        "description": "Get top brands based on a specific product from Whole Foods Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "product": {
+              "type": "string",
+              "description": "The product for which the top brands should be fetched."
+            },
+            "number": {
+              "type": "integer",
+              "description": "Number of top brands to be fetched. Default is 5"
+            },
+            "organic": {
+              "type": "boolean",
+              "description": "If the product should be organic. Default is false"
+            }
+          },
+          "required": [
+            "product"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find the top five organic bananas brands on the basis of rating from Whole Foods store."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "whole_foods_find_top_brands",
+          "description": "Get top brands based on a specific product from Whole Foods Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "product": {
+                "type": "string",
+                "description": "The product for which the top brands should be fetched."
+              },
+              "number": {
+                "type": "integer",
+                "description": "Number of top brands to be fetched. Default is 5"
+              },
+              "organic": {
+                "type": "boolean",
+                "description": "If the product should be organic. Default is false"
+              }
+            },
+            "required": [
+              "product"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239329-0QBtIPdFRd0QhbseKXHN",
+    "object": "chat.completion",
+    "created": 1776239329,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_40559199",
+              "function": {
+                "name": "whole_foods_find_top_brands",
+                "arguments": "{\"product\":\"bananas\",\"number\":5,\"organic\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 344,
+      "completion_tokens": 42,
+      "total_tokens": 386,
+      "cost": 0.0011798325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00119175,
+        "upstream_inference_prompt_cost": 0.00056175,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239329-0QBtIPdFRd0QhbseKXHN",
+    "object": "response",
+    "created_at": 1776239330,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_40559199",
+        "call_id": "call_40559199",
+        "name": "whole_foods_find_top_brands",
+        "arguments": "{\"product\":\"bananas\",\"number\":5,\"organic\":true}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 344,
+      "completion_tokens": 42,
+      "total_tokens": 386,
+      "cost": 0.0011798325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00119175,
+        "upstream_inference_prompt_cost": 0.00056175,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239329-0QBtIPdFRd0QhbseKXHN",
+    "object": "chat.completion",
+    "created": 1776239329,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_40559199",
+              "function": {
+                "name": "whole_foods_find_top_brands",
+                "arguments": "{\"product\":\"bananas\",\"number\":5,\"organic\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 344,
+      "completion_tokens": 42,
+      "total_tokens": 386,
+      "cost": 0.0011798325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00119175,
+        "upstream_inference_prompt_cost": 0.00056175,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1735.708,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "cda44ac7-37e9-40f6-97f4-ab9222df776f"
+}

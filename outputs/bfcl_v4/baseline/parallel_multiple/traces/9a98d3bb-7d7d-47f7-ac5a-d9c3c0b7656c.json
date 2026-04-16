@@ -1,0 +1,511 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Can you help me plan a day out? I want to start by having lunch at a restaurant in San Francisco that serves Italian food. I would like to see 5 options and I am a vegan. After lunch, I want to catch a match of the Golden State Warriors. Can you tell me their next 3 match schedules in the NBA? Later in the evening, I am thinking of buying some stocks. Can you provide me a detailed information about the Apple Inc. stocks in the NASDAQ market? And finally, I am thinking of buying a guitar. I have a budget of $500. Can you find me a Fender guitar within my budget?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "find_restaurants",
+        "description": "Locate nearby restaurants based on location and food preferences. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The specific location or area."
+            },
+            "food_type": {
+              "type": "string",
+              "description": "The type of food preferred."
+            },
+            "number": {
+              "type": "integer",
+              "description": "Number of results to return."
+            },
+            "dietary_requirements": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Special dietary requirements, e.g. vegan, gluten-free. Default is all if not specified."
+            }
+          },
+          "required": [
+            "location",
+            "food_type",
+            "number"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "sports_match_schedule",
+        "description": "Retrieve the match schedule for a specific sports team. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "team_name": {
+              "type": "string",
+              "description": "The name of the sports team."
+            },
+            "num_matches": {
+              "type": "integer",
+              "description": "The number of upcoming matches you want to get."
+            },
+            "league": {
+              "type": "string",
+              "description": "The sports league of the team. This is an optional parameter. Default is 'NBA'"
+            }
+          },
+          "required": [
+            "team_name",
+            "num_matches"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "find_instrument",
+        "description": "Search for a musical instrument within specified budget and of specific type. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "budget": {
+              "type": "integer",
+              "description": "Your budget for the instrument."
+            },
+            "type": {
+              "type": "string",
+              "description": "Type of the instrument"
+            },
+            "make": {
+              "type": "string",
+              "description": "Maker of the instrument, Optional parameter. Default is all if not specified."
+            }
+          },
+          "required": [
+            "budget",
+            "type"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "get_stock_info",
+        "description": "Retrieves information about a specific stock based on company's name. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "company_name": {
+              "type": "string",
+              "description": "The name of the company."
+            },
+            "detail_level": {
+              "type": "string",
+              "description": "Level of detail for stock information. Can be 'summary' or 'detailed'."
+            },
+            "market": {
+              "type": "string",
+              "description": "The stock market of interest. Default is 'NASDAQ'"
+            }
+          },
+          "required": [
+            "company_name",
+            "detail_level"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Can you help me plan a day out? I want to start by having lunch at a restaurant in San Francisco that serves Italian food. I would like to see 5 options and I am a vegan. After lunch, I want to catch a match of the Golden State Warriors. Can you tell me their next 3 match schedules in the NBA? Later in the evening, I am thinking of buying some stocks. Can you provide me a detailed information about the Apple Inc. stocks in the NASDAQ market? And finally, I am thinking of buying a guitar. I have a budget of $500. Can you find me a Fender guitar within my budget?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "find_restaurants",
+          "description": "Locate nearby restaurants based on location and food preferences. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The specific location or area."
+              },
+              "food_type": {
+                "type": "string",
+                "description": "The type of food preferred."
+              },
+              "number": {
+                "type": "integer",
+                "description": "Number of results to return."
+              },
+              "dietary_requirements": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Special dietary requirements, e.g. vegan, gluten-free. Default is all if not specified."
+              }
+            },
+            "required": [
+              "location",
+              "food_type",
+              "number"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "sports_match_schedule",
+          "description": "Retrieve the match schedule for a specific sports team. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "team_name": {
+                "type": "string",
+                "description": "The name of the sports team."
+              },
+              "num_matches": {
+                "type": "integer",
+                "description": "The number of upcoming matches you want to get."
+              },
+              "league": {
+                "type": "string",
+                "description": "The sports league of the team. This is an optional parameter. Default is 'NBA'"
+              }
+            },
+            "required": [
+              "team_name",
+              "num_matches"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "find_instrument",
+          "description": "Search for a musical instrument within specified budget and of specific type. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "budget": {
+                "type": "integer",
+                "description": "Your budget for the instrument."
+              },
+              "type": {
+                "type": "string",
+                "description": "Type of the instrument"
+              },
+              "make": {
+                "type": "string",
+                "description": "Maker of the instrument, Optional parameter. Default is all if not specified."
+              }
+            },
+            "required": [
+              "budget",
+              "type"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "get_stock_info",
+          "description": "Retrieves information about a specific stock based on company's name. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "company_name": {
+                "type": "string",
+                "description": "The name of the company."
+              },
+              "detail_level": {
+                "type": "string",
+                "description": "Level of detail for stock information. Can be 'summary' or 'detailed'."
+              },
+              "market": {
+                "type": "string",
+                "description": "The stock market of interest. Default is 'NASDAQ'"
+              }
+            },
+            "required": [
+              "company_name",
+              "detail_level"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241040-SDvfEgHNBoPzykXPrVY8",
+    "object": "chat.completion",
+    "created": 1776241040,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help you plan your day out. Let's tackle each part of your request step by step.\n\n1. **Lunch at an Italian Restaurant in San Francisco**: I'll find vegan-friendly Italian restaurants in San Francisco for you.\n2. **Golden State Warriors Match Schedule**: I'll retrieve the schedule for the next 3 matches of the Golden State Warriors in the NBA.\n3. **Apple Inc. Stock Information**: I'll get detailed information about Apple Inc. stocks in the NASDAQ market.\n4. **Finding a Fender Guitar within Budget**: I'll search for a Fender guitar within your $500 budget.\n\nI'll start by calling the necessary functions to gather this information.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_23939896",
+              "function": {
+                "name": "find_restaurants",
+                "arguments": "{\"location\":\"San Francisco\",\"food_type\":\"Italian\",\"number\":5,\"dietary_requirements\":[\"vegan\"]}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_83656258",
+              "function": {
+                "name": "sports_match_schedule",
+                "arguments": "{\"team_name\":\"Golden State Warriors\",\"num_matches\":3,\"league\":\"NBA\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_45430779",
+              "function": {
+                "name": "get_stock_info",
+                "arguments": "{\"company_name\":\"Apple Inc.\",\"detail_level\":\"detailed\",\"market\":\"NASDAQ\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_01360972",
+              "function": {
+                "name": "find_instrument",
+                "arguments": "{\"budget\":500,\"type\":\"guitar\",\"make\":\"Fender\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 822,
+      "completion_tokens": 308,
+      "total_tokens": 1130,
+      "cost": 0.0070084575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00707925,
+        "upstream_inference_prompt_cost": 0.00245925,
+        "upstream_inference_completions_cost": 0.00462
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241040-SDvfEgHNBoPzykXPrVY8",
+    "object": "response",
+    "created_at": 1776241045,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'm happy to help you plan your day out. Let's tackle each part of your request step by step.\n\n1. **Lunch at an Italian Restaurant in San Francisco**: I'll find vegan-friendly Italian restaurants in San Francisco for you.\n2. **Golden State Warriors Match Schedule**: I'll retrieve the schedule for the next 3 matches of the Golden State Warriors in the NBA.\n3. **Apple Inc. Stock Information**: I'll get detailed information about Apple Inc. stocks in the NASDAQ market.\n4. **Finding a Fender Guitar within Budget**: I'll search for a Fender guitar within your $500 budget.\n\nI'll start by calling the necessary functions to gather this information.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_23939896",
+        "call_id": "call_23939896",
+        "name": "find_restaurants",
+        "arguments": "{\"location\":\"San Francisco\",\"food_type\":\"Italian\",\"number\":5,\"dietary_requirements\":[\"vegan\"]}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_83656258",
+        "call_id": "call_83656258",
+        "name": "sports_match_schedule",
+        "arguments": "{\"team_name\":\"Golden State Warriors\",\"num_matches\":3,\"league\":\"NBA\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_45430779",
+        "call_id": "call_45430779",
+        "name": "get_stock_info",
+        "arguments": "{\"company_name\":\"Apple Inc.\",\"detail_level\":\"detailed\",\"market\":\"NASDAQ\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_01360972",
+        "call_id": "call_01360972",
+        "name": "find_instrument",
+        "arguments": "{\"budget\":500,\"type\":\"guitar\",\"make\":\"Fender\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 822,
+      "completion_tokens": 308,
+      "total_tokens": 1130,
+      "cost": 0.0070084575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00707925,
+        "upstream_inference_prompt_cost": 0.00245925,
+        "upstream_inference_completions_cost": 0.00462
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241040-SDvfEgHNBoPzykXPrVY8",
+    "object": "chat.completion",
+    "created": 1776241040,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help you plan your day out. Let's tackle each part of your request step by step.\n\n1. **Lunch at an Italian Restaurant in San Francisco**: I'll find vegan-friendly Italian restaurants in San Francisco for you.\n2. **Golden State Warriors Match Schedule**: I'll retrieve the schedule for the next 3 matches of the Golden State Warriors in the NBA.\n3. **Apple Inc. Stock Information**: I'll get detailed information about Apple Inc. stocks in the NASDAQ market.\n4. **Finding a Fender Guitar within Budget**: I'll search for a Fender guitar within your $500 budget.\n\nI'll start by calling the necessary functions to gather this information.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_23939896",
+              "function": {
+                "name": "find_restaurants",
+                "arguments": "{\"location\":\"San Francisco\",\"food_type\":\"Italian\",\"number\":5,\"dietary_requirements\":[\"vegan\"]}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_83656258",
+              "function": {
+                "name": "sports_match_schedule",
+                "arguments": "{\"team_name\":\"Golden State Warriors\",\"num_matches\":3,\"league\":\"NBA\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_45430779",
+              "function": {
+                "name": "get_stock_info",
+                "arguments": "{\"company_name\":\"Apple Inc.\",\"detail_level\":\"detailed\",\"market\":\"NASDAQ\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_01360972",
+              "function": {
+                "name": "find_instrument",
+                "arguments": "{\"budget\":500,\"type\":\"guitar\",\"make\":\"Fender\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 822,
+      "completion_tokens": 308,
+      "total_tokens": 1130,
+      "cost": 0.0070084575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00707925,
+        "upstream_inference_prompt_cost": 0.00245925,
+        "upstream_inference_completions_cost": 0.00462
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 5556.602,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "9a98d3bb-7d7d-47f7-ac5a-d9c3c0b7656c"
+}

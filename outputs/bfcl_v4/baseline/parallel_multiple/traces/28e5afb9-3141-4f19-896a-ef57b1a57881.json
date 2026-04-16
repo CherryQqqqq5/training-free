@@ -1,0 +1,415 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Can you help me plan my trip? I need to book a hotel room in Paris for 5 nights. I prefer a deluxe room and would like to add breakfast and spa services. After that, I need to rent a car in Paris for 7 days. I prefer a SUV and I will pick it up from the airport. Then, I need to book another hotel room in Rome for 3 nights. I prefer a suite and would like to add airport transfer service. Lastly, I need to rent a car in Rome for 5 days. I prefer a compact car and I will pick it up from the hotel.\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "car_rental",
+        "description": "Rent a car at the specified location for a specific number of days Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "Location of the car rental."
+            },
+            "days": {
+              "type": "integer",
+              "description": "Number of days for which to rent the car."
+            },
+            "car_type": {
+              "type": "string",
+              "description": "Type of the car to rent."
+            },
+            "pick_up": {
+              "type": "string",
+              "description": "Location of where to pick up the car. Default is 'airport' if not specified."
+            }
+          },
+          "required": [
+            "location",
+            "days",
+            "car_type"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "hotel_book",
+        "description": "Book a hotel room given the location, room type, and number of nights and additional services Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "Location of the hotel."
+            },
+            "roomType": {
+              "type": "string",
+              "description": "Type of the room to be booked."
+            },
+            "nights": {
+              "type": "integer",
+              "description": "Number of nights to book the room for."
+            },
+            "additional_services": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "Additonal services that can be booked."
+              },
+              "description": "Additional services to be added. Default is not use it if not specified."
+            }
+          },
+          "required": [
+            "location",
+            "roomType",
+            "nights"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Can you help me plan my trip? I need to book a hotel room in Paris for 5 nights. I prefer a deluxe room and would like to add breakfast and spa services. After that, I need to rent a car in Paris for 7 days. I prefer a SUV and I will pick it up from the airport. Then, I need to book another hotel room in Rome for 3 nights. I prefer a suite and would like to add airport transfer service. Lastly, I need to rent a car in Rome for 5 days. I prefer a compact car and I will pick it up from the hotel.\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "car_rental",
+          "description": "Rent a car at the specified location for a specific number of days Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "Location of the car rental."
+              },
+              "days": {
+                "type": "integer",
+                "description": "Number of days for which to rent the car."
+              },
+              "car_type": {
+                "type": "string",
+                "description": "Type of the car to rent."
+              },
+              "pick_up": {
+                "type": "string",
+                "description": "Location of where to pick up the car. Default is 'airport' if not specified."
+              }
+            },
+            "required": [
+              "location",
+              "days",
+              "car_type"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "hotel_book",
+          "description": "Book a hotel room given the location, room type, and number of nights and additional services Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "Location of the hotel."
+              },
+              "roomType": {
+                "type": "string",
+                "description": "Type of the room to be booked."
+              },
+              "nights": {
+                "type": "integer",
+                "description": "Number of nights to book the room for."
+              },
+              "additional_services": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "description": "Additonal services that can be booked."
+                },
+                "description": "Additional services to be added. Default is not use it if not specified."
+              }
+            },
+            "required": [
+              "location",
+              "roomType",
+              "nights"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240940-9GcSwpv7HKVmdUO2gJWj",
+    "object": "chat.completion",
+    "created": 1776240940,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to assist with planning your trip. Let's handle each part of your request step by step.\n\nFirst, I'll book a hotel room in Paris for 5 nights with a deluxe room and the additional services you requested.\n\nNext, I'll arrange for a car rental in Paris for 7 days with an SUV, picking up at the airport.\n\nThen, I'll book a hotel room in Rome for 3 nights in a suite with airport transfer service.\n\nLastly, I'll arrange a car rental in Rome for 5 days with a compact car, picking up at the hotel.\n\nAll bookings have been initiated as per your specifications. Please let me know if you need any adjustments or additional assistance with your trip planning!",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_03537704",
+              "function": {
+                "name": "hotel_book",
+                "arguments": "{\"location\":\"Paris\",\"roomType\":\"deluxe\",\"nights\":5,\"additional_services\":[\"breakfast\",\"spa\"]}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_30498412",
+              "function": {
+                "name": "car_rental",
+                "arguments": "{\"location\":\"Paris\",\"days\":7,\"car_type\":\"SUV\",\"pick_up\":\"airport\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_95974874",
+              "function": {
+                "name": "hotel_book",
+                "arguments": "{\"location\":\"Rome\",\"roomType\":\"suite\",\"nights\":3,\"additional_services\":[\"airport transfer\"]}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_95110477",
+              "function": {
+                "name": "car_rental",
+                "arguments": "{\"location\":\"Rome\",\"days\":5,\"car_type\":\"compact\",\"pick_up\":\"hotel\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 631,
+      "completion_tokens": 334,
+      "total_tokens": 965,
+      "cost": 0.0068272875,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00689625,
+        "upstream_inference_prompt_cost": 0.00188625,
+        "upstream_inference_completions_cost": 0.00501
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240940-9GcSwpv7HKVmdUO2gJWj",
+    "object": "response",
+    "created_at": 1776240944,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'm happy to assist with planning your trip. Let's handle each part of your request step by step.\n\nFirst, I'll book a hotel room in Paris for 5 nights with a deluxe room and the additional services you requested.\n\nNext, I'll arrange for a car rental in Paris for 7 days with an SUV, picking up at the airport.\n\nThen, I'll book a hotel room in Rome for 3 nights in a suite with airport transfer service.\n\nLastly, I'll arrange a car rental in Rome for 5 days with a compact car, picking up at the hotel.\n\nAll bookings have been initiated as per your specifications. Please let me know if you need any adjustments or additional assistance with your trip planning!"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_03537704",
+        "call_id": "call_03537704",
+        "name": "hotel_book",
+        "arguments": "{\"location\":\"Paris\",\"roomType\":\"deluxe\",\"nights\":5,\"additional_services\":[\"breakfast\",\"spa\"]}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_30498412",
+        "call_id": "call_30498412",
+        "name": "car_rental",
+        "arguments": "{\"location\":\"Paris\",\"days\":7,\"car_type\":\"SUV\",\"pick_up\":\"airport\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_95974874",
+        "call_id": "call_95974874",
+        "name": "hotel_book",
+        "arguments": "{\"location\":\"Rome\",\"roomType\":\"suite\",\"nights\":3,\"additional_services\":[\"airport transfer\"]}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_95110477",
+        "call_id": "call_95110477",
+        "name": "car_rental",
+        "arguments": "{\"location\":\"Rome\",\"days\":5,\"car_type\":\"compact\",\"pick_up\":\"hotel\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 631,
+      "completion_tokens": 334,
+      "total_tokens": 965,
+      "cost": 0.0068272875,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00689625,
+        "upstream_inference_prompt_cost": 0.00188625,
+        "upstream_inference_completions_cost": 0.00501
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240940-9GcSwpv7HKVmdUO2gJWj",
+    "object": "chat.completion",
+    "created": 1776240940,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to assist with planning your trip. Let's handle each part of your request step by step.\n\nFirst, I'll book a hotel room in Paris for 5 nights with a deluxe room and the additional services you requested.\n\nNext, I'll arrange for a car rental in Paris for 7 days with an SUV, picking up at the airport.\n\nThen, I'll book a hotel room in Rome for 3 nights in a suite with airport transfer service.\n\nLastly, I'll arrange a car rental in Rome for 5 days with a compact car, picking up at the hotel.\n\nAll bookings have been initiated as per your specifications. Please let me know if you need any adjustments or additional assistance with your trip planning!",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_03537704",
+              "function": {
+                "name": "hotel_book",
+                "arguments": "{\"location\":\"Paris\",\"roomType\":\"deluxe\",\"nights\":5,\"additional_services\":[\"breakfast\",\"spa\"]}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_30498412",
+              "function": {
+                "name": "car_rental",
+                "arguments": "{\"location\":\"Paris\",\"days\":7,\"car_type\":\"SUV\",\"pick_up\":\"airport\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_95974874",
+              "function": {
+                "name": "hotel_book",
+                "arguments": "{\"location\":\"Rome\",\"roomType\":\"suite\",\"nights\":3,\"additional_services\":[\"airport transfer\"]}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_95110477",
+              "function": {
+                "name": "car_rental",
+                "arguments": "{\"location\":\"Rome\",\"days\":5,\"car_type\":\"compact\",\"pick_up\":\"hotel\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 631,
+      "completion_tokens": 334,
+      "total_tokens": 965,
+      "cost": 0.0068272875,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00689625,
+        "upstream_inference_prompt_cost": 0.00188625,
+        "upstream_inference_completions_cost": 0.00501
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 4795.381,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "28e5afb9-3141-4f19-896a-ef57b1a57881"
+}

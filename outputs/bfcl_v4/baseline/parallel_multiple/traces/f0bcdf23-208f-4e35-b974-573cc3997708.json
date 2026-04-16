@@ -1,0 +1,355 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Could you please help me with a couple of calculations? First, I have a circle with a radius of 5.6 feet and I need to know its area. Second, I'm working on a project where I need to plot a sine wave. The range I'm interested in is from 0 to 3.14 radians. The frequency of the wave should be 2 Hz. Also, I want the amplitude of the wave to be 1.5 and the phase shift to be 0.5 radians. Could you calculate the area and plot the sine wave for me?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "plot_sine_wave",
+        "description": "Plot a sine wave for a given frequency in a given range. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "start_range": {
+              "type": "integer",
+              "description": "Start of the range in radians."
+            },
+            "end_range": {
+              "type": "number",
+              "description": "End of the range in radians. This is a float type value.",
+              "format": "float"
+            },
+            "frequency": {
+              "type": "integer",
+              "description": "Frequency of the sine wave in Hz."
+            },
+            "amplitude": {
+              "type": "number",
+              "description": "Amplitude of the sine wave. Default is 1. This is a float type value.",
+              "format": "float"
+            },
+            "phase_shift": {
+              "type": "number",
+              "description": "Phase shift of the sine wave in radians. Default is 0. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "start_range",
+            "end_range",
+            "frequency"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "geometry_area_circle",
+        "description": "Calculate the area of a circle given the radius. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "radius": {
+              "type": "number",
+              "description": "The radius of the circle. This is a float type value.",
+              "format": "float"
+            },
+            "units": {
+              "type": "string",
+              "description": "The units in which the radius is measured (defaults to meters).",
+              "default": "meters"
+            }
+          },
+          "required": [
+            "radius"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Could you please help me with a couple of calculations? First, I have a circle with a radius of 5.6 feet and I need to know its area. Second, I'm working on a project where I need to plot a sine wave. The range I'm interested in is from 0 to 3.14 radians. The frequency of the wave should be 2 Hz. Also, I want the amplitude of the wave to be 1.5 and the phase shift to be 0.5 radians. Could you calculate the area and plot the sine wave for me?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "plot_sine_wave",
+          "description": "Plot a sine wave for a given frequency in a given range. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "start_range": {
+                "type": "integer",
+                "description": "Start of the range in radians."
+              },
+              "end_range": {
+                "type": "number",
+                "description": "End of the range in radians. This is a float type value.",
+                "format": "float"
+              },
+              "frequency": {
+                "type": "integer",
+                "description": "Frequency of the sine wave in Hz."
+              },
+              "amplitude": {
+                "type": "number",
+                "description": "Amplitude of the sine wave. Default is 1. This is a float type value.",
+                "format": "float"
+              },
+              "phase_shift": {
+                "type": "number",
+                "description": "Phase shift of the sine wave in radians. Default is 0. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "start_range",
+              "end_range",
+              "frequency"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "geometry_area_circle",
+          "description": "Calculate the area of a circle given the radius. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "radius": {
+                "type": "number",
+                "description": "The radius of the circle. This is a float type value.",
+                "format": "float"
+              },
+              "units": {
+                "type": "string",
+                "description": "The units in which the radius is measured (defaults to meters).",
+                "default": "meters"
+              }
+            },
+            "required": [
+              "radius"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240961-g57qYol97qt1juWjD8xn",
+    "object": "chat.completion",
+    "created": 1776240962,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help with both of your requests. Let's start by addressing each one.\n\nFirst, for the circle area calculation with a radius of 5.6 feet:\n\nSecond, for plotting the sine wave with the specified parameters:\n\nI'll provide the results once the calculations and plotting are completed. If you have any additional specifications or adjustments, please let me know!",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_69407080",
+              "function": {
+                "name": "geometry_area_circle",
+                "arguments": "{\"radius\":5.6,\"units\":\"feet\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_19680216",
+              "function": {
+                "name": "plot_sine_wave",
+                "arguments": "{\"start_range\":0,\"end_range\":3.14,\"frequency\":2,\"amplitude\":1.5,\"phase_shift\":0.5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 615,
+      "completion_tokens": 168,
+      "total_tokens": 783,
+      "cost": 0.0038558025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00389475,
+        "upstream_inference_prompt_cost": 0.00137475,
+        "upstream_inference_completions_cost": 0.00252
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240961-g57qYol97qt1juWjD8xn",
+    "object": "response",
+    "created_at": 1776240966,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'm happy to help with both of your requests. Let's start by addressing each one.\n\nFirst, for the circle area calculation with a radius of 5.6 feet:\n\nSecond, for plotting the sine wave with the specified parameters:\n\nI'll provide the results once the calculations and plotting are completed. If you have any additional specifications or adjustments, please let me know!"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_69407080",
+        "call_id": "call_69407080",
+        "name": "geometry_area_circle",
+        "arguments": "{\"radius\":5.6,\"units\":\"feet\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_19680216",
+        "call_id": "call_19680216",
+        "name": "plot_sine_wave",
+        "arguments": "{\"start_range\":0,\"end_range\":3.14,\"frequency\":2,\"amplitude\":1.5,\"phase_shift\":0.5}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 615,
+      "completion_tokens": 168,
+      "total_tokens": 783,
+      "cost": 0.0038558025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00389475,
+        "upstream_inference_prompt_cost": 0.00137475,
+        "upstream_inference_completions_cost": 0.00252
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240961-g57qYol97qt1juWjD8xn",
+    "object": "chat.completion",
+    "created": 1776240962,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help with both of your requests. Let's start by addressing each one.\n\nFirst, for the circle area calculation with a radius of 5.6 feet:\n\nSecond, for plotting the sine wave with the specified parameters:\n\nI'll provide the results once the calculations and plotting are completed. If you have any additional specifications or adjustments, please let me know!",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_69407080",
+              "function": {
+                "name": "geometry_area_circle",
+                "arguments": "{\"radius\":5.6,\"units\":\"feet\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_19680216",
+              "function": {
+                "name": "plot_sine_wave",
+                "arguments": "{\"start_range\":0,\"end_range\":3.14,\"frequency\":2,\"amplitude\":1.5,\"phase_shift\":0.5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 615,
+      "completion_tokens": 168,
+      "total_tokens": 783,
+      "cost": 0.0038558025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00389475,
+        "upstream_inference_prompt_cost": 0.00137475,
+        "upstream_inference_completions_cost": 0.00252
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 5382.176,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "f0bcdf23-208f-4e35-b974-573cc3997708"
+}

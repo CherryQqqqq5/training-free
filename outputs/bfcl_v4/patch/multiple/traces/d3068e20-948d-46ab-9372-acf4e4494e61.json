@@ -1,0 +1,302 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the average grade for student John who has these scores {'math':90, 'science':75, 'history':82, 'music':89} across different subjects."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_standard_deviation",
+        "description": "This function calculates the standard deviation across different scores for a specific student. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "gradeDict": {
+              "type": "object",
+              "description": "A dictionary where keys represent subjects and values represent scores"
+            }
+          },
+          "required": [
+            "gradeDict"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "calculate_average",
+        "description": "This function calculates the average grade across different subjects for a specific student. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "gradeDict": {
+              "type": "object",
+              "description": "A dictionary where keys represent subjects and values represent scores"
+            }
+          },
+          "required": [
+            "gradeDict"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "highest_grade",
+        "description": "This function finds the subject where the student got the highest score. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "gradeDict": {
+              "type": "object",
+              "description": "A dictionary where keys represent subjects and values represent scores"
+            }
+          },
+          "required": [
+            "gradeDict"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the average grade for student John who has these scores {'math':90, 'science':75, 'history':82, 'music':89} across different subjects."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_standard_deviation",
+          "description": "This function calculates the standard deviation across different scores for a specific student. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "gradeDict": {
+                "type": "object",
+                "description": "A dictionary where keys represent subjects and values represent scores"
+              }
+            },
+            "required": [
+              "gradeDict"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_average",
+          "description": "This function calculates the average grade across different subjects for a specific student. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "gradeDict": {
+                "type": "object",
+                "description": "A dictionary where keys represent subjects and values represent scores"
+              }
+            },
+            "required": [
+              "gradeDict"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "highest_grade",
+          "description": "This function finds the subject where the student got the highest score. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "gradeDict": {
+                "type": "object",
+                "description": "A dictionary where keys represent subjects and values represent scores"
+              }
+            },
+            "required": [
+              "gradeDict"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239979-s3QSNANcCHNe9Owj8xME",
+    "object": "chat.completion",
+    "created": 1776239979,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_39920347",
+              "function": {
+                "name": "calculate_average",
+                "arguments": "{\"gradeDict\":{}}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 481,
+      "completion_tokens": 25,
+      "total_tokens": 506,
+      "cost": 0.00073062,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 480,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.000738,
+        "upstream_inference_prompt_cost": 0.000363,
+        "upstream_inference_completions_cost": 0.000375
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239979-s3QSNANcCHNe9Owj8xME",
+    "object": "response",
+    "created_at": 1776239980,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_39920347",
+        "call_id": "call_39920347",
+        "name": "calculate_average",
+        "arguments": "{\"gradeDict\":{}}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 481,
+      "completion_tokens": 25,
+      "total_tokens": 506,
+      "cost": 0.00073062,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 480,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.000738,
+        "upstream_inference_prompt_cost": 0.000363,
+        "upstream_inference_completions_cost": 0.000375
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239979-s3QSNANcCHNe9Owj8xME",
+    "object": "chat.completion",
+    "created": 1776239979,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_39920347",
+              "function": {
+                "name": "calculate_average",
+                "arguments": "{\"gradeDict\":{}}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 481,
+      "completion_tokens": 25,
+      "total_tokens": 506,
+      "cost": 0.00073062,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 480,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.000738,
+        "upstream_inference_prompt_cost": 0.000363,
+        "upstream_inference_completions_cost": 0.000375
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1531.053,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "d3068e20-948d-46ab-9372-acf4e4494e61"
+}

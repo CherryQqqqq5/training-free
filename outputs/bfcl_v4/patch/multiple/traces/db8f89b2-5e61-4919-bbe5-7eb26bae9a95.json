@@ -1,0 +1,440 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the expected evolutionary fitness of a creature, with trait A contributing to 40% of the fitness and trait B contributing 60%, if trait A has a value of 0.8 and trait B a value of 0.7."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "chess_rating",
+        "description": "Fetches the current chess rating of a given player Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "player_name": {
+              "type": "string",
+              "description": "The full name of the chess player."
+            },
+            "variant": {
+              "type": "string",
+              "description": "The variant of chess for which rating is requested (e.g., 'classical', 'blitz', 'bullet'). Default is 'classical'."
+            }
+          },
+          "required": [
+            "player_name"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "calculate_fitness",
+        "description": "Calculate the expected evolutionary fitness of a creature based on the individual values and contributions of its traits. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "trait_values": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "description": "List of trait values, which are decimal numbers between 0 and 1, where 1 represents the trait maximally contributing to fitness."
+            },
+            "trait_contributions": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "description": "List of the percentage contributions of each trait to the overall fitness, which must sum to 1."
+            }
+          },
+          "required": [
+            "trait_values",
+            "trait_contributions"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "walmart_purchase",
+        "description": "Retrieve information of items from Walmart including stock availability. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "loc": {
+              "type": "string",
+              "description": "Location of the nearest Walmart."
+            },
+            "product_list": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Items to be purchased listed in an array."
+            },
+            "pack_size": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "Size of the product pack if applicable. The size of the array should be equal to product_list. Default is empty array."
+            }
+          },
+          "required": [
+            "loc",
+            "product_list"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "lawyer_find_nearby",
+        "description": "Locate nearby lawyers based on specific criteria like specialty, fee per hour and city. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "city": {
+              "type": "string",
+              "description": "The city and state, e.g. Chicago, IL."
+            },
+            "specialty": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Civil",
+                  "Divorce",
+                  "Immigration",
+                  "Business",
+                  "Criminal"
+                ]
+              },
+              "description": "Specialization of the lawyer."
+            },
+            "fee": {
+              "type": "integer",
+              "description": "Hourly fee charged by lawyer",
+              "maximum": 400
+            }
+          },
+          "required": [
+            "city",
+            "specialty",
+            "fee"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the expected evolutionary fitness of a creature, with trait A contributing to 40% of the fitness and trait B contributing 60%, if trait A has a value of 0.8 and trait B a value of 0.7."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "chess_rating",
+          "description": "Fetches the current chess rating of a given player Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "player_name": {
+                "type": "string",
+                "description": "The full name of the chess player."
+              },
+              "variant": {
+                "type": "string",
+                "description": "The variant of chess for which rating is requested (e.g., 'classical', 'blitz', 'bullet'). Default is 'classical'."
+              }
+            },
+            "required": [
+              "player_name"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_fitness",
+          "description": "Calculate the expected evolutionary fitness of a creature based on the individual values and contributions of its traits. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "trait_values": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "description": "List of trait values, which are decimal numbers between 0 and 1, where 1 represents the trait maximally contributing to fitness."
+              },
+              "trait_contributions": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "description": "List of the percentage contributions of each trait to the overall fitness, which must sum to 1."
+              }
+            },
+            "required": [
+              "trait_values",
+              "trait_contributions"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "walmart_purchase",
+          "description": "Retrieve information of items from Walmart including stock availability. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "loc": {
+                "type": "string",
+                "description": "Location of the nearest Walmart."
+              },
+              "product_list": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Items to be purchased listed in an array."
+              },
+              "pack_size": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "Size of the product pack if applicable. The size of the array should be equal to product_list. Default is empty array."
+              }
+            },
+            "required": [
+              "loc",
+              "product_list"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "lawyer_find_nearby",
+          "description": "Locate nearby lawyers based on specific criteria like specialty, fee per hour and city. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "city": {
+                "type": "string",
+                "description": "The city and state, e.g. Chicago, IL."
+              },
+              "specialty": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "Civil",
+                    "Divorce",
+                    "Immigration",
+                    "Business",
+                    "Criminal"
+                  ]
+                },
+                "description": "Specialization of the lawyer."
+              },
+              "fee": {
+                "type": "integer",
+                "description": "Hourly fee charged by lawyer",
+                "maximum": 400
+              }
+            },
+            "required": [
+              "city",
+              "specialty",
+              "fee"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240200-sefbNwMnB5YBIYYdtyfV",
+    "object": "chat.completion",
+    "created": 1776240200,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_97742698",
+              "function": {
+                "name": "calculate_fitness",
+                "arguments": "{\"trait_values\":[0.8,0.7],\"trait_contributions\":[0.4,0.6]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 779,
+      "completion_tokens": 50,
+      "total_tokens": 829,
+      "cost": 0.0025905825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00261675,
+        "upstream_inference_prompt_cost": 0.00186675,
+        "upstream_inference_completions_cost": 0.00075
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240200-sefbNwMnB5YBIYYdtyfV",
+    "object": "response",
+    "created_at": 1776240201,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_97742698",
+        "call_id": "call_97742698",
+        "name": "calculate_fitness",
+        "arguments": "{\"trait_values\":[0.8,0.7],\"trait_contributions\":[0.4,0.6]}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 779,
+      "completion_tokens": 50,
+      "total_tokens": 829,
+      "cost": 0.0025905825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00261675,
+        "upstream_inference_prompt_cost": 0.00186675,
+        "upstream_inference_completions_cost": 0.00075
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240200-sefbNwMnB5YBIYYdtyfV",
+    "object": "chat.completion",
+    "created": 1776240200,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_97742698",
+              "function": {
+                "name": "calculate_fitness",
+                "arguments": "{\"trait_values\":[0.8,0.7],\"trait_contributions\":[0.4,0.6]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 779,
+      "completion_tokens": 50,
+      "total_tokens": 829,
+      "cost": 0.0025905825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00261675,
+        "upstream_inference_prompt_cost": 0.00186675,
+        "upstream_inference_completions_cost": 0.00075
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1870.737,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "db8f89b2-5e61-4919-bbe5-7eb26bae9a95"
+}

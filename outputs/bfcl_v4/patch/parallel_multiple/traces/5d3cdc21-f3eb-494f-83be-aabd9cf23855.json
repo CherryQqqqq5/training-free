@@ -1,0 +1,404 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Imagine you are a math teacher preparing for a geometry class. You want to create a worksheet for your students that includes problems on calculating areas of different shapes. You have decided to include a problem on calculating the area of a triangle using Heron's formula, another problem on calculating the area of a triangle using the base and height, and a problem on calculating the area of a circle. For the first problem, you have chosen a triangle with sides of lengths 7 units, 10 units, and 5 units. For the second problem, you have chosen a triangle with a base of 8 units and a height of 6 units. For the third problem, you have chosen a circle with a radius of 4 units. Could you calculate the areas of these shapes for your worksheet?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "math_triangle_area_heron",
+        "description": "Calculates the area of a triangle using Heron's formula, given the lengths of its three sides. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "side1": {
+              "type": "number",
+              "description": "Length of the first side of the triangle. This is a float type value.",
+              "format": "float"
+            },
+            "side2": {
+              "type": "number",
+              "description": "Length of the second side of the triangle. This is a float type value.",
+              "format": "float"
+            },
+            "side3": {
+              "type": "number",
+              "description": "Length of the third side of the triangle. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "side1",
+            "side2",
+            "side3"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "math_triangle_area_base_height",
+        "description": "Calculates the area of a triangle using the formula (1/2)base*height. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "base": {
+              "type": "number",
+              "description": "The base length of the triangle. This is a float type value.",
+              "format": "float"
+            },
+            "height": {
+              "type": "number",
+              "description": "The height of the triangle. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "base",
+            "height"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "math_circle_area",
+        "description": "Calculates the area of a circle given its radius. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "radius": {
+              "type": "number",
+              "description": "The radius of the circle. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "radius"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Imagine you are a math teacher preparing for a geometry class. You want to create a worksheet for your students that includes problems on calculating areas of different shapes. You have decided to include a problem on calculating the area of a triangle using Heron's formula, another problem on calculating the area of a triangle using the base and height, and a problem on calculating the area of a circle. For the first problem, you have chosen a triangle with sides of lengths 7 units, 10 units, and 5 units. For the second problem, you have chosen a triangle with a base of 8 units and a height of 6 units. For the third problem, you have chosen a circle with a radius of 4 units. Could you calculate the areas of these shapes for your worksheet?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "math_triangle_area_heron",
+          "description": "Calculates the area of a triangle using Heron's formula, given the lengths of its three sides. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "side1": {
+                "type": "number",
+                "description": "Length of the first side of the triangle. This is a float type value.",
+                "format": "float"
+              },
+              "side2": {
+                "type": "number",
+                "description": "Length of the second side of the triangle. This is a float type value.",
+                "format": "float"
+              },
+              "side3": {
+                "type": "number",
+                "description": "Length of the third side of the triangle. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "side1",
+              "side2",
+              "side3"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "math_triangle_area_base_height",
+          "description": "Calculates the area of a triangle using the formula (1/2)base*height. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "base": {
+                "type": "number",
+                "description": "The base length of the triangle. This is a float type value.",
+                "format": "float"
+              },
+              "height": {
+                "type": "number",
+                "description": "The height of the triangle. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "base",
+              "height"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "math_circle_area",
+          "description": "Calculates the area of a circle given its radius. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "radius": {
+                "type": "number",
+                "description": "The radius of the circle. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "radius"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241498-NyozO0hyXivBK65OBKL7",
+    "object": "chat.completion",
+    "created": 1776241498,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help you calculate the areas of these shapes for your geometry worksheet. Let's go through each problem one by one using the available functions.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_47028560",
+              "function": {
+                "name": "math_triangle_area_heron",
+                "arguments": "{\"side1\":7.0,\"side2\":10.0,\"side3\":5.0}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_05223766",
+              "function": {
+                "name": "math_triangle_area_base_height",
+                "arguments": "{\"base\":8.0,\"height\":6.0}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_76354462",
+              "function": {
+                "name": "math_circle_area",
+                "arguments": "{\"radius\":4.0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 714,
+      "completion_tokens": 145,
+      "total_tokens": 859,
+      "cost": 0.0038082825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00384675,
+        "upstream_inference_prompt_cost": 0.00167175,
+        "upstream_inference_completions_cost": 0.002175
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241498-NyozO0hyXivBK65OBKL7",
+    "object": "response",
+    "created_at": 1776241500,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'm happy to help you calculate the areas of these shapes for your geometry worksheet. Let's go through each problem one by one using the available functions.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_47028560",
+        "call_id": "call_47028560",
+        "name": "math_triangle_area_heron",
+        "arguments": "{\"side1\":7.0,\"side2\":10.0,\"side3\":5.0}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_05223766",
+        "call_id": "call_05223766",
+        "name": "math_triangle_area_base_height",
+        "arguments": "{\"base\":8.0,\"height\":6.0}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_76354462",
+        "call_id": "call_76354462",
+        "name": "math_circle_area",
+        "arguments": "{\"radius\":4.0}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 714,
+      "completion_tokens": 145,
+      "total_tokens": 859,
+      "cost": 0.0038082825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00384675,
+        "upstream_inference_prompt_cost": 0.00167175,
+        "upstream_inference_completions_cost": 0.002175
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241498-NyozO0hyXivBK65OBKL7",
+    "object": "chat.completion",
+    "created": 1776241498,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help you calculate the areas of these shapes for your geometry worksheet. Let's go through each problem one by one using the available functions.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_47028560",
+              "function": {
+                "name": "math_triangle_area_heron",
+                "arguments": "{\"side1\":7.0,\"side2\":10.0,\"side3\":5.0}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_05223766",
+              "function": {
+                "name": "math_triangle_area_base_height",
+                "arguments": "{\"base\":8.0,\"height\":6.0}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_76354462",
+              "function": {
+                "name": "math_circle_area",
+                "arguments": "{\"radius\":4.0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 714,
+      "completion_tokens": 145,
+      "total_tokens": 859,
+      "cost": 0.0038082825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00384675,
+        "upstream_inference_prompt_cost": 0.00167175,
+        "upstream_inference_completions_cost": 0.002175
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2728.675,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "5d3cdc21-f3eb-494f-83be-aabd9cf23855"
+}

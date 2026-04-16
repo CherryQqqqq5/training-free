@@ -1,0 +1,322 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Translate Hello, how are you? from English to French."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "translate",
+        "description": "Translate text from a specified source language to a specified target language. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "description": "The text to be translated."
+            },
+            "source_language": {
+              "type": "string",
+              "description": "The language the text is currently in."
+            },
+            "target_language": {
+              "type": "string",
+              "description": "The language the text will be translated to."
+            }
+          },
+          "required": [
+            "text",
+            "source_language",
+            "target_language"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "sentiment_analysis",
+        "description": "Analyze the sentiment of a specified text. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "description": "The text whose sentiment is to be analyzed."
+            }
+          },
+          "required": [
+            "text"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "word_count",
+        "description": "Count the number of words in the given text. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "description": "The text that the number of words is to be calculated."
+            }
+          },
+          "required": [
+            "text"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Translate Hello, how are you? from English to French."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "translate",
+          "description": "Translate text from a specified source language to a specified target language. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "description": "The text to be translated."
+              },
+              "source_language": {
+                "type": "string",
+                "description": "The language the text is currently in."
+              },
+              "target_language": {
+                "type": "string",
+                "description": "The language the text will be translated to."
+              }
+            },
+            "required": [
+              "text",
+              "source_language",
+              "target_language"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "sentiment_analysis",
+          "description": "Analyze the sentiment of a specified text. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "description": "The text whose sentiment is to be analyzed."
+              }
+            },
+            "required": [
+              "text"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "word_count",
+          "description": "Count the number of words in the given text. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "description": "The text that the number of words is to be calculated."
+              }
+            },
+            "required": [
+              "text"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239596-SUpYBdjsAkzN9bifpnW2",
+    "object": "chat.completion",
+    "created": 1776239596,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_21357567",
+              "function": {
+                "name": "translate",
+                "arguments": "{\"text\":\"Hello, how are you?\",\"source_language\":\"English\",\"target_language\":\"French\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 464,
+      "completion_tokens": 43,
+      "total_tokens": 507,
+      "cost": 0.0015510825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00156675,
+        "upstream_inference_prompt_cost": 0.00092175,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239596-SUpYBdjsAkzN9bifpnW2",
+    "object": "response",
+    "created_at": 1776239598,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_21357567",
+        "call_id": "call_21357567",
+        "name": "translate",
+        "arguments": "{\"text\":\"Hello, how are you?\",\"source_language\":\"English\",\"target_language\":\"French\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 464,
+      "completion_tokens": 43,
+      "total_tokens": 507,
+      "cost": 0.0015510825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00156675,
+        "upstream_inference_prompt_cost": 0.00092175,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239596-SUpYBdjsAkzN9bifpnW2",
+    "object": "chat.completion",
+    "created": 1776239596,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_21357567",
+              "function": {
+                "name": "translate",
+                "arguments": "{\"text\":\"Hello, how are you?\",\"source_language\":\"English\",\"target_language\":\"French\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 464,
+      "completion_tokens": 43,
+      "total_tokens": 507,
+      "cost": 0.0015510825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00156675,
+        "upstream_inference_prompt_cost": 0.00092175,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2136.585,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "8ad02914-6153-4aac-a58c-91dab850f621"
+}

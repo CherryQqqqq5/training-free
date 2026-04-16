@@ -1,0 +1,360 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find the price of a used Gibson Les Paul guitar in excellent condition in the Chicago area."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "identify_color_rgb",
+        "description": "This function identifies the RGB values of a named color. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "color_name": {
+              "type": "string",
+              "description": "Name of the color."
+            },
+            "standard": {
+              "type": "string",
+              "description": "The color standard (e.g. basic, pantone). Default is 'basic'"
+            }
+          },
+          "required": [
+            "color_name"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "board_game_chess_get_top_players",
+        "description": "Find top chess players in a location based on rating. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city you want to find the players from."
+            },
+            "minimum_rating": {
+              "type": "integer",
+              "description": "Minimum rating to filter the players."
+            },
+            "number_of_players": {
+              "type": "integer",
+              "default": 10,
+              "description": "Number of players you want to retrieve, default value is 10"
+            }
+          },
+          "required": [
+            "location",
+            "minimum_rating"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "guitar_price_find",
+        "description": "Retrieve the price of a specific used guitar model based on its condition and location. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "model": {
+              "type": "string",
+              "description": "The model of the guitar."
+            },
+            "condition": {
+              "type": "string",
+              "enum": [
+                "Poor",
+                "Good",
+                "Excellent"
+              ],
+              "description": "The condition of the guitar."
+            },
+            "location": {
+              "type": "string",
+              "description": "The location where the guitar is being sold."
+            }
+          },
+          "required": [
+            "model",
+            "condition",
+            "location"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find the price of a used Gibson Les Paul guitar in excellent condition in the Chicago area."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "identify_color_rgb",
+          "description": "This function identifies the RGB values of a named color. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "color_name": {
+                "type": "string",
+                "description": "Name of the color."
+              },
+              "standard": {
+                "type": "string",
+                "description": "The color standard (e.g. basic, pantone). Default is 'basic'"
+              }
+            },
+            "required": [
+              "color_name"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "board_game_chess_get_top_players",
+          "description": "Find top chess players in a location based on rating. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city you want to find the players from."
+              },
+              "minimum_rating": {
+                "type": "integer",
+                "description": "Minimum rating to filter the players."
+              },
+              "number_of_players": {
+                "type": "integer",
+                "default": 10,
+                "description": "Number of players you want to retrieve, default value is 10"
+              }
+            },
+            "required": [
+              "location",
+              "minimum_rating"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "guitar_price_find",
+          "description": "Retrieve the price of a specific used guitar model based on its condition and location. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "model": {
+                "type": "string",
+                "description": "The model of the guitar."
+              },
+              "condition": {
+                "type": "string",
+                "enum": [
+                  "Poor",
+                  "Good",
+                  "Excellent"
+                ],
+                "description": "The condition of the guitar."
+              },
+              "location": {
+                "type": "string",
+                "description": "The location where the guitar is being sold."
+              }
+            },
+            "required": [
+              "model",
+              "condition",
+              "location"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240310-WsR7d22noWOXJjNdwZTr",
+    "object": "chat.completion",
+    "created": 1776240310,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_37644583",
+              "function": {
+                "name": "guitar_price_find",
+                "arguments": "{\"model\":\"Gibson Les Paul\",\"condition\":\"Excellent\",\"location\":\"Chicago\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 558,
+      "completion_tokens": 43,
+      "total_tokens": 601,
+      "cost": 0.0018302625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00184875,
+        "upstream_inference_prompt_cost": 0.00120375,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240310-WsR7d22noWOXJjNdwZTr",
+    "object": "response",
+    "created_at": 1776240312,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_37644583",
+        "call_id": "call_37644583",
+        "name": "guitar_price_find",
+        "arguments": "{\"model\":\"Gibson Les Paul\",\"condition\":\"Excellent\",\"location\":\"Chicago\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 558,
+      "completion_tokens": 43,
+      "total_tokens": 601,
+      "cost": 0.0018302625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00184875,
+        "upstream_inference_prompt_cost": 0.00120375,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240310-WsR7d22noWOXJjNdwZTr",
+    "object": "chat.completion",
+    "created": 1776240310,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_37644583",
+              "function": {
+                "name": "guitar_price_find",
+                "arguments": "{\"model\":\"Gibson Les Paul\",\"condition\":\"Excellent\",\"location\":\"Chicago\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 558,
+      "completion_tokens": 43,
+      "total_tokens": 601,
+      "cost": 0.0018302625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00184875,
+        "upstream_inference_prompt_cost": 0.00120375,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1815.865,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "bacdd569-fe71-47b3-ab75-6bec6f382529"
+}

@@ -1,0 +1,357 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find the area of a rectangle with length 7 and breadth 3. Also, calculate the area of a circle with radius 5."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "volume_cylinder_calculate",
+        "description": "Calculate the volume of a cylinder given the radius and the height. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "radius": {
+              "type": "number",
+              "description": "The radius of the cylinder. This is a float type value.",
+              "format": "float"
+            },
+            "height": {
+              "type": "number",
+              "description": "The height of the cylinder. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "radius",
+            "height"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "area_rectangle_calculate",
+        "description": "Calculate the area of a rectangle given the length and breadth. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "length": {
+              "type": "number",
+              "description": "The length of the rectangle. This is a float type value.",
+              "format": "float"
+            },
+            "breadth": {
+              "type": "number",
+              "description": "The breadth of the rectangle. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "length",
+            "breadth"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "area_circle_calculate",
+        "description": "Calculate the area of a circle given the radius. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "radius": {
+              "type": "number",
+              "description": "The radius of the circle. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "radius"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find the area of a rectangle with length 7 and breadth 3. Also, calculate the area of a circle with radius 5."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "volume_cylinder_calculate",
+          "description": "Calculate the volume of a cylinder given the radius and the height. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "radius": {
+                "type": "number",
+                "description": "The radius of the cylinder. This is a float type value.",
+                "format": "float"
+              },
+              "height": {
+                "type": "number",
+                "description": "The height of the cylinder. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "radius",
+              "height"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "area_rectangle_calculate",
+          "description": "Calculate the area of a rectangle given the length and breadth. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "length": {
+                "type": "number",
+                "description": "The length of the rectangle. This is a float type value.",
+                "format": "float"
+              },
+              "breadth": {
+                "type": "number",
+                "description": "The breadth of the rectangle. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "length",
+              "breadth"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "area_circle_calculate",
+          "description": "Calculate the area of a circle given the radius. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "radius": {
+                "type": "number",
+                "description": "The radius of the circle. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "radius"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241337-TGB5GlhSG1v7iu7cfkbI",
+    "object": "chat.completion",
+    "created": 1776241337,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_72493370",
+              "function": {
+                "name": "area_rectangle_calculate",
+                "arguments": "{\"length\":7,\"breadth\":3}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_74057685",
+              "function": {
+                "name": "area_circle_calculate",
+                "arguments": "{\"radius\":5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 526,
+      "completion_tokens": 61,
+      "total_tokens": 587,
+      "cost": 0.0020025225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00202275,
+        "upstream_inference_prompt_cost": 0.00110775,
+        "upstream_inference_completions_cost": 0.000915
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241337-TGB5GlhSG1v7iu7cfkbI",
+    "object": "response",
+    "created_at": 1776241339,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_72493370",
+        "call_id": "call_72493370",
+        "name": "area_rectangle_calculate",
+        "arguments": "{\"length\":7,\"breadth\":3}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_74057685",
+        "call_id": "call_74057685",
+        "name": "area_circle_calculate",
+        "arguments": "{\"radius\":5}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 526,
+      "completion_tokens": 61,
+      "total_tokens": 587,
+      "cost": 0.0020025225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00202275,
+        "upstream_inference_prompt_cost": 0.00110775,
+        "upstream_inference_completions_cost": 0.000915
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241337-TGB5GlhSG1v7iu7cfkbI",
+    "object": "chat.completion",
+    "created": 1776241337,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_72493370",
+              "function": {
+                "name": "area_rectangle_calculate",
+                "arguments": "{\"length\":7,\"breadth\":3}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_74057685",
+              "function": {
+                "name": "area_circle_calculate",
+                "arguments": "{\"radius\":5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 526,
+      "completion_tokens": 61,
+      "total_tokens": 587,
+      "cost": 0.0020025225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00202275,
+        "upstream_inference_prompt_cost": 0.00110775,
+        "upstream_inference_completions_cost": 0.000915
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2286.758,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "8f9bee1e-56fa-4e64-b13e-9feab2f70983"
+}

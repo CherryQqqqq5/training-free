@@ -1,0 +1,248 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "What was Albert Einstein's contribution to science on March 17, 1915?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "historical_contrib_get_contrib",
+        "description": "Retrieve historical contribution made by a scientist on a specific date. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "scientist": {
+              "type": "string",
+              "description": "The scientist whose contributions need to be searched."
+            },
+            "date": {
+              "type": "string",
+              "description": "The date when the contribution was made in yyyy-mm-dd format."
+            },
+            "category": {
+              "type": "string",
+              "description": "The field of the contribution, such as 'Physics' or 'Chemistry'. Default is 'all'."
+            }
+          },
+          "required": [
+            "scientist",
+            "date"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What was Albert Einstein's contribution to science on March 17, 1915?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "historical_contrib_get_contrib",
+          "description": "Retrieve historical contribution made by a scientist on a specific date. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "scientist": {
+                "type": "string",
+                "description": "The scientist whose contributions need to be searched."
+              },
+              "date": {
+                "type": "string",
+                "description": "The date when the contribution was made in yyyy-mm-dd format."
+              },
+              "category": {
+                "type": "string",
+                "description": "The field of the contribution, such as 'Physics' or 'Chemistry'. Default is 'all'."
+              }
+            },
+            "required": [
+              "scientist",
+              "date"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776238159-cutR6usHGafomjljF3Ck",
+    "object": "chat.completion",
+    "created": 1776238159,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_58786438",
+              "function": {
+                "name": "historical_contrib_get_contrib",
+                "arguments": "{\"scientist\":\"Albert Einstein\",\"date\":\"1915-03-17\",\"category\":\"all\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 358,
+      "completion_tokens": 49,
+      "total_tokens": 407,
+      "cost": 0.0013253625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00133875,
+        "upstream_inference_prompt_cost": 0.00060375,
+        "upstream_inference_completions_cost": 0.000735
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776238159-cutR6usHGafomjljF3Ck",
+    "object": "response",
+    "created_at": 1776238161,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_58786438",
+        "call_id": "call_58786438",
+        "name": "historical_contrib_get_contrib",
+        "arguments": "{\"scientist\":\"Albert Einstein\",\"date\":\"1915-03-17\",\"category\":\"all\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 358,
+      "completion_tokens": 49,
+      "total_tokens": 407,
+      "cost": 0.0013253625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00133875,
+        "upstream_inference_prompt_cost": 0.00060375,
+        "upstream_inference_completions_cost": 0.000735
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776238159-cutR6usHGafomjljF3Ck",
+    "object": "chat.completion",
+    "created": 1776238159,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_58786438",
+              "function": {
+                "name": "historical_contrib_get_contrib",
+                "arguments": "{\"scientist\":\"Albert Einstein\",\"date\":\"1915-03-17\",\"category\":\"all\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 358,
+      "completion_tokens": 49,
+      "total_tokens": 407,
+      "cost": 0.0013253625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00133875,
+        "upstream_inference_prompt_cost": 0.00060375,
+        "upstream_inference_completions_cost": 0.000735
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1996.132,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "61351d06-b260-40a4-b03b-a048d00ab8f2"
+}

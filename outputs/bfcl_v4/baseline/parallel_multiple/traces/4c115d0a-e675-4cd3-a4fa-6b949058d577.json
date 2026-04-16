@@ -1,0 +1,503 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Imagine you are playing a role-playing game and you want to create a new player profile. You decided to name your character 'DragonSlayer' and choose 'Warrior' as your class. You also want to start at level 5. After setting up your profile, you want to take a break and find a nearby concert to attend. You are currently in 'New York, NY' and you want to find a concert that plays 'Rock' music. Later in the evening, you decide to play a game of poker with a standard deck of 52 cards and a hand size of 5. What is the probability of getting a full house? The next day, you decide to go on a hike and you want to calculate the slope gradient between two geographical coordinates. The first point is [40.7128, -74.0060] (New York, NY) and the second point is [34.0522, -118.2437] (Los Angeles, CA). You want the slope gradient in 'degree'. Can you provide the information for all these scenarios?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "poker_probability_full_house",
+        "description": "Calculate the probability of getting a full house in a poker game. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "deck_size": {
+              "type": "integer",
+              "description": "The size of the deck. Default is 52."
+            },
+            "hand_size": {
+              "type": "integer",
+              "description": "The size of the hand. Default is 5."
+            }
+          },
+          "required": [
+            "deck_size",
+            "hand_size"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "calculate_slope_gradient",
+        "description": "Calculate the slope gradient between two geographical coordinates. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "point1": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "description": "The geographic coordinates for the first point [Latitude, Longitude]."
+            },
+            "point2": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "description": "The geographic coordinates for the second point [Latitude, Longitude]."
+            },
+            "unit": {
+              "type": "string",
+              "enum": [
+                "degree",
+                "percent",
+                "ratio"
+              ],
+              "description": "The unit for the slope gradient. Default is 'degree'."
+            }
+          },
+          "required": [
+            "point1",
+            "point2"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "concert_find_nearby",
+        "description": "Locate nearby concerts based on specific criteria like genre. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city and state, e.g. Seattle, WA"
+            },
+            "genre": {
+              "type": "string",
+              "description": "Genre of music to be played at the concert."
+            }
+          },
+          "required": [
+            "location",
+            "genre"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "create_player_profile",
+        "description": "Create a new player profile with character name, class and starting level. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "player_name": {
+              "type": "string",
+              "description": "The desired name of the player."
+            },
+            "class_type": {
+              "type": "string",
+              "description": "The character class for the player. Default ''"
+            },
+            "starting_level": {
+              "type": "integer",
+              "description": "The starting level for the player",
+              "default": 1
+            }
+          },
+          "required": [
+            "player_name",
+            "class_type"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Imagine you are playing a role-playing game and you want to create a new player profile. You decided to name your character 'DragonSlayer' and choose 'Warrior' as your class. You also want to start at level 5. After setting up your profile, you want to take a break and find a nearby concert to attend. You are currently in 'New York, NY' and you want to find a concert that plays 'Rock' music. Later in the evening, you decide to play a game of poker with a standard deck of 52 cards and a hand size of 5. What is the probability of getting a full house? The next day, you decide to go on a hike and you want to calculate the slope gradient between two geographical coordinates. The first point is [40.7128, -74.0060] (New York, NY) and the second point is [34.0522, -118.2437] (Los Angeles, CA). You want the slope gradient in 'degree'. Can you provide the information for all these scenarios?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "poker_probability_full_house",
+          "description": "Calculate the probability of getting a full house in a poker game. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "deck_size": {
+                "type": "integer",
+                "description": "The size of the deck. Default is 52."
+              },
+              "hand_size": {
+                "type": "integer",
+                "description": "The size of the hand. Default is 5."
+              }
+            },
+            "required": [
+              "deck_size",
+              "hand_size"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_slope_gradient",
+          "description": "Calculate the slope gradient between two geographical coordinates. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "point1": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "description": "The geographic coordinates for the first point [Latitude, Longitude]."
+              },
+              "point2": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "description": "The geographic coordinates for the second point [Latitude, Longitude]."
+              },
+              "unit": {
+                "type": "string",
+                "enum": [
+                  "degree",
+                  "percent",
+                  "ratio"
+                ],
+                "description": "The unit for the slope gradient. Default is 'degree'."
+              }
+            },
+            "required": [
+              "point1",
+              "point2"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "concert_find_nearby",
+          "description": "Locate nearby concerts based on specific criteria like genre. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city and state, e.g. Seattle, WA"
+              },
+              "genre": {
+                "type": "string",
+                "description": "Genre of music to be played at the concert."
+              }
+            },
+            "required": [
+              "location",
+              "genre"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "create_player_profile",
+          "description": "Create a new player profile with character name, class and starting level. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "player_name": {
+                "type": "string",
+                "description": "The desired name of the player."
+              },
+              "class_type": {
+                "type": "string",
+                "description": "The character class for the player. Default ''"
+              },
+              "starting_level": {
+                "type": "integer",
+                "description": "The starting level for the player",
+                "default": 1
+              }
+            },
+            "required": [
+              "player_name",
+              "class_type"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241155-Of7CY5jUBDCtFvp84Vvo",
+    "object": "chat.completion",
+    "created": 1776241155,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'll handle each of your requests step by step by calling the relevant functions to provide the information you need.\n\nFirst, let's create your player profile for the role-playing game.\n\nNext, I'll help you find a nearby concert in New York, NY for Rock music.\n\nNow, let's calculate the probability of getting a full house in a poker game with a standard deck of 52 cards and a hand size of 5.\n\nLastly, I'll calculate the slope gradient between the two geographical coordinates you provided, with the result in degrees.\n\nI've initiated all the necessary function calls to address your requests. The results for each of these actions will be provided based on the outputs of these functions.",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_62371603",
+              "function": {
+                "name": "create_player_profile",
+                "arguments": "{\"player_name\":\"DragonSlayer\",\"class_type\":\"Warrior\",\"starting_level\":5}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_80805916",
+              "function": {
+                "name": "concert_find_nearby",
+                "arguments": "{\"location\":\"New York, NY\",\"genre\":\"Rock\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_22864349",
+              "function": {
+                "name": "poker_probability_full_house",
+                "arguments": "{\"deck_size\":52,\"hand_size\":5}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_29085159",
+              "function": {
+                "name": "calculate_slope_gradient",
+                "arguments": "{\"point1\":[40.7128,-74.006],\"point2\":[34.0522,-118.2437],\"unit\":\"degree\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 873,
+      "completion_tokens": 309,
+      "total_tokens": 1182,
+      "cost": 0.0071747775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00724725,
+        "upstream_inference_prompt_cost": 0.00261225,
+        "upstream_inference_completions_cost": 0.004635
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241155-Of7CY5jUBDCtFvp84Vvo",
+    "object": "response",
+    "created_at": 1776241160,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'll handle each of your requests step by step by calling the relevant functions to provide the information you need.\n\nFirst, let's create your player profile for the role-playing game.\n\nNext, I'll help you find a nearby concert in New York, NY for Rock music.\n\nNow, let's calculate the probability of getting a full house in a poker game with a standard deck of 52 cards and a hand size of 5.\n\nLastly, I'll calculate the slope gradient between the two geographical coordinates you provided, with the result in degrees.\n\nI've initiated all the necessary function calls to address your requests. The results for each of these actions will be provided based on the outputs of these functions."
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_62371603",
+        "call_id": "call_62371603",
+        "name": "create_player_profile",
+        "arguments": "{\"player_name\":\"DragonSlayer\",\"class_type\":\"Warrior\",\"starting_level\":5}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_80805916",
+        "call_id": "call_80805916",
+        "name": "concert_find_nearby",
+        "arguments": "{\"location\":\"New York, NY\",\"genre\":\"Rock\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_22864349",
+        "call_id": "call_22864349",
+        "name": "poker_probability_full_house",
+        "arguments": "{\"deck_size\":52,\"hand_size\":5}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_29085159",
+        "call_id": "call_29085159",
+        "name": "calculate_slope_gradient",
+        "arguments": "{\"point1\":[40.7128,-74.006],\"point2\":[34.0522,-118.2437],\"unit\":\"degree\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 873,
+      "completion_tokens": 309,
+      "total_tokens": 1182,
+      "cost": 0.0071747775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00724725,
+        "upstream_inference_prompt_cost": 0.00261225,
+        "upstream_inference_completions_cost": 0.004635
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241155-Of7CY5jUBDCtFvp84Vvo",
+    "object": "chat.completion",
+    "created": 1776241155,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'll handle each of your requests step by step by calling the relevant functions to provide the information you need.\n\nFirst, let's create your player profile for the role-playing game.\n\nNext, I'll help you find a nearby concert in New York, NY for Rock music.\n\nNow, let's calculate the probability of getting a full house in a poker game with a standard deck of 52 cards and a hand size of 5.\n\nLastly, I'll calculate the slope gradient between the two geographical coordinates you provided, with the result in degrees.\n\nI've initiated all the necessary function calls to address your requests. The results for each of these actions will be provided based on the outputs of these functions.",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_62371603",
+              "function": {
+                "name": "create_player_profile",
+                "arguments": "{\"player_name\":\"DragonSlayer\",\"class_type\":\"Warrior\",\"starting_level\":5}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_80805916",
+              "function": {
+                "name": "concert_find_nearby",
+                "arguments": "{\"location\":\"New York, NY\",\"genre\":\"Rock\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_22864349",
+              "function": {
+                "name": "poker_probability_full_house",
+                "arguments": "{\"deck_size\":52,\"hand_size\":5}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_29085159",
+              "function": {
+                "name": "calculate_slope_gradient",
+                "arguments": "{\"point1\":[40.7128,-74.006],\"point2\":[34.0522,-118.2437],\"unit\":\"degree\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 873,
+      "completion_tokens": 309,
+      "total_tokens": 1182,
+      "cost": 0.0071747775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00724725,
+        "upstream_inference_prompt_cost": 0.00261225,
+        "upstream_inference_completions_cost": 0.004635
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 5355.077,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "4c115d0a-e675-4cd3-a4fa-6b949058d577"
+}

@@ -1,0 +1,248 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the Body Mass Index (BMI) of a person with a weight of 85 kilograms and height of 180 cm."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_bmi",
+        "description": "Calculate the Body Mass Index (BMI) of a person. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "weight": {
+              "type": "integer",
+              "description": "Weight of the person in kilograms."
+            },
+            "height": {
+              "type": "integer",
+              "description": "Height of the person in centimeters."
+            },
+            "unit": {
+              "type": "string",
+              "description": "Optional parameter to choose between 'imperial' and 'metric' systems. Default is 'metric'."
+            }
+          },
+          "required": [
+            "weight",
+            "height"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the Body Mass Index (BMI) of a person with a weight of 85 kilograms and height of 180 cm."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_bmi",
+          "description": "Calculate the Body Mass Index (BMI) of a person. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "weight": {
+                "type": "integer",
+                "description": "Weight of the person in kilograms."
+              },
+              "height": {
+                "type": "integer",
+                "description": "Height of the person in centimeters."
+              },
+              "unit": {
+                "type": "string",
+                "description": "Optional parameter to choose between 'imperial' and 'metric' systems. Default is 'metric'."
+              }
+            },
+            "required": [
+              "weight",
+              "height"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776238735-Xl8ouR5gMLH4pQ2531Lo",
+    "object": "chat.completion",
+    "created": 1776238735,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_24750671",
+              "function": {
+                "name": "calculate_bmi",
+                "arguments": "{\"weight\":85,\"height\":180,\"unit\":\"metric\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 353,
+      "completion_tokens": 39,
+      "total_tokens": 392,
+      "cost": 0.0011620125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00117375,
+        "upstream_inference_prompt_cost": 0.00058875,
+        "upstream_inference_completions_cost": 0.000585
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776238735-Xl8ouR5gMLH4pQ2531Lo",
+    "object": "response",
+    "created_at": 1776238737,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_24750671",
+        "call_id": "call_24750671",
+        "name": "calculate_bmi",
+        "arguments": "{\"weight\":85,\"height\":180,\"unit\":\"metric\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 353,
+      "completion_tokens": 39,
+      "total_tokens": 392,
+      "cost": 0.0011620125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00117375,
+        "upstream_inference_prompt_cost": 0.00058875,
+        "upstream_inference_completions_cost": 0.000585
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776238735-Xl8ouR5gMLH4pQ2531Lo",
+    "object": "chat.completion",
+    "created": 1776238735,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_24750671",
+              "function": {
+                "name": "calculate_bmi",
+                "arguments": "{\"weight\":85,\"height\":180,\"unit\":\"metric\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 353,
+      "completion_tokens": 39,
+      "total_tokens": 392,
+      "cost": 0.0011620125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00117375,
+        "upstream_inference_prompt_cost": 0.00058875,
+        "upstream_inference_completions_cost": 0.000585
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1756.527,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "4426ef55-a71d-4e29-a9fd-79cbd0ba312b"
+}

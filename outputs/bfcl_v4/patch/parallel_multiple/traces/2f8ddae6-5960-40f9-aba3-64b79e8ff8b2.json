@@ -1,0 +1,327 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Create a hip hop beat at 95 beats per minute with a major scale and make a bass melody with C4, E4, F4, G4."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "melody_generator",
+        "description": "Create a melody based on specified notes. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "note_sequence": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "The sequence of notes for the melody."
+            },
+            "instrument": {
+              "type": "string",
+              "default": "Bass",
+              "description": "The instrument to play the melody, e.g. Bass."
+            }
+          },
+          "required": [
+            "note_sequence"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "beat_generator",
+        "description": "Generate a beat based on specified genre and beats per minute. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "genre": {
+              "type": "string",
+              "description": "The genre of the beat, e.g. Hip Hop."
+            },
+            "bpm": {
+              "type": "integer",
+              "description": "The beats per minute of the beat."
+            },
+            "scale": {
+              "type": "string",
+              "description": "The scale for the beat, e.g. Major.",
+              "default": "Major"
+            }
+          },
+          "required": [
+            "genre",
+            "bpm"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Create a hip hop beat at 95 beats per minute with a major scale and make a bass melody with C4, E4, F4, G4."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "melody_generator",
+          "description": "Create a melody based on specified notes. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "note_sequence": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "The sequence of notes for the melody."
+              },
+              "instrument": {
+                "type": "string",
+                "default": "Bass",
+                "description": "The instrument to play the melody, e.g. Bass."
+              }
+            },
+            "required": [
+              "note_sequence"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "beat_generator",
+          "description": "Generate a beat based on specified genre and beats per minute. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "genre": {
+                "type": "string",
+                "description": "The genre of the beat, e.g. Hip Hop."
+              },
+              "bpm": {
+                "type": "integer",
+                "description": "The beats per minute of the beat."
+              },
+              "scale": {
+                "type": "string",
+                "description": "The scale for the beat, e.g. Major.",
+                "default": "Major"
+              }
+            },
+            "required": [
+              "genre",
+              "bpm"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241470-EMkCxf4itSij7x1oT5hi",
+    "object": "chat.completion",
+    "created": 1776241470,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_55446825",
+              "function": {
+                "name": "beat_generator",
+                "arguments": "{\"genre\":\"Hip Hop\",\"bpm\":95,\"scale\":\"Major\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_93063498",
+              "function": {
+                "name": "melody_generator",
+                "arguments": "{\"note_sequence\":[\"C4\",\"E4\",\"F4\",\"G4\"],\"instrument\":\"Bass\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 457,
+      "completion_tokens": 87,
+      "total_tokens": 544,
+      "cost": 0.0026425575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00266925,
+        "upstream_inference_prompt_cost": 0.00136425,
+        "upstream_inference_completions_cost": 0.001305
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241470-EMkCxf4itSij7x1oT5hi",
+    "object": "response",
+    "created_at": 1776241471,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_55446825",
+        "call_id": "call_55446825",
+        "name": "beat_generator",
+        "arguments": "{\"genre\":\"Hip Hop\",\"bpm\":95,\"scale\":\"Major\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_93063498",
+        "call_id": "call_93063498",
+        "name": "melody_generator",
+        "arguments": "{\"note_sequence\":[\"C4\",\"E4\",\"F4\",\"G4\"],\"instrument\":\"Bass\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 457,
+      "completion_tokens": 87,
+      "total_tokens": 544,
+      "cost": 0.0026425575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00266925,
+        "upstream_inference_prompt_cost": 0.00136425,
+        "upstream_inference_completions_cost": 0.001305
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241470-EMkCxf4itSij7x1oT5hi",
+    "object": "chat.completion",
+    "created": 1776241470,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_55446825",
+              "function": {
+                "name": "beat_generator",
+                "arguments": "{\"genre\":\"Hip Hop\",\"bpm\":95,\"scale\":\"Major\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_93063498",
+              "function": {
+                "name": "melody_generator",
+                "arguments": "{\"note_sequence\":[\"C4\",\"E4\",\"F4\",\"G4\"],\"instrument\":\"Bass\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 457,
+      "completion_tokens": 87,
+      "total_tokens": 544,
+      "cost": 0.0026425575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00266925,
+        "upstream_inference_prompt_cost": 0.00136425,
+        "upstream_inference_completions_cost": 0.001305
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2096.593,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "2f8ddae6-5960-40f9-aba3-64b79e8ff8b2"
+}

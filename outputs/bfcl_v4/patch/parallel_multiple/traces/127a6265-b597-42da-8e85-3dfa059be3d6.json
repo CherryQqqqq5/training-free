@@ -1,0 +1,418 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Can you help me with a few things? First, I'm studying genetics and I came across a SNP mutation with the ID 'rs123456'. I'm not sure what type of mutation it is. Could you find out for me? The species is 'Homo sapiens'. Second, I'm planning to visit New York, NY next month (Feb) and I'm interested in attending an art exhibition, particularly one that displays sculptures. Could you find the most popular ones for me? I would prefer exhibitions with high user ratings. Lastly, I'm also studying cell biology and I need to know the list of proteins in the 'nucleus' cell compartment. Could you get that for me? And please include a brief description of each protein.\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "cellbio_get_proteins",
+        "description": "Get the list of proteins in a specific cell compartment. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "cell_compartment": {
+              "type": "string",
+              "description": "The specific cell compartment."
+            },
+            "include_description": {
+              "type": "boolean",
+              "description": "Set true if you want a brief description of each protein.",
+              "default": false
+            }
+          },
+          "required": [
+            "cell_compartment"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "mutation_type_find",
+        "description": "Finds the type of a genetic mutation based on its SNP (Single Nucleotide Polymorphism) ID. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "snp_id": {
+              "type": "string",
+              "description": "The ID of the Single Nucleotide Polymorphism (SNP) mutation."
+            },
+            "species": {
+              "type": "string",
+              "description": "Species in which the SNP occurs, default is 'Homo sapiens' (Humans)."
+            }
+          },
+          "required": [
+            "snp_id"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "find_exhibition",
+        "description": "Locate the most popular exhibitions based on criteria like location, time, art form, and user ratings. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city where the exhibition is held, e.g., New York, NY."
+            },
+            "art_form": {
+              "type": "string",
+              "description": "The form of art the exhibition is displaying e.g., sculpture."
+            },
+            "month": {
+              "type": "string",
+              "description": "The month (in full name) of exhibition."
+            },
+            "user_ratings": {
+              "type": "string",
+              "enum": [
+                "low",
+                "average",
+                "high"
+              ],
+              "description": "Select exhibitions with user rating threshold. Default is all if not specified."
+            }
+          },
+          "required": [
+            "location",
+            "art_form",
+            "month"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Can you help me with a few things? First, I'm studying genetics and I came across a SNP mutation with the ID 'rs123456'. I'm not sure what type of mutation it is. Could you find out for me? The species is 'Homo sapiens'. Second, I'm planning to visit New York, NY next month (Feb) and I'm interested in attending an art exhibition, particularly one that displays sculptures. Could you find the most popular ones for me? I would prefer exhibitions with high user ratings. Lastly, I'm also studying cell biology and I need to know the list of proteins in the 'nucleus' cell compartment. Could you get that for me? And please include a brief description of each protein.\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "cellbio_get_proteins",
+          "description": "Get the list of proteins in a specific cell compartment. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "cell_compartment": {
+                "type": "string",
+                "description": "The specific cell compartment."
+              },
+              "include_description": {
+                "type": "boolean",
+                "description": "Set true if you want a brief description of each protein.",
+                "default": false
+              }
+            },
+            "required": [
+              "cell_compartment"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "mutation_type_find",
+          "description": "Finds the type of a genetic mutation based on its SNP (Single Nucleotide Polymorphism) ID. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "snp_id": {
+                "type": "string",
+                "description": "The ID of the Single Nucleotide Polymorphism (SNP) mutation."
+              },
+              "species": {
+                "type": "string",
+                "description": "Species in which the SNP occurs, default is 'Homo sapiens' (Humans)."
+              }
+            },
+            "required": [
+              "snp_id"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "find_exhibition",
+          "description": "Locate the most popular exhibitions based on criteria like location, time, art form, and user ratings. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city where the exhibition is held, e.g., New York, NY."
+              },
+              "art_form": {
+                "type": "string",
+                "description": "The form of art the exhibition is displaying e.g., sculpture."
+              },
+              "month": {
+                "type": "string",
+                "description": "The month (in full name) of exhibition."
+              },
+              "user_ratings": {
+                "type": "string",
+                "enum": [
+                  "low",
+                  "average",
+                  "high"
+                ],
+                "description": "Select exhibitions with user rating threshold. Default is all if not specified."
+              }
+            },
+            "required": [
+              "location",
+              "art_form",
+              "month"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241810-NYw981aCLZx1ZMUufeXo",
+    "object": "chat.completion",
+    "created": 1776241810,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help with all your requests. Let's address each one step by step.\n\nFor the SNP mutation type:\nFor the art exhibition in New York:\nFor the list of proteins in the nucleus:\nI’ve triggered the necessary function calls to retrieve the information you requested. Once the results are available, I’ll provide you with the details for each query. Is there anything else you’d like assistance with in the meantime?",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_01449232",
+              "function": {
+                "name": "mutation_type_find",
+                "arguments": "{\"snp_id\":\"rs123456\",\"species\":\"Homo sapiens\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_54040180",
+              "function": {
+                "name": "find_exhibition",
+                "arguments": "{\"location\":\"New York, NY\",\"art_form\":\"sculpture\",\"month\":\"February\",\"user_ratings\":\"high\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_57575412",
+              "function": {
+                "name": "cellbio_get_proteins",
+                "arguments": "{\"cell_compartment\":\"nucleus\",\"include_description\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 730,
+      "completion_tokens": 213,
+      "total_tokens": 943,
+      "cost": 0.0048656025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00491475,
+        "upstream_inference_prompt_cost": 0.00171975,
+        "upstream_inference_completions_cost": 0.003195
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241810-NYw981aCLZx1ZMUufeXo",
+    "object": "response",
+    "created_at": 1776241813,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'm happy to help with all your requests. Let's address each one step by step.\n\nFor the SNP mutation type:\nFor the art exhibition in New York:\nFor the list of proteins in the nucleus:\nI’ve triggered the necessary function calls to retrieve the information you requested. Once the results are available, I’ll provide you with the details for each query. Is there anything else you’d like assistance with in the meantime?"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_01449232",
+        "call_id": "call_01449232",
+        "name": "mutation_type_find",
+        "arguments": "{\"snp_id\":\"rs123456\",\"species\":\"Homo sapiens\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_54040180",
+        "call_id": "call_54040180",
+        "name": "find_exhibition",
+        "arguments": "{\"location\":\"New York, NY\",\"art_form\":\"sculpture\",\"month\":\"February\",\"user_ratings\":\"high\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_57575412",
+        "call_id": "call_57575412",
+        "name": "cellbio_get_proteins",
+        "arguments": "{\"cell_compartment\":\"nucleus\",\"include_description\":true}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 730,
+      "completion_tokens": 213,
+      "total_tokens": 943,
+      "cost": 0.0048656025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00491475,
+        "upstream_inference_prompt_cost": 0.00171975,
+        "upstream_inference_completions_cost": 0.003195
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241810-NYw981aCLZx1ZMUufeXo",
+    "object": "chat.completion",
+    "created": 1776241810,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help with all your requests. Let's address each one step by step.\n\nFor the SNP mutation type:\nFor the art exhibition in New York:\nFor the list of proteins in the nucleus:\nI’ve triggered the necessary function calls to retrieve the information you requested. Once the results are available, I’ll provide you with the details for each query. Is there anything else you’d like assistance with in the meantime?",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_01449232",
+              "function": {
+                "name": "mutation_type_find",
+                "arguments": "{\"snp_id\":\"rs123456\",\"species\":\"Homo sapiens\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_54040180",
+              "function": {
+                "name": "find_exhibition",
+                "arguments": "{\"location\":\"New York, NY\",\"art_form\":\"sculpture\",\"month\":\"February\",\"user_ratings\":\"high\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_57575412",
+              "function": {
+                "name": "cellbio_get_proteins",
+                "arguments": "{\"cell_compartment\":\"nucleus\",\"include_description\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 730,
+      "completion_tokens": 213,
+      "total_tokens": 943,
+      "cost": 0.0048656025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00491475,
+        "upstream_inference_prompt_cost": 0.00171975,
+        "upstream_inference_completions_cost": 0.003195
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 3399.239,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "127a6265-b597-42da-8e85-3dfa059be3d6"
+}

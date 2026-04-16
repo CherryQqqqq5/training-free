@@ -1,0 +1,501 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Could you help me with a few tasks? First, I'd like to book a hotel room at the 'Hilton' in 'Los Angeles, CA' from '2022-05-01' to '2022-05-10' and I need '2' rooms. Second, I'm curious about the time difference between 'New York, NY' and 'Los Angeles, CA'. Third, I've been trying to keep track of my health and I'd like to calculate my Body Mass Index (BMI). I weigh '75' kilograms and I'm '180' centimeters tall, and I'd like to use the 'metric' system. Lastly, I've written a piece of text in 'English' and I'd like to perform a sentiment analysis on it. The text is 'I had a wonderful day at the beach. The weather was perfect and I enjoyed a delicious ice cream.' Can you assist me with these?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_bmi",
+        "description": "Calculate the Body Mass Index (BMI) for a person based on their weight and height. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "weight": {
+              "type": "integer",
+              "description": "The weight of the person in kilograms."
+            },
+            "height": {
+              "type": "integer",
+              "description": "The height of the person in centimeters."
+            },
+            "system": {
+              "type": "string",
+              "description": "The system of units to be used, 'metric' or 'imperial'. Default is 'metric'."
+            }
+          },
+          "required": [
+            "weight",
+            "height"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "hotel_booking",
+        "description": "Books a hotel room for a specific date range. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "hotel_name": {
+              "type": "string",
+              "description": "The name of the hotel."
+            },
+            "location": {
+              "type": "string",
+              "description": "The city and state, e.g. New York, NY."
+            },
+            "start_date": {
+              "type": "string",
+              "description": "The start date of the reservation. Use format 'YYYY-MM-DD'."
+            },
+            "end_date": {
+              "type": "string",
+              "description": "The end date of the reservation. Use format 'YYYY-MM-DD'."
+            },
+            "rooms": {
+              "type": "integer",
+              "default": 1,
+              "description": "The number of rooms to reserve."
+            }
+          },
+          "required": [
+            "hotel_name",
+            "location",
+            "start_date",
+            "end_date"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "sentiment_analysis",
+        "description": "Perform sentiment analysis on a given piece of text. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "description": "The text on which to perform sentiment analysis."
+            },
+            "language": {
+              "type": "string",
+              "description": "The language in which the text is written."
+            }
+          },
+          "required": [
+            "text",
+            "language"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "get_time_difference",
+        "description": "Get the time difference between two places. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "place1": {
+              "type": "string",
+              "description": "The first place for time difference."
+            },
+            "place2": {
+              "type": "string",
+              "description": "The second place for time difference."
+            }
+          },
+          "required": [
+            "place1",
+            "place2"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Could you help me with a few tasks? First, I'd like to book a hotel room at the 'Hilton' in 'Los Angeles, CA' from '2022-05-01' to '2022-05-10' and I need '2' rooms. Second, I'm curious about the time difference between 'New York, NY' and 'Los Angeles, CA'. Third, I've been trying to keep track of my health and I'd like to calculate my Body Mass Index (BMI). I weigh '75' kilograms and I'm '180' centimeters tall, and I'd like to use the 'metric' system. Lastly, I've written a piece of text in 'English' and I'd like to perform a sentiment analysis on it. The text is 'I had a wonderful day at the beach. The weather was perfect and I enjoyed a delicious ice cream.' Can you assist me with these?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_bmi",
+          "description": "Calculate the Body Mass Index (BMI) for a person based on their weight and height. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "weight": {
+                "type": "integer",
+                "description": "The weight of the person in kilograms."
+              },
+              "height": {
+                "type": "integer",
+                "description": "The height of the person in centimeters."
+              },
+              "system": {
+                "type": "string",
+                "description": "The system of units to be used, 'metric' or 'imperial'. Default is 'metric'."
+              }
+            },
+            "required": [
+              "weight",
+              "height"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "hotel_booking",
+          "description": "Books a hotel room for a specific date range. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "hotel_name": {
+                "type": "string",
+                "description": "The name of the hotel."
+              },
+              "location": {
+                "type": "string",
+                "description": "The city and state, e.g. New York, NY."
+              },
+              "start_date": {
+                "type": "string",
+                "description": "The start date of the reservation. Use format 'YYYY-MM-DD'."
+              },
+              "end_date": {
+                "type": "string",
+                "description": "The end date of the reservation. Use format 'YYYY-MM-DD'."
+              },
+              "rooms": {
+                "type": "integer",
+                "default": 1,
+                "description": "The number of rooms to reserve."
+              }
+            },
+            "required": [
+              "hotel_name",
+              "location",
+              "start_date",
+              "end_date"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "sentiment_analysis",
+          "description": "Perform sentiment analysis on a given piece of text. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "description": "The text on which to perform sentiment analysis."
+              },
+              "language": {
+                "type": "string",
+                "description": "The language in which the text is written."
+              }
+            },
+            "required": [
+              "text",
+              "language"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "get_time_difference",
+          "description": "Get the time difference between two places. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "place1": {
+                "type": "string",
+                "description": "The first place for time difference."
+              },
+              "place2": {
+                "type": "string",
+                "description": "The second place for time difference."
+              }
+            },
+            "required": [
+              "place1",
+              "place2"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241182-NeIgFpxsTtk7dZvByQ3a",
+    "object": "chat.completion",
+    "created": 1776241182,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help with all your requests. Let's address each one step by step.\n\n1. For the hotel booking at the Hilton in Los Angeles, CA:\n2. For the time difference between New York, NY and Los Angeles, CA:\n3. For calculating your Body Mass Index (BMI):\n4. For the sentiment analysis of your text:\nI've initiated all the necessary function calls to handle your requests. Let me know if there's anything else you need assistance with!",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_72883256",
+              "function": {
+                "name": "hotel_booking",
+                "arguments": "{\"hotel_name\":\"Hilton\",\"location\":\"Los Angeles, CA\",\"start_date\":\"2022-05-01\",\"end_date\":\"2022-05-10\",\"rooms\":2}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_10094575",
+              "function": {
+                "name": "get_time_difference",
+                "arguments": "{\"place1\":\"New York, NY\",\"place2\":\"Los Angeles, CA\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_07382189",
+              "function": {
+                "name": "calculate_bmi",
+                "arguments": "{\"weight\":75,\"height\":180,\"system\":\"metric\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_29518381",
+              "function": {
+                "name": "sentiment_analysis",
+                "arguments": "{\"text\":\"I had a wonderful day at the beach. The weather was perfect and I enjoyed a delicious ice cream.\",\"language\":\"English\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 854,
+      "completion_tokens": 292,
+      "total_tokens": 1146,
+      "cost": 0.0064070325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00647175,
+        "upstream_inference_prompt_cost": 0.00209175,
+        "upstream_inference_completions_cost": 0.00438
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241182-NeIgFpxsTtk7dZvByQ3a",
+    "object": "response",
+    "created_at": 1776241185,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'm happy to help with all your requests. Let's address each one step by step.\n\n1. For the hotel booking at the Hilton in Los Angeles, CA:\n2. For the time difference between New York, NY and Los Angeles, CA:\n3. For calculating your Body Mass Index (BMI):\n4. For the sentiment analysis of your text:\nI've initiated all the necessary function calls to handle your requests. Let me know if there's anything else you need assistance with!"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_72883256",
+        "call_id": "call_72883256",
+        "name": "hotel_booking",
+        "arguments": "{\"hotel_name\":\"Hilton\",\"location\":\"Los Angeles, CA\",\"start_date\":\"2022-05-01\",\"end_date\":\"2022-05-10\",\"rooms\":2}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_10094575",
+        "call_id": "call_10094575",
+        "name": "get_time_difference",
+        "arguments": "{\"place1\":\"New York, NY\",\"place2\":\"Los Angeles, CA\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_07382189",
+        "call_id": "call_07382189",
+        "name": "calculate_bmi",
+        "arguments": "{\"weight\":75,\"height\":180,\"system\":\"metric\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_29518381",
+        "call_id": "call_29518381",
+        "name": "sentiment_analysis",
+        "arguments": "{\"text\":\"I had a wonderful day at the beach. The weather was perfect and I enjoyed a delicious ice cream.\",\"language\":\"English\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 854,
+      "completion_tokens": 292,
+      "total_tokens": 1146,
+      "cost": 0.0064070325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00647175,
+        "upstream_inference_prompt_cost": 0.00209175,
+        "upstream_inference_completions_cost": 0.00438
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241182-NeIgFpxsTtk7dZvByQ3a",
+    "object": "chat.completion",
+    "created": 1776241182,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help with all your requests. Let's address each one step by step.\n\n1. For the hotel booking at the Hilton in Los Angeles, CA:\n2. For the time difference between New York, NY and Los Angeles, CA:\n3. For calculating your Body Mass Index (BMI):\n4. For the sentiment analysis of your text:\nI've initiated all the necessary function calls to handle your requests. Let me know if there's anything else you need assistance with!",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_72883256",
+              "function": {
+                "name": "hotel_booking",
+                "arguments": "{\"hotel_name\":\"Hilton\",\"location\":\"Los Angeles, CA\",\"start_date\":\"2022-05-01\",\"end_date\":\"2022-05-10\",\"rooms\":2}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_10094575",
+              "function": {
+                "name": "get_time_difference",
+                "arguments": "{\"place1\":\"New York, NY\",\"place2\":\"Los Angeles, CA\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_07382189",
+              "function": {
+                "name": "calculate_bmi",
+                "arguments": "{\"weight\":75,\"height\":180,\"system\":\"metric\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_29518381",
+              "function": {
+                "name": "sentiment_analysis",
+                "arguments": "{\"text\":\"I had a wonderful day at the beach. The weather was perfect and I enjoyed a delicious ice cream.\",\"language\":\"English\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 854,
+      "completion_tokens": 292,
+      "total_tokens": 1146,
+      "cost": 0.0064070325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00647175,
+        "upstream_inference_prompt_cost": 0.00209175,
+        "upstream_inference_completions_cost": 0.00438
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 4029.167,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "a40553ed-84ab-4025-b527-f959d7553c95"
+}

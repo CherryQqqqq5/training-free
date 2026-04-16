@@ -1,0 +1,387 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"I'm planning a game night and I need some board game recommendations. I have a group of 5 friends coming over, so we'll be 6 players in total. We all enjoy strategy games but we're all beginners, so nothing too complex. Can you recommend some games from BoardGameGeek that fit this criteria? Also, I have another group of 4 friends who love party games. We're not beginners but we're not advanced players either, so something in the middle would be great. Can you recommend some games from BoardGameGeek for this group as well? Lastly, I'm also considering buying some games from Amazon Game Store. I have a budget of $20-$30. Can you recommend some strategy games for 6 players and party games for 4 players within this price range?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "AmazonGameStore_recommend",
+        "description": "Generate game recommendation from Amazon Game Store based on number of players and category. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "numOfPlayers": {
+              "type": "integer",
+              "description": "The number of players who will play the game."
+            },
+            "category": {
+              "type": "string",
+              "description": "The preferred category of board game. E.g. strategy, family, party etc."
+            },
+            "priceRange": {
+              "type": "string",
+              "description": "The price range you are willing to pay for the board game. E.g. $10-$20, $20-$30 etc. This is an optional parameter. Default to '$10-$20' if not specified."
+            }
+          },
+          "required": [
+            "numOfPlayers",
+            "category"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "BoardGameGeek_recommend",
+        "description": "Generate game recommendation from BoardGameGeek store based on number of players and category. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "numPlayers": {
+              "type": "integer",
+              "description": "The number of players who will play the game."
+            },
+            "category": {
+              "type": "string",
+              "description": "The preferred category of board game. E.g. strategy, family, party etc."
+            },
+            "difficulty": {
+              "type": "string",
+              "description": "Preferred difficulty level. E.g. beginner, intermediate, advanced etc. This is an optional parameter. Default to 'beginner' if not specified."
+            }
+          },
+          "required": [
+            "numPlayers",
+            "category"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"I'm planning a game night and I need some board game recommendations. I have a group of 5 friends coming over, so we'll be 6 players in total. We all enjoy strategy games but we're all beginners, so nothing too complex. Can you recommend some games from BoardGameGeek that fit this criteria? Also, I have another group of 4 friends who love party games. We're not beginners but we're not advanced players either, so something in the middle would be great. Can you recommend some games from BoardGameGeek for this group as well? Lastly, I'm also considering buying some games from Amazon Game Store. I have a budget of $20-$30. Can you recommend some strategy games for 6 players and party games for 4 players within this price range?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "AmazonGameStore_recommend",
+          "description": "Generate game recommendation from Amazon Game Store based on number of players and category. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "numOfPlayers": {
+                "type": "integer",
+                "description": "The number of players who will play the game."
+              },
+              "category": {
+                "type": "string",
+                "description": "The preferred category of board game. E.g. strategy, family, party etc."
+              },
+              "priceRange": {
+                "type": "string",
+                "description": "The price range you are willing to pay for the board game. E.g. $10-$20, $20-$30 etc. This is an optional parameter. Default to '$10-$20' if not specified."
+              }
+            },
+            "required": [
+              "numOfPlayers",
+              "category"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "BoardGameGeek_recommend",
+          "description": "Generate game recommendation from BoardGameGeek store based on number of players and category. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "numPlayers": {
+                "type": "integer",
+                "description": "The number of players who will play the game."
+              },
+              "category": {
+                "type": "string",
+                "description": "The preferred category of board game. E.g. strategy, family, party etc."
+              },
+              "difficulty": {
+                "type": "string",
+                "description": "Preferred difficulty level. E.g. beginner, intermediate, advanced etc. This is an optional parameter. Default to 'beginner' if not specified."
+              }
+            },
+            "required": [
+              "numPlayers",
+              "category"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241713-SRrUYEhym7D8nFjtFraR",
+    "object": "chat.completion",
+    "created": 1776241713,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help with your game night planning! Let's address each of your requests by calling the appropriate functions to get tailored recommendations for your groups and preferences.\n\nFor the first group of 6 players who enjoy strategy games and are beginners, I'll request recommendations from BoardGameGeek:\n\nFor the second group of 4 friends who enjoy party games and are at an intermediate level, I'll also request recommendations from BoardGameGeek:\n\nLastly, for the games from Amazon Game Store within your budget of $20-$30, I'll request recommendations for strategy games for 6 players and party games for 4 players:\n\nI'll provide the recommendations once I receive the results from these function calls. If you have any other details or preferences to add, feel free to let me know!",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_73123809",
+              "function": {
+                "name": "BoardGameGeek_recommend",
+                "arguments": "{\"numPlayers\":6,\"category\":\"strategy\",\"difficulty\":\"beginner\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_23871822",
+              "function": {
+                "name": "BoardGameGeek_recommend",
+                "arguments": "{\"numPlayers\":4,\"category\":\"party\",\"difficulty\":\"intermediate\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_26026032",
+              "function": {
+                "name": "AmazonGameStore_recommend",
+                "arguments": "{\"numOfPlayers\":6,\"category\":\"strategy\",\"priceRange\":\"$20-$30\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_27670511",
+              "function": {
+                "name": "AmazonGameStore_recommend",
+                "arguments": "{\"numOfPlayers\":4,\"category\":\"party\",\"priceRange\":\"$20-$30\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 675,
+      "completion_tokens": 328,
+      "total_tokens": 1003,
+      "cost": 0.0064100025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00647475,
+        "upstream_inference_prompt_cost": 0.00155475,
+        "upstream_inference_completions_cost": 0.00492
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241713-SRrUYEhym7D8nFjtFraR",
+    "object": "response",
+    "created_at": 1776241718,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'm happy to help with your game night planning! Let's address each of your requests by calling the appropriate functions to get tailored recommendations for your groups and preferences.\n\nFor the first group of 6 players who enjoy strategy games and are beginners, I'll request recommendations from BoardGameGeek:\n\nFor the second group of 4 friends who enjoy party games and are at an intermediate level, I'll also request recommendations from BoardGameGeek:\n\nLastly, for the games from Amazon Game Store within your budget of $20-$30, I'll request recommendations for strategy games for 6 players and party games for 4 players:\n\nI'll provide the recommendations once I receive the results from these function calls. If you have any other details or preferences to add, feel free to let me know!"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_73123809",
+        "call_id": "call_73123809",
+        "name": "BoardGameGeek_recommend",
+        "arguments": "{\"numPlayers\":6,\"category\":\"strategy\",\"difficulty\":\"beginner\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_23871822",
+        "call_id": "call_23871822",
+        "name": "BoardGameGeek_recommend",
+        "arguments": "{\"numPlayers\":4,\"category\":\"party\",\"difficulty\":\"intermediate\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_26026032",
+        "call_id": "call_26026032",
+        "name": "AmazonGameStore_recommend",
+        "arguments": "{\"numOfPlayers\":6,\"category\":\"strategy\",\"priceRange\":\"$20-$30\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_27670511",
+        "call_id": "call_27670511",
+        "name": "AmazonGameStore_recommend",
+        "arguments": "{\"numOfPlayers\":4,\"category\":\"party\",\"priceRange\":\"$20-$30\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 675,
+      "completion_tokens": 328,
+      "total_tokens": 1003,
+      "cost": 0.0064100025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00647475,
+        "upstream_inference_prompt_cost": 0.00155475,
+        "upstream_inference_completions_cost": 0.00492
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241713-SRrUYEhym7D8nFjtFraR",
+    "object": "chat.completion",
+    "created": 1776241713,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help with your game night planning! Let's address each of your requests by calling the appropriate functions to get tailored recommendations for your groups and preferences.\n\nFor the first group of 6 players who enjoy strategy games and are beginners, I'll request recommendations from BoardGameGeek:\n\nFor the second group of 4 friends who enjoy party games and are at an intermediate level, I'll also request recommendations from BoardGameGeek:\n\nLastly, for the games from Amazon Game Store within your budget of $20-$30, I'll request recommendations for strategy games for 6 players and party games for 4 players:\n\nI'll provide the recommendations once I receive the results from these function calls. If you have any other details or preferences to add, feel free to let me know!",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_73123809",
+              "function": {
+                "name": "BoardGameGeek_recommend",
+                "arguments": "{\"numPlayers\":6,\"category\":\"strategy\",\"difficulty\":\"beginner\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_23871822",
+              "function": {
+                "name": "BoardGameGeek_recommend",
+                "arguments": "{\"numPlayers\":4,\"category\":\"party\",\"difficulty\":\"intermediate\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_26026032",
+              "function": {
+                "name": "AmazonGameStore_recommend",
+                "arguments": "{\"numOfPlayers\":6,\"category\":\"strategy\",\"priceRange\":\"$20-$30\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_27670511",
+              "function": {
+                "name": "AmazonGameStore_recommend",
+                "arguments": "{\"numOfPlayers\":4,\"category\":\"party\",\"priceRange\":\"$20-$30\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 675,
+      "completion_tokens": 328,
+      "total_tokens": 1003,
+      "cost": 0.0064100025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00647475,
+        "upstream_inference_prompt_cost": 0.00155475,
+        "upstream_inference_completions_cost": 0.00492
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 4951.646,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "0a23e6f2-3c64-402b-9ec8-4c0c3c991d45"
+}

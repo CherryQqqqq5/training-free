@@ -1,0 +1,332 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "What will be the humidity and temperature for New York City after 7 days?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "event_search",
+        "description": "Search for events happening in a specific location for a future date. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city that you want to get the event information for."
+            },
+            "days": {
+              "type": "integer",
+              "description": "Number of future days for which to retrieve the event information."
+            }
+          },
+          "required": [
+            "location",
+            "days"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "movie_showtimes",
+        "description": "Retrieve movie showtimes for a specific location and for a future date. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city that you want to get the movie showtimes for."
+            },
+            "days": {
+              "type": "integer",
+              "description": "Number of future days for which to retrieve the showtimes."
+            }
+          },
+          "required": [
+            "location",
+            "days"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "humidity_temperature_forecast",
+        "description": "Retrieve forecast of humidity and temperature for a specific location and for a future date. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city that you want to get the humidity and temperature forecast for."
+            },
+            "days": {
+              "type": "integer",
+              "description": "Number of future days for which to retrieve the forecast."
+            }
+          },
+          "required": [
+            "location",
+            "days"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What will be the humidity and temperature for New York City after 7 days?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "event_search",
+          "description": "Search for events happening in a specific location for a future date. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city that you want to get the event information for."
+              },
+              "days": {
+                "type": "integer",
+                "description": "Number of future days for which to retrieve the event information."
+              }
+            },
+            "required": [
+              "location",
+              "days"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "movie_showtimes",
+          "description": "Retrieve movie showtimes for a specific location and for a future date. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city that you want to get the movie showtimes for."
+              },
+              "days": {
+                "type": "integer",
+                "description": "Number of future days for which to retrieve the showtimes."
+              }
+            },
+            "required": [
+              "location",
+              "days"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "humidity_temperature_forecast",
+          "description": "Retrieve forecast of humidity and temperature for a specific location and for a future date. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city that you want to get the humidity and temperature forecast for."
+              },
+              "days": {
+                "type": "integer",
+                "description": "Number of future days for which to retrieve the forecast."
+              }
+            },
+            "required": [
+              "location",
+              "days"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239581-52Xrjj48PZxpvHyhEfiP",
+    "object": "chat.completion",
+    "created": 1776239581,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_59965686",
+              "function": {
+                "name": "humidity_temperature_forecast",
+                "arguments": "{\"location\":\"New York City\",\"days\":7}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 520,
+      "completion_tokens": 34,
+      "total_tokens": 554,
+      "cost": 0.0015837525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00159975,
+        "upstream_inference_prompt_cost": 0.00108975,
+        "upstream_inference_completions_cost": 0.00051
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239581-52Xrjj48PZxpvHyhEfiP",
+    "object": "response",
+    "created_at": 1776239582,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_59965686",
+        "call_id": "call_59965686",
+        "name": "humidity_temperature_forecast",
+        "arguments": "{\"location\":\"New York City\",\"days\":7}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 520,
+      "completion_tokens": 34,
+      "total_tokens": 554,
+      "cost": 0.0015837525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00159975,
+        "upstream_inference_prompt_cost": 0.00108975,
+        "upstream_inference_completions_cost": 0.00051
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239581-52Xrjj48PZxpvHyhEfiP",
+    "object": "chat.completion",
+    "created": 1776239581,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_59965686",
+              "function": {
+                "name": "humidity_temperature_forecast",
+                "arguments": "{\"location\":\"New York City\",\"days\":7}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 520,
+      "completion_tokens": 34,
+      "total_tokens": 554,
+      "cost": 0.0015837525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00159975,
+        "upstream_inference_prompt_cost": 0.00108975,
+        "upstream_inference_completions_cost": 0.00051
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1825.674,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "907f9340-b87a-4a87-8dbd-2421e5746b1d"
+}

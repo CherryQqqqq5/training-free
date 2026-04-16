@@ -1,0 +1,311 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the net profit margin of Company XYZ given that the net income is $20,000 and total revenue is $100,000. Also calculate the debt ratio of the same company if the total liabilities are $10,000 and total assets are $30,000."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "financial_ratio_net_profit_margin",
+        "description": "Calculate net profit margin of a company given the net income and total revenue Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "net_income": {
+              "type": "integer",
+              "description": "The net income of the company."
+            },
+            "total_revenue": {
+              "type": "integer",
+              "description": "The total revenue of the company."
+            }
+          },
+          "required": [
+            "net_income",
+            "total_revenue"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "financial_ratio_debt_ratio",
+        "description": "Calculate the debt ratio of a company given the total liabilities and total assets. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "total_liabilities": {
+              "type": "integer",
+              "description": "The total liabilities of the company."
+            },
+            "total_assets": {
+              "type": "integer",
+              "description": "The total assets of the company."
+            }
+          },
+          "required": [
+            "total_liabilities",
+            "total_assets"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the net profit margin of Company XYZ given that the net income is $20,000 and total revenue is $100,000. Also calculate the debt ratio of the same company if the total liabilities are $10,000 and total assets are $30,000."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "financial_ratio_net_profit_margin",
+          "description": "Calculate net profit margin of a company given the net income and total revenue Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "net_income": {
+                "type": "integer",
+                "description": "The net income of the company."
+              },
+              "total_revenue": {
+                "type": "integer",
+                "description": "The total revenue of the company."
+              }
+            },
+            "required": [
+              "net_income",
+              "total_revenue"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "financial_ratio_debt_ratio",
+          "description": "Calculate the debt ratio of a company given the total liabilities and total assets. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "total_liabilities": {
+                "type": "integer",
+                "description": "The total liabilities of the company."
+              },
+              "total_assets": {
+                "type": "integer",
+                "description": "The total assets of the company."
+              }
+            },
+            "required": [
+              "total_liabilities",
+              "total_assets"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240537-gWAx5vuQNPxG85ZNUirg",
+    "object": "chat.completion",
+    "created": 1776240537,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_46738123",
+              "function": {
+                "name": "financial_ratio_net_profit_margin",
+                "arguments": "{\"net_income\":20000,\"total_revenue\":100000}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_29308007",
+              "function": {
+                "name": "financial_ratio_debt_ratio",
+                "arguments": "{\"total_liabilities\":10000,\"total_assets\":30000}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 457,
+      "completion_tokens": 78,
+      "total_tokens": 535,
+      "cost": 0.0020500425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00207075,
+        "upstream_inference_prompt_cost": 0.00090075,
+        "upstream_inference_completions_cost": 0.00117
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240537-gWAx5vuQNPxG85ZNUirg",
+    "object": "response",
+    "created_at": 1776240539,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_46738123",
+        "call_id": "call_46738123",
+        "name": "financial_ratio_net_profit_margin",
+        "arguments": "{\"net_income\":20000,\"total_revenue\":100000}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_29308007",
+        "call_id": "call_29308007",
+        "name": "financial_ratio_debt_ratio",
+        "arguments": "{\"total_liabilities\":10000,\"total_assets\":30000}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 457,
+      "completion_tokens": 78,
+      "total_tokens": 535,
+      "cost": 0.0020500425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00207075,
+        "upstream_inference_prompt_cost": 0.00090075,
+        "upstream_inference_completions_cost": 0.00117
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240537-gWAx5vuQNPxG85ZNUirg",
+    "object": "chat.completion",
+    "created": 1776240537,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_46738123",
+              "function": {
+                "name": "financial_ratio_net_profit_margin",
+                "arguments": "{\"net_income\":20000,\"total_revenue\":100000}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_29308007",
+              "function": {
+                "name": "financial_ratio_debt_ratio",
+                "arguments": "{\"total_liabilities\":10000,\"total_assets\":30000}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 457,
+      "completion_tokens": 78,
+      "total_tokens": 535,
+      "cost": 0.0020500425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00207075,
+        "upstream_inference_prompt_cost": 0.00090075,
+        "upstream_inference_completions_cost": 0.00117
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2462.574,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "dd5e7300-9c49-447f-a75b-d630df8c2e20"
+}

@@ -1,0 +1,367 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Buy me a ticket to the Mamma Mia musical for next Friday, June 30th 2023, also get me a train ticket from New York to Chicago for the same day."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "train_ticket_buy",
+        "description": "Buy a train ticket for a specific date and route. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "origin": {
+              "type": "string",
+              "description": "The departure full name of the city."
+            },
+            "destination": {
+              "type": "string",
+              "description": "The destination city."
+            },
+            "date": {
+              "type": "string",
+              "description": "The date when the journey should be, in the format of yyyy-mm-dd."
+            }
+          },
+          "required": [
+            "origin",
+            "destination",
+            "date"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "musical_ticket_buy",
+        "description": "Buy a ticket for a musical Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "show": {
+              "type": "string",
+              "description": "Name of the show."
+            },
+            "date": {
+              "type": "string",
+              "description": "Date when the ticket should be bought for."
+            }
+          },
+          "required": [
+            "show",
+            "date"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "concert_ticket_buy",
+        "description": "Buy a concert ticket Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "artist": {
+              "type": "string",
+              "description": "Name of the artist."
+            },
+            "date": {
+              "type": "string",
+              "description": "Date of the concert."
+            }
+          },
+          "required": [
+            "artist",
+            "date"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Buy me a ticket to the Mamma Mia musical for next Friday, June 30th 2023, also get me a train ticket from New York to Chicago for the same day."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "train_ticket_buy",
+          "description": "Buy a train ticket for a specific date and route. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "origin": {
+                "type": "string",
+                "description": "The departure full name of the city."
+              },
+              "destination": {
+                "type": "string",
+                "description": "The destination city."
+              },
+              "date": {
+                "type": "string",
+                "description": "The date when the journey should be, in the format of yyyy-mm-dd."
+              }
+            },
+            "required": [
+              "origin",
+              "destination",
+              "date"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "musical_ticket_buy",
+          "description": "Buy a ticket for a musical Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "show": {
+                "type": "string",
+                "description": "Name of the show."
+              },
+              "date": {
+                "type": "string",
+                "description": "Date when the ticket should be bought for."
+              }
+            },
+            "required": [
+              "show",
+              "date"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "concert_ticket_buy",
+          "description": "Buy a concert ticket Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "artist": {
+                "type": "string",
+                "description": "Name of the artist."
+              },
+              "date": {
+                "type": "string",
+                "description": "Date of the concert."
+              }
+            },
+            "required": [
+              "artist",
+              "date"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240472-8rIh6gccZTSFgCFnZQiT",
+    "object": "chat.completion",
+    "created": 1776240472,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_64986185",
+              "function": {
+                "name": "musical_ticket_buy",
+                "arguments": "{\"show\":\"Mamma Mia\",\"date\":\"2023-06-30\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_80751149",
+              "function": {
+                "name": "train_ticket_buy",
+                "arguments": "{\"origin\":\"New York\",\"destination\":\"Chicago\",\"date\":\"2023-06-30\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 510,
+      "completion_tokens": 86,
+      "total_tokens": 596,
+      "cost": 0.0023262525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00234975,
+        "upstream_inference_prompt_cost": 0.00105975,
+        "upstream_inference_completions_cost": 0.00129
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240472-8rIh6gccZTSFgCFnZQiT",
+    "object": "response",
+    "created_at": 1776240473,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_64986185",
+        "call_id": "call_64986185",
+        "name": "musical_ticket_buy",
+        "arguments": "{\"show\":\"Mamma Mia\",\"date\":\"2023-06-30\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_80751149",
+        "call_id": "call_80751149",
+        "name": "train_ticket_buy",
+        "arguments": "{\"origin\":\"New York\",\"destination\":\"Chicago\",\"date\":\"2023-06-30\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 510,
+      "completion_tokens": 86,
+      "total_tokens": 596,
+      "cost": 0.0023262525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00234975,
+        "upstream_inference_prompt_cost": 0.00105975,
+        "upstream_inference_completions_cost": 0.00129
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240472-8rIh6gccZTSFgCFnZQiT",
+    "object": "chat.completion",
+    "created": 1776240472,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_64986185",
+              "function": {
+                "name": "musical_ticket_buy",
+                "arguments": "{\"show\":\"Mamma Mia\",\"date\":\"2023-06-30\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_80751149",
+              "function": {
+                "name": "train_ticket_buy",
+                "arguments": "{\"origin\":\"New York\",\"destination\":\"Chicago\",\"date\":\"2023-06-30\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 510,
+      "completion_tokens": 86,
+      "total_tokens": 596,
+      "cost": 0.0023262525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00234975,
+        "upstream_inference_prompt_cost": 0.00105975,
+        "upstream_inference_completions_cost": 0.00129
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2391.77,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "cc08cbd8-b112-4e03-a7e4-a7f0e0eba1f4"
+}

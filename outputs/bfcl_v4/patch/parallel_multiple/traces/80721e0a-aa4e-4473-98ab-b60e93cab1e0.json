@@ -1,0 +1,371 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Imagine you are a math teacher preparing for a class. You want to create a challenging problem for your students that involves multiple steps. You decide to create a problem that involves finding the least common multiple (LCM) and the greatest common divisor (GCD) of two numbers, and then calculating the square root of these results. You choose the numbers 36 and 48 for the LCM and GCD calculations. For the square root calculations, you want the results to be accurate to 3 decimal places. What are the square roots of the LCM and GCD of 36 and 48, accurate to 3 decimal places?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "math_sqrt",
+        "description": "Calculates the square root of a number. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "num": {
+              "type": "number",
+              "description": "The number. This is a float type value.",
+              "format": "float"
+            },
+            "accuracy": {
+              "type": "number",
+              "description": "The number of decimal places in the result. This is a float type value.",
+              "default": 2.0,
+              "format": "float"
+            }
+          },
+          "required": [
+            "num"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "math_gcd",
+        "description": "Calculates the greatest common divisor of two numbers. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "num1": {
+              "type": "integer",
+              "description": "The first number."
+            },
+            "num2": {
+              "type": "integer",
+              "description": "The second number."
+            }
+          },
+          "required": [
+            "num1",
+            "num2"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "math_lcm",
+        "description": "Calculates the least common multiple of two numbers. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "num1": {
+              "type": "integer",
+              "description": "The first number."
+            },
+            "num2": {
+              "type": "integer",
+              "description": "The second number."
+            }
+          },
+          "required": [
+            "num1",
+            "num2"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Imagine you are a math teacher preparing for a class. You want to create a challenging problem for your students that involves multiple steps. You decide to create a problem that involves finding the least common multiple (LCM) and the greatest common divisor (GCD) of two numbers, and then calculating the square root of these results. You choose the numbers 36 and 48 for the LCM and GCD calculations. For the square root calculations, you want the results to be accurate to 3 decimal places. What are the square roots of the LCM and GCD of 36 and 48, accurate to 3 decimal places?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "math_sqrt",
+          "description": "Calculates the square root of a number. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "num": {
+                "type": "number",
+                "description": "The number. This is a float type value.",
+                "format": "float"
+              },
+              "accuracy": {
+                "type": "number",
+                "description": "The number of decimal places in the result. This is a float type value.",
+                "default": 2.0,
+                "format": "float"
+              }
+            },
+            "required": [
+              "num"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "math_gcd",
+          "description": "Calculates the greatest common divisor of two numbers. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "num1": {
+                "type": "integer",
+                "description": "The first number."
+              },
+              "num2": {
+                "type": "integer",
+                "description": "The second number."
+              }
+            },
+            "required": [
+              "num1",
+              "num2"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "math_lcm",
+          "description": "Calculates the least common multiple of two numbers. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "num1": {
+                "type": "integer",
+                "description": "The first number."
+              },
+              "num2": {
+                "type": "integer",
+                "description": "The second number."
+              }
+            },
+            "required": [
+              "num1",
+              "num2"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241592-DPbOADSpKsyt8AOgOHJI",
+    "object": "chat.completion",
+    "created": 1776241592,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "Let's solve this step by step. I'll calculate the greatest common divisor (GCD) and the least common multiple (LCM) of 36 and 48, and then find the square roots of those results with an accuracy of 3 decimal places.\n\nFirst, I'll find the GCD of 36 and 48.\n\nNext, I'll find the LCM of 36 and 48.\n\nOnce I have the results for the GCD and LCM, I will calculate the square roots of those values with an accuracy of 3 decimal places. I'll proceed with the square root calculations after receiving the GCD and LCM results.",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_40503738",
+              "function": {
+                "name": "math_gcd",
+                "arguments": "{\"num1\":36,\"num2\":48}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_14136842",
+              "function": {
+                "name": "math_lcm",
+                "arguments": "{\"num1\":36,\"num2\":48}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 603,
+      "completion_tokens": 192,
+      "total_tokens": 795,
+      "cost": 0.0046354275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00468225,
+        "upstream_inference_prompt_cost": 0.00180225,
+        "upstream_inference_completions_cost": 0.00288
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241592-DPbOADSpKsyt8AOgOHJI",
+    "object": "response",
+    "created_at": 1776241595,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "Let's solve this step by step. I'll calculate the greatest common divisor (GCD) and the least common multiple (LCM) of 36 and 48, and then find the square roots of those results with an accuracy of 3 decimal places.\n\nFirst, I'll find the GCD of 36 and 48.\n\nNext, I'll find the LCM of 36 and 48.\n\nOnce I have the results for the GCD and LCM, I will calculate the square roots of those values with an accuracy of 3 decimal places. I'll proceed with the square root calculations after receiving the GCD and LCM results."
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_40503738",
+        "call_id": "call_40503738",
+        "name": "math_gcd",
+        "arguments": "{\"num1\":36,\"num2\":48}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_14136842",
+        "call_id": "call_14136842",
+        "name": "math_lcm",
+        "arguments": "{\"num1\":36,\"num2\":48}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 603,
+      "completion_tokens": 192,
+      "total_tokens": 795,
+      "cost": 0.0046354275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00468225,
+        "upstream_inference_prompt_cost": 0.00180225,
+        "upstream_inference_completions_cost": 0.00288
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241592-DPbOADSpKsyt8AOgOHJI",
+    "object": "chat.completion",
+    "created": 1776241592,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "Let's solve this step by step. I'll calculate the greatest common divisor (GCD) and the least common multiple (LCM) of 36 and 48, and then find the square roots of those results with an accuracy of 3 decimal places.\n\nFirst, I'll find the GCD of 36 and 48.\n\nNext, I'll find the LCM of 36 and 48.\n\nOnce I have the results for the GCD and LCM, I will calculate the square roots of those values with an accuracy of 3 decimal places. I'll proceed with the square root calculations after receiving the GCD and LCM results.",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_40503738",
+              "function": {
+                "name": "math_gcd",
+                "arguments": "{\"num1\":36,\"num2\":48}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_14136842",
+              "function": {
+                "name": "math_lcm",
+                "arguments": "{\"num1\":36,\"num2\":48}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 603,
+      "completion_tokens": 192,
+      "total_tokens": 795,
+      "cost": 0.0046354275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00468225,
+        "upstream_inference_prompt_cost": 0.00180225,
+        "upstream_inference_completions_cost": 0.00288
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 3262.452,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "80721e0a-aa4e-4473-98ab-b60e93cab1e0"
+}

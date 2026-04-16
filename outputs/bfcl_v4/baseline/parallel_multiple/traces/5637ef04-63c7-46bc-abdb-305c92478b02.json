@@ -1,0 +1,401 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Could you help me plan my day? I need to go from my home at 123 Main Street to my office at 456 Park Avenue, and I don't want to spend more than $30 on the ride. After work, I need to order groceries from the Whole Foods at 789 Broadway. The items I need are milk, bread, eggs, and apples. I don't want to spend more than $10 on delivery. Then, I need to get a ride from my office to my friend's house at 321 Elm Street, and I don't want to spend more than $20 on that ride. Finally, I need to get a ride from my friend's house back to my home, and I don't want to spend more than $25 on that ride. Can you help me with all of this?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "grocery_delivery_order",
+        "description": "Order grocery items from a specific location with optional delivery price limit Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The location of the grocery store"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of items to order"
+            },
+            "max_delivery_cost": {
+              "type": "number",
+              "description": "The maximum delivery cost. It is optional This is a float type value.",
+              "default": 10.0,
+              "format": "float"
+            }
+          },
+          "required": [
+            "location",
+            "items"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "ride_hailing_get_rides",
+        "description": "Find ride from source to destination with an optional cost limit Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "description": "The starting point of the journey"
+            },
+            "destination": {
+              "type": "string",
+              "description": "The endpoint of the journey"
+            },
+            "max_cost": {
+              "type": "number",
+              "description": "The maximum cost of the ride. It is optional This is a float type value.",
+              "default": 30.0,
+              "format": "float"
+            }
+          },
+          "required": [
+            "source",
+            "destination"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Could you help me plan my day? I need to go from my home at 123 Main Street to my office at 456 Park Avenue, and I don't want to spend more than $30 on the ride. After work, I need to order groceries from the Whole Foods at 789 Broadway. The items I need are milk, bread, eggs, and apples. I don't want to spend more than $10 on delivery. Then, I need to get a ride from my office to my friend's house at 321 Elm Street, and I don't want to spend more than $20 on that ride. Finally, I need to get a ride from my friend's house back to my home, and I don't want to spend more than $25 on that ride. Can you help me with all of this?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "grocery_delivery_order",
+          "description": "Order grocery items from a specific location with optional delivery price limit Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The location of the grocery store"
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "List of items to order"
+              },
+              "max_delivery_cost": {
+                "type": "number",
+                "description": "The maximum delivery cost. It is optional This is a float type value.",
+                "default": 10.0,
+                "format": "float"
+              }
+            },
+            "required": [
+              "location",
+              "items"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "ride_hailing_get_rides",
+          "description": "Find ride from source to destination with an optional cost limit Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "source": {
+                "type": "string",
+                "description": "The starting point of the journey"
+              },
+              "destination": {
+                "type": "string",
+                "description": "The endpoint of the journey"
+              },
+              "max_cost": {
+                "type": "number",
+                "description": "The maximum cost of the ride. It is optional This is a float type value.",
+                "default": 30.0,
+                "format": "float"
+              }
+            },
+            "required": [
+              "source",
+              "destination"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240782-N8xMgpFwxQyVtIcycihj",
+    "object": "chat.completion",
+    "created": 1776240782,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help you plan your day. Let's address each part of your request step by step.\n\nFirst, I'll arrange a ride from your home to your office with a cost limit of $30.\n\nNext, I'll order groceries from Whole Foods at 789 Broadway with the items you specified and a delivery cost limit of $10.\n\nThen, I'll arrange a ride from your office to your friend's house with a cost limit of $20.\n\nFinally, I'll arrange a ride from your friend's house back to your home with a cost limit of $25.\n\nI've initiated all the necessary actions to plan your day as requested. If you need any further assistance or adjustments, please let me know!",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_90315079",
+              "function": {
+                "name": "ride_hailing_get_rides",
+                "arguments": "{\"source\":\"123 Main Street\",\"destination\":\"456 Park Avenue\",\"max_cost\":30}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_87471618",
+              "function": {
+                "name": "grocery_delivery_order",
+                "arguments": "{\"location\":\"789 Broadway\",\"items\":[\"milk\",\"bread\",\"eggs\",\"apples\"],\"max_delivery_cost\":10}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_89041266",
+              "function": {
+                "name": "ride_hailing_get_rides",
+                "arguments": "{\"source\":\"456 Park Avenue\",\"destination\":\"321 Elm Street\",\"max_cost\":20}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_35550393",
+              "function": {
+                "name": "ride_hailing_get_rides",
+                "arguments": "{\"source\":\"321 Elm Street\",\"destination\":\"123 Main Street\",\"max_cost\":25}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 614,
+      "completion_tokens": 325,
+      "total_tokens": 939,
+      "cost": 0.0061842825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00624675,
+        "upstream_inference_prompt_cost": 0.00137175,
+        "upstream_inference_completions_cost": 0.004875
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240782-N8xMgpFwxQyVtIcycihj",
+    "object": "response",
+    "created_at": 1776240787,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'm happy to help you plan your day. Let's address each part of your request step by step.\n\nFirst, I'll arrange a ride from your home to your office with a cost limit of $30.\n\nNext, I'll order groceries from Whole Foods at 789 Broadway with the items you specified and a delivery cost limit of $10.\n\nThen, I'll arrange a ride from your office to your friend's house with a cost limit of $20.\n\nFinally, I'll arrange a ride from your friend's house back to your home with a cost limit of $25.\n\nI've initiated all the necessary actions to plan your day as requested. If you need any further assistance or adjustments, please let me know!"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_90315079",
+        "call_id": "call_90315079",
+        "name": "ride_hailing_get_rides",
+        "arguments": "{\"source\":\"123 Main Street\",\"destination\":\"456 Park Avenue\",\"max_cost\":30}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_87471618",
+        "call_id": "call_87471618",
+        "name": "grocery_delivery_order",
+        "arguments": "{\"location\":\"789 Broadway\",\"items\":[\"milk\",\"bread\",\"eggs\",\"apples\"],\"max_delivery_cost\":10}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_89041266",
+        "call_id": "call_89041266",
+        "name": "ride_hailing_get_rides",
+        "arguments": "{\"source\":\"456 Park Avenue\",\"destination\":\"321 Elm Street\",\"max_cost\":20}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_35550393",
+        "call_id": "call_35550393",
+        "name": "ride_hailing_get_rides",
+        "arguments": "{\"source\":\"321 Elm Street\",\"destination\":\"123 Main Street\",\"max_cost\":25}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 614,
+      "completion_tokens": 325,
+      "total_tokens": 939,
+      "cost": 0.0061842825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00624675,
+        "upstream_inference_prompt_cost": 0.00137175,
+        "upstream_inference_completions_cost": 0.004875
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240782-N8xMgpFwxQyVtIcycihj",
+    "object": "chat.completion",
+    "created": 1776240782,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help you plan your day. Let's address each part of your request step by step.\n\nFirst, I'll arrange a ride from your home to your office with a cost limit of $30.\n\nNext, I'll order groceries from Whole Foods at 789 Broadway with the items you specified and a delivery cost limit of $10.\n\nThen, I'll arrange a ride from your office to your friend's house with a cost limit of $20.\n\nFinally, I'll arrange a ride from your friend's house back to your home with a cost limit of $25.\n\nI've initiated all the necessary actions to plan your day as requested. If you need any further assistance or adjustments, please let me know!",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_90315079",
+              "function": {
+                "name": "ride_hailing_get_rides",
+                "arguments": "{\"source\":\"123 Main Street\",\"destination\":\"456 Park Avenue\",\"max_cost\":30}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_87471618",
+              "function": {
+                "name": "grocery_delivery_order",
+                "arguments": "{\"location\":\"789 Broadway\",\"items\":[\"milk\",\"bread\",\"eggs\",\"apples\"],\"max_delivery_cost\":10}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_89041266",
+              "function": {
+                "name": "ride_hailing_get_rides",
+                "arguments": "{\"source\":\"456 Park Avenue\",\"destination\":\"321 Elm Street\",\"max_cost\":20}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_35550393",
+              "function": {
+                "name": "ride_hailing_get_rides",
+                "arguments": "{\"source\":\"321 Elm Street\",\"destination\":\"123 Main Street\",\"max_cost\":25}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 614,
+      "completion_tokens": 325,
+      "total_tokens": 939,
+      "cost": 0.0061842825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00624675,
+        "upstream_inference_prompt_cost": 0.00137175,
+        "upstream_inference_completions_cost": 0.004875
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 6140.574,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "5637ef04-63c7-46bc-abdb-305c92478b02"
+}

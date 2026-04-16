@@ -1,0 +1,438 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Look up details of a felony crime record for case number CA123456 in San Diego County"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_density",
+        "description": "Calculate the population density of a specific country in a specific year. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "country": {
+              "type": "string",
+              "description": "The country for which the density needs to be calculated."
+            },
+            "year": {
+              "type": "string",
+              "description": "The year in which the density is to be calculated."
+            },
+            "population": {
+              "type": "integer",
+              "description": "The population of the country."
+            },
+            "land_area": {
+              "type": "number",
+              "description": "The land area of the country in square kilometers. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "country",
+            "year",
+            "population",
+            "land_area"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "crime_record_get_record",
+        "description": "Retrieve detailed felony crime records using a specific case number and location. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "case_number": {
+              "type": "string",
+              "description": "The case number related to the crime."
+            },
+            "county": {
+              "type": "string",
+              "description": "The county in which the crime occurred."
+            },
+            "details": {
+              "type": "boolean",
+              "description": "To get a detailed report, set as true. Defaults to false."
+            }
+          },
+          "required": [
+            "case_number",
+            "county"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "get_highest_scoring_player",
+        "description": "Retrieve the highest scoring player in a specific game and season. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "game": {
+              "type": "string",
+              "description": "The game in which you want to find the highest scoring player."
+            },
+            "season": {
+              "type": "string",
+              "description": "The season during which the high score was achieved."
+            },
+            "region": {
+              "type": "string",
+              "description": "The geographical region in which the game is being played (Optional). Defaults to 'USA'"
+            }
+          },
+          "required": [
+            "game",
+            "season"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "calculate_compound_interest",
+        "description": "Calculates the compound interest of an investment over a given time period. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "principle": {
+              "type": "number",
+              "description": "The initial amount of the investment. This is a float type value.",
+              "format": "float"
+            },
+            "interest_rate": {
+              "type": "number",
+              "description": "The yearly interest rate of the investment. This is a float type value.",
+              "format": "float"
+            },
+            "time": {
+              "type": "integer",
+              "description": "The time, in years, the money is invested or borrowed for."
+            },
+            "compounds_per_year": {
+              "type": "integer",
+              "description": "The number of times the interest is compounded per year. Default is 1 (interest is compounded yearly)."
+            }
+          },
+          "required": [
+            "principle",
+            "interest_rate",
+            "time"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Look up details of a felony crime record for case number CA123456 in San Diego County"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_density",
+          "description": "Calculate the population density of a specific country in a specific year. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "country": {
+                "type": "string",
+                "description": "The country for which the density needs to be calculated."
+              },
+              "year": {
+                "type": "string",
+                "description": "The year in which the density is to be calculated."
+              },
+              "population": {
+                "type": "integer",
+                "description": "The population of the country."
+              },
+              "land_area": {
+                "type": "number",
+                "description": "The land area of the country in square kilometers. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "country",
+              "year",
+              "population",
+              "land_area"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "crime_record_get_record",
+          "description": "Retrieve detailed felony crime records using a specific case number and location. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "case_number": {
+                "type": "string",
+                "description": "The case number related to the crime."
+              },
+              "county": {
+                "type": "string",
+                "description": "The county in which the crime occurred."
+              },
+              "details": {
+                "type": "boolean",
+                "description": "To get a detailed report, set as true. Defaults to false."
+              }
+            },
+            "required": [
+              "case_number",
+              "county"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "get_highest_scoring_player",
+          "description": "Retrieve the highest scoring player in a specific game and season. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "game": {
+                "type": "string",
+                "description": "The game in which you want to find the highest scoring player."
+              },
+              "season": {
+                "type": "string",
+                "description": "The season during which the high score was achieved."
+              },
+              "region": {
+                "type": "string",
+                "description": "The geographical region in which the game is being played (Optional). Defaults to 'USA'"
+              }
+            },
+            "required": [
+              "game",
+              "season"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_compound_interest",
+          "description": "Calculates the compound interest of an investment over a given time period. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "principle": {
+                "type": "number",
+                "description": "The initial amount of the investment. This is a float type value.",
+                "format": "float"
+              },
+              "interest_rate": {
+                "type": "number",
+                "description": "The yearly interest rate of the investment. This is a float type value.",
+                "format": "float"
+              },
+              "time": {
+                "type": "integer",
+                "description": "The time, in years, the money is invested or borrowed for."
+              },
+              "compounds_per_year": {
+                "type": "integer",
+                "description": "The number of times the interest is compounded per year. Default is 1 (interest is compounded yearly)."
+              }
+            },
+            "required": [
+              "principle",
+              "interest_rate",
+              "time"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239748-j9NsU5PxoDNJ8aRhTly2",
+    "object": "chat.completion",
+    "created": 1776239748,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_72856610",
+              "function": {
+                "name": "crime_record_get_record",
+                "arguments": "{\"case_number\":\"CA123456\",\"county\":\"San Diego County\",\"details\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 780,
+      "completion_tokens": 43,
+      "total_tokens": 823,
+      "cost": 0.002487375,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0025125,
+        "upstream_inference_prompt_cost": 0.0018675,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239748-j9NsU5PxoDNJ8aRhTly2",
+    "object": "response",
+    "created_at": 1776239750,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_72856610",
+        "call_id": "call_72856610",
+        "name": "crime_record_get_record",
+        "arguments": "{\"case_number\":\"CA123456\",\"county\":\"San Diego County\",\"details\":true}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 780,
+      "completion_tokens": 43,
+      "total_tokens": 823,
+      "cost": 0.002487375,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0025125,
+        "upstream_inference_prompt_cost": 0.0018675,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239748-j9NsU5PxoDNJ8aRhTly2",
+    "object": "chat.completion",
+    "created": 1776239748,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_72856610",
+              "function": {
+                "name": "crime_record_get_record",
+                "arguments": "{\"case_number\":\"CA123456\",\"county\":\"San Diego County\",\"details\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 780,
+      "completion_tokens": 43,
+      "total_tokens": 823,
+      "cost": 0.002487375,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0025125,
+        "upstream_inference_prompt_cost": 0.0018675,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2004.93,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "15127670-0c77-480c-9f26-950eda212430"
+}

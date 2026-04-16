@@ -1,0 +1,350 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "What is the cheapest selling price for the game 'Assassins Creed Valhalla' in the PlayStation Store in the United States?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "video_games_store_currency",
+        "description": "Fetches the currency used in a specific region in a gaming platform store. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "platform": {
+              "type": "string",
+              "description": "The gaming platform e.g. PlayStation, Xbox, Nintendo Switch"
+            },
+            "region": {
+              "type": "string",
+              "description": "The region e.g. United States, United Kingdom, Japan",
+              "default": "True"
+            }
+          },
+          "required": [
+            "platform"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "video_games_on_sale",
+        "description": "Checks if a particular game is currently on sale in a specific gaming platform store and in a specific region. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "game_title": {
+              "type": "string",
+              "description": "The title of the video game"
+            },
+            "platform": {
+              "type": "string",
+              "description": "The gaming platform e.g. PlayStation, Xbox, Nintendo Switch"
+            },
+            "region": {
+              "type": "string",
+              "description": "The region e.g. United States, United Kingdom, Japan. Default United States",
+              "optional": "True"
+            }
+          },
+          "required": [
+            "game_title",
+            "platform"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "video_games_store_price",
+        "description": "Fetches the selling price of a specified game in a particular gaming platform store and in a specific region. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "game_title": {
+              "type": "string",
+              "description": "The title of the video game"
+            },
+            "platform": {
+              "type": "string",
+              "description": "The gaming platform e.g. PlayStation, Xbox, Nintendo Switch"
+            },
+            "region": {
+              "type": "string",
+              "description": "The region e.g. United States, United Kingdom, Japan. Default to United States"
+            }
+          },
+          "required": [
+            "game_title",
+            "platform"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What is the cheapest selling price for the game 'Assassins Creed Valhalla' in the PlayStation Store in the United States?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "video_games_store_currency",
+          "description": "Fetches the currency used in a specific region in a gaming platform store. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "platform": {
+                "type": "string",
+                "description": "The gaming platform e.g. PlayStation, Xbox, Nintendo Switch"
+              },
+              "region": {
+                "type": "string",
+                "description": "The region e.g. United States, United Kingdom, Japan",
+                "default": "True"
+              }
+            },
+            "required": [
+              "platform"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "video_games_on_sale",
+          "description": "Checks if a particular game is currently on sale in a specific gaming platform store and in a specific region. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "game_title": {
+                "type": "string",
+                "description": "The title of the video game"
+              },
+              "platform": {
+                "type": "string",
+                "description": "The gaming platform e.g. PlayStation, Xbox, Nintendo Switch"
+              },
+              "region": {
+                "type": "string",
+                "description": "The region e.g. United States, United Kingdom, Japan. Default United States",
+                "optional": "True"
+              }
+            },
+            "required": [
+              "game_title",
+              "platform"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "video_games_store_price",
+          "description": "Fetches the selling price of a specified game in a particular gaming platform store and in a specific region. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "game_title": {
+                "type": "string",
+                "description": "The title of the video game"
+              },
+              "platform": {
+                "type": "string",
+                "description": "The gaming platform e.g. PlayStation, Xbox, Nintendo Switch"
+              },
+              "region": {
+                "type": "string",
+                "description": "The region e.g. United States, United Kingdom, Japan. Default to United States"
+              }
+            },
+            "required": [
+              "game_title",
+              "platform"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239503-1myO9RxULqlWjuQn7rDL",
+    "object": "chat.completion",
+    "created": 1776239503,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_77379207",
+              "function": {
+                "name": "video_games_store_price",
+                "arguments": "{\"game_title\":\"Assassins Creed Valhalla\",\"platform\":\"PlayStation\",\"region\":\"United States\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 599,
+      "completion_tokens": 48,
+      "total_tokens": 647,
+      "cost": 0.0020262825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00204675,
+        "upstream_inference_prompt_cost": 0.00132675,
+        "upstream_inference_completions_cost": 0.00072
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239503-1myO9RxULqlWjuQn7rDL",
+    "object": "response",
+    "created_at": 1776239505,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_77379207",
+        "call_id": "call_77379207",
+        "name": "video_games_store_price",
+        "arguments": "{\"game_title\":\"Assassins Creed Valhalla\",\"platform\":\"PlayStation\",\"region\":\"United States\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 599,
+      "completion_tokens": 48,
+      "total_tokens": 647,
+      "cost": 0.0020262825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00204675,
+        "upstream_inference_prompt_cost": 0.00132675,
+        "upstream_inference_completions_cost": 0.00072
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239503-1myO9RxULqlWjuQn7rDL",
+    "object": "chat.completion",
+    "created": 1776239503,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_77379207",
+              "function": {
+                "name": "video_games_store_price",
+                "arguments": "{\"game_title\":\"Assassins Creed Valhalla\",\"platform\":\"PlayStation\",\"region\":\"United States\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 599,
+      "completion_tokens": 48,
+      "total_tokens": 647,
+      "cost": 0.0020262825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00204675,
+        "upstream_inference_prompt_cost": 0.00132675,
+        "upstream_inference_completions_cost": 0.00072
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2000.591,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "bfb3fb80-7e14-400c-8605-3b5a9cc735a0"
+}

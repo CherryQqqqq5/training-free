@@ -1,0 +1,240 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find the score of last game for Los Angeles Lakers including its opponent name."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "team_score_get_latest",
+        "description": "Retrieve the score of the most recent game for a specified sports team. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "team": {
+              "type": "string",
+              "description": "Name of the sports team."
+            },
+            "include_opponent": {
+              "type": "boolean",
+              "description": "Include the name of the opponent team in the return.",
+              "default": false
+            }
+          },
+          "required": [
+            "team"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find the score of last game for Los Angeles Lakers including its opponent name."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "team_score_get_latest",
+          "description": "Retrieve the score of the most recent game for a specified sports team. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "team": {
+                "type": "string",
+                "description": "Name of the sports team."
+              },
+              "include_opponent": {
+                "type": "boolean",
+                "description": "Include the name of the opponent team in the return.",
+                "default": false
+              }
+            },
+            "required": [
+              "team"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239236-cbLvF41911gMxZMJDZDF",
+    "object": "chat.completion",
+    "created": 1776239236,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_52012219",
+              "function": {
+                "name": "team_score_get_latest",
+                "arguments": "{\"team\":\"Los Angeles Lakers\",\"include_opponent\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 322,
+      "completion_tokens": 36,
+      "total_tokens": 358,
+      "cost": 0.0010253925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00103575,
+        "upstream_inference_prompt_cost": 0.00049575,
+        "upstream_inference_completions_cost": 0.00054
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239236-cbLvF41911gMxZMJDZDF",
+    "object": "response",
+    "created_at": 1776239237,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_52012219",
+        "call_id": "call_52012219",
+        "name": "team_score_get_latest",
+        "arguments": "{\"team\":\"Los Angeles Lakers\",\"include_opponent\":true}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 322,
+      "completion_tokens": 36,
+      "total_tokens": 358,
+      "cost": 0.0010253925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00103575,
+        "upstream_inference_prompt_cost": 0.00049575,
+        "upstream_inference_completions_cost": 0.00054
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239236-cbLvF41911gMxZMJDZDF",
+    "object": "chat.completion",
+    "created": 1776239236,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_52012219",
+              "function": {
+                "name": "team_score_get_latest",
+                "arguments": "{\"team\":\"Los Angeles Lakers\",\"include_opponent\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 322,
+      "completion_tokens": 36,
+      "total_tokens": 358,
+      "cost": 0.0010253925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00103575,
+        "upstream_inference_prompt_cost": 0.00049575,
+        "upstream_inference_completions_cost": 0.00054
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1600.295,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "122028cd-2ea9-43b3-9400-3b4dcfc534de"
+}

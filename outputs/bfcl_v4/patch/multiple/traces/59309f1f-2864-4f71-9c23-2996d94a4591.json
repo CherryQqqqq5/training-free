@@ -1,0 +1,296 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "What is the shortest path from Paris, France to Rome, Italy by using a public transportation?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "maps_route_times",
+        "description": "Estimates the time it will take to travel from one location to another by a specific mode of transportation. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "route": {
+              "type": "string",
+              "description": "The string representation of the route."
+            },
+            "mode": {
+              "type": "string",
+              "description": "The mode of transportation (walk, bike, transit, drive).",
+              "default": "walk"
+            }
+          },
+          "required": [
+            "route"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "maps_shortest_path",
+        "description": "Find the shortest path from one location to another by using a specific mode of transportation. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "start_location": {
+              "type": "string",
+              "description": "The name or coordinates of the start location."
+            },
+            "end_location": {
+              "type": "string",
+              "description": "The name or coordinates of the end location."
+            },
+            "mode": {
+              "type": "string",
+              "description": "The mode of transportation (walk, bike, transit, drive).",
+              "default": "walk"
+            }
+          },
+          "required": [
+            "start_location",
+            "end_location"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What is the shortest path from Paris, France to Rome, Italy by using a public transportation?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "maps_route_times",
+          "description": "Estimates the time it will take to travel from one location to another by a specific mode of transportation. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "route": {
+                "type": "string",
+                "description": "The string representation of the route."
+              },
+              "mode": {
+                "type": "string",
+                "description": "The mode of transportation (walk, bike, transit, drive).",
+                "default": "walk"
+              }
+            },
+            "required": [
+              "route"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "maps_shortest_path",
+          "description": "Find the shortest path from one location to another by using a specific mode of transportation. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "start_location": {
+                "type": "string",
+                "description": "The name or coordinates of the start location."
+              },
+              "end_location": {
+                "type": "string",
+                "description": "The name or coordinates of the end location."
+              },
+              "mode": {
+                "type": "string",
+                "description": "The mode of transportation (walk, bike, transit, drive).",
+                "default": "walk"
+              }
+            },
+            "required": [
+              "start_location",
+              "end_location"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240019-KApd4aaduIjqboPEJ2ms",
+    "object": "chat.completion",
+    "created": 1776240019,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_40703639",
+              "function": {
+                "name": "maps_shortest_path",
+                "arguments": "{\"start_location\":\"Paris, France\",\"end_location\":\"Rome, Italy\",\"mode\":\"transit\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 458,
+      "completion_tokens": 47,
+      "total_tokens": 505,
+      "cost": 0.0020515275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00207225,
+        "upstream_inference_prompt_cost": 0.00136725,
+        "upstream_inference_completions_cost": 0.000705
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240019-KApd4aaduIjqboPEJ2ms",
+    "object": "response",
+    "created_at": 1776240020,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_40703639",
+        "call_id": "call_40703639",
+        "name": "maps_shortest_path",
+        "arguments": "{\"start_location\":\"Paris, France\",\"end_location\":\"Rome, Italy\",\"mode\":\"transit\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 458,
+      "completion_tokens": 47,
+      "total_tokens": 505,
+      "cost": 0.0020515275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00207225,
+        "upstream_inference_prompt_cost": 0.00136725,
+        "upstream_inference_completions_cost": 0.000705
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240019-KApd4aaduIjqboPEJ2ms",
+    "object": "chat.completion",
+    "created": 1776240019,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_40703639",
+              "function": {
+                "name": "maps_shortest_path",
+                "arguments": "{\"start_location\":\"Paris, France\",\"end_location\":\"Rome, Italy\",\"mode\":\"transit\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 458,
+      "completion_tokens": 47,
+      "total_tokens": 505,
+      "cost": 0.0020515275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00207225,
+        "upstream_inference_prompt_cost": 0.00136725,
+        "upstream_inference_completions_cost": 0.000705
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1823.18,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "59309f1f-2864-4f71-9c23-2996d94a4591"
+}

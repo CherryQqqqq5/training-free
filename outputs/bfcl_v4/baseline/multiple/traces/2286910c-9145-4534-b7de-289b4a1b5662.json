@@ -1,0 +1,294 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find art exhibitions for the upcoming month in the Museum of Modern Art, New York."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "restaurant_info",
+        "description": "Get restaurant information for a specific area. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "Location for which to find restaurants."
+            },
+            "food_type": {
+              "type": "string",
+              "description": "Type of cuisine for which to find restaurants. Default 'any'",
+              "enum": [
+                "Italian",
+                "Chinese",
+                "Mexican",
+                "American"
+              ]
+            }
+          },
+          "required": [
+            "location"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "exhibition_info",
+        "description": "Get exhibition information for a specific museum. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "museum_name": {
+              "type": "string",
+              "description": "Name of the museum for which to find exhibitions."
+            },
+            "month": {
+              "type": "integer",
+              "description": "Number of upcoming months for which to retrieve exhibition details. Default 1"
+            }
+          },
+          "required": [
+            "museum_name"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find art exhibitions for the upcoming month in the Museum of Modern Art, New York."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "restaurant_info",
+          "description": "Get restaurant information for a specific area. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "Location for which to find restaurants."
+              },
+              "food_type": {
+                "type": "string",
+                "description": "Type of cuisine for which to find restaurants. Default 'any'",
+                "enum": [
+                  "Italian",
+                  "Chinese",
+                  "Mexican",
+                  "American"
+                ]
+              }
+            },
+            "required": [
+              "location"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "exhibition_info",
+          "description": "Get exhibition information for a specific museum. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "museum_name": {
+                "type": "string",
+                "description": "Name of the museum for which to find exhibitions."
+              },
+              "month": {
+                "type": "integer",
+                "description": "Number of upcoming months for which to retrieve exhibition details. Default 1"
+              }
+            },
+            "required": [
+              "museum_name"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239626-0Rj8bLMWJAGbNE2EvELJ",
+    "object": "chat.completion",
+    "created": 1776239626,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_43677671",
+              "function": {
+                "name": "exhibition_info",
+                "arguments": "{\"museum_name\":\"Museum of Modern Art, New York\",\"month\":1}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 416,
+      "completion_tokens": 39,
+      "total_tokens": 455,
+      "cost": 0.0013491225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00136275,
+        "upstream_inference_prompt_cost": 0.00077775,
+        "upstream_inference_completions_cost": 0.000585
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239626-0Rj8bLMWJAGbNE2EvELJ",
+    "object": "response",
+    "created_at": 1776239627,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_43677671",
+        "call_id": "call_43677671",
+        "name": "exhibition_info",
+        "arguments": "{\"museum_name\":\"Museum of Modern Art, New York\",\"month\":1}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 416,
+      "completion_tokens": 39,
+      "total_tokens": 455,
+      "cost": 0.0013491225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00136275,
+        "upstream_inference_prompt_cost": 0.00077775,
+        "upstream_inference_completions_cost": 0.000585
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239626-0Rj8bLMWJAGbNE2EvELJ",
+    "object": "chat.completion",
+    "created": 1776239626,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_43677671",
+              "function": {
+                "name": "exhibition_info",
+                "arguments": "{\"museum_name\":\"Museum of Modern Art, New York\",\"month\":1}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 416,
+      "completion_tokens": 39,
+      "total_tokens": 455,
+      "cost": 0.0013491225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00136275,
+        "upstream_inference_prompt_cost": 0.00077775,
+        "upstream_inference_completions_cost": 0.000585
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2026.967,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "2286910c-9145-4534-b7de-289b4a1b5662"
+}

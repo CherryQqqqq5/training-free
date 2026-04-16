@@ -1,0 +1,493 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Could you help me with a few tasks? First, I'm interested in a company's financials. I'd like to know the quarterly dividend per share for a company that has a total dividend payout of $1,000,000 and 500,000 outstanding shares. Second, I'm a big fan of the Beatles and I'd like to know the lyrics of their song 'Hey Jude'. Third, I'm planning to watch a movie tonight and I'm considering 'The Godfather'. Could you provide a brief about this movie and also include additional information like Director, Cast, Awards etc.? Lastly, I'm doing a painting and I'd like to mix the colors red and blue, and I want the resulting color to have a lightness level of 70%.\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "get_song_lyrics",
+        "description": "Retrieve the lyrics of a song based on the artist's name and song title. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "song_title": {
+              "type": "string",
+              "description": "The title of the song."
+            },
+            "artist_name": {
+              "type": "string",
+              "description": "The name of the artist who performed the song."
+            },
+            "lang": {
+              "type": "string",
+              "description": "The language of the lyrics. Default is English.",
+              "enum": [
+                "English",
+                "French",
+                "Spanish",
+                "German",
+                "Italian"
+              ]
+            }
+          },
+          "required": [
+            "song_title",
+            "artist_name"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "mix_paint_color",
+        "description": "Combine two primary paint colors and adjust the resulting color's lightness level. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "color1": {
+              "type": "string",
+              "description": "The first primary color to be mixed."
+            },
+            "color2": {
+              "type": "string",
+              "description": "The second primary color to be mixed."
+            },
+            "lightness": {
+              "type": "integer",
+              "description": "The desired lightness level of the resulting color in percentage. The default level is set to 50."
+            }
+          },
+          "required": [
+            "color1",
+            "color2"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "finance_calculate_quarterly_dividend_per_share",
+        "description": "Calculate quarterly dividend per share for a company given total dividend payout and outstanding shares Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "total_payout": {
+              "type": "integer",
+              "description": "The total amount of dividends paid out in USD"
+            },
+            "outstanding_shares": {
+              "type": "integer",
+              "description": "Total number of outstanding shares"
+            }
+          },
+          "required": [
+            "total_payout",
+            "outstanding_shares"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "movie_details_brief",
+        "description": "This function retrieves a brief about a specified movie. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "description": "Title of the movie"
+            },
+            "extra_info": {
+              "type": "boolean",
+              "description": "Option to get additional information like Director, Cast, Awards etc.",
+              "default": false
+            }
+          },
+          "required": [
+            "title"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Could you help me with a few tasks? First, I'm interested in a company's financials. I'd like to know the quarterly dividend per share for a company that has a total dividend payout of $1,000,000 and 500,000 outstanding shares. Second, I'm a big fan of the Beatles and I'd like to know the lyrics of their song 'Hey Jude'. Third, I'm planning to watch a movie tonight and I'm considering 'The Godfather'. Could you provide a brief about this movie and also include additional information like Director, Cast, Awards etc.? Lastly, I'm doing a painting and I'd like to mix the colors red and blue, and I want the resulting color to have a lightness level of 70%.\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_song_lyrics",
+          "description": "Retrieve the lyrics of a song based on the artist's name and song title. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "song_title": {
+                "type": "string",
+                "description": "The title of the song."
+              },
+              "artist_name": {
+                "type": "string",
+                "description": "The name of the artist who performed the song."
+              },
+              "lang": {
+                "type": "string",
+                "description": "The language of the lyrics. Default is English.",
+                "enum": [
+                  "English",
+                  "French",
+                  "Spanish",
+                  "German",
+                  "Italian"
+                ]
+              }
+            },
+            "required": [
+              "song_title",
+              "artist_name"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "mix_paint_color",
+          "description": "Combine two primary paint colors and adjust the resulting color's lightness level. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "color1": {
+                "type": "string",
+                "description": "The first primary color to be mixed."
+              },
+              "color2": {
+                "type": "string",
+                "description": "The second primary color to be mixed."
+              },
+              "lightness": {
+                "type": "integer",
+                "description": "The desired lightness level of the resulting color in percentage. The default level is set to 50."
+              }
+            },
+            "required": [
+              "color1",
+              "color2"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "finance_calculate_quarterly_dividend_per_share",
+          "description": "Calculate quarterly dividend per share for a company given total dividend payout and outstanding shares Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "total_payout": {
+                "type": "integer",
+                "description": "The total amount of dividends paid out in USD"
+              },
+              "outstanding_shares": {
+                "type": "integer",
+                "description": "Total number of outstanding shares"
+              }
+            },
+            "required": [
+              "total_payout",
+              "outstanding_shares"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "movie_details_brief",
+          "description": "This function retrieves a brief about a specified movie. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string",
+                "description": "Title of the movie"
+              },
+              "extra_info": {
+                "type": "boolean",
+                "description": "Option to get additional information like Director, Cast, Awards etc.",
+                "default": false
+              }
+            },
+            "required": [
+              "title"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241099-HZ6WslEu51GLiJzYEiuU",
+    "object": "chat.completion",
+    "created": 1776241099,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to assist with all your requests. Let's handle each task one by one.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_84166134",
+              "function": {
+                "name": "finance_calculate_quarterly_dividend_per_share",
+                "arguments": "{\"total_payout\":1000000,\"outstanding_shares\":500000}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_90326152",
+              "function": {
+                "name": "get_song_lyrics",
+                "arguments": "{\"song_title\":\"Hey Jude\",\"artist_name\":\"The Beatles\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_60372925",
+              "function": {
+                "name": "movie_details_brief",
+                "arguments": "{\"title\":\"The Godfather\",\"extra_info\":true}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_02939078",
+              "function": {
+                "name": "mix_paint_color",
+                "arguments": "{\"color1\":\"red\",\"color2\":\"blue\",\"lightness\":70}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 801,
+      "completion_tokens": 179,
+      "total_tokens": 980,
+      "cost": 0.0045715725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00461775,
+        "upstream_inference_prompt_cost": 0.00193275,
+        "upstream_inference_completions_cost": 0.002685
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241099-HZ6WslEu51GLiJzYEiuU",
+    "object": "response",
+    "created_at": 1776241102,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'm happy to assist with all your requests. Let's handle each task one by one.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_84166134",
+        "call_id": "call_84166134",
+        "name": "finance_calculate_quarterly_dividend_per_share",
+        "arguments": "{\"total_payout\":1000000,\"outstanding_shares\":500000}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_90326152",
+        "call_id": "call_90326152",
+        "name": "get_song_lyrics",
+        "arguments": "{\"song_title\":\"Hey Jude\",\"artist_name\":\"The Beatles\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_60372925",
+        "call_id": "call_60372925",
+        "name": "movie_details_brief",
+        "arguments": "{\"title\":\"The Godfather\",\"extra_info\":true}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_02939078",
+        "call_id": "call_02939078",
+        "name": "mix_paint_color",
+        "arguments": "{\"color1\":\"red\",\"color2\":\"blue\",\"lightness\":70}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 801,
+      "completion_tokens": 179,
+      "total_tokens": 980,
+      "cost": 0.0045715725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00461775,
+        "upstream_inference_prompt_cost": 0.00193275,
+        "upstream_inference_completions_cost": 0.002685
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241099-HZ6WslEu51GLiJzYEiuU",
+    "object": "chat.completion",
+    "created": 1776241099,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to assist with all your requests. Let's handle each task one by one.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_84166134",
+              "function": {
+                "name": "finance_calculate_quarterly_dividend_per_share",
+                "arguments": "{\"total_payout\":1000000,\"outstanding_shares\":500000}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_90326152",
+              "function": {
+                "name": "get_song_lyrics",
+                "arguments": "{\"song_title\":\"Hey Jude\",\"artist_name\":\"The Beatles\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_60372925",
+              "function": {
+                "name": "movie_details_brief",
+                "arguments": "{\"title\":\"The Godfather\",\"extra_info\":true}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_02939078",
+              "function": {
+                "name": "mix_paint_color",
+                "arguments": "{\"color1\":\"red\",\"color2\":\"blue\",\"lightness\":70}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 801,
+      "completion_tokens": 179,
+      "total_tokens": 980,
+      "cost": 0.0045715725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00461775,
+        "upstream_inference_prompt_cost": 0.00193275,
+        "upstream_inference_completions_cost": 0.002685
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 3606.187,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "8f7f678d-c3c7-4730-8f62-cc4b6a1303bb"
+}

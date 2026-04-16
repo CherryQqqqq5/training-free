@@ -1,0 +1,397 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Could you first fetch the top 10 popular artworks at the Metropolitan Museum of Art sorted by popularity and then fetch the top 5 artworks sorted chronologically? After that, could you search for ongoing lawsuits related to Google that were filed in California starting from January 1, 2020? Lastly, could you also find any settled lawsuits related to Microsoft that were filed in New York starting from January 1, 2018?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "metropolitan_museum_get_top_artworks",
+        "description": "Fetches the list of popular artworks at the Metropolitan Museum of Art. Results can be sorted based on popularity. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "number": {
+              "type": "integer",
+              "description": "The number of artworks to fetch"
+            },
+            "sort_by": {
+              "type": "string",
+              "description": "The criteria to sort the results on. Default is 'popularity'.",
+              "enum": [
+                "popularity",
+                "chronological",
+                "alphabetical"
+              ]
+            }
+          },
+          "required": [
+            "number"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "lawsuit_search",
+        "description": "Search for lawsuits related to a specific company within a specific date range and location. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "company": {
+              "type": "string",
+              "description": "The company related to the lawsuit."
+            },
+            "start_date": {
+              "type": "string",
+              "description": "Start of the date range for when the lawsuit was filed."
+            },
+            "location": {
+              "type": "string",
+              "description": "Location where the lawsuit was filed."
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "ongoing",
+                "settled",
+                "dismissed"
+              ],
+              "description": "The status of the lawsuit. Default is 'ongoing'."
+            }
+          },
+          "required": [
+            "company",
+            "start_date",
+            "location"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Could you first fetch the top 10 popular artworks at the Metropolitan Museum of Art sorted by popularity and then fetch the top 5 artworks sorted chronologically? After that, could you search for ongoing lawsuits related to Google that were filed in California starting from January 1, 2020? Lastly, could you also find any settled lawsuits related to Microsoft that were filed in New York starting from January 1, 2018?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "metropolitan_museum_get_top_artworks",
+          "description": "Fetches the list of popular artworks at the Metropolitan Museum of Art. Results can be sorted based on popularity. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "number": {
+                "type": "integer",
+                "description": "The number of artworks to fetch"
+              },
+              "sort_by": {
+                "type": "string",
+                "description": "The criteria to sort the results on. Default is 'popularity'.",
+                "enum": [
+                  "popularity",
+                  "chronological",
+                  "alphabetical"
+                ]
+              }
+            },
+            "required": [
+              "number"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "lawsuit_search",
+          "description": "Search for lawsuits related to a specific company within a specific date range and location. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "company": {
+                "type": "string",
+                "description": "The company related to the lawsuit."
+              },
+              "start_date": {
+                "type": "string",
+                "description": "Start of the date range for when the lawsuit was filed."
+              },
+              "location": {
+                "type": "string",
+                "description": "Location where the lawsuit was filed."
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "ongoing",
+                  "settled",
+                  "dismissed"
+                ],
+                "description": "The status of the lawsuit. Default is 'ongoing'."
+              }
+            },
+            "required": [
+              "company",
+              "start_date",
+              "location"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241982-NIUnuHvspIPoJBEIodMZ",
+    "object": "chat.completion",
+    "created": 1776241982,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_22268017",
+              "function": {
+                "name": "metropolitan_museum_get_top_artworks",
+                "arguments": "{\"number\":10,\"sort_by\":\"popularity\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_65655821",
+              "function": {
+                "name": "metropolitan_museum_get_top_artworks",
+                "arguments": "{\"number\":5,\"sort_by\":\"chronological\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_84991555",
+              "function": {
+                "name": "lawsuit_search",
+                "arguments": "{\"company\":\"Google\",\"start_date\":\"2020-01-01\",\"location\":\"California\",\"status\":\"ongoing\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_25843608",
+              "function": {
+                "name": "lawsuit_search",
+                "arguments": "{\"company\":\"Microsoft\",\"start_date\":\"2018-01-01\",\"location\":\"New York\",\"status\":\"settled\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 560,
+      "completion_tokens": 184,
+      "total_tokens": 744,
+      "cost": 0.0043889175,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00443325,
+        "upstream_inference_prompt_cost": 0.00167325,
+        "upstream_inference_completions_cost": 0.00276
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241982-NIUnuHvspIPoJBEIodMZ",
+    "object": "response",
+    "created_at": 1776241985,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_22268017",
+        "call_id": "call_22268017",
+        "name": "metropolitan_museum_get_top_artworks",
+        "arguments": "{\"number\":10,\"sort_by\":\"popularity\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_65655821",
+        "call_id": "call_65655821",
+        "name": "metropolitan_museum_get_top_artworks",
+        "arguments": "{\"number\":5,\"sort_by\":\"chronological\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_84991555",
+        "call_id": "call_84991555",
+        "name": "lawsuit_search",
+        "arguments": "{\"company\":\"Google\",\"start_date\":\"2020-01-01\",\"location\":\"California\",\"status\":\"ongoing\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_25843608",
+        "call_id": "call_25843608",
+        "name": "lawsuit_search",
+        "arguments": "{\"company\":\"Microsoft\",\"start_date\":\"2018-01-01\",\"location\":\"New York\",\"status\":\"settled\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 560,
+      "completion_tokens": 184,
+      "total_tokens": 744,
+      "cost": 0.0043889175,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00443325,
+        "upstream_inference_prompt_cost": 0.00167325,
+        "upstream_inference_completions_cost": 0.00276
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241982-NIUnuHvspIPoJBEIodMZ",
+    "object": "chat.completion",
+    "created": 1776241982,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_22268017",
+              "function": {
+                "name": "metropolitan_museum_get_top_artworks",
+                "arguments": "{\"number\":10,\"sort_by\":\"popularity\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_65655821",
+              "function": {
+                "name": "metropolitan_museum_get_top_artworks",
+                "arguments": "{\"number\":5,\"sort_by\":\"chronological\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_84991555",
+              "function": {
+                "name": "lawsuit_search",
+                "arguments": "{\"company\":\"Google\",\"start_date\":\"2020-01-01\",\"location\":\"California\",\"status\":\"ongoing\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_25843608",
+              "function": {
+                "name": "lawsuit_search",
+                "arguments": "{\"company\":\"Microsoft\",\"start_date\":\"2018-01-01\",\"location\":\"New York\",\"status\":\"settled\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 560,
+      "completion_tokens": 184,
+      "total_tokens": 744,
+      "cost": 0.0043889175,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00443325,
+        "upstream_inference_prompt_cost": 0.00167325,
+        "upstream_inference_completions_cost": 0.00276
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 3521.542,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "2cf6413d-ddcc-42a2-8742-15fdae12bdf4"
+}

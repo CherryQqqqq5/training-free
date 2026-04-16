@@ -1,0 +1,262 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find the value of a vintage Super Mario Bros. game from 1985 like new."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "game_valuation",
+        "description": "Get the current market value of a vintage video game. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "game_name": {
+              "type": "string",
+              "description": "The name of the game."
+            },
+            "release_year": {
+              "type": "integer",
+              "description": "The year the game was released."
+            },
+            "condition": {
+              "type": "string",
+              "enum": [
+                "New",
+                "Like New",
+                "Used",
+                "Fair",
+                "Poor"
+              ],
+              "description": "The condition of the game. Default is 'Used'."
+            }
+          },
+          "required": [
+            "game_name",
+            "release_year"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find the value of a vintage Super Mario Bros. game from 1985 like new."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "game_valuation",
+          "description": "Get the current market value of a vintage video game. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "game_name": {
+                "type": "string",
+                "description": "The name of the game."
+              },
+              "release_year": {
+                "type": "integer",
+                "description": "The year the game was released."
+              },
+              "condition": {
+                "type": "string",
+                "enum": [
+                  "New",
+                  "Like New",
+                  "Used",
+                  "Fair",
+                  "Poor"
+                ],
+                "description": "The condition of the game. Default is 'Used'."
+              }
+            },
+            "required": [
+              "game_name",
+              "release_year"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239277-UnWSwyIYyp5zNv42adbN",
+    "object": "chat.completion",
+    "created": 1776239277,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_06874081",
+              "function": {
+                "name": "game_valuation",
+                "arguments": "{\"game_name\":\"Super Mario Bros.\",\"release_year\":1985,\"condition\":\"Like New\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 352,
+      "completion_tokens": 45,
+      "total_tokens": 397,
+      "cost": 0.0009318375,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 351,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00094125,
+        "upstream_inference_prompt_cost": 0.00026625,
+        "upstream_inference_completions_cost": 0.000675
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239277-UnWSwyIYyp5zNv42adbN",
+    "object": "response",
+    "created_at": 1776239278,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_06874081",
+        "call_id": "call_06874081",
+        "name": "game_valuation",
+        "arguments": "{\"game_name\":\"Super Mario Bros.\",\"release_year\":1985,\"condition\":\"Like New\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 352,
+      "completion_tokens": 45,
+      "total_tokens": 397,
+      "cost": 0.0009318375,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 351,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00094125,
+        "upstream_inference_prompt_cost": 0.00026625,
+        "upstream_inference_completions_cost": 0.000675
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239277-UnWSwyIYyp5zNv42adbN",
+    "object": "chat.completion",
+    "created": 1776239277,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_06874081",
+              "function": {
+                "name": "game_valuation",
+                "arguments": "{\"game_name\":\"Super Mario Bros.\",\"release_year\":1985,\"condition\":\"Like New\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 352,
+      "completion_tokens": 45,
+      "total_tokens": 397,
+      "cost": 0.0009318375,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 351,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00094125,
+        "upstream_inference_prompt_cost": 0.00026625,
+        "upstream_inference_completions_cost": 0.000675
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1676.16,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "8c086455-068a-42ea-8281-386d8eaf0f4b"
+}

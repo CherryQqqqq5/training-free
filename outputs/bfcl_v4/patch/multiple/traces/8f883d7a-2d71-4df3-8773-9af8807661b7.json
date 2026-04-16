@@ -1,0 +1,382 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "How to obtain the detailed case information of the R vs Adams legal case?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "park_information",
+        "description": "Retrieve the basic information such as elevation and area of a national park. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "park_name": {
+              "type": "string",
+              "description": "The name of the national park."
+            },
+            "information": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Elevation",
+                  "Area",
+                  "Location",
+                  "Established Year"
+                ]
+              },
+              "description": "The type of information you want about the park."
+            }
+          },
+          "required": [
+            "park_name",
+            "information"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "legal_case_fetch",
+        "description": "Fetch detailed legal case information from database. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "case_id": {
+              "type": "string",
+              "description": "The ID of the legal case."
+            },
+            "details": {
+              "type": "boolean",
+              "description": "True if need the detail info. Default is false."
+            }
+          },
+          "required": [
+            "case_id",
+            "details"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "calculate_stock_return",
+        "description": "Calculate the projected return of a stock investment given the investment amount, the annual growth rate and holding period in years. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "investment_amount": {
+              "type": "number",
+              "description": "The amount of money to invest. This is a float type value.",
+              "format": "float"
+            },
+            "annual_growth_rate": {
+              "type": "number",
+              "description": "The expected annual growth rate of the stock. This is a float type value.",
+              "format": "float"
+            },
+            "holding_period": {
+              "type": "integer",
+              "description": "The number of years you intend to hold the stock."
+            },
+            "include_dividends": {
+              "type": "boolean",
+              "description": "Optional. True if the calculation should take into account potential dividends. Default is false."
+            }
+          },
+          "required": [
+            "investment_amount",
+            "annual_growth_rate",
+            "holding_period"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "How to obtain the detailed case information of the R vs Adams legal case?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "park_information",
+          "description": "Retrieve the basic information such as elevation and area of a national park. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "park_name": {
+                "type": "string",
+                "description": "The name of the national park."
+              },
+              "information": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "Elevation",
+                    "Area",
+                    "Location",
+                    "Established Year"
+                  ]
+                },
+                "description": "The type of information you want about the park."
+              }
+            },
+            "required": [
+              "park_name",
+              "information"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "legal_case_fetch",
+          "description": "Fetch detailed legal case information from database. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "case_id": {
+                "type": "string",
+                "description": "The ID of the legal case."
+              },
+              "details": {
+                "type": "boolean",
+                "description": "True if need the detail info. Default is false."
+              }
+            },
+            "required": [
+              "case_id",
+              "details"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_stock_return",
+          "description": "Calculate the projected return of a stock investment given the investment amount, the annual growth rate and holding period in years. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "investment_amount": {
+                "type": "number",
+                "description": "The amount of money to invest. This is a float type value.",
+                "format": "float"
+              },
+              "annual_growth_rate": {
+                "type": "number",
+                "description": "The expected annual growth rate of the stock. This is a float type value.",
+                "format": "float"
+              },
+              "holding_period": {
+                "type": "integer",
+                "description": "The number of years you intend to hold the stock."
+              },
+              "include_dividends": {
+                "type": "boolean",
+                "description": "Optional. True if the calculation should take into account potential dividends. Default is false."
+              }
+            },
+            "required": [
+              "investment_amount",
+              "annual_growth_rate",
+              "holding_period"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240257-9rInliZNc8xYQXp5rVWj",
+    "object": "chat.completion",
+    "created": 1776240257,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "To obtain the detailed case information for R vs Adams, I will fetch the data from the database using the provided case ID.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_15146713",
+              "function": {
+                "name": "legal_case_fetch",
+                "arguments": "{\"case_id\":\"R vs Adams\",\"details\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 597,
+      "completion_tokens": 59,
+      "total_tokens": 656,
+      "cost": 0.0021836925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00220575,
+        "upstream_inference_prompt_cost": 0.00132075,
+        "upstream_inference_completions_cost": 0.000885
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240257-9rInliZNc8xYQXp5rVWj",
+    "object": "response",
+    "created_at": 1776240258,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "To obtain the detailed case information for R vs Adams, I will fetch the data from the database using the provided case ID.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_15146713",
+        "call_id": "call_15146713",
+        "name": "legal_case_fetch",
+        "arguments": "{\"case_id\":\"R vs Adams\",\"details\":true}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 597,
+      "completion_tokens": 59,
+      "total_tokens": 656,
+      "cost": 0.0021836925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00220575,
+        "upstream_inference_prompt_cost": 0.00132075,
+        "upstream_inference_completions_cost": 0.000885
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240257-9rInliZNc8xYQXp5rVWj",
+    "object": "chat.completion",
+    "created": 1776240257,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "To obtain the detailed case information for R vs Adams, I will fetch the data from the database using the provided case ID.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_15146713",
+              "function": {
+                "name": "legal_case_fetch",
+                "arguments": "{\"case_id\":\"R vs Adams\",\"details\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 597,
+      "completion_tokens": 59,
+      "total_tokens": 656,
+      "cost": 0.0021836925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00220575,
+        "upstream_inference_prompt_cost": 0.00132075,
+        "upstream_inference_completions_cost": 0.000885
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2204.853,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "8f883d7a-2d71-4df3-8773-9af8807661b7"
+}

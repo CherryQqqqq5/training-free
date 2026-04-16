@@ -1,0 +1,489 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"In the game 'Animal Crossing' during the 'Summer' season, can you find out what types of 'fish' are collectable? After that, can you tell me the highest score achieved by any player in the game 'Fortnite' on 'Playstation' platform in the 'Asia' region? Then, I would like to know the details of lawsuits involving the company 'Apple Inc.' in the year 2018. Lastly, could you calculate the binomial probability for 10 trials, with 3 successes and a probability of success of 0.7 on an individual trial?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "lawsuit_details_find",
+        "description": "Find details of lawsuits involving a specific company from a given year. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "company_name": {
+              "type": "string",
+              "description": "Name of the company."
+            },
+            "year": {
+              "type": "integer",
+              "description": "Year of the lawsuit."
+            },
+            "case_type": {
+              "type": "string",
+              "description": "Type of the lawsuit, e.g., 'IPR', 'Patent', 'Commercial', etc. This is an optional parameter. Default is all if not specified."
+            }
+          },
+          "required": [
+            "company_name",
+            "year"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "calculate_binomial_probability",
+        "description": "Calculates the binomial probability given the number of trials, successes and the probability of success on an individual trial. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "number_of_trials": {
+              "type": "integer",
+              "description": "The total number of trials."
+            },
+            "number_of_successes": {
+              "type": "integer",
+              "description": "The desired number of successful outcomes."
+            },
+            "probability_of_success": {
+              "type": "number",
+              "description": "The probability of a successful outcome on any given trial. This is a float type value.",
+              "default": 0.5,
+              "format": "float"
+            }
+          },
+          "required": [
+            "number_of_trials",
+            "number_of_successes"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "game_score_highest",
+        "description": "Retrieve the highest score achieved by any player in a specific game. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "game": {
+              "type": "string",
+              "description": "The name of the online game."
+            },
+            "platform": {
+              "type": "string",
+              "description": "The platform where the game is played, e.g. PC, Xbox, Playstation"
+            },
+            "region": {
+              "type": "string",
+              "description": "The geographic region of the player. Defaults to 'Global'"
+            }
+          },
+          "required": [
+            "game",
+            "platform"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "get_collectables_in_season",
+        "description": "Retrieve a list of collectable items in a specific game during a specified season. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "game_name": {
+              "type": "string",
+              "description": "Name of the game."
+            },
+            "season": {
+              "type": "string",
+              "description": "The season for which to retrieve the collectable items."
+            },
+            "item_type": {
+              "type": "string",
+              "description": "The type of item to search for. Default is 'all'. Possible values: 'all', 'bug', 'fish', 'sea creatures', etc."
+            }
+          },
+          "required": [
+            "game_name",
+            "season"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"In the game 'Animal Crossing' during the 'Summer' season, can you find out what types of 'fish' are collectable? After that, can you tell me the highest score achieved by any player in the game 'Fortnite' on 'Playstation' platform in the 'Asia' region? Then, I would like to know the details of lawsuits involving the company 'Apple Inc.' in the year 2018. Lastly, could you calculate the binomial probability for 10 trials, with 3 successes and a probability of success of 0.7 on an individual trial?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "lawsuit_details_find",
+          "description": "Find details of lawsuits involving a specific company from a given year. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "company_name": {
+                "type": "string",
+                "description": "Name of the company."
+              },
+              "year": {
+                "type": "integer",
+                "description": "Year of the lawsuit."
+              },
+              "case_type": {
+                "type": "string",
+                "description": "Type of the lawsuit, e.g., 'IPR', 'Patent', 'Commercial', etc. This is an optional parameter. Default is all if not specified."
+              }
+            },
+            "required": [
+              "company_name",
+              "year"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_binomial_probability",
+          "description": "Calculates the binomial probability given the number of trials, successes and the probability of success on an individual trial. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "number_of_trials": {
+                "type": "integer",
+                "description": "The total number of trials."
+              },
+              "number_of_successes": {
+                "type": "integer",
+                "description": "The desired number of successful outcomes."
+              },
+              "probability_of_success": {
+                "type": "number",
+                "description": "The probability of a successful outcome on any given trial. This is a float type value.",
+                "default": 0.5,
+                "format": "float"
+              }
+            },
+            "required": [
+              "number_of_trials",
+              "number_of_successes"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "game_score_highest",
+          "description": "Retrieve the highest score achieved by any player in a specific game. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "game": {
+                "type": "string",
+                "description": "The name of the online game."
+              },
+              "platform": {
+                "type": "string",
+                "description": "The platform where the game is played, e.g. PC, Xbox, Playstation"
+              },
+              "region": {
+                "type": "string",
+                "description": "The geographic region of the player. Defaults to 'Global'"
+              }
+            },
+            "required": [
+              "game",
+              "platform"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "get_collectables_in_season",
+          "description": "Retrieve a list of collectable items in a specific game during a specified season. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "game_name": {
+                "type": "string",
+                "description": "Name of the game."
+              },
+              "season": {
+                "type": "string",
+                "description": "The season for which to retrieve the collectable items."
+              },
+              "item_type": {
+                "type": "string",
+                "description": "The type of item to search for. Default is 'all'. Possible values: 'all', 'bug', 'fish', 'sea creatures', etc."
+              }
+            },
+            "required": [
+              "game_name",
+              "season"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241918-NZ9RaHfwo7RL9QTZDEV7",
+    "object": "chat.completion",
+    "created": 1776241918,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_33910895",
+              "function": {
+                "name": "get_collectables_in_season",
+                "arguments": "{\"game_name\":\"Animal Crossing\",\"season\":\"Summer\",\"item_type\":\"fish\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_79199337",
+              "function": {
+                "name": "game_score_highest",
+                "arguments": "{\"game\":\"Fortnite\",\"platform\":\"Playstation\",\"region\":\"Asia\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_16483000",
+              "function": {
+                "name": "lawsuit_details_find",
+                "arguments": "{\"company_name\":\"Apple Inc.\",\"year\":2018}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_92752867",
+              "function": {
+                "name": "calculate_binomial_probability",
+                "arguments": "{\"number_of_trials\":10,\"number_of_successes\":3,\"probability_of_success\":0.7}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 853,
+      "completion_tokens": 170,
+      "total_tokens": 1023,
+      "cost": 0.0045879075,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 211,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00463425,
+        "upstream_inference_prompt_cost": 0.00208425,
+        "upstream_inference_completions_cost": 0.00255
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241918-NZ9RaHfwo7RL9QTZDEV7",
+    "object": "response",
+    "created_at": 1776241920,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_33910895",
+        "call_id": "call_33910895",
+        "name": "get_collectables_in_season",
+        "arguments": "{\"game_name\":\"Animal Crossing\",\"season\":\"Summer\",\"item_type\":\"fish\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_79199337",
+        "call_id": "call_79199337",
+        "name": "game_score_highest",
+        "arguments": "{\"game\":\"Fortnite\",\"platform\":\"Playstation\",\"region\":\"Asia\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_16483000",
+        "call_id": "call_16483000",
+        "name": "lawsuit_details_find",
+        "arguments": "{\"company_name\":\"Apple Inc.\",\"year\":2018}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_92752867",
+        "call_id": "call_92752867",
+        "name": "calculate_binomial_probability",
+        "arguments": "{\"number_of_trials\":10,\"number_of_successes\":3,\"probability_of_success\":0.7}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 853,
+      "completion_tokens": 170,
+      "total_tokens": 1023,
+      "cost": 0.0045879075,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 211,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00463425,
+        "upstream_inference_prompt_cost": 0.00208425,
+        "upstream_inference_completions_cost": 0.00255
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241918-NZ9RaHfwo7RL9QTZDEV7",
+    "object": "chat.completion",
+    "created": 1776241918,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_33910895",
+              "function": {
+                "name": "get_collectables_in_season",
+                "arguments": "{\"game_name\":\"Animal Crossing\",\"season\":\"Summer\",\"item_type\":\"fish\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_79199337",
+              "function": {
+                "name": "game_score_highest",
+                "arguments": "{\"game\":\"Fortnite\",\"platform\":\"Playstation\",\"region\":\"Asia\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_16483000",
+              "function": {
+                "name": "lawsuit_details_find",
+                "arguments": "{\"company_name\":\"Apple Inc.\",\"year\":2018}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_92752867",
+              "function": {
+                "name": "calculate_binomial_probability",
+                "arguments": "{\"number_of_trials\":10,\"number_of_successes\":3,\"probability_of_success\":0.7}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 853,
+      "completion_tokens": 170,
+      "total_tokens": 1023,
+      "cost": 0.0045879075,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 211,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00463425,
+        "upstream_inference_prompt_cost": 0.00208425,
+        "upstream_inference_completions_cost": 0.00255
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2910.199,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "78e1297b-583c-4d08-a2ba-7ab3b7680e4f"
+}

@@ -1,0 +1,372 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"In a park, there is a rectangular playground with a length of 50 meters and a width of 30 meters. Next to it, there is a square sandbox with a side length of 5 meters. A circular fountain with a radius of 3 meters is located at the center of the park. Can you calculate the area and perimeter of the playground, the area and perimeter of the sandbox, and the area and circumference of the fountain?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "geometry_rectangle_calculate",
+        "description": "Calculates the area and perimeter of a rectangle given the width and length. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "width": {
+              "type": "integer",
+              "description": "The width of the rectangle."
+            },
+            "length": {
+              "type": "integer",
+              "description": "The length of the rectangle."
+            }
+          },
+          "required": [
+            "width",
+            "length"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "geometry_circle_calculate",
+        "description": "Calculates the area and circumference of a circle given the radius. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "radius": {
+              "type": "integer",
+              "description": "The radius of the circle."
+            }
+          },
+          "required": [
+            "radius"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "geometry_square_calculate",
+        "description": "Calculates the area and perimeter of a square given the side length. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "side": {
+              "type": "integer",
+              "description": "The length of a side of the square."
+            }
+          },
+          "required": [
+            "side"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"In a park, there is a rectangular playground with a length of 50 meters and a width of 30 meters. Next to it, there is a square sandbox with a side length of 5 meters. A circular fountain with a radius of 3 meters is located at the center of the park. Can you calculate the area and perimeter of the playground, the area and perimeter of the sandbox, and the area and circumference of the fountain?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "geometry_rectangle_calculate",
+          "description": "Calculates the area and perimeter of a rectangle given the width and length. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "width": {
+                "type": "integer",
+                "description": "The width of the rectangle."
+              },
+              "length": {
+                "type": "integer",
+                "description": "The length of the rectangle."
+              }
+            },
+            "required": [
+              "width",
+              "length"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "geometry_circle_calculate",
+          "description": "Calculates the area and circumference of a circle given the radius. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "radius": {
+                "type": "integer",
+                "description": "The radius of the circle."
+              }
+            },
+            "required": [
+              "radius"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "geometry_square_calculate",
+          "description": "Calculates the area and perimeter of a square given the side length. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "side": {
+                "type": "integer",
+                "description": "The length of a side of the square."
+              }
+            },
+            "required": [
+              "side"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240746-x08EtISXmKDuUbR01HBQ",
+    "object": "chat.completion",
+    "created": 1776240746,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I will calculate the area and perimeter of the rectangular playground, the square sandbox, and the area and circumference of the circular fountain using the provided functions.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_56762298",
+              "function": {
+                "name": "geometry_rectangle_calculate",
+                "arguments": "{\"width\":30,\"length\":50}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_32945303",
+              "function": {
+                "name": "geometry_square_calculate",
+                "arguments": "{\"side\":5}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_64830789",
+              "function": {
+                "name": "geometry_circle_calculate",
+                "arguments": "{\"radius\":3}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 528,
+      "completion_tokens": 117,
+      "total_tokens": 645,
+      "cost": 0.0028400625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00286875,
+        "upstream_inference_prompt_cost": 0.00111375,
+        "upstream_inference_completions_cost": 0.001755
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240746-x08EtISXmKDuUbR01HBQ",
+    "object": "response",
+    "created_at": 1776240748,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I will calculate the area and perimeter of the rectangular playground, the square sandbox, and the area and circumference of the circular fountain using the provided functions.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_56762298",
+        "call_id": "call_56762298",
+        "name": "geometry_rectangle_calculate",
+        "arguments": "{\"width\":30,\"length\":50}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_32945303",
+        "call_id": "call_32945303",
+        "name": "geometry_square_calculate",
+        "arguments": "{\"side\":5}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_64830789",
+        "call_id": "call_64830789",
+        "name": "geometry_circle_calculate",
+        "arguments": "{\"radius\":3}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 528,
+      "completion_tokens": 117,
+      "total_tokens": 645,
+      "cost": 0.0028400625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00286875,
+        "upstream_inference_prompt_cost": 0.00111375,
+        "upstream_inference_completions_cost": 0.001755
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240746-x08EtISXmKDuUbR01HBQ",
+    "object": "chat.completion",
+    "created": 1776240746,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I will calculate the area and perimeter of the rectangular playground, the square sandbox, and the area and circumference of the circular fountain using the provided functions.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_56762298",
+              "function": {
+                "name": "geometry_rectangle_calculate",
+                "arguments": "{\"width\":30,\"length\":50}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_32945303",
+              "function": {
+                "name": "geometry_square_calculate",
+                "arguments": "{\"side\":5}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_64830789",
+              "function": {
+                "name": "geometry_circle_calculate",
+                "arguments": "{\"radius\":3}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 528,
+      "completion_tokens": 117,
+      "total_tokens": 645,
+      "cost": 0.0028400625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00286875,
+        "upstream_inference_prompt_cost": 0.00111375,
+        "upstream_inference_completions_cost": 0.001755
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2567.086,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "f22c500a-ac9f-453c-a47c-2f10335d6613"
+}

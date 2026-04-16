@@ -1,0 +1,302 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "What are some recommended board games for 2 players and strategy based from store BoardGameGeek?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "BoardGameGeek_recommend",
+        "description": "Generate game recommendation from BoardGameGeek store based on number of players and category. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "numPlayers": {
+              "type": "integer",
+              "description": "The number of players who will play the game."
+            },
+            "category": {
+              "type": "string",
+              "description": "The preferred category of board game. E.g. strategy, family, party etc."
+            },
+            "difficulty": {
+              "type": "string",
+              "description": "Preferred difficulty level. E.g. beginner, intermediate, advanced etc. This is an optional parameter. Default 'beginner'"
+            }
+          },
+          "required": [
+            "numPlayers",
+            "category"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "AmazonGameStore_recommend",
+        "description": "Generate game recommendation from Amazon Game Store based on number of players and category. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "numOfPlayers": {
+              "type": "integer",
+              "description": "The number of players who will play the game."
+            },
+            "category": {
+              "type": "string",
+              "description": "The preferred category of board game. E.g. strategy, family, party etc."
+            },
+            "priceRange": {
+              "type": "string",
+              "description": "The price range you are willing to pay for the board game. E.g. $10-$20, $20-$30 etc. This is an optional parameter. Default ''"
+            }
+          },
+          "required": [
+            "numOfPlayers",
+            "category"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What are some recommended board games for 2 players and strategy based from store BoardGameGeek?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "BoardGameGeek_recommend",
+          "description": "Generate game recommendation from BoardGameGeek store based on number of players and category. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "numPlayers": {
+                "type": "integer",
+                "description": "The number of players who will play the game."
+              },
+              "category": {
+                "type": "string",
+                "description": "The preferred category of board game. E.g. strategy, family, party etc."
+              },
+              "difficulty": {
+                "type": "string",
+                "description": "Preferred difficulty level. E.g. beginner, intermediate, advanced etc. This is an optional parameter. Default 'beginner'"
+              }
+            },
+            "required": [
+              "numPlayers",
+              "category"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "AmazonGameStore_recommend",
+          "description": "Generate game recommendation from Amazon Game Store based on number of players and category. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "numOfPlayers": {
+                "type": "integer",
+                "description": "The number of players who will play the game."
+              },
+              "category": {
+                "type": "string",
+                "description": "The preferred category of board game. E.g. strategy, family, party etc."
+              },
+              "priceRange": {
+                "type": "string",
+                "description": "The price range you are willing to pay for the board game. E.g. $10-$20, $20-$30 etc. This is an optional parameter. Default ''"
+              }
+            },
+            "required": [
+              "numOfPlayers",
+              "category"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239641-uQfXiY0sb5pIZRJd2aVY",
+    "object": "chat.completion",
+    "created": 1776239641,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_96325320",
+              "function": {
+                "name": "BoardGameGeek_recommend",
+                "arguments": "{\"numPlayers\":2,\"category\":\"strategy\",\"difficulty\":\"beginner\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 523,
+      "completion_tokens": 43,
+      "total_tokens": 566,
+      "cost": 0.0017263125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00174375,
+        "upstream_inference_prompt_cost": 0.00109875,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239641-uQfXiY0sb5pIZRJd2aVY",
+    "object": "response",
+    "created_at": 1776239642,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_96325320",
+        "call_id": "call_96325320",
+        "name": "BoardGameGeek_recommend",
+        "arguments": "{\"numPlayers\":2,\"category\":\"strategy\",\"difficulty\":\"beginner\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 523,
+      "completion_tokens": 43,
+      "total_tokens": 566,
+      "cost": 0.0017263125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00174375,
+        "upstream_inference_prompt_cost": 0.00109875,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239641-uQfXiY0sb5pIZRJd2aVY",
+    "object": "chat.completion",
+    "created": 1776239641,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_96325320",
+              "function": {
+                "name": "BoardGameGeek_recommend",
+                "arguments": "{\"numPlayers\":2,\"category\":\"strategy\",\"difficulty\":\"beginner\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 523,
+      "completion_tokens": 43,
+      "total_tokens": 566,
+      "cost": 0.0017263125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00174375,
+        "upstream_inference_prompt_cost": 0.00109875,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1999.049,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "72ed0f0c-c730-4f44-8725-b197f1967168"
+}

@@ -1,0 +1,238 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find me the most recent art sculpture by James Plensa with detailed description."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "get_sculpture_info",
+        "description": "Retrieves the most recent artwork by a specified artist with its detailed description. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "artist_name": {
+              "type": "string",
+              "description": "The name of the artist."
+            },
+            "detail": {
+              "type": "boolean",
+              "description": "If True, it provides detailed description of the sculpture. Defaults to False."
+            }
+          },
+          "required": [
+            "artist_name"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find me the most recent art sculpture by James Plensa with detailed description."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_sculpture_info",
+          "description": "Retrieves the most recent artwork by a specified artist with its detailed description. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "artist_name": {
+                "type": "string",
+                "description": "The name of the artist."
+              },
+              "detail": {
+                "type": "boolean",
+                "description": "If True, it provides detailed description of the sculpture. Defaults to False."
+              }
+            },
+            "required": [
+              "artist_name"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239108-075oIGzUcbDAYErtEsGW",
+    "object": "chat.completion",
+    "created": 1776239108,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_79665713",
+              "function": {
+                "name": "get_sculpture_info",
+                "arguments": "{\"artist_name\":\"James Plensa\",\"detail\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 326,
+      "completion_tokens": 37,
+      "total_tokens": 363,
+      "cost": 0.0007937325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 325,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00080175,
+        "upstream_inference_prompt_cost": 0.00024675,
+        "upstream_inference_completions_cost": 0.000555
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239108-075oIGzUcbDAYErtEsGW",
+    "object": "response",
+    "created_at": 1776239109,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_79665713",
+        "call_id": "call_79665713",
+        "name": "get_sculpture_info",
+        "arguments": "{\"artist_name\":\"James Plensa\",\"detail\":true}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 326,
+      "completion_tokens": 37,
+      "total_tokens": 363,
+      "cost": 0.0007937325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 325,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00080175,
+        "upstream_inference_prompt_cost": 0.00024675,
+        "upstream_inference_completions_cost": 0.000555
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239108-075oIGzUcbDAYErtEsGW",
+    "object": "chat.completion",
+    "created": 1776239108,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_79665713",
+              "function": {
+                "name": "get_sculpture_info",
+                "arguments": "{\"artist_name\":\"James Plensa\",\"detail\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 326,
+      "completion_tokens": 37,
+      "total_tokens": 363,
+      "cost": 0.0007937325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 325,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00080175,
+        "upstream_inference_prompt_cost": 0.00024675,
+        "upstream_inference_completions_cost": 0.000555
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1759.011,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "d3a321c6-ef2e-4e21-b9b4-8248c9b62856"
+}

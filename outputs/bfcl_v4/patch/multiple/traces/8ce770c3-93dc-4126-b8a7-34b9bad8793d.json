@@ -1,0 +1,342 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the probability of rolling a sum of 7 on a roll of two dice."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "dice_roll_probability",
+        "description": "Calculate the probability of a specific sum appearing from rolling two dice. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "desired_sum": {
+              "type": "integer",
+              "description": "The sum for which to calculate the probability."
+            },
+            "n_rolls": {
+              "type": "integer",
+              "description": "Number of dice to be rolled. Default is 1",
+              "optional": true
+            },
+            "sides_per_die": {
+              "type": "integer",
+              "description": "Number of sides on each die."
+            }
+          },
+          "required": [
+            "desired_sum",
+            "sides_per_die"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "flip_coin_probability",
+        "description": "Calculate the probability of a specific outcome appearing from flipping a coin. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "desired_outcome": {
+              "type": "string",
+              "description": "The outcome for which to calculate the probability."
+            },
+            "n_flips": {
+              "type": "integer",
+              "description": "Number of coins to be flipped. Default 1",
+              "optional": true
+            }
+          },
+          "required": [
+            "desired_outcome"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "shuffle_card_probability",
+        "description": "Calculate the probability of a specific card appearing from a shuffled deck. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "desired_card": {
+              "type": "string",
+              "description": "The card for which to calculate the probability."
+            },
+            "n_decks": {
+              "type": "integer",
+              "description": "Number of decks to shuffle. Default 1",
+              "optional": true
+            }
+          },
+          "required": [
+            "desired_card"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the probability of rolling a sum of 7 on a roll of two dice."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "dice_roll_probability",
+          "description": "Calculate the probability of a specific sum appearing from rolling two dice. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "desired_sum": {
+                "type": "integer",
+                "description": "The sum for which to calculate the probability."
+              },
+              "n_rolls": {
+                "type": "integer",
+                "description": "Number of dice to be rolled. Default is 1",
+                "optional": true
+              },
+              "sides_per_die": {
+                "type": "integer",
+                "description": "Number of sides on each die."
+              }
+            },
+            "required": [
+              "desired_sum",
+              "sides_per_die"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "flip_coin_probability",
+          "description": "Calculate the probability of a specific outcome appearing from flipping a coin. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "desired_outcome": {
+                "type": "string",
+                "description": "The outcome for which to calculate the probability."
+              },
+              "n_flips": {
+                "type": "integer",
+                "description": "Number of coins to be flipped. Default 1",
+                "optional": true
+              }
+            },
+            "required": [
+              "desired_outcome"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "shuffle_card_probability",
+          "description": "Calculate the probability of a specific card appearing from a shuffled deck. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "desired_card": {
+                "type": "string",
+                "description": "The card for which to calculate the probability."
+              },
+              "n_decks": {
+                "type": "integer",
+                "description": "Number of decks to shuffle. Default 1",
+                "optional": true
+              }
+            },
+            "required": [
+              "desired_card"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240069-zZMGmwGXRtNbGGScLEoK",
+    "object": "chat.completion",
+    "created": 1776240069,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_02815188",
+              "function": {
+                "name": "dice_roll_probability",
+                "arguments": "{\"desired_sum\":7,\"n_rolls\":2,\"sides_per_die\":6}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 543,
+      "completion_tokens": 43,
+      "total_tokens": 586,
+      "cost": 0.001043955,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 542,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0010545,
+        "upstream_inference_prompt_cost": 0.0004095,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240069-zZMGmwGXRtNbGGScLEoK",
+    "object": "response",
+    "created_at": 1776240070,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_02815188",
+        "call_id": "call_02815188",
+        "name": "dice_roll_probability",
+        "arguments": "{\"desired_sum\":7,\"n_rolls\":2,\"sides_per_die\":6}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 543,
+      "completion_tokens": 43,
+      "total_tokens": 586,
+      "cost": 0.001043955,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 542,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0010545,
+        "upstream_inference_prompt_cost": 0.0004095,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240069-zZMGmwGXRtNbGGScLEoK",
+    "object": "chat.completion",
+    "created": 1776240069,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_02815188",
+              "function": {
+                "name": "dice_roll_probability",
+                "arguments": "{\"desired_sum\":7,\"n_rolls\":2,\"sides_per_die\":6}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 543,
+      "completion_tokens": 43,
+      "total_tokens": 586,
+      "cost": 0.001043955,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 542,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0010545,
+        "upstream_inference_prompt_cost": 0.0004095,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1683.13,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "8ce770c3-93dc-4126-b8a7-34b9bad8793d"
+}

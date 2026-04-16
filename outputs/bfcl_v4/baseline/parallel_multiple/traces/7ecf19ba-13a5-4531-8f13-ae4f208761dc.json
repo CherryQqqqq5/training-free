@@ -1,0 +1,327 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find cases that pertain to 'Theft' from court record in 'New York' and from 'San Francisco', filed in year 2021, and display briefs of top 5 relevant cases."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "briefs_display_cases",
+        "description": "Display briefs of the cases Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "case_id": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "A list of unique identifiers for cases."
+            }
+          },
+          "required": [
+            "case_id"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "court_records_search_cases",
+        "description": "Search for court cases based on specific criteria. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city where the court is located"
+            },
+            "query": {
+              "type": "string",
+              "description": "Search string to look for specific cases"
+            },
+            "year": {
+              "type": "integer",
+              "description": "Year the case was filed"
+            },
+            "limit": {
+              "type": "integer",
+              "description": "Limits the number of results returned",
+              "default": 5
+            }
+          },
+          "required": [
+            "location",
+            "query",
+            "year"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find cases that pertain to 'Theft' from court record in 'New York' and from 'San Francisco', filed in year 2021, and display briefs of top 5 relevant cases."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "briefs_display_cases",
+          "description": "Display briefs of the cases Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "case_id": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "A list of unique identifiers for cases."
+              }
+            },
+            "required": [
+              "case_id"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "court_records_search_cases",
+          "description": "Search for court cases based on specific criteria. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city where the court is located"
+              },
+              "query": {
+                "type": "string",
+                "description": "Search string to look for specific cases"
+              },
+              "year": {
+                "type": "integer",
+                "description": "Year the case was filed"
+              },
+              "limit": {
+                "type": "integer",
+                "description": "Limits the number of results returned",
+                "default": 5
+              }
+            },
+            "required": [
+              "location",
+              "query",
+              "year"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240553-cv7AE3C0X9LS0GqbWo6B",
+    "object": "chat.completion",
+    "created": 1776240553,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_86842077",
+              "function": {
+                "name": "court_records_search_cases",
+                "arguments": "{\"location\":\"New York\",\"query\":\"Theft\",\"year\":2021,\"limit\":5}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_33785010",
+              "function": {
+                "name": "court_records_search_cases",
+                "arguments": "{\"location\":\"San Francisco\",\"query\":\"Theft\",\"year\":2021,\"limit\":5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 440,
+      "completion_tokens": 96,
+      "total_tokens": 536,
+      "cost": 0.0022668525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00228975,
+        "upstream_inference_prompt_cost": 0.00084975,
+        "upstream_inference_completions_cost": 0.00144
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240553-cv7AE3C0X9LS0GqbWo6B",
+    "object": "response",
+    "created_at": 1776240555,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_86842077",
+        "call_id": "call_86842077",
+        "name": "court_records_search_cases",
+        "arguments": "{\"location\":\"New York\",\"query\":\"Theft\",\"year\":2021,\"limit\":5}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_33785010",
+        "call_id": "call_33785010",
+        "name": "court_records_search_cases",
+        "arguments": "{\"location\":\"San Francisco\",\"query\":\"Theft\",\"year\":2021,\"limit\":5}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 440,
+      "completion_tokens": 96,
+      "total_tokens": 536,
+      "cost": 0.0022668525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00228975,
+        "upstream_inference_prompt_cost": 0.00084975,
+        "upstream_inference_completions_cost": 0.00144
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240553-cv7AE3C0X9LS0GqbWo6B",
+    "object": "chat.completion",
+    "created": 1776240553,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_86842077",
+              "function": {
+                "name": "court_records_search_cases",
+                "arguments": "{\"location\":\"New York\",\"query\":\"Theft\",\"year\":2021,\"limit\":5}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_33785010",
+              "function": {
+                "name": "court_records_search_cases",
+                "arguments": "{\"location\":\"San Francisco\",\"query\":\"Theft\",\"year\":2021,\"limit\":5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 440,
+      "completion_tokens": 96,
+      "total_tokens": 536,
+      "cost": 0.0022668525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00228975,
+        "upstream_inference_prompt_cost": 0.00084975,
+        "upstream_inference_completions_cost": 0.00144
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2488.472,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "7ecf19ba-13a5-4531-8f13-ae4f208761dc"
+}

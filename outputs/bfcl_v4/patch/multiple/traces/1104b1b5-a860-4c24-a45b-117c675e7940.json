@@ -1,0 +1,426 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Who is ranked as the top player in woman tennis?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "find_instrument",
+        "description": "Search for a musical instrument within specified budget and of specific type. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "budget": {
+              "type": "number",
+              "description": "Your budget for the instrument. This is a float type value.",
+              "format": "float"
+            },
+            "type": {
+              "type": "string",
+              "description": "Type of the instrument"
+            },
+            "make": {
+              "type": "string",
+              "description": "Maker of the instrument, Optional parameter. Default is ''"
+            }
+          },
+          "required": [
+            "budget",
+            "type"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "calculate_binomial_probability",
+        "description": "Calculates the binomial probability given the number of trials, successes and the probability of success on an individual trial. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "number_of_trials": {
+              "type": "integer",
+              "description": "The total number of trials."
+            },
+            "number_of_successes": {
+              "type": "integer",
+              "description": "The desired number of successful outcomes."
+            },
+            "probability_of_success": {
+              "type": "number",
+              "description": "The probability of a successful outcome on any given trial. This is a float type value.",
+              "default": 0.5,
+              "format": "float"
+            }
+          },
+          "required": [
+            "number_of_trials",
+            "number_of_successes"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "electromagnetic_force",
+        "description": "Calculate the electromagnetic force between two charges placed at a certain distance. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "charge1": {
+              "type": "number",
+              "description": "The magnitude of the first charge in coulombs. This is a float type value.",
+              "format": "float"
+            },
+            "charge2": {
+              "type": "number",
+              "description": "The magnitude of the second charge in coulombs. This is a float type value.",
+              "format": "float"
+            },
+            "distance": {
+              "type": "number",
+              "description": "The distance between the two charges in meters. This is a float type value.",
+              "format": "float"
+            },
+            "medium_permittivity": {
+              "type": "number",
+              "description": "The relative permittivity of the medium in which the charges are present. Default is 8.854 x 10^-12 F/m (vacuum permittivity). This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "charge1",
+            "charge2",
+            "distance"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "sports_ranking_get_top_player",
+        "description": "Get the top player in a specific sport. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "sport": {
+              "type": "string",
+              "description": "The type of sport."
+            },
+            "gender": {
+              "type": "string",
+              "description": "The gender of the sport category. Optional.",
+              "default": "men"
+            }
+          },
+          "required": [
+            "sport"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Who is ranked as the top player in woman tennis?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "find_instrument",
+          "description": "Search for a musical instrument within specified budget and of specific type. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "budget": {
+                "type": "number",
+                "description": "Your budget for the instrument. This is a float type value.",
+                "format": "float"
+              },
+              "type": {
+                "type": "string",
+                "description": "Type of the instrument"
+              },
+              "make": {
+                "type": "string",
+                "description": "Maker of the instrument, Optional parameter. Default is ''"
+              }
+            },
+            "required": [
+              "budget",
+              "type"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_binomial_probability",
+          "description": "Calculates the binomial probability given the number of trials, successes and the probability of success on an individual trial. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "number_of_trials": {
+                "type": "integer",
+                "description": "The total number of trials."
+              },
+              "number_of_successes": {
+                "type": "integer",
+                "description": "The desired number of successful outcomes."
+              },
+              "probability_of_success": {
+                "type": "number",
+                "description": "The probability of a successful outcome on any given trial. This is a float type value.",
+                "default": 0.5,
+                "format": "float"
+              }
+            },
+            "required": [
+              "number_of_trials",
+              "number_of_successes"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "electromagnetic_force",
+          "description": "Calculate the electromagnetic force between two charges placed at a certain distance. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "charge1": {
+                "type": "number",
+                "description": "The magnitude of the first charge in coulombs. This is a float type value.",
+                "format": "float"
+              },
+              "charge2": {
+                "type": "number",
+                "description": "The magnitude of the second charge in coulombs. This is a float type value.",
+                "format": "float"
+              },
+              "distance": {
+                "type": "number",
+                "description": "The distance between the two charges in meters. This is a float type value.",
+                "format": "float"
+              },
+              "medium_permittivity": {
+                "type": "number",
+                "description": "The relative permittivity of the medium in which the charges are present. Default is 8.854 x 10^-12 F/m (vacuum permittivity). This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "charge1",
+              "charge2",
+              "distance"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "sports_ranking_get_top_player",
+          "description": "Get the top player in a specific sport. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "sport": {
+                "type": "string",
+                "description": "The type of sport."
+              },
+              "gender": {
+                "type": "string",
+                "description": "The gender of the sport category. Optional.",
+                "default": "men"
+              }
+            },
+            "required": [
+              "sport"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240333-sSZZxdgNA22sG76Jl89Q",
+    "object": "chat.completion",
+    "created": 1776240333,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_49553883",
+              "function": {
+                "name": "sports_ranking_get_top_player",
+                "arguments": "{\"sport\":\"tennis\",\"gender\":\"women\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 763,
+      "completion_tokens": 37,
+      "total_tokens": 800,
+      "cost": 0.0023500125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00237375,
+        "upstream_inference_prompt_cost": 0.00181875,
+        "upstream_inference_completions_cost": 0.000555
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240333-sSZZxdgNA22sG76Jl89Q",
+    "object": "response",
+    "created_at": 1776240334,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_49553883",
+        "call_id": "call_49553883",
+        "name": "sports_ranking_get_top_player",
+        "arguments": "{\"sport\":\"tennis\",\"gender\":\"women\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 763,
+      "completion_tokens": 37,
+      "total_tokens": 800,
+      "cost": 0.0023500125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00237375,
+        "upstream_inference_prompt_cost": 0.00181875,
+        "upstream_inference_completions_cost": 0.000555
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240333-sSZZxdgNA22sG76Jl89Q",
+    "object": "chat.completion",
+    "created": 1776240333,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_49553883",
+              "function": {
+                "name": "sports_ranking_get_top_player",
+                "arguments": "{\"sport\":\"tennis\",\"gender\":\"women\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 763,
+      "completion_tokens": 37,
+      "total_tokens": 800,
+      "cost": 0.0023500125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00237375,
+        "upstream_inference_prompt_cost": 0.00181875,
+        "upstream_inference_completions_cost": 0.000555
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1613.445,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "1104b1b5-a860-4c24-a45b-117c675e7940"
+}

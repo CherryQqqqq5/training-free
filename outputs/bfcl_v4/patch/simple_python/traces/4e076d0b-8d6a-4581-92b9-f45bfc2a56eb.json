@@ -1,0 +1,260 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the Future Value of a $5000 investment made today for a term of 10 years at an annual interest rate of 5%"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_future_value",
+        "description": "Calculates the future value of an investment based on the present value, interest rate, and time period. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "present_value": {
+              "type": "integer",
+              "description": "The present value or principal amount."
+            },
+            "annual_interest_rate": {
+              "type": "number",
+              "description": "The annual interest rate in decimal form. Example, 5% is 0.05. This is a float type value.",
+              "format": "float"
+            },
+            "years": {
+              "type": "integer",
+              "description": "The time period in years for which the investment is made."
+            },
+            "compounds_per_year": {
+              "type": "integer",
+              "description": "The number of times the interest is compounded per year. Default is 1 (annual compounding)."
+            }
+          },
+          "required": [
+            "present_value",
+            "annual_interest_rate",
+            "years"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the Future Value of a $5000 investment made today for a term of 10 years at an annual interest rate of 5%"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_future_value",
+          "description": "Calculates the future value of an investment based on the present value, interest rate, and time period. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "present_value": {
+                "type": "integer",
+                "description": "The present value or principal amount."
+              },
+              "annual_interest_rate": {
+                "type": "number",
+                "description": "The annual interest rate in decimal form. Example, 5% is 0.05. This is a float type value.",
+                "format": "float"
+              },
+              "years": {
+                "type": "integer",
+                "description": "The time period in years for which the investment is made."
+              },
+              "compounds_per_year": {
+                "type": "integer",
+                "description": "The number of times the interest is compounded per year. Default is 1 (annual compounding)."
+              }
+            },
+            "required": [
+              "present_value",
+              "annual_interest_rate",
+              "years"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776238880-3s3b5aU3gWczbMqjG4JV",
+    "object": "chat.completion",
+    "created": 1776238880,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_84642184",
+              "function": {
+                "name": "calculate_future_value",
+                "arguments": "{\"present_value\":5000,\"annual_interest_rate\":0.05,\"years\":10,\"compounds_per_year\":1}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 417,
+      "completion_tokens": 53,
+      "total_tokens": 470,
+      "cost": 0.001557765,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0015735,
+        "upstream_inference_prompt_cost": 0.0007785,
+        "upstream_inference_completions_cost": 0.000795
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776238880-3s3b5aU3gWczbMqjG4JV",
+    "object": "response",
+    "created_at": 1776238881,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_84642184",
+        "call_id": "call_84642184",
+        "name": "calculate_future_value",
+        "arguments": "{\"present_value\":5000,\"annual_interest_rate\":0.05,\"years\":10,\"compounds_per_year\":1}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 417,
+      "completion_tokens": 53,
+      "total_tokens": 470,
+      "cost": 0.001557765,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0015735,
+        "upstream_inference_prompt_cost": 0.0007785,
+        "upstream_inference_completions_cost": 0.000795
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776238880-3s3b5aU3gWczbMqjG4JV",
+    "object": "chat.completion",
+    "created": 1776238880,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_84642184",
+              "function": {
+                "name": "calculate_future_value",
+                "arguments": "{\"present_value\":5000,\"annual_interest_rate\":0.05,\"years\":10,\"compounds_per_year\":1}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 417,
+      "completion_tokens": 53,
+      "total_tokens": 470,
+      "cost": 0.001557765,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0015735,
+        "upstream_inference_prompt_cost": 0.0007785,
+        "upstream_inference_completions_cost": 0.000795
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2007.849,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "4e076d0b-8d6a-4581-92b9-f45bfc2a56eb"
+}

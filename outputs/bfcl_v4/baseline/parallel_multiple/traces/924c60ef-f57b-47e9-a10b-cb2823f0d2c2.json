@@ -1,0 +1,359 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Can you tell me the name of the scientist who is credited for the discovery of the theory of relativity? Also, I would like to know the predicted forest growth in Amazon rainforest over the next 10 years, considering the impact of human activities. After that, could you also provide the forecast for the same location but this time without considering human impact? Lastly, I'm curious about the scientist who discovered the DNA double helix structure.\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "get_scientist_for_discovery",
+        "description": "Retrieve the scientist's name who is credited for a specific scientific discovery or theory. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "discovery": {
+              "type": "string",
+              "description": "The scientific discovery or theory."
+            }
+          },
+          "required": [
+            "discovery"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "forest_growth_forecast",
+        "description": "Predicts the forest growth over the next N years based on current trends. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The location where you want to predict forest growth."
+            },
+            "years": {
+              "type": "integer",
+              "description": "The number of years for the forecast."
+            },
+            "include_human_impact": {
+              "type": "boolean",
+              "description": "Whether or not to include the impact of human activities in the forecast. If not provided, defaults to false."
+            }
+          },
+          "required": [
+            "location",
+            "years"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Can you tell me the name of the scientist who is credited for the discovery of the theory of relativity? Also, I would like to know the predicted forest growth in Amazon rainforest over the next 10 years, considering the impact of human activities. After that, could you also provide the forecast for the same location but this time without considering human impact? Lastly, I'm curious about the scientist who discovered the DNA double helix structure.\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_scientist_for_discovery",
+          "description": "Retrieve the scientist's name who is credited for a specific scientific discovery or theory. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "discovery": {
+                "type": "string",
+                "description": "The scientific discovery or theory."
+              }
+            },
+            "required": [
+              "discovery"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "forest_growth_forecast",
+          "description": "Predicts the forest growth over the next N years based on current trends. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The location where you want to predict forest growth."
+              },
+              "years": {
+                "type": "integer",
+                "description": "The number of years for the forecast."
+              },
+              "include_human_impact": {
+                "type": "boolean",
+                "description": "Whether or not to include the impact of human activities in the forecast. If not provided, defaults to false."
+              }
+            },
+            "required": [
+              "location",
+              "years"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241028-hM9CEgWGQL2lgIQKRddO",
+    "object": "chat.completion",
+    "created": 1776241028,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_69153579",
+              "function": {
+                "name": "get_scientist_for_discovery",
+                "arguments": "{\"discovery\":\"theory of relativity\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_33409211",
+              "function": {
+                "name": "forest_growth_forecast",
+                "arguments": "{\"location\":\"Amazon rainforest\",\"years\":10,\"include_human_impact\":true}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_25223832",
+              "function": {
+                "name": "forest_growth_forecast",
+                "arguments": "{\"location\":\"Amazon rainforest\",\"years\":10,\"include_human_impact\":false}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_91554991",
+              "function": {
+                "name": "get_scientist_for_discovery",
+                "arguments": "{\"discovery\":\"DNA double helix structure\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 498,
+      "completion_tokens": 149,
+      "total_tokens": 647,
+      "cost": 0.0036850275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00372225,
+        "upstream_inference_prompt_cost": 0.00148725,
+        "upstream_inference_completions_cost": 0.002235
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241028-hM9CEgWGQL2lgIQKRddO",
+    "object": "response",
+    "created_at": 1776241031,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_69153579",
+        "call_id": "call_69153579",
+        "name": "get_scientist_for_discovery",
+        "arguments": "{\"discovery\":\"theory of relativity\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_33409211",
+        "call_id": "call_33409211",
+        "name": "forest_growth_forecast",
+        "arguments": "{\"location\":\"Amazon rainforest\",\"years\":10,\"include_human_impact\":true}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_25223832",
+        "call_id": "call_25223832",
+        "name": "forest_growth_forecast",
+        "arguments": "{\"location\":\"Amazon rainforest\",\"years\":10,\"include_human_impact\":false}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_91554991",
+        "call_id": "call_91554991",
+        "name": "get_scientist_for_discovery",
+        "arguments": "{\"discovery\":\"DNA double helix structure\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 498,
+      "completion_tokens": 149,
+      "total_tokens": 647,
+      "cost": 0.0036850275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00372225,
+        "upstream_inference_prompt_cost": 0.00148725,
+        "upstream_inference_completions_cost": 0.002235
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241028-hM9CEgWGQL2lgIQKRddO",
+    "object": "chat.completion",
+    "created": 1776241028,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_69153579",
+              "function": {
+                "name": "get_scientist_for_discovery",
+                "arguments": "{\"discovery\":\"theory of relativity\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_33409211",
+              "function": {
+                "name": "forest_growth_forecast",
+                "arguments": "{\"location\":\"Amazon rainforest\",\"years\":10,\"include_human_impact\":true}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_25223832",
+              "function": {
+                "name": "forest_growth_forecast",
+                "arguments": "{\"location\":\"Amazon rainforest\",\"years\":10,\"include_human_impact\":false}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_91554991",
+              "function": {
+                "name": "get_scientist_for_discovery",
+                "arguments": "{\"discovery\":\"DNA double helix structure\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 498,
+      "completion_tokens": 149,
+      "total_tokens": 647,
+      "cost": 0.0036850275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00372225,
+        "upstream_inference_prompt_cost": 0.00148725,
+        "upstream_inference_completions_cost": 0.002235
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 3506.392,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "924c60ef-f57b-47e9-a10b-cb2823f0d2c2"
+}

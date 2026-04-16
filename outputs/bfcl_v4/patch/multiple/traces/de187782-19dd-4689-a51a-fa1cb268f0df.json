@@ -1,0 +1,304 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find restaurants near me within 10 miles that offer Chinese cuisine in Seattle."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "restaurant_find_nearby",
+        "description": "Locate nearby restaurants based on specific criteria like cuisine type. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city and state, e.g. Seattle, WA"
+            },
+            "cuisine": {
+              "type": "string",
+              "description": "Preferred type of cuisine in restaurant."
+            },
+            "max_distance": {
+              "type": "integer",
+              "description": "Maximum distance (in miles) within which to search for restaurants. Default is 5."
+            }
+          },
+          "required": [
+            "location",
+            "cuisine"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "ecology_data_precipitation_stats",
+        "description": "Retrieve precipitation data for a specified location and time period. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The name of the location, e.g., 'Amazon rainforest'."
+            },
+            "time_frame": {
+              "type": "string",
+              "enum": [
+                "six_months",
+                "year",
+                "five_years"
+              ],
+              "description": "The time period for which data is required."
+            }
+          },
+          "required": [
+            "location",
+            "time_frame"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find restaurants near me within 10 miles that offer Chinese cuisine in Seattle."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "restaurant_find_nearby",
+          "description": "Locate nearby restaurants based on specific criteria like cuisine type. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city and state, e.g. Seattle, WA"
+              },
+              "cuisine": {
+                "type": "string",
+                "description": "Preferred type of cuisine in restaurant."
+              },
+              "max_distance": {
+                "type": "integer",
+                "description": "Maximum distance (in miles) within which to search for restaurants. Default is 5."
+              }
+            },
+            "required": [
+              "location",
+              "cuisine"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "ecology_data_precipitation_stats",
+          "description": "Retrieve precipitation data for a specified location and time period. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The name of the location, e.g., 'Amazon rainforest'."
+              },
+              "time_frame": {
+                "type": "string",
+                "enum": [
+                  "six_months",
+                  "year",
+                  "five_years"
+                ],
+                "description": "The time period for which data is required."
+              }
+            },
+            "required": [
+              "location",
+              "time_frame"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240273-AeTS0XgbIEuEGJVx9hcK",
+    "object": "chat.completion",
+    "created": 1776240273,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_57758624",
+              "function": {
+                "name": "restaurant_find_nearby",
+                "arguments": "{\"location\":\"Seattle, WA\",\"cuisine\":\"Chinese\",\"max_distance\":10}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 457,
+      "completion_tokens": 43,
+      "total_tokens": 500,
+      "cost": 0.0015302925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00154575,
+        "upstream_inference_prompt_cost": 0.00090075,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240273-AeTS0XgbIEuEGJVx9hcK",
+    "object": "response",
+    "created_at": 1776240274,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_57758624",
+        "call_id": "call_57758624",
+        "name": "restaurant_find_nearby",
+        "arguments": "{\"location\":\"Seattle, WA\",\"cuisine\":\"Chinese\",\"max_distance\":10}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 457,
+      "completion_tokens": 43,
+      "total_tokens": 500,
+      "cost": 0.0015302925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00154575,
+        "upstream_inference_prompt_cost": 0.00090075,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240273-AeTS0XgbIEuEGJVx9hcK",
+    "object": "chat.completion",
+    "created": 1776240273,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_57758624",
+              "function": {
+                "name": "restaurant_find_nearby",
+                "arguments": "{\"location\":\"Seattle, WA\",\"cuisine\":\"Chinese\",\"max_distance\":10}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 457,
+      "completion_tokens": 43,
+      "total_tokens": 500,
+      "cost": 0.0015302925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00154575,
+        "upstream_inference_prompt_cost": 0.00090075,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1565.881,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "de187782-19dd-4689-a51a-fa1cb268f0df"
+}

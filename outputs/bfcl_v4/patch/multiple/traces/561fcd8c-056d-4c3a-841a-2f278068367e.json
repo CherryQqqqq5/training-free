@@ -1,0 +1,404 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Get me the travel distance and duration from the Eiffel Tower to the Louvre Museum"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "math_factorial",
+        "description": "Calculate the factorial of a given number. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "number": {
+              "type": "number",
+              "description": "The number for which factorial needs to be calculated. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "number"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "grocery_store_find_best",
+        "description": "Find the closest high-rated grocery stores based on certain product availability. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "my_location": {
+              "type": "string",
+              "description": "The current location of the user."
+            },
+            "rating": {
+              "type": "number",
+              "description": "The minimum required store rating. Default is 0.0. This is a float type value.",
+              "format": "float"
+            },
+            "products": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Required products in a list."
+            }
+          },
+          "required": [
+            "my_location",
+            "products"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "restaurant_find_nearby",
+        "description": "Locate nearby restaurants based on specific criteria like cuisine type. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city and state, e.g. Seattle, WA"
+            },
+            "cuisine": {
+              "type": "string",
+              "description": "Preferred type of cuisine in restaurant."
+            },
+            "max_distance": {
+              "type": "number",
+              "description": "Maximum distance (in miles) within which to search for restaurants. Default is 5. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "location",
+            "cuisine"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "maps_get_distance_duration",
+        "description": "Retrieve the travel distance and estimated travel time from one location to another via car Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "start_location": {
+              "type": "string",
+              "description": "Starting point of the journey"
+            },
+            "end_location": {
+              "type": "string",
+              "description": "Ending point of the journey"
+            },
+            "traffic": {
+              "type": "boolean",
+              "description": "If true, considers current traffic. Default is false."
+            }
+          },
+          "required": [
+            "start_location",
+            "end_location"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Get me the travel distance and duration from the Eiffel Tower to the Louvre Museum"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "math_factorial",
+          "description": "Calculate the factorial of a given number. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "number": {
+                "type": "number",
+                "description": "The number for which factorial needs to be calculated. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "number"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "grocery_store_find_best",
+          "description": "Find the closest high-rated grocery stores based on certain product availability. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "my_location": {
+                "type": "string",
+                "description": "The current location of the user."
+              },
+              "rating": {
+                "type": "number",
+                "description": "The minimum required store rating. Default is 0.0. This is a float type value.",
+                "format": "float"
+              },
+              "products": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Required products in a list."
+              }
+            },
+            "required": [
+              "my_location",
+              "products"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "restaurant_find_nearby",
+          "description": "Locate nearby restaurants based on specific criteria like cuisine type. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city and state, e.g. Seattle, WA"
+              },
+              "cuisine": {
+                "type": "string",
+                "description": "Preferred type of cuisine in restaurant."
+              },
+              "max_distance": {
+                "type": "number",
+                "description": "Maximum distance (in miles) within which to search for restaurants. Default is 5. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "location",
+              "cuisine"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "maps_get_distance_duration",
+          "description": "Retrieve the travel distance and estimated travel time from one location to another via car Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "start_location": {
+                "type": "string",
+                "description": "Starting point of the journey"
+              },
+              "end_location": {
+                "type": "string",
+                "description": "Ending point of the journey"
+              },
+              "traffic": {
+                "type": "boolean",
+                "description": "If true, considers current traffic. Default is false."
+              }
+            },
+            "required": [
+              "start_location",
+              "end_location"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240372-vwsnw04RB2042kFVqNwL",
+    "object": "chat.completion",
+    "created": 1776240372,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_60203306",
+              "function": {
+                "name": "maps_get_distance_duration",
+                "arguments": "{\"start_location\":\"Eiffel Tower\",\"end_location\":\"Louvre Museum\",\"traffic\":false}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 667,
+      "completion_tokens": 44,
+      "total_tokens": 711,
+      "cost": 0.001150875,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 666,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0011625,
+        "upstream_inference_prompt_cost": 0.0005025,
+        "upstream_inference_completions_cost": 0.00066
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240372-vwsnw04RB2042kFVqNwL",
+    "object": "response",
+    "created_at": 1776240373,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_60203306",
+        "call_id": "call_60203306",
+        "name": "maps_get_distance_duration",
+        "arguments": "{\"start_location\":\"Eiffel Tower\",\"end_location\":\"Louvre Museum\",\"traffic\":false}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 667,
+      "completion_tokens": 44,
+      "total_tokens": 711,
+      "cost": 0.001150875,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 666,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0011625,
+        "upstream_inference_prompt_cost": 0.0005025,
+        "upstream_inference_completions_cost": 0.00066
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240372-vwsnw04RB2042kFVqNwL",
+    "object": "chat.completion",
+    "created": 1776240372,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_60203306",
+              "function": {
+                "name": "maps_get_distance_duration",
+                "arguments": "{\"start_location\":\"Eiffel Tower\",\"end_location\":\"Louvre Museum\",\"traffic\":false}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 667,
+      "completion_tokens": 44,
+      "total_tokens": 711,
+      "cost": 0.001150875,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 666,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0011625,
+        "upstream_inference_prompt_cost": 0.0005025,
+        "upstream_inference_completions_cost": 0.00066
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1925.47,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "561fcd8c-056d-4c3a-841a-2f278068367e"
+}

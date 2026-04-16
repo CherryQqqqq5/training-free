@@ -1,0 +1,430 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Can you help me plan my meals for the day? I want to start with a breakfast recipe using eggs, milk, and bread, and it should not exceed 300 calories. Then, for lunch, I want to try a new restaurant that serves dishes with chicken, tomatoes, and lettuce, and the dishes should not be more than 500 calories. In the evening, I have a recipe for dinner that uses beef, but I want to replace the beef with tofu and keep the total calories under 600. Can you assist me with these?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "recipe_search",
+        "description": "Searches for recipes based on a list of ingredients and a maximum caloric value. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "ingredients": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "A list of ingredients you want to use in the recipe."
+            },
+            "calories": {
+              "type": "integer",
+              "description": "The maximum number of calories for the recipe."
+            },
+            "meal": {
+              "type": "string",
+              "description": "Type of the meal for the recipe, it's optional and could be breakfast, lunch or dinner. Default is all if not specified."
+            }
+          },
+          "required": [
+            "ingredients",
+            "calories"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "ingredient_replace",
+        "description": "Replaces an ingredient in a recipe with a substitute, keeping the calories below a certain number. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "original_ingredient": {
+              "type": "string",
+              "description": "The ingredient in the recipe to replace."
+            },
+            "replacement_ingredient": {
+              "type": "string",
+              "description": "The substitute ingredient to replace the original one."
+            },
+            "calories": {
+              "type": "integer",
+              "description": "The maximum number of calories for the recipe after replacement."
+            }
+          },
+          "required": [
+            "original_ingredient",
+            "replacement_ingredient",
+            "calories"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "restaurant_search",
+        "description": "Searches for restaurants based on a list of preferred ingredients and maximum calorie count. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "ingredients": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "A list of ingredients you prefer in the restaurant's dishes."
+            },
+            "calories": {
+              "type": "integer",
+              "description": "The maximum calorie count you prefer for the restaurant's dishes."
+            },
+            "meal": {
+              "type": "string",
+              "description": "Type of the meal for the restaurant's dishes, it's optional and could be breakfast, lunch or dinner. Default is all if not specified."
+            }
+          },
+          "required": [
+            "ingredients",
+            "calories"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Can you help me plan my meals for the day? I want to start with a breakfast recipe using eggs, milk, and bread, and it should not exceed 300 calories. Then, for lunch, I want to try a new restaurant that serves dishes with chicken, tomatoes, and lettuce, and the dishes should not be more than 500 calories. In the evening, I have a recipe for dinner that uses beef, but I want to replace the beef with tofu and keep the total calories under 600. Can you assist me with these?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "recipe_search",
+          "description": "Searches for recipes based on a list of ingredients and a maximum caloric value. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "ingredients": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "A list of ingredients you want to use in the recipe."
+              },
+              "calories": {
+                "type": "integer",
+                "description": "The maximum number of calories for the recipe."
+              },
+              "meal": {
+                "type": "string",
+                "description": "Type of the meal for the recipe, it's optional and could be breakfast, lunch or dinner. Default is all if not specified."
+              }
+            },
+            "required": [
+              "ingredients",
+              "calories"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "ingredient_replace",
+          "description": "Replaces an ingredient in a recipe with a substitute, keeping the calories below a certain number. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "original_ingredient": {
+                "type": "string",
+                "description": "The ingredient in the recipe to replace."
+              },
+              "replacement_ingredient": {
+                "type": "string",
+                "description": "The substitute ingredient to replace the original one."
+              },
+              "calories": {
+                "type": "integer",
+                "description": "The maximum number of calories for the recipe after replacement."
+              }
+            },
+            "required": [
+              "original_ingredient",
+              "replacement_ingredient",
+              "calories"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "restaurant_search",
+          "description": "Searches for restaurants based on a list of preferred ingredients and maximum calorie count. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "ingredients": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "A list of ingredients you prefer in the restaurant's dishes."
+              },
+              "calories": {
+                "type": "integer",
+                "description": "The maximum calorie count you prefer for the restaurant's dishes."
+              },
+              "meal": {
+                "type": "string",
+                "description": "Type of the meal for the restaurant's dishes, it's optional and could be breakfast, lunch or dinner. Default is all if not specified."
+              }
+            },
+            "required": [
+              "ingredients",
+              "calories"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241724-5qXFB6Q6jL9rkjXFDKLv",
+    "object": "chat.completion",
+    "created": 1776241724,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help you plan your meals for the day. Let's address each part of your request step by step.\n\nFor breakfast, I’ll search for a recipe using eggs, milk, and bread, with a maximum of 300 calories.\n\nFor lunch, I’ll search for a restaurant that offers dishes with chicken, tomatoes, and lettuce, keeping the calorie count under 500.\n\nFor dinner, I’ll assist with replacing beef with tofu in your recipe, ensuring the total calories remain under 600.\n\nI’ve initiated these searches and replacements for you. Once I have the results, I’ll provide you with the details for your breakfast recipe, lunch restaurant options, and the adjusted dinner recipe. If you have any additional preferences or adjustments, just let me know!",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_88491917",
+              "function": {
+                "name": "recipe_search",
+                "arguments": "{\"ingredients\":[\"eggs\",\"milk\",\"bread\"],\"calories\":300,\"meal\":\"breakfast\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_89986062",
+              "function": {
+                "name": "restaurant_search",
+                "arguments": "{\"ingredients\":[\"chicken\",\"tomatoes\",\"lettuce\"],\"calories\":500,\"meal\":\"lunch\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_07217339",
+              "function": {
+                "name": "ingredient_replace",
+                "arguments": "{\"original_ingredient\":\"beef\",\"replacement_ingredient\":\"tofu\",\"calories\":600}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 729,
+      "completion_tokens": 289,
+      "total_tokens": 1018,
+      "cost": 0.0059912325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00605175,
+        "upstream_inference_prompt_cost": 0.00171675,
+        "upstream_inference_completions_cost": 0.004335
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241724-5qXFB6Q6jL9rkjXFDKLv",
+    "object": "response",
+    "created_at": 1776241728,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'm happy to help you plan your meals for the day. Let's address each part of your request step by step.\n\nFor breakfast, I’ll search for a recipe using eggs, milk, and bread, with a maximum of 300 calories.\n\nFor lunch, I’ll search for a restaurant that offers dishes with chicken, tomatoes, and lettuce, keeping the calorie count under 500.\n\nFor dinner, I’ll assist with replacing beef with tofu in your recipe, ensuring the total calories remain under 600.\n\nI’ve initiated these searches and replacements for you. Once I have the results, I’ll provide you with the details for your breakfast recipe, lunch restaurant options, and the adjusted dinner recipe. If you have any additional preferences or adjustments, just let me know!"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_88491917",
+        "call_id": "call_88491917",
+        "name": "recipe_search",
+        "arguments": "{\"ingredients\":[\"eggs\",\"milk\",\"bread\"],\"calories\":300,\"meal\":\"breakfast\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_89986062",
+        "call_id": "call_89986062",
+        "name": "restaurant_search",
+        "arguments": "{\"ingredients\":[\"chicken\",\"tomatoes\",\"lettuce\"],\"calories\":500,\"meal\":\"lunch\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_07217339",
+        "call_id": "call_07217339",
+        "name": "ingredient_replace",
+        "arguments": "{\"original_ingredient\":\"beef\",\"replacement_ingredient\":\"tofu\",\"calories\":600}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 729,
+      "completion_tokens": 289,
+      "total_tokens": 1018,
+      "cost": 0.0059912325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00605175,
+        "upstream_inference_prompt_cost": 0.00171675,
+        "upstream_inference_completions_cost": 0.004335
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241724-5qXFB6Q6jL9rkjXFDKLv",
+    "object": "chat.completion",
+    "created": 1776241724,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help you plan your meals for the day. Let's address each part of your request step by step.\n\nFor breakfast, I’ll search for a recipe using eggs, milk, and bread, with a maximum of 300 calories.\n\nFor lunch, I’ll search for a restaurant that offers dishes with chicken, tomatoes, and lettuce, keeping the calorie count under 500.\n\nFor dinner, I’ll assist with replacing beef with tofu in your recipe, ensuring the total calories remain under 600.\n\nI’ve initiated these searches and replacements for you. Once I have the results, I’ll provide you with the details for your breakfast recipe, lunch restaurant options, and the adjusted dinner recipe. If you have any additional preferences or adjustments, just let me know!",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_88491917",
+              "function": {
+                "name": "recipe_search",
+                "arguments": "{\"ingredients\":[\"eggs\",\"milk\",\"bread\"],\"calories\":300,\"meal\":\"breakfast\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_89986062",
+              "function": {
+                "name": "restaurant_search",
+                "arguments": "{\"ingredients\":[\"chicken\",\"tomatoes\",\"lettuce\"],\"calories\":500,\"meal\":\"lunch\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_07217339",
+              "function": {
+                "name": "ingredient_replace",
+                "arguments": "{\"original_ingredient\":\"beef\",\"replacement_ingredient\":\"tofu\",\"calories\":600}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 729,
+      "completion_tokens": 289,
+      "total_tokens": 1018,
+      "cost": 0.0059912325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00605175,
+        "upstream_inference_prompt_cost": 0.00171675,
+        "upstream_inference_completions_cost": 0.004335
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 4998.35,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "e713e68e-ea83-403a-8e8f-f5a2fe3a91be"
+}

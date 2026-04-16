@@ -1,0 +1,391 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Can you tell me how many active players were engaged with the video game 'Call of Duty: Modern Warfare' in the year 2019 on the 'Playstation' platform, and then compare that with the number of active players for the same game in the year 2020 on the 'PC' platform? Also, could you provide the sales figures for 'Call of Duty: Modern Warfare' for the year 2019 on the 'Playstation' platform and then for the year 2020 on the 'PC' platform?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "video_games_get_player_count",
+        "description": "Retrieves the number of active players for a specified video game and year. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "game_title": {
+              "type": "string",
+              "description": "The title of the video game."
+            },
+            "year": {
+              "type": "integer",
+              "description": "The year in question."
+            },
+            "platform": {
+              "type": "string",
+              "optional": true,
+              "description": "The gaming platform (e.g. 'PC', 'Xbox', 'Playstation'). Default is all if not specified."
+            }
+          },
+          "required": [
+            "game_title",
+            "year"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "video_games_get_sales",
+        "description": "Retrieves the sales figures for a specified video game and year. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "game_title": {
+              "type": "string",
+              "description": "The title of the video game."
+            },
+            "year": {
+              "type": "integer",
+              "description": "The year in question."
+            },
+            "platform": {
+              "type": "string",
+              "optional": true,
+              "description": "The gaming platform (e.g. 'PC', 'Xbox', 'Playstation'). Default is all if not specified."
+            }
+          },
+          "required": [
+            "game_title",
+            "year"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Can you tell me how many active players were engaged with the video game 'Call of Duty: Modern Warfare' in the year 2019 on the 'Playstation' platform, and then compare that with the number of active players for the same game in the year 2020 on the 'PC' platform? Also, could you provide the sales figures for 'Call of Duty: Modern Warfare' for the year 2019 on the 'Playstation' platform and then for the year 2020 on the 'PC' platform?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "video_games_get_player_count",
+          "description": "Retrieves the number of active players for a specified video game and year. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "game_title": {
+                "type": "string",
+                "description": "The title of the video game."
+              },
+              "year": {
+                "type": "integer",
+                "description": "The year in question."
+              },
+              "platform": {
+                "type": "string",
+                "optional": true,
+                "description": "The gaming platform (e.g. 'PC', 'Xbox', 'Playstation'). Default is all if not specified."
+              }
+            },
+            "required": [
+              "game_title",
+              "year"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "video_games_get_sales",
+          "description": "Retrieves the sales figures for a specified video game and year. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "game_title": {
+                "type": "string",
+                "description": "The title of the video game."
+              },
+              "year": {
+                "type": "integer",
+                "description": "The year in question."
+              },
+              "platform": {
+                "type": "string",
+                "optional": true,
+                "description": "The gaming platform (e.g. 'PC', 'Xbox', 'Playstation'). Default is all if not specified."
+              }
+            },
+            "required": [
+              "game_title",
+              "year"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241721-i4ZD82BUvvKji2ZMc5J8",
+    "object": "chat.completion",
+    "created": 1776241721,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'll help you retrieve the information about active player counts and sales figures for 'Call of Duty: Modern Warfare' across the specified years and platforms.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_84823291",
+              "function": {
+                "name": "video_games_get_player_count",
+                "arguments": "{\"game_title\":\"Call of Duty: Modern Warfare\",\"year\":2019,\"platform\":\"Playstation\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_57794114",
+              "function": {
+                "name": "video_games_get_player_count",
+                "arguments": "{\"game_title\":\"Call of Duty: Modern Warfare\",\"year\":2020,\"platform\":\"PC\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_70733657",
+              "function": {
+                "name": "video_games_get_sales",
+                "arguments": "{\"game_title\":\"Call of Duty: Modern Warfare\",\"year\":2019,\"platform\":\"Playstation\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_19842438",
+              "function": {
+                "name": "video_games_get_sales",
+                "arguments": "{\"game_title\":\"Call of Duty: Modern Warfare\",\"year\":2020,\"platform\":\"PC\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 572,
+      "completion_tokens": 221,
+      "total_tokens": 793,
+      "cost": 0.0045151425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00456075,
+        "upstream_inference_prompt_cost": 0.00124575,
+        "upstream_inference_completions_cost": 0.003315
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241721-i4ZD82BUvvKji2ZMc5J8",
+    "object": "response",
+    "created_at": 1776241723,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'll help you retrieve the information about active player counts and sales figures for 'Call of Duty: Modern Warfare' across the specified years and platforms.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_84823291",
+        "call_id": "call_84823291",
+        "name": "video_games_get_player_count",
+        "arguments": "{\"game_title\":\"Call of Duty: Modern Warfare\",\"year\":2019,\"platform\":\"Playstation\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_57794114",
+        "call_id": "call_57794114",
+        "name": "video_games_get_player_count",
+        "arguments": "{\"game_title\":\"Call of Duty: Modern Warfare\",\"year\":2020,\"platform\":\"PC\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_70733657",
+        "call_id": "call_70733657",
+        "name": "video_games_get_sales",
+        "arguments": "{\"game_title\":\"Call of Duty: Modern Warfare\",\"year\":2019,\"platform\":\"Playstation\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_19842438",
+        "call_id": "call_19842438",
+        "name": "video_games_get_sales",
+        "arguments": "{\"game_title\":\"Call of Duty: Modern Warfare\",\"year\":2020,\"platform\":\"PC\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 572,
+      "completion_tokens": 221,
+      "total_tokens": 793,
+      "cost": 0.0045151425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00456075,
+        "upstream_inference_prompt_cost": 0.00124575,
+        "upstream_inference_completions_cost": 0.003315
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241721-i4ZD82BUvvKji2ZMc5J8",
+    "object": "chat.completion",
+    "created": 1776241721,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'll help you retrieve the information about active player counts and sales figures for 'Call of Duty: Modern Warfare' across the specified years and platforms.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_84823291",
+              "function": {
+                "name": "video_games_get_player_count",
+                "arguments": "{\"game_title\":\"Call of Duty: Modern Warfare\",\"year\":2019,\"platform\":\"Playstation\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_57794114",
+              "function": {
+                "name": "video_games_get_player_count",
+                "arguments": "{\"game_title\":\"Call of Duty: Modern Warfare\",\"year\":2020,\"platform\":\"PC\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_70733657",
+              "function": {
+                "name": "video_games_get_sales",
+                "arguments": "{\"game_title\":\"Call of Duty: Modern Warfare\",\"year\":2019,\"platform\":\"Playstation\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_19842438",
+              "function": {
+                "name": "video_games_get_sales",
+                "arguments": "{\"game_title\":\"Call of Duty: Modern Warfare\",\"year\":2020,\"platform\":\"PC\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 572,
+      "completion_tokens": 221,
+      "total_tokens": 793,
+      "cost": 0.0045151425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00456075,
+        "upstream_inference_prompt_cost": 0.00124575,
+        "upstream_inference_completions_cost": 0.003315
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 3101.901,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "50df66ac-b303-4fec-a677-671d4e02a282"
+}

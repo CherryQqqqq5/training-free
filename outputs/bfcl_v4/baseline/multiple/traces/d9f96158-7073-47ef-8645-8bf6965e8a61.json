@@ -1,0 +1,370 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "What is the year over year growth rate for company 'Tech Inc' with revenues of $1M in 2019 and $1.2M in 2020?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "corporate_finance_calculate_YOY_growth_rate",
+        "description": "Calculate the year over year (YOY) growth rate for a company. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "company_name": {
+              "type": "string",
+              "description": "The name of the company for which to calculate the YOY growth rate."
+            },
+            "year1": {
+              "type": "integer",
+              "description": "The initial year."
+            },
+            "year1_revenue": {
+              "type": "integer",
+              "description": "The revenue for the initial year."
+            },
+            "year2": {
+              "type": "integer",
+              "description": "The subsequent year."
+            },
+            "year2_revenue": {
+              "type": "integer",
+              "description": "The revenue for the subsequent year."
+            }
+          },
+          "required": [
+            "company_name",
+            "year1",
+            "year1_revenue",
+            "year2",
+            "year2_revenue"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "financial_ratios_calculate_ROE",
+        "description": "Calculate the return on equity (ROE) for a company. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "net_income": {
+              "type": "number",
+              "description": "Net income for the period. This is a float type value.",
+              "format": "float"
+            },
+            "shareholder_equity": {
+              "type": "number",
+              "description": "Average shareholder equity for the period. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "net_income",
+            "shareholder_equity"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "financial_ratios_calculate_ROA",
+        "description": "Calculate the return on assets (ROA) for a company. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "net_income": {
+              "type": "number",
+              "description": "Net income for the period. This is a float type value.",
+              "format": "float"
+            },
+            "total_assets": {
+              "type": "number",
+              "description": "Total average assets for the period. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "net_income",
+            "total_assets"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What is the year over year growth rate for company 'Tech Inc' with revenues of $1M in 2019 and $1.2M in 2020?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "corporate_finance_calculate_YOY_growth_rate",
+          "description": "Calculate the year over year (YOY) growth rate for a company. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "company_name": {
+                "type": "string",
+                "description": "The name of the company for which to calculate the YOY growth rate."
+              },
+              "year1": {
+                "type": "integer",
+                "description": "The initial year."
+              },
+              "year1_revenue": {
+                "type": "integer",
+                "description": "The revenue for the initial year."
+              },
+              "year2": {
+                "type": "integer",
+                "description": "The subsequent year."
+              },
+              "year2_revenue": {
+                "type": "integer",
+                "description": "The revenue for the subsequent year."
+              }
+            },
+            "required": [
+              "company_name",
+              "year1",
+              "year1_revenue",
+              "year2",
+              "year2_revenue"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "financial_ratios_calculate_ROE",
+          "description": "Calculate the return on equity (ROE) for a company. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "net_income": {
+                "type": "number",
+                "description": "Net income for the period. This is a float type value.",
+                "format": "float"
+              },
+              "shareholder_equity": {
+                "type": "number",
+                "description": "Average shareholder equity for the period. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "net_income",
+              "shareholder_equity"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "financial_ratios_calculate_ROA",
+          "description": "Calculate the return on assets (ROA) for a company. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "net_income": {
+                "type": "number",
+                "description": "Net income for the period. This is a float type value.",
+                "format": "float"
+              },
+              "total_assets": {
+                "type": "number",
+                "description": "Total average assets for the period. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "net_income",
+              "total_assets"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239471-F1W2fkgpBl8Zc02zWclb",
+    "object": "chat.completion",
+    "created": 1776239471,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_60683774",
+              "function": {
+                "name": "corporate_finance_calculate_YOY_growth_rate",
+                "arguments": "{\"company_name\":\"Tech Inc\",\"year1\":2019,\"year1_revenue\":1000000,\"year2\":2020,\"year2_revenue\":1200000}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 644,
+      "completion_tokens": 72,
+      "total_tokens": 716,
+      "cost": 0.0029751975,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00300525,
+        "upstream_inference_prompt_cost": 0.00192525,
+        "upstream_inference_completions_cost": 0.00108
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239471-F1W2fkgpBl8Zc02zWclb",
+    "object": "response",
+    "created_at": 1776239472,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_60683774",
+        "call_id": "call_60683774",
+        "name": "corporate_finance_calculate_YOY_growth_rate",
+        "arguments": "{\"company_name\":\"Tech Inc\",\"year1\":2019,\"year1_revenue\":1000000,\"year2\":2020,\"year2_revenue\":1200000}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 644,
+      "completion_tokens": 72,
+      "total_tokens": 716,
+      "cost": 0.0029751975,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00300525,
+        "upstream_inference_prompt_cost": 0.00192525,
+        "upstream_inference_completions_cost": 0.00108
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239471-F1W2fkgpBl8Zc02zWclb",
+    "object": "chat.completion",
+    "created": 1776239471,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_60683774",
+              "function": {
+                "name": "corporate_finance_calculate_YOY_growth_rate",
+                "arguments": "{\"company_name\":\"Tech Inc\",\"year1\":2019,\"year1_revenue\":1000000,\"year2\":2020,\"year2_revenue\":1200000}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 644,
+      "completion_tokens": 72,
+      "total_tokens": 716,
+      "cost": 0.0029751975,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00300525,
+        "upstream_inference_prompt_cost": 0.00192525,
+        "upstream_inference_completions_cost": 0.00108
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2092.732,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "d9f96158-7073-47ef-8645-8bf6965e8a61"
+}

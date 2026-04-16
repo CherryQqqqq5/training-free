@@ -1,0 +1,364 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Can you help me with two things? First, I am currently in New York and it's 2pm here. I have a meeting scheduled with a client in London and another one in Tokyo. I need to know what time it will be in both these cities when it's 2pm in New York. Second, I am considering switching to solar energy for my home in California and I want to understand the potential greenhouse gas emissions I could save. I plan to use it for 12 months. Can you calculate the emission savings for me?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "timezone_convert",
+        "description": "Convert time from one time zone to another. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "time": {
+              "type": "string",
+              "description": "The local time you want to convert, e.g. 3pm"
+            },
+            "from_timezone": {
+              "type": "string",
+              "description": "The time zone you want to convert from."
+            },
+            "to_timezone": {
+              "type": "string",
+              "description": "The time zone you want to convert to."
+            }
+          },
+          "required": [
+            "time",
+            "from_timezone",
+            "to_timezone"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "calculate_emission_savings",
+        "description": "Calculate potential greenhouse gas emissions saved by switching to renewable energy sources. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "energy_type": {
+              "type": "string",
+              "description": "Type of the renewable energy source."
+            },
+            "usage_duration": {
+              "type": "integer",
+              "description": "Usage duration in months."
+            },
+            "region": {
+              "type": "string",
+              "description": "The region where you use energy. Default is 'global'."
+            }
+          },
+          "required": [
+            "energy_type",
+            "usage_duration"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Can you help me with two things? First, I am currently in New York and it's 2pm here. I have a meeting scheduled with a client in London and another one in Tokyo. I need to know what time it will be in both these cities when it's 2pm in New York. Second, I am considering switching to solar energy for my home in California and I want to understand the potential greenhouse gas emissions I could save. I plan to use it for 12 months. Can you calculate the emission savings for me?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "timezone_convert",
+          "description": "Convert time from one time zone to another. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "time": {
+                "type": "string",
+                "description": "The local time you want to convert, e.g. 3pm"
+              },
+              "from_timezone": {
+                "type": "string",
+                "description": "The time zone you want to convert from."
+              },
+              "to_timezone": {
+                "type": "string",
+                "description": "The time zone you want to convert to."
+              }
+            },
+            "required": [
+              "time",
+              "from_timezone",
+              "to_timezone"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_emission_savings",
+          "description": "Calculate potential greenhouse gas emissions saved by switching to renewable energy sources. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "energy_type": {
+                "type": "string",
+                "description": "Type of the renewable energy source."
+              },
+              "usage_duration": {
+                "type": "integer",
+                "description": "Usage duration in months."
+              },
+              "region": {
+                "type": "string",
+                "description": "The region where you use energy. Default is 'global'."
+              }
+            },
+            "required": [
+              "energy_type",
+              "usage_duration"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776242033-lNzfjA4vx3RhPgLYzf6j",
+    "object": "chat.completion",
+    "created": 1776242033,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help with both of your requests.\n\nFor the first part, I'll convert the time from 2pm in New York to the corresponding times in London and Tokyo. I'll make two separate calls for each conversion.\n\nFor the second part, I'll calculate the potential greenhouse gas emissions savings by switching to solar energy in California for 12 months.\n\nI'll provide you with the results once I have the information from these function calls.",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_43503007",
+              "function": {
+                "name": "timezone_convert",
+                "arguments": "{\"time\":\"2pm\",\"from_timezone\":\"New York\",\"to_timezone\":\"London\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_10713493",
+              "function": {
+                "name": "timezone_convert",
+                "arguments": "{\"time\":\"2pm\",\"from_timezone\":\"New York\",\"to_timezone\":\"Tokyo\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_64914292",
+              "function": {
+                "name": "calculate_emission_savings",
+                "arguments": "{\"energy_type\":\"solar\",\"usage_duration\":12,\"region\":\"California\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 547,
+      "completion_tokens": 212,
+      "total_tokens": 759,
+      "cost": 0.0043072425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00435075,
+        "upstream_inference_prompt_cost": 0.00117075,
+        "upstream_inference_completions_cost": 0.00318
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776242033-lNzfjA4vx3RhPgLYzf6j",
+    "object": "response",
+    "created_at": 1776242037,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'm happy to help with both of your requests.\n\nFor the first part, I'll convert the time from 2pm in New York to the corresponding times in London and Tokyo. I'll make two separate calls for each conversion.\n\nFor the second part, I'll calculate the potential greenhouse gas emissions savings by switching to solar energy in California for 12 months.\n\nI'll provide you with the results once I have the information from these function calls."
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_43503007",
+        "call_id": "call_43503007",
+        "name": "timezone_convert",
+        "arguments": "{\"time\":\"2pm\",\"from_timezone\":\"New York\",\"to_timezone\":\"London\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_10713493",
+        "call_id": "call_10713493",
+        "name": "timezone_convert",
+        "arguments": "{\"time\":\"2pm\",\"from_timezone\":\"New York\",\"to_timezone\":\"Tokyo\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_64914292",
+        "call_id": "call_64914292",
+        "name": "calculate_emission_savings",
+        "arguments": "{\"energy_type\":\"solar\",\"usage_duration\":12,\"region\":\"California\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 547,
+      "completion_tokens": 212,
+      "total_tokens": 759,
+      "cost": 0.0043072425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00435075,
+        "upstream_inference_prompt_cost": 0.00117075,
+        "upstream_inference_completions_cost": 0.00318
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776242033-lNzfjA4vx3RhPgLYzf6j",
+    "object": "chat.completion",
+    "created": 1776242033,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help with both of your requests.\n\nFor the first part, I'll convert the time from 2pm in New York to the corresponding times in London and Tokyo. I'll make two separate calls for each conversion.\n\nFor the second part, I'll calculate the potential greenhouse gas emissions savings by switching to solar energy in California for 12 months.\n\nI'll provide you with the results once I have the information from these function calls.",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_43503007",
+              "function": {
+                "name": "timezone_convert",
+                "arguments": "{\"time\":\"2pm\",\"from_timezone\":\"New York\",\"to_timezone\":\"London\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_10713493",
+              "function": {
+                "name": "timezone_convert",
+                "arguments": "{\"time\":\"2pm\",\"from_timezone\":\"New York\",\"to_timezone\":\"Tokyo\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_64914292",
+              "function": {
+                "name": "calculate_emission_savings",
+                "arguments": "{\"energy_type\":\"solar\",\"usage_duration\":12,\"region\":\"California\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 547,
+      "completion_tokens": 212,
+      "total_tokens": 759,
+      "cost": 0.0043072425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00435075,
+        "upstream_inference_prompt_cost": 0.00117075,
+        "upstream_inference_completions_cost": 0.00318
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 4066.942,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "0c898e1c-9c42-4cec-865c-fdfe2e8109a5"
+}

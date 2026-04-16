@@ -1,0 +1,340 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "How much traffic should I expect from Las Vegas to Los Angeles this weekend?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_distance",
+        "description": "Calculate distance between two locations. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "start_point": {
+              "type": "string",
+              "description": "Starting point of the journey."
+            },
+            "end_point": {
+              "type": "string",
+              "description": "Ending point of the journey."
+            }
+          },
+          "required": [
+            "start_point",
+            "end_point"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "traffic_estimate",
+        "description": "Estimate traffic from one location to another for a specific time period. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "start_location": {
+              "type": "string",
+              "description": "Starting location for the journey."
+            },
+            "end_location": {
+              "type": "string",
+              "description": "Ending location for the journey."
+            },
+            "time_period": {
+              "type": "string",
+              "description": "Specify a time frame to estimate the traffic, 'now' for current, 'weekend' for the coming weekend. Default 'now'"
+            }
+          },
+          "required": [
+            "start_location",
+            "end_location"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "weather_forecast",
+        "description": "Retrieve a weather forecast for a specific location and time frame. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city that you want to get the weather for."
+            },
+            "days": {
+              "type": "integer",
+              "description": "Number of days for the forecast."
+            }
+          },
+          "required": [
+            "location",
+            "days"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "How much traffic should I expect from Las Vegas to Los Angeles this weekend?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_distance",
+          "description": "Calculate distance between two locations. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "start_point": {
+                "type": "string",
+                "description": "Starting point of the journey."
+              },
+              "end_point": {
+                "type": "string",
+                "description": "Ending point of the journey."
+              }
+            },
+            "required": [
+              "start_point",
+              "end_point"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "traffic_estimate",
+          "description": "Estimate traffic from one location to another for a specific time period. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "start_location": {
+                "type": "string",
+                "description": "Starting location for the journey."
+              },
+              "end_location": {
+                "type": "string",
+                "description": "Ending location for the journey."
+              },
+              "time_period": {
+                "type": "string",
+                "description": "Specify a time frame to estimate the traffic, 'now' for current, 'weekend' for the coming weekend. Default 'now'"
+              }
+            },
+            "required": [
+              "start_location",
+              "end_location"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "weather_forecast",
+          "description": "Retrieve a weather forecast for a specific location and time frame. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city that you want to get the weather for."
+              },
+              "days": {
+                "type": "integer",
+                "description": "Number of days for the forecast."
+              }
+            },
+            "required": [
+              "location",
+              "days"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240099-ae9B2VBq5q1tX6GBKPVX",
+    "object": "chat.completion",
+    "created": 1776240099,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_16316923",
+              "function": {
+                "name": "traffic_estimate",
+                "arguments": "{\"start_location\":\"Las Vegas\",\"end_location\":\"Los Angeles\",\"time_period\":\"weekend\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 519,
+      "completion_tokens": 44,
+      "total_tokens": 563,
+      "cost": 0.0021881475,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00221025,
+        "upstream_inference_prompt_cost": 0.00155025,
+        "upstream_inference_completions_cost": 0.00066
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240099-ae9B2VBq5q1tX6GBKPVX",
+    "object": "response",
+    "created_at": 1776240102,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_16316923",
+        "call_id": "call_16316923",
+        "name": "traffic_estimate",
+        "arguments": "{\"start_location\":\"Las Vegas\",\"end_location\":\"Los Angeles\",\"time_period\":\"weekend\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 519,
+      "completion_tokens": 44,
+      "total_tokens": 563,
+      "cost": 0.0021881475,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00221025,
+        "upstream_inference_prompt_cost": 0.00155025,
+        "upstream_inference_completions_cost": 0.00066
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240099-ae9B2VBq5q1tX6GBKPVX",
+    "object": "chat.completion",
+    "created": 1776240099,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_16316923",
+              "function": {
+                "name": "traffic_estimate",
+                "arguments": "{\"start_location\":\"Las Vegas\",\"end_location\":\"Los Angeles\",\"time_period\":\"weekend\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 519,
+      "completion_tokens": 44,
+      "total_tokens": 563,
+      "cost": 0.0021881475,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00221025,
+        "upstream_inference_prompt_cost": 0.00155025,
+        "upstream_inference_completions_cost": 0.00066
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2914.88,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "e3716476-dba1-4788-bdda-057319776f1e"
+}

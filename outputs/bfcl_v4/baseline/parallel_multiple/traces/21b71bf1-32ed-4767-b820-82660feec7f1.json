@@ -1,0 +1,357 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Can you first find out the key historical events related to 'War' and 'Economy' that took place in France between the years 1800 and 1900? After that, could you please tell me the current market value of the sculpture 'The Thinker' created by the artist 'Auguste Rodin'? Lastly, I would also like to know the market value of the sculpture 'The Kiss', also created by 'Auguste Rodin', in the year 1882.\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "get_sculpture_value",
+        "description": "Retrieve the current market value of a particular sculpture by a specific artist. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "sculpture": {
+              "type": "string",
+              "description": "The name of the sculpture."
+            },
+            "artist": {
+              "type": "string",
+              "description": "The name of the artist who created the sculpture."
+            }
+          },
+          "required": [
+            "sculpture",
+            "artist"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "history_get_key_events",
+        "description": "Retrieve key historical events within a specific period for a certain country. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "country": {
+              "type": "string",
+              "description": "The name of the country for which history is queried."
+            },
+            "start_year": {
+              "type": "integer",
+              "description": "Start year of the period for which history is queried."
+            },
+            "end_year": {
+              "type": "integer",
+              "description": "End year of the period for which history is queried."
+            },
+            "event_type": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "War",
+                  "Revolutions",
+                  "Diplomacy",
+                  "Economy"
+                ]
+              },
+              "description": "Types of event. If none is provided, default that all types will be considered."
+            }
+          },
+          "required": [
+            "country",
+            "start_year",
+            "end_year"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Can you first find out the key historical events related to 'War' and 'Economy' that took place in France between the years 1800 and 1900? After that, could you please tell me the current market value of the sculpture 'The Thinker' created by the artist 'Auguste Rodin'? Lastly, I would also like to know the market value of the sculpture 'The Kiss', also created by 'Auguste Rodin', in the year 1882.\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_sculpture_value",
+          "description": "Retrieve the current market value of a particular sculpture by a specific artist. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "sculpture": {
+                "type": "string",
+                "description": "The name of the sculpture."
+              },
+              "artist": {
+                "type": "string",
+                "description": "The name of the artist who created the sculpture."
+              }
+            },
+            "required": [
+              "sculpture",
+              "artist"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "history_get_key_events",
+          "description": "Retrieve key historical events within a specific period for a certain country. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "country": {
+                "type": "string",
+                "description": "The name of the country for which history is queried."
+              },
+              "start_year": {
+                "type": "integer",
+                "description": "Start year of the period for which history is queried."
+              },
+              "end_year": {
+                "type": "integer",
+                "description": "End year of the period for which history is queried."
+              },
+              "event_type": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "War",
+                    "Revolutions",
+                    "Diplomacy",
+                    "Economy"
+                  ]
+                },
+                "description": "Types of event. If none is provided, default that all types will be considered."
+              }
+            },
+            "required": [
+              "country",
+              "start_year",
+              "end_year"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241186-PXRJbrQ5lWqluJtuURdd",
+    "object": "chat.completion",
+    "created": 1776241186,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'll handle your requests one by one. First, I’ll retrieve the key historical events related to 'War' and 'Economy' in France between 1800 and 1900. Then, I’ll get the current market value of 'The Thinker' by Auguste Rodin. Regarding the market value of 'The Kiss' by Auguste Rodin in 1882, I must note that the available function only provides current market values, not historical ones. I’ll address the first two requests with function calls and then explain the limitation for the third.\n\nRegarding your request for the market value of 'The Kiss' by Auguste Rodin in 1882, I’m unable to provide historical market values as the available function only retrieves current market values. If you would like the current market value of 'The Kiss', I can assist with that. Please confirm, and I’ll proceed with the request.",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_94115704",
+              "function": {
+                "name": "history_get_key_events",
+                "arguments": "{\"country\":\"France\",\"start_year\":1800,\"end_year\":1900,\"event_type\":[\"War\",\"Economy\"]}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_33641814",
+              "function": {
+                "name": "get_sculpture_value",
+                "arguments": "{\"sculpture\":\"The Thinker\",\"artist\":\"Auguste Rodin\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 575,
+      "completion_tokens": 277,
+      "total_tokens": 852,
+      "cost": 0.0058145175,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00587325,
+        "upstream_inference_prompt_cost": 0.00171825,
+        "upstream_inference_completions_cost": 0.004155
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241186-PXRJbrQ5lWqluJtuURdd",
+    "object": "response",
+    "created_at": 1776241190,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'll handle your requests one by one. First, I’ll retrieve the key historical events related to 'War' and 'Economy' in France between 1800 and 1900. Then, I’ll get the current market value of 'The Thinker' by Auguste Rodin. Regarding the market value of 'The Kiss' by Auguste Rodin in 1882, I must note that the available function only provides current market values, not historical ones. I’ll address the first two requests with function calls and then explain the limitation for the third.\n\nRegarding your request for the market value of 'The Kiss' by Auguste Rodin in 1882, I’m unable to provide historical market values as the available function only retrieves current market values. If you would like the current market value of 'The Kiss', I can assist with that. Please confirm, and I’ll proceed with the request."
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_94115704",
+        "call_id": "call_94115704",
+        "name": "history_get_key_events",
+        "arguments": "{\"country\":\"France\",\"start_year\":1800,\"end_year\":1900,\"event_type\":[\"War\",\"Economy\"]}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_33641814",
+        "call_id": "call_33641814",
+        "name": "get_sculpture_value",
+        "arguments": "{\"sculpture\":\"The Thinker\",\"artist\":\"Auguste Rodin\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 575,
+      "completion_tokens": 277,
+      "total_tokens": 852,
+      "cost": 0.0058145175,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00587325,
+        "upstream_inference_prompt_cost": 0.00171825,
+        "upstream_inference_completions_cost": 0.004155
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241186-PXRJbrQ5lWqluJtuURdd",
+    "object": "chat.completion",
+    "created": 1776241186,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'll handle your requests one by one. First, I’ll retrieve the key historical events related to 'War' and 'Economy' in France between 1800 and 1900. Then, I’ll get the current market value of 'The Thinker' by Auguste Rodin. Regarding the market value of 'The Kiss' by Auguste Rodin in 1882, I must note that the available function only provides current market values, not historical ones. I’ll address the first two requests with function calls and then explain the limitation for the third.\n\nRegarding your request for the market value of 'The Kiss' by Auguste Rodin in 1882, I’m unable to provide historical market values as the available function only retrieves current market values. If you would like the current market value of 'The Kiss', I can assist with that. Please confirm, and I’ll proceed with the request.",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_94115704",
+              "function": {
+                "name": "history_get_key_events",
+                "arguments": "{\"country\":\"France\",\"start_year\":1800,\"end_year\":1900,\"event_type\":[\"War\",\"Economy\"]}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_33641814",
+              "function": {
+                "name": "get_sculpture_value",
+                "arguments": "{\"sculpture\":\"The Thinker\",\"artist\":\"Auguste Rodin\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 575,
+      "completion_tokens": 277,
+      "total_tokens": 852,
+      "cost": 0.0058145175,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00587325,
+        "upstream_inference_prompt_cost": 0.00171825,
+        "upstream_inference_completions_cost": 0.004155
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 4109.767,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "21b71bf1-32ed-4767-b820-82660feec7f1"
+}

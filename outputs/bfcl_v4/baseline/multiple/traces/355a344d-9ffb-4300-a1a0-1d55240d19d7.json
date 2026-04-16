@@ -1,0 +1,352 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Which paint color is currently most popular for living rooms?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "weather_forecast",
+        "description": "Retrieve a weather forecast for a specific location and time frame. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city that you want to get the weather for."
+            },
+            "days": {
+              "type": "integer",
+              "description": "Number of days for the forecast."
+            }
+          },
+          "required": [
+            "location",
+            "days"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "paint_color_trends",
+        "description": "Find the most popular paint color for a specific area in the home. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "room": {
+              "type": "string",
+              "description": "Type of the room e.g. Living room, Bathroom etc."
+            },
+            "period": {
+              "type": "string",
+              "enum": [
+                "Daily",
+                "Weekly",
+                "Monthly",
+                "Yearly"
+              ],
+              "description": "The period over which to check the paint color trend. Default 'Daily'"
+            }
+          },
+          "required": [
+            "room"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "house_price_trends",
+        "description": "Find the average house price in a specific area. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "City and state, e.g. New York, NY."
+            },
+            "period": {
+              "type": "string",
+              "enum": [
+                "Daily",
+                "Weekly",
+                "Monthly",
+                "Yearly"
+              ],
+              "description": "The period over which to check the price trend. Default 'Yearly'"
+            }
+          },
+          "required": [
+            "location"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Which paint color is currently most popular for living rooms?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "weather_forecast",
+          "description": "Retrieve a weather forecast for a specific location and time frame. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city that you want to get the weather for."
+              },
+              "days": {
+                "type": "integer",
+                "description": "Number of days for the forecast."
+              }
+            },
+            "required": [
+              "location",
+              "days"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "paint_color_trends",
+          "description": "Find the most popular paint color for a specific area in the home. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "room": {
+                "type": "string",
+                "description": "Type of the room e.g. Living room, Bathroom etc."
+              },
+              "period": {
+                "type": "string",
+                "enum": [
+                  "Daily",
+                  "Weekly",
+                  "Monthly",
+                  "Yearly"
+                ],
+                "description": "The period over which to check the paint color trend. Default 'Daily'"
+              }
+            },
+            "required": [
+              "room"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "house_price_trends",
+          "description": "Find the average house price in a specific area. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "City and state, e.g. New York, NY."
+              },
+              "period": {
+                "type": "string",
+                "enum": [
+                  "Daily",
+                  "Weekly",
+                  "Monthly",
+                  "Yearly"
+                ],
+                "description": "The period over which to check the price trend. Default 'Yearly'"
+              }
+            },
+            "required": [
+              "location"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239616-GbuzNUun11TqJZMs0H62",
+    "object": "chat.completion",
+    "created": 1776239616,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_43107334",
+              "function": {
+                "name": "paint_color_trends",
+                "arguments": "{\"room\":\"Living room\",\"period\":\"Daily\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 527,
+      "completion_tokens": 35,
+      "total_tokens": 562,
+      "cost": 0.0016193925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00163575,
+        "upstream_inference_prompt_cost": 0.00111075,
+        "upstream_inference_completions_cost": 0.000525
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239616-GbuzNUun11TqJZMs0H62",
+    "object": "response",
+    "created_at": 1776239618,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_43107334",
+        "call_id": "call_43107334",
+        "name": "paint_color_trends",
+        "arguments": "{\"room\":\"Living room\",\"period\":\"Daily\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 527,
+      "completion_tokens": 35,
+      "total_tokens": 562,
+      "cost": 0.0016193925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00163575,
+        "upstream_inference_prompt_cost": 0.00111075,
+        "upstream_inference_completions_cost": 0.000525
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239616-GbuzNUun11TqJZMs0H62",
+    "object": "chat.completion",
+    "created": 1776239616,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_43107334",
+              "function": {
+                "name": "paint_color_trends",
+                "arguments": "{\"room\":\"Living room\",\"period\":\"Daily\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 527,
+      "completion_tokens": 35,
+      "total_tokens": 562,
+      "cost": 0.0016193925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00163575,
+        "upstream_inference_prompt_cost": 0.00111075,
+        "upstream_inference_completions_cost": 0.000525
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1989.063,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "355a344d-9ffb-4300-a1a0-1d55240d19d7"
+}

@@ -1,0 +1,317 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find the sum of all the multiples of 3 and 5 between 1 and 1000. Also find the product of the first five prime numbers."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "math_toolkit_sum_of_multiples",
+        "description": "Find the sum of all multiples of specified numbers within a specified range. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "lower_limit": {
+              "type": "integer",
+              "description": "The start of the range (inclusive)."
+            },
+            "upper_limit": {
+              "type": "integer",
+              "description": "The end of the range (inclusive)."
+            },
+            "multiples": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "The numbers to find multiples of."
+            }
+          },
+          "required": [
+            "lower_limit",
+            "upper_limit",
+            "multiples"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "math_toolkit_product_of_primes",
+        "description": "Find the product of the first n prime numbers. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "count": {
+              "type": "integer",
+              "description": "The number of prime numbers to multiply together."
+            }
+          },
+          "required": [
+            "count"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find the sum of all the multiples of 3 and 5 between 1 and 1000. Also find the product of the first five prime numbers."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "math_toolkit_sum_of_multiples",
+          "description": "Find the sum of all multiples of specified numbers within a specified range. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "lower_limit": {
+                "type": "integer",
+                "description": "The start of the range (inclusive)."
+              },
+              "upper_limit": {
+                "type": "integer",
+                "description": "The end of the range (inclusive)."
+              },
+              "multiples": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "The numbers to find multiples of."
+              }
+            },
+            "required": [
+              "lower_limit",
+              "upper_limit",
+              "multiples"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "math_toolkit_product_of_primes",
+          "description": "Find the product of the first n prime numbers. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "count": {
+                "type": "integer",
+                "description": "The number of prime numbers to multiply together."
+              }
+            },
+            "required": [
+              "count"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241335-ahlksJfqCwYs76BLERDX",
+    "object": "chat.completion",
+    "created": 1776241335,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_90044669",
+              "function": {
+                "name": "math_toolkit_sum_of_multiples",
+                "arguments": "{\"lower_limit\":1,\"upper_limit\":1000,\"multiples\":[3,5]}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_75318370",
+              "function": {
+                "name": "math_toolkit_product_of_primes",
+                "arguments": "{\"count\":5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 438,
+      "completion_tokens": 80,
+      "total_tokens": 518,
+      "cost": 0.0024821775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00250725,
+        "upstream_inference_prompt_cost": 0.00130725,
+        "upstream_inference_completions_cost": 0.0012
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241335-ahlksJfqCwYs76BLERDX",
+    "object": "response",
+    "created_at": 1776241337,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_90044669",
+        "call_id": "call_90044669",
+        "name": "math_toolkit_sum_of_multiples",
+        "arguments": "{\"lower_limit\":1,\"upper_limit\":1000,\"multiples\":[3,5]}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_75318370",
+        "call_id": "call_75318370",
+        "name": "math_toolkit_product_of_primes",
+        "arguments": "{\"count\":5}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 438,
+      "completion_tokens": 80,
+      "total_tokens": 518,
+      "cost": 0.0024821775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00250725,
+        "upstream_inference_prompt_cost": 0.00130725,
+        "upstream_inference_completions_cost": 0.0012
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241335-ahlksJfqCwYs76BLERDX",
+    "object": "chat.completion",
+    "created": 1776241335,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_90044669",
+              "function": {
+                "name": "math_toolkit_sum_of_multiples",
+                "arguments": "{\"lower_limit\":1,\"upper_limit\":1000,\"multiples\":[3,5]}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_75318370",
+              "function": {
+                "name": "math_toolkit_product_of_primes",
+                "arguments": "{\"count\":5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 438,
+      "completion_tokens": 80,
+      "total_tokens": 518,
+      "cost": 0.0024821775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00250725,
+        "upstream_inference_prompt_cost": 0.00130725,
+        "upstream_inference_completions_cost": 0.0012
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2530.545,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "81cb5072-684a-4f1e-bd3d-97f1dab7a6e5"
+}

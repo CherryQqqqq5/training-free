@@ -1,0 +1,444 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Could you help me with a few things? First, I'm interested in finding out all the movies that actor Leonardo DiCaprio starred in the year 2010, specifically in the Drama category. Second, I'd like to know about any lawsuits filed against the company 'Apple Inc.' in the location 'California' in the year 2015, and I'm particularly interested in civil cases. Lastly, I need to book a direct flight from 'New York' to 'London' on the date '2022-12-25', and I prefer the time to be around '10:00AM'. Can you assist me with these?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "lawsuits_search",
+        "description": "Search for lawsuits against a specific company within a specific time and location. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "company_name": {
+              "type": "string",
+              "description": "The name of the company."
+            },
+            "location": {
+              "type": "string",
+              "description": "The location where the lawsuit was filed."
+            },
+            "year": {
+              "type": "integer",
+              "description": "The year when the lawsuit was filed."
+            },
+            "case_type": {
+              "type": "string",
+              "description": "The type of the case. Options include: 'civil', 'criminal', 'small_claims', etc. If not specified, default to search for all types."
+            }
+          },
+          "required": [
+            "company_name",
+            "location",
+            "year"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "flight_book",
+        "description": "Book a direct flight for a specific date and time from departure location to destination location. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "departure_location": {
+              "type": "string",
+              "description": "The location you are departing from."
+            },
+            "destination_location": {
+              "type": "string",
+              "description": "The location you are flying to."
+            },
+            "date": {
+              "type": "string",
+              "description": "The date of the flight. Accepts standard date format e.g., 2022-04-28."
+            },
+            "time": {
+              "type": "string",
+              "description": "Preferred time of flight. Format XX:XXAM or XX:XXPM. Default ''"
+            },
+            "direct_flight": {
+              "type": "boolean",
+              "description": "If set to true, only direct flights will be searched. Default is false"
+            }
+          },
+          "required": [
+            "departure_location",
+            "destination_location",
+            "date"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "imdb_find_movies_by_actor",
+        "description": "Searches the database to find all movies by a specific actor within a certain year. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "actor_name": {
+              "type": "string",
+              "description": "The name of the actor."
+            },
+            "year": {
+              "type": "integer",
+              "description": "The specific year to search in."
+            },
+            "category": {
+              "type": "string",
+              "description": "The category of the film (e.g. Drama, Comedy, etc). This parameter is optional. Default is all if not specified."
+            }
+          },
+          "required": [
+            "actor_name",
+            "year"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Could you help me with a few things? First, I'm interested in finding out all the movies that actor Leonardo DiCaprio starred in the year 2010, specifically in the Drama category. Second, I'd like to know about any lawsuits filed against the company 'Apple Inc.' in the location 'California' in the year 2015, and I'm particularly interested in civil cases. Lastly, I need to book a direct flight from 'New York' to 'London' on the date '2022-12-25', and I prefer the time to be around '10:00AM'. Can you assist me with these?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "lawsuits_search",
+          "description": "Search for lawsuits against a specific company within a specific time and location. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "company_name": {
+                "type": "string",
+                "description": "The name of the company."
+              },
+              "location": {
+                "type": "string",
+                "description": "The location where the lawsuit was filed."
+              },
+              "year": {
+                "type": "integer",
+                "description": "The year when the lawsuit was filed."
+              },
+              "case_type": {
+                "type": "string",
+                "description": "The type of the case. Options include: 'civil', 'criminal', 'small_claims', etc. If not specified, default to search for all types."
+              }
+            },
+            "required": [
+              "company_name",
+              "location",
+              "year"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "flight_book",
+          "description": "Book a direct flight for a specific date and time from departure location to destination location. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "departure_location": {
+                "type": "string",
+                "description": "The location you are departing from."
+              },
+              "destination_location": {
+                "type": "string",
+                "description": "The location you are flying to."
+              },
+              "date": {
+                "type": "string",
+                "description": "The date of the flight. Accepts standard date format e.g., 2022-04-28."
+              },
+              "time": {
+                "type": "string",
+                "description": "Preferred time of flight. Format XX:XXAM or XX:XXPM. Default ''"
+              },
+              "direct_flight": {
+                "type": "boolean",
+                "description": "If set to true, only direct flights will be searched. Default is false"
+              }
+            },
+            "required": [
+              "departure_location",
+              "destination_location",
+              "date"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "imdb_find_movies_by_actor",
+          "description": "Searches the database to find all movies by a specific actor within a certain year. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "actor_name": {
+                "type": "string",
+                "description": "The name of the actor."
+              },
+              "year": {
+                "type": "integer",
+                "description": "The specific year to search in."
+              },
+              "category": {
+                "type": "string",
+                "description": "The category of the film (e.g. Drama, Comedy, etc). This parameter is optional. Default is all if not specified."
+              }
+            },
+            "required": [
+              "actor_name",
+              "year"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241054-2E9YAE5G0OuZbLZQWz22",
+    "object": "chat.completion",
+    "created": 1776241054,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to assist with all your requests. Let's address each one systematically.\n\nFor the first request regarding Leonardo DiCaprio's movies in 2010 in the Drama category, I will search for the relevant information.\n\nFor the second request about lawsuits against Apple Inc. in California in 2015, specifically civil cases, I will search for the details.\n\nLastly, for booking a direct flight from New York to London on December 25, 2022, with a preferred time of 10:00 AM, I will initiate the booking process.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_44410650",
+              "function": {
+                "name": "imdb_find_movies_by_actor",
+                "arguments": "{\"actor_name\":\"Leonardo DiCaprio\",\"year\":2010,\"category\":\"Drama\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_22121256",
+              "function": {
+                "name": "lawsuits_search",
+                "arguments": "{\"company_name\":\"Apple Inc.\",\"location\":\"California\",\"year\":2015,\"case_type\":\"civil\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_29226318",
+              "function": {
+                "name": "flight_book",
+                "arguments": "{\"departure_location\":\"New York\",\"destination_location\":\"London\",\"date\":\"2022-12-25\",\"time\":\"10:00AM\",\"direct_flight\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 799,
+      "completion_tokens": 267,
+      "total_tokens": 1066,
+      "cost": 0.0058724325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00593175,
+        "upstream_inference_prompt_cost": 0.00192675,
+        "upstream_inference_completions_cost": 0.004005
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241054-2E9YAE5G0OuZbLZQWz22",
+    "object": "response",
+    "created_at": 1776241057,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'm happy to assist with all your requests. Let's address each one systematically.\n\nFor the first request regarding Leonardo DiCaprio's movies in 2010 in the Drama category, I will search for the relevant information.\n\nFor the second request about lawsuits against Apple Inc. in California in 2015, specifically civil cases, I will search for the details.\n\nLastly, for booking a direct flight from New York to London on December 25, 2022, with a preferred time of 10:00 AM, I will initiate the booking process.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_44410650",
+        "call_id": "call_44410650",
+        "name": "imdb_find_movies_by_actor",
+        "arguments": "{\"actor_name\":\"Leonardo DiCaprio\",\"year\":2010,\"category\":\"Drama\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_22121256",
+        "call_id": "call_22121256",
+        "name": "lawsuits_search",
+        "arguments": "{\"company_name\":\"Apple Inc.\",\"location\":\"California\",\"year\":2015,\"case_type\":\"civil\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_29226318",
+        "call_id": "call_29226318",
+        "name": "flight_book",
+        "arguments": "{\"departure_location\":\"New York\",\"destination_location\":\"London\",\"date\":\"2022-12-25\",\"time\":\"10:00AM\",\"direct_flight\":true}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 799,
+      "completion_tokens": 267,
+      "total_tokens": 1066,
+      "cost": 0.0058724325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00593175,
+        "upstream_inference_prompt_cost": 0.00192675,
+        "upstream_inference_completions_cost": 0.004005
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241054-2E9YAE5G0OuZbLZQWz22",
+    "object": "chat.completion",
+    "created": 1776241054,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to assist with all your requests. Let's address each one systematically.\n\nFor the first request regarding Leonardo DiCaprio's movies in 2010 in the Drama category, I will search for the relevant information.\n\nFor the second request about lawsuits against Apple Inc. in California in 2015, specifically civil cases, I will search for the details.\n\nLastly, for booking a direct flight from New York to London on December 25, 2022, with a preferred time of 10:00 AM, I will initiate the booking process.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_44410650",
+              "function": {
+                "name": "imdb_find_movies_by_actor",
+                "arguments": "{\"actor_name\":\"Leonardo DiCaprio\",\"year\":2010,\"category\":\"Drama\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_22121256",
+              "function": {
+                "name": "lawsuits_search",
+                "arguments": "{\"company_name\":\"Apple Inc.\",\"location\":\"California\",\"year\":2015,\"case_type\":\"civil\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_29226318",
+              "function": {
+                "name": "flight_book",
+                "arguments": "{\"departure_location\":\"New York\",\"destination_location\":\"London\",\"date\":\"2022-12-25\",\"time\":\"10:00AM\",\"direct_flight\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 799,
+      "completion_tokens": 267,
+      "total_tokens": 1066,
+      "cost": 0.0058724325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00593175,
+        "upstream_inference_prompt_cost": 0.00192675,
+        "upstream_inference_completions_cost": 0.004005
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 4053.13,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "8f7927fd-15d5-41c5-8d1e-dd357f4bc4a2"
+}

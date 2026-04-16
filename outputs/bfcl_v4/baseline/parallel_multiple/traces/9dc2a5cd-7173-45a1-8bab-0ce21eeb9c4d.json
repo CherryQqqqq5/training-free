@@ -1,0 +1,311 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Can you find information on Michael Jordan's highest scoring game and the total championships he won?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "get_team_info",
+        "description": "Retrieve information for a specific team, such as championships won. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "team": {
+              "type": "string",
+              "description": "The name of the team."
+            },
+            "info": {
+              "type": "string",
+              "description": "The information sought. E.g., 'championships_won'."
+            }
+          },
+          "required": [
+            "team",
+            "info"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "get_player_record",
+        "description": "Retrieve record stats for a specific player and stat type. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "player": {
+              "type": "string",
+              "description": "The name of the player."
+            },
+            "stat": {
+              "type": "string",
+              "description": "The type of statistic. E.g., 'highest_scoring_game', 'total_championships'."
+            }
+          },
+          "required": [
+            "player",
+            "stat"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Can you find information on Michael Jordan's highest scoring game and the total championships he won?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_team_info",
+          "description": "Retrieve information for a specific team, such as championships won. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "team": {
+                "type": "string",
+                "description": "The name of the team."
+              },
+              "info": {
+                "type": "string",
+                "description": "The information sought. E.g., 'championships_won'."
+              }
+            },
+            "required": [
+              "team",
+              "info"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "get_player_record",
+          "description": "Retrieve record stats for a specific player and stat type. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "player": {
+                "type": "string",
+                "description": "The name of the player."
+              },
+              "stat": {
+                "type": "string",
+                "description": "The type of statistic. E.g., 'highest_scoring_game', 'total_championships'."
+              }
+            },
+            "required": [
+              "player",
+              "stat"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240621-thVX9Sm9issFoIrPkq6G",
+    "object": "chat.completion",
+    "created": 1776240621,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_44079706",
+              "function": {
+                "name": "get_player_record",
+                "arguments": "{\"player\":\"Michael Jordan\",\"stat\":\"highest_scoring_game\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_77273123",
+              "function": {
+                "name": "get_player_record",
+                "arguments": "{\"player\":\"Michael Jordan\",\"stat\":\"total_championships\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 420,
+      "completion_tokens": 75,
+      "total_tokens": 495,
+      "cost": 0.0018956025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00191475,
+        "upstream_inference_prompt_cost": 0.00078975,
+        "upstream_inference_completions_cost": 0.001125
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240621-thVX9Sm9issFoIrPkq6G",
+    "object": "response",
+    "created_at": 1776240623,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_44079706",
+        "call_id": "call_44079706",
+        "name": "get_player_record",
+        "arguments": "{\"player\":\"Michael Jordan\",\"stat\":\"highest_scoring_game\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_77273123",
+        "call_id": "call_77273123",
+        "name": "get_player_record",
+        "arguments": "{\"player\":\"Michael Jordan\",\"stat\":\"total_championships\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 420,
+      "completion_tokens": 75,
+      "total_tokens": 495,
+      "cost": 0.0018956025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00191475,
+        "upstream_inference_prompt_cost": 0.00078975,
+        "upstream_inference_completions_cost": 0.001125
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240621-thVX9Sm9issFoIrPkq6G",
+    "object": "chat.completion",
+    "created": 1776240621,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_44079706",
+              "function": {
+                "name": "get_player_record",
+                "arguments": "{\"player\":\"Michael Jordan\",\"stat\":\"highest_scoring_game\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_77273123",
+              "function": {
+                "name": "get_player_record",
+                "arguments": "{\"player\":\"Michael Jordan\",\"stat\":\"total_championships\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 420,
+      "completion_tokens": 75,
+      "total_tokens": 495,
+      "cost": 0.0018956025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00191475,
+        "upstream_inference_prompt_cost": 0.00078975,
+        "upstream_inference_completions_cost": 0.001125
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2283.316,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "9dc2a5cd-7173-45a1-8bab-0ce21eeb9c4d"
+}

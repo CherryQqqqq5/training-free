@@ -1,0 +1,268 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "developer",
+        "content": "You are a general customer support assistant for an e-commerce platform. Your task is to understand and remember information that can be used to provide information about user inquiries, preferences, and offer consistent, helpful assistance over multiple interactions.\n\nYou have access to an advanced memory system, which is persistent across multiple conversations with the user, and can be accessed in a later interactions. You should actively manage your memory data to keep track of important information, ensure that it is up-to-date and easy to retrieve to provide personalized responses to the user later.\n\nHere is the content of your memory system from previous interactions:\nThere is no content in the memory at this point.\n"
+      },
+      {
+        "role": "user",
+        "content": "Hi again! I hope you've been doing well since our last chat. I'm pretty excited because I think I'm finally ready to take the plunge and order one of your espresso machines. After all that research and back-and-forth, I've decided that an espresso machine seems to fit my routine better than a standard drip coffee maker—especially given how particular I am about taste, temperature, and that café-like experience. And as someone who tinkers with design on a daily basis, I'm drawn to the sleeker, modern models I saw on your site. I'd love to confirm I can get the machine with a stainless-steel finish to match my kitchen's aesthetic."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "memory_append",
+        "description": "This tool belongs to the memory suite, which provides APIs to manage memory data via recursive summarization. Tool description: Append a new text to the end of the memory. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "description": "The text to append to the memory. "
+            }
+          },
+          "required": [
+            "text"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Status of the operation."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "memory_clear",
+        "description": "This tool belongs to the memory suite, which provides APIs to manage memory data via recursive summarization. Tool description: Clear all content in the memory, including any from previous interactions. This operation is irreversible. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {},
+          "required": []
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Status of the operation."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "memory_replace",
+        "description": "This tool belongs to the memory suite, which provides APIs to manage memory data via recursive summarization. Tool description: Replace a specific text in the memory with new text. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "old_text": {
+              "type": "string",
+              "description": "The text to be replaced in the memory."
+            },
+            "new_text": {
+              "type": "string",
+              "description": "The new text to replace the old text."
+            }
+          },
+          "required": [
+            "old_text",
+            "new_text"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Status of the operation."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "memory_retrieve",
+        "description": "This tool belongs to the memory suite, which provides APIs to manage memory data via recursive summarization. Tool description: Retrieve the current content of the memory. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {},
+          "required": []
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "memory_content": {
+              "type": "string",
+              "description": "The current content of the memory."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "memory_update",
+        "description": "This tool belongs to the memory suite, which provides APIs to manage memory data via recursive summarization. Tool description: Update the memory with new text. This will replace the existing memory content. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "description": "The new text to set as the memory. "
+            }
+          },
+          "required": [
+            "text"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Status of the operation."
+            }
+          }
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "gpt-4o-mini-2024-07-18-FC",
+    "messages": [
+      {
+        "role": "developer",
+        "content": "You are a general customer support assistant for an e-commerce platform. Your task is to understand and remember information that can be used to provide information about user inquiries, preferences, and offer consistent, helpful assistance over multiple interactions.\n\nYou have access to an advanced memory system, which is persistent across multiple conversations with the user, and can be accessed in a later interactions. You should actively manage your memory data to keep track of important information, ensure that it is up-to-date and easy to retrieve to provide personalized responses to the user later.\n\nHere is the content of your memory system from previous interactions:\nThere is no content in the memory at this point.\n"
+      },
+      {
+        "role": "user",
+        "content": "Hi again! I hope you've been doing well since our last chat. I'm pretty excited because I think I'm finally ready to take the plunge and order one of your espresso machines. After all that research and back-and-forth, I've decided that an espresso machine seems to fit my routine better than a standard drip coffee maker—especially given how particular I am about taste, temperature, and that café-like experience. And as someone who tinkers with design on a daily basis, I'm drawn to the sleeker, modern models I saw on your site. I'd love to confirm I can get the machine with a stainless-steel finish to match my kitchen's aesthetic."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "memory_append",
+          "description": "This tool belongs to the memory suite, which provides APIs to manage memory data via recursive summarization. Tool description: Append a new text to the end of the memory. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "description": "The text to append to the memory. "
+              }
+            },
+            "required": [
+              "text"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "memory_clear",
+          "description": "This tool belongs to the memory suite, which provides APIs to manage memory data via recursive summarization. Tool description: Clear all content in the memory, including any from previous interactions. This operation is irreversible. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "memory_replace",
+          "description": "This tool belongs to the memory suite, which provides APIs to manage memory data via recursive summarization. Tool description: Replace a specific text in the memory with new text. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "old_text": {
+                "type": "string",
+                "description": "The text to be replaced in the memory."
+              },
+              "new_text": {
+                "type": "string",
+                "description": "The new text to replace the old text."
+              }
+            },
+            "required": [
+              "old_text",
+              "new_text"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "memory_retrieve",
+          "description": "This tool belongs to the memory suite, which provides APIs to manage memory data via recursive summarization. Tool description: Retrieve the current content of the memory. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "memory_update",
+          "description": "This tool belongs to the memory suite, which provides APIs to manage memory data via recursive summarization. Tool description: Update the memory with new text. This will replace the existing memory content. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "description": "The new text to set as the memory. "
+              }
+            },
+            "required": [
+              "text"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "error": {
+      "message": "gpt-4o-mini-2024-07-18-FC is not a valid model ID",
+      "code": 400
+    },
+    "user_id": "user_2orsh05y5y5xw5GGP8W1QWXPNop"
+  },
+  "final_response": {
+    "error": {
+      "message": "gpt-4o-mini-2024-07-18-FC is not a valid model ID",
+      "code": 400
+    },
+    "user_id": "user_2orsh05y5y5xw5GGP8W1QWXPNop"
+  },
+  "repairs": [],
+  "validation": {
+    "issues": [],
+    "rule_hits": [],
+    "request_patches": []
+  },
+  "status_code": 400,
+  "latency_ms": 765.134,
+  "upstream_profile": "openrouter",
+  "upstream_model": "gpt-4o-mini-2024-07-18-FC",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "c2659458-72e0-45d3-a130-2e8f52e3c407"
+}

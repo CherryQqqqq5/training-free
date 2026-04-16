@@ -1,0 +1,350 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "I want a homemade healthy spaghetti recipe that is gluten free, how long will it take to prepare and cook, and what nutritional information could it provide me."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "recipe_prep_time",
+        "description": "Calculate the estimated preparation and cooking time for a specified recipe. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "recipe": {
+              "type": "string",
+              "description": "Name of the recipe to calculate time for."
+            }
+          },
+          "required": [
+            "recipe"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "recipe_nutrition_info",
+        "description": "Provide detailed nutritional information for a specified recipe. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "recipe": {
+              "type": "string",
+              "description": "Name of the recipe to fetch nutrition info for."
+            }
+          },
+          "required": [
+            "recipe"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "recipe_search",
+        "description": "Search for a recipe based on a particular ingredient or dietary requirement. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "ingredient": {
+              "type": "string",
+              "description": "The ingredient that you want to have in the recipe."
+            },
+            "dietary_requirements": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "gluten_free",
+                  "dairy_free",
+                  "vegetarian",
+                  "vegan"
+                ]
+              },
+              "description": "Dietary requirements in the recipe."
+            },
+            "isHomemade": {
+              "type": "boolean",
+              "description": "If true, returns homemade recipe; otherwise, return not homemade recipe."
+            }
+          },
+          "required": [
+            "ingredient",
+            "dietary_requirements",
+            "isHomemade"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "I want a homemade healthy spaghetti recipe that is gluten free, how long will it take to prepare and cook, and what nutritional information could it provide me."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "recipe_prep_time",
+          "description": "Calculate the estimated preparation and cooking time for a specified recipe. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "recipe": {
+                "type": "string",
+                "description": "Name of the recipe to calculate time for."
+              }
+            },
+            "required": [
+              "recipe"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "recipe_nutrition_info",
+          "description": "Provide detailed nutritional information for a specified recipe. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "recipe": {
+                "type": "string",
+                "description": "Name of the recipe to fetch nutrition info for."
+              }
+            },
+            "required": [
+              "recipe"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "recipe_search",
+          "description": "Search for a recipe based on a particular ingredient or dietary requirement. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "ingredient": {
+                "type": "string",
+                "description": "The ingredient that you want to have in the recipe."
+              },
+              "dietary_requirements": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "gluten_free",
+                    "dairy_free",
+                    "vegetarian",
+                    "vegan"
+                  ]
+                },
+                "description": "Dietary requirements in the recipe."
+              },
+              "isHomemade": {
+                "type": "boolean",
+                "description": "If true, returns homemade recipe; otherwise, return not homemade recipe."
+              }
+            },
+            "required": [
+              "ingredient",
+              "dietary_requirements",
+              "isHomemade"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240635-xDyXVxvNNMP9Oih8FU04",
+    "object": "chat.completion",
+    "created": 1776240635,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "Let's address your request step by step. First, I'll search for a homemade, gluten-free spaghetti recipe. Then, I'll provide the estimated preparation and cooking time, followed by the nutritional information for that recipe.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_02183755",
+              "function": {
+                "name": "recipe_search",
+                "arguments": "{\"ingredient\":\"spaghetti\",\"dietary_requirements\":[\"gluten_free\"],\"isHomemade\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 524,
+      "completion_tokens": 85,
+      "total_tokens": 609,
+      "cost": 0.0023529825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00237675,
+        "upstream_inference_prompt_cost": 0.00110175,
+        "upstream_inference_completions_cost": 0.001275
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240635-xDyXVxvNNMP9Oih8FU04",
+    "object": "response",
+    "created_at": 1776240637,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "Let's address your request step by step. First, I'll search for a homemade, gluten-free spaghetti recipe. Then, I'll provide the estimated preparation and cooking time, followed by the nutritional information for that recipe.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_02183755",
+        "call_id": "call_02183755",
+        "name": "recipe_search",
+        "arguments": "{\"ingredient\":\"spaghetti\",\"dietary_requirements\":[\"gluten_free\"],\"isHomemade\":true}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 524,
+      "completion_tokens": 85,
+      "total_tokens": 609,
+      "cost": 0.0023529825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00237675,
+        "upstream_inference_prompt_cost": 0.00110175,
+        "upstream_inference_completions_cost": 0.001275
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240635-xDyXVxvNNMP9Oih8FU04",
+    "object": "chat.completion",
+    "created": 1776240635,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "Let's address your request step by step. First, I'll search for a homemade, gluten-free spaghetti recipe. Then, I'll provide the estimated preparation and cooking time, followed by the nutritional information for that recipe.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_02183755",
+              "function": {
+                "name": "recipe_search",
+                "arguments": "{\"ingredient\":\"spaghetti\",\"dietary_requirements\":[\"gluten_free\"],\"isHomemade\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 524,
+      "completion_tokens": 85,
+      "total_tokens": 609,
+      "cost": 0.0023529825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00237675,
+        "upstream_inference_prompt_cost": 0.00110175,
+        "upstream_inference_completions_cost": 0.001275
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2708.102,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "c5225af8-f355-4589-b61d-12c1250b7cde"
+}

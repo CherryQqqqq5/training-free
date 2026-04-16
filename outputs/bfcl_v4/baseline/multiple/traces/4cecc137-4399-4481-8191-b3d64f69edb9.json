@@ -1,0 +1,446 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Book a luxury room in Hotel Paradise, Las Vegas, with a city view for 3 days starting from May 12, 2022."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "random_normalvariate",
+        "description": "Generates a random number from a normal distribution given the mean and standard deviation. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "mu": {
+              "type": "number",
+              "description": "Mean of the normal distribution. This is a float type value.",
+              "format": "float"
+            },
+            "sigma": {
+              "type": "number",
+              "description": "Standard deviation of the normal distribution. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "mu",
+            "sigma"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "get_personality_traits",
+        "description": "Retrieve the personality traits for a specific personality type, including their strengths and weaknesses. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "description": "The personality type."
+            },
+            "traits": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "strengths",
+                  "weaknesses"
+                ]
+              },
+              "description": "List of traits to be retrieved, default is ['strengths', 'weaknesses']."
+            }
+          },
+          "required": [
+            "type"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "elephant_population_estimate",
+        "description": "Estimate future population of elephants given current population and growth rate. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "current_population": {
+              "type": "integer",
+              "description": "The current number of elephants."
+            },
+            "growth_rate": {
+              "type": "number",
+              "description": "The annual population growth rate of elephants. This is a float type value.",
+              "format": "float"
+            },
+            "years": {
+              "type": "integer",
+              "description": "The number of years to project the population."
+            }
+          },
+          "required": [
+            "current_population",
+            "growth_rate",
+            "years"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "book_hotel",
+        "description": "Book a room in a specific hotel with particular preferences Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "hotel_name": {
+              "type": "string",
+              "description": "The name of the hotel."
+            },
+            "location": {
+              "type": "string",
+              "description": "The location of the hotel."
+            },
+            "room_type": {
+              "type": "string",
+              "description": "The type of room preferred."
+            },
+            "start_date": {
+              "type": "string",
+              "description": "The starting date of the stay in format MM-DD-YYYY."
+            },
+            "stay_duration": {
+              "type": "integer",
+              "description": "The duration of the stay in days."
+            },
+            "view": {
+              "type": "string",
+              "description": "The preferred view from the room, can be ignored if no preference. If none provided, assumes no preference.",
+              "default": "No preference"
+            }
+          },
+          "required": [
+            "hotel_name",
+            "location",
+            "room_type",
+            "start_date",
+            "stay_duration"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Book a luxury room in Hotel Paradise, Las Vegas, with a city view for 3 days starting from May 12, 2022."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "random_normalvariate",
+          "description": "Generates a random number from a normal distribution given the mean and standard deviation. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "mu": {
+                "type": "number",
+                "description": "Mean of the normal distribution. This is a float type value.",
+                "format": "float"
+              },
+              "sigma": {
+                "type": "number",
+                "description": "Standard deviation of the normal distribution. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "mu",
+              "sigma"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "get_personality_traits",
+          "description": "Retrieve the personality traits for a specific personality type, including their strengths and weaknesses. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "The personality type."
+              },
+              "traits": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "strengths",
+                    "weaknesses"
+                  ]
+                },
+                "description": "List of traits to be retrieved, default is ['strengths', 'weaknesses']."
+              }
+            },
+            "required": [
+              "type"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "elephant_population_estimate",
+          "description": "Estimate future population of elephants given current population and growth rate. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "current_population": {
+                "type": "integer",
+                "description": "The current number of elephants."
+              },
+              "growth_rate": {
+                "type": "number",
+                "description": "The annual population growth rate of elephants. This is a float type value.",
+                "format": "float"
+              },
+              "years": {
+                "type": "integer",
+                "description": "The number of years to project the population."
+              }
+            },
+            "required": [
+              "current_population",
+              "growth_rate",
+              "years"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "book_hotel",
+          "description": "Book a room in a specific hotel with particular preferences Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "hotel_name": {
+                "type": "string",
+                "description": "The name of the hotel."
+              },
+              "location": {
+                "type": "string",
+                "description": "The location of the hotel."
+              },
+              "room_type": {
+                "type": "string",
+                "description": "The type of room preferred."
+              },
+              "start_date": {
+                "type": "string",
+                "description": "The starting date of the stay in format MM-DD-YYYY."
+              },
+              "stay_duration": {
+                "type": "integer",
+                "description": "The duration of the stay in days."
+              },
+              "view": {
+                "type": "string",
+                "description": "The preferred view from the room, can be ignored if no preference. If none provided, assumes no preference.",
+                "default": "No preference"
+              }
+            },
+            "required": [
+              "hotel_name",
+              "location",
+              "room_type",
+              "start_date",
+              "stay_duration"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239889-g1pC5l1vWhWE5Wk58XwP",
+    "object": "chat.completion",
+    "created": 1776239889,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_71480840",
+              "function": {
+                "name": "book_hotel",
+                "arguments": "{\"hotel_name\":\"Hotel Paradise\",\"location\":\"Las Vegas\",\"room_type\":\"luxury\",\"start_date\":\"05-12-2022\",\"stay_duration\":3,\"view\":\"city view\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 761,
+      "completion_tokens": 70,
+      "total_tokens": 831,
+      "cost": 0.0028341225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00286275,
+        "upstream_inference_prompt_cost": 0.00181275,
+        "upstream_inference_completions_cost": 0.00105
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239889-g1pC5l1vWhWE5Wk58XwP",
+    "object": "response",
+    "created_at": 1776239892,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_71480840",
+        "call_id": "call_71480840",
+        "name": "book_hotel",
+        "arguments": "{\"hotel_name\":\"Hotel Paradise\",\"location\":\"Las Vegas\",\"room_type\":\"luxury\",\"start_date\":\"05-12-2022\",\"stay_duration\":3,\"view\":\"city view\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 761,
+      "completion_tokens": 70,
+      "total_tokens": 831,
+      "cost": 0.0028341225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00286275,
+        "upstream_inference_prompt_cost": 0.00181275,
+        "upstream_inference_completions_cost": 0.00105
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239889-g1pC5l1vWhWE5Wk58XwP",
+    "object": "chat.completion",
+    "created": 1776239889,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_71480840",
+              "function": {
+                "name": "book_hotel",
+                "arguments": "{\"hotel_name\":\"Hotel Paradise\",\"location\":\"Las Vegas\",\"room_type\":\"luxury\",\"start_date\":\"05-12-2022\",\"stay_duration\":3,\"view\":\"city view\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 761,
+      "completion_tokens": 70,
+      "total_tokens": 831,
+      "cost": 0.0028341225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00286275,
+        "upstream_inference_prompt_cost": 0.00181275,
+        "upstream_inference_completions_cost": 0.00105
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 3364.468,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "4cecc137-4399-4481-8191-b3d64f69edb9"
+}

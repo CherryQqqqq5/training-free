@@ -1,0 +1,378 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the depreciated value of a property costing $200,000 with an annual depreciation rate of 3% for 5 years."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "finance_property_depreciation",
+        "description": "Calculates the depreciated value of a property given its initial cost, depreciation rate, and the number of years. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "initial_cost": {
+              "type": "integer",
+              "description": "The initial cost of the property."
+            },
+            "depreciation_rate": {
+              "type": "integer",
+              "description": "The annual depreciation rate in percentage."
+            },
+            "years": {
+              "type": "integer",
+              "description": "The number of years for which to calculate the depreciation."
+            },
+            "monthly": {
+              "type": "boolean",
+              "description": "If set to true, it will calculate monthly depreciation instead of annually. (optional)",
+              "default": false
+            }
+          },
+          "required": [
+            "initial_cost",
+            "depreciation_rate",
+            "years"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "finance_loan_repayment",
+        "description": "Calculates the monthly repayment for a loan. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "loan_amount": {
+              "type": "number",
+              "description": "The amount borrowed or loaned. This is a float type value.",
+              "format": "float"
+            },
+            "interest_rate": {
+              "type": "number",
+              "description": "The annual interest rate. This is a float type value.",
+              "format": "float"
+            },
+            "loan_term": {
+              "type": "integer",
+              "description": "The term of the loan in years."
+            }
+          },
+          "required": [
+            "loan_amount",
+            "interest_rate",
+            "loan_term"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "finance_inflation_adjustment",
+        "description": "Adjusts a sum of money for inflation based on the consumer price index (CPI). Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "initial_sum": {
+              "type": "number",
+              "description": "The initial sum of money. This is a float type value.",
+              "format": "float"
+            },
+            "years": {
+              "type": "integer",
+              "description": "The number of years over which inflation is calculated."
+            },
+            "inflation_rate": {
+              "type": "number",
+              "description": "The annual rate of inflation. Default 0.0 This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "initial_sum",
+            "years"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the depreciated value of a property costing $200,000 with an annual depreciation rate of 3% for 5 years."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "finance_property_depreciation",
+          "description": "Calculates the depreciated value of a property given its initial cost, depreciation rate, and the number of years. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "initial_cost": {
+                "type": "integer",
+                "description": "The initial cost of the property."
+              },
+              "depreciation_rate": {
+                "type": "integer",
+                "description": "The annual depreciation rate in percentage."
+              },
+              "years": {
+                "type": "integer",
+                "description": "The number of years for which to calculate the depreciation."
+              },
+              "monthly": {
+                "type": "boolean",
+                "description": "If set to true, it will calculate monthly depreciation instead of annually. (optional)",
+                "default": false
+              }
+            },
+            "required": [
+              "initial_cost",
+              "depreciation_rate",
+              "years"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "finance_loan_repayment",
+          "description": "Calculates the monthly repayment for a loan. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "loan_amount": {
+                "type": "number",
+                "description": "The amount borrowed or loaned. This is a float type value.",
+                "format": "float"
+              },
+              "interest_rate": {
+                "type": "number",
+                "description": "The annual interest rate. This is a float type value.",
+                "format": "float"
+              },
+              "loan_term": {
+                "type": "integer",
+                "description": "The term of the loan in years."
+              }
+            },
+            "required": [
+              "loan_amount",
+              "interest_rate",
+              "loan_term"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "finance_inflation_adjustment",
+          "description": "Adjusts a sum of money for inflation based on the consumer price index (CPI). Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "initial_sum": {
+                "type": "number",
+                "description": "The initial sum of money. This is a float type value.",
+                "format": "float"
+              },
+              "years": {
+                "type": "integer",
+                "description": "The number of years over which inflation is calculated."
+              },
+              "inflation_rate": {
+                "type": "number",
+                "description": "The annual rate of inflation. Default 0.0 This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "initial_sum",
+              "years"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239475-qALRjeXcabLA2tfD9oLM",
+    "object": "chat.completion",
+    "created": 1776239475,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_69208515",
+              "function": {
+                "name": "finance_property_depreciation",
+                "arguments": "{\"initial_cost\":200000,\"depreciation_rate\":3,\"years\":5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 658,
+      "completion_tokens": 45,
+      "total_tokens": 703,
+      "cost": 0.0021569625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00217875,
+        "upstream_inference_prompt_cost": 0.00150375,
+        "upstream_inference_completions_cost": 0.000675
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239475-qALRjeXcabLA2tfD9oLM",
+    "object": "response",
+    "created_at": 1776239477,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_69208515",
+        "call_id": "call_69208515",
+        "name": "finance_property_depreciation",
+        "arguments": "{\"initial_cost\":200000,\"depreciation_rate\":3,\"years\":5}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 658,
+      "completion_tokens": 45,
+      "total_tokens": 703,
+      "cost": 0.0021569625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00217875,
+        "upstream_inference_prompt_cost": 0.00150375,
+        "upstream_inference_completions_cost": 0.000675
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239475-qALRjeXcabLA2tfD9oLM",
+    "object": "chat.completion",
+    "created": 1776239475,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_69208515",
+              "function": {
+                "name": "finance_property_depreciation",
+                "arguments": "{\"initial_cost\":200000,\"depreciation_rate\":3,\"years\":5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 658,
+      "completion_tokens": 45,
+      "total_tokens": 703,
+      "cost": 0.0021569625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00217875,
+        "upstream_inference_prompt_cost": 0.00150375,
+        "upstream_inference_completions_cost": 0.000675
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2013.479,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "3df0acba-f4a7-4eee-ad89-578557b3326d"
+}

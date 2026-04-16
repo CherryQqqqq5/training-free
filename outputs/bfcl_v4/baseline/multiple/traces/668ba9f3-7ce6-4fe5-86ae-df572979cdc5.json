@@ -1,0 +1,388 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Generate a melody in C major scale, starting with the note C4, 16 measures long, at 120 beats per minute."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_density",
+        "description": "Calculate the population density of a specific country in a specific year. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "country": {
+              "type": "string",
+              "description": "The country for which the density needs to be calculated."
+            },
+            "year": {
+              "type": "string",
+              "description": "The year in which the density is to be calculated."
+            },
+            "population": {
+              "type": "integer",
+              "description": "The population of the country."
+            },
+            "land_area": {
+              "type": "number",
+              "description": "The land area of the country in square kilometers. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "country",
+            "year",
+            "population",
+            "land_area"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "get_directions",
+        "description": "Retrieve directions from one location to another. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "start_location": {
+              "type": "string",
+              "description": "The starting point of the journey."
+            },
+            "end_location": {
+              "type": "string",
+              "description": "The destination point of the journey."
+            },
+            "route_type": {
+              "type": "string",
+              "description": "Type of route to use (e.g., fastest, scenic). Default is fastest.",
+              "enum": [
+                "fastest",
+                "scenic"
+              ]
+            }
+          },
+          "required": [
+            "start_location",
+            "end_location"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "music_generator_generate_melody",
+        "description": "Generate a melody based on certain musical parameters. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "The key of the melody. E.g., 'C' for C major."
+            },
+            "start_note": {
+              "type": "string",
+              "description": "The first note of the melody, specified in scientific pitch notation. E.g., 'C4'."
+            },
+            "length": {
+              "type": "integer",
+              "description": "The number of measures in the melody."
+            },
+            "tempo": {
+              "type": "integer",
+              "description": "The tempo of the melody, in beats per minute. Optional parameter. If not specified, defaults to 120."
+            }
+          },
+          "required": [
+            "key",
+            "start_note",
+            "length"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Generate a melody in C major scale, starting with the note C4, 16 measures long, at 120 beats per minute."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_density",
+          "description": "Calculate the population density of a specific country in a specific year. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "country": {
+                "type": "string",
+                "description": "The country for which the density needs to be calculated."
+              },
+              "year": {
+                "type": "string",
+                "description": "The year in which the density is to be calculated."
+              },
+              "population": {
+                "type": "integer",
+                "description": "The population of the country."
+              },
+              "land_area": {
+                "type": "number",
+                "description": "The land area of the country in square kilometers. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "country",
+              "year",
+              "population",
+              "land_area"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "get_directions",
+          "description": "Retrieve directions from one location to another. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "start_location": {
+                "type": "string",
+                "description": "The starting point of the journey."
+              },
+              "end_location": {
+                "type": "string",
+                "description": "The destination point of the journey."
+              },
+              "route_type": {
+                "type": "string",
+                "description": "Type of route to use (e.g., fastest, scenic). Default is fastest.",
+                "enum": [
+                  "fastest",
+                  "scenic"
+                ]
+              }
+            },
+            "required": [
+              "start_location",
+              "end_location"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "music_generator_generate_melody",
+          "description": "Generate a melody based on certain musical parameters. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The key of the melody. E.g., 'C' for C major."
+              },
+              "start_note": {
+                "type": "string",
+                "description": "The first note of the melody, specified in scientific pitch notation. E.g., 'C4'."
+              },
+              "length": {
+                "type": "integer",
+                "description": "The number of measures in the melody."
+              },
+              "tempo": {
+                "type": "integer",
+                "description": "The tempo of the melody, in beats per minute. Optional parameter. If not specified, defaults to 120."
+              }
+            },
+            "required": [
+              "key",
+              "start_note",
+              "length"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239834-gihbgGxlbpQhMsMXkX8q",
+    "object": "chat.completion",
+    "created": 1776239834,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_67851831",
+              "function": {
+                "name": "music_generator_generate_melody",
+                "arguments": "{\"key\":\"C\",\"start_note\":\"C4\",\"length\":16,\"tempo\":120}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 662,
+      "completion_tokens": 49,
+      "total_tokens": 711,
+      "cost": 0.002226015,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0022485,
+        "upstream_inference_prompt_cost": 0.0015135,
+        "upstream_inference_completions_cost": 0.000735
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239834-gihbgGxlbpQhMsMXkX8q",
+    "object": "response",
+    "created_at": 1776239835,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_67851831",
+        "call_id": "call_67851831",
+        "name": "music_generator_generate_melody",
+        "arguments": "{\"key\":\"C\",\"start_note\":\"C4\",\"length\":16,\"tempo\":120}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 662,
+      "completion_tokens": 49,
+      "total_tokens": 711,
+      "cost": 0.002226015,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0022485,
+        "upstream_inference_prompt_cost": 0.0015135,
+        "upstream_inference_completions_cost": 0.000735
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239834-gihbgGxlbpQhMsMXkX8q",
+    "object": "chat.completion",
+    "created": 1776239834,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_67851831",
+              "function": {
+                "name": "music_generator_generate_melody",
+                "arguments": "{\"key\":\"C\",\"start_note\":\"C4\",\"length\":16,\"tempo\":120}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 662,
+      "completion_tokens": 49,
+      "total_tokens": 711,
+      "cost": 0.002226015,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0022485,
+        "upstream_inference_prompt_cost": 0.0015135,
+        "upstream_inference_completions_cost": 0.000735
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2367.89,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "668ba9f3-7ce6-4fe5-86ae-df572979cdc5"
+}

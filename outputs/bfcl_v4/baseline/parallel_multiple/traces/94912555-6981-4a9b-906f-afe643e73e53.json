@@ -1,0 +1,388 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Create a square painting with blue background and dimensions 16x16 inches, then display it for 30 seconds with 70% screen brightness"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "painting_create",
+        "description": "Creates a new painting with specified parameters Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "shape": {
+              "type": "string",
+              "description": "Shape of the painting to be created."
+            },
+            "background_color": {
+              "type": "string",
+              "description": "Background color of the painting."
+            },
+            "dimensions": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "Dimensions of the painting in inches."
+            }
+          },
+          "required": [
+            "shape",
+            "background_color",
+            "dimensions"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "display_set_screen_brightness",
+        "description": "Sets the screen brightness for viewing the painting Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "percentage": {
+              "type": "integer",
+              "description": "Screen brightness level in percentage."
+            },
+            "duration": {
+              "type": "integer",
+              "description": "Duration to maintain the brightness level in seconds."
+            }
+          },
+          "required": [
+            "percentage",
+            "duration"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "painting_display",
+        "description": "Displays a created painting for a specific amount of time Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "time": {
+              "type": "integer",
+              "description": "Time in seconds the painting will be displayed for."
+            }
+          },
+          "required": [
+            "time"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Create a square painting with blue background and dimensions 16x16 inches, then display it for 30 seconds with 70% screen brightness"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "painting_create",
+          "description": "Creates a new painting with specified parameters Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "shape": {
+                "type": "string",
+                "description": "Shape of the painting to be created."
+              },
+              "background_color": {
+                "type": "string",
+                "description": "Background color of the painting."
+              },
+              "dimensions": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "Dimensions of the painting in inches."
+              }
+            },
+            "required": [
+              "shape",
+              "background_color",
+              "dimensions"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "display_set_screen_brightness",
+          "description": "Sets the screen brightness for viewing the painting Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "percentage": {
+                "type": "integer",
+                "description": "Screen brightness level in percentage."
+              },
+              "duration": {
+                "type": "integer",
+                "description": "Duration to maintain the brightness level in seconds."
+              }
+            },
+            "required": [
+              "percentage",
+              "duration"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "painting_display",
+          "description": "Displays a created painting for a specific amount of time Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "time": {
+                "type": "integer",
+                "description": "Time in seconds the painting will be displayed for."
+              }
+            },
+            "required": [
+              "time"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240589-UULHQtNLINlEzn2P6YrC",
+    "object": "chat.completion",
+    "created": 1776240589,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_78505310",
+              "function": {
+                "name": "painting_create",
+                "arguments": "{\"shape\":\"square\",\"background_color\":\"blue\",\"dimensions\":[16,16]}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_89972472",
+              "function": {
+                "name": "display_set_screen_brightness",
+                "arguments": "{\"percentage\":70,\"duration\":30}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_65733774",
+              "function": {
+                "name": "painting_display",
+                "arguments": "{\"time\":30}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 497,
+      "completion_tokens": 103,
+      "total_tokens": 600,
+      "cost": 0.0025400925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00256575,
+        "upstream_inference_prompt_cost": 0.00102075,
+        "upstream_inference_completions_cost": 0.001545
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240589-UULHQtNLINlEzn2P6YrC",
+    "object": "response",
+    "created_at": 1776240592,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_78505310",
+        "call_id": "call_78505310",
+        "name": "painting_create",
+        "arguments": "{\"shape\":\"square\",\"background_color\":\"blue\",\"dimensions\":[16,16]}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_89972472",
+        "call_id": "call_89972472",
+        "name": "display_set_screen_brightness",
+        "arguments": "{\"percentage\":70,\"duration\":30}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_65733774",
+        "call_id": "call_65733774",
+        "name": "painting_display",
+        "arguments": "{\"time\":30}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 497,
+      "completion_tokens": 103,
+      "total_tokens": 600,
+      "cost": 0.0025400925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00256575,
+        "upstream_inference_prompt_cost": 0.00102075,
+        "upstream_inference_completions_cost": 0.001545
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240589-UULHQtNLINlEzn2P6YrC",
+    "object": "chat.completion",
+    "created": 1776240589,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_78505310",
+              "function": {
+                "name": "painting_create",
+                "arguments": "{\"shape\":\"square\",\"background_color\":\"blue\",\"dimensions\":[16,16]}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_89972472",
+              "function": {
+                "name": "display_set_screen_brightness",
+                "arguments": "{\"percentage\":70,\"duration\":30}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_65733774",
+              "function": {
+                "name": "painting_display",
+                "arguments": "{\"time\":30}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 497,
+      "completion_tokens": 103,
+      "total_tokens": 600,
+      "cost": 0.0025400925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00256575,
+        "upstream_inference_prompt_cost": 0.00102075,
+        "upstream_inference_completions_cost": 0.001545
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2981.25,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "94912555-6981-4a9b-906f-afe643e73e53"
+}

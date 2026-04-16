@@ -1,0 +1,377 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Could you please first use the 'get_current_time' function to find out the current time in Tokyo, Japan, in the 'Asia/Tokyo' timezone? Then, could you use the same function again to find out the current time in New York, United States, in the 'America/New_York' timezone? After that, could you use the 'get_stock_info' function to retrieve a detailed information about the stock of the company 'Microsoft' in the 'NASDAQ' market? Finally, could you use the same function again to retrieve a summary information about the stock of the company 'Apple' in the 'NASDAQ' market?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "get_stock_info",
+        "description": "Retrieves information about a specific stock based on company's name. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "company_name": {
+              "type": "string",
+              "description": "The name of the company."
+            },
+            "detail_level": {
+              "type": "string",
+              "description": "Level of detail for stock information. Can be 'summary' or 'detailed'."
+            },
+            "market": {
+              "type": "string",
+              "description": "The stock market of interest. Default is 'NASDAQ'"
+            }
+          },
+          "required": [
+            "company_name",
+            "detail_level"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "get_current_time",
+        "description": "Retrieve the current time in a specific time zone. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The name of the city."
+            },
+            "country": {
+              "type": "string",
+              "description": "The name of the country."
+            },
+            "timezone": {
+              "type": "string",
+              "description": "The optional timezone to get current time. Default is 'UTC'."
+            }
+          },
+          "required": [
+            "location",
+            "country"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Could you please first use the 'get_current_time' function to find out the current time in Tokyo, Japan, in the 'Asia/Tokyo' timezone? Then, could you use the same function again to find out the current time in New York, United States, in the 'America/New_York' timezone? After that, could you use the 'get_stock_info' function to retrieve a detailed information about the stock of the company 'Microsoft' in the 'NASDAQ' market? Finally, could you use the same function again to retrieve a summary information about the stock of the company 'Apple' in the 'NASDAQ' market?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_stock_info",
+          "description": "Retrieves information about a specific stock based on company's name. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "company_name": {
+                "type": "string",
+                "description": "The name of the company."
+              },
+              "detail_level": {
+                "type": "string",
+                "description": "Level of detail for stock information. Can be 'summary' or 'detailed'."
+              },
+              "market": {
+                "type": "string",
+                "description": "The stock market of interest. Default is 'NASDAQ'"
+              }
+            },
+            "required": [
+              "company_name",
+              "detail_level"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "get_current_time",
+          "description": "Retrieve the current time in a specific time zone. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The name of the city."
+              },
+              "country": {
+                "type": "string",
+                "description": "The name of the country."
+              },
+              "timezone": {
+                "type": "string",
+                "description": "The optional timezone to get current time. Default is 'UTC'."
+              }
+            },
+            "required": [
+              "location",
+              "country"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241944-ryrk2hoxbpAZbMGnm72s",
+    "object": "chat.completion",
+    "created": 1776241944,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_49675410",
+              "function": {
+                "name": "get_current_time",
+                "arguments": "{\"location\":\"Tokyo\",\"country\":\"Japan\",\"timezone\":\"Asia/Tokyo\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_74474227",
+              "function": {
+                "name": "get_current_time",
+                "arguments": "{\"location\":\"New York\",\"country\":\"United States\",\"timezone\":\"America/New_York\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_41420237",
+              "function": {
+                "name": "get_stock_info",
+                "arguments": "{\"company_name\":\"Microsoft\",\"detail_level\":\"detailed\",\"market\":\"NASDAQ\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_21101002",
+              "function": {
+                "name": "get_stock_info",
+                "arguments": "{\"company_name\":\"Apple\",\"detail_level\":\"summary\",\"market\":\"NASDAQ\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 563,
+      "completion_tokens": 167,
+      "total_tokens": 730,
+      "cost": 0.0041453775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00418725,
+        "upstream_inference_prompt_cost": 0.00168225,
+        "upstream_inference_completions_cost": 0.002505
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241944-ryrk2hoxbpAZbMGnm72s",
+    "object": "response",
+    "created_at": 1776241947,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_49675410",
+        "call_id": "call_49675410",
+        "name": "get_current_time",
+        "arguments": "{\"location\":\"Tokyo\",\"country\":\"Japan\",\"timezone\":\"Asia/Tokyo\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_74474227",
+        "call_id": "call_74474227",
+        "name": "get_current_time",
+        "arguments": "{\"location\":\"New York\",\"country\":\"United States\",\"timezone\":\"America/New_York\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_41420237",
+        "call_id": "call_41420237",
+        "name": "get_stock_info",
+        "arguments": "{\"company_name\":\"Microsoft\",\"detail_level\":\"detailed\",\"market\":\"NASDAQ\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_21101002",
+        "call_id": "call_21101002",
+        "name": "get_stock_info",
+        "arguments": "{\"company_name\":\"Apple\",\"detail_level\":\"summary\",\"market\":\"NASDAQ\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 563,
+      "completion_tokens": 167,
+      "total_tokens": 730,
+      "cost": 0.0041453775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00418725,
+        "upstream_inference_prompt_cost": 0.00168225,
+        "upstream_inference_completions_cost": 0.002505
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241944-ryrk2hoxbpAZbMGnm72s",
+    "object": "chat.completion",
+    "created": 1776241944,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_49675410",
+              "function": {
+                "name": "get_current_time",
+                "arguments": "{\"location\":\"Tokyo\",\"country\":\"Japan\",\"timezone\":\"Asia/Tokyo\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_74474227",
+              "function": {
+                "name": "get_current_time",
+                "arguments": "{\"location\":\"New York\",\"country\":\"United States\",\"timezone\":\"America/New_York\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_41420237",
+              "function": {
+                "name": "get_stock_info",
+                "arguments": "{\"company_name\":\"Microsoft\",\"detail_level\":\"detailed\",\"market\":\"NASDAQ\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_21101002",
+              "function": {
+                "name": "get_stock_info",
+                "arguments": "{\"company_name\":\"Apple\",\"detail_level\":\"summary\",\"market\":\"NASDAQ\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 563,
+      "completion_tokens": 167,
+      "total_tokens": 730,
+      "cost": 0.0041453775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00418725,
+        "upstream_inference_prompt_cost": 0.00168225,
+        "upstream_inference_completions_cost": 0.002505
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 3486.586,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "9c657c8e-989b-4da4-aaff-5c85ed27acb4"
+}

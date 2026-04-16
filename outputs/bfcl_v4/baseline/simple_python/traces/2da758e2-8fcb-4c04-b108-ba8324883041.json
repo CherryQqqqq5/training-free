@@ -1,0 +1,248 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find the highest score achieved by any player in the online game 'Overwatch' on PC globally."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "game_score_highest",
+        "description": "Retrieve the highest score achieved by any player in a specific game. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "game": {
+              "type": "string",
+              "description": "The name of the online game."
+            },
+            "platform": {
+              "type": "string",
+              "description": "The platform where the game is played, e.g. PC, Xbox, Playstation"
+            },
+            "region": {
+              "type": "string",
+              "description": "The geographic region of the player. Defaults to 'Global'"
+            }
+          },
+          "required": [
+            "game",
+            "platform"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find the highest score achieved by any player in the online game 'Overwatch' on PC globally."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "game_score_highest",
+          "description": "Retrieve the highest score achieved by any player in a specific game. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "game": {
+                "type": "string",
+                "description": "The name of the online game."
+              },
+              "platform": {
+                "type": "string",
+                "description": "The platform where the game is played, e.g. PC, Xbox, Playstation"
+              },
+              "region": {
+                "type": "string",
+                "description": "The geographic region of the player. Defaults to 'Global'"
+              }
+            },
+            "required": [
+              "game",
+              "platform"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776238373-BMfSRKyfmmuhIWTQyNax",
+    "object": "chat.completion",
+    "created": 1776238373,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_29742112",
+              "function": {
+                "name": "game_score_highest",
+                "arguments": "{\"game\":\"Overwatch\",\"platform\":\"PC\",\"region\":\"Global\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 350,
+      "completion_tokens": 41,
+      "total_tokens": 391,
+      "cost": 0.001180575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0011925,
+        "upstream_inference_prompt_cost": 0.0005775,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776238373-BMfSRKyfmmuhIWTQyNax",
+    "object": "response",
+    "created_at": 1776238375,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_29742112",
+        "call_id": "call_29742112",
+        "name": "game_score_highest",
+        "arguments": "{\"game\":\"Overwatch\",\"platform\":\"PC\",\"region\":\"Global\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 350,
+      "completion_tokens": 41,
+      "total_tokens": 391,
+      "cost": 0.001180575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0011925,
+        "upstream_inference_prompt_cost": 0.0005775,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776238373-BMfSRKyfmmuhIWTQyNax",
+    "object": "chat.completion",
+    "created": 1776238373,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_29742112",
+              "function": {
+                "name": "game_score_highest",
+                "arguments": "{\"game\":\"Overwatch\",\"platform\":\"PC\",\"region\":\"Global\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 350,
+      "completion_tokens": 41,
+      "total_tokens": 391,
+      "cost": 0.001180575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0011925,
+        "upstream_inference_prompt_cost": 0.0005775,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2171.353,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "2da758e2-8fcb-4c04-b108-ba8324883041"
+}

@@ -1,0 +1,424 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find the grocery store closest to Berkeley that has at least a 4.5 star rating, selling tomatoes and also pet food."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "sentiment_analysis",
+        "description": "Perform sentiment analysis on a given piece of text. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "description": "The text on which to perform sentiment analysis."
+            },
+            "language": {
+              "type": "string",
+              "description": "The language in which the text is written."
+            }
+          },
+          "required": [
+            "text",
+            "language"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "psych_research_get_preference",
+        "description": "Gathers research data on public preference between two options, based on societal category. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "category": {
+              "type": "string",
+              "description": "The societal category the preference data is about. E.g. reading, transportation, food"
+            },
+            "option_one": {
+              "type": "string",
+              "description": "The first option people could prefer."
+            },
+            "option_two": {
+              "type": "string",
+              "description": "The second option people could prefer."
+            },
+            "demographic": {
+              "type": "string",
+              "description": "Specific demographic of society to narrow down the research.",
+              "default": "all"
+            }
+          },
+          "required": [
+            "category",
+            "option_one",
+            "option_two"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "grocery_store_find_best",
+        "description": "Find the closest high-rated grocery stores based on certain product availability. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "my_location": {
+              "type": "string",
+              "description": "The current location of the user."
+            },
+            "rating": {
+              "type": "number",
+              "description": "The minimum required store rating. Default is 0.0. This is a float type value.",
+              "format": "float"
+            },
+            "products": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Required products in a list."
+            }
+          },
+          "required": [
+            "my_location",
+            "products"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "train_random_forest_classifier",
+        "description": "Train a Random Forest classifier with the specified parameters. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "dataset": {
+              "type": "string",
+              "description": "The dataset to train the classifier on."
+            },
+            "max_depth": {
+              "type": "integer",
+              "description": "The maximum depth of the trees in the forest."
+            },
+            "n_estimators": {
+              "type": "integer",
+              "description": "The number of trees in the forest."
+            }
+          },
+          "required": [
+            "dataset",
+            "max_depth",
+            "n_estimators"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find the grocery store closest to Berkeley that has at least a 4.5 star rating, selling tomatoes and also pet food."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "sentiment_analysis",
+          "description": "Perform sentiment analysis on a given piece of text. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "description": "The text on which to perform sentiment analysis."
+              },
+              "language": {
+                "type": "string",
+                "description": "The language in which the text is written."
+              }
+            },
+            "required": [
+              "text",
+              "language"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "psych_research_get_preference",
+          "description": "Gathers research data on public preference between two options, based on societal category. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "category": {
+                "type": "string",
+                "description": "The societal category the preference data is about. E.g. reading, transportation, food"
+              },
+              "option_one": {
+                "type": "string",
+                "description": "The first option people could prefer."
+              },
+              "option_two": {
+                "type": "string",
+                "description": "The second option people could prefer."
+              },
+              "demographic": {
+                "type": "string",
+                "description": "Specific demographic of society to narrow down the research.",
+                "default": "all"
+              }
+            },
+            "required": [
+              "category",
+              "option_one",
+              "option_two"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "grocery_store_find_best",
+          "description": "Find the closest high-rated grocery stores based on certain product availability. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "my_location": {
+                "type": "string",
+                "description": "The current location of the user."
+              },
+              "rating": {
+                "type": "number",
+                "description": "The minimum required store rating. Default is 0.0. This is a float type value.",
+                "format": "float"
+              },
+              "products": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Required products in a list."
+              }
+            },
+            "required": [
+              "my_location",
+              "products"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "train_random_forest_classifier",
+          "description": "Train a Random Forest classifier with the specified parameters. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "dataset": {
+                "type": "string",
+                "description": "The dataset to train the classifier on."
+              },
+              "max_depth": {
+                "type": "integer",
+                "description": "The maximum depth of the trees in the forest."
+              },
+              "n_estimators": {
+                "type": "integer",
+                "description": "The number of trees in the forest."
+              }
+            },
+            "required": [
+              "dataset",
+              "max_depth",
+              "n_estimators"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240361-JSBk83d65UCYFOSJWsZ9",
+    "object": "chat.completion",
+    "created": 1776240361,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_12982009",
+              "function": {
+                "name": "grocery_store_find_best",
+                "arguments": "{\"my_location\":\"Berkeley\",\"rating\":4.5,\"products\":[\"tomatoes\",\"pet food\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 707,
+      "completion_tokens": 49,
+      "total_tokens": 756,
+      "cost": 0.0023618925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00238575,
+        "upstream_inference_prompt_cost": 0.00165075,
+        "upstream_inference_completions_cost": 0.000735
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240361-JSBk83d65UCYFOSJWsZ9",
+    "object": "response",
+    "created_at": 1776240362,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_12982009",
+        "call_id": "call_12982009",
+        "name": "grocery_store_find_best",
+        "arguments": "{\"my_location\":\"Berkeley\",\"rating\":4.5,\"products\":[\"tomatoes\",\"pet food\"]}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 707,
+      "completion_tokens": 49,
+      "total_tokens": 756,
+      "cost": 0.0023618925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00238575,
+        "upstream_inference_prompt_cost": 0.00165075,
+        "upstream_inference_completions_cost": 0.000735
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240361-JSBk83d65UCYFOSJWsZ9",
+    "object": "chat.completion",
+    "created": 1776240361,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_12982009",
+              "function": {
+                "name": "grocery_store_find_best",
+                "arguments": "{\"my_location\":\"Berkeley\",\"rating\":4.5,\"products\":[\"tomatoes\",\"pet food\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 707,
+      "completion_tokens": 49,
+      "total_tokens": 756,
+      "cost": 0.0023618925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00238575,
+        "upstream_inference_prompt_cost": 0.00165075,
+        "upstream_inference_completions_cost": 0.000735
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1735.686,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "a22c5191-4544-4ddc-b75f-1dc7145c4331"
+}

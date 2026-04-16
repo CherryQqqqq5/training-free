@@ -1,0 +1,424 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Can you help me with the following tasks? First, I want to find the closest high-rated grocery stores from my location at '123 Main Street, New York' that have 'milk', 'bread', and 'eggs' in stock. The store should have a minimum rating of 4.5. Second, I am interested in knowing more about the sculpture titled 'The Thinker' made by the artist 'Auguste Rodin'. I specifically want to know about its 'material'. Lastly, I drove my car, which uses 'diesel' as fuel and has a fuel efficiency of 25 miles per gallon, for a total distance of 12000 miles last year. Can you calculate the annual carbon dioxide emissions produced by my vehicle? Also, consider a 2% decrease in fuel efficiency per year.\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "grocery_store_find_best",
+        "description": "Find the closest high-rated grocery stores based on certain product availability. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "my_location": {
+              "type": "string",
+              "description": "The current location of the user."
+            },
+            "rating": {
+              "type": "number",
+              "description": "The minimum required store rating. Default is 5.0. This is a float type value.",
+              "format": "float"
+            },
+            "products": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Required products in a list."
+            }
+          },
+          "required": [
+            "my_location",
+            "products"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "calculate_emissions",
+        "description": "Calculates the annual carbon dioxide emissions produced by a vehicle based on the distance traveled, the fuel type and the fuel efficiency of the vehicle. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "distance": {
+              "type": "integer",
+              "description": "The distance travelled in miles."
+            },
+            "fuel_type": {
+              "type": "string",
+              "description": "Type of fuel used by the vehicle."
+            },
+            "fuel_efficiency": {
+              "type": "integer",
+              "description": "The vehicle's fuel efficiency in miles per gallon."
+            },
+            "efficiency_reduction": {
+              "type": "integer",
+              "description": "The percentage decrease in fuel efficiency per year (optional). Default is 0"
+            }
+          },
+          "required": [
+            "distance",
+            "fuel_type",
+            "fuel_efficiency"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "sculpture_get_details",
+        "description": "Retrieve details of a sculpture based on the artist and the title of the sculpture. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "artist": {
+              "type": "string",
+              "description": "The artist who made the sculpture."
+            },
+            "title": {
+              "type": "string",
+              "description": "The title of the sculpture."
+            },
+            "detail": {
+              "type": "string",
+              "description": "The specific detail wanted about the sculpture. Default is 'general information'."
+            }
+          },
+          "required": [
+            "artist",
+            "title"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Can you help me with the following tasks? First, I want to find the closest high-rated grocery stores from my location at '123 Main Street, New York' that have 'milk', 'bread', and 'eggs' in stock. The store should have a minimum rating of 4.5. Second, I am interested in knowing more about the sculpture titled 'The Thinker' made by the artist 'Auguste Rodin'. I specifically want to know about its 'material'. Lastly, I drove my car, which uses 'diesel' as fuel and has a fuel efficiency of 25 miles per gallon, for a total distance of 12000 miles last year. Can you calculate the annual carbon dioxide emissions produced by my vehicle? Also, consider a 2% decrease in fuel efficiency per year.\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "grocery_store_find_best",
+          "description": "Find the closest high-rated grocery stores based on certain product availability. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "my_location": {
+                "type": "string",
+                "description": "The current location of the user."
+              },
+              "rating": {
+                "type": "number",
+                "description": "The minimum required store rating. Default is 5.0. This is a float type value.",
+                "format": "float"
+              },
+              "products": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Required products in a list."
+              }
+            },
+            "required": [
+              "my_location",
+              "products"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_emissions",
+          "description": "Calculates the annual carbon dioxide emissions produced by a vehicle based on the distance traveled, the fuel type and the fuel efficiency of the vehicle. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "distance": {
+                "type": "integer",
+                "description": "The distance travelled in miles."
+              },
+              "fuel_type": {
+                "type": "string",
+                "description": "Type of fuel used by the vehicle."
+              },
+              "fuel_efficiency": {
+                "type": "integer",
+                "description": "The vehicle's fuel efficiency in miles per gallon."
+              },
+              "efficiency_reduction": {
+                "type": "integer",
+                "description": "The percentage decrease in fuel efficiency per year (optional). Default is 0"
+              }
+            },
+            "required": [
+              "distance",
+              "fuel_type",
+              "fuel_efficiency"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "sculpture_get_details",
+          "description": "Retrieve details of a sculpture based on the artist and the title of the sculpture. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "artist": {
+                "type": "string",
+                "description": "The artist who made the sculpture."
+              },
+              "title": {
+                "type": "string",
+                "description": "The title of the sculpture."
+              },
+              "detail": {
+                "type": "string",
+                "description": "The specific detail wanted about the sculpture. Default is 'general information'."
+              }
+            },
+            "required": [
+              "artist",
+              "title"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241164-O3Mr6cVbeX9mTPGdU7z2",
+    "object": "chat.completion",
+    "created": 1776241164,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_17998816",
+              "function": {
+                "name": "grocery_store_find_best",
+                "arguments": "{\"my_location\":\"123 Main Street, New York\",\"rating\":4.5,\"products\":[\"milk\",\"bread\",\"eggs\"]}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_09852459",
+              "function": {
+                "name": "sculpture_get_details",
+                "arguments": "{\"artist\":\"Auguste Rodin\",\"title\":\"The Thinker\",\"detail\":\"material\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_33149932",
+              "function": {
+                "name": "calculate_emissions",
+                "arguments": "{\"distance\":12000,\"fuel_type\":\"diesel\",\"fuel_efficiency\":25,\"efficiency_reduction\":2}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 771,
+      "completion_tokens": 153,
+      "total_tokens": 924,
+      "cost": 0.0040963725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00413775,
+        "upstream_inference_prompt_cost": 0.00184275,
+        "upstream_inference_completions_cost": 0.002295
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241164-O3Mr6cVbeX9mTPGdU7z2",
+    "object": "response",
+    "created_at": 1776241168,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_17998816",
+        "call_id": "call_17998816",
+        "name": "grocery_store_find_best",
+        "arguments": "{\"my_location\":\"123 Main Street, New York\",\"rating\":4.5,\"products\":[\"milk\",\"bread\",\"eggs\"]}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_09852459",
+        "call_id": "call_09852459",
+        "name": "sculpture_get_details",
+        "arguments": "{\"artist\":\"Auguste Rodin\",\"title\":\"The Thinker\",\"detail\":\"material\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_33149932",
+        "call_id": "call_33149932",
+        "name": "calculate_emissions",
+        "arguments": "{\"distance\":12000,\"fuel_type\":\"diesel\",\"fuel_efficiency\":25,\"efficiency_reduction\":2}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 771,
+      "completion_tokens": 153,
+      "total_tokens": 924,
+      "cost": 0.0040963725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00413775,
+        "upstream_inference_prompt_cost": 0.00184275,
+        "upstream_inference_completions_cost": 0.002295
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241164-O3Mr6cVbeX9mTPGdU7z2",
+    "object": "chat.completion",
+    "created": 1776241164,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_17998816",
+              "function": {
+                "name": "grocery_store_find_best",
+                "arguments": "{\"my_location\":\"123 Main Street, New York\",\"rating\":4.5,\"products\":[\"milk\",\"bread\",\"eggs\"]}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_09852459",
+              "function": {
+                "name": "sculpture_get_details",
+                "arguments": "{\"artist\":\"Auguste Rodin\",\"title\":\"The Thinker\",\"detail\":\"material\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_33149932",
+              "function": {
+                "name": "calculate_emissions",
+                "arguments": "{\"distance\":12000,\"fuel_type\":\"diesel\",\"fuel_efficiency\":25,\"efficiency_reduction\":2}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 771,
+      "completion_tokens": 153,
+      "total_tokens": 924,
+      "cost": 0.0040963725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00413775,
+        "upstream_inference_prompt_cost": 0.00184275,
+        "upstream_inference_completions_cost": 0.002295
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 3798.848,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "6dac1e4c-d46b-47a1-b95b-381197df817b"
+}

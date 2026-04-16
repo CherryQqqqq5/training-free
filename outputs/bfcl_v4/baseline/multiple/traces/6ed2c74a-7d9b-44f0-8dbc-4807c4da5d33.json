@@ -1,0 +1,344 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "How many calories in the Beef Lasagna Recipe from Foodnetwork.com?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "get_stock_price",
+        "description": "Retrieves the current stock price of the specified companies Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "company_names": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "The list of companies for which to retrieve the stock price."
+            }
+          },
+          "required": [
+            "company_names"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "get_team_ranking",
+        "description": "Retrieve the FIFA ranking of a specific soccer team for a certain year. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "team_name": {
+              "type": "string",
+              "description": "The name of the soccer team."
+            },
+            "year": {
+              "type": "integer",
+              "description": "The year for which the ranking is to be retrieved."
+            },
+            "gender": {
+              "type": "string",
+              "description": "The gender of the team. It can be either 'men' or 'women'. Default is 'men'."
+            }
+          },
+          "required": [
+            "team_name",
+            "year"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "recipe_info_get_calories",
+        "description": "Retrieve the amount of calories from a specific recipe in a food website. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "website": {
+              "type": "string",
+              "description": "The food website that has the recipe."
+            },
+            "recipe": {
+              "type": "string",
+              "description": "Name of the recipe."
+            },
+            "optional_meal_time": {
+              "type": "string",
+              "description": "Specific meal time of the day for the recipe (optional, could be 'Breakfast', 'Lunch', 'Dinner') Default is ''"
+            }
+          },
+          "required": [
+            "website",
+            "recipe"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "How many calories in the Beef Lasagna Recipe from Foodnetwork.com?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_stock_price",
+          "description": "Retrieves the current stock price of the specified companies Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "company_names": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "The list of companies for which to retrieve the stock price."
+              }
+            },
+            "required": [
+              "company_names"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "get_team_ranking",
+          "description": "Retrieve the FIFA ranking of a specific soccer team for a certain year. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "team_name": {
+                "type": "string",
+                "description": "The name of the soccer team."
+              },
+              "year": {
+                "type": "integer",
+                "description": "The year for which the ranking is to be retrieved."
+              },
+              "gender": {
+                "type": "string",
+                "description": "The gender of the team. It can be either 'men' or 'women'. Default is 'men'."
+              }
+            },
+            "required": [
+              "team_name",
+              "year"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "recipe_info_get_calories",
+          "description": "Retrieve the amount of calories from a specific recipe in a food website. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "website": {
+                "type": "string",
+                "description": "The food website that has the recipe."
+              },
+              "recipe": {
+                "type": "string",
+                "description": "Name of the recipe."
+              },
+              "optional_meal_time": {
+                "type": "string",
+                "description": "Specific meal time of the day for the recipe (optional, could be 'Breakfast', 'Lunch', 'Dinner') Default is ''"
+              }
+            },
+            "required": [
+              "website",
+              "recipe"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239870-m5ZHJSbA5zMI3xxQgfAl",
+    "object": "chat.completion",
+    "created": 1776239870,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_04867168",
+              "function": {
+                "name": "recipe_info_get_calories",
+                "arguments": "{\"website\":\"Foodnetwork.com\",\"recipe\":\"Beef Lasagna\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 555,
+      "completion_tokens": 40,
+      "total_tokens": 595,
+      "cost": 0.0017768025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00179475,
+        "upstream_inference_prompt_cost": 0.00119475,
+        "upstream_inference_completions_cost": 0.0006
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239870-m5ZHJSbA5zMI3xxQgfAl",
+    "object": "response",
+    "created_at": 1776239872,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_04867168",
+        "call_id": "call_04867168",
+        "name": "recipe_info_get_calories",
+        "arguments": "{\"website\":\"Foodnetwork.com\",\"recipe\":\"Beef Lasagna\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 555,
+      "completion_tokens": 40,
+      "total_tokens": 595,
+      "cost": 0.0017768025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00179475,
+        "upstream_inference_prompt_cost": 0.00119475,
+        "upstream_inference_completions_cost": 0.0006
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239870-m5ZHJSbA5zMI3xxQgfAl",
+    "object": "chat.completion",
+    "created": 1776239870,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_04867168",
+              "function": {
+                "name": "recipe_info_get_calories",
+                "arguments": "{\"website\":\"Foodnetwork.com\",\"recipe\":\"Beef Lasagna\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 555,
+      "completion_tokens": 40,
+      "total_tokens": 595,
+      "cost": 0.0017768025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00179475,
+        "upstream_inference_prompt_cost": 0.00119475,
+        "upstream_inference_completions_cost": 0.0006
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2076.242,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "6ed2c74a-7d9b-44f0-8dbc-4807c4da5d33"
+}

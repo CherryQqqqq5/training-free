@@ -1,0 +1,381 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Can you help me plan a trip? I would like to first find the shortest path from my home in New York City to the Metropolitan Museum of Art by walking. Then, I want to estimate how long it will take to walk this route. After visiting the museum, I plan to bike to Central Park. Could you find the shortest path for this bike trip? And finally, I would like to know how long it would take to bike this route.\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "maps_shortest_path",
+        "description": "Find the shortest path from one location to another by using a specific mode of transportation. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "start_location": {
+              "type": "string",
+              "description": "The name or coordinates of the start location."
+            },
+            "end_location": {
+              "type": "string",
+              "description": "The name or coordinates of the end location."
+            },
+            "mode": {
+              "type": "string",
+              "description": "The mode of transportation (walk, bike, transit, drive).",
+              "default": "walk"
+            }
+          },
+          "required": [
+            "start_location",
+            "end_location"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "maps_route_times",
+        "description": "Estimates the time it will take to travel from one location to another by a specific mode of transportation. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "route": {
+              "type": "string",
+              "description": "The string representation of the route.  Format is location 1 to location 2"
+            },
+            "mode": {
+              "type": "string",
+              "description": "The mode of transportation (walk, bike, transit, drive).",
+              "default": "walk"
+            }
+          },
+          "required": [
+            "route"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Can you help me plan a trip? I would like to first find the shortest path from my home in New York City to the Metropolitan Museum of Art by walking. Then, I want to estimate how long it will take to walk this route. After visiting the museum, I plan to bike to Central Park. Could you find the shortest path for this bike trip? And finally, I would like to know how long it would take to bike this route.\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "maps_shortest_path",
+          "description": "Find the shortest path from one location to another by using a specific mode of transportation. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "start_location": {
+                "type": "string",
+                "description": "The name or coordinates of the start location."
+              },
+              "end_location": {
+                "type": "string",
+                "description": "The name or coordinates of the end location."
+              },
+              "mode": {
+                "type": "string",
+                "description": "The mode of transportation (walk, bike, transit, drive).",
+                "default": "walk"
+              }
+            },
+            "required": [
+              "start_location",
+              "end_location"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "maps_route_times",
+          "description": "Estimates the time it will take to travel from one location to another by a specific mode of transportation. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "route": {
+                "type": "string",
+                "description": "The string representation of the route.  Format is location 1 to location 2"
+              },
+              "mode": {
+                "type": "string",
+                "description": "The mode of transportation (walk, bike, transit, drive).",
+                "default": "walk"
+              }
+            },
+            "required": [
+              "route"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240735-0jk1qSGUhjLCUWZf2OPQ",
+    "object": "chat.completion",
+    "created": 1776240735,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'd be happy to help you plan your trip. Let's break this down step by step.\n\nFirst, I'll find the shortest path from your home in New York City to the Metropolitan Museum of Art by walking.\n\nNext, I'll estimate the time it will take to walk this route.\n\nThen, I'll find the shortest path from the Metropolitan Museum of Art to Central Park by biking.\n\nFinally, I'll estimate the time it will take to bike this route.\n\nOnce I have the results from these function calls, I'll provide you with the complete details of your trip itinerary.",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_73716589",
+              "function": {
+                "name": "maps_shortest_path",
+                "arguments": "{\"start_location\":\"New York City\",\"end_location\":\"Metropolitan Museum of Art\",\"mode\":\"walk\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_62213897",
+              "function": {
+                "name": "maps_route_times",
+                "arguments": "{\"route\":\"New York City to Metropolitan Museum of Art\",\"mode\":\"walk\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_85226361",
+              "function": {
+                "name": "maps_shortest_path",
+                "arguments": "{\"start_location\":\"Metropolitan Museum of Art\",\"end_location\":\"Central Park\",\"mode\":\"bike\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_93113139",
+              "function": {
+                "name": "maps_route_times",
+                "arguments": "{\"route\":\"Metropolitan Museum of Art to Central Park\",\"mode\":\"bike\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 541,
+      "completion_tokens": 285,
+      "total_tokens": 826,
+      "cost": 0.0053734725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00542775,
+        "upstream_inference_prompt_cost": 0.00115275,
+        "upstream_inference_completions_cost": 0.004275
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240735-0jk1qSGUhjLCUWZf2OPQ",
+    "object": "response",
+    "created_at": 1776240739,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'd be happy to help you plan your trip. Let's break this down step by step.\n\nFirst, I'll find the shortest path from your home in New York City to the Metropolitan Museum of Art by walking.\n\nNext, I'll estimate the time it will take to walk this route.\n\nThen, I'll find the shortest path from the Metropolitan Museum of Art to Central Park by biking.\n\nFinally, I'll estimate the time it will take to bike this route.\n\nOnce I have the results from these function calls, I'll provide you with the complete details of your trip itinerary."
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_73716589",
+        "call_id": "call_73716589",
+        "name": "maps_shortest_path",
+        "arguments": "{\"start_location\":\"New York City\",\"end_location\":\"Metropolitan Museum of Art\",\"mode\":\"walk\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_62213897",
+        "call_id": "call_62213897",
+        "name": "maps_route_times",
+        "arguments": "{\"route\":\"New York City to Metropolitan Museum of Art\",\"mode\":\"walk\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_85226361",
+        "call_id": "call_85226361",
+        "name": "maps_shortest_path",
+        "arguments": "{\"start_location\":\"Metropolitan Museum of Art\",\"end_location\":\"Central Park\",\"mode\":\"bike\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_93113139",
+        "call_id": "call_93113139",
+        "name": "maps_route_times",
+        "arguments": "{\"route\":\"Metropolitan Museum of Art to Central Park\",\"mode\":\"bike\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 541,
+      "completion_tokens": 285,
+      "total_tokens": 826,
+      "cost": 0.0053734725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00542775,
+        "upstream_inference_prompt_cost": 0.00115275,
+        "upstream_inference_completions_cost": 0.004275
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240735-0jk1qSGUhjLCUWZf2OPQ",
+    "object": "chat.completion",
+    "created": 1776240735,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'd be happy to help you plan your trip. Let's break this down step by step.\n\nFirst, I'll find the shortest path from your home in New York City to the Metropolitan Museum of Art by walking.\n\nNext, I'll estimate the time it will take to walk this route.\n\nThen, I'll find the shortest path from the Metropolitan Museum of Art to Central Park by biking.\n\nFinally, I'll estimate the time it will take to bike this route.\n\nOnce I have the results from these function calls, I'll provide you with the complete details of your trip itinerary.",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_73716589",
+              "function": {
+                "name": "maps_shortest_path",
+                "arguments": "{\"start_location\":\"New York City\",\"end_location\":\"Metropolitan Museum of Art\",\"mode\":\"walk\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_62213897",
+              "function": {
+                "name": "maps_route_times",
+                "arguments": "{\"route\":\"New York City to Metropolitan Museum of Art\",\"mode\":\"walk\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_85226361",
+              "function": {
+                "name": "maps_shortest_path",
+                "arguments": "{\"start_location\":\"Metropolitan Museum of Art\",\"end_location\":\"Central Park\",\"mode\":\"bike\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_93113139",
+              "function": {
+                "name": "maps_route_times",
+                "arguments": "{\"route\":\"Metropolitan Museum of Art to Central Park\",\"mode\":\"bike\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 541,
+      "completion_tokens": 285,
+      "total_tokens": 826,
+      "cost": 0.0053734725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00542775,
+        "upstream_inference_prompt_cost": 0.00115275,
+        "upstream_inference_completions_cost": 0.004275
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 4101.84,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "33aa573f-02d1-4605-8a78-76a65a764765"
+}

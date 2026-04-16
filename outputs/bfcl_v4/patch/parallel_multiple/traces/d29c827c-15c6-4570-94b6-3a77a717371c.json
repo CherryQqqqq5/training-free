@@ -1,0 +1,455 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Could you please help me with the following tasks? First, I would like to know the elevation and area of the Yellowstone National Park. Second, I am considering investing $5000 in a stock that has an expected annual growth rate of 7%. I plan to hold the stock for 10 years and I would like to know the projected return of this investment, taking into account potential dividends. Third, I need to fetch detailed information about a legal case with the ID 'LC12345'. Lastly, I would also like to know the location and the year when the Yosemite National Park was established.\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_stock_return",
+        "description": "Calculate the projected return of a stock investment given the investment amount, the annual growth rate and holding period in years. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "investment_amount": {
+              "type": "integer",
+              "description": "The amount of money to invest."
+            },
+            "annual_growth_rate": {
+              "type": "number",
+              "description": "The expected annual growth rate of the stock. This is a float type value.",
+              "format": "float"
+            },
+            "holding_period": {
+              "type": "integer",
+              "description": "The number of years you intend to hold the stock."
+            },
+            "dividends": {
+              "type": "boolean",
+              "description": "Optional. True if the calculation should take into account potential dividends. Default is false."
+            }
+          },
+          "required": [
+            "investment_amount",
+            "annual_growth_rate",
+            "holding_period"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "park_information",
+        "description": "Retrieve the basic information such as elevation and area of a national park. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "park_name": {
+              "type": "string",
+              "description": "The name of the national park."
+            },
+            "information": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Elevation",
+                  "Area",
+                  "Location",
+                  "Established Year"
+                ]
+              },
+              "description": "The type of information you want about the park."
+            }
+          },
+          "required": [
+            "park_name",
+            "information"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "legal_case_fetch",
+        "description": "Fetch detailed legal case information from database. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "case_id": {
+              "type": "string",
+              "description": "The ID of the legal case."
+            },
+            "details": {
+              "type": "boolean",
+              "description": "True if need the detail info. Default is false."
+            }
+          },
+          "required": [
+            "case_id",
+            "details"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Could you please help me with the following tasks? First, I would like to know the elevation and area of the Yellowstone National Park. Second, I am considering investing $5000 in a stock that has an expected annual growth rate of 7%. I plan to hold the stock for 10 years and I would like to know the projected return of this investment, taking into account potential dividends. Third, I need to fetch detailed information about a legal case with the ID 'LC12345'. Lastly, I would also like to know the location and the year when the Yosemite National Park was established.\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_stock_return",
+          "description": "Calculate the projected return of a stock investment given the investment amount, the annual growth rate and holding period in years. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "investment_amount": {
+                "type": "integer",
+                "description": "The amount of money to invest."
+              },
+              "annual_growth_rate": {
+                "type": "number",
+                "description": "The expected annual growth rate of the stock. This is a float type value.",
+                "format": "float"
+              },
+              "holding_period": {
+                "type": "integer",
+                "description": "The number of years you intend to hold the stock."
+              },
+              "dividends": {
+                "type": "boolean",
+                "description": "Optional. True if the calculation should take into account potential dividends. Default is false."
+              }
+            },
+            "required": [
+              "investment_amount",
+              "annual_growth_rate",
+              "holding_period"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "park_information",
+          "description": "Retrieve the basic information such as elevation and area of a national park. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "park_name": {
+                "type": "string",
+                "description": "The name of the national park."
+              },
+              "information": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "Elevation",
+                    "Area",
+                    "Location",
+                    "Established Year"
+                  ]
+                },
+                "description": "The type of information you want about the park."
+              }
+            },
+            "required": [
+              "park_name",
+              "information"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "legal_case_fetch",
+          "description": "Fetch detailed legal case information from database. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "case_id": {
+                "type": "string",
+                "description": "The ID of the legal case."
+              },
+              "details": {
+                "type": "boolean",
+                "description": "True if need the detail info. Default is false."
+              }
+            },
+            "required": [
+              "case_id",
+              "details"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241914-7xFa2KzP1yAPnHdXgcFm",
+    "object": "chat.completion",
+    "created": 1776241914,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to assist with all of your requests. Let's address each one systematically by calling the necessary functions.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_87574474",
+              "function": {
+                "name": "park_information",
+                "arguments": "{\"park_name\":\"Yellowstone National Park\",\"information\":[\"Elevation\",\"Area\"]}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_38851131",
+              "function": {
+                "name": "calculate_stock_return",
+                "arguments": "{\"investment_amount\":5000,\"annual_growth_rate\":0.07,\"holding_period\":10,\"dividends\":true}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_78246389",
+              "function": {
+                "name": "legal_case_fetch",
+                "arguments": "{\"case_id\":\"LC12345\",\"details\":true}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_42828337",
+              "function": {
+                "name": "park_information",
+                "arguments": "{\"park_name\":\"Yosemite National Park\",\"information\":[\"Location\",\"Established Year\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 692,
+      "completion_tokens": 185,
+      "total_tokens": 877,
+      "cost": 0.0043369425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00438075,
+        "upstream_inference_prompt_cost": 0.00160575,
+        "upstream_inference_completions_cost": 0.002775
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241914-7xFa2KzP1yAPnHdXgcFm",
+    "object": "response",
+    "created_at": 1776241917,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'm happy to assist with all of your requests. Let's address each one systematically by calling the necessary functions.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_87574474",
+        "call_id": "call_87574474",
+        "name": "park_information",
+        "arguments": "{\"park_name\":\"Yellowstone National Park\",\"information\":[\"Elevation\",\"Area\"]}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_38851131",
+        "call_id": "call_38851131",
+        "name": "calculate_stock_return",
+        "arguments": "{\"investment_amount\":5000,\"annual_growth_rate\":0.07,\"holding_period\":10,\"dividends\":true}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_78246389",
+        "call_id": "call_78246389",
+        "name": "legal_case_fetch",
+        "arguments": "{\"case_id\":\"LC12345\",\"details\":true}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_42828337",
+        "call_id": "call_42828337",
+        "name": "park_information",
+        "arguments": "{\"park_name\":\"Yosemite National Park\",\"information\":[\"Location\",\"Established Year\"]}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 692,
+      "completion_tokens": 185,
+      "total_tokens": 877,
+      "cost": 0.0043369425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00438075,
+        "upstream_inference_prompt_cost": 0.00160575,
+        "upstream_inference_completions_cost": 0.002775
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241914-7xFa2KzP1yAPnHdXgcFm",
+    "object": "chat.completion",
+    "created": 1776241914,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to assist with all of your requests. Let's address each one systematically by calling the necessary functions.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_87574474",
+              "function": {
+                "name": "park_information",
+                "arguments": "{\"park_name\":\"Yellowstone National Park\",\"information\":[\"Elevation\",\"Area\"]}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_38851131",
+              "function": {
+                "name": "calculate_stock_return",
+                "arguments": "{\"investment_amount\":5000,\"annual_growth_rate\":0.07,\"holding_period\":10,\"dividends\":true}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_78246389",
+              "function": {
+                "name": "legal_case_fetch",
+                "arguments": "{\"case_id\":\"LC12345\",\"details\":true}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_42828337",
+              "function": {
+                "name": "park_information",
+                "arguments": "{\"park_name\":\"Yosemite National Park\",\"information\":[\"Location\",\"Established Year\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 692,
+      "completion_tokens": 185,
+      "total_tokens": 877,
+      "cost": 0.0043369425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00438075,
+        "upstream_inference_prompt_cost": 0.00160575,
+        "upstream_inference_completions_cost": 0.002775
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 4177.717,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "d29c827c-15c6-4570-94b6-3a77a717371c"
+}

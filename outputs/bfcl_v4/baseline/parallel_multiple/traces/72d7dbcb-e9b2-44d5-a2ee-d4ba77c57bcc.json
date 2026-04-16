@@ -1,0 +1,326 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "What is the current time in Beijing and Tokyo and what's the time difference between two cities?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "time_zones_get_current_time",
+        "description": "Retrieve current time for the specified location Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city that you want to get the current time for."
+            }
+          },
+          "required": [
+            "location"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "time_zones_get_time_difference",
+        "description": "Retrieve the time difference between two cities Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "city_1": {
+              "type": "string",
+              "description": "First city for calculating the time difference."
+            },
+            "city_2": {
+              "type": "string",
+              "description": "Second city for calculating the time difference."
+            }
+          },
+          "required": [
+            "city_1",
+            "city_2"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What is the current time in Beijing and Tokyo and what's the time difference between two cities?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "time_zones_get_current_time",
+          "description": "Retrieve current time for the specified location Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city that you want to get the current time for."
+              }
+            },
+            "required": [
+              "location"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "time_zones_get_time_difference",
+          "description": "Retrieve the time difference between two cities Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "city_1": {
+                "type": "string",
+                "description": "First city for calculating the time difference."
+              },
+              "city_2": {
+                "type": "string",
+                "description": "Second city for calculating the time difference."
+              }
+            },
+            "required": [
+              "city_1",
+              "city_2"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240638-LbNbmMN3cADPVfYf1OzB",
+    "object": "chat.completion",
+    "created": 1776240638,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_44018484",
+              "function": {
+                "name": "time_zones_get_current_time",
+                "arguments": "{\"location\":\"Beijing\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_79895104",
+              "function": {
+                "name": "time_zones_get_current_time",
+                "arguments": "{\"location\":\"Tokyo\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_80142203",
+              "function": {
+                "name": "time_zones_get_time_difference",
+                "arguments": "{\"city_1\":\"Beijing\",\"city_2\":\"Tokyo\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 393,
+      "completion_tokens": 100,
+      "total_tokens": 493,
+      "cost": 0.002184435,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0022065,
+        "upstream_inference_prompt_cost": 0.0007065,
+        "upstream_inference_completions_cost": 0.0015
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240638-LbNbmMN3cADPVfYf1OzB",
+    "object": "response",
+    "created_at": 1776240640,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_44018484",
+        "call_id": "call_44018484",
+        "name": "time_zones_get_current_time",
+        "arguments": "{\"location\":\"Beijing\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_79895104",
+        "call_id": "call_79895104",
+        "name": "time_zones_get_current_time",
+        "arguments": "{\"location\":\"Tokyo\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_80142203",
+        "call_id": "call_80142203",
+        "name": "time_zones_get_time_difference",
+        "arguments": "{\"city_1\":\"Beijing\",\"city_2\":\"Tokyo\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 393,
+      "completion_tokens": 100,
+      "total_tokens": 493,
+      "cost": 0.002184435,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0022065,
+        "upstream_inference_prompt_cost": 0.0007065,
+        "upstream_inference_completions_cost": 0.0015
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240638-LbNbmMN3cADPVfYf1OzB",
+    "object": "chat.completion",
+    "created": 1776240638,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_44018484",
+              "function": {
+                "name": "time_zones_get_current_time",
+                "arguments": "{\"location\":\"Beijing\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_79895104",
+              "function": {
+                "name": "time_zones_get_current_time",
+                "arguments": "{\"location\":\"Tokyo\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_80142203",
+              "function": {
+                "name": "time_zones_get_time_difference",
+                "arguments": "{\"city_1\":\"Beijing\",\"city_2\":\"Tokyo\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 393,
+      "completion_tokens": 100,
+      "total_tokens": 493,
+      "cost": 0.002184435,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0022065,
+        "upstream_inference_prompt_cost": 0.0007065,
+        "upstream_inference_completions_cost": 0.0015
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2605.739,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "72d7dbcb-e9b2-44d5-a2ee-d4ba77c57bcc"
+}

@@ -1,0 +1,414 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Can you tell me who discovered the Higgs Boson and provide additional details about them, such as their birth date and nationality? Also, I am a 180 lbs, 5'11\" tall individual who is moderately active, can you predict my likelihood of having type 2 diabetes? Lastly, I am planning to visit the Louvre museum in Paris, can you tell me its working hours on Monday?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "get_discoverer",
+        "description": "Get the person or team who made a particular scientific discovery Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "discovery": {
+              "type": "string",
+              "description": "The discovery for which the discoverer's information is needed."
+            },
+            "detail": {
+              "type": "boolean",
+              "description": "Optional flag to get additional details about the discoverer, such as birth date and nationality. Defaults to false."
+            }
+          },
+          "required": [
+            "discovery",
+            "detail"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "museum_working_hours_get",
+        "description": "Get the working hours of a museum in a specific location. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "museum": {
+              "type": "string",
+              "description": "The name of the museum."
+            },
+            "location": {
+              "type": "string",
+              "description": "The location of the museum."
+            },
+            "day": {
+              "type": "string",
+              "description": "Specific day of the week. Optional parameter. Default is 'Monday'."
+            }
+          },
+          "required": [
+            "museum",
+            "location"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "diabetes_prediction",
+        "description": "Predict the likelihood of diabetes type 2 based on a person's weight and height. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "weight": {
+              "type": "integer",
+              "description": "Weight of the person in lbs."
+            },
+            "height": {
+              "type": "integer",
+              "description": "Height of the person in inches."
+            },
+            "activity_level": {
+              "type": "string",
+              "enum": [
+                "sedentary",
+                "lightly active",
+                "moderately active",
+                "very active",
+                "extra active"
+              ],
+              "description": "Physical activity level of the person."
+            }
+          },
+          "required": [
+            "weight",
+            "height",
+            "activity_level"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Can you tell me who discovered the Higgs Boson and provide additional details about them, such as their birth date and nationality? Also, I am a 180 lbs, 5'11\" tall individual who is moderately active, can you predict my likelihood of having type 2 diabetes? Lastly, I am planning to visit the Louvre museum in Paris, can you tell me its working hours on Monday?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_discoverer",
+          "description": "Get the person or team who made a particular scientific discovery Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "discovery": {
+                "type": "string",
+                "description": "The discovery for which the discoverer's information is needed."
+              },
+              "detail": {
+                "type": "boolean",
+                "description": "Optional flag to get additional details about the discoverer, such as birth date and nationality. Defaults to false."
+              }
+            },
+            "required": [
+              "discovery",
+              "detail"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "museum_working_hours_get",
+          "description": "Get the working hours of a museum in a specific location. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "museum": {
+                "type": "string",
+                "description": "The name of the museum."
+              },
+              "location": {
+                "type": "string",
+                "description": "The location of the museum."
+              },
+              "day": {
+                "type": "string",
+                "description": "Specific day of the week. Optional parameter. Default is 'Monday'."
+              }
+            },
+            "required": [
+              "museum",
+              "location"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "diabetes_prediction",
+          "description": "Predict the likelihood of diabetes type 2 based on a person's weight and height. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "weight": {
+                "type": "integer",
+                "description": "Weight of the person in lbs."
+              },
+              "height": {
+                "type": "integer",
+                "description": "Height of the person in inches."
+              },
+              "activity_level": {
+                "type": "string",
+                "enum": [
+                  "sedentary",
+                  "lightly active",
+                  "moderately active",
+                  "very active",
+                  "extra active"
+                ],
+                "description": "Physical activity level of the person."
+              }
+            },
+            "required": [
+              "weight",
+              "height",
+              "activity_level"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241965-BGYl8BvOjUUrFBWWe6HM",
+    "object": "chat.completion",
+    "created": 1776241965,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_67023893",
+              "function": {
+                "name": "get_discoverer",
+                "arguments": "{\"discovery\":\"Higgs Boson\",\"detail\":true}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_63511359",
+              "function": {
+                "name": "diabetes_prediction",
+                "arguments": "{\"weight\":180,\"height\":71,\"activity_level\":\"moderately active\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_39358352",
+              "function": {
+                "name": "museum_working_hours_get",
+                "arguments": "{\"museum\":\"Louvre\",\"location\":\"Paris\",\"day\":\"Monday\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 633,
+      "completion_tokens": 118,
+      "total_tokens": 751,
+      "cost": 0.00222453,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 632,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.002247,
+        "upstream_inference_prompt_cost": 0.000477,
+        "upstream_inference_completions_cost": 0.00177
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241965-BGYl8BvOjUUrFBWWe6HM",
+    "object": "response",
+    "created_at": 1776241967,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_67023893",
+        "call_id": "call_67023893",
+        "name": "get_discoverer",
+        "arguments": "{\"discovery\":\"Higgs Boson\",\"detail\":true}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_63511359",
+        "call_id": "call_63511359",
+        "name": "diabetes_prediction",
+        "arguments": "{\"weight\":180,\"height\":71,\"activity_level\":\"moderately active\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_39358352",
+        "call_id": "call_39358352",
+        "name": "museum_working_hours_get",
+        "arguments": "{\"museum\":\"Louvre\",\"location\":\"Paris\",\"day\":\"Monday\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 633,
+      "completion_tokens": 118,
+      "total_tokens": 751,
+      "cost": 0.00222453,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 632,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.002247,
+        "upstream_inference_prompt_cost": 0.000477,
+        "upstream_inference_completions_cost": 0.00177
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241965-BGYl8BvOjUUrFBWWe6HM",
+    "object": "chat.completion",
+    "created": 1776241965,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_67023893",
+              "function": {
+                "name": "get_discoverer",
+                "arguments": "{\"discovery\":\"Higgs Boson\",\"detail\":true}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_63511359",
+              "function": {
+                "name": "diabetes_prediction",
+                "arguments": "{\"weight\":180,\"height\":71,\"activity_level\":\"moderately active\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_39358352",
+              "function": {
+                "name": "museum_working_hours_get",
+                "arguments": "{\"museum\":\"Louvre\",\"location\":\"Paris\",\"day\":\"Monday\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 633,
+      "completion_tokens": 118,
+      "total_tokens": 751,
+      "cost": 0.00222453,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 632,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.002247,
+        "upstream_inference_prompt_cost": 0.000477,
+        "upstream_inference_completions_cost": 0.00177
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2278.279,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "be2343ef-db49-4088-9faf-58434c2d4b8f"
+}

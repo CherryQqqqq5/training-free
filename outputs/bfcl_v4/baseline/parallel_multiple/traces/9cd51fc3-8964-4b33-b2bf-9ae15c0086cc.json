@@ -1,0 +1,377 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"In the game 'Animal Crossing', I am interested in collecting bugs during the 'Summer' season. Could you help me find out what bugs are available during this time? Also, in the same game, I would like to know what fish can be collected in the 'Winter' season. On a completely different note, I am studying genetics and I came across a SNP mutation with the ID 'rs53576'. Can you tell me what type of mutation this is in the species 'Homo sapiens'? Lastly, I also found another SNP mutation with the ID 'rs1800497'. Could you help me find out what type of mutation this is in the species 'Mus musculus'?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "mutation_type_find",
+        "description": "Finds the type of a genetic mutation based on its SNP (Single Nucleotide Polymorphism) ID. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "snp_id": {
+              "type": "string",
+              "description": "The ID of the Single Nucleotide Polymorphism (SNP) mutation."
+            },
+            "species": {
+              "type": "string",
+              "description": "Species in which the SNP occurs, default is 'Homo sapiens' (Humans)."
+            }
+          },
+          "required": [
+            "snp_id"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "get_collectables_in_season",
+        "description": "Retrieve a list of collectable items in a specific game during a specified season. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "game_name": {
+              "type": "string",
+              "description": "Name of the game."
+            },
+            "season": {
+              "type": "string",
+              "description": "The season for which to retrieve the collectable items."
+            },
+            "item_type": {
+              "type": "string",
+              "description": "The type of item to search for. Default is 'all'. Possible values: 'all', 'bug', 'fish', 'sea creatures', etc."
+            }
+          },
+          "required": [
+            "game_name",
+            "season"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"In the game 'Animal Crossing', I am interested in collecting bugs during the 'Summer' season. Could you help me find out what bugs are available during this time? Also, in the same game, I would like to know what fish can be collected in the 'Winter' season. On a completely different note, I am studying genetics and I came across a SNP mutation with the ID 'rs53576'. Can you tell me what type of mutation this is in the species 'Homo sapiens'? Lastly, I also found another SNP mutation with the ID 'rs1800497'. Could you help me find out what type of mutation this is in the species 'Mus musculus'?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "mutation_type_find",
+          "description": "Finds the type of a genetic mutation based on its SNP (Single Nucleotide Polymorphism) ID. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "snp_id": {
+                "type": "string",
+                "description": "The ID of the Single Nucleotide Polymorphism (SNP) mutation."
+              },
+              "species": {
+                "type": "string",
+                "description": "Species in which the SNP occurs, default is 'Homo sapiens' (Humans)."
+              }
+            },
+            "required": [
+              "snp_id"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "get_collectables_in_season",
+          "description": "Retrieve a list of collectable items in a specific game during a specified season. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "game_name": {
+                "type": "string",
+                "description": "Name of the game."
+              },
+              "season": {
+                "type": "string",
+                "description": "The season for which to retrieve the collectable items."
+              },
+              "item_type": {
+                "type": "string",
+                "description": "The type of item to search for. Default is 'all'. Possible values: 'all', 'bug', 'fish', 'sea creatures', etc."
+              }
+            },
+            "required": [
+              "game_name",
+              "season"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241013-UfceaKq9IeQQbrHbTpq5",
+    "object": "chat.completion",
+    "created": 1776241013,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help with all your requests. Let's address them one by one by calling the relevant functions to retrieve the information you need.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_37288133",
+              "function": {
+                "name": "get_collectables_in_season",
+                "arguments": "{\"game_name\":\"Animal Crossing\",\"season\":\"Summer\",\"item_type\":\"bug\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_02784379",
+              "function": {
+                "name": "get_collectables_in_season",
+                "arguments": "{\"game_name\":\"Animal Crossing\",\"season\":\"Winter\",\"item_type\":\"fish\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_44215708",
+              "function": {
+                "name": "mutation_type_find",
+                "arguments": "{\"snp_id\":\"rs53576\",\"species\":\"Homo sapiens\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_16417419",
+              "function": {
+                "name": "mutation_type_find",
+                "arguments": "{\"snp_id\":\"rs1800497\",\"species\":\"Mus musculus\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 601,
+      "completion_tokens": 194,
+      "total_tokens": 795,
+      "cost": 0.0042003225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00424275,
+        "upstream_inference_prompt_cost": 0.00133275,
+        "upstream_inference_completions_cost": 0.00291
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241013-UfceaKq9IeQQbrHbTpq5",
+    "object": "response",
+    "created_at": 1776241020,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'm happy to help with all your requests. Let's address them one by one by calling the relevant functions to retrieve the information you need.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_37288133",
+        "call_id": "call_37288133",
+        "name": "get_collectables_in_season",
+        "arguments": "{\"game_name\":\"Animal Crossing\",\"season\":\"Summer\",\"item_type\":\"bug\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_02784379",
+        "call_id": "call_02784379",
+        "name": "get_collectables_in_season",
+        "arguments": "{\"game_name\":\"Animal Crossing\",\"season\":\"Winter\",\"item_type\":\"fish\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_44215708",
+        "call_id": "call_44215708",
+        "name": "mutation_type_find",
+        "arguments": "{\"snp_id\":\"rs53576\",\"species\":\"Homo sapiens\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_16417419",
+        "call_id": "call_16417419",
+        "name": "mutation_type_find",
+        "arguments": "{\"snp_id\":\"rs1800497\",\"species\":\"Mus musculus\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 601,
+      "completion_tokens": 194,
+      "total_tokens": 795,
+      "cost": 0.0042003225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00424275,
+        "upstream_inference_prompt_cost": 0.00133275,
+        "upstream_inference_completions_cost": 0.00291
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241013-UfceaKq9IeQQbrHbTpq5",
+    "object": "chat.completion",
+    "created": 1776241013,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help with all your requests. Let's address them one by one by calling the relevant functions to retrieve the information you need.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_37288133",
+              "function": {
+                "name": "get_collectables_in_season",
+                "arguments": "{\"game_name\":\"Animal Crossing\",\"season\":\"Summer\",\"item_type\":\"bug\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_02784379",
+              "function": {
+                "name": "get_collectables_in_season",
+                "arguments": "{\"game_name\":\"Animal Crossing\",\"season\":\"Winter\",\"item_type\":\"fish\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_44215708",
+              "function": {
+                "name": "mutation_type_find",
+                "arguments": "{\"snp_id\":\"rs53576\",\"species\":\"Homo sapiens\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_16417419",
+              "function": {
+                "name": "mutation_type_find",
+                "arguments": "{\"snp_id\":\"rs1800497\",\"species\":\"Mus musculus\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 601,
+      "completion_tokens": 194,
+      "total_tokens": 795,
+      "cost": 0.0042003225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00424275,
+        "upstream_inference_prompt_cost": 0.00133275,
+        "upstream_inference_completions_cost": 0.00291
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 6785.724,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "9cd51fc3-8964-4b33-b2bf-9ae15c0086cc"
+}

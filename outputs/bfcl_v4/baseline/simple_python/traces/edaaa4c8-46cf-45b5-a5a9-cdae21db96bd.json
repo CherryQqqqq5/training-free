@@ -1,0 +1,240 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find the boiling point and melting point of water under the sea level of 5000m."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "get_boiling_melting_points",
+        "description": "Retrieve the boiling point and melting point of a substance based on its name and the sea level. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "substance": {
+              "type": "string",
+              "description": "The name of the substance."
+            },
+            "sea_level": {
+              "type": "integer",
+              "description": "The sea level in meters."
+            }
+          },
+          "required": [
+            "substance",
+            "sea_level"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find the boiling point and melting point of water under the sea level of 5000m."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_boiling_melting_points",
+          "description": "Retrieve the boiling point and melting point of a substance based on its name and the sea level. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "substance": {
+                "type": "string",
+                "description": "The name of the substance."
+              },
+              "sea_level": {
+                "type": "integer",
+                "description": "The sea level in meters."
+              }
+            },
+            "required": [
+              "substance",
+              "sea_level"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776237741-HUCTMVqhuNDs54AiTYTk",
+    "object": "chat.completion",
+    "created": 1776237741,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_16066121",
+              "function": {
+                "name": "get_boiling_melting_points",
+                "arguments": "{\"substance\":\"water\",\"sea_level\":5000}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 329,
+      "completion_tokens": 38,
+      "total_tokens": 367,
+      "cost": 0.0015347475,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00155025,
+        "upstream_inference_prompt_cost": 0.00098025,
+        "upstream_inference_completions_cost": 0.00057
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776237741-HUCTMVqhuNDs54AiTYTk",
+    "object": "response",
+    "created_at": 1776237743,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_16066121",
+        "call_id": "call_16066121",
+        "name": "get_boiling_melting_points",
+        "arguments": "{\"substance\":\"water\",\"sea_level\":5000}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 329,
+      "completion_tokens": 38,
+      "total_tokens": 367,
+      "cost": 0.0015347475,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00155025,
+        "upstream_inference_prompt_cost": 0.00098025,
+        "upstream_inference_completions_cost": 0.00057
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776237741-HUCTMVqhuNDs54AiTYTk",
+    "object": "chat.completion",
+    "created": 1776237741,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_16066121",
+              "function": {
+                "name": "get_boiling_melting_points",
+                "arguments": "{\"substance\":\"water\",\"sea_level\":5000}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 329,
+      "completion_tokens": 38,
+      "total_tokens": 367,
+      "cost": 0.0015347475,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00155025,
+        "upstream_inference_prompt_cost": 0.00098025,
+        "upstream_inference_completions_cost": 0.00057
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2310.875,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "edaaa4c8-46cf-45b5-a5a9-cdae21db96bd"
+}

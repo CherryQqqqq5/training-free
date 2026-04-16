@@ -1,0 +1,361 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Translate the phrase 'Hello World' from English to Spanish and translate 'Goodbye' from French to English. In addition to that get current time in 'Los Angeles' and 'London'."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "get_current_time",
+        "description": "Fetches current time for a given location Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The location for which to fetch current time"
+            }
+          },
+          "required": [
+            "location"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "translate_text",
+        "description": "Translates a given text from one language to another Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "description": "The text that needs to be translated"
+            },
+            "from_lang": {
+              "type": "string",
+              "description": "The source language from which to translate"
+            },
+            "to_lang": {
+              "type": "string",
+              "description": "The target language to which to translate"
+            }
+          },
+          "required": [
+            "text",
+            "from_lang",
+            "to_lang"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Translate the phrase 'Hello World' from English to Spanish and translate 'Goodbye' from French to English. In addition to that get current time in 'Los Angeles' and 'London'."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_current_time",
+          "description": "Fetches current time for a given location Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The location for which to fetch current time"
+              }
+            },
+            "required": [
+              "location"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "translate_text",
+          "description": "Translates a given text from one language to another Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "description": "The text that needs to be translated"
+              },
+              "from_lang": {
+                "type": "string",
+                "description": "The source language from which to translate"
+              },
+              "to_lang": {
+                "type": "string",
+                "description": "The target language to which to translate"
+              }
+            },
+            "required": [
+              "text",
+              "from_lang",
+              "to_lang"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241425-qHzZYVCk4kCfYg5CUdJ3",
+    "object": "chat.completion",
+    "created": 1776241425,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_96460961",
+              "function": {
+                "name": "translate_text",
+                "arguments": "{\"text\":\"Hello World\",\"from_lang\":\"English\",\"to_lang\":\"Spanish\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_08478662",
+              "function": {
+                "name": "translate_text",
+                "arguments": "{\"text\":\"Goodbye\",\"from_lang\":\"French\",\"to_lang\":\"English\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_25790623",
+              "function": {
+                "name": "get_current_time",
+                "arguments": "{\"location\":\"Los Angeles\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_44883339",
+              "function": {
+                "name": "get_current_time",
+                "arguments": "{\"location\":\"London\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 417,
+      "completion_tokens": 136,
+      "total_tokens": 553,
+      "cost": 0.0032514075,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00328425,
+        "upstream_inference_prompt_cost": 0.00124425,
+        "upstream_inference_completions_cost": 0.00204
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241425-qHzZYVCk4kCfYg5CUdJ3",
+    "object": "response",
+    "created_at": 1776241427,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_96460961",
+        "call_id": "call_96460961",
+        "name": "translate_text",
+        "arguments": "{\"text\":\"Hello World\",\"from_lang\":\"English\",\"to_lang\":\"Spanish\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_08478662",
+        "call_id": "call_08478662",
+        "name": "translate_text",
+        "arguments": "{\"text\":\"Goodbye\",\"from_lang\":\"French\",\"to_lang\":\"English\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_25790623",
+        "call_id": "call_25790623",
+        "name": "get_current_time",
+        "arguments": "{\"location\":\"Los Angeles\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_44883339",
+        "call_id": "call_44883339",
+        "name": "get_current_time",
+        "arguments": "{\"location\":\"London\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 417,
+      "completion_tokens": 136,
+      "total_tokens": 553,
+      "cost": 0.0032514075,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00328425,
+        "upstream_inference_prompt_cost": 0.00124425,
+        "upstream_inference_completions_cost": 0.00204
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241425-qHzZYVCk4kCfYg5CUdJ3",
+    "object": "chat.completion",
+    "created": 1776241425,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_96460961",
+              "function": {
+                "name": "translate_text",
+                "arguments": "{\"text\":\"Hello World\",\"from_lang\":\"English\",\"to_lang\":\"Spanish\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_08478662",
+              "function": {
+                "name": "translate_text",
+                "arguments": "{\"text\":\"Goodbye\",\"from_lang\":\"French\",\"to_lang\":\"English\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_25790623",
+              "function": {
+                "name": "get_current_time",
+                "arguments": "{\"location\":\"Los Angeles\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_44883339",
+              "function": {
+                "name": "get_current_time",
+                "arguments": "{\"location\":\"London\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 417,
+      "completion_tokens": 136,
+      "total_tokens": 553,
+      "cost": 0.0032514075,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00328425,
+        "upstream_inference_prompt_cost": 0.00124425,
+        "upstream_inference_completions_cost": 0.00204
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2615.325,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "19c2cbfe-16cf-4708-8480-17a6c56e97a4"
+}

@@ -1,0 +1,356 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "In game Battle Reign, change the armor level to 5 and find me a game guide for how to win in snowy weather conditions. Also find me any strategy guides available for game Shadow Fall."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "BattleReignGameAPI_update_player_equipment",
+        "description": "Modify the player's equipment level for specified attributes Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "attribute": {
+              "type": "string",
+              "description": "The attribute of the equipment to modify."
+            },
+            "level": {
+              "type": "integer",
+              "description": "The level to modify the attribute to."
+            },
+            "playerID": {
+              "type": "integer",
+              "description": "Player ID of the player. Default to 123",
+              "default": 123
+            }
+          },
+          "required": [
+            "attribute",
+            "level"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "GameGuideAPI_search_guide",
+        "description": "Search for game guides given specific conditions and preferences Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "game": {
+              "type": "string",
+              "description": "Name of the game."
+            },
+            "condition": {
+              "type": "string",
+              "description": "Specific game conditions. (eg: 'snowy weather', 'hard mode').",
+              "default": ""
+            },
+            "type": {
+              "type": "string",
+              "description": "Specific type of guide. (eg: 'strategy', 'walkthrough')",
+              "default": ""
+            }
+          },
+          "required": [
+            "game"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "In game Battle Reign, change the armor level to 5 and find me a game guide for how to win in snowy weather conditions. Also find me any strategy guides available for game Shadow Fall."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "BattleReignGameAPI_update_player_equipment",
+          "description": "Modify the player's equipment level for specified attributes Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "attribute": {
+                "type": "string",
+                "description": "The attribute of the equipment to modify."
+              },
+              "level": {
+                "type": "integer",
+                "description": "The level to modify the attribute to."
+              },
+              "playerID": {
+                "type": "integer",
+                "description": "Player ID of the player. Default to 123",
+                "default": 123
+              }
+            },
+            "required": [
+              "attribute",
+              "level"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "GameGuideAPI_search_guide",
+          "description": "Search for game guides given specific conditions and preferences Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "game": {
+                "type": "string",
+                "description": "Name of the game."
+              },
+              "condition": {
+                "type": "string",
+                "description": "Specific game conditions. (eg: 'snowy weather', 'hard mode').",
+                "default": ""
+              },
+              "type": {
+                "type": "string",
+                "description": "Specific type of guide. (eg: 'strategy', 'walkthrough')",
+                "default": ""
+              }
+            },
+            "required": [
+              "game"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240631-u7Th7NWBuuWSoDkSXSAH",
+    "object": "chat.completion",
+    "created": 1776240631,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_42535536",
+              "function": {
+                "name": "BattleReignGameAPI_update_player_equipment",
+                "arguments": "{\"attribute\":\"armor\",\"level\":5,\"playerID\":123}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_75973159",
+              "function": {
+                "name": "GameGuideAPI_search_guide",
+                "arguments": "{\"game\":\"Battle Reign\",\"condition\":\"snowy weather\",\"type\":\"\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_88008552",
+              "function": {
+                "name": "GameGuideAPI_search_guide",
+                "arguments": "{\"game\":\"Shadow Fall\",\"condition\":\"\",\"type\":\"strategy\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 482,
+      "completion_tokens": 127,
+      "total_tokens": 609,
+      "cost": 0.0028519425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00288075,
+        "upstream_inference_prompt_cost": 0.00097575,
+        "upstream_inference_completions_cost": 0.001905
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240631-u7Th7NWBuuWSoDkSXSAH",
+    "object": "response",
+    "created_at": 1776240633,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_42535536",
+        "call_id": "call_42535536",
+        "name": "BattleReignGameAPI_update_player_equipment",
+        "arguments": "{\"attribute\":\"armor\",\"level\":5,\"playerID\":123}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_75973159",
+        "call_id": "call_75973159",
+        "name": "GameGuideAPI_search_guide",
+        "arguments": "{\"game\":\"Battle Reign\",\"condition\":\"snowy weather\",\"type\":\"\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_88008552",
+        "call_id": "call_88008552",
+        "name": "GameGuideAPI_search_guide",
+        "arguments": "{\"game\":\"Shadow Fall\",\"condition\":\"\",\"type\":\"strategy\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 482,
+      "completion_tokens": 127,
+      "total_tokens": 609,
+      "cost": 0.0028519425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00288075,
+        "upstream_inference_prompt_cost": 0.00097575,
+        "upstream_inference_completions_cost": 0.001905
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240631-u7Th7NWBuuWSoDkSXSAH",
+    "object": "chat.completion",
+    "created": 1776240631,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_42535536",
+              "function": {
+                "name": "BattleReignGameAPI_update_player_equipment",
+                "arguments": "{\"attribute\":\"armor\",\"level\":5,\"playerID\":123}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_75973159",
+              "function": {
+                "name": "GameGuideAPI_search_guide",
+                "arguments": "{\"game\":\"Battle Reign\",\"condition\":\"snowy weather\",\"type\":\"\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_88008552",
+              "function": {
+                "name": "GameGuideAPI_search_guide",
+                "arguments": "{\"game\":\"Shadow Fall\",\"condition\":\"\",\"type\":\"strategy\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 482,
+      "completion_tokens": 127,
+      "total_tokens": 609,
+      "cost": 0.0028519425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00288075,
+        "upstream_inference_prompt_cost": 0.00097575,
+        "upstream_inference_completions_cost": 0.001905
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2670.434,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "07f7d847-0d44-4237-8191-bb037b064f6a"
+}

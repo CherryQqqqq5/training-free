@@ -1,0 +1,248 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Search for current lawsuits filed against Apple in Santa Clara County."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "lawsuit_search",
+        "description": "Retrieve all lawsuits involving a particular entity from specified jurisdiction. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "entity": {
+              "type": "string",
+              "description": "The entity involved in lawsuits."
+            },
+            "county": {
+              "type": "string",
+              "description": "The jurisdiction for the lawsuit search for example Alameda county."
+            },
+            "state": {
+              "type": "string",
+              "description": "The state for the lawsuit search. Default is California."
+            }
+          },
+          "required": [
+            "entity",
+            "county"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Search for current lawsuits filed against Apple in Santa Clara County."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "lawsuit_search",
+          "description": "Retrieve all lawsuits involving a particular entity from specified jurisdiction. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "entity": {
+                "type": "string",
+                "description": "The entity involved in lawsuits."
+              },
+              "county": {
+                "type": "string",
+                "description": "The jurisdiction for the lawsuit search for example Alameda county."
+              },
+              "state": {
+                "type": "string",
+                "description": "The state for the lawsuit search. Default is California."
+              }
+            },
+            "required": [
+              "entity",
+              "county"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776238025-MrYaOOKrDtKzGluJ1daG",
+    "object": "chat.completion",
+    "created": 1776238025,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_92537572",
+              "function": {
+                "name": "lawsuit_search",
+                "arguments": "{\"entity\":\"Apple\",\"county\":\"Santa Clara County\",\"state\":\"California\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 332,
+      "completion_tokens": 41,
+      "total_tokens": 373,
+      "cost": 0.0011248875,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 211,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00113625,
+        "upstream_inference_prompt_cost": 0.00052125,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776238025-MrYaOOKrDtKzGluJ1daG",
+    "object": "response",
+    "created_at": 1776238027,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_92537572",
+        "call_id": "call_92537572",
+        "name": "lawsuit_search",
+        "arguments": "{\"entity\":\"Apple\",\"county\":\"Santa Clara County\",\"state\":\"California\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 332,
+      "completion_tokens": 41,
+      "total_tokens": 373,
+      "cost": 0.0011248875,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 211,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00113625,
+        "upstream_inference_prompt_cost": 0.00052125,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776238025-MrYaOOKrDtKzGluJ1daG",
+    "object": "chat.completion",
+    "created": 1776238025,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_92537572",
+              "function": {
+                "name": "lawsuit_search",
+                "arguments": "{\"entity\":\"Apple\",\"county\":\"Santa Clara County\",\"state\":\"California\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 332,
+      "completion_tokens": 41,
+      "total_tokens": 373,
+      "cost": 0.0011248875,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 211,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00113625,
+        "upstream_inference_prompt_cost": 0.00052125,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2081.769,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "1ad39572-700a-4d28-a7c1-6a7e8cf7f304"
+}

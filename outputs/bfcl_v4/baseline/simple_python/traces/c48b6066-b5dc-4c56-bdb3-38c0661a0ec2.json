@@ -1,0 +1,250 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find a historical law case about fraud from 2010 to 2015."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "law_case_search_find_historical",
+        "description": "Search for a historical law case based on specific criteria like the subject and year. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "subject": {
+              "type": "string",
+              "description": "The subject matter of the case, e.g., 'fraud'"
+            },
+            "from_year": {
+              "type": "integer",
+              "description": "The start year for the range of the case. The case should happen after this year."
+            },
+            "to_year": {
+              "type": "integer",
+              "description": "The end year for the range of the case. The case should happen before this year."
+            }
+          },
+          "required": [
+            "subject",
+            "from_year",
+            "to_year"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find a historical law case about fraud from 2010 to 2015."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "law_case_search_find_historical",
+          "description": "Search for a historical law case based on specific criteria like the subject and year. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "subject": {
+                "type": "string",
+                "description": "The subject matter of the case, e.g., 'fraud'"
+              },
+              "from_year": {
+                "type": "integer",
+                "description": "The start year for the range of the case. The case should happen after this year."
+              },
+              "to_year": {
+                "type": "integer",
+                "description": "The end year for the range of the case. The case should happen before this year."
+              }
+            },
+            "required": [
+              "subject",
+              "from_year",
+              "to_year"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776237996-wehAKVOUkbmQYwZzFwTP",
+    "object": "chat.completion",
+    "created": 1776237996,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_49101106",
+              "function": {
+                "name": "law_case_search_find_historical",
+                "arguments": "{\"subject\":\"fraud\",\"from_year\":2010,\"to_year\":2015}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 372,
+      "completion_tokens": 46,
+      "total_tokens": 418,
+      "cost": 0.0013223925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00133575,
+        "upstream_inference_prompt_cost": 0.00064575,
+        "upstream_inference_completions_cost": 0.00069
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776237996-wehAKVOUkbmQYwZzFwTP",
+    "object": "response",
+    "created_at": 1776237998,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_49101106",
+        "call_id": "call_49101106",
+        "name": "law_case_search_find_historical",
+        "arguments": "{\"subject\":\"fraud\",\"from_year\":2010,\"to_year\":2015}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 372,
+      "completion_tokens": 46,
+      "total_tokens": 418,
+      "cost": 0.0013223925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00133575,
+        "upstream_inference_prompt_cost": 0.00064575,
+        "upstream_inference_completions_cost": 0.00069
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776237996-wehAKVOUkbmQYwZzFwTP",
+    "object": "chat.completion",
+    "created": 1776237996,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_49101106",
+              "function": {
+                "name": "law_case_search_find_historical",
+                "arguments": "{\"subject\":\"fraud\",\"from_year\":2010,\"to_year\":2015}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 372,
+      "completion_tokens": 46,
+      "total_tokens": 418,
+      "cost": 0.0013223925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00133575,
+        "upstream_inference_prompt_cost": 0.00064575,
+        "upstream_inference_completions_cost": 0.00069
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1722.431,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "c48b6066-b5dc-4c56-bdb3-38c0661a0ec2"
+}

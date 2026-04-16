@@ -1,0 +1,315 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Invest $2000 in Google and withdraw $1000 from Apple."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "investment_withdraw",
+        "description": "Withdraw a specific amount from a company's stock. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "company": {
+              "type": "string",
+              "description": "The company you want to withdraw from."
+            },
+            "amount": {
+              "type": "number",
+              "description": "The amount you want to withdraw. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "company",
+            "amount"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "investment_invest",
+        "description": "Invest a specific amount in a company's stock. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "company": {
+              "type": "string",
+              "description": "The company you want to invest in."
+            },
+            "amount": {
+              "type": "number",
+              "description": "The amount you want to invest. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "company",
+            "amount"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Invest $2000 in Google and withdraw $1000 from Apple."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "investment_withdraw",
+          "description": "Withdraw a specific amount from a company's stock. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "company": {
+                "type": "string",
+                "description": "The company you want to withdraw from."
+              },
+              "amount": {
+                "type": "number",
+                "description": "The amount you want to withdraw. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "company",
+              "amount"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "investment_invest",
+          "description": "Invest a specific amount in a company's stock. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "company": {
+                "type": "string",
+                "description": "The company you want to invest in."
+              },
+              "amount": {
+                "type": "number",
+                "description": "The amount you want to invest. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "company",
+              "amount"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240540-6RfFoA0KMKTo5zjBpg6J",
+    "object": "chat.completion",
+    "created": 1776240540,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_37849198",
+              "function": {
+                "name": "investment_invest",
+                "arguments": "{\"company\":\"Google\",\"amount\":2000.0}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_83394505",
+              "function": {
+                "name": "investment_withdraw",
+                "arguments": "{\"company\":\"Apple\",\"amount\":1000.0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 412,
+      "completion_tokens": 70,
+      "total_tokens": 482,
+      "cost": 0.0017975925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00181575,
+        "upstream_inference_prompt_cost": 0.00076575,
+        "upstream_inference_completions_cost": 0.00105
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240540-6RfFoA0KMKTo5zjBpg6J",
+    "object": "response",
+    "created_at": 1776240542,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_37849198",
+        "call_id": "call_37849198",
+        "name": "investment_invest",
+        "arguments": "{\"company\":\"Google\",\"amount\":2000.0}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_83394505",
+        "call_id": "call_83394505",
+        "name": "investment_withdraw",
+        "arguments": "{\"company\":\"Apple\",\"amount\":1000.0}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 412,
+      "completion_tokens": 70,
+      "total_tokens": 482,
+      "cost": 0.0017975925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00181575,
+        "upstream_inference_prompt_cost": 0.00076575,
+        "upstream_inference_completions_cost": 0.00105
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240540-6RfFoA0KMKTo5zjBpg6J",
+    "object": "chat.completion",
+    "created": 1776240540,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_37849198",
+              "function": {
+                "name": "investment_invest",
+                "arguments": "{\"company\":\"Google\",\"amount\":2000.0}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_83394505",
+              "function": {
+                "name": "investment_withdraw",
+                "arguments": "{\"company\":\"Apple\",\"amount\":1000.0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 412,
+      "completion_tokens": 70,
+      "total_tokens": 482,
+      "cost": 0.0017975925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00181575,
+        "upstream_inference_prompt_cost": 0.00076575,
+        "upstream_inference_completions_cost": 0.00105
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2636.848,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "f4ec5b6e-4b9c-44b7-948d-c8fafb900f73"
+}

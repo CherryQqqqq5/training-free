@@ -1,0 +1,260 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find a grocery store near me with organic fruits and vegetables in Houston."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "grocery_store_find_nearby",
+        "description": "Locate nearby grocery stores based on specific criteria like organic fruits and vegetables. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city and state, e.g. Houston, TX"
+            },
+            "categories": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Organic",
+                  "Vegetables",
+                  "Fruits",
+                  "Dairy",
+                  "Seafood",
+                  "Bakery"
+                ]
+              },
+              "description": "Categories of items to be found in the grocery store. Default is all if not specified."
+            }
+          },
+          "required": [
+            "location"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find a grocery store near me with organic fruits and vegetables in Houston."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "grocery_store_find_nearby",
+          "description": "Locate nearby grocery stores based on specific criteria like organic fruits and vegetables. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city and state, e.g. Houston, TX"
+              },
+              "categories": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "Organic",
+                    "Vegetables",
+                    "Fruits",
+                    "Dairy",
+                    "Seafood",
+                    "Bakery"
+                  ]
+                },
+                "description": "Categories of items to be found in the grocery store. Default is all if not specified."
+              }
+            },
+            "required": [
+              "location"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776238414-h9Y4IqZPK7HlALHSGyaS",
+    "object": "chat.completion",
+    "created": 1776238414,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_06921970",
+              "function": {
+                "name": "grocery_store_find_nearby",
+                "arguments": "{\"location\":\"Houston, TX\",\"categories\":[\"Organic\",\"Fruits\",\"Vegetables\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 356,
+      "completion_tokens": 46,
+      "total_tokens": 402,
+      "cost": 0.0009496575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 355,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00095925,
+        "upstream_inference_prompt_cost": 0.00026925,
+        "upstream_inference_completions_cost": 0.00069
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776238414-h9Y4IqZPK7HlALHSGyaS",
+    "object": "response",
+    "created_at": 1776238415,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_06921970",
+        "call_id": "call_06921970",
+        "name": "grocery_store_find_nearby",
+        "arguments": "{\"location\":\"Houston, TX\",\"categories\":[\"Organic\",\"Fruits\",\"Vegetables\"]}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 356,
+      "completion_tokens": 46,
+      "total_tokens": 402,
+      "cost": 0.0009496575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 355,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00095925,
+        "upstream_inference_prompt_cost": 0.00026925,
+        "upstream_inference_completions_cost": 0.00069
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776238414-h9Y4IqZPK7HlALHSGyaS",
+    "object": "chat.completion",
+    "created": 1776238414,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_06921970",
+              "function": {
+                "name": "grocery_store_find_nearby",
+                "arguments": "{\"location\":\"Houston, TX\",\"categories\":[\"Organic\",\"Fruits\",\"Vegetables\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 356,
+      "completion_tokens": 46,
+      "total_tokens": 402,
+      "cost": 0.0009496575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 355,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00095925,
+        "upstream_inference_prompt_cost": 0.00026925,
+        "upstream_inference_completions_cost": 0.00069
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1662.478,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "2873468c-e866-4135-8008-4253c5fd9d5b"
+}

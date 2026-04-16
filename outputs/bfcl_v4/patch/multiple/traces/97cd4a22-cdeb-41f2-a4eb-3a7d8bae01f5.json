@@ -1,0 +1,304 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "What is the humidity level in Miami, Florida in the upcoming 7 days?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "weather_humidity_forecast",
+        "description": "Retrieve a humidity forecast for a specific location and time frame. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city that you want to get the humidity for."
+            },
+            "days": {
+              "type": "integer",
+              "description": "Number of days for the forecast."
+            },
+            "min_humidity": {
+              "type": "integer",
+              "description": "Minimum level of humidity (in percentage) to filter the result. Optional parameter. Default is 0."
+            }
+          },
+          "required": [
+            "location",
+            "days"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "get_team_score",
+        "description": "Retrieves the latest game score, individual player stats, and team stats for a specified sports team. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "team_name": {
+              "type": "string",
+              "description": "The name of the sports team."
+            },
+            "league": {
+              "type": "string",
+              "description": "The league that the team is part of."
+            },
+            "include_player_stats": {
+              "type": "boolean",
+              "default": false,
+              "description": "Indicates if individual player statistics should be included in the result. Default is false."
+            }
+          },
+          "required": [
+            "team_name",
+            "league"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What is the humidity level in Miami, Florida in the upcoming 7 days?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "weather_humidity_forecast",
+          "description": "Retrieve a humidity forecast for a specific location and time frame. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city that you want to get the humidity for."
+              },
+              "days": {
+                "type": "integer",
+                "description": "Number of days for the forecast."
+              },
+              "min_humidity": {
+                "type": "integer",
+                "description": "Minimum level of humidity (in percentage) to filter the result. Optional parameter. Default is 0."
+              }
+            },
+            "required": [
+              "location",
+              "days"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "get_team_score",
+          "description": "Retrieves the latest game score, individual player stats, and team stats for a specified sports team. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "team_name": {
+                "type": "string",
+                "description": "The name of the sports team."
+              },
+              "league": {
+                "type": "string",
+                "description": "The league that the team is part of."
+              },
+              "include_player_stats": {
+                "type": "boolean",
+                "default": false,
+                "description": "Indicates if individual player statistics should be included in the result. Default is false."
+              }
+            },
+            "required": [
+              "team_name",
+              "league"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240265-lVNpmdhtdJg3feCscIRV",
+    "object": "chat.completion",
+    "created": 1776240265,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_31297396",
+              "function": {
+                "name": "weather_humidity_forecast",
+                "arguments": "{\"location\":\"Miami, Florida\",\"days\":7}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 478,
+      "completion_tokens": 35,
+      "total_tokens": 513,
+      "cost": 0.0019327275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00195225,
+        "upstream_inference_prompt_cost": 0.00142725,
+        "upstream_inference_completions_cost": 0.000525
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240265-lVNpmdhtdJg3feCscIRV",
+    "object": "response",
+    "created_at": 1776240266,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_31297396",
+        "call_id": "call_31297396",
+        "name": "weather_humidity_forecast",
+        "arguments": "{\"location\":\"Miami, Florida\",\"days\":7}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 478,
+      "completion_tokens": 35,
+      "total_tokens": 513,
+      "cost": 0.0019327275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00195225,
+        "upstream_inference_prompt_cost": 0.00142725,
+        "upstream_inference_completions_cost": 0.000525
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240265-lVNpmdhtdJg3feCscIRV",
+    "object": "chat.completion",
+    "created": 1776240265,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_31297396",
+              "function": {
+                "name": "weather_humidity_forecast",
+                "arguments": "{\"location\":\"Miami, Florida\",\"days\":7}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 478,
+      "completion_tokens": 35,
+      "total_tokens": 513,
+      "cost": 0.0019327275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00195225,
+        "upstream_inference_prompt_cost": 0.00142725,
+        "upstream_inference_completions_cost": 0.000525
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1727.649,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "97cd4a22-cdeb-41f2-a4eb-3a7d8bae01f5"
+}

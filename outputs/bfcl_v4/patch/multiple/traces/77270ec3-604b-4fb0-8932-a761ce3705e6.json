@@ -1,0 +1,350 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the Compound Annual Growth Rate (CAGR) for an initial investment of $2000, final value of $3000 in a period of 4 years."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "chess_rating",
+        "description": "Fetches the current chess rating of a given player Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "player_name": {
+              "type": "string",
+              "description": "The full name of the chess player."
+            },
+            "variant": {
+              "type": "string",
+              "description": "The variant of chess for which rating is requested (e.g., 'classical', 'blitz', 'bullet'). Default is 'classical'."
+            }
+          },
+          "required": [
+            "player_name"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "solve_quadratic",
+        "description": "Find the roots of a quadratic equation. Returns both roots. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "a": {
+              "type": "integer",
+              "description": "Coefficient of x²."
+            },
+            "b": {
+              "type": "integer",
+              "description": "Coefficient of x."
+            },
+            "c": {
+              "type": "integer",
+              "description": "Constant term."
+            }
+          },
+          "required": [
+            "a",
+            "b",
+            "c"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "calculate_cagr",
+        "description": "Calculate the Compound Annual Growth Rate (CAGR) given an initial investment value, a final investment value, and the number of years. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "initial_value": {
+              "type": "integer",
+              "description": "The initial investment value."
+            },
+            "final_value": {
+              "type": "integer",
+              "description": "The final investment value."
+            },
+            "period_in_years": {
+              "type": "integer",
+              "description": "The period of the investment in years."
+            }
+          },
+          "required": [
+            "initial_value",
+            "final_value",
+            "period_in_years"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the Compound Annual Growth Rate (CAGR) for an initial investment of $2000, final value of $3000 in a period of 4 years."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "chess_rating",
+          "description": "Fetches the current chess rating of a given player Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "player_name": {
+                "type": "string",
+                "description": "The full name of the chess player."
+              },
+              "variant": {
+                "type": "string",
+                "description": "The variant of chess for which rating is requested (e.g., 'classical', 'blitz', 'bullet'). Default is 'classical'."
+              }
+            },
+            "required": [
+              "player_name"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "solve_quadratic",
+          "description": "Find the roots of a quadratic equation. Returns both roots. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "a": {
+                "type": "integer",
+                "description": "Coefficient of x²."
+              },
+              "b": {
+                "type": "integer",
+                "description": "Coefficient of x."
+              },
+              "c": {
+                "type": "integer",
+                "description": "Constant term."
+              }
+            },
+            "required": [
+              "a",
+              "b",
+              "c"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_cagr",
+          "description": "Calculate the Compound Annual Growth Rate (CAGR) given an initial investment value, a final investment value, and the number of years. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "initial_value": {
+                "type": "integer",
+                "description": "The initial investment value."
+              },
+              "final_value": {
+                "type": "integer",
+                "description": "The final investment value."
+              },
+              "period_in_years": {
+                "type": "integer",
+                "description": "The period of the investment in years."
+              }
+            },
+            "required": [
+              "initial_value",
+              "final_value",
+              "period_in_years"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240241-LjGxp0ZlZPqecb1rVsqE",
+    "object": "chat.completion",
+    "created": 1776240241,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_52775036",
+              "function": {
+                "name": "calculate_cagr",
+                "arguments": "{\"initial_value\":2000,\"final_value\":3000,\"period_in_years\":4}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 566,
+      "completion_tokens": 44,
+      "total_tokens": 610,
+      "cost": 0.0016372125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 313,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00165375,
+        "upstream_inference_prompt_cost": 0.00099375,
+        "upstream_inference_completions_cost": 0.00066
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240241-LjGxp0ZlZPqecb1rVsqE",
+    "object": "response",
+    "created_at": 1776240242,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_52775036",
+        "call_id": "call_52775036",
+        "name": "calculate_cagr",
+        "arguments": "{\"initial_value\":2000,\"final_value\":3000,\"period_in_years\":4}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 566,
+      "completion_tokens": 44,
+      "total_tokens": 610,
+      "cost": 0.0016372125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 313,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00165375,
+        "upstream_inference_prompt_cost": 0.00099375,
+        "upstream_inference_completions_cost": 0.00066
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240241-LjGxp0ZlZPqecb1rVsqE",
+    "object": "chat.completion",
+    "created": 1776240241,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_52775036",
+              "function": {
+                "name": "calculate_cagr",
+                "arguments": "{\"initial_value\":2000,\"final_value\":3000,\"period_in_years\":4}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 566,
+      "completion_tokens": 44,
+      "total_tokens": 610,
+      "cost": 0.0016372125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 313,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00165375,
+        "upstream_inference_prompt_cost": 0.00099375,
+        "upstream_inference_completions_cost": 0.00066
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 3832.018,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "77270ec3-604b-4fb0-8932-a761ce3705e6"
+}

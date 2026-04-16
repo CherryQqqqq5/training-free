@@ -1,0 +1,291 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Identify objects in my backyard image my_backyard_image_url and analyze the sentiment of today's journal entry my_journal_entry_text."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "image_processing_object_identification",
+        "description": "Identify objects in a given image. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "image_url": {
+              "type": "string",
+              "description": "The URL of the image."
+            }
+          },
+          "required": [
+            "image_url"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "text_analysis_sentiment_analysis",
+        "description": "Analyze the sentiment of a given text. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "description": "The text to be analyzed."
+            }
+          },
+          "required": [
+            "text"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Identify objects in my backyard image my_backyard_image_url and analyze the sentiment of today's journal entry my_journal_entry_text."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "image_processing_object_identification",
+          "description": "Identify objects in a given image. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "image_url": {
+                "type": "string",
+                "description": "The URL of the image."
+              }
+            },
+            "required": [
+              "image_url"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "text_analysis_sentiment_analysis",
+          "description": "Analyze the sentiment of a given text. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "description": "The text to be analyzed."
+              }
+            },
+            "required": [
+              "text"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240573-56eBQrxV40XIKiEbFOce",
+    "object": "chat.completion",
+    "created": 1776240573,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_13809503",
+              "function": {
+                "name": "image_processing_object_identification",
+                "arguments": "{\"image_url\":\"my_backyard_image_url\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_85909134",
+              "function": {
+                "name": "text_analysis_sentiment_analysis",
+                "arguments": "{\"text\":\"my_journal_entry_text\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 365,
+      "completion_tokens": 66,
+      "total_tokens": 431,
+      "cost": 0.0015986025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00161475,
+        "upstream_inference_prompt_cost": 0.00062475,
+        "upstream_inference_completions_cost": 0.00099
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240573-56eBQrxV40XIKiEbFOce",
+    "object": "response",
+    "created_at": 1776240575,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_13809503",
+        "call_id": "call_13809503",
+        "name": "image_processing_object_identification",
+        "arguments": "{\"image_url\":\"my_backyard_image_url\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_85909134",
+        "call_id": "call_85909134",
+        "name": "text_analysis_sentiment_analysis",
+        "arguments": "{\"text\":\"my_journal_entry_text\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 365,
+      "completion_tokens": 66,
+      "total_tokens": 431,
+      "cost": 0.0015986025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00161475,
+        "upstream_inference_prompt_cost": 0.00062475,
+        "upstream_inference_completions_cost": 0.00099
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240573-56eBQrxV40XIKiEbFOce",
+    "object": "chat.completion",
+    "created": 1776240573,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_13809503",
+              "function": {
+                "name": "image_processing_object_identification",
+                "arguments": "{\"image_url\":\"my_backyard_image_url\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_85909134",
+              "function": {
+                "name": "text_analysis_sentiment_analysis",
+                "arguments": "{\"text\":\"my_journal_entry_text\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 365,
+      "completion_tokens": 66,
+      "total_tokens": 431,
+      "cost": 0.0015986025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00161475,
+        "upstream_inference_prompt_cost": 0.00062475,
+        "upstream_inference_completions_cost": 0.00099
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2338.555,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "9da1a8ef-c713-40e7-bbf7-4d1fa5772094"
+}

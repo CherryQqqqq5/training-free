@@ -1,0 +1,254 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "In a texas holdem game, Who won in the poker game with players Alex, Sam, Robert and Steve given the cards Alex':['A of spades', 'K of spades'], 'Sam': ['2 of diamonds', '3 of clubs'], 'Robert': ['Q of hearts', '10 of hearts'], 'Steve': ['4 of spades', '5 of spades']?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "poker_game_winner",
+        "description": "Identify the winner in a poker game based on the cards. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "players": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Names of the players in a list."
+            },
+            "cards": {
+              "type": "object",
+              "description": "An object containing the player name as key and the cards as values in a list."
+            },
+            "type": {
+              "type": "string",
+              "description": "Type of poker game. Defaults to 'Texas Holdem'"
+            }
+          },
+          "required": [
+            "players",
+            "cards"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "In a texas holdem game, Who won in the poker game with players Alex, Sam, Robert and Steve given the cards Alex':['A of spades', 'K of spades'], 'Sam': ['2 of diamonds', '3 of clubs'], 'Robert': ['Q of hearts', '10 of hearts'], 'Steve': ['4 of spades', '5 of spades']?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "poker_game_winner",
+          "description": "Identify the winner in a poker game based on the cards. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "players": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Names of the players in a list."
+              },
+              "cards": {
+                "type": "object",
+                "description": "An object containing the player name as key and the cards as values in a list."
+              },
+              "type": {
+                "type": "string",
+                "description": "Type of poker game. Defaults to 'Texas Holdem'"
+              }
+            },
+            "required": [
+              "players",
+              "cards"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776238347-J0ZOBNLFYPutnFI2VUpD",
+    "object": "chat.completion",
+    "created": 1776238347,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_77565514",
+              "function": {
+                "name": "poker_game_winner",
+                "arguments": "{\"players\":[\"Alex\",\"Sam\",\"Robert\",\"Steve\"],\"cards\":{}}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 422,
+      "completion_tokens": 43,
+      "total_tokens": 465,
+      "cost": 0.0018852075,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00190425,
+        "upstream_inference_prompt_cost": 0.00125925,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776238347-J0ZOBNLFYPutnFI2VUpD",
+    "object": "response",
+    "created_at": 1776238349,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_77565514",
+        "call_id": "call_77565514",
+        "name": "poker_game_winner",
+        "arguments": "{\"players\":[\"Alex\",\"Sam\",\"Robert\",\"Steve\"],\"cards\":{}}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 422,
+      "completion_tokens": 43,
+      "total_tokens": 465,
+      "cost": 0.0018852075,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00190425,
+        "upstream_inference_prompt_cost": 0.00125925,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776238347-J0ZOBNLFYPutnFI2VUpD",
+    "object": "chat.completion",
+    "created": 1776238347,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_77565514",
+              "function": {
+                "name": "poker_game_winner",
+                "arguments": "{\"players\":[\"Alex\",\"Sam\",\"Robert\",\"Steve\"],\"cards\":{}}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 422,
+      "completion_tokens": 43,
+      "total_tokens": 465,
+      "cost": 0.0018852075,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00190425,
+        "upstream_inference_prompt_cost": 0.00125925,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2061.975,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "6876456c-8ab8-434a-bd09-ef2fa3721f76"
+}

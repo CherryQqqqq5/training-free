@@ -1,0 +1,437 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Give me the population size of tigers in Bangladesh and India for the last 5 years. Also provide the projected population size of tigers in Nepal and Malaysia for the next 10 years."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "crop_yield_get_history",
+        "description": "Retrieve historical crop yield data of a specific crop in a given country. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "country": {
+              "type": "string",
+              "description": "The country of interest."
+            },
+            "crop": {
+              "type": "string",
+              "description": "Type of crop."
+            },
+            "years": {
+              "type": "integer",
+              "description": "Number of years of history to retrieve."
+            }
+          },
+          "required": [
+            "country",
+            "crop",
+            "years"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "animal_population_get_history",
+        "description": "Retrieve historical population size of a specific species in a given country. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "country": {
+              "type": "string",
+              "description": "The country of interest."
+            },
+            "species": {
+              "type": "string",
+              "description": "Species of the animal."
+            },
+            "years": {
+              "type": "integer",
+              "description": "Number of years of history to retrieve."
+            }
+          },
+          "required": [
+            "country",
+            "species",
+            "years"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "animal_population_get_projection",
+        "description": "Predict the future population size of a specific species in a given country. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "country": {
+              "type": "string",
+              "description": "The country of interest."
+            },
+            "species": {
+              "type": "string",
+              "description": "Species of the animal."
+            },
+            "years": {
+              "type": "integer",
+              "description": "Number of years in the future to predict."
+            }
+          },
+          "required": [
+            "country",
+            "species",
+            "years"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Give me the population size of tigers in Bangladesh and India for the last 5 years. Also provide the projected population size of tigers in Nepal and Malaysia for the next 10 years."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "crop_yield_get_history",
+          "description": "Retrieve historical crop yield data of a specific crop in a given country. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "country": {
+                "type": "string",
+                "description": "The country of interest."
+              },
+              "crop": {
+                "type": "string",
+                "description": "Type of crop."
+              },
+              "years": {
+                "type": "integer",
+                "description": "Number of years of history to retrieve."
+              }
+            },
+            "required": [
+              "country",
+              "crop",
+              "years"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "animal_population_get_history",
+          "description": "Retrieve historical population size of a specific species in a given country. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "country": {
+                "type": "string",
+                "description": "The country of interest."
+              },
+              "species": {
+                "type": "string",
+                "description": "Species of the animal."
+              },
+              "years": {
+                "type": "integer",
+                "description": "Number of years of history to retrieve."
+              }
+            },
+            "required": [
+              "country",
+              "species",
+              "years"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "animal_population_get_projection",
+          "description": "Predict the future population size of a specific species in a given country. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "country": {
+                "type": "string",
+                "description": "The country of interest."
+              },
+              "species": {
+                "type": "string",
+                "description": "Species of the animal."
+              },
+              "years": {
+                "type": "integer",
+                "description": "Number of years in the future to predict."
+              }
+            },
+            "required": [
+              "country",
+              "species",
+              "years"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241373-CgR2IWLXFqck3H9Lc574",
+    "object": "chat.completion",
+    "created": 1776241373,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_45475305",
+              "function": {
+                "name": "animal_population_get_history",
+                "arguments": "{\"country\":\"Bangladesh\",\"species\":\"tiger\",\"years\":5}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_50277364",
+              "function": {
+                "name": "animal_population_get_history",
+                "arguments": "{\"country\":\"India\",\"species\":\"tiger\",\"years\":5}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_44775794",
+              "function": {
+                "name": "animal_population_get_projection",
+                "arguments": "{\"country\":\"Nepal\",\"species\":\"tiger\",\"years\":10}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_28403733",
+              "function": {
+                "name": "animal_population_get_projection",
+                "arguments": "{\"country\":\"Malaysia\",\"species\":\"tiger\",\"years\":10}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 557,
+      "completion_tokens": 162,
+      "total_tokens": 719,
+      "cost": 0.0035944425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00363075,
+        "upstream_inference_prompt_cost": 0.00120075,
+        "upstream_inference_completions_cost": 0.00243
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241373-CgR2IWLXFqck3H9Lc574",
+    "object": "response",
+    "created_at": 1776241375,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_45475305",
+        "call_id": "call_45475305",
+        "name": "animal_population_get_history",
+        "arguments": "{\"country\":\"Bangladesh\",\"species\":\"tiger\",\"years\":5}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_50277364",
+        "call_id": "call_50277364",
+        "name": "animal_population_get_history",
+        "arguments": "{\"country\":\"India\",\"species\":\"tiger\",\"years\":5}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_44775794",
+        "call_id": "call_44775794",
+        "name": "animal_population_get_projection",
+        "arguments": "{\"country\":\"Nepal\",\"species\":\"tiger\",\"years\":10}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_28403733",
+        "call_id": "call_28403733",
+        "name": "animal_population_get_projection",
+        "arguments": "{\"country\":\"Malaysia\",\"species\":\"tiger\",\"years\":10}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 557,
+      "completion_tokens": 162,
+      "total_tokens": 719,
+      "cost": 0.0035944425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00363075,
+        "upstream_inference_prompt_cost": 0.00120075,
+        "upstream_inference_completions_cost": 0.00243
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241373-CgR2IWLXFqck3H9Lc574",
+    "object": "chat.completion",
+    "created": 1776241373,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_45475305",
+              "function": {
+                "name": "animal_population_get_history",
+                "arguments": "{\"country\":\"Bangladesh\",\"species\":\"tiger\",\"years\":5}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_50277364",
+              "function": {
+                "name": "animal_population_get_history",
+                "arguments": "{\"country\":\"India\",\"species\":\"tiger\",\"years\":5}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_44775794",
+              "function": {
+                "name": "animal_population_get_projection",
+                "arguments": "{\"country\":\"Nepal\",\"species\":\"tiger\",\"years\":10}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_28403733",
+              "function": {
+                "name": "animal_population_get_projection",
+                "arguments": "{\"country\":\"Malaysia\",\"species\":\"tiger\",\"years\":10}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 557,
+      "completion_tokens": 162,
+      "total_tokens": 719,
+      "cost": 0.0035944425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00363075,
+        "upstream_inference_prompt_cost": 0.00120075,
+        "upstream_inference_completions_cost": 0.00243
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 3098.891,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "55746914-5cd6-46de-b396-a96a1cb96b1b"
+}

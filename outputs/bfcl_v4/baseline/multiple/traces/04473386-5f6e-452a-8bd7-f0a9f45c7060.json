@@ -1,0 +1,416 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Analyze the sentiment of a customer review 'I love the food here! It's always fresh and delicious.'."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "hotel_booking",
+        "description": "Books a hotel room for a specific date range. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "hotel_name": {
+              "type": "string",
+              "description": "The name of the hotel."
+            },
+            "location": {
+              "type": "string",
+              "description": "The city and state, e.g. New York, NY."
+            },
+            "start_date": {
+              "type": "string",
+              "description": "The start date of the reservation. Use format 'YYYY-MM-DD'."
+            },
+            "end_date": {
+              "type": "string",
+              "description": "The end date of the reservation. Use format 'YYYY-MM-DD'."
+            },
+            "rooms": {
+              "type": "integer",
+              "default": 1,
+              "description": "The number of rooms to reserve."
+            }
+          },
+          "required": [
+            "hotel_name",
+            "location",
+            "start_date",
+            "end_date"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "sentiment_analysis",
+        "description": "Perform sentiment analysis on a given piece of text. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "description": "The text on which to perform sentiment analysis."
+            },
+            "language": {
+              "type": "string",
+              "description": "The language in which the text is written."
+            }
+          },
+          "required": [
+            "text",
+            "language"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "get_time_difference",
+        "description": "Get the time difference between two places. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "place1": {
+              "type": "string",
+              "description": "The first place for time difference."
+            },
+            "place2": {
+              "type": "string",
+              "description": "The second place for time difference."
+            }
+          },
+          "required": [
+            "place1",
+            "place2"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "calculate_bmi",
+        "description": "Calculate the Body Mass Index (BMI) for a person based on their weight and height. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "weight": {
+              "type": "integer",
+              "description": "The weight of the person in kilograms."
+            },
+            "height": {
+              "type": "integer",
+              "description": "The height of the person in centimeters."
+            },
+            "system": {
+              "type": "string",
+              "description": "The system of units to be used, 'metric' or 'imperial'. Default is 'metric'."
+            }
+          },
+          "required": [
+            "weight",
+            "height"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Analyze the sentiment of a customer review 'I love the food here! It's always fresh and delicious.'."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "hotel_booking",
+          "description": "Books a hotel room for a specific date range. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "hotel_name": {
+                "type": "string",
+                "description": "The name of the hotel."
+              },
+              "location": {
+                "type": "string",
+                "description": "The city and state, e.g. New York, NY."
+              },
+              "start_date": {
+                "type": "string",
+                "description": "The start date of the reservation. Use format 'YYYY-MM-DD'."
+              },
+              "end_date": {
+                "type": "string",
+                "description": "The end date of the reservation. Use format 'YYYY-MM-DD'."
+              },
+              "rooms": {
+                "type": "integer",
+                "default": 1,
+                "description": "The number of rooms to reserve."
+              }
+            },
+            "required": [
+              "hotel_name",
+              "location",
+              "start_date",
+              "end_date"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "sentiment_analysis",
+          "description": "Perform sentiment analysis on a given piece of text. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "description": "The text on which to perform sentiment analysis."
+              },
+              "language": {
+                "type": "string",
+                "description": "The language in which the text is written."
+              }
+            },
+            "required": [
+              "text",
+              "language"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "get_time_difference",
+          "description": "Get the time difference between two places. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "place1": {
+                "type": "string",
+                "description": "The first place for time difference."
+              },
+              "place2": {
+                "type": "string",
+                "description": "The second place for time difference."
+              }
+            },
+            "required": [
+              "place1",
+              "place2"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_bmi",
+          "description": "Calculate the Body Mass Index (BMI) for a person based on their weight and height. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "weight": {
+                "type": "integer",
+                "description": "The weight of the person in kilograms."
+              },
+              "height": {
+                "type": "integer",
+                "description": "The height of the person in centimeters."
+              },
+              "system": {
+                "type": "string",
+                "description": "The system of units to be used, 'metric' or 'imperial'. Default is 'metric'."
+              }
+            },
+            "required": [
+              "weight",
+              "height"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239790-jPmYBko6vpzOWpQM9VOE",
+    "object": "chat.completion",
+    "created": 1776239791,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_61712108",
+              "function": {
+                "name": "sentiment_analysis",
+                "arguments": "{\"text\":\"I love the food here! It's always fresh and delicious.\",\"language\":\"English\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 691,
+      "completion_tokens": 42,
+      "total_tokens": 733,
+      "cost": 0.0026692875,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00269625,
+        "upstream_inference_prompt_cost": 0.00206625,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239790-jPmYBko6vpzOWpQM9VOE",
+    "object": "response",
+    "created_at": 1776239792,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_61712108",
+        "call_id": "call_61712108",
+        "name": "sentiment_analysis",
+        "arguments": "{\"text\":\"I love the food here! It's always fresh and delicious.\",\"language\":\"English\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 691,
+      "completion_tokens": 42,
+      "total_tokens": 733,
+      "cost": 0.0026692875,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00269625,
+        "upstream_inference_prompt_cost": 0.00206625,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239790-jPmYBko6vpzOWpQM9VOE",
+    "object": "chat.completion",
+    "created": 1776239791,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_61712108",
+              "function": {
+                "name": "sentiment_analysis",
+                "arguments": "{\"text\":\"I love the food here! It's always fresh and delicious.\",\"language\":\"English\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 691,
+      "completion_tokens": 42,
+      "total_tokens": 733,
+      "cost": 0.0026692875,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00269625,
+        "upstream_inference_prompt_cost": 0.00206625,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2058.549,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "04473386-5f6e-452a-8bd7-f0a9f45c7060"
+}

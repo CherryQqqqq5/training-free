@@ -1,0 +1,380 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Determine the median and variance for the following data points 3,4,5,2,8,5. Also determine the mode for these points."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "statistics_variance",
+        "description": "This function calculates the variance of a given set of numbers. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "The list of data points."
+            },
+            "population": {
+              "type": "boolean",
+              "description": "Determines whether to use population variance formula. Default to True",
+              "default": true
+            }
+          },
+          "required": [
+            "data"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "statistics_median",
+        "description": "This function returns the median of the data set provided. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "The list of data points."
+            }
+          },
+          "required": [
+            "data"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "statistics_mode",
+        "description": "This function determines the mode of a list of numbers. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "The list of data points."
+            }
+          },
+          "required": [
+            "data"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Determine the median and variance for the following data points 3,4,5,2,8,5. Also determine the mode for these points."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "statistics_variance",
+          "description": "This function calculates the variance of a given set of numbers. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "The list of data points."
+              },
+              "population": {
+                "type": "boolean",
+                "description": "Determines whether to use population variance formula. Default to True",
+                "default": true
+              }
+            },
+            "required": [
+              "data"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "statistics_median",
+          "description": "This function returns the median of the data set provided. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "The list of data points."
+              }
+            },
+            "required": [
+              "data"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "statistics_mode",
+          "description": "This function determines the mode of a list of numbers. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "The list of data points."
+              }
+            },
+            "required": [
+              "data"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240530-spoiub7TxxaZHx0myc3D",
+    "object": "chat.completion",
+    "created": 1776240530,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_87970362",
+              "function": {
+                "name": "statistics_median",
+                "arguments": "{\"data\":[3,4,5,2,8,5]}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_09841916",
+              "function": {
+                "name": "statistics_variance",
+                "arguments": "{\"data\":[3,4,5,2,8,5],\"population\":true}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_31971274",
+              "function": {
+                "name": "statistics_mode",
+                "arguments": "{\"data\":[3,4,5,2,8,5]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 478,
+      "completion_tokens": 127,
+      "total_tokens": 605,
+      "cost": 0.0032989275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00333225,
+        "upstream_inference_prompt_cost": 0.00142725,
+        "upstream_inference_completions_cost": 0.001905
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240530-spoiub7TxxaZHx0myc3D",
+    "object": "response",
+    "created_at": 1776240532,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_87970362",
+        "call_id": "call_87970362",
+        "name": "statistics_median",
+        "arguments": "{\"data\":[3,4,5,2,8,5]}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_09841916",
+        "call_id": "call_09841916",
+        "name": "statistics_variance",
+        "arguments": "{\"data\":[3,4,5,2,8,5],\"population\":true}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_31971274",
+        "call_id": "call_31971274",
+        "name": "statistics_mode",
+        "arguments": "{\"data\":[3,4,5,2,8,5]}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 478,
+      "completion_tokens": 127,
+      "total_tokens": 605,
+      "cost": 0.0032989275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00333225,
+        "upstream_inference_prompt_cost": 0.00142725,
+        "upstream_inference_completions_cost": 0.001905
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240530-spoiub7TxxaZHx0myc3D",
+    "object": "chat.completion",
+    "created": 1776240530,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_87970362",
+              "function": {
+                "name": "statistics_median",
+                "arguments": "{\"data\":[3,4,5,2,8,5]}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_09841916",
+              "function": {
+                "name": "statistics_variance",
+                "arguments": "{\"data\":[3,4,5,2,8,5],\"population\":true}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_31971274",
+              "function": {
+                "name": "statistics_mode",
+                "arguments": "{\"data\":[3,4,5,2,8,5]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 478,
+      "completion_tokens": 127,
+      "total_tokens": 605,
+      "cost": 0.0032989275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00333225,
+        "upstream_inference_prompt_cost": 0.00142725,
+        "upstream_inference_completions_cost": 0.001905
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2745.183,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "dfbc4387-7c57-4f45-aaa5-27a18ac3bdbb"
+}

@@ -1,0 +1,242 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "What's the quarterly dividend per share of a company with 100 million outstanding shares and total dividend payout of 50 million USD?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "finance_calculate_quarterly_dividend_per_share",
+        "description": "Calculate quarterly dividend per share for a company given total dividend payout and outstanding shares Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "total_payout": {
+              "type": "integer",
+              "description": "The total amount of dividends paid out in USD"
+            },
+            "outstanding_shares": {
+              "type": "integer",
+              "description": "Total number of outstanding shares"
+            }
+          },
+          "required": [
+            "total_payout",
+            "outstanding_shares"
+          ],
+          "optional": []
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What's the quarterly dividend per share of a company with 100 million outstanding shares and total dividend payout of 50 million USD?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "finance_calculate_quarterly_dividend_per_share",
+          "description": "Calculate quarterly dividend per share for a company given total dividend payout and outstanding shares Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "total_payout": {
+                "type": "integer",
+                "description": "The total amount of dividends paid out in USD"
+              },
+              "outstanding_shares": {
+                "type": "integer",
+                "description": "Total number of outstanding shares"
+              }
+            },
+            "required": [
+              "total_payout",
+              "outstanding_shares"
+            ],
+            "optional": []
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776238825-ZhCm0MC8ez7ndjYdtADW",
+    "object": "chat.completion",
+    "created": 1776238825,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_90189676",
+              "function": {
+                "name": "finance_calculate_quarterly_dividend_per_share",
+                "arguments": "{\"total_payout\":50000000,\"outstanding_shares\":100000000}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 345,
+      "completion_tokens": 48,
+      "total_tokens": 393,
+      "cost": 0.0012719025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00128475,
+        "upstream_inference_prompt_cost": 0.00056475,
+        "upstream_inference_completions_cost": 0.00072
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776238825-ZhCm0MC8ez7ndjYdtADW",
+    "object": "response",
+    "created_at": 1776238827,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_90189676",
+        "call_id": "call_90189676",
+        "name": "finance_calculate_quarterly_dividend_per_share",
+        "arguments": "{\"total_payout\":50000000,\"outstanding_shares\":100000000}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 345,
+      "completion_tokens": 48,
+      "total_tokens": 393,
+      "cost": 0.0012719025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00128475,
+        "upstream_inference_prompt_cost": 0.00056475,
+        "upstream_inference_completions_cost": 0.00072
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776238825-ZhCm0MC8ez7ndjYdtADW",
+    "object": "chat.completion",
+    "created": 1776238825,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_90189676",
+              "function": {
+                "name": "finance_calculate_quarterly_dividend_per_share",
+                "arguments": "{\"total_payout\":50000000,\"outstanding_shares\":100000000}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 345,
+      "completion_tokens": 48,
+      "total_tokens": 393,
+      "cost": 0.0012719025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00128475,
+        "upstream_inference_prompt_cost": 0.00056475,
+        "upstream_inference_completions_cost": 0.00072
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1883.107,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "d3ac994b-2d81-47e3-9864-c7e5fc72e276"
+}

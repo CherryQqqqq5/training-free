@@ -1,0 +1,398 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Could you please find the latest updates for the game 'Call of Duty' on the 'Playstation' platform for the 'European' region, then find the current price for the same game on the 'Xbox' platform, and finally find reviews for the game 'FIFA 21' from the 'American' region?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "games_update_find",
+        "description": "Find the latest updates or patches for a specific game on a specified gaming platform. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "game": {
+              "type": "string",
+              "description": "The name of the game."
+            },
+            "platform": {
+              "type": "string",
+              "description": "The gaming platform, e.g. Xbox, Playstation, PC."
+            },
+            "region": {
+              "type": "string",
+              "description": "The region of the update (optional, default is 'global')"
+            }
+          },
+          "required": [
+            "game",
+            "platform"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "games_reviews_find",
+        "description": "Find reviews for a specific game. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "game": {
+              "type": "string",
+              "description": "The name of the game."
+            },
+            "region": {
+              "type": "string",
+              "description": "The region where the reviews are coming from (optional, default is 'global')"
+            }
+          },
+          "required": [
+            "game"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "games_price_find",
+        "description": "Find the current price for a specific game on a specified gaming platform. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "game": {
+              "type": "string",
+              "description": "The name of the game."
+            },
+            "platform": {
+              "type": "string",
+              "description": "The gaming platform, e.g. Xbox, Playstation, PC."
+            }
+          },
+          "required": [
+            "game",
+            "platform"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Could you please find the latest updates for the game 'Call of Duty' on the 'Playstation' platform for the 'European' region, then find the current price for the same game on the 'Xbox' platform, and finally find reviews for the game 'FIFA 21' from the 'American' region?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "games_update_find",
+          "description": "Find the latest updates or patches for a specific game on a specified gaming platform. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "game": {
+                "type": "string",
+                "description": "The name of the game."
+              },
+              "platform": {
+                "type": "string",
+                "description": "The gaming platform, e.g. Xbox, Playstation, PC."
+              },
+              "region": {
+                "type": "string",
+                "description": "The region of the update (optional, default is 'global')"
+              }
+            },
+            "required": [
+              "game",
+              "platform"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "games_reviews_find",
+          "description": "Find reviews for a specific game. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "game": {
+                "type": "string",
+                "description": "The name of the game."
+              },
+              "region": {
+                "type": "string",
+                "description": "The region where the reviews are coming from (optional, default is 'global')"
+              }
+            },
+            "required": [
+              "game"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "games_price_find",
+          "description": "Find the current price for a specific game on a specified gaming platform. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "game": {
+                "type": "string",
+                "description": "The name of the game."
+              },
+              "platform": {
+                "type": "string",
+                "description": "The gaming platform, e.g. Xbox, Playstation, PC."
+              }
+            },
+            "required": [
+              "game",
+              "platform"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240918-GuGskGMEkp4rDKQwLu7Z",
+    "object": "chat.completion",
+    "created": 1776240918,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'll handle your requests step by step.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_87189934",
+              "function": {
+                "name": "games_update_find",
+                "arguments": "{\"game\":\"Call of Duty\",\"platform\":\"Playstation\",\"region\":\"European\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_87757101",
+              "function": {
+                "name": "games_price_find",
+                "arguments": "{\"game\":\"Call of Duty\",\"platform\":\"Xbox\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_48799887",
+              "function": {
+                "name": "games_reviews_find",
+                "arguments": "{\"game\":\"FIFA 21\",\"region\":\"American\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 571,
+      "completion_tokens": 121,
+      "total_tokens": 692,
+      "cost": 0.0030271725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00305775,
+        "upstream_inference_prompt_cost": 0.00124275,
+        "upstream_inference_completions_cost": 0.001815
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240918-GuGskGMEkp4rDKQwLu7Z",
+    "object": "response",
+    "created_at": 1776240920,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'll handle your requests step by step.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_87189934",
+        "call_id": "call_87189934",
+        "name": "games_update_find",
+        "arguments": "{\"game\":\"Call of Duty\",\"platform\":\"Playstation\",\"region\":\"European\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_87757101",
+        "call_id": "call_87757101",
+        "name": "games_price_find",
+        "arguments": "{\"game\":\"Call of Duty\",\"platform\":\"Xbox\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_48799887",
+        "call_id": "call_48799887",
+        "name": "games_reviews_find",
+        "arguments": "{\"game\":\"FIFA 21\",\"region\":\"American\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 571,
+      "completion_tokens": 121,
+      "total_tokens": 692,
+      "cost": 0.0030271725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00305775,
+        "upstream_inference_prompt_cost": 0.00124275,
+        "upstream_inference_completions_cost": 0.001815
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240918-GuGskGMEkp4rDKQwLu7Z",
+    "object": "chat.completion",
+    "created": 1776240918,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'll handle your requests step by step.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_87189934",
+              "function": {
+                "name": "games_update_find",
+                "arguments": "{\"game\":\"Call of Duty\",\"platform\":\"Playstation\",\"region\":\"European\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_87757101",
+              "function": {
+                "name": "games_price_find",
+                "arguments": "{\"game\":\"Call of Duty\",\"platform\":\"Xbox\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_48799887",
+              "function": {
+                "name": "games_reviews_find",
+                "arguments": "{\"game\":\"FIFA 21\",\"region\":\"American\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 571,
+      "completion_tokens": 121,
+      "total_tokens": 692,
+      "cost": 0.0030271725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00305775,
+        "upstream_inference_prompt_cost": 0.00124275,
+        "upstream_inference_completions_cost": 0.001815
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2806.695,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "3cadedd5-5cd3-4480-a227-1bedfa78b330"
+}

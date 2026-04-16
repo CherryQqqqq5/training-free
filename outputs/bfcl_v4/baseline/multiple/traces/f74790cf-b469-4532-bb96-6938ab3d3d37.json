@@ -1,0 +1,336 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Can I find a historical fiction book at the New York public library?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "library_search_books",
+        "description": "Search for a book in a given library with optional parameters Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "Name or city of library"
+            },
+            "genre": {
+              "type": "string",
+              "description": "Genre of the book"
+            },
+            "title": {
+              "type": "string",
+              "description": "Title of the book. Default ''"
+            }
+          },
+          "required": [
+            "location",
+            "genre"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "google_books_search",
+        "description": "Search for a book in the Google Books library with optional parameters Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "genre": {
+              "type": "string",
+              "description": "Genre of the book"
+            },
+            "title": {
+              "type": "string",
+              "description": "Title of the book. Default ''"
+            }
+          },
+          "required": [
+            "genre"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "openlibrary_books_search",
+        "description": "Search for a book in the Open Library with optional parameters Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "genre": {
+              "type": "string",
+              "description": "Genre of the book"
+            },
+            "title": {
+              "type": "string",
+              "description": "Title of the book. Default ''"
+            }
+          },
+          "required": [
+            "genre"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Can I find a historical fiction book at the New York public library?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "library_search_books",
+          "description": "Search for a book in a given library with optional parameters Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "Name or city of library"
+              },
+              "genre": {
+                "type": "string",
+                "description": "Genre of the book"
+              },
+              "title": {
+                "type": "string",
+                "description": "Title of the book. Default ''"
+              }
+            },
+            "required": [
+              "location",
+              "genre"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "google_books_search",
+          "description": "Search for a book in the Google Books library with optional parameters Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "genre": {
+                "type": "string",
+                "description": "Genre of the book"
+              },
+              "title": {
+                "type": "string",
+                "description": "Title of the book. Default ''"
+              }
+            },
+            "required": [
+              "genre"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "openlibrary_books_search",
+          "description": "Search for a book in the Open Library with optional parameters Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "genre": {
+                "type": "string",
+                "description": "Genre of the book"
+              },
+              "title": {
+                "type": "string",
+                "description": "Title of the book. Default ''"
+              }
+            },
+            "required": [
+              "genre"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239598-7JClfgr4n2XwegDrZi8V",
+    "object": "chat.completion",
+    "created": 1776239598,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_68777710",
+              "function": {
+                "name": "library_search_books",
+                "arguments": "{\"location\":\"New York Public Library\",\"genre\":\"historical fiction\",\"title\":\"\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 480,
+      "completion_tokens": 41,
+      "total_tokens": 521,
+      "cost": 0.0020277675,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00204825,
+        "upstream_inference_prompt_cost": 0.00143325,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239598-7JClfgr4n2XwegDrZi8V",
+    "object": "response",
+    "created_at": 1776239600,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_68777710",
+        "call_id": "call_68777710",
+        "name": "library_search_books",
+        "arguments": "{\"location\":\"New York Public Library\",\"genre\":\"historical fiction\",\"title\":\"\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 480,
+      "completion_tokens": 41,
+      "total_tokens": 521,
+      "cost": 0.0020277675,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00204825,
+        "upstream_inference_prompt_cost": 0.00143325,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239598-7JClfgr4n2XwegDrZi8V",
+    "object": "chat.completion",
+    "created": 1776239598,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_68777710",
+              "function": {
+                "name": "library_search_books",
+                "arguments": "{\"location\":\"New York Public Library\",\"genre\":\"historical fiction\",\"title\":\"\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 480,
+      "completion_tokens": 41,
+      "total_tokens": 521,
+      "cost": 0.0020277675,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00204825,
+        "upstream_inference_prompt_cost": 0.00143325,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2035.782,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "f74790cf-b469-4532-bb96-6938ab3d3d37"
+}

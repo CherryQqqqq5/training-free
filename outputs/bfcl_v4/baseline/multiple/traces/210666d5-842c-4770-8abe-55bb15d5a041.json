@@ -1,0 +1,318 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "How much is the potential of the Solar farm at location with coordinates [43.653225, -79.383186] in December, given that it has a total solar panel area of 80000 sq ft?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "solarFarm_potential",
+        "description": "Estimate the energy output of a solar farm given its location and panel area for a particular month. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "coordinates": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "description": "The geographic coordinates of the location of the solar farm."
+            },
+            "panelArea": {
+              "type": "integer",
+              "description": "The total solar panel area in square feet at the location."
+            },
+            "month": {
+              "type": "string",
+              "description": "The month for which to calculate the potential energy output. Default to January",
+              "optional": true
+            }
+          },
+          "required": [
+            "coordinates",
+            "panelArea"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "windFarm_potential",
+        "description": "Estimate the energy output of a wind farm given its location and turbine count for a particular month. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "coordinates": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "description": "The geographic coordinates of the location of the wind farm."
+            },
+            "turbineCount": {
+              "type": "integer",
+              "description": "The total number of wind turbines at the location."
+            },
+            "month": {
+              "type": "string",
+              "description": "The month for which to calculate the potential energy output. Default to January",
+              "optional": true
+            }
+          },
+          "required": [
+            "coordinates",
+            "turbineCount"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "How much is the potential of the Solar farm at location with coordinates [43.653225, -79.383186] in December, given that it has a total solar panel area of 80000 sq ft?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "solarFarm_potential",
+          "description": "Estimate the energy output of a solar farm given its location and panel area for a particular month. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "coordinates": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "description": "The geographic coordinates of the location of the solar farm."
+              },
+              "panelArea": {
+                "type": "integer",
+                "description": "The total solar panel area in square feet at the location."
+              },
+              "month": {
+                "type": "string",
+                "description": "The month for which to calculate the potential energy output. Default to January",
+                "optional": true
+              }
+            },
+            "required": [
+              "coordinates",
+              "panelArea"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "windFarm_potential",
+          "description": "Estimate the energy output of a wind farm given its location and turbine count for a particular month. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "coordinates": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "description": "The geographic coordinates of the location of the wind farm."
+              },
+              "turbineCount": {
+                "type": "integer",
+                "description": "The total number of wind turbines at the location."
+              },
+              "month": {
+                "type": "string",
+                "description": "The month for which to calculate the potential energy output. Default to January",
+                "optional": true
+              }
+            },
+            "required": [
+              "coordinates",
+              "turbineCount"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239478-UNZhoV40AXG5eqIrVzoP",
+    "object": "chat.completion",
+    "created": 1776239478,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_17286175",
+              "function": {
+                "name": "solarFarm_potential",
+                "arguments": "{\"coordinates\":[43.653225,-79.383186],\"panelArea\":80000,\"month\":\"December\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 530,
+      "completion_tokens": 51,
+      "total_tokens": 581,
+      "cost": 0.0018659025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00188475,
+        "upstream_inference_prompt_cost": 0.00111975,
+        "upstream_inference_completions_cost": 0.000765
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239478-UNZhoV40AXG5eqIrVzoP",
+    "object": "response",
+    "created_at": 1776239479,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_17286175",
+        "call_id": "call_17286175",
+        "name": "solarFarm_potential",
+        "arguments": "{\"coordinates\":[43.653225,-79.383186],\"panelArea\":80000,\"month\":\"December\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 530,
+      "completion_tokens": 51,
+      "total_tokens": 581,
+      "cost": 0.0018659025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00188475,
+        "upstream_inference_prompt_cost": 0.00111975,
+        "upstream_inference_completions_cost": 0.000765
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239478-UNZhoV40AXG5eqIrVzoP",
+    "object": "chat.completion",
+    "created": 1776239478,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_17286175",
+              "function": {
+                "name": "solarFarm_potential",
+                "arguments": "{\"coordinates\":[43.653225,-79.383186],\"panelArea\":80000,\"month\":\"December\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 530,
+      "completion_tokens": 51,
+      "total_tokens": 581,
+      "cost": 0.0018659025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00188475,
+        "upstream_inference_prompt_cost": 0.00111975,
+        "upstream_inference_completions_cost": 0.000765
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1881.938,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "210666d5-842c-4770-8abe-55bb15d5a041"
+}

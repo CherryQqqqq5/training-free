@@ -1,0 +1,356 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "What are the names of proteins found in the plasma membrane?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "find_exhibition",
+        "description": "Locate the most popular exhibitions based on criteria like location, time, art form, and user ratings. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city where the exhibition is held, e.g., New York, NY."
+            },
+            "art_form": {
+              "type": "string",
+              "description": "The form of art the exhibition is displaying e.g., sculpture."
+            },
+            "month": {
+              "type": "string",
+              "description": "The month of exhibition. Default value will return upcoming events."
+            },
+            "user_ratings": {
+              "type": "string",
+              "enum": [
+                "low",
+                "average",
+                "high"
+              ],
+              "description": "Select exhibitions with user rating threshold. Default is 'high'"
+            }
+          },
+          "required": [
+            "location",
+            "art_form"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "mutation_type_find",
+        "description": "Finds the type of a genetic mutation based on its SNP (Single Nucleotide Polymorphism) ID. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "snp_id": {
+              "type": "string",
+              "description": "The ID of the Single Nucleotide Polymorphism (SNP) mutation."
+            },
+            "species": {
+              "type": "string",
+              "description": "Species in which the SNP occurs, default is 'Homo sapiens' (Humans)."
+            }
+          },
+          "required": [
+            "snp_id"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "cellbio_get_proteins",
+        "description": "Get the list of proteins in a specific cell compartment. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "cell_compartment": {
+              "type": "string",
+              "description": "The specific cell compartment."
+            },
+            "include_description": {
+              "type": "boolean",
+              "description": "Set true if you want a brief description of each protein.",
+              "default": "false"
+            }
+          },
+          "required": [
+            "cell_compartment"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What are the names of proteins found in the plasma membrane?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "find_exhibition",
+          "description": "Locate the most popular exhibitions based on criteria like location, time, art form, and user ratings. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city where the exhibition is held, e.g., New York, NY."
+              },
+              "art_form": {
+                "type": "string",
+                "description": "The form of art the exhibition is displaying e.g., sculpture."
+              },
+              "month": {
+                "type": "string",
+                "description": "The month of exhibition. Default value will return upcoming events."
+              },
+              "user_ratings": {
+                "type": "string",
+                "enum": [
+                  "low",
+                  "average",
+                  "high"
+                ],
+                "description": "Select exhibitions with user rating threshold. Default is 'high'"
+              }
+            },
+            "required": [
+              "location",
+              "art_form"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "mutation_type_find",
+          "description": "Finds the type of a genetic mutation based on its SNP (Single Nucleotide Polymorphism) ID. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "snp_id": {
+                "type": "string",
+                "description": "The ID of the Single Nucleotide Polymorphism (SNP) mutation."
+              },
+              "species": {
+                "type": "string",
+                "description": "Species in which the SNP occurs, default is 'Homo sapiens' (Humans)."
+              }
+            },
+            "required": [
+              "snp_id"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "cellbio_get_proteins",
+          "description": "Get the list of proteins in a specific cell compartment. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "cell_compartment": {
+                "type": "string",
+                "description": "The specific cell compartment."
+              },
+              "include_description": {
+                "type": "boolean",
+                "description": "Set true if you want a brief description of each protein.",
+                "default": "false"
+              }
+            },
+            "required": [
+              "cell_compartment"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240191-MCbTzXHoacgWkBqyp7O2",
+    "object": "chat.completion",
+    "created": 1776240191,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_10606804",
+              "function": {
+                "name": "cellbio_get_proteins",
+                "arguments": "{\"cell_compartment\":\"plasma membrane\",\"include_description\":false}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 594,
+      "completion_tokens": 38,
+      "total_tokens": 632,
+      "cost": 0.0018629325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00188175,
+        "upstream_inference_prompt_cost": 0.00131175,
+        "upstream_inference_completions_cost": 0.00057
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240191-MCbTzXHoacgWkBqyp7O2",
+    "object": "response",
+    "created_at": 1776240193,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_10606804",
+        "call_id": "call_10606804",
+        "name": "cellbio_get_proteins",
+        "arguments": "{\"cell_compartment\":\"plasma membrane\",\"include_description\":false}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 594,
+      "completion_tokens": 38,
+      "total_tokens": 632,
+      "cost": 0.0018629325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00188175,
+        "upstream_inference_prompt_cost": 0.00131175,
+        "upstream_inference_completions_cost": 0.00057
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240191-MCbTzXHoacgWkBqyp7O2",
+    "object": "chat.completion",
+    "created": 1776240191,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_10606804",
+              "function": {
+                "name": "cellbio_get_proteins",
+                "arguments": "{\"cell_compartment\":\"plasma membrane\",\"include_description\":false}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 594,
+      "completion_tokens": 38,
+      "total_tokens": 632,
+      "cost": 0.0018629325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00188175,
+        "upstream_inference_prompt_cost": 0.00131175,
+        "upstream_inference_completions_cost": 0.00057
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2200.25,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "1d16063e-2c4c-471a-a9fa-83316230bcfb"
+}

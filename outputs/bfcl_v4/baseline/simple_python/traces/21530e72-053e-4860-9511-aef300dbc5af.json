@@ -1,0 +1,260 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "How many ounces in 2 pounds of butter?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "cooking_conversion_convert",
+        "description": "Convert cooking measurements from one unit to another. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "quantity": {
+              "type": "integer",
+              "description": "The quantity to be converted."
+            },
+            "from_unit": {
+              "type": "string",
+              "description": "The unit to convert from."
+            },
+            "to_unit": {
+              "type": "string",
+              "description": "The unit to convert to."
+            },
+            "item": {
+              "type": "string",
+              "description": "The item to be converted."
+            }
+          },
+          "required": [
+            "quantity",
+            "from_unit",
+            "to_unit",
+            "item"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "How many ounces in 2 pounds of butter?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "cooking_conversion_convert",
+          "description": "Convert cooking measurements from one unit to another. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "quantity": {
+                "type": "integer",
+                "description": "The quantity to be converted."
+              },
+              "from_unit": {
+                "type": "string",
+                "description": "The unit to convert from."
+              },
+              "to_unit": {
+                "type": "string",
+                "description": "The unit to convert to."
+              },
+              "item": {
+                "type": "string",
+                "description": "The item to be converted."
+              }
+            },
+            "required": [
+              "quantity",
+              "from_unit",
+              "to_unit",
+              "item"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776238407-kjaBJvLW2OXQyVkzlhq1",
+    "object": "chat.completion",
+    "created": 1776238407,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_53564500",
+              "function": {
+                "name": "cooking_conversion_convert",
+                "arguments": "{\"quantity\":2,\"from_unit\":\"pounds\",\"to_unit\":\"ounces\",\"item\":\"butter\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 341,
+      "completion_tokens": 48,
+      "total_tokens": 389,
+      "cost": 0.0012600225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00127275,
+        "upstream_inference_prompt_cost": 0.00055275,
+        "upstream_inference_completions_cost": 0.00072
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776238407-kjaBJvLW2OXQyVkzlhq1",
+    "object": "response",
+    "created_at": 1776238408,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_53564500",
+        "call_id": "call_53564500",
+        "name": "cooking_conversion_convert",
+        "arguments": "{\"quantity\":2,\"from_unit\":\"pounds\",\"to_unit\":\"ounces\",\"item\":\"butter\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 341,
+      "completion_tokens": 48,
+      "total_tokens": 389,
+      "cost": 0.0012600225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00127275,
+        "upstream_inference_prompt_cost": 0.00055275,
+        "upstream_inference_completions_cost": 0.00072
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776238407-kjaBJvLW2OXQyVkzlhq1",
+    "object": "chat.completion",
+    "created": 1776238407,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_53564500",
+              "function": {
+                "name": "cooking_conversion_convert",
+                "arguments": "{\"quantity\":2,\"from_unit\":\"pounds\",\"to_unit\":\"ounces\",\"item\":\"butter\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 341,
+      "completion_tokens": 48,
+      "total_tokens": 389,
+      "cost": 0.0012600225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00127275,
+        "upstream_inference_prompt_cost": 0.00055275,
+        "upstream_inference_completions_cost": 0.00072
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1957.183,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "21530e72-053e-4860-9511-aef300dbc5af"
+}

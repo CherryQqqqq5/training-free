@@ -1,0 +1,408 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Can you tell me about the monarchs of France during the 17th century, major wars that took place in England during the 18th century, and the prominent art movements in Italy during the 19th century?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "european_history_get_events",
+        "description": "Provides a list of major historical events based on the specified country and century. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "country": {
+              "type": "string",
+              "description": "Country name."
+            },
+            "century": {
+              "type": "integer",
+              "description": "Century as an integer. For example, for the 1700s, input '18'."
+            },
+            "event_type": {
+              "type": "string",
+              "description": "Type of the event such as 'war', 'invention', 'revolution' etc. This field is optional. Default to 'war'."
+            }
+          },
+          "required": [
+            "country",
+            "century"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "european_history_get_monarchs",
+        "description": "Provides a list of monarchs based on the specified country and century. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "country": {
+              "type": "string",
+              "description": "Country name."
+            },
+            "century": {
+              "type": "integer",
+              "description": "Century as an integer. For example, for the 1700s, input '18'."
+            }
+          },
+          "required": [
+            "country",
+            "century"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "european_history_get_culture",
+        "description": "Provides information on cultural trends, art movements, philosophical ideas based on the specified country and century. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "country": {
+              "type": "string",
+              "description": "Country name."
+            },
+            "century": {
+              "type": "integer",
+              "description": "Century as an integer. For example, for the 1700s, input '18'."
+            },
+            "aspect": {
+              "type": "string",
+              "description": "Aspect of culture such as 'literature', 'art', 'philosophy' etc. This field is optional. Default to 'art'."
+            }
+          },
+          "required": [
+            "country",
+            "century"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Can you tell me about the monarchs of France during the 17th century, major wars that took place in England during the 18th century, and the prominent art movements in Italy during the 19th century?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "european_history_get_events",
+          "description": "Provides a list of major historical events based on the specified country and century. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "country": {
+                "type": "string",
+                "description": "Country name."
+              },
+              "century": {
+                "type": "integer",
+                "description": "Century as an integer. For example, for the 1700s, input '18'."
+              },
+              "event_type": {
+                "type": "string",
+                "description": "Type of the event such as 'war', 'invention', 'revolution' etc. This field is optional. Default to 'war'."
+              }
+            },
+            "required": [
+              "country",
+              "century"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "european_history_get_monarchs",
+          "description": "Provides a list of monarchs based on the specified country and century. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "country": {
+                "type": "string",
+                "description": "Country name."
+              },
+              "century": {
+                "type": "integer",
+                "description": "Century as an integer. For example, for the 1700s, input '18'."
+              }
+            },
+            "required": [
+              "country",
+              "century"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "european_history_get_culture",
+          "description": "Provides information on cultural trends, art movements, philosophical ideas based on the specified country and century. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "country": {
+                "type": "string",
+                "description": "Country name."
+              },
+              "century": {
+                "type": "integer",
+                "description": "Century as an integer. For example, for the 1700s, input '18'."
+              },
+              "aspect": {
+                "type": "string",
+                "description": "Aspect of culture such as 'literature', 'art', 'philosophy' etc. This field is optional. Default to 'art'."
+              }
+            },
+            "required": [
+              "country",
+              "century"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241673-A5lYiLF7plrm0ulcsjXV",
+    "object": "chat.completion",
+    "created": 1776241673,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'll help you with this request by calling the relevant functions to retrieve the information you need.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_87282126",
+              "function": {
+                "name": "european_history_get_monarchs",
+                "arguments": "{\"country\":\"France\",\"century\":17}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_42338947",
+              "function": {
+                "name": "european_history_get_events",
+                "arguments": "{\"country\":\"England\",\"century\":18,\"event_type\":\"war\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_33070379",
+              "function": {
+                "name": "european_history_get_culture",
+                "arguments": "{\"country\":\"Italy\",\"century\":19,\"aspect\":\"art\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 638,
+      "completion_tokens": 138,
+      "total_tokens": 776,
+      "cost": 0.0039374775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00397725,
+        "upstream_inference_prompt_cost": 0.00190725,
+        "upstream_inference_completions_cost": 0.00207
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241673-A5lYiLF7plrm0ulcsjXV",
+    "object": "response",
+    "created_at": 1776241675,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'll help you with this request by calling the relevant functions to retrieve the information you need.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_87282126",
+        "call_id": "call_87282126",
+        "name": "european_history_get_monarchs",
+        "arguments": "{\"country\":\"France\",\"century\":17}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_42338947",
+        "call_id": "call_42338947",
+        "name": "european_history_get_events",
+        "arguments": "{\"country\":\"England\",\"century\":18,\"event_type\":\"war\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_33070379",
+        "call_id": "call_33070379",
+        "name": "european_history_get_culture",
+        "arguments": "{\"country\":\"Italy\",\"century\":19,\"aspect\":\"art\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 638,
+      "completion_tokens": 138,
+      "total_tokens": 776,
+      "cost": 0.0039374775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00397725,
+        "upstream_inference_prompt_cost": 0.00190725,
+        "upstream_inference_completions_cost": 0.00207
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241673-A5lYiLF7plrm0ulcsjXV",
+    "object": "chat.completion",
+    "created": 1776241673,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'll help you with this request by calling the relevant functions to retrieve the information you need.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_87282126",
+              "function": {
+                "name": "european_history_get_monarchs",
+                "arguments": "{\"country\":\"France\",\"century\":17}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_42338947",
+              "function": {
+                "name": "european_history_get_events",
+                "arguments": "{\"country\":\"England\",\"century\":18,\"event_type\":\"war\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_33070379",
+              "function": {
+                "name": "european_history_get_culture",
+                "arguments": "{\"country\":\"Italy\",\"century\":19,\"aspect\":\"art\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 638,
+      "completion_tokens": 138,
+      "total_tokens": 776,
+      "cost": 0.0039374775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00397725,
+        "upstream_inference_prompt_cost": 0.00190725,
+        "upstream_inference_completions_cost": 0.00207
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2686.088,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "2b0b3d92-3867-4df6-a1a6-cb4c486e2c41"
+}

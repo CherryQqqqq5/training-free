@@ -1,0 +1,412 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "What are the opening hours of the Metropolitan Museum of Art on Saturday?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "discoverer_get",
+        "description": "Retrieve the name of the discoverer of an element based on its name. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "element_name": {
+              "type": "string",
+              "description": "The name of the element."
+            },
+            "year": {
+              "type": "integer",
+              "description": "Optional parameter that refers to the year of discovery. It could be helpful in case an element was discovered more than once. Default is 0."
+            },
+            "first": {
+              "type": "boolean",
+              "default": true,
+              "description": "Optional parameter indicating if the first discoverer's name should be retrieved."
+            }
+          },
+          "required": [
+            "element_name"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "lawsuit_check_case",
+        "description": "Verify the details of a lawsuit case and check its status using case ID. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "case_id": {
+              "type": "integer",
+              "description": "The identification number of the lawsuit case."
+            },
+            "closed_status": {
+              "type": "boolean",
+              "description": "The status of the lawsuit case to be verified."
+            }
+          },
+          "required": [
+            "case_id",
+            "closed_status"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "get_museum_hours",
+        "description": "Retrieve opening hours of a specified museum for the specified day. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "museum_name": {
+              "type": "string",
+              "description": "The name of the museum."
+            },
+            "day": {
+              "type": "string",
+              "description": "Day of the week.",
+              "enum": [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+                "Sunday"
+              ]
+            }
+          },
+          "required": [
+            "museum_name",
+            "day"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "monopoly_odds_calculator",
+        "description": "Calculates the probability of rolling a certain sum with two dice, commonly used in board game like Monopoly. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "number": {
+              "type": "integer",
+              "description": "The number for which the odds are calculated."
+            },
+            "dice_number": {
+              "type": "integer",
+              "description": "The number of dice involved in the roll."
+            },
+            "dice_faces": {
+              "type": "integer",
+              "description": "The number of faces on a single die. Default is 6 for standard six-faced die."
+            }
+          },
+          "required": [
+            "number",
+            "dice_number"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What are the opening hours of the Metropolitan Museum of Art on Saturday?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "discoverer_get",
+          "description": "Retrieve the name of the discoverer of an element based on its name. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "element_name": {
+                "type": "string",
+                "description": "The name of the element."
+              },
+              "year": {
+                "type": "integer",
+                "description": "Optional parameter that refers to the year of discovery. It could be helpful in case an element was discovered more than once. Default is 0."
+              },
+              "first": {
+                "type": "boolean",
+                "default": true,
+                "description": "Optional parameter indicating if the first discoverer's name should be retrieved."
+              }
+            },
+            "required": [
+              "element_name"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "lawsuit_check_case",
+          "description": "Verify the details of a lawsuit case and check its status using case ID. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "case_id": {
+                "type": "integer",
+                "description": "The identification number of the lawsuit case."
+              },
+              "closed_status": {
+                "type": "boolean",
+                "description": "The status of the lawsuit case to be verified."
+              }
+            },
+            "required": [
+              "case_id",
+              "closed_status"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "get_museum_hours",
+          "description": "Retrieve opening hours of a specified museum for the specified day. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "museum_name": {
+                "type": "string",
+                "description": "The name of the museum."
+              },
+              "day": {
+                "type": "string",
+                "description": "Day of the week.",
+                "enum": [
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Friday",
+                  "Saturday",
+                  "Sunday"
+                ]
+              }
+            },
+            "required": [
+              "museum_name",
+              "day"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "monopoly_odds_calculator",
+          "description": "Calculates the probability of rolling a certain sum with two dice, commonly used in board game like Monopoly. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "number": {
+                "type": "integer",
+                "description": "The number for which the odds are calculated."
+              },
+              "dice_number": {
+                "type": "integer",
+                "description": "The number of dice involved in the roll."
+              },
+              "dice_faces": {
+                "type": "integer",
+                "description": "The number of faces on a single die. Default is 6 for standard six-faced die."
+              }
+            },
+            "required": [
+              "number",
+              "dice_number"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240374-mTeqUlWD9hXffw0dBkYD",
+    "object": "chat.completion",
+    "created": 1776240374,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_33211853",
+              "function": {
+                "name": "get_museum_hours",
+                "arguments": "{\"museum_name\":\"Metropolitan Museum of Art\",\"day\":\"Saturday\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 689,
+      "completion_tokens": 39,
+      "total_tokens": 728,
+      "cost": 0.00109296,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 688,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001104,
+        "upstream_inference_prompt_cost": 0.000519,
+        "upstream_inference_completions_cost": 0.000585
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240374-mTeqUlWD9hXffw0dBkYD",
+    "object": "response",
+    "created_at": 1776240375,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_33211853",
+        "call_id": "call_33211853",
+        "name": "get_museum_hours",
+        "arguments": "{\"museum_name\":\"Metropolitan Museum of Art\",\"day\":\"Saturday\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 689,
+      "completion_tokens": 39,
+      "total_tokens": 728,
+      "cost": 0.00109296,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 688,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001104,
+        "upstream_inference_prompt_cost": 0.000519,
+        "upstream_inference_completions_cost": 0.000585
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240374-mTeqUlWD9hXffw0dBkYD",
+    "object": "chat.completion",
+    "created": 1776240374,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_33211853",
+              "function": {
+                "name": "get_museum_hours",
+                "arguments": "{\"museum_name\":\"Metropolitan Museum of Art\",\"day\":\"Saturday\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 689,
+      "completion_tokens": 39,
+      "total_tokens": 728,
+      "cost": 0.00109296,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 688,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001104,
+        "upstream_inference_prompt_cost": 0.000519,
+        "upstream_inference_completions_cost": 0.000585
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1708.849,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "784d4093-39c7-4889-91ea-bbba639bba45"
+}

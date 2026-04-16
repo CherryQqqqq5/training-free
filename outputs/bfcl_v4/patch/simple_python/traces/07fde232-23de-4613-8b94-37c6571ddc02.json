@@ -1,0 +1,250 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Can I find an Italian restaurant with Gluten-free options near Brooklyn?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "find_restaurant",
+        "description": "Locate nearby restaurants based on user defined criteria Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The location where user wants to search for a restaurant."
+            },
+            "type": {
+              "type": "string",
+              "description": "The type of the cuisine/restaurant."
+            },
+            "diet_option": {
+              "type": "string",
+              "description": "Special dietary preferences."
+            }
+          },
+          "required": [
+            "location",
+            "type",
+            "diet_option"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Can I find an Italian restaurant with Gluten-free options near Brooklyn?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "find_restaurant",
+          "description": "Locate nearby restaurants based on user defined criteria Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The location where user wants to search for a restaurant."
+              },
+              "type": {
+                "type": "string",
+                "description": "The type of the cuisine/restaurant."
+              },
+              "diet_option": {
+                "type": "string",
+                "description": "Special dietary preferences."
+              }
+            },
+            "required": [
+              "location",
+              "type",
+              "diet_option"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239313-kvA2MrQgW47bgLToTbm3",
+    "object": "chat.completion",
+    "created": 1776239313,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_98332978",
+              "function": {
+                "name": "find_restaurant",
+                "arguments": "{\"location\":\"Brooklyn\",\"type\":\"Italian\",\"diet_option\":\"Gluten-free\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 330,
+      "completion_tokens": 42,
+      "total_tokens": 372,
+      "cost": 0.0011382525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00114975,
+        "upstream_inference_prompt_cost": 0.00051975,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239313-kvA2MrQgW47bgLToTbm3",
+    "object": "response",
+    "created_at": 1776239314,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_98332978",
+        "call_id": "call_98332978",
+        "name": "find_restaurant",
+        "arguments": "{\"location\":\"Brooklyn\",\"type\":\"Italian\",\"diet_option\":\"Gluten-free\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 330,
+      "completion_tokens": 42,
+      "total_tokens": 372,
+      "cost": 0.0011382525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00114975,
+        "upstream_inference_prompt_cost": 0.00051975,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239313-kvA2MrQgW47bgLToTbm3",
+    "object": "chat.completion",
+    "created": 1776239313,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_98332978",
+              "function": {
+                "name": "find_restaurant",
+                "arguments": "{\"location\":\"Brooklyn\",\"type\":\"Italian\",\"diet_option\":\"Gluten-free\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 330,
+      "completion_tokens": 42,
+      "total_tokens": 372,
+      "cost": 0.0011382525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00114975,
+        "upstream_inference_prompt_cost": 0.00051975,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1841.539,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "07fde232-23de-4613-8b94-37c6571ddc02"
+}

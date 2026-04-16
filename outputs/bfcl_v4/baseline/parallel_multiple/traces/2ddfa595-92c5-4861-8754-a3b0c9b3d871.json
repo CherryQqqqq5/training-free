@@ -1,0 +1,410 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Can you help me with a few calculations? First, I'm curious about the current classical chess rating of a player named Magnus Carlsen. Second, I have a quadratic equation that I'm struggling with, it's 2x² - 3x + 1 = 0, could you find the roots for me? Lastly, I made an investment 5 years ago. The initial value was $5000 and now it's worth $8000. Could you calculate the Compound Annual Growth Rate (CAGR) for me?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_cagr",
+        "description": "Calculate the Compound Annual Growth Rate (CAGR) given an initial investment value, a final investment value, and the number of years. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "initial_value": {
+              "type": "integer",
+              "description": "The initial investment value."
+            },
+            "final_value": {
+              "type": "integer",
+              "description": "The final investment value."
+            },
+            "period_in_years": {
+              "type": "integer",
+              "description": "The period of the investment in years."
+            }
+          },
+          "required": [
+            "initial_value",
+            "final_value",
+            "period_in_years"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "chess_rating",
+        "description": "Fetches the current chess rating of a given player Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "player_name": {
+              "type": "string",
+              "description": "The full name of the chess player."
+            },
+            "variant": {
+              "type": "string",
+              "description": "The variant of chess for which rating is requested (e.g., 'classical', 'blitz', 'bullet'). Default is 'classical'."
+            }
+          },
+          "required": [
+            "player_name"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "solve_quadratic",
+        "description": "Find the roots of a quadratic equation. Returns both roots. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "a": {
+              "type": "integer",
+              "description": "Coefficient of x²."
+            },
+            "b": {
+              "type": "integer",
+              "description": "Coefficient of x."
+            },
+            "c": {
+              "type": "integer",
+              "description": "Constant term."
+            }
+          },
+          "required": [
+            "a",
+            "b",
+            "c"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Can you help me with a few calculations? First, I'm curious about the current classical chess rating of a player named Magnus Carlsen. Second, I have a quadratic equation that I'm struggling with, it's 2x² - 3x + 1 = 0, could you find the roots for me? Lastly, I made an investment 5 years ago. The initial value was $5000 and now it's worth $8000. Could you calculate the Compound Annual Growth Rate (CAGR) for me?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_cagr",
+          "description": "Calculate the Compound Annual Growth Rate (CAGR) given an initial investment value, a final investment value, and the number of years. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "initial_value": {
+                "type": "integer",
+                "description": "The initial investment value."
+              },
+              "final_value": {
+                "type": "integer",
+                "description": "The final investment value."
+              },
+              "period_in_years": {
+                "type": "integer",
+                "description": "The period of the investment in years."
+              }
+            },
+            "required": [
+              "initial_value",
+              "final_value",
+              "period_in_years"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "chess_rating",
+          "description": "Fetches the current chess rating of a given player Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "player_name": {
+                "type": "string",
+                "description": "The full name of the chess player."
+              },
+              "variant": {
+                "type": "string",
+                "description": "The variant of chess for which rating is requested (e.g., 'classical', 'blitz', 'bullet'). Default is 'classical'."
+              }
+            },
+            "required": [
+              "player_name"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "solve_quadratic",
+          "description": "Find the roots of a quadratic equation. Returns both roots. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "a": {
+                "type": "integer",
+                "description": "Coefficient of x²."
+              },
+              "b": {
+                "type": "integer",
+                "description": "Coefficient of x."
+              },
+              "c": {
+                "type": "integer",
+                "description": "Constant term."
+              }
+            },
+            "required": [
+              "a",
+              "b",
+              "c"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241112-Ux4DKLzmXYpvTaMhdlLO",
+    "object": "chat.completion",
+    "created": 1776241112,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help with all your calculations. I'll address each of your requests by calling the relevant functions to retrieve the information or perform the calculations you need.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_54324117",
+              "function": {
+                "name": "chess_rating",
+                "arguments": "{\"player_name\":\"Magnus Carlsen\",\"variant\":\"classical\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_97869434",
+              "function": {
+                "name": "solve_quadratic",
+                "arguments": "{\"a\":2,\"b\":-3,\"c\":1}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_74347716",
+              "function": {
+                "name": "calculate_cagr",
+                "arguments": "{\"initial_value\":5000,\"final_value\":8000,\"period_in_years\":5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 638,
+      "completion_tokens": 149,
+      "total_tokens": 787,
+      "cost": 0.0041008275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00414225,
+        "upstream_inference_prompt_cost": 0.00190725,
+        "upstream_inference_completions_cost": 0.002235
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241112-Ux4DKLzmXYpvTaMhdlLO",
+    "object": "response",
+    "created_at": 1776241115,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'm happy to help with all your calculations. I'll address each of your requests by calling the relevant functions to retrieve the information or perform the calculations you need.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_54324117",
+        "call_id": "call_54324117",
+        "name": "chess_rating",
+        "arguments": "{\"player_name\":\"Magnus Carlsen\",\"variant\":\"classical\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_97869434",
+        "call_id": "call_97869434",
+        "name": "solve_quadratic",
+        "arguments": "{\"a\":2,\"b\":-3,\"c\":1}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_74347716",
+        "call_id": "call_74347716",
+        "name": "calculate_cagr",
+        "arguments": "{\"initial_value\":5000,\"final_value\":8000,\"period_in_years\":5}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 638,
+      "completion_tokens": 149,
+      "total_tokens": 787,
+      "cost": 0.0041008275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00414225,
+        "upstream_inference_prompt_cost": 0.00190725,
+        "upstream_inference_completions_cost": 0.002235
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241112-Ux4DKLzmXYpvTaMhdlLO",
+    "object": "chat.completion",
+    "created": 1776241112,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help with all your calculations. I'll address each of your requests by calling the relevant functions to retrieve the information or perform the calculations you need.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_54324117",
+              "function": {
+                "name": "chess_rating",
+                "arguments": "{\"player_name\":\"Magnus Carlsen\",\"variant\":\"classical\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_97869434",
+              "function": {
+                "name": "solve_quadratic",
+                "arguments": "{\"a\":2,\"b\":-3,\"c\":1}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_74347716",
+              "function": {
+                "name": "calculate_cagr",
+                "arguments": "{\"initial_value\":5000,\"final_value\":8000,\"period_in_years\":5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 638,
+      "completion_tokens": 149,
+      "total_tokens": 787,
+      "cost": 0.0041008275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00414225,
+        "upstream_inference_prompt_cost": 0.00190725,
+        "upstream_inference_completions_cost": 0.002235
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 3704.783,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "2ddfa595-92c5-4861-8754-a3b0c9b3d871"
+}

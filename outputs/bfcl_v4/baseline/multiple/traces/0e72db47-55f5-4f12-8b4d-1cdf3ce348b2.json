@@ -1,0 +1,332 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Can you calculate the displacement of a car moving at an initial speed of 20 m/s and then accelerates at 10 m/s^2 for 5 seconds? (assuming a straight line motion)"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "kinematics_calculate_displacement",
+        "description": "Calculate displacement based on initial speed, acceleration, and time interval for a motion along a straight line. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "initial_speed": {
+              "type": "integer",
+              "description": "The initial speed of the moving object in m/s."
+            },
+            "acceleration": {
+              "type": "integer",
+              "description": "The rate of change of speed, m/s^2."
+            },
+            "time": {
+              "type": "integer",
+              "description": "The time interval during which the acceleration is applied, in seconds."
+            },
+            "rounding": {
+              "type": "integer",
+              "description": "The number of decimals to round off the result (optional).",
+              "default": 2
+            }
+          },
+          "required": [
+            "initial_speed",
+            "acceleration",
+            "time"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "kinematics_calculate_final_speed",
+        "description": "Calculate the final speed of an object that starts from an initial speed and then accelerates for a certain duration. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "initial_speed": {
+              "type": "number",
+              "description": "The initial speed of the moving object in m/s. This is a float type value.",
+              "format": "float"
+            },
+            "acceleration": {
+              "type": "number",
+              "description": "The rate of change of speed, m/s^2. This is a float type value.",
+              "format": "float"
+            },
+            "time": {
+              "type": "number",
+              "description": "The time interval during which the acceleration is applied, in seconds. This is a float type value.",
+              "format": "float"
+            },
+            "rounding": {
+              "type": "integer",
+              "description": "The number of decimals to round off the result (optional).",
+              "default": 2
+            }
+          },
+          "required": [
+            "initial_speed",
+            "acceleration",
+            "time"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Can you calculate the displacement of a car moving at an initial speed of 20 m/s and then accelerates at 10 m/s^2 for 5 seconds? (assuming a straight line motion)"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "kinematics_calculate_displacement",
+          "description": "Calculate displacement based on initial speed, acceleration, and time interval for a motion along a straight line. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "initial_speed": {
+                "type": "integer",
+                "description": "The initial speed of the moving object in m/s."
+              },
+              "acceleration": {
+                "type": "integer",
+                "description": "The rate of change of speed, m/s^2."
+              },
+              "time": {
+                "type": "integer",
+                "description": "The time interval during which the acceleration is applied, in seconds."
+              },
+              "rounding": {
+                "type": "integer",
+                "description": "The number of decimals to round off the result (optional).",
+                "default": 2
+              }
+            },
+            "required": [
+              "initial_speed",
+              "acceleration",
+              "time"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "kinematics_calculate_final_speed",
+          "description": "Calculate the final speed of an object that starts from an initial speed and then accelerates for a certain duration. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "initial_speed": {
+                "type": "number",
+                "description": "The initial speed of the moving object in m/s. This is a float type value.",
+                "format": "float"
+              },
+              "acceleration": {
+                "type": "number",
+                "description": "The rate of change of speed, m/s^2. This is a float type value.",
+                "format": "float"
+              },
+              "time": {
+                "type": "number",
+                "description": "The time interval during which the acceleration is applied, in seconds. This is a float type value.",
+                "format": "float"
+              },
+              "rounding": {
+                "type": "integer",
+                "description": "The number of decimals to round off the result (optional).",
+                "default": 2
+              }
+            },
+            "required": [
+              "initial_speed",
+              "acceleration",
+              "time"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239450-J0GWSyqmqe0p0b9Ujulf",
+    "object": "chat.completion",
+    "created": 1776239450,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_76880348",
+              "function": {
+                "name": "kinematics_calculate_displacement",
+                "arguments": "{\"initial_speed\":20,\"acceleration\":10,\"time\":5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 595,
+      "completion_tokens": 42,
+      "total_tokens": 637,
+      "cost": 0.0019253025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00194475,
+        "upstream_inference_prompt_cost": 0.00131475,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239450-J0GWSyqmqe0p0b9Ujulf",
+    "object": "response",
+    "created_at": 1776239451,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_76880348",
+        "call_id": "call_76880348",
+        "name": "kinematics_calculate_displacement",
+        "arguments": "{\"initial_speed\":20,\"acceleration\":10,\"time\":5}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 595,
+      "completion_tokens": 42,
+      "total_tokens": 637,
+      "cost": 0.0019253025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00194475,
+        "upstream_inference_prompt_cost": 0.00131475,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239450-J0GWSyqmqe0p0b9Ujulf",
+    "object": "chat.completion",
+    "created": 1776239450,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_76880348",
+              "function": {
+                "name": "kinematics_calculate_displacement",
+                "arguments": "{\"initial_speed\":20,\"acceleration\":10,\"time\":5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 595,
+      "completion_tokens": 42,
+      "total_tokens": 637,
+      "cost": 0.0019253025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00194475,
+        "upstream_inference_prompt_cost": 0.00131475,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2029.19,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "0e72db47-55f5-4f12-8b4d-1cdf3ce348b2"
+}

@@ -1,0 +1,331 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Analyze the performance of the L.A Lakers in their last game and give me the field goal percentage and free throw percentage. Also, compare the team's points per game (ppg) average from 2018-2019 and 2019-2020 season."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "sport_analysis_last_game_performance",
+        "description": "Analyzes the team's performance in their most recent game. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "team": {
+              "type": "string",
+              "description": "The sports team that needs to be analyzed."
+            },
+            "details": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "field goal %",
+                  "free throw %"
+                ]
+              },
+              "description": "Key performance indicators that you want for the analysis"
+            }
+          },
+          "required": [
+            "team",
+            "details"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "sport_analysis_compare_ppg",
+        "description": "Compares a team's average points per game in two different seasons. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "team": {
+              "type": "string",
+              "description": "The sports team that needs to be compared."
+            },
+            "seasons": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "The seasons that you want to compare the ppg."
+            }
+          },
+          "required": [
+            "team",
+            "seasons"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Analyze the performance of the L.A Lakers in their last game and give me the field goal percentage and free throw percentage. Also, compare the team's points per game (ppg) average from 2018-2019 and 2019-2020 season."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "sport_analysis_last_game_performance",
+          "description": "Analyzes the team's performance in their most recent game. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "team": {
+                "type": "string",
+                "description": "The sports team that needs to be analyzed."
+              },
+              "details": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "field goal %",
+                    "free throw %"
+                  ]
+                },
+                "description": "Key performance indicators that you want for the analysis"
+              }
+            },
+            "required": [
+              "team",
+              "details"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "sport_analysis_compare_ppg",
+          "description": "Compares a team's average points per game in two different seasons. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "team": {
+                "type": "string",
+                "description": "The sports team that needs to be compared."
+              },
+              "seasons": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "The seasons that you want to compare the ppg."
+              }
+            },
+            "required": [
+              "team",
+              "seasons"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240618-00Om9gZ1NXBUa7xYuwJG",
+    "object": "chat.completion",
+    "created": 1776240618,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_01286294",
+              "function": {
+                "name": "sport_analysis_last_game_performance",
+                "arguments": "{\"team\":\"L.A Lakers\",\"details\":[\"field goal %\",\"free throw %\"]}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_10527889",
+              "function": {
+                "name": "sport_analysis_compare_ppg",
+                "arguments": "{\"team\":\"L.A Lakers\",\"seasons\":[\"2018-2019\",\"2019-2020\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 473,
+      "completion_tokens": 93,
+      "total_tokens": 566,
+      "cost": 0.0023203125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00234375,
+        "upstream_inference_prompt_cost": 0.00094875,
+        "upstream_inference_completions_cost": 0.001395
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240618-00Om9gZ1NXBUa7xYuwJG",
+    "object": "response",
+    "created_at": 1776240620,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_01286294",
+        "call_id": "call_01286294",
+        "name": "sport_analysis_last_game_performance",
+        "arguments": "{\"team\":\"L.A Lakers\",\"details\":[\"field goal %\",\"free throw %\"]}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_10527889",
+        "call_id": "call_10527889",
+        "name": "sport_analysis_compare_ppg",
+        "arguments": "{\"team\":\"L.A Lakers\",\"seasons\":[\"2018-2019\",\"2019-2020\"]}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 473,
+      "completion_tokens": 93,
+      "total_tokens": 566,
+      "cost": 0.0023203125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00234375,
+        "upstream_inference_prompt_cost": 0.00094875,
+        "upstream_inference_completions_cost": 0.001395
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240618-00Om9gZ1NXBUa7xYuwJG",
+    "object": "chat.completion",
+    "created": 1776240618,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_01286294",
+              "function": {
+                "name": "sport_analysis_last_game_performance",
+                "arguments": "{\"team\":\"L.A Lakers\",\"details\":[\"field goal %\",\"free throw %\"]}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_10527889",
+              "function": {
+                "name": "sport_analysis_compare_ppg",
+                "arguments": "{\"team\":\"L.A Lakers\",\"seasons\":[\"2018-2019\",\"2019-2020\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 473,
+      "completion_tokens": 93,
+      "total_tokens": 566,
+      "cost": 0.0023203125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00234375,
+        "upstream_inference_prompt_cost": 0.00094875,
+        "upstream_inference_completions_cost": 0.001395
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2584.789,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "66d0854d-08ff-4de3-abd9-f8b165a6cfa1"
+}

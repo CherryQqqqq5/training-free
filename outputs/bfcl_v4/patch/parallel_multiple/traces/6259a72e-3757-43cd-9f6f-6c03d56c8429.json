@@ -1,0 +1,345 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Could you help me with a two-step conversion? First, I have 5000 Japanese Yen that I would like to convert into US Dollars. After that, I have a measurement of 15 kilometers that I would like to convert into miles. Can you tell me how much I would have in US Dollars and how many miles I would have?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "currency_conversion",
+        "description": "Convert a value from one currency to another. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number",
+              "description": "The amount to be converted. This is a float type value.",
+              "format": "float"
+            },
+            "from_currency": {
+              "type": "string",
+              "description": "The currency to convert from."
+            },
+            "to_currency": {
+              "type": "string",
+              "description": "The currency to convert to."
+            }
+          },
+          "required": [
+            "amount",
+            "from_currency",
+            "to_currency"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "unit_conversion",
+        "description": "Convert a value from one unit to another. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "number",
+              "description": "The value to be converted. This is a float type value.",
+              "format": "float"
+            },
+            "from_unit": {
+              "type": "string",
+              "description": "The unit to convert from."
+            },
+            "to_unit": {
+              "type": "string",
+              "description": "The unit to convert to."
+            }
+          },
+          "required": [
+            "value",
+            "from_unit",
+            "to_unit"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Could you help me with a two-step conversion? First, I have 5000 Japanese Yen that I would like to convert into US Dollars. After that, I have a measurement of 15 kilometers that I would like to convert into miles. Can you tell me how much I would have in US Dollars and how many miles I would have?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "currency_conversion",
+          "description": "Convert a value from one currency to another. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "number",
+                "description": "The amount to be converted. This is a float type value.",
+                "format": "float"
+              },
+              "from_currency": {
+                "type": "string",
+                "description": "The currency to convert from."
+              },
+              "to_currency": {
+                "type": "string",
+                "description": "The currency to convert to."
+              }
+            },
+            "required": [
+              "amount",
+              "from_currency",
+              "to_currency"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "unit_conversion",
+          "description": "Convert a value from one unit to another. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "number",
+                "description": "The value to be converted. This is a float type value.",
+                "format": "float"
+              },
+              "from_unit": {
+                "type": "string",
+                "description": "The unit to convert from."
+              },
+              "to_unit": {
+                "type": "string",
+                "description": "The unit to convert to."
+              }
+            },
+            "required": [
+              "value",
+              "from_unit",
+              "to_unit"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241641-egqcGBRuAiyrwgArzQxO",
+    "object": "chat.completion",
+    "created": 1776241641,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help with both conversions.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_70194364",
+              "function": {
+                "name": "currency_conversion",
+                "arguments": "{\"amount\":5000,\"from_currency\":\"JPY\",\"to_currency\":\"USD\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_48897933",
+              "function": {
+                "name": "unit_conversion",
+                "arguments": "{\"value\":15,\"from_unit\":\"kilometers\",\"to_unit\":\"miles\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 91,
+      "total_tokens": 593,
+      "cost": 0.0023767425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00240075,
+        "upstream_inference_prompt_cost": 0.00103575,
+        "upstream_inference_completions_cost": 0.001365
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241641-egqcGBRuAiyrwgArzQxO",
+    "object": "response",
+    "created_at": 1776241643,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'm happy to help with both conversions.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_70194364",
+        "call_id": "call_70194364",
+        "name": "currency_conversion",
+        "arguments": "{\"amount\":5000,\"from_currency\":\"JPY\",\"to_currency\":\"USD\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_48897933",
+        "call_id": "call_48897933",
+        "name": "unit_conversion",
+        "arguments": "{\"value\":15,\"from_unit\":\"kilometers\",\"to_unit\":\"miles\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 91,
+      "total_tokens": 593,
+      "cost": 0.0023767425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00240075,
+        "upstream_inference_prompt_cost": 0.00103575,
+        "upstream_inference_completions_cost": 0.001365
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241641-egqcGBRuAiyrwgArzQxO",
+    "object": "chat.completion",
+    "created": 1776241641,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help with both conversions.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_70194364",
+              "function": {
+                "name": "currency_conversion",
+                "arguments": "{\"amount\":5000,\"from_currency\":\"JPY\",\"to_currency\":\"USD\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_48897933",
+              "function": {
+                "name": "unit_conversion",
+                "arguments": "{\"value\":15,\"from_unit\":\"kilometers\",\"to_unit\":\"miles\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 91,
+      "total_tokens": 593,
+      "cost": 0.0023767425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00240075,
+        "upstream_inference_prompt_cost": 0.00103575,
+        "upstream_inference_completions_cost": 0.001365
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2166.035,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "6259a72e-3757-43cd-9f6f-6c03d56c8429"
+}

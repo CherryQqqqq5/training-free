@@ -1,0 +1,359 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Get me the transaction history for my account '00125648' for the past 7 days and also calculate the total balance."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "bank_get_transaction_history",
+        "description": "Retrieve transaction history for a specific bank account over a specified time frame. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "account": {
+              "type": "string",
+              "description": "The account number for which transaction history is required."
+            },
+            "days": {
+              "type": "integer",
+              "description": "Number of past days for which to retrieve the transaction history."
+            }
+          },
+          "required": [
+            "account",
+            "days"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "bank_calculate_balance",
+        "description": "Calculate the balance of a specified bank account based on the transactions. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "account": {
+              "type": "string",
+              "description": "The account number for which balance is to be calculated."
+            },
+            "transactions": {
+              "type": "array",
+              "description": "Transaction array Default is empty array.",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "number",
+                    "description": "The amount of the transaction. Default 0 This is a float type value.",
+                    "format": "float"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "credit",
+                      "debit"
+                    ],
+                    "description": "Type of the transaction. Default is credit.",
+                    "default": "credit"
+                  }
+                }
+              },
+              "default": []
+            },
+            "starting_balance": {
+              "type": "number",
+              "description": "The starting balance of the account, if known. Default 0.0 This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "account"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Get me the transaction history for my account '00125648' for the past 7 days and also calculate the total balance."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "bank_get_transaction_history",
+          "description": "Retrieve transaction history for a specific bank account over a specified time frame. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "account": {
+                "type": "string",
+                "description": "The account number for which transaction history is required."
+              },
+              "days": {
+                "type": "integer",
+                "description": "Number of past days for which to retrieve the transaction history."
+              }
+            },
+            "required": [
+              "account",
+              "days"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "bank_calculate_balance",
+          "description": "Calculate the balance of a specified bank account based on the transactions. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "account": {
+                "type": "string",
+                "description": "The account number for which balance is to be calculated."
+              },
+              "transactions": {
+                "type": "array",
+                "description": "Transaction array Default is empty array.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "amount": {
+                      "type": "number",
+                      "description": "The amount of the transaction. Default 0 This is a float type value.",
+                      "format": "float"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "credit",
+                        "debit"
+                      ],
+                      "description": "Type of the transaction. Default is credit.",
+                      "default": "credit"
+                    }
+                  }
+                },
+                "default": []
+              },
+              "starting_balance": {
+                "type": "number",
+                "description": "The starting balance of the account, if known. Default 0.0 This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "account"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241403-141sAzCDvlHHTmsnBjXq",
+    "object": "chat.completion",
+    "created": 1776241403,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_83459157",
+              "function": {
+                "name": "bank_get_transaction_history",
+                "arguments": "{\"account\":\"00125648\",\"days\":7}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_94048241",
+              "function": {
+                "name": "bank_calculate_balance",
+                "arguments": "{\"account\":\"00125648\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 528,
+      "completion_tokens": 65,
+      "total_tokens": 593,
+      "cost": 0.0013595175,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 527,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00137325,
+        "upstream_inference_prompt_cost": 0.00039825,
+        "upstream_inference_completions_cost": 0.000975
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241403-141sAzCDvlHHTmsnBjXq",
+    "object": "response",
+    "created_at": 1776241404,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_83459157",
+        "call_id": "call_83459157",
+        "name": "bank_get_transaction_history",
+        "arguments": "{\"account\":\"00125648\",\"days\":7}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_94048241",
+        "call_id": "call_94048241",
+        "name": "bank_calculate_balance",
+        "arguments": "{\"account\":\"00125648\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 528,
+      "completion_tokens": 65,
+      "total_tokens": 593,
+      "cost": 0.0013595175,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 527,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00137325,
+        "upstream_inference_prompt_cost": 0.00039825,
+        "upstream_inference_completions_cost": 0.000975
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241403-141sAzCDvlHHTmsnBjXq",
+    "object": "chat.completion",
+    "created": 1776241403,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_83459157",
+              "function": {
+                "name": "bank_get_transaction_history",
+                "arguments": "{\"account\":\"00125648\",\"days\":7}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_94048241",
+              "function": {
+                "name": "bank_calculate_balance",
+                "arguments": "{\"account\":\"00125648\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 528,
+      "completion_tokens": 65,
+      "total_tokens": 593,
+      "cost": 0.0013595175,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 527,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00137325,
+        "upstream_inference_prompt_cost": 0.00039825,
+        "upstream_inference_completions_cost": 0.000975
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1879.557,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "3be5cf17-ad29-469a-9092-d34caf6b1a1f"
+}

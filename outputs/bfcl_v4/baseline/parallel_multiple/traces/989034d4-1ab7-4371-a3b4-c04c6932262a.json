@@ -1,0 +1,293 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "What is the equivalent note of C in Indian musical scale? And convert the frequency 440 Hz to wavelength?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "frequency_to_wavelength",
+        "description": "Converts the frequency of a musical note to its wavelength. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "frequency": {
+              "type": "number",
+              "description": "The frequency in hertz of the musical note. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "frequency"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "note_conversion_indian",
+        "description": "Converts a note in Western music to Indian classical music. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "note": {
+              "type": "string",
+              "description": "The note in Western musical scale."
+            }
+          },
+          "required": [
+            "note"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What is the equivalent note of C in Indian musical scale? And convert the frequency 440 Hz to wavelength?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "frequency_to_wavelength",
+          "description": "Converts the frequency of a musical note to its wavelength. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "frequency": {
+                "type": "number",
+                "description": "The frequency in hertz of the musical note. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "frequency"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "note_conversion_indian",
+          "description": "Converts a note in Western music to Indian classical music. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "note": {
+                "type": "string",
+                "description": "The note in Western musical scale."
+              }
+            },
+            "required": [
+              "note"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240610-2dKQ2bEMSbsTIHrI0HcC",
+    "object": "chat.completion",
+    "created": 1776240610,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_05001221",
+              "function": {
+                "name": "note_conversion_indian",
+                "arguments": "{\"note\":\"C\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_41784598",
+              "function": {
+                "name": "frequency_to_wavelength",
+                "arguments": "{\"frequency\":440.0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 383,
+      "completion_tokens": 57,
+      "total_tokens": 440,
+      "cost": 0.0015184125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00153375,
+        "upstream_inference_prompt_cost": 0.00067875,
+        "upstream_inference_completions_cost": 0.000855
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240610-2dKQ2bEMSbsTIHrI0HcC",
+    "object": "response",
+    "created_at": 1776240615,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_05001221",
+        "call_id": "call_05001221",
+        "name": "note_conversion_indian",
+        "arguments": "{\"note\":\"C\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_41784598",
+        "call_id": "call_41784598",
+        "name": "frequency_to_wavelength",
+        "arguments": "{\"frequency\":440.0}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 383,
+      "completion_tokens": 57,
+      "total_tokens": 440,
+      "cost": 0.0015184125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00153375,
+        "upstream_inference_prompt_cost": 0.00067875,
+        "upstream_inference_completions_cost": 0.000855
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240610-2dKQ2bEMSbsTIHrI0HcC",
+    "object": "chat.completion",
+    "created": 1776240610,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_05001221",
+              "function": {
+                "name": "note_conversion_indian",
+                "arguments": "{\"note\":\"C\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_41784598",
+              "function": {
+                "name": "frequency_to_wavelength",
+                "arguments": "{\"frequency\":440.0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 383,
+      "completion_tokens": 57,
+      "total_tokens": 440,
+      "cost": 0.0015184125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00153375,
+        "upstream_inference_prompt_cost": 0.00067875,
+        "upstream_inference_completions_cost": 0.000855
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 4757.844,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "989034d4-1ab7-4371-a3b4-c04c6932262a"
+}

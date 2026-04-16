@@ -1,0 +1,468 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find records in database in user table where age is greater than 25 and job is 'engineer'."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "average_batting_score",
+        "description": "Get the average batting score of a cricketer for specified past matches. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "player_name": {
+              "type": "string",
+              "description": "Name of the cricket player."
+            },
+            "matches": {
+              "type": "integer",
+              "description": "Number of past matches to consider for average calculation."
+            },
+            "match_format": {
+              "type": "string",
+              "description": "Format of the cricket matches considered (e.g., 'T20', 'ODI', 'Test'). Default is 'T20'."
+            }
+          },
+          "required": [
+            "player_name",
+            "matches"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "calculate_return_on_investment",
+        "description": "Calculate the return on investment for a given stock based on its purchase price, sale price, and any dividends received. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "purchase_price": {
+              "type": "number",
+              "description": "The price the stock was bought at. This is a float type value.",
+              "format": "float"
+            },
+            "sale_price": {
+              "type": "number",
+              "description": "The price the stock was sold at. This is a float type value.",
+              "format": "float"
+            },
+            "dividend": {
+              "type": "number",
+              "description": "Any dividends received from the stock. This is a float type value.",
+              "default": 0,
+              "format": "float"
+            }
+          },
+          "required": [
+            "purchase_price",
+            "sale_price"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "database_query",
+        "description": "Query the database based on certain conditions. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "table": {
+              "type": "string",
+              "description": "Name of the table to query."
+            },
+            "conditions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "field": {
+                    "type": "string",
+                    "description": "The field to apply the condition."
+                  },
+                  "operation": {
+                    "type": "string",
+                    "description": "The operation to be performed.",
+                    "enum": [
+                      "<",
+                      ">",
+                      "=",
+                      ">=",
+                      "<="
+                    ]
+                  },
+                  "value": {
+                    "type": "string",
+                    "description": "The value to be compared."
+                  }
+                },
+                "required": [
+                  "field",
+                  "operation",
+                  "value"
+                ]
+              },
+              "description": "Conditions for the query."
+            }
+          },
+          "required": [
+            "table",
+            "conditions"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "probability_of_event",
+        "description": "Calculates the probability of an event. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "success_outcomes": {
+              "type": "integer",
+              "description": "The number of successful outcomes."
+            },
+            "total_outcomes": {
+              "type": "integer",
+              "description": "The total number of possible outcomes."
+            },
+            "format_as_ratio": {
+              "type": "boolean",
+              "description": "When true, formats the output as a ratio instead of a decimal. Default is false."
+            }
+          },
+          "required": [
+            "success_outcomes",
+            "total_outcomes"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find records in database in user table where age is greater than 25 and job is 'engineer'."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "average_batting_score",
+          "description": "Get the average batting score of a cricketer for specified past matches. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "player_name": {
+                "type": "string",
+                "description": "Name of the cricket player."
+              },
+              "matches": {
+                "type": "integer",
+                "description": "Number of past matches to consider for average calculation."
+              },
+              "match_format": {
+                "type": "string",
+                "description": "Format of the cricket matches considered (e.g., 'T20', 'ODI', 'Test'). Default is 'T20'."
+              }
+            },
+            "required": [
+              "player_name",
+              "matches"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_return_on_investment",
+          "description": "Calculate the return on investment for a given stock based on its purchase price, sale price, and any dividends received. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "purchase_price": {
+                "type": "number",
+                "description": "The price the stock was bought at. This is a float type value.",
+                "format": "float"
+              },
+              "sale_price": {
+                "type": "number",
+                "description": "The price the stock was sold at. This is a float type value.",
+                "format": "float"
+              },
+              "dividend": {
+                "type": "number",
+                "description": "Any dividends received from the stock. This is a float type value.",
+                "default": 0,
+                "format": "float"
+              }
+            },
+            "required": [
+              "purchase_price",
+              "sale_price"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "database_query",
+          "description": "Query the database based on certain conditions. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "table": {
+                "type": "string",
+                "description": "Name of the table to query."
+              },
+              "conditions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "description": "The field to apply the condition."
+                    },
+                    "operation": {
+                      "type": "string",
+                      "description": "The operation to be performed.",
+                      "enum": [
+                        "<",
+                        ">",
+                        "=",
+                        ">=",
+                        "<="
+                      ]
+                    },
+                    "value": {
+                      "type": "string",
+                      "description": "The value to be compared."
+                    }
+                  },
+                  "required": [
+                    "field",
+                    "operation",
+                    "value"
+                  ]
+                },
+                "description": "Conditions for the query."
+              }
+            },
+            "required": [
+              "table",
+              "conditions"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "probability_of_event",
+          "description": "Calculates the probability of an event. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "success_outcomes": {
+                "type": "integer",
+                "description": "The number of successful outcomes."
+              },
+              "total_outcomes": {
+                "type": "integer",
+                "description": "The total number of possible outcomes."
+              },
+              "format_as_ratio": {
+                "type": "boolean",
+                "description": "When true, formats the output as a ratio instead of a decimal. Default is false."
+              }
+            },
+            "required": [
+              "success_outcomes",
+              "total_outcomes"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240213-sEAbKj1QtgEef0nhtl7V",
+    "object": "chat.completion",
+    "created": 1776240213,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_51822681",
+              "function": {
+                "name": "database_query",
+                "arguments": "{\"table\":\"user\",\"conditions\":[{\"field\":\"age\",\"operation\":\">\",\"value\":\"25\"},{\"field\":\"job\",\"operation\":\"=\",\"value\":\"engineer\"}]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 791,
+      "completion_tokens": 63,
+      "total_tokens": 854,
+      "cost": 0.001525095,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 790,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0015405,
+        "upstream_inference_prompt_cost": 0.0005955,
+        "upstream_inference_completions_cost": 0.000945
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240213-sEAbKj1QtgEef0nhtl7V",
+    "object": "response",
+    "created_at": 1776240215,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_51822681",
+        "call_id": "call_51822681",
+        "name": "database_query",
+        "arguments": "{\"table\":\"user\",\"conditions\":[{\"field\":\"age\",\"operation\":\">\",\"value\":\"25\"},{\"field\":\"job\",\"operation\":\"=\",\"value\":\"engineer\"}]}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 791,
+      "completion_tokens": 63,
+      "total_tokens": 854,
+      "cost": 0.001525095,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 790,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0015405,
+        "upstream_inference_prompt_cost": 0.0005955,
+        "upstream_inference_completions_cost": 0.000945
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240213-sEAbKj1QtgEef0nhtl7V",
+    "object": "chat.completion",
+    "created": 1776240213,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_51822681",
+              "function": {
+                "name": "database_query",
+                "arguments": "{\"table\":\"user\",\"conditions\":[{\"field\":\"age\",\"operation\":\">\",\"value\":\"25\"},{\"field\":\"job\",\"operation\":\"=\",\"value\":\"engineer\"}]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 791,
+      "completion_tokens": 63,
+      "total_tokens": 854,
+      "cost": 0.001525095,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 790,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0015405,
+        "upstream_inference_prompt_cost": 0.0005955,
+        "upstream_inference_completions_cost": 0.000945
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2069.498,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "5620d0d0-2f49-4b8a-87ff-2c6f778c5089"
+}

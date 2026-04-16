@@ -1,0 +1,341 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the magnetic field produced by a wire carrying a current of 4 amps with a distance of 2 m from the wire. And find the voltage difference of a region in the direction of the electric field that is 3 m apart, assuming the electric field is 5 N/C."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_voltage_difference",
+        "description": "Calculate the voltage difference between two points in an electric field. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "electric_field": {
+              "type": "number",
+              "description": "The electric field in newtons per coulomb. This is a float type value.",
+              "format": "float"
+            },
+            "distance": {
+              "type": "number",
+              "description": "The distance between the two points in the direction of the field in meters. This is a float type value.",
+              "format": "float"
+            },
+            "charge": {
+              "type": "number",
+              "description": "The charge of the test particle, typically an electron, in coulombs. Default to 0 This is a float type value.",
+              "default": 0,
+              "format": "float"
+            }
+          },
+          "required": [
+            "electric_field",
+            "distance"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "calculate_magnetic_field",
+        "description": "Calculate the magnetic field produced by a current-carrying wire. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "current": {
+              "type": "number",
+              "description": "The current in the wire in amperes. This is a float type value.",
+              "format": "float"
+            },
+            "distance": {
+              "type": "number",
+              "description": "The perpendicular distance from the wire in meters. This is a float type value.",
+              "format": "float"
+            },
+            "permeability": {
+              "type": "number",
+              "description": "The permeability of free space, a constant value. Default 0.1 This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "current",
+            "distance"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the magnetic field produced by a wire carrying a current of 4 amps with a distance of 2 m from the wire. And find the voltage difference of a region in the direction of the electric field that is 3 m apart, assuming the electric field is 5 N/C."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_voltage_difference",
+          "description": "Calculate the voltage difference between two points in an electric field. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "electric_field": {
+                "type": "number",
+                "description": "The electric field in newtons per coulomb. This is a float type value.",
+                "format": "float"
+              },
+              "distance": {
+                "type": "number",
+                "description": "The distance between the two points in the direction of the field in meters. This is a float type value.",
+                "format": "float"
+              },
+              "charge": {
+                "type": "number",
+                "description": "The charge of the test particle, typically an electron, in coulombs. Default to 0 This is a float type value.",
+                "default": 0,
+                "format": "float"
+              }
+            },
+            "required": [
+              "electric_field",
+              "distance"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_magnetic_field",
+          "description": "Calculate the magnetic field produced by a current-carrying wire. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "current": {
+                "type": "number",
+                "description": "The current in the wire in amperes. This is a float type value.",
+                "format": "float"
+              },
+              "distance": {
+                "type": "number",
+                "description": "The perpendicular distance from the wire in meters. This is a float type value.",
+                "format": "float"
+              },
+              "permeability": {
+                "type": "number",
+                "description": "The permeability of free space, a constant value. Default 0.1 This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "current",
+              "distance"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240477-rot5JNlQv2L316d43nO2",
+    "object": "chat.completion",
+    "created": 1776240477,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_51691567",
+              "function": {
+                "name": "calculate_magnetic_field",
+                "arguments": "{\"current\":4.0,\"distance\":2.0}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_38573745",
+              "function": {
+                "name": "calculate_voltage_difference",
+                "arguments": "{\"electric_field\":5.0,\"distance\":3.0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 576,
+      "completion_tokens": 74,
+      "total_tokens": 650,
+      "cost": 0.0028029375,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00283125,
+        "upstream_inference_prompt_cost": 0.00172125,
+        "upstream_inference_completions_cost": 0.00111
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240477-rot5JNlQv2L316d43nO2",
+    "object": "response",
+    "created_at": 1776240479,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_51691567",
+        "call_id": "call_51691567",
+        "name": "calculate_magnetic_field",
+        "arguments": "{\"current\":4.0,\"distance\":2.0}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_38573745",
+        "call_id": "call_38573745",
+        "name": "calculate_voltage_difference",
+        "arguments": "{\"electric_field\":5.0,\"distance\":3.0}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 576,
+      "completion_tokens": 74,
+      "total_tokens": 650,
+      "cost": 0.0028029375,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00283125,
+        "upstream_inference_prompt_cost": 0.00172125,
+        "upstream_inference_completions_cost": 0.00111
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240477-rot5JNlQv2L316d43nO2",
+    "object": "chat.completion",
+    "created": 1776240477,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_51691567",
+              "function": {
+                "name": "calculate_magnetic_field",
+                "arguments": "{\"current\":4.0,\"distance\":2.0}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_38573745",
+              "function": {
+                "name": "calculate_voltage_difference",
+                "arguments": "{\"electric_field\":5.0,\"distance\":3.0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 576,
+      "completion_tokens": 74,
+      "total_tokens": 650,
+      "cost": 0.0028029375,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00283125,
+        "upstream_inference_prompt_cost": 0.00172125,
+        "upstream_inference_completions_cost": 0.00111
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2866.381,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "ec731401-bb4e-4b6a-95c8-1e548949aa3e"
+}

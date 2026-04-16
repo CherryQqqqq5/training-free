@@ -1,0 +1,316 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the heat capacity at constant pressure for air, given its temperature is 298K and volume is 10 m^3."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calc_heat_capacity",
+        "description": "Calculate the heat capacity at constant pressure of air using its temperature and volume. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "temp": {
+              "type": "integer",
+              "description": "The temperature of the gas in Kelvin."
+            },
+            "volume": {
+              "type": "integer",
+              "description": "The volume of the gas in m^3."
+            },
+            "gas": {
+              "type": "string",
+              "description": "Type of gas, with air as default."
+            }
+          },
+          "required": [
+            "temp",
+            "volume"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "calculate_discounted_cash_flow",
+        "description": "Calculate the discounted cash flow of a bond for a given annual coupon payment, time frame and discount rate. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "coupon_payment": {
+              "type": "number",
+              "description": "The annual coupon payment. This is a float type value.",
+              "format": "float"
+            },
+            "period": {
+              "type": "integer",
+              "description": "The time frame in years for which coupon payment is made."
+            },
+            "discount_rate": {
+              "type": "number",
+              "description": "The discount rate. This is a float type value.",
+              "format": "float"
+            },
+            "face_value": {
+              "type": "integer",
+              "description": "The face value of the bond, default is $1000."
+            }
+          },
+          "required": [
+            "coupon_payment",
+            "period",
+            "discount_rate"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the heat capacity at constant pressure for air, given its temperature is 298K and volume is 10 m^3."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calc_heat_capacity",
+          "description": "Calculate the heat capacity at constant pressure of air using its temperature and volume. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "temp": {
+                "type": "integer",
+                "description": "The temperature of the gas in Kelvin."
+              },
+              "volume": {
+                "type": "integer",
+                "description": "The volume of the gas in m^3."
+              },
+              "gas": {
+                "type": "string",
+                "description": "Type of gas, with air as default."
+              }
+            },
+            "required": [
+              "temp",
+              "volume"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_discounted_cash_flow",
+          "description": "Calculate the discounted cash flow of a bond for a given annual coupon payment, time frame and discount rate. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "coupon_payment": {
+                "type": "number",
+                "description": "The annual coupon payment. This is a float type value.",
+                "format": "float"
+              },
+              "period": {
+                "type": "integer",
+                "description": "The time frame in years for which coupon payment is made."
+              },
+              "discount_rate": {
+                "type": "number",
+                "description": "The discount rate. This is a float type value.",
+                "format": "float"
+              },
+              "face_value": {
+                "type": "integer",
+                "description": "The face value of the bond, default is $1000."
+              }
+            },
+            "required": [
+              "coupon_payment",
+              "period",
+              "discount_rate"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239690-6FdvC7DVMZsCA67HLxXc",
+    "object": "chat.completion",
+    "created": 1776239690,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_70911580",
+              "function": {
+                "name": "calc_heat_capacity",
+                "arguments": "{\"temp\":298,\"volume\":10,\"gas\":\"air\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 510,
+      "completion_tokens": 40,
+      "total_tokens": 550,
+      "cost": 0.0016431525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00165975,
+        "upstream_inference_prompt_cost": 0.00105975,
+        "upstream_inference_completions_cost": 0.0006
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239690-6FdvC7DVMZsCA67HLxXc",
+    "object": "response",
+    "created_at": 1776239692,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_70911580",
+        "call_id": "call_70911580",
+        "name": "calc_heat_capacity",
+        "arguments": "{\"temp\":298,\"volume\":10,\"gas\":\"air\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 510,
+      "completion_tokens": 40,
+      "total_tokens": 550,
+      "cost": 0.0016431525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00165975,
+        "upstream_inference_prompt_cost": 0.00105975,
+        "upstream_inference_completions_cost": 0.0006
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239690-6FdvC7DVMZsCA67HLxXc",
+    "object": "chat.completion",
+    "created": 1776239690,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_70911580",
+              "function": {
+                "name": "calc_heat_capacity",
+                "arguments": "{\"temp\":298,\"volume\":10,\"gas\":\"air\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 510,
+      "completion_tokens": 40,
+      "total_tokens": 550,
+      "cost": 0.0016431525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00165975,
+        "upstream_inference_prompt_cost": 0.00105975,
+        "upstream_inference_completions_cost": 0.0006
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1976.607,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "97c688bb-3821-4dc5-ad30-cafa2e1b3dbc"
+}

@@ -1,0 +1,240 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Get the NBA team's ranking with the best defence in the 2021 season."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "get_defense_ranking",
+        "description": "Retrieve the defence ranking of NBA teams in a specified season. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "season": {
+              "type": "integer",
+              "description": "The NBA season to get defence ranking from."
+            },
+            "top": {
+              "type": "integer",
+              "default": 1,
+              "description": "Number of top teams in defence ranking to fetch."
+            }
+          },
+          "required": [
+            "season"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Get the NBA team's ranking with the best defence in the 2021 season."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_defense_ranking",
+          "description": "Retrieve the defence ranking of NBA teams in a specified season. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "season": {
+                "type": "integer",
+                "description": "The NBA season to get defence ranking from."
+              },
+              "top": {
+                "type": "integer",
+                "default": 1,
+                "description": "Number of top teams in defence ranking to fetch."
+              }
+            },
+            "required": [
+              "season"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776238302-RFr8WXfl0HQUbLMveJFT",
+    "object": "chat.completion",
+    "created": 1776238302,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_72930285",
+              "function": {
+                "name": "get_defense_ranking",
+                "arguments": "{\"season\":2021,\"top\":1}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 323,
+      "completion_tokens": 35,
+      "total_tokens": 358,
+      "cost": 0.0010135125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00102375,
+        "upstream_inference_prompt_cost": 0.00049875,
+        "upstream_inference_completions_cost": 0.000525
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776238302-RFr8WXfl0HQUbLMveJFT",
+    "object": "response",
+    "created_at": 1776238303,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_72930285",
+        "call_id": "call_72930285",
+        "name": "get_defense_ranking",
+        "arguments": "{\"season\":2021,\"top\":1}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 323,
+      "completion_tokens": 35,
+      "total_tokens": 358,
+      "cost": 0.0010135125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00102375,
+        "upstream_inference_prompt_cost": 0.00049875,
+        "upstream_inference_completions_cost": 0.000525
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776238302-RFr8WXfl0HQUbLMveJFT",
+    "object": "chat.completion",
+    "created": 1776238302,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_72930285",
+              "function": {
+                "name": "get_defense_ranking",
+                "arguments": "{\"season\":2021,\"top\":1}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 323,
+      "completion_tokens": 35,
+      "total_tokens": 358,
+      "cost": 0.0010135125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00102375,
+        "upstream_inference_prompt_cost": 0.00049875,
+        "upstream_inference_completions_cost": 0.000525
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1678.801,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "888eb270-208c-41eb-90c6-c07be00c4f2a"
+}

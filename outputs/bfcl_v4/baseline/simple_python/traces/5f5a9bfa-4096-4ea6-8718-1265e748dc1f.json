@@ -1,0 +1,254 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find the estimated travel time by car from San Francisco to Los Angeles with stops at Santa Barbara and Monterey."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "route_estimate_time",
+        "description": "Estimate the travel time for a specific route with optional stops. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "start_location": {
+              "type": "string",
+              "description": "The starting point for the journey. It should be format as city name such as Boston."
+            },
+            "end_location": {
+              "type": "string",
+              "description": "The destination for the journey. It should be format as city name such as Boston."
+            },
+            "stops": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Additional cities or points of interest to stop at during the journey. Default is an empty list."
+            }
+          },
+          "required": [
+            "start_location",
+            "end_location"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find the estimated travel time by car from San Francisco to Los Angeles with stops at Santa Barbara and Monterey."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "route_estimate_time",
+          "description": "Estimate the travel time for a specific route with optional stops. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "start_location": {
+                "type": "string",
+                "description": "The starting point for the journey. It should be format as city name such as Boston."
+              },
+              "end_location": {
+                "type": "string",
+                "description": "The destination for the journey. It should be format as city name such as Boston."
+              },
+              "stops": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Additional cities or points of interest to stop at during the journey. Default is an empty list."
+              }
+            },
+            "required": [
+              "start_location",
+              "end_location"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776237720-O2Cu8PRjUCi32QS9w0U6",
+    "object": "chat.completion",
+    "created": 1776237720,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_00733695",
+              "function": {
+                "name": "route_estimate_time",
+                "arguments": "{\"start_location\":\"San Francisco\",\"end_location\":\"Los Angeles\",\"stops\":[\"Monterey\",\"Santa Barbara\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 378,
+      "completion_tokens": 49,
+      "total_tokens": 427,
+      "cost": 0.0013847625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00139875,
+        "upstream_inference_prompt_cost": 0.00066375,
+        "upstream_inference_completions_cost": 0.000735
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776237720-O2Cu8PRjUCi32QS9w0U6",
+    "object": "response",
+    "created_at": 1776237722,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_00733695",
+        "call_id": "call_00733695",
+        "name": "route_estimate_time",
+        "arguments": "{\"start_location\":\"San Francisco\",\"end_location\":\"Los Angeles\",\"stops\":[\"Monterey\",\"Santa Barbara\"]}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 378,
+      "completion_tokens": 49,
+      "total_tokens": 427,
+      "cost": 0.0013847625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00139875,
+        "upstream_inference_prompt_cost": 0.00066375,
+        "upstream_inference_completions_cost": 0.000735
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776237720-O2Cu8PRjUCi32QS9w0U6",
+    "object": "chat.completion",
+    "created": 1776237720,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_00733695",
+              "function": {
+                "name": "route_estimate_time",
+                "arguments": "{\"start_location\":\"San Francisco\",\"end_location\":\"Los Angeles\",\"stops\":[\"Monterey\",\"Santa Barbara\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 378,
+      "completion_tokens": 49,
+      "total_tokens": 427,
+      "cost": 0.0013847625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00139875,
+        "upstream_inference_prompt_cost": 0.00066375,
+        "upstream_inference_completions_cost": 0.000735
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1873.973,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "5f5a9bfa-4096-4ea6-8718-1265e748dc1f"
+}

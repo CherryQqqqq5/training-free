@@ -1,0 +1,254 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "What are some gluten-free recipes for dinner?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "find_recipes",
+        "description": "Find recipes based on dietary restrictions, meal type, and preferred ingredients. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "diet": {
+              "type": "string",
+              "description": "The dietary restrictions, e.g., 'vegan', 'gluten-free'."
+            },
+            "meal_type": {
+              "type": "string",
+              "description": "The type of meal, e.g., 'dinner', 'breakfast'."
+            },
+            "ingredients": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "The preferred ingredients. If left blank, it will default to return general recipes."
+            }
+          },
+          "required": [
+            "diet",
+            "meal_type"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What are some gluten-free recipes for dinner?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "find_recipes",
+          "description": "Find recipes based on dietary restrictions, meal type, and preferred ingredients. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "diet": {
+                "type": "string",
+                "description": "The dietary restrictions, e.g., 'vegan', 'gluten-free'."
+              },
+              "meal_type": {
+                "type": "string",
+                "description": "The type of meal, e.g., 'dinner', 'breakfast'."
+              },
+              "ingredients": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "The preferred ingredients. If left blank, it will default to return general recipes."
+              }
+            },
+            "required": [
+              "diet",
+              "meal_type"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776238382-fIMJOEA2G0KRAuqxoB8A",
+    "object": "chat.completion",
+    "created": 1776238382,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_43726832",
+              "function": {
+                "name": "find_recipes",
+                "arguments": "{\"diet\":\"gluten-free\",\"meal_type\":\"dinner\",\"ingredients\":[]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 361,
+      "completion_tokens": 41,
+      "total_tokens": 402,
+      "cost": 0.001676565,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 2,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0016935,
+        "upstream_inference_prompt_cost": 0.0010785,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776238382-fIMJOEA2G0KRAuqxoB8A",
+    "object": "response",
+    "created_at": 1776238383,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_43726832",
+        "call_id": "call_43726832",
+        "name": "find_recipes",
+        "arguments": "{\"diet\":\"gluten-free\",\"meal_type\":\"dinner\",\"ingredients\":[]}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 361,
+      "completion_tokens": 41,
+      "total_tokens": 402,
+      "cost": 0.001676565,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 2,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0016935,
+        "upstream_inference_prompt_cost": 0.0010785,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776238382-fIMJOEA2G0KRAuqxoB8A",
+    "object": "chat.completion",
+    "created": 1776238382,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_43726832",
+              "function": {
+                "name": "find_recipes",
+                "arguments": "{\"diet\":\"gluten-free\",\"meal_type\":\"dinner\",\"ingredients\":[]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 361,
+      "completion_tokens": 41,
+      "total_tokens": 402,
+      "cost": 0.001676565,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 2,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0016935,
+        "upstream_inference_prompt_cost": 0.0010785,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1798.526,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "a875a016-1ac5-416d-815e-acdbad8fbb85"
+}

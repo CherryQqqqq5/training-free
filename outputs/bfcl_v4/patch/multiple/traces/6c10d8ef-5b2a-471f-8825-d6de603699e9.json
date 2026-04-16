@@ -1,0 +1,322 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "I need to delete some columns from my employees database on personal_data table. I want to remove their email addresses and social security numbers to respect privacy."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "database_modify_columns",
+        "description": "This function allows deletion or addition of columns in a database Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "db_name": {
+              "type": "string",
+              "description": "The name of the database to modify."
+            },
+            "table": {
+              "type": "string",
+              "description": "The name of the table to modify."
+            },
+            "operation": {
+              "type": "string",
+              "description": "The operation to carry out on the table. Can be 'delete' or 'add'."
+            },
+            "columns": {
+              "type": "array",
+              "description": "List of the columns to add or delete from the table.",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "db_name",
+            "table",
+            "operation",
+            "columns"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "database_create_backup",
+        "description": "This function creates a backup of the database before modification Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "db_name": {
+              "type": "string",
+              "description": "The name of the database to create a backup of."
+            },
+            "backup_location": {
+              "type": "string",
+              "description": "The file path where the backup should be stored."
+            },
+            "timestamp": {
+              "type": "boolean",
+              "description": "Option to append a timestamp to the backup file name.",
+              "default": "False"
+            }
+          },
+          "required": [
+            "db_name",
+            "backup_location"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "I need to delete some columns from my employees database on personal_data table. I want to remove their email addresses and social security numbers to respect privacy."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "database_modify_columns",
+          "description": "This function allows deletion or addition of columns in a database Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "db_name": {
+                "type": "string",
+                "description": "The name of the database to modify."
+              },
+              "table": {
+                "type": "string",
+                "description": "The name of the table to modify."
+              },
+              "operation": {
+                "type": "string",
+                "description": "The operation to carry out on the table. Can be 'delete' or 'add'."
+              },
+              "columns": {
+                "type": "array",
+                "description": "List of the columns to add or delete from the table.",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "db_name",
+              "table",
+              "operation",
+              "columns"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "database_create_backup",
+          "description": "This function creates a backup of the database before modification Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "db_name": {
+                "type": "string",
+                "description": "The name of the database to create a backup of."
+              },
+              "backup_location": {
+                "type": "string",
+                "description": "The file path where the backup should be stored."
+              },
+              "timestamp": {
+                "type": "boolean",
+                "description": "Option to append a timestamp to the backup file name.",
+                "default": "False"
+              }
+            },
+            "required": [
+              "db_name",
+              "backup_location"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239981-qsh6zPpSqOyNoXsEQitV",
+    "object": "chat.completion",
+    "created": 1776239981,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_54895292",
+              "function": {
+                "name": "database_modify_columns",
+                "arguments": "{\"db_name\":\"employees\",\"table\":\"personal_data\",\"operation\":\"delete\",\"columns\":[\"email\",\"ssn\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 506,
+      "completion_tokens": 51,
+      "total_tokens": 557,
+      "cost": 0.0017946225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00181275,
+        "upstream_inference_prompt_cost": 0.00104775,
+        "upstream_inference_completions_cost": 0.000765
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239981-qsh6zPpSqOyNoXsEQitV",
+    "object": "response",
+    "created_at": 1776239982,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_54895292",
+        "call_id": "call_54895292",
+        "name": "database_modify_columns",
+        "arguments": "{\"db_name\":\"employees\",\"table\":\"personal_data\",\"operation\":\"delete\",\"columns\":[\"email\",\"ssn\"]}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 506,
+      "completion_tokens": 51,
+      "total_tokens": 557,
+      "cost": 0.0017946225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00181275,
+        "upstream_inference_prompt_cost": 0.00104775,
+        "upstream_inference_completions_cost": 0.000765
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239981-qsh6zPpSqOyNoXsEQitV",
+    "object": "chat.completion",
+    "created": 1776239981,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_54895292",
+              "function": {
+                "name": "database_modify_columns",
+                "arguments": "{\"db_name\":\"employees\",\"table\":\"personal_data\",\"operation\":\"delete\",\"columns\":[\"email\",\"ssn\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 506,
+      "completion_tokens": 51,
+      "total_tokens": 557,
+      "cost": 0.0017946225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00181275,
+        "upstream_inference_prompt_cost": 0.00104775,
+        "upstream_inference_completions_cost": 0.000765
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1997.611,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "6c10d8ef-5b2a-471f-8825-d6de603699e9"
+}

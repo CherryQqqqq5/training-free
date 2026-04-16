@@ -1,0 +1,266 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find the high and low temperatures, humidity, and precipitation for London, United Kingdom for the next 3 days."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "detailed_weather_forecast",
+        "description": "Retrieve a detailed weather forecast for a specific location and time frame, including high/low temperatures, humidity, and precipitation. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city that you want to get the weather for."
+            },
+            "days": {
+              "type": "integer",
+              "description": "Number of days for the forecast."
+            },
+            "details": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "high_low_temperature",
+                  "humidity",
+                  "precipitation"
+                ]
+              },
+              "description": "Specific weather details required in the forecast."
+            }
+          },
+          "required": [
+            "location",
+            "days",
+            "details"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find the high and low temperatures, humidity, and precipitation for London, United Kingdom for the next 3 days."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "detailed_weather_forecast",
+          "description": "Retrieve a detailed weather forecast for a specific location and time frame, including high/low temperatures, humidity, and precipitation. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city that you want to get the weather for."
+              },
+              "days": {
+                "type": "integer",
+                "description": "Number of days for the forecast."
+              },
+              "details": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "high_low_temperature",
+                    "humidity",
+                    "precipitation"
+                  ]
+                },
+                "description": "Specific weather details required in the forecast."
+              }
+            },
+            "required": [
+              "location",
+              "days",
+              "details"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776238339-PNYkfXm1Tz2kb67Mk8XW",
+    "object": "chat.completion",
+    "created": 1776238339,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_66558159",
+              "function": {
+                "name": "detailed_weather_forecast",
+                "arguments": "{\"location\":\"London, United Kingdom\",\"days\":3,\"details\":[\"high_low_temperature\",\"humidity\",\"precipitation\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 372,
+      "completion_tokens": 51,
+      "total_tokens": 423,
+      "cost": 0.0018555075,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00187425,
+        "upstream_inference_prompt_cost": 0.00110925,
+        "upstream_inference_completions_cost": 0.000765
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776238339-PNYkfXm1Tz2kb67Mk8XW",
+    "object": "response",
+    "created_at": 1776238341,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_66558159",
+        "call_id": "call_66558159",
+        "name": "detailed_weather_forecast",
+        "arguments": "{\"location\":\"London, United Kingdom\",\"days\":3,\"details\":[\"high_low_temperature\",\"humidity\",\"precipitation\"]}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 372,
+      "completion_tokens": 51,
+      "total_tokens": 423,
+      "cost": 0.0018555075,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00187425,
+        "upstream_inference_prompt_cost": 0.00110925,
+        "upstream_inference_completions_cost": 0.000765
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776238339-PNYkfXm1Tz2kb67Mk8XW",
+    "object": "chat.completion",
+    "created": 1776238339,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_66558159",
+              "function": {
+                "name": "detailed_weather_forecast",
+                "arguments": "{\"location\":\"London, United Kingdom\",\"days\":3,\"details\":[\"high_low_temperature\",\"humidity\",\"precipitation\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 372,
+      "completion_tokens": 51,
+      "total_tokens": 423,
+      "cost": 0.0018555075,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00187425,
+        "upstream_inference_prompt_cost": 0.00110925,
+        "upstream_inference_completions_cost": 0.000765
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2675.261,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "caf26ee8-b033-4b1b-a2c3-feb5ef57cd44"
+}

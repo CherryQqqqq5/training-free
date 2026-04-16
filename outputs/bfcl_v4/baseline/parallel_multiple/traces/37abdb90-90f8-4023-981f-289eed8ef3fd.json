@@ -1,0 +1,431 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Could you please provide me with the following financial data for Microsoft and Apple over the past 30 days? First, I would like to know the average closing price of Microsoft's stocks using data from Yahoo Finance. Second, I need to know the total revenue of Apple using data from Google Finance. Third, I am interested in the total volume of stocks traded for both Microsoft and Apple, again using data from Yahoo Finance. Could you please calculate these for me?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "volume_traded",
+        "description": "Calculate the total volume of stocks traded over a certain period of time Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "company": {
+              "type": "string",
+              "description": "Name of the company to get data for"
+            },
+            "days": {
+              "type": "integer",
+              "description": "Number of past days to calculate volume traded for"
+            },
+            "data_source": {
+              "type": "string",
+              "description": "Source to fetch the financial data. default is 'yahoo finance'"
+            }
+          },
+          "required": [
+            "company",
+            "days"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "total_revenue",
+        "description": "Calculate the total revenue of a company over a specific period of time Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "company": {
+              "type": "string",
+              "description": "Name of the company to get data for"
+            },
+            "days": {
+              "type": "integer",
+              "description": "Number of past days to calculate total revenue for"
+            },
+            "data_source": {
+              "type": "string",
+              "description": "Source to fetch the financial data. default is 'google finance'"
+            }
+          },
+          "required": [
+            "company",
+            "days"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "avg_closing_price",
+        "description": "Calculate the average closing price of a specific company over a given period of time Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "company": {
+              "type": "string",
+              "description": "Name of the company to get data for"
+            },
+            "days": {
+              "type": "integer",
+              "description": "Number of past days to calculate average closing price for"
+            },
+            "data_source": {
+              "type": "string",
+              "description": "Source to fetch the stock data. default is 'yahoo finance'"
+            }
+          },
+          "required": [
+            "company",
+            "days"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Could you please provide me with the following financial data for Microsoft and Apple over the past 30 days? First, I would like to know the average closing price of Microsoft's stocks using data from Yahoo Finance. Second, I need to know the total revenue of Apple using data from Google Finance. Third, I am interested in the total volume of stocks traded for both Microsoft and Apple, again using data from Yahoo Finance. Could you please calculate these for me?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "volume_traded",
+          "description": "Calculate the total volume of stocks traded over a certain period of time Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "company": {
+                "type": "string",
+                "description": "Name of the company to get data for"
+              },
+              "days": {
+                "type": "integer",
+                "description": "Number of past days to calculate volume traded for"
+              },
+              "data_source": {
+                "type": "string",
+                "description": "Source to fetch the financial data. default is 'yahoo finance'"
+              }
+            },
+            "required": [
+              "company",
+              "days"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "total_revenue",
+          "description": "Calculate the total revenue of a company over a specific period of time Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "company": {
+                "type": "string",
+                "description": "Name of the company to get data for"
+              },
+              "days": {
+                "type": "integer",
+                "description": "Number of past days to calculate total revenue for"
+              },
+              "data_source": {
+                "type": "string",
+                "description": "Source to fetch the financial data. default is 'google finance'"
+              }
+            },
+            "required": [
+              "company",
+              "days"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "avg_closing_price",
+          "description": "Calculate the average closing price of a specific company over a given period of time Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "company": {
+                "type": "string",
+                "description": "Name of the company to get data for"
+              },
+              "days": {
+                "type": "integer",
+                "description": "Number of past days to calculate average closing price for"
+              },
+              "data_source": {
+                "type": "string",
+                "description": "Source to fetch the stock data. default is 'yahoo finance'"
+              }
+            },
+            "required": [
+              "company",
+              "days"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240831-yjwH3fL7VV2z6fJxpOin",
+    "object": "chat.completion",
+    "created": 1776240831,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_58239647",
+              "function": {
+                "name": "avg_closing_price",
+                "arguments": "{\"company\":\"Microsoft\",\"days\":30,\"data_source\":\"yahoo finance\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_54302685",
+              "function": {
+                "name": "total_revenue",
+                "arguments": "{\"company\":\"Apple\",\"days\":30,\"data_source\":\"google finance\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_93109173",
+              "function": {
+                "name": "volume_traded",
+                "arguments": "{\"company\":\"Microsoft\",\"days\":30,\"data_source\":\"yahoo finance\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_27795277",
+              "function": {
+                "name": "volume_traded",
+                "arguments": "{\"company\":\"Apple\",\"days\":30,\"data_source\":\"yahoo finance\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 643,
+      "completion_tokens": 165,
+      "total_tokens": 808,
+      "cost": 0.0043532775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00439725,
+        "upstream_inference_prompt_cost": 0.00192225,
+        "upstream_inference_completions_cost": 0.002475
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240831-yjwH3fL7VV2z6fJxpOin",
+    "object": "response",
+    "created_at": 1776240833,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_58239647",
+        "call_id": "call_58239647",
+        "name": "avg_closing_price",
+        "arguments": "{\"company\":\"Microsoft\",\"days\":30,\"data_source\":\"yahoo finance\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_54302685",
+        "call_id": "call_54302685",
+        "name": "total_revenue",
+        "arguments": "{\"company\":\"Apple\",\"days\":30,\"data_source\":\"google finance\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_93109173",
+        "call_id": "call_93109173",
+        "name": "volume_traded",
+        "arguments": "{\"company\":\"Microsoft\",\"days\":30,\"data_source\":\"yahoo finance\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_27795277",
+        "call_id": "call_27795277",
+        "name": "volume_traded",
+        "arguments": "{\"company\":\"Apple\",\"days\":30,\"data_source\":\"yahoo finance\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 643,
+      "completion_tokens": 165,
+      "total_tokens": 808,
+      "cost": 0.0043532775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00439725,
+        "upstream_inference_prompt_cost": 0.00192225,
+        "upstream_inference_completions_cost": 0.002475
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240831-yjwH3fL7VV2z6fJxpOin",
+    "object": "chat.completion",
+    "created": 1776240831,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_58239647",
+              "function": {
+                "name": "avg_closing_price",
+                "arguments": "{\"company\":\"Microsoft\",\"days\":30,\"data_source\":\"yahoo finance\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_54302685",
+              "function": {
+                "name": "total_revenue",
+                "arguments": "{\"company\":\"Apple\",\"days\":30,\"data_source\":\"google finance\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_93109173",
+              "function": {
+                "name": "volume_traded",
+                "arguments": "{\"company\":\"Microsoft\",\"days\":30,\"data_source\":\"yahoo finance\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_27795277",
+              "function": {
+                "name": "volume_traded",
+                "arguments": "{\"company\":\"Apple\",\"days\":30,\"data_source\":\"yahoo finance\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 643,
+      "completion_tokens": 165,
+      "total_tokens": 808,
+      "cost": 0.0043532775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00439725,
+        "upstream_inference_prompt_cost": 0.00192225,
+        "upstream_inference_completions_cost": 0.002475
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2881.186,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "37abdb90-90f8-4023-981f-289eed8ef3fd"
+}

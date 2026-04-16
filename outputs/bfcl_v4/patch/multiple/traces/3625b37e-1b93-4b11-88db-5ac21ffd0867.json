@@ -1,0 +1,302 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "What is the density of a substance with a mass of 45 kg and a volume of 15 m³?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "mix_paint_color",
+        "description": "Combine two primary paint colors and adjust the resulting color's lightness level. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "color1": {
+              "type": "string",
+              "description": "The first primary color to be mixed."
+            },
+            "color2": {
+              "type": "string",
+              "description": "The second primary color to be mixed."
+            },
+            "lightness": {
+              "type": "integer",
+              "description": "The desired lightness level of the resulting color in percentage. The default level is set to 50%."
+            }
+          },
+          "required": [
+            "color1",
+            "color2"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "calculate_density",
+        "description": "Calculate the density of a substance based on its mass and volume. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "mass": {
+              "type": "integer",
+              "description": "The mass of the substance in kilograms."
+            },
+            "volume": {
+              "type": "integer",
+              "description": "The volume of the substance in cubic meters."
+            },
+            "unit": {
+              "type": "string",
+              "description": "The unit of density. Default is kg/m³"
+            }
+          },
+          "required": [
+            "mass",
+            "volume"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What is the density of a substance with a mass of 45 kg and a volume of 15 m³?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "mix_paint_color",
+          "description": "Combine two primary paint colors and adjust the resulting color's lightness level. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "color1": {
+                "type": "string",
+                "description": "The first primary color to be mixed."
+              },
+              "color2": {
+                "type": "string",
+                "description": "The second primary color to be mixed."
+              },
+              "lightness": {
+                "type": "integer",
+                "description": "The desired lightness level of the resulting color in percentage. The default level is set to 50%."
+              }
+            },
+            "required": [
+              "color1",
+              "color2"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_density",
+          "description": "Calculate the density of a substance based on its mass and volume. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "mass": {
+                "type": "integer",
+                "description": "The mass of the substance in kilograms."
+              },
+              "volume": {
+                "type": "integer",
+                "description": "The volume of the substance in cubic meters."
+              },
+              "unit": {
+                "type": "string",
+                "description": "The unit of density. Default is kg/m³"
+              }
+            },
+            "required": [
+              "mass",
+              "volume"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240187-O8TcowpxxIVgfvgihPvi",
+    "object": "chat.completion",
+    "created": 1776240187,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_96810794",
+              "function": {
+                "name": "calculate_density",
+                "arguments": "{\"mass\":45,\"volume\":15}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 467,
+      "completion_tokens": 31,
+      "total_tokens": 498,
+      "cost": 0.000809325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 466,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0008175,
+        "upstream_inference_prompt_cost": 0.0003525,
+        "upstream_inference_completions_cost": 0.000465
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240187-O8TcowpxxIVgfvgihPvi",
+    "object": "response",
+    "created_at": 1776240188,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_96810794",
+        "call_id": "call_96810794",
+        "name": "calculate_density",
+        "arguments": "{\"mass\":45,\"volume\":15}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 467,
+      "completion_tokens": 31,
+      "total_tokens": 498,
+      "cost": 0.000809325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 466,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0008175,
+        "upstream_inference_prompt_cost": 0.0003525,
+        "upstream_inference_completions_cost": 0.000465
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240187-O8TcowpxxIVgfvgihPvi",
+    "object": "chat.completion",
+    "created": 1776240187,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_96810794",
+              "function": {
+                "name": "calculate_density",
+                "arguments": "{\"mass\":45,\"volume\":15}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 467,
+      "completion_tokens": 31,
+      "total_tokens": 498,
+      "cost": 0.000809325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 466,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0008175,
+        "upstream_inference_prompt_cost": 0.0003525,
+        "upstream_inference_completions_cost": 0.000465
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1612.282,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "3625b37e-1b93-4b11-88db-5ac21ffd0867"
+}

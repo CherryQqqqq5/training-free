@@ -1,0 +1,372 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find the market performance of the S&P 500 and the Dow Jones over the past 5 days."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "restaurant_find_nearby",
+        "description": "Locate nearby restaurants based on specific dietary preferences. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city and state, e.g. Los Angeles, CA"
+            },
+            "dietary_preference": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Vegan",
+                  "Vegetarian",
+                  "Gluten-free",
+                  "Dairy-free",
+                  "Nut-free"
+                ]
+              },
+              "description": "Dietary preference. Default is empty array."
+            }
+          },
+          "required": [
+            "location"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "market_performance_get_data",
+        "description": "Retrieve the market performance data for specified indexes over a specified time period. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "indexes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Array of stock market indexes. Supported indexes are 'S&P 500', 'Dow Jones', 'NASDAQ', 'FTSE 100', 'DAX' etc."
+            },
+            "days": {
+              "type": "integer",
+              "description": "Number of days in the past for which the performance data is required."
+            },
+            "detailed": {
+              "type": "boolean",
+              "description": "Whether to return detailed performance data. If set to true, returns high, low, opening, and closing prices. If false, returns only closing prices. Default is false."
+            }
+          },
+          "required": [
+            "indexes",
+            "days"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "sports_match_results",
+        "description": "Returns the results of a given match between two teams. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "team1": {
+              "type": "string",
+              "description": "The name of the first team."
+            },
+            "team2": {
+              "type": "string",
+              "description": "The name of the second team."
+            },
+            "season": {
+              "type": "string",
+              "description": "The season when the match happened. Default is the current season."
+            }
+          },
+          "required": [
+            "team1",
+            "team2"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find the market performance of the S&P 500 and the Dow Jones over the past 5 days."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "restaurant_find_nearby",
+          "description": "Locate nearby restaurants based on specific dietary preferences. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city and state, e.g. Los Angeles, CA"
+              },
+              "dietary_preference": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "Vegan",
+                    "Vegetarian",
+                    "Gluten-free",
+                    "Dairy-free",
+                    "Nut-free"
+                  ]
+                },
+                "description": "Dietary preference. Default is empty array."
+              }
+            },
+            "required": [
+              "location"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "market_performance_get_data",
+          "description": "Retrieve the market performance data for specified indexes over a specified time period. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "indexes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Array of stock market indexes. Supported indexes are 'S&P 500', 'Dow Jones', 'NASDAQ', 'FTSE 100', 'DAX' etc."
+              },
+              "days": {
+                "type": "integer",
+                "description": "Number of days in the past for which the performance data is required."
+              },
+              "detailed": {
+                "type": "boolean",
+                "description": "Whether to return detailed performance data. If set to true, returns high, low, opening, and closing prices. If false, returns only closing prices. Default is false."
+              }
+            },
+            "required": [
+              "indexes",
+              "days"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "sports_match_results",
+          "description": "Returns the results of a given match between two teams. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "team1": {
+                "type": "string",
+                "description": "The name of the first team."
+              },
+              "team2": {
+                "type": "string",
+                "description": "The name of the second team."
+              },
+              "season": {
+                "type": "string",
+                "description": "The season when the match happened. Default is the current season."
+              }
+            },
+            "required": [
+              "team1",
+              "team2"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240243-oRIycvWVzt1K6JLBjPHX",
+    "object": "chat.completion",
+    "created": 1776240243,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_23228993",
+              "function": {
+                "name": "market_performance_get_data",
+                "arguments": "{\"indexes\":[\"S&P 500\",\"Dow Jones\"],\"days\":5,\"detailed\":false}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 631,
+      "completion_tokens": 45,
+      "total_tokens": 676,
+      "cost": 0.001138995,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 630,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0011505,
+        "upstream_inference_prompt_cost": 0.0004755,
+        "upstream_inference_completions_cost": 0.000675
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240243-oRIycvWVzt1K6JLBjPHX",
+    "object": "response",
+    "created_at": 1776240244,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_23228993",
+        "call_id": "call_23228993",
+        "name": "market_performance_get_data",
+        "arguments": "{\"indexes\":[\"S&P 500\",\"Dow Jones\"],\"days\":5,\"detailed\":false}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 631,
+      "completion_tokens": 45,
+      "total_tokens": 676,
+      "cost": 0.001138995,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 630,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0011505,
+        "upstream_inference_prompt_cost": 0.0004755,
+        "upstream_inference_completions_cost": 0.000675
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240243-oRIycvWVzt1K6JLBjPHX",
+    "object": "chat.completion",
+    "created": 1776240243,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_23228993",
+              "function": {
+                "name": "market_performance_get_data",
+                "arguments": "{\"indexes\":[\"S&P 500\",\"Dow Jones\"],\"days\":5,\"detailed\":false}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 631,
+      "completion_tokens": 45,
+      "total_tokens": 676,
+      "cost": 0.001138995,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 630,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0011505,
+        "upstream_inference_prompt_cost": 0.0004755,
+        "upstream_inference_completions_cost": 0.000675
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1818.673,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "7b96e577-cd40-475c-b1b4-25a5fdb2690f"
+}

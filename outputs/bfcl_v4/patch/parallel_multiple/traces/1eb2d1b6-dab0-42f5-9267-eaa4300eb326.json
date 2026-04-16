@@ -1,0 +1,346 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Can you help me find a book? I'm not sure of the title, but I know it's a mystery novel. I'd like to search in the library in New York City first, then I'd like to check Google Books and Open Library. Can you assist with these searches?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "google_books_search",
+        "description": "Search for a book in the Google Books library with optional parameters Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "genre": {
+              "type": "string",
+              "description": "Genre of the book"
+            },
+            "title": {
+              "type": "string",
+              "description": "Title of the book. Default is not use it if not specified."
+            }
+          },
+          "required": [
+            "genre"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "library_search_books",
+        "description": "Search for a book in a given library with optional parameters Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "Name or city of library"
+            },
+            "genre": {
+              "type": "string",
+              "description": "Genre of the book"
+            },
+            "title": {
+              "type": "string",
+              "description": "Title of the book. Default is not use it if not specified."
+            }
+          },
+          "required": [
+            "location",
+            "genre"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "openlibrary_books_search",
+        "description": "Search for a book in the Open Library with optional parameters Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "genre": {
+              "type": "string",
+              "description": "Genre of the book"
+            },
+            "title": {
+              "type": "string",
+              "description": "Title of the book. Default is not use it if not specified."
+            }
+          },
+          "required": [
+            "genre"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Can you help me find a book? I'm not sure of the title, but I know it's a mystery novel. I'd like to search in the library in New York City first, then I'd like to check Google Books and Open Library. Can you assist with these searches?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "google_books_search",
+          "description": "Search for a book in the Google Books library with optional parameters Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "genre": {
+                "type": "string",
+                "description": "Genre of the book"
+              },
+              "title": {
+                "type": "string",
+                "description": "Title of the book. Default is not use it if not specified."
+              }
+            },
+            "required": [
+              "genre"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "library_search_books",
+          "description": "Search for a book in a given library with optional parameters Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "Name or city of library"
+              },
+              "genre": {
+                "type": "string",
+                "description": "Genre of the book"
+              },
+              "title": {
+                "type": "string",
+                "description": "Title of the book. Default is not use it if not specified."
+              }
+            },
+            "required": [
+              "location",
+              "genre"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "openlibrary_books_search",
+          "description": "Search for a book in the Open Library with optional parameters Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "genre": {
+                "type": "string",
+                "description": "Genre of the book"
+              },
+              "title": {
+                "type": "string",
+                "description": "Title of the book. Default is not use it if not specified."
+              }
+            },
+            "required": [
+              "genre"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241668-X3EKUypBlXraaOOcqp8W",
+    "object": "chat.completion",
+    "created": 1776241668,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help you find a mystery novel. Let's start by searching in the library in New York City, and then we can proceed to Google Books and Open Library.\n\nFirst, I'll search for mystery novels in the New York City library.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_74565855",
+              "function": {
+                "name": "library_search_books",
+                "arguments": "{\"location\":\"New York City\",\"genre\":\"mystery\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 542,
+      "completion_tokens": 84,
+      "total_tokens": 626,
+      "cost": 0.0028504575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00287925,
+        "upstream_inference_prompt_cost": 0.00161925,
+        "upstream_inference_completions_cost": 0.00126
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241668-X3EKUypBlXraaOOcqp8W",
+    "object": "response",
+    "created_at": 1776241669,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'm happy to help you find a mystery novel. Let's start by searching in the library in New York City, and then we can proceed to Google Books and Open Library.\n\nFirst, I'll search for mystery novels in the New York City library.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_74565855",
+        "call_id": "call_74565855",
+        "name": "library_search_books",
+        "arguments": "{\"location\":\"New York City\",\"genre\":\"mystery\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 542,
+      "completion_tokens": 84,
+      "total_tokens": 626,
+      "cost": 0.0028504575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00287925,
+        "upstream_inference_prompt_cost": 0.00161925,
+        "upstream_inference_completions_cost": 0.00126
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241668-X3EKUypBlXraaOOcqp8W",
+    "object": "chat.completion",
+    "created": 1776241668,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help you find a mystery novel. Let's start by searching in the library in New York City, and then we can proceed to Google Books and Open Library.\n\nFirst, I'll search for mystery novels in the New York City library.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_74565855",
+              "function": {
+                "name": "library_search_books",
+                "arguments": "{\"location\":\"New York City\",\"genre\":\"mystery\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 542,
+      "completion_tokens": 84,
+      "total_tokens": 626,
+      "cost": 0.0028504575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00287925,
+        "upstream_inference_prompt_cost": 0.00161925,
+        "upstream_inference_completions_cost": 0.00126
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2272.089,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "1eb2d1b6-dab0-42f5-9267-eaa4300eb326"
+}

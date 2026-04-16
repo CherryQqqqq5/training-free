@@ -1,0 +1,441 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Could you first calculate the probability of drawing a heart from a deck of 52 cards where there are 13 hearts, and then calculate the probability of drawing a queen from the same deck where there are 4 queens? After that, could you retrieve the most recent artwork by the artist named 'Pablo Picasso' with a detailed description? Finally, could you locate the most popular sculpture exhibitions in New York, NY that are happening in the month of December and have high user ratings?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "get_sculpture_info",
+        "description": "Retrieves the most recent artwork by a specified artist with its detailed description. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "artist_name": {
+              "type": "string",
+              "description": "The name of the artist."
+            },
+            "detail": {
+              "type": "boolean",
+              "description": "If True, it provides detailed description of the sculpture. Defaults to False."
+            }
+          },
+          "required": [
+            "artist_name"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "find_exhibition",
+        "description": "Locate the most popular exhibitions based on criteria like location, time, art form, and user ratings. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city where the exhibition is held, e.g., New York, NY."
+            },
+            "art_form": {
+              "type": "string",
+              "description": "The form of art the exhibition is displaying e.g., sculpture."
+            },
+            "month": {
+              "type": "string",
+              "description": "The month of exhibition. Default value will return upcoming events."
+            },
+            "user_ratings": {
+              "type": "string",
+              "enum": [
+                "low",
+                "average",
+                "high"
+              ],
+              "description": "Select exhibitions with user rating threshold. Default is 'average'."
+            }
+          },
+          "required": [
+            "location",
+            "art_form"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "card_game_probability_calculate",
+        "description": "Calculate the probability of drawing a certain card or suit from a deck of cards. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "total_cards": {
+              "type": "integer",
+              "description": "Total number of cards in the deck."
+            },
+            "desired_cards": {
+              "type": "integer",
+              "description": "Number of cards in the deck that satisfy the conditions."
+            },
+            "cards_drawn": {
+              "type": "integer",
+              "default": 1,
+              "description": "Number of cards drawn from the deck."
+            }
+          },
+          "required": [
+            "total_cards",
+            "desired_cards"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Could you first calculate the probability of drawing a heart from a deck of 52 cards where there are 13 hearts, and then calculate the probability of drawing a queen from the same deck where there are 4 queens? After that, could you retrieve the most recent artwork by the artist named 'Pablo Picasso' with a detailed description? Finally, could you locate the most popular sculpture exhibitions in New York, NY that are happening in the month of December and have high user ratings?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_sculpture_info",
+          "description": "Retrieves the most recent artwork by a specified artist with its detailed description. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "artist_name": {
+                "type": "string",
+                "description": "The name of the artist."
+              },
+              "detail": {
+                "type": "boolean",
+                "description": "If True, it provides detailed description of the sculpture. Defaults to False."
+              }
+            },
+            "required": [
+              "artist_name"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "find_exhibition",
+          "description": "Locate the most popular exhibitions based on criteria like location, time, art form, and user ratings. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city where the exhibition is held, e.g., New York, NY."
+              },
+              "art_form": {
+                "type": "string",
+                "description": "The form of art the exhibition is displaying e.g., sculpture."
+              },
+              "month": {
+                "type": "string",
+                "description": "The month of exhibition. Default value will return upcoming events."
+              },
+              "user_ratings": {
+                "type": "string",
+                "enum": [
+                  "low",
+                  "average",
+                  "high"
+                ],
+                "description": "Select exhibitions with user rating threshold. Default is 'average'."
+              }
+            },
+            "required": [
+              "location",
+              "art_form"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "card_game_probability_calculate",
+          "description": "Calculate the probability of drawing a certain card or suit from a deck of cards. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "total_cards": {
+                "type": "integer",
+                "description": "Total number of cards in the deck."
+              },
+              "desired_cards": {
+                "type": "integer",
+                "description": "Number of cards in the deck that satisfy the conditions."
+              },
+              "cards_drawn": {
+                "type": "integer",
+                "default": 1,
+                "description": "Number of cards drawn from the deck."
+              }
+            },
+            "required": [
+              "total_cards",
+              "desired_cards"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241212-X3GZRF3DHuY1zayK4A12",
+    "object": "chat.completion",
+    "created": 1776241212,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_38631871",
+              "function": {
+                "name": "card_game_probability_calculate",
+                "arguments": "{\"total_cards\":52,\"desired_cards\":13,\"cards_drawn\":1}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_57521203",
+              "function": {
+                "name": "card_game_probability_calculate",
+                "arguments": "{\"total_cards\":52,\"desired_cards\":4,\"cards_drawn\":1}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_93903095",
+              "function": {
+                "name": "get_sculpture_info",
+                "arguments": "{\"artist_name\":\"Pablo Picasso\",\"detail\":true}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_28758421",
+              "function": {
+                "name": "find_exhibition",
+                "arguments": "{\"location\":\"New York, NY\",\"art_form\":\"sculpture\",\"month\":\"December\",\"user_ratings\":\"high\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 692,
+      "completion_tokens": 176,
+      "total_tokens": 868,
+      "cost": 0.004201065,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0042435,
+        "upstream_inference_prompt_cost": 0.0016035,
+        "upstream_inference_completions_cost": 0.00264
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241212-X3GZRF3DHuY1zayK4A12",
+    "object": "response",
+    "created_at": 1776241214,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_38631871",
+        "call_id": "call_38631871",
+        "name": "card_game_probability_calculate",
+        "arguments": "{\"total_cards\":52,\"desired_cards\":13,\"cards_drawn\":1}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_57521203",
+        "call_id": "call_57521203",
+        "name": "card_game_probability_calculate",
+        "arguments": "{\"total_cards\":52,\"desired_cards\":4,\"cards_drawn\":1}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_93903095",
+        "call_id": "call_93903095",
+        "name": "get_sculpture_info",
+        "arguments": "{\"artist_name\":\"Pablo Picasso\",\"detail\":true}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_28758421",
+        "call_id": "call_28758421",
+        "name": "find_exhibition",
+        "arguments": "{\"location\":\"New York, NY\",\"art_form\":\"sculpture\",\"month\":\"December\",\"user_ratings\":\"high\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 692,
+      "completion_tokens": 176,
+      "total_tokens": 868,
+      "cost": 0.004201065,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0042435,
+        "upstream_inference_prompt_cost": 0.0016035,
+        "upstream_inference_completions_cost": 0.00264
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241212-X3GZRF3DHuY1zayK4A12",
+    "object": "chat.completion",
+    "created": 1776241212,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_38631871",
+              "function": {
+                "name": "card_game_probability_calculate",
+                "arguments": "{\"total_cards\":52,\"desired_cards\":13,\"cards_drawn\":1}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_57521203",
+              "function": {
+                "name": "card_game_probability_calculate",
+                "arguments": "{\"total_cards\":52,\"desired_cards\":4,\"cards_drawn\":1}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_93903095",
+              "function": {
+                "name": "get_sculpture_info",
+                "arguments": "{\"artist_name\":\"Pablo Picasso\",\"detail\":true}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_28758421",
+              "function": {
+                "name": "find_exhibition",
+                "arguments": "{\"location\":\"New York, NY\",\"art_form\":\"sculpture\",\"month\":\"December\",\"user_ratings\":\"high\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 692,
+      "completion_tokens": 176,
+      "total_tokens": 868,
+      "cost": 0.004201065,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0042435,
+        "upstream_inference_prompt_cost": 0.0016035,
+        "upstream_inference_completions_cost": 0.00264
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 3009.963,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "08be1c12-b725-4e63-9646-fe202df774d5"
+}

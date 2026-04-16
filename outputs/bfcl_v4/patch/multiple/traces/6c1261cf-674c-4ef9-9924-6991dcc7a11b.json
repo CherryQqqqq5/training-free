@@ -1,0 +1,370 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find a healthy lunch recipe under 500 calories that uses chicken and mushrooms."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "restaurant_search",
+        "description": "Searches for restaurants based on a list of preferred ingredients and maximum calorie count. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "ingredients": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "A list of ingredients you prefer in the restaurant's dishes."
+            },
+            "calories": {
+              "type": "integer",
+              "description": "The maximum calorie count you prefer for the restaurant's dishes."
+            },
+            "meal": {
+              "type": "string",
+              "description": "Type of the meal for the restaurant's dishes, it's optional and could be breakfast, lunch or dinner. Default 'lunch'"
+            }
+          },
+          "required": [
+            "ingredients",
+            "calories"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "ingredient_replace",
+        "description": "Replaces an ingredient in a recipe with a substitute, keeping the calories below a certain number. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "original_ingredient": {
+              "type": "string",
+              "description": "The ingredient in the recipe to replace."
+            },
+            "replacement_ingredient": {
+              "type": "string",
+              "description": "The substitute ingredient to replace the original one."
+            },
+            "calories": {
+              "type": "integer",
+              "description": "The maximum number of calories for the recipe after replacement."
+            }
+          },
+          "required": [
+            "original_ingredient",
+            "replacement_ingredient",
+            "calories"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "recipe_search",
+        "description": "Searches for recipes based on a list of ingredients and a maximum caloric value. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "ingredients": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "A list of ingredients you want to use in the recipe."
+            },
+            "calories": {
+              "type": "integer",
+              "description": "The maximum number of calories for the recipe."
+            },
+            "meal": {
+              "type": "string",
+              "description": "Type of the meal for the recipe, it's optional and could be breakfast, lunch or dinner. Default 'lunch'"
+            }
+          },
+          "required": [
+            "ingredients",
+            "calories"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find a healthy lunch recipe under 500 calories that uses chicken and mushrooms."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "restaurant_search",
+          "description": "Searches for restaurants based on a list of preferred ingredients and maximum calorie count. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "ingredients": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "A list of ingredients you prefer in the restaurant's dishes."
+              },
+              "calories": {
+                "type": "integer",
+                "description": "The maximum calorie count you prefer for the restaurant's dishes."
+              },
+              "meal": {
+                "type": "string",
+                "description": "Type of the meal for the restaurant's dishes, it's optional and could be breakfast, lunch or dinner. Default 'lunch'"
+              }
+            },
+            "required": [
+              "ingredients",
+              "calories"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "ingredient_replace",
+          "description": "Replaces an ingredient in a recipe with a substitute, keeping the calories below a certain number. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "original_ingredient": {
+                "type": "string",
+                "description": "The ingredient in the recipe to replace."
+              },
+              "replacement_ingredient": {
+                "type": "string",
+                "description": "The substitute ingredient to replace the original one."
+              },
+              "calories": {
+                "type": "integer",
+                "description": "The maximum number of calories for the recipe after replacement."
+              }
+            },
+            "required": [
+              "original_ingredient",
+              "replacement_ingredient",
+              "calories"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "recipe_search",
+          "description": "Searches for recipes based on a list of ingredients and a maximum caloric value. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "ingredients": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "A list of ingredients you want to use in the recipe."
+              },
+              "calories": {
+                "type": "integer",
+                "description": "The maximum number of calories for the recipe."
+              },
+              "meal": {
+                "type": "string",
+                "description": "Type of the meal for the recipe, it's optional and could be breakfast, lunch or dinner. Default 'lunch'"
+              }
+            },
+            "required": [
+              "ingredients",
+              "calories"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240150-2xh5PnsbnttxBf0JhqrS",
+    "object": "chat.completion",
+    "created": 1776240150,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_84320717",
+              "function": {
+                "name": "recipe_search",
+                "arguments": "{\"ingredients\":[\"chicken\",\"mushrooms\"],\"calories\":500,\"meal\":\"lunch\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 629,
+      "completion_tokens": 45,
+      "total_tokens": 674,
+      "cost": 0.00113751,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 628,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001149,
+        "upstream_inference_prompt_cost": 0.000474,
+        "upstream_inference_completions_cost": 0.000675
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240150-2xh5PnsbnttxBf0JhqrS",
+    "object": "response",
+    "created_at": 1776240151,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_84320717",
+        "call_id": "call_84320717",
+        "name": "recipe_search",
+        "arguments": "{\"ingredients\":[\"chicken\",\"mushrooms\"],\"calories\":500,\"meal\":\"lunch\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 629,
+      "completion_tokens": 45,
+      "total_tokens": 674,
+      "cost": 0.00113751,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 628,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001149,
+        "upstream_inference_prompt_cost": 0.000474,
+        "upstream_inference_completions_cost": 0.000675
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240150-2xh5PnsbnttxBf0JhqrS",
+    "object": "chat.completion",
+    "created": 1776240150,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_84320717",
+              "function": {
+                "name": "recipe_search",
+                "arguments": "{\"ingredients\":[\"chicken\",\"mushrooms\"],\"calories\":500,\"meal\":\"lunch\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 629,
+      "completion_tokens": 45,
+      "total_tokens": 674,
+      "cost": 0.00113751,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 628,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001149,
+        "upstream_inference_prompt_cost": 0.000474,
+        "upstream_inference_completions_cost": 0.000675
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1686.444,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "6c1261cf-674c-4ef9-9924-6991dcc7a11b"
+}

@@ -1,0 +1,336 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Determine my personality type based on the five factor model with given information: I'm talkative, gets nervous easily, has few artistic interests, tend to be lazy and has a forgiving nature."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "MBTI_analyse",
+        "description": "Analyse personality based on the Myers-Briggs Type Indicator (MBTI) which sorts for preferences and generates a 4-letter personality type. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "thinking_vs_feeling": {
+              "type": "string",
+              "description": "Preference of user between thinking and feeling."
+            },
+            "introverted_vs_extroverted": {
+              "type": "string",
+              "description": "Preference of user between introverted and extroverted."
+            },
+            "judging_vs_perceiving": {
+              "type": "string",
+              "description": "Preference of user between judging and perceiving."
+            },
+            "sensing_vs_intuition": {
+              "type": "string",
+              "description": "Preference of user between sensing and intuition."
+            }
+          },
+          "required": [
+            "thinking_vs_feeling",
+            "introverted_vs_extroverted",
+            "judging_vs_perceiving",
+            "sensing_vs_intuition"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "five_factor_model_analyse",
+        "description": "Analyse personality based on the five-factor model, also known as the Big Five, which measures openness, conscientiousness, extraversion, agreeableness, and neuroticism. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "talkative": {
+              "type": "boolean",
+              "description": "Indicates if the user is talkative."
+            },
+            "nervous": {
+              "type": "boolean",
+              "description": "Indicates if the user gets nervous easily."
+            },
+            "artistic_interests": {
+              "type": "boolean",
+              "description": "Indicates if the user has many artistic interests."
+            },
+            "lazy": {
+              "type": "boolean",
+              "description": "Indicates if the user tends to be lazy."
+            },
+            "forgiving": {
+              "type": "boolean",
+              "description": "Indicates if the user is forgiving."
+            }
+          },
+          "required": [
+            "talkative",
+            "nervous",
+            "artistic_interests",
+            "lazy",
+            "forgiving"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Determine my personality type based on the five factor model with given information: I'm talkative, gets nervous easily, has few artistic interests, tend to be lazy and has a forgiving nature."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "MBTI_analyse",
+          "description": "Analyse personality based on the Myers-Briggs Type Indicator (MBTI) which sorts for preferences and generates a 4-letter personality type. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "thinking_vs_feeling": {
+                "type": "string",
+                "description": "Preference of user between thinking and feeling."
+              },
+              "introverted_vs_extroverted": {
+                "type": "string",
+                "description": "Preference of user between introverted and extroverted."
+              },
+              "judging_vs_perceiving": {
+                "type": "string",
+                "description": "Preference of user between judging and perceiving."
+              },
+              "sensing_vs_intuition": {
+                "type": "string",
+                "description": "Preference of user between sensing and intuition."
+              }
+            },
+            "required": [
+              "thinking_vs_feeling",
+              "introverted_vs_extroverted",
+              "judging_vs_perceiving",
+              "sensing_vs_intuition"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "five_factor_model_analyse",
+          "description": "Analyse personality based on the five-factor model, also known as the Big Five, which measures openness, conscientiousness, extraversion, agreeableness, and neuroticism. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "talkative": {
+                "type": "boolean",
+                "description": "Indicates if the user is talkative."
+              },
+              "nervous": {
+                "type": "boolean",
+                "description": "Indicates if the user gets nervous easily."
+              },
+              "artistic_interests": {
+                "type": "boolean",
+                "description": "Indicates if the user has many artistic interests."
+              },
+              "lazy": {
+                "type": "boolean",
+                "description": "Indicates if the user tends to be lazy."
+              },
+              "forgiving": {
+                "type": "boolean",
+                "description": "Indicates if the user is forgiving."
+              }
+            },
+            "required": [
+              "talkative",
+              "nervous",
+              "artistic_interests",
+              "lazy",
+              "forgiving"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239600-KH7WXj42xI3gfLO9Ncem",
+    "object": "chat.completion",
+    "created": 1776239600,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_00463629",
+              "function": {
+                "name": "five_factor_model_analyse",
+                "arguments": "{\"talkative\":true,\"nervous\":true,\"artistic_interests\":false,\"lazy\":true,\"forgiving\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 607,
+      "completion_tokens": 54,
+      "total_tokens": 661,
+      "cost": 0.0021391425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00216075,
+        "upstream_inference_prompt_cost": 0.00135075,
+        "upstream_inference_completions_cost": 0.00081
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239600-KH7WXj42xI3gfLO9Ncem",
+    "object": "response",
+    "created_at": 1776239603,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_00463629",
+        "call_id": "call_00463629",
+        "name": "five_factor_model_analyse",
+        "arguments": "{\"talkative\":true,\"nervous\":true,\"artistic_interests\":false,\"lazy\":true,\"forgiving\":true}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 607,
+      "completion_tokens": 54,
+      "total_tokens": 661,
+      "cost": 0.0021391425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00216075,
+        "upstream_inference_prompt_cost": 0.00135075,
+        "upstream_inference_completions_cost": 0.00081
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239600-KH7WXj42xI3gfLO9Ncem",
+    "object": "chat.completion",
+    "created": 1776239600,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_00463629",
+              "function": {
+                "name": "five_factor_model_analyse",
+                "arguments": "{\"talkative\":true,\"nervous\":true,\"artistic_interests\":false,\"lazy\":true,\"forgiving\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 607,
+      "completion_tokens": 54,
+      "total_tokens": 661,
+      "cost": 0.0021391425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00216075,
+        "upstream_inference_prompt_cost": 0.00135075,
+        "upstream_inference_completions_cost": 0.00081
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 3096.618,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "f4b95c60-f056-48f9-b197-5500b12d7c77"
+}

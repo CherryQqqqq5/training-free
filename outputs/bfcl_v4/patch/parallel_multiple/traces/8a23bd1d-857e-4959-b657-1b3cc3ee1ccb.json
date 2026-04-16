@@ -1,0 +1,387 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"What was the population of California in 1980 and 1990 according to the 'us_history.population_by_state_year' function, and what was the Real GDP of California in those same years according to the 'us_economy.gdp_by_state_year' function with the adjustment set to 'Real'?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "us_history_population_by_state_year",
+        "description": "Retrieve historical population data for a specific U.S. state and year. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "state": {
+              "type": "string",
+              "description": "The U.S. state for which to retrieve the population."
+            },
+            "year": {
+              "type": "integer",
+              "description": "The year for which to retrieve the population."
+            }
+          },
+          "required": [
+            "state",
+            "year"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "us_economy_gdp_by_state_year",
+        "description": "Retrieve historical GDP data for a specific U.S. state and year. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "state": {
+              "type": "string",
+              "description": "The U.S. state for which to retrieve the GDP."
+            },
+            "year": {
+              "type": "integer",
+              "description": "The year for which to retrieve the GDP."
+            },
+            "adjustment": {
+              "type": "string",
+              "description": "The type of adjustment for inflation, 'Real' or 'Nominal'. Optional, 'Nominal' by default.",
+              "enum": [
+                "Real",
+                "Nominal"
+              ]
+            }
+          },
+          "required": [
+            "state",
+            "year"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"What was the population of California in 1980 and 1990 according to the 'us_history.population_by_state_year' function, and what was the Real GDP of California in those same years according to the 'us_economy.gdp_by_state_year' function with the adjustment set to 'Real'?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "us_history_population_by_state_year",
+          "description": "Retrieve historical population data for a specific U.S. state and year. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "state": {
+                "type": "string",
+                "description": "The U.S. state for which to retrieve the population."
+              },
+              "year": {
+                "type": "integer",
+                "description": "The year for which to retrieve the population."
+              }
+            },
+            "required": [
+              "state",
+              "year"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "us_economy_gdp_by_state_year",
+          "description": "Retrieve historical GDP data for a specific U.S. state and year. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "state": {
+                "type": "string",
+                "description": "The U.S. state for which to retrieve the GDP."
+              },
+              "year": {
+                "type": "integer",
+                "description": "The year for which to retrieve the GDP."
+              },
+              "adjustment": {
+                "type": "string",
+                "description": "The type of adjustment for inflation, 'Real' or 'Nominal'. Optional, 'Nominal' by default.",
+                "enum": [
+                  "Real",
+                  "Nominal"
+                ]
+              }
+            },
+            "required": [
+              "state",
+              "year"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241676-tuZrbDI1yZhEzlg1J06v",
+    "object": "chat.completion",
+    "created": 1776241676,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "Let me retrieve the population and GDP data for California in 1980 and 1990 for you.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_67213965",
+              "function": {
+                "name": "us_history_population_by_state_year",
+                "arguments": "{\"state\":\"California\",\"year\":1980}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_15505467",
+              "function": {
+                "name": "us_history_population_by_state_year",
+                "arguments": "{\"state\":\"California\",\"year\":1990}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_21604529",
+              "function": {
+                "name": "us_economy_gdp_by_state_year",
+                "arguments": "{\"state\":\"California\",\"year\":1980,\"adjustment\":\"Real\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_24915038",
+              "function": {
+                "name": "us_economy_gdp_by_state_year",
+                "arguments": "{\"state\":\"California\",\"year\":1990,\"adjustment\":\"Real\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 508,
+      "completion_tokens": 183,
+      "total_tokens": 691,
+      "cost": 0.0037607625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00379875,
+        "upstream_inference_prompt_cost": 0.00105375,
+        "upstream_inference_completions_cost": 0.002745
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241676-tuZrbDI1yZhEzlg1J06v",
+    "object": "response",
+    "created_at": 1776241678,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "Let me retrieve the population and GDP data for California in 1980 and 1990 for you.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_67213965",
+        "call_id": "call_67213965",
+        "name": "us_history_population_by_state_year",
+        "arguments": "{\"state\":\"California\",\"year\":1980}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_15505467",
+        "call_id": "call_15505467",
+        "name": "us_history_population_by_state_year",
+        "arguments": "{\"state\":\"California\",\"year\":1990}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_21604529",
+        "call_id": "call_21604529",
+        "name": "us_economy_gdp_by_state_year",
+        "arguments": "{\"state\":\"California\",\"year\":1980,\"adjustment\":\"Real\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_24915038",
+        "call_id": "call_24915038",
+        "name": "us_economy_gdp_by_state_year",
+        "arguments": "{\"state\":\"California\",\"year\":1990,\"adjustment\":\"Real\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 508,
+      "completion_tokens": 183,
+      "total_tokens": 691,
+      "cost": 0.0037607625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00379875,
+        "upstream_inference_prompt_cost": 0.00105375,
+        "upstream_inference_completions_cost": 0.002745
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241676-tuZrbDI1yZhEzlg1J06v",
+    "object": "chat.completion",
+    "created": 1776241676,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "Let me retrieve the population and GDP data for California in 1980 and 1990 for you.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_67213965",
+              "function": {
+                "name": "us_history_population_by_state_year",
+                "arguments": "{\"state\":\"California\",\"year\":1980}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_15505467",
+              "function": {
+                "name": "us_history_population_by_state_year",
+                "arguments": "{\"state\":\"California\",\"year\":1990}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_21604529",
+              "function": {
+                "name": "us_economy_gdp_by_state_year",
+                "arguments": "{\"state\":\"California\",\"year\":1980,\"adjustment\":\"Real\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_24915038",
+              "function": {
+                "name": "us_economy_gdp_by_state_year",
+                "arguments": "{\"state\":\"California\",\"year\":1990,\"adjustment\":\"Real\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 508,
+      "completion_tokens": 183,
+      "total_tokens": 691,
+      "cost": 0.0037607625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00379875,
+        "upstream_inference_prompt_cost": 0.00105375,
+        "upstream_inference_completions_cost": 0.002745
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2899.373,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "8a23bd1d-857e-4959-b657-1b3cc3ee1ccb"
+}

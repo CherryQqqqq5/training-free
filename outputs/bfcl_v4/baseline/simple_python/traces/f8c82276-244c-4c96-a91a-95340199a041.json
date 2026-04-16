@@ -1,0 +1,238 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Who discovered Gravity and what was the method used?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "science_history_get_discovery_details",
+        "description": "Retrieve the details of a scientific discovery based on the discovery name. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "discovery": {
+              "type": "string",
+              "description": "The name of the discovery, e.g. Gravity"
+            },
+            "method_used": {
+              "type": "string",
+              "description": "The method used for the discovery, default value is 'default' which gives the most accepted method."
+            }
+          },
+          "required": [
+            "discovery"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Who discovered Gravity and what was the method used?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "science_history_get_discovery_details",
+          "description": "Retrieve the details of a scientific discovery based on the discovery name. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "discovery": {
+                "type": "string",
+                "description": "The name of the discovery, e.g. Gravity"
+              },
+              "method_used": {
+                "type": "string",
+                "description": "The method used for the discovery, default value is 'default' which gives the most accepted method."
+              }
+            },
+            "required": [
+              "discovery"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776238158-vmRahp2G9m6jHpvmjmhc",
+    "object": "chat.completion",
+    "created": 1776238158,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_71326719",
+              "function": {
+                "name": "science_history_get_discovery_details",
+                "arguments": "{\"discovery\":\"Gravity\",\"method_used\":\"default\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 327,
+      "completion_tokens": 37,
+      "total_tokens": 364,
+      "cost": 0.0010550925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00106575,
+        "upstream_inference_prompt_cost": 0.00051075,
+        "upstream_inference_completions_cost": 0.000555
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776238158-vmRahp2G9m6jHpvmjmhc",
+    "object": "response",
+    "created_at": 1776238159,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_71326719",
+        "call_id": "call_71326719",
+        "name": "science_history_get_discovery_details",
+        "arguments": "{\"discovery\":\"Gravity\",\"method_used\":\"default\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 327,
+      "completion_tokens": 37,
+      "total_tokens": 364,
+      "cost": 0.0010550925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00106575,
+        "upstream_inference_prompt_cost": 0.00051075,
+        "upstream_inference_completions_cost": 0.000555
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776238158-vmRahp2G9m6jHpvmjmhc",
+    "object": "chat.completion",
+    "created": 1776238158,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_71326719",
+              "function": {
+                "name": "science_history_get_discovery_details",
+                "arguments": "{\"discovery\":\"Gravity\",\"method_used\":\"default\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 327,
+      "completion_tokens": 37,
+      "total_tokens": 364,
+      "cost": 0.0010550925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00106575,
+        "upstream_inference_prompt_cost": 0.00051075,
+        "upstream_inference_completions_cost": 0.000555
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1754.207,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "f8c82276-244c-4c96-a91a-95340199a041"
+}

@@ -1,0 +1,424 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"A car is initially at rest and then starts moving with a constant acceleration of 3 m/s^2. After 5 seconds, what is its final velocity? Now, imagine a wave with a frequency of 50 Hz and a wavelength of 3 meters. What is the velocity of this wave? Going back to the car, if it continues to move with the same acceleration for another 7 seconds, what is the total distance it has traveled from the start?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "kinematics_distance",
+        "description": "Find the distance traveled by an object moving under constant acceleration. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "initial_velocity": {
+              "type": "number",
+              "description": "The initial velocity of the object in m/s. This is a float type value.",
+              "format": "float"
+            },
+            "time": {
+              "type": "number",
+              "description": "The time in seconds the object has been moving. This is a float type value.",
+              "format": "float"
+            },
+            "acceleration": {
+              "type": "number",
+              "description": "The acceleration of the object in m/s^2. Default value is -9.81 (Earth's gravity) This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "initial_velocity",
+            "time"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "kinematics_final_velocity",
+        "description": "Find the final velocity of an object moving under constant acceleration. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "initial_velocity": {
+              "type": "number",
+              "description": "The initial velocity of the object in m/s. This is a float type value.",
+              "format": "float"
+            },
+            "time": {
+              "type": "number",
+              "description": "The time in seconds the object has been moving. This is a float type value.",
+              "format": "float"
+            },
+            "acceleration": {
+              "type": "number",
+              "description": "The acceleration of the object in m/s^2. Default value is -9.81 (Earth's gravity) This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "initial_velocity",
+            "time"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "physics_wave_velocity",
+        "description": "Calculate the velocity of a wave based on its frequency and wavelength. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "frequency": {
+              "type": "number",
+              "description": "The frequency of the wave in Hz. This is a float type value.",
+              "format": "float"
+            },
+            "wavelength": {
+              "type": "number",
+              "description": "The wavelength of the wave in m. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "frequency",
+            "wavelength"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"A car is initially at rest and then starts moving with a constant acceleration of 3 m/s^2. After 5 seconds, what is its final velocity? Now, imagine a wave with a frequency of 50 Hz and a wavelength of 3 meters. What is the velocity of this wave? Going back to the car, if it continues to move with the same acceleration for another 7 seconds, what is the total distance it has traveled from the start?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "kinematics_distance",
+          "description": "Find the distance traveled by an object moving under constant acceleration. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "initial_velocity": {
+                "type": "number",
+                "description": "The initial velocity of the object in m/s. This is a float type value.",
+                "format": "float"
+              },
+              "time": {
+                "type": "number",
+                "description": "The time in seconds the object has been moving. This is a float type value.",
+                "format": "float"
+              },
+              "acceleration": {
+                "type": "number",
+                "description": "The acceleration of the object in m/s^2. Default value is -9.81 (Earth's gravity) This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "initial_velocity",
+              "time"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "kinematics_final_velocity",
+          "description": "Find the final velocity of an object moving under constant acceleration. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "initial_velocity": {
+                "type": "number",
+                "description": "The initial velocity of the object in m/s. This is a float type value.",
+                "format": "float"
+              },
+              "time": {
+                "type": "number",
+                "description": "The time in seconds the object has been moving. This is a float type value.",
+                "format": "float"
+              },
+              "acceleration": {
+                "type": "number",
+                "description": "The acceleration of the object in m/s^2. Default value is -9.81 (Earth's gravity) This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "initial_velocity",
+              "time"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "physics_wave_velocity",
+          "description": "Calculate the velocity of a wave based on its frequency and wavelength. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "frequency": {
+                "type": "number",
+                "description": "The frequency of the wave in Hz. This is a float type value.",
+                "format": "float"
+              },
+              "wavelength": {
+                "type": "number",
+                "description": "The wavelength of the wave in m. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "frequency",
+              "wavelength"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240774-lVX373rjbDJRrvFmLWAo",
+    "object": "chat.completion",
+    "created": 1776240774,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "Let me address each part of your query step by step using the available functions.\n\nFor the car's final velocity after 5 seconds:\nFor the wave's velocity with a frequency of 50 Hz and a wavelength of 3 meters:\nFor the total distance traveled by the car from the start after an additional 7 seconds (total time of 12 seconds):\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_93936251",
+              "function": {
+                "name": "kinematics_final_velocity",
+                "arguments": "{\"initial_velocity\":0.0,\"time\":5.0,\"acceleration\":3.0}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_70512245",
+              "function": {
+                "name": "physics_wave_velocity",
+                "arguments": "{\"frequency\":50.0,\"wavelength\":3.0}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_32849834",
+              "function": {
+                "name": "kinematics_distance",
+                "arguments": "{\"initial_velocity\":0.0,\"time\":12.0,\"acceleration\":3.0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 725,
+      "completion_tokens": 198,
+      "total_tokens": 923,
+      "cost": 0.0046280025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00467475,
+        "upstream_inference_prompt_cost": 0.00170475,
+        "upstream_inference_completions_cost": 0.00297
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240774-lVX373rjbDJRrvFmLWAo",
+    "object": "response",
+    "created_at": 1776240778,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "Let me address each part of your query step by step using the available functions.\n\nFor the car's final velocity after 5 seconds:\nFor the wave's velocity with a frequency of 50 Hz and a wavelength of 3 meters:\nFor the total distance traveled by the car from the start after an additional 7 seconds (total time of 12 seconds):\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_93936251",
+        "call_id": "call_93936251",
+        "name": "kinematics_final_velocity",
+        "arguments": "{\"initial_velocity\":0.0,\"time\":5.0,\"acceleration\":3.0}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_70512245",
+        "call_id": "call_70512245",
+        "name": "physics_wave_velocity",
+        "arguments": "{\"frequency\":50.0,\"wavelength\":3.0}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_32849834",
+        "call_id": "call_32849834",
+        "name": "kinematics_distance",
+        "arguments": "{\"initial_velocity\":0.0,\"time\":12.0,\"acceleration\":3.0}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 725,
+      "completion_tokens": 198,
+      "total_tokens": 923,
+      "cost": 0.0046280025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00467475,
+        "upstream_inference_prompt_cost": 0.00170475,
+        "upstream_inference_completions_cost": 0.00297
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240774-lVX373rjbDJRrvFmLWAo",
+    "object": "chat.completion",
+    "created": 1776240774,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "Let me address each part of your query step by step using the available functions.\n\nFor the car's final velocity after 5 seconds:\nFor the wave's velocity with a frequency of 50 Hz and a wavelength of 3 meters:\nFor the total distance traveled by the car from the start after an additional 7 seconds (total time of 12 seconds):\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_93936251",
+              "function": {
+                "name": "kinematics_final_velocity",
+                "arguments": "{\"initial_velocity\":0.0,\"time\":5.0,\"acceleration\":3.0}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_70512245",
+              "function": {
+                "name": "physics_wave_velocity",
+                "arguments": "{\"frequency\":50.0,\"wavelength\":3.0}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_32849834",
+              "function": {
+                "name": "kinematics_distance",
+                "arguments": "{\"initial_velocity\":0.0,\"time\":12.0,\"acceleration\":3.0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 725,
+      "completion_tokens": 198,
+      "total_tokens": 923,
+      "cost": 0.0046280025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00467475,
+        "upstream_inference_prompt_cost": 0.00170475,
+        "upstream_inference_completions_cost": 0.00297
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 5084.829,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "fa8babc9-52e5-4418-a9a0-667bd87a2979"
+}

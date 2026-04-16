@@ -1,0 +1,240 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the molecular weight of Glucose (C6H12O6) in grams/mole."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_molecular_weight",
+        "description": "Calculate the molecular weight of a compound given the compound formula. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "compound": {
+              "type": "string",
+              "description": "The molecular formula of the compound."
+            },
+            "to_unit": {
+              "type": "string",
+              "description": "The unit in which to return the result."
+            }
+          },
+          "required": [
+            "compound",
+            "to_unit"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the molecular weight of Glucose (C6H12O6) in grams/mole."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_molecular_weight",
+          "description": "Calculate the molecular weight of a compound given the compound formula. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "compound": {
+                "type": "string",
+                "description": "The molecular formula of the compound."
+              },
+              "to_unit": {
+                "type": "string",
+                "description": "The unit in which to return the result."
+              }
+            },
+            "required": [
+              "compound",
+              "to_unit"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776238687-mCNVyQibTxygdbwHPT8E",
+    "object": "chat.completion",
+    "created": 1776238687,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_14216556",
+              "function": {
+                "name": "calculate_molecular_weight",
+                "arguments": "{\"compound\":\"C6H12O6\",\"to_unit\":\"grams/mole\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 322,
+      "completion_tokens": 42,
+      "total_tokens": 364,
+      "cost": 0.0008650125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 321,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00087375,
+        "upstream_inference_prompt_cost": 0.00024375,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776238687-mCNVyQibTxygdbwHPT8E",
+    "object": "response",
+    "created_at": 1776238688,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_14216556",
+        "call_id": "call_14216556",
+        "name": "calculate_molecular_weight",
+        "arguments": "{\"compound\":\"C6H12O6\",\"to_unit\":\"grams/mole\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 322,
+      "completion_tokens": 42,
+      "total_tokens": 364,
+      "cost": 0.0008650125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 321,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00087375,
+        "upstream_inference_prompt_cost": 0.00024375,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776238687-mCNVyQibTxygdbwHPT8E",
+    "object": "chat.completion",
+    "created": 1776238687,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_14216556",
+              "function": {
+                "name": "calculate_molecular_weight",
+                "arguments": "{\"compound\":\"C6H12O6\",\"to_unit\":\"grams/mole\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 322,
+      "completion_tokens": 42,
+      "total_tokens": 364,
+      "cost": 0.0008650125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 321,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00087375,
+        "upstream_inference_prompt_cost": 0.00024375,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1529.872,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "2f3de188-3ef0-40d2-9ad2-27a8ef597e6a"
+}

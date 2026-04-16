@@ -1,0 +1,258 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Give me the schedule of Manchester United for the next 6 games in Premier League."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "sports_team_get_schedule",
+        "description": "Fetches the schedule of the specified sports team for the specified number of games in the given league. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "team_name": {
+              "type": "string",
+              "description": "The name of the sports team."
+            },
+            "num_of_games": {
+              "type": "integer",
+              "description": "Number of games for which to fetch the schedule."
+            },
+            "league": {
+              "type": "string",
+              "description": "The name of the sports league. If not provided, the function will fetch the schedule for all games, regardless of the league."
+            },
+            "location": {
+              "type": "string",
+              "description": "Optional. The city or venue where games are to be held. If not provided, default that all venues will be considered."
+            }
+          },
+          "required": [
+            "team_name",
+            "num_of_games",
+            "league"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Give me the schedule of Manchester United for the next 6 games in Premier League."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "sports_team_get_schedule",
+          "description": "Fetches the schedule of the specified sports team for the specified number of games in the given league. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "team_name": {
+                "type": "string",
+                "description": "The name of the sports team."
+              },
+              "num_of_games": {
+                "type": "integer",
+                "description": "Number of games for which to fetch the schedule."
+              },
+              "league": {
+                "type": "string",
+                "description": "The name of the sports league. If not provided, the function will fetch the schedule for all games, regardless of the league."
+              },
+              "location": {
+                "type": "string",
+                "description": "Optional. The city or venue where games are to be held. If not provided, default that all venues will be considered."
+              }
+            },
+            "required": [
+              "team_name",
+              "num_of_games",
+              "league"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776238327-FxUNgzU7jykDhjnasdSh",
+    "object": "chat.completion",
+    "created": 1776238327,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_56672075",
+              "function": {
+                "name": "sports_team_get_schedule",
+                "arguments": "{\"team_name\":\"Manchester United\",\"num_of_games\":6,\"league\":\"Premier League\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 404,
+      "completion_tokens": 45,
+      "total_tokens": 449,
+      "cost": 0.0014025825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00141675,
+        "upstream_inference_prompt_cost": 0.00074175,
+        "upstream_inference_completions_cost": 0.000675
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776238327-FxUNgzU7jykDhjnasdSh",
+    "object": "response",
+    "created_at": 1776238328,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_56672075",
+        "call_id": "call_56672075",
+        "name": "sports_team_get_schedule",
+        "arguments": "{\"team_name\":\"Manchester United\",\"num_of_games\":6,\"league\":\"Premier League\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 404,
+      "completion_tokens": 45,
+      "total_tokens": 449,
+      "cost": 0.0014025825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00141675,
+        "upstream_inference_prompt_cost": 0.00074175,
+        "upstream_inference_completions_cost": 0.000675
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776238327-FxUNgzU7jykDhjnasdSh",
+    "object": "chat.completion",
+    "created": 1776238327,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_56672075",
+              "function": {
+                "name": "sports_team_get_schedule",
+                "arguments": "{\"team_name\":\"Manchester United\",\"num_of_games\":6,\"league\":\"Premier League\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 404,
+      "completion_tokens": 45,
+      "total_tokens": 449,
+      "cost": 0.0014025825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00141675,
+        "upstream_inference_prompt_cost": 0.00074175,
+        "upstream_inference_completions_cost": 0.000675
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1681.537,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "49ff83ef-e28b-4016-9e28-ab64c44dfb00"
+}

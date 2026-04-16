@@ -1,0 +1,363 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find all law cases where Charles Dickens is a party and it happened in Boston. Also, get cases where University of California was a party and happened in Los Angeles."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "movie_ratings_get_movie",
+        "description": "Get a movie by its name. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "movie_name": {
+              "type": "string",
+              "description": "The name of the movie to be retrieved"
+            }
+          },
+          "required": [
+            "movie_name"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "legal_case_get_summary",
+        "description": "Get a summary of a legal case Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "case_id": {
+              "type": "string",
+              "description": "The unique ID of the case to summarise"
+            },
+            "summary_type": {
+              "type": "string",
+              "description": "Type of the summary to get, e.g., brief, full",
+              "default": "brief"
+            }
+          },
+          "required": [
+            "case_id"
+          ],
+          "optional": [
+            "summary_type"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "legal_case_find_parties",
+        "description": "Locate legal cases involving a specified party in a particular city Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "party_name": {
+              "type": "string",
+              "description": "The name of the party involved in the case"
+            },
+            "city": {
+              "type": "string",
+              "description": "The city where the case was heard"
+            }
+          },
+          "required": [
+            "party_name",
+            "city"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find all law cases where Charles Dickens is a party and it happened in Boston. Also, get cases where University of California was a party and happened in Los Angeles."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "movie_ratings_get_movie",
+          "description": "Get a movie by its name. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "movie_name": {
+                "type": "string",
+                "description": "The name of the movie to be retrieved"
+              }
+            },
+            "required": [
+              "movie_name"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "legal_case_get_summary",
+          "description": "Get a summary of a legal case Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "case_id": {
+                "type": "string",
+                "description": "The unique ID of the case to summarise"
+              },
+              "summary_type": {
+                "type": "string",
+                "description": "Type of the summary to get, e.g., brief, full",
+                "default": "brief"
+              }
+            },
+            "required": [
+              "case_id"
+            ],
+            "optional": [
+              "summary_type"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "legal_case_find_parties",
+          "description": "Locate legal cases involving a specified party in a particular city Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "party_name": {
+                "type": "string",
+                "description": "The name of the party involved in the case"
+              },
+              "city": {
+                "type": "string",
+                "description": "The city where the case was heard"
+              }
+            },
+            "required": [
+              "party_name",
+              "city"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241414-0AlenI8kFzSqZ6p4dtqb",
+    "object": "chat.completion",
+    "created": 1776241414,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'll help you find the legal cases for both Charles Dickens in Boston and University of California in Los Angeles.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_61938377",
+              "function": {
+                "name": "legal_case_find_parties",
+                "arguments": "{\"party_name\":\"Charles Dickens\",\"city\":\"Boston\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_58197584",
+              "function": {
+                "name": "legal_case_find_parties",
+                "arguments": "{\"party_name\":\"University of California\",\"city\":\"Los Angeles\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 499,
+      "completion_tokens": 97,
+      "total_tokens": 596,
+      "cost": 0.0024569325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00248175,
+        "upstream_inference_prompt_cost": 0.00102675,
+        "upstream_inference_completions_cost": 0.001455
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241414-0AlenI8kFzSqZ6p4dtqb",
+    "object": "response",
+    "created_at": 1776241416,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'll help you find the legal cases for both Charles Dickens in Boston and University of California in Los Angeles.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_61938377",
+        "call_id": "call_61938377",
+        "name": "legal_case_find_parties",
+        "arguments": "{\"party_name\":\"Charles Dickens\",\"city\":\"Boston\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_58197584",
+        "call_id": "call_58197584",
+        "name": "legal_case_find_parties",
+        "arguments": "{\"party_name\":\"University of California\",\"city\":\"Los Angeles\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 499,
+      "completion_tokens": 97,
+      "total_tokens": 596,
+      "cost": 0.0024569325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00248175,
+        "upstream_inference_prompt_cost": 0.00102675,
+        "upstream_inference_completions_cost": 0.001455
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241414-0AlenI8kFzSqZ6p4dtqb",
+    "object": "chat.completion",
+    "created": 1776241414,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'll help you find the legal cases for both Charles Dickens in Boston and University of California in Los Angeles.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_61938377",
+              "function": {
+                "name": "legal_case_find_parties",
+                "arguments": "{\"party_name\":\"Charles Dickens\",\"city\":\"Boston\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_58197584",
+              "function": {
+                "name": "legal_case_find_parties",
+                "arguments": "{\"party_name\":\"University of California\",\"city\":\"Los Angeles\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 499,
+      "completion_tokens": 97,
+      "total_tokens": 596,
+      "cost": 0.0024569325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00248175,
+        "upstream_inference_prompt_cost": 0.00102675,
+        "upstream_inference_completions_cost": 0.001455
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2485.097,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "924aabd1-78cd-4315-a911-4681c7e139f0"
+}

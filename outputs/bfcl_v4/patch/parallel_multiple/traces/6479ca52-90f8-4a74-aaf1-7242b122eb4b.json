@@ -1,0 +1,335 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "I need to convert 10 dollars to Euros and make a 10 dollar deposit in my local bank account with account number - 987654."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "banking_service",
+        "description": "Make a deposit to a given bank account Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "account_id": {
+              "type": "string",
+              "description": "Target account to make deposit to."
+            },
+            "amount": {
+              "type": "number",
+              "description": "Amount to deposit. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "account_id",
+            "amount"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "currency_conversion",
+        "description": "Convert a specific amount from one currency to another Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number",
+              "description": "Amount to convert. This is a float type value.",
+              "format": "float"
+            },
+            "from_currency": {
+              "type": "string",
+              "description": "Source currency."
+            },
+            "to_currency": {
+              "type": "string",
+              "description": "Target currency."
+            }
+          },
+          "required": [
+            "amount",
+            "from_currency",
+            "to_currency"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "I need to convert 10 dollars to Euros and make a 10 dollar deposit in my local bank account with account number - 987654."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "banking_service",
+          "description": "Make a deposit to a given bank account Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "account_id": {
+                "type": "string",
+                "description": "Target account to make deposit to."
+              },
+              "amount": {
+                "type": "number",
+                "description": "Amount to deposit. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "account_id",
+              "amount"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "currency_conversion",
+          "description": "Convert a specific amount from one currency to another Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "number",
+                "description": "Amount to convert. This is a float type value.",
+                "format": "float"
+              },
+              "from_currency": {
+                "type": "string",
+                "description": "Source currency."
+              },
+              "to_currency": {
+                "type": "string",
+                "description": "Target currency."
+              }
+            },
+            "required": [
+              "amount",
+              "from_currency",
+              "to_currency"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241383-ME18kcckwUbkN7u2APd7",
+    "object": "chat.completion",
+    "created": 1776241383,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'll help you with both tasks. Let's start by converting 10 dollars to Euros and then proceed with the deposit.\n\nAdditionally, I'll make the deposit of 10 dollars to your bank account.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_69129320",
+              "function": {
+                "name": "currency_conversion",
+                "arguments": "{\"amount\":10.0,\"from_currency\":\"USD\",\"to_currency\":\"EUR\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_57951368",
+              "function": {
+                "name": "banking_service",
+                "arguments": "{\"account_id\":\"987654\",\"amount\":10.0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 433,
+      "completion_tokens": 116,
+      "total_tokens": 549,
+      "cost": 0.0025430625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00256875,
+        "upstream_inference_prompt_cost": 0.00082875,
+        "upstream_inference_completions_cost": 0.00174
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241383-ME18kcckwUbkN7u2APd7",
+    "object": "response",
+    "created_at": 1776241385,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'll help you with both tasks. Let's start by converting 10 dollars to Euros and then proceed with the deposit.\n\nAdditionally, I'll make the deposit of 10 dollars to your bank account.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_69129320",
+        "call_id": "call_69129320",
+        "name": "currency_conversion",
+        "arguments": "{\"amount\":10.0,\"from_currency\":\"USD\",\"to_currency\":\"EUR\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_57951368",
+        "call_id": "call_57951368",
+        "name": "banking_service",
+        "arguments": "{\"account_id\":\"987654\",\"amount\":10.0}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 433,
+      "completion_tokens": 116,
+      "total_tokens": 549,
+      "cost": 0.0025430625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00256875,
+        "upstream_inference_prompt_cost": 0.00082875,
+        "upstream_inference_completions_cost": 0.00174
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241383-ME18kcckwUbkN7u2APd7",
+    "object": "chat.completion",
+    "created": 1776241383,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'll help you with both tasks. Let's start by converting 10 dollars to Euros and then proceed with the deposit.\n\nAdditionally, I'll make the deposit of 10 dollars to your bank account.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_69129320",
+              "function": {
+                "name": "currency_conversion",
+                "arguments": "{\"amount\":10.0,\"from_currency\":\"USD\",\"to_currency\":\"EUR\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_57951368",
+              "function": {
+                "name": "banking_service",
+                "arguments": "{\"account_id\":\"987654\",\"amount\":10.0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 433,
+      "completion_tokens": 116,
+      "total_tokens": 549,
+      "cost": 0.0025430625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00256875,
+        "upstream_inference_prompt_cost": 0.00082875,
+        "upstream_inference_completions_cost": 0.00174
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2477.445,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "6479ca52-90f8-4a74-aaf1-7242b122eb4b"
+}

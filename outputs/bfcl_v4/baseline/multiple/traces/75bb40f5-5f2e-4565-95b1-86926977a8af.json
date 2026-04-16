@@ -1,0 +1,366 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "When was the signing of the Treaty of Lisbon?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "locate_tallest_mountains",
+        "description": "Find the tallest mountains within a specified radius of a location. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city from which to calculate distance."
+            },
+            "radius": {
+              "type": "number",
+              "description": "The radius within which to find mountains, measured in kilometers. This is a float type value.",
+              "format": "float"
+            },
+            "amount": {
+              "type": "integer",
+              "description": "The number of mountains to find, listed from tallest to smallest."
+            }
+          },
+          "required": [
+            "location",
+            "radius",
+            "amount"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "calculate_entropy_change",
+        "description": "Calculate the entropy change for an isothermal and reversible process. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "initial_temp": {
+              "type": "number",
+              "description": "The initial temperature in Kelvin. This is a float type value.",
+              "format": "float"
+            },
+            "final_temp": {
+              "type": "number",
+              "description": "The final temperature in Kelvin. This is a float type value.",
+              "format": "float"
+            },
+            "heat_capacity": {
+              "type": "number",
+              "description": "The heat capacity in J/K. This is a float type value.",
+              "format": "float"
+            },
+            "isothermal": {
+              "type": "boolean",
+              "description": "Whether the process is isothermal. Default is True."
+            }
+          },
+          "required": [
+            "initial_temp",
+            "final_temp",
+            "heat_capacity"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "get_event_date",
+        "description": "Retrieve the date of a historical event. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "event": {
+              "type": "string",
+              "description": "The name of the historical event."
+            },
+            "location": {
+              "type": "string",
+              "description": "Location where the event took place. Defaults to global if not specified"
+            }
+          },
+          "required": [
+            "event"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "When was the signing of the Treaty of Lisbon?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "locate_tallest_mountains",
+          "description": "Find the tallest mountains within a specified radius of a location. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city from which to calculate distance."
+              },
+              "radius": {
+                "type": "number",
+                "description": "The radius within which to find mountains, measured in kilometers. This is a float type value.",
+                "format": "float"
+              },
+              "amount": {
+                "type": "integer",
+                "description": "The number of mountains to find, listed from tallest to smallest."
+              }
+            },
+            "required": [
+              "location",
+              "radius",
+              "amount"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_entropy_change",
+          "description": "Calculate the entropy change for an isothermal and reversible process. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "initial_temp": {
+                "type": "number",
+                "description": "The initial temperature in Kelvin. This is a float type value.",
+                "format": "float"
+              },
+              "final_temp": {
+                "type": "number",
+                "description": "The final temperature in Kelvin. This is a float type value.",
+                "format": "float"
+              },
+              "heat_capacity": {
+                "type": "number",
+                "description": "The heat capacity in J/K. This is a float type value.",
+                "format": "float"
+              },
+              "isothermal": {
+                "type": "boolean",
+                "description": "Whether the process is isothermal. Default is True."
+              }
+            },
+            "required": [
+              "initial_temp",
+              "final_temp",
+              "heat_capacity"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "get_event_date",
+          "description": "Retrieve the date of a historical event. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "event": {
+                "type": "string",
+                "description": "The name of the historical event."
+              },
+              "location": {
+                "type": "string",
+                "description": "Location where the event took place. Defaults to global if not specified"
+              }
+            },
+            "required": [
+              "event"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239801-F4kbhe3y3QSQcXGqbjKg",
+    "object": "chat.completion",
+    "created": 1776239802,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_66512483",
+              "function": {
+                "name": "get_event_date",
+                "arguments": "{\"event\":\"Signing of the Treaty of Lisbon\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 590,
+      "completion_tokens": 32,
+      "total_tokens": 622,
+      "cost": 0.0017619525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00177975,
+        "upstream_inference_prompt_cost": 0.00129975,
+        "upstream_inference_completions_cost": 0.00048
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239801-F4kbhe3y3QSQcXGqbjKg",
+    "object": "response",
+    "created_at": 1776239803,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_66512483",
+        "call_id": "call_66512483",
+        "name": "get_event_date",
+        "arguments": "{\"event\":\"Signing of the Treaty of Lisbon\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 590,
+      "completion_tokens": 32,
+      "total_tokens": 622,
+      "cost": 0.0017619525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00177975,
+        "upstream_inference_prompt_cost": 0.00129975,
+        "upstream_inference_completions_cost": 0.00048
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239801-F4kbhe3y3QSQcXGqbjKg",
+    "object": "chat.completion",
+    "created": 1776239802,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_66512483",
+              "function": {
+                "name": "get_event_date",
+                "arguments": "{\"event\":\"Signing of the Treaty of Lisbon\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 590,
+      "completion_tokens": 32,
+      "total_tokens": 622,
+      "cost": 0.0017619525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00177975,
+        "upstream_inference_prompt_cost": 0.00129975,
+        "upstream_inference_completions_cost": 0.00048
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1880.858,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "75bb40f5-5f2e-4565-95b1-86926977a8af"
+}

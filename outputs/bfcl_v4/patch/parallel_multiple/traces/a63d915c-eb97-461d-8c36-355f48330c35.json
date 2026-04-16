@@ -1,0 +1,422 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find me a bronze statue in the Modern Arts Museum in New York and a stone sculpture in the Louvre Museum in Paris. Also, find me a painting made by Picasso in the Metropolitan Museum of Art."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "book_find",
+        "description": "Find a book in a library based on specific criteria like author, genre or publication year. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "library": {
+              "type": "string",
+              "description": "The name of the library."
+            },
+            "author": {
+              "type": "string",
+              "description": "Author of the book."
+            },
+            "genre": {
+              "type": "string",
+              "default": "Sci-Fi",
+              "description": "Genre of the book."
+            },
+            "year": {
+              "type": "integer",
+              "default": 2000,
+              "description": "Year of publication."
+            }
+          },
+          "required": [
+            "library",
+            "author"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "historical_landmark_find",
+        "description": "Find historical landmarks based on specific criteria like location or era. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "Location of the landmark."
+            },
+            "era": {
+              "type": "string",
+              "default": "Renaissance",
+              "description": "Era of the landmark. E.g. Middle Ages, Renaissance"
+            }
+          },
+          "required": [
+            "location"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "artwork_find",
+        "description": "Locate artwork in museums based on specific criteria like type of material, artist, or era. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "museum": {
+              "type": "string",
+              "description": "The name of the museum, e.g. Modern Arts Museum, New York"
+            },
+            "type": {
+              "type": "string",
+              "description": "Type of the artwork. E.g. Painting, Sculpture"
+            },
+            "material": {
+              "type": "string",
+              "description": "Material of the artwork if it's a sculpture. E.g. Bronze, Marble",
+              "default": ""
+            },
+            "artist": {
+              "type": "string",
+              "description": "Name of the artist.",
+              "default": ""
+            }
+          },
+          "required": [
+            "museum",
+            "type"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find me a bronze statue in the Modern Arts Museum in New York and a stone sculpture in the Louvre Museum in Paris. Also, find me a painting made by Picasso in the Metropolitan Museum of Art."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "book_find",
+          "description": "Find a book in a library based on specific criteria like author, genre or publication year. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "library": {
+                "type": "string",
+                "description": "The name of the library."
+              },
+              "author": {
+                "type": "string",
+                "description": "Author of the book."
+              },
+              "genre": {
+                "type": "string",
+                "default": "Sci-Fi",
+                "description": "Genre of the book."
+              },
+              "year": {
+                "type": "integer",
+                "default": 2000,
+                "description": "Year of publication."
+              }
+            },
+            "required": [
+              "library",
+              "author"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "historical_landmark_find",
+          "description": "Find historical landmarks based on specific criteria like location or era. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "Location of the landmark."
+              },
+              "era": {
+                "type": "string",
+                "default": "Renaissance",
+                "description": "Era of the landmark. E.g. Middle Ages, Renaissance"
+              }
+            },
+            "required": [
+              "location"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "artwork_find",
+          "description": "Locate artwork in museums based on specific criteria like type of material, artist, or era. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "museum": {
+                "type": "string",
+                "description": "The name of the museum, e.g. Modern Arts Museum, New York"
+              },
+              "type": {
+                "type": "string",
+                "description": "Type of the artwork. E.g. Painting, Sculpture"
+              },
+              "material": {
+                "type": "string",
+                "description": "Material of the artwork if it's a sculpture. E.g. Bronze, Marble",
+                "default": ""
+              },
+              "artist": {
+                "type": "string",
+                "description": "Name of the artist.",
+                "default": ""
+              }
+            },
+            "required": [
+              "museum",
+              "type"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241450-UyCYhc6evr5pAHMR3D84",
+    "object": "chat.completion",
+    "created": 1776241450,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_38063100",
+              "function": {
+                "name": "artwork_find",
+                "arguments": "{\"museum\":\"Modern Arts Museum, New York\",\"type\":\"Sculpture\",\"material\":\"Bronze\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_09841438",
+              "function": {
+                "name": "artwork_find",
+                "arguments": "{\"museum\":\"Louvre Museum, Paris\",\"type\":\"Sculpture\",\"material\":\"Stone\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_90404002",
+              "function": {
+                "name": "artwork_find",
+                "arguments": "{\"museum\":\"Metropolitan Museum of Art\",\"type\":\"Painting\",\"artist\":\"Picasso\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 613,
+      "completion_tokens": 138,
+      "total_tokens": 751,
+      "cost": 0.0034043625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00343875,
+        "upstream_inference_prompt_cost": 0.00136875,
+        "upstream_inference_completions_cost": 0.00207
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241450-UyCYhc6evr5pAHMR3D84",
+    "object": "response",
+    "created_at": 1776241453,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_38063100",
+        "call_id": "call_38063100",
+        "name": "artwork_find",
+        "arguments": "{\"museum\":\"Modern Arts Museum, New York\",\"type\":\"Sculpture\",\"material\":\"Bronze\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_09841438",
+        "call_id": "call_09841438",
+        "name": "artwork_find",
+        "arguments": "{\"museum\":\"Louvre Museum, Paris\",\"type\":\"Sculpture\",\"material\":\"Stone\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_90404002",
+        "call_id": "call_90404002",
+        "name": "artwork_find",
+        "arguments": "{\"museum\":\"Metropolitan Museum of Art\",\"type\":\"Painting\",\"artist\":\"Picasso\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 613,
+      "completion_tokens": 138,
+      "total_tokens": 751,
+      "cost": 0.0034043625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00343875,
+        "upstream_inference_prompt_cost": 0.00136875,
+        "upstream_inference_completions_cost": 0.00207
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241450-UyCYhc6evr5pAHMR3D84",
+    "object": "chat.completion",
+    "created": 1776241450,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_38063100",
+              "function": {
+                "name": "artwork_find",
+                "arguments": "{\"museum\":\"Modern Arts Museum, New York\",\"type\":\"Sculpture\",\"material\":\"Bronze\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_09841438",
+              "function": {
+                "name": "artwork_find",
+                "arguments": "{\"museum\":\"Louvre Museum, Paris\",\"type\":\"Sculpture\",\"material\":\"Stone\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_90404002",
+              "function": {
+                "name": "artwork_find",
+                "arguments": "{\"museum\":\"Metropolitan Museum of Art\",\"type\":\"Painting\",\"artist\":\"Picasso\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 613,
+      "completion_tokens": 138,
+      "total_tokens": 751,
+      "cost": 0.0034043625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00343875,
+        "upstream_inference_prompt_cost": 0.00136875,
+        "upstream_inference_completions_cost": 0.00207
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2884.726,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "a63d915c-eb97-461d-8c36-355f48330c35"
+}

@@ -1,0 +1,284 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Predict the growth of forest in Yellowstone National Park for the next 5 years including human impact."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "forest_growth_forecast",
+        "description": "Predicts the forest growth over the next N years based on current trends. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The location where you want to predict forest growth."
+            },
+            "years": {
+              "type": "integer",
+              "description": "The number of years for the forecast."
+            },
+            "include_human_impact": {
+              "type": "boolean",
+              "description": "Whether or not to include the impact of human activities in the forecast. If not provided, defaults to false."
+            }
+          },
+          "required": [
+            "location",
+            "years"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "get_scientist_for_discovery",
+        "description": "Retrieve the scientist's name who is credited for a specific scientific discovery or theory. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "discovery": {
+              "type": "string",
+              "description": "The scientific discovery or theory."
+            }
+          },
+          "required": [
+            "discovery"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Predict the growth of forest in Yellowstone National Park for the next 5 years including human impact."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "forest_growth_forecast",
+          "description": "Predicts the forest growth over the next N years based on current trends. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The location where you want to predict forest growth."
+              },
+              "years": {
+                "type": "integer",
+                "description": "The number of years for the forecast."
+              },
+              "include_human_impact": {
+                "type": "boolean",
+                "description": "Whether or not to include the impact of human activities in the forecast. If not provided, defaults to false."
+              }
+            },
+            "required": [
+              "location",
+              "years"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "get_scientist_for_discovery",
+          "description": "Retrieve the scientist's name who is credited for a specific scientific discovery or theory. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "discovery": {
+                "type": "string",
+                "description": "The scientific discovery or theory."
+              }
+            },
+            "required": [
+              "discovery"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239698-Qk76aYenmK7dP9xMZQAO",
+    "object": "chat.completion",
+    "created": 1776239698,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_76214621",
+              "function": {
+                "name": "forest_growth_forecast",
+                "arguments": "{\"location\":\"Yellowstone National Park\",\"years\":5,\"include_human_impact\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 431,
+      "completion_tokens": 43,
+      "total_tokens": 474,
+      "cost": 0.0019119375,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00193125,
+        "upstream_inference_prompt_cost": 0.00128625,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239698-Qk76aYenmK7dP9xMZQAO",
+    "object": "response",
+    "created_at": 1776239700,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_76214621",
+        "call_id": "call_76214621",
+        "name": "forest_growth_forecast",
+        "arguments": "{\"location\":\"Yellowstone National Park\",\"years\":5,\"include_human_impact\":true}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 431,
+      "completion_tokens": 43,
+      "total_tokens": 474,
+      "cost": 0.0019119375,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00193125,
+        "upstream_inference_prompt_cost": 0.00128625,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239698-Qk76aYenmK7dP9xMZQAO",
+    "object": "chat.completion",
+    "created": 1776239698,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_76214621",
+              "function": {
+                "name": "forest_growth_forecast",
+                "arguments": "{\"location\":\"Yellowstone National Park\",\"years\":5,\"include_human_impact\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 431,
+      "completion_tokens": 43,
+      "total_tokens": 474,
+      "cost": 0.0019119375,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00193125,
+        "upstream_inference_prompt_cost": 0.00128625,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1930.084,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "8fc2e0e0-753e-4801-ad81-0ea4f58e7611"
+}

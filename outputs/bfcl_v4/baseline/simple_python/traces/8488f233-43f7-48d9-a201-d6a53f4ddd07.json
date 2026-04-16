@@ -1,0 +1,250 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Train a random forest classifier on dataset your_dataset_name with maximum depth of trees as 5, and number of estimators as 100."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "train_random_forest_classifier",
+        "description": "Train a Random Forest classifier with the specified parameters. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "dataset": {
+              "type": "string",
+              "description": "The dataset to train the classifier on."
+            },
+            "max_depth": {
+              "type": "integer",
+              "description": "The maximum depth of the trees in the forest."
+            },
+            "n_estimators": {
+              "type": "integer",
+              "description": "The number of trees in the forest."
+            }
+          },
+          "required": [
+            "dataset",
+            "max_depth",
+            "n_estimators"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Train a random forest classifier on dataset your_dataset_name with maximum depth of trees as 5, and number of estimators as 100."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "train_random_forest_classifier",
+          "description": "Train a Random Forest classifier with the specified parameters. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "dataset": {
+                "type": "string",
+                "description": "The dataset to train the classifier on."
+              },
+              "max_depth": {
+                "type": "integer",
+                "description": "The maximum depth of the trees in the forest."
+              },
+              "n_estimators": {
+                "type": "integer",
+                "description": "The number of trees in the forest."
+              }
+            },
+            "required": [
+              "dataset",
+              "max_depth",
+              "n_estimators"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776237860-JY7Yh8jO2REWLfRKfzC8",
+    "object": "chat.completion",
+    "created": 1776237860,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_60455306",
+              "function": {
+                "name": "train_random_forest_classifier",
+                "arguments": "{\"dataset\":\"your_dataset_name\",\"max_depth\":5,\"n_estimators\":100}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 351,
+      "completion_tokens": 43,
+      "total_tokens": 394,
+      "cost": 0.0012154725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00122775,
+        "upstream_inference_prompt_cost": 0.00058275,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776237860-JY7Yh8jO2REWLfRKfzC8",
+    "object": "response",
+    "created_at": 1776237861,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_60455306",
+        "call_id": "call_60455306",
+        "name": "train_random_forest_classifier",
+        "arguments": "{\"dataset\":\"your_dataset_name\",\"max_depth\":5,\"n_estimators\":100}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 351,
+      "completion_tokens": 43,
+      "total_tokens": 394,
+      "cost": 0.0012154725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00122775,
+        "upstream_inference_prompt_cost": 0.00058275,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776237860-JY7Yh8jO2REWLfRKfzC8",
+    "object": "chat.completion",
+    "created": 1776237860,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_60455306",
+              "function": {
+                "name": "train_random_forest_classifier",
+                "arguments": "{\"dataset\":\"your_dataset_name\",\"max_depth\":5,\"n_estimators\":100}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 351,
+      "completion_tokens": 43,
+      "total_tokens": 394,
+      "cost": 0.0012154725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00122775,
+        "upstream_inference_prompt_cost": 0.00058275,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1684.522,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "8488f233-43f7-48d9-a201-d6a53f4ddd07"
+}

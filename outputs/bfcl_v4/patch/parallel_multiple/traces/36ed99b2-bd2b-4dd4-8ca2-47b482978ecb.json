@@ -1,0 +1,343 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the final velocity of a moving object given initial velocity of 20 m/s, acceleration of 5 m/s^2 and time of 6 seconds. Also, compute the total distance covered by the object."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "kinematics_distance_traveled",
+        "description": "Computes the total distance covered by a moving object given initial velocity, acceleration and time. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "initial_velocity": {
+              "type": "number",
+              "description": "The initial velocity of the object in m/s. This is a float type value.",
+              "format": "float"
+            },
+            "acceleration": {
+              "type": "number",
+              "description": "The acceleration of the object in m/s^2. This is a float type value.",
+              "format": "float"
+            },
+            "time": {
+              "type": "number",
+              "description": "The time for which the object has been moving in seconds. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "initial_velocity",
+            "acceleration",
+            "time"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "kinematics_final_velocity",
+        "description": "Calculates the final velocity of a moving object given initial velocity, acceleration and time. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "initial_velocity": {
+              "type": "number",
+              "description": "The initial velocity of the object in m/s. This is a float type value.",
+              "format": "float"
+            },
+            "acceleration": {
+              "type": "number",
+              "description": "The acceleration of the object in m/s^2. This is a float type value.",
+              "format": "float"
+            },
+            "time": {
+              "type": "number",
+              "description": "The time for which the object has been moving in seconds. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "initial_velocity",
+            "acceleration",
+            "time"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the final velocity of a moving object given initial velocity of 20 m/s, acceleration of 5 m/s^2 and time of 6 seconds. Also, compute the total distance covered by the object."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "kinematics_distance_traveled",
+          "description": "Computes the total distance covered by a moving object given initial velocity, acceleration and time. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "initial_velocity": {
+                "type": "number",
+                "description": "The initial velocity of the object in m/s. This is a float type value.",
+                "format": "float"
+              },
+              "acceleration": {
+                "type": "number",
+                "description": "The acceleration of the object in m/s^2. This is a float type value.",
+                "format": "float"
+              },
+              "time": {
+                "type": "number",
+                "description": "The time for which the object has been moving in seconds. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "initial_velocity",
+              "acceleration",
+              "time"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "kinematics_final_velocity",
+          "description": "Calculates the final velocity of a moving object given initial velocity, acceleration and time. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "initial_velocity": {
+                "type": "number",
+                "description": "The initial velocity of the object in m/s. This is a float type value.",
+                "format": "float"
+              },
+              "acceleration": {
+                "type": "number",
+                "description": "The acceleration of the object in m/s^2. This is a float type value.",
+                "format": "float"
+              },
+              "time": {
+                "type": "number",
+                "description": "The time for which the object has been moving in seconds. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "initial_velocity",
+              "acceleration",
+              "time"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241355-liyIfrqVqA4Vmjs4A3iV",
+    "object": "chat.completion",
+    "created": 1776241355,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_14710747",
+              "function": {
+                "name": "kinematics_final_velocity",
+                "arguments": "{\"initial_velocity\":20.0,\"acceleration\":5.0,\"time\":6.0}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_92945333",
+              "function": {
+                "name": "kinematics_distance_traveled",
+                "arguments": "{\"initial_velocity\":20.0,\"acceleration\":5.0,\"time\":6.0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 563,
+      "completion_tokens": 93,
+      "total_tokens": 656,
+      "cost": 0.0030464775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00307725,
+        "upstream_inference_prompt_cost": 0.00168225,
+        "upstream_inference_completions_cost": 0.001395
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241355-liyIfrqVqA4Vmjs4A3iV",
+    "object": "response",
+    "created_at": 1776241357,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_14710747",
+        "call_id": "call_14710747",
+        "name": "kinematics_final_velocity",
+        "arguments": "{\"initial_velocity\":20.0,\"acceleration\":5.0,\"time\":6.0}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_92945333",
+        "call_id": "call_92945333",
+        "name": "kinematics_distance_traveled",
+        "arguments": "{\"initial_velocity\":20.0,\"acceleration\":5.0,\"time\":6.0}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 563,
+      "completion_tokens": 93,
+      "total_tokens": 656,
+      "cost": 0.0030464775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00307725,
+        "upstream_inference_prompt_cost": 0.00168225,
+        "upstream_inference_completions_cost": 0.001395
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241355-liyIfrqVqA4Vmjs4A3iV",
+    "object": "chat.completion",
+    "created": 1776241355,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_14710747",
+              "function": {
+                "name": "kinematics_final_velocity",
+                "arguments": "{\"initial_velocity\":20.0,\"acceleration\":5.0,\"time\":6.0}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_92945333",
+              "function": {
+                "name": "kinematics_distance_traveled",
+                "arguments": "{\"initial_velocity\":20.0,\"acceleration\":5.0,\"time\":6.0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 563,
+      "completion_tokens": 93,
+      "total_tokens": 656,
+      "cost": 0.0030464775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00307725,
+        "upstream_inference_prompt_cost": 0.00168225,
+        "upstream_inference_completions_cost": 0.001395
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2519.223,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "36ed99b2-bd2b-4dd4-8ca2-47b482978ecb"
+}

@@ -1,0 +1,368 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Get me a list of available vegetarian and gluten-free foods at the Walmart near Denver."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "safeway_vegan_products",
+        "description": "Get available vegan products at specified Safeway store Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "City and state where the Safeway store is located, e.g. Denver, CO"
+            },
+            "categories": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "vegan",
+                  "gluten-free"
+                ]
+              },
+              "description": "Product categories to search within. Default empty array"
+            }
+          },
+          "required": [
+            "location"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "wholefoods_vegan_products",
+        "description": "Get available vegan products at specified Whole Foods store Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "City and state where the Whole Foods store is located, e.g. Denver, CO"
+            },
+            "categories": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "vegan",
+                  "gluten-free"
+                ]
+              },
+              "description": "Product categories to search within. Default empty array"
+            }
+          },
+          "required": [
+            "location"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "walmart_vegan_products",
+        "description": "Get available vegan products at specified Walmart store Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "City and state where the Walmart store is located, e.g. Denver, CO"
+            },
+            "categories": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "vegan",
+                  "gluten-free"
+                ]
+              },
+              "description": "Product categories to search within. Default empty array"
+            }
+          },
+          "required": [
+            "location"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Get me a list of available vegetarian and gluten-free foods at the Walmart near Denver."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "safeway_vegan_products",
+          "description": "Get available vegan products at specified Safeway store Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "City and state where the Safeway store is located, e.g. Denver, CO"
+              },
+              "categories": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "vegan",
+                    "gluten-free"
+                  ]
+                },
+                "description": "Product categories to search within. Default empty array"
+              }
+            },
+            "required": [
+              "location"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "wholefoods_vegan_products",
+          "description": "Get available vegan products at specified Whole Foods store Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "City and state where the Whole Foods store is located, e.g. Denver, CO"
+              },
+              "categories": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "vegan",
+                    "gluten-free"
+                  ]
+                },
+                "description": "Product categories to search within. Default empty array"
+              }
+            },
+            "required": [
+              "location"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "walmart_vegan_products",
+          "description": "Get available vegan products at specified Walmart store Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "City and state where the Walmart store is located, e.g. Denver, CO"
+              },
+              "categories": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "vegan",
+                    "gluten-free"
+                  ]
+                },
+                "description": "Product categories to search within. Default empty array"
+              }
+            },
+            "required": [
+              "location"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239654-wPWSDUwqcgv5WgTWSRzk",
+    "object": "chat.completion",
+    "created": 1776239654,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_75801092",
+              "function": {
+                "name": "walmart_vegan_products",
+                "arguments": "{\"location\":\"Denver, CO\",\"categories\":[\"vegan\",\"gluten-free\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 550,
+      "completion_tokens": 42,
+      "total_tokens": 592,
+      "cost": 0.0017916525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00180975,
+        "upstream_inference_prompt_cost": 0.00117975,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239654-wPWSDUwqcgv5WgTWSRzk",
+    "object": "response",
+    "created_at": 1776239655,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_75801092",
+        "call_id": "call_75801092",
+        "name": "walmart_vegan_products",
+        "arguments": "{\"location\":\"Denver, CO\",\"categories\":[\"vegan\",\"gluten-free\"]}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 550,
+      "completion_tokens": 42,
+      "total_tokens": 592,
+      "cost": 0.0017916525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00180975,
+        "upstream_inference_prompt_cost": 0.00117975,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239654-wPWSDUwqcgv5WgTWSRzk",
+    "object": "chat.completion",
+    "created": 1776239654,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_75801092",
+              "function": {
+                "name": "walmart_vegan_products",
+                "arguments": "{\"location\":\"Denver, CO\",\"categories\":[\"vegan\",\"gluten-free\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 550,
+      "completion_tokens": 42,
+      "total_tokens": 592,
+      "cost": 0.0017916525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00180975,
+        "upstream_inference_prompt_cost": 0.00117975,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1879.001,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "98326df9-a391-494d-93f4-4885606f523a"
+}

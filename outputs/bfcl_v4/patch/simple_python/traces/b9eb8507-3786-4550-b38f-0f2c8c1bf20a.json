@@ -1,0 +1,252 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the resonant frequency of an LC circuit given capacitance of 100µF and inductance of 50mH."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_resonant_frequency",
+        "description": "Calculate the resonant frequency of an LC (inductor-capacitor) circuit. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "inductance": {
+              "type": "number",
+              "description": "The inductance (L) in henries (H). This is a float type value.",
+              "format": "float"
+            },
+            "capacitance": {
+              "type": "number",
+              "description": "The capacitance (C) in farads (F). This is a float type value.",
+              "format": "float"
+            },
+            "round_off": {
+              "type": "integer",
+              "description": "Rounding off the result to a certain decimal places, default is 2."
+            }
+          },
+          "required": [
+            "inductance",
+            "capacitance"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the resonant frequency of an LC circuit given capacitance of 100µF and inductance of 50mH."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_resonant_frequency",
+          "description": "Calculate the resonant frequency of an LC (inductor-capacitor) circuit. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "inductance": {
+                "type": "number",
+                "description": "The inductance (L) in henries (H). This is a float type value.",
+                "format": "float"
+              },
+              "capacitance": {
+                "type": "number",
+                "description": "The capacitance (C) in farads (F). This is a float type value.",
+                "format": "float"
+              },
+              "round_off": {
+                "type": "integer",
+                "description": "Rounding off the result to a certain decimal places, default is 2."
+              }
+            },
+            "required": [
+              "inductance",
+              "capacitance"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776238653-LA0uD7LxXyYjalrRSn4k",
+    "object": "chat.completion",
+    "created": 1776238653,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_03144526",
+              "function": {
+                "name": "calculate_resonant_frequency",
+                "arguments": "{\"inductance\":0.05,\"capacitance\":0.0001}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 387,
+      "completion_tokens": 42,
+      "total_tokens": 429,
+      "cost": 0.0013075425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00132075,
+        "upstream_inference_prompt_cost": 0.00069075,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776238653-LA0uD7LxXyYjalrRSn4k",
+    "object": "response",
+    "created_at": 1776238654,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_03144526",
+        "call_id": "call_03144526",
+        "name": "calculate_resonant_frequency",
+        "arguments": "{\"inductance\":0.05,\"capacitance\":0.0001}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 387,
+      "completion_tokens": 42,
+      "total_tokens": 429,
+      "cost": 0.0013075425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00132075,
+        "upstream_inference_prompt_cost": 0.00069075,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776238653-LA0uD7LxXyYjalrRSn4k",
+    "object": "chat.completion",
+    "created": 1776238653,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_03144526",
+              "function": {
+                "name": "calculate_resonant_frequency",
+                "arguments": "{\"inductance\":0.05,\"capacitance\":0.0001}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 387,
+      "completion_tokens": 42,
+      "total_tokens": 429,
+      "cost": 0.0013075425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00132075,
+        "upstream_inference_prompt_cost": 0.00069075,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2178.097,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "b9eb8507-3786-4550-b38f-0f2c8c1bf20a"
+}

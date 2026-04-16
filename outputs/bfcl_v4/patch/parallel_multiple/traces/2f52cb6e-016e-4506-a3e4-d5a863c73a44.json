@@ -1,0 +1,389 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Could you please tell me the latest game score, individual player stats, and team stats for the basketball team 'Los Angeles Lakers' in the 'NBA' league? Also, I would like to know the same information but this time for the football team 'Manchester United' in the 'Premier League'. Additionally, could you provide me with a 5-day humidity forecast for New York, ensuring that the minimum humidity level is 60%? Lastly, I would also like to know the humidity forecast for the next 7 days in London, but without any minimum humidity level filter.\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "weather_humidity_forecast",
+        "description": "Retrieve a humidity forecast for a specific location and time frame. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city that you want to get the humidity for."
+            },
+            "days": {
+              "type": "integer",
+              "description": "Number of days for the forecast."
+            },
+            "min_humidity": {
+              "type": "integer",
+              "description": "Minimum level of humidity (in percentage) to filter the result. Default is 0."
+            }
+          },
+          "required": [
+            "location",
+            "days"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "get_team_score",
+        "description": "Retrieves the latest game score, individual player stats, and team stats for a specified sports team. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "team_name": {
+              "type": "string",
+              "description": "The name of the sports team."
+            },
+            "league": {
+              "type": "string",
+              "description": "The league that the team is part of."
+            },
+            "include_player_stats": {
+              "type": "boolean",
+              "default": false,
+              "description": "Indicates if individual player statistics should be included in the result. Default is false."
+            }
+          },
+          "required": [
+            "team_name",
+            "league"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Could you please tell me the latest game score, individual player stats, and team stats for the basketball team 'Los Angeles Lakers' in the 'NBA' league? Also, I would like to know the same information but this time for the football team 'Manchester United' in the 'Premier League'. Additionally, could you provide me with a 5-day humidity forecast for New York, ensuring that the minimum humidity level is 60%? Lastly, I would also like to know the humidity forecast for the next 7 days in London, but without any minimum humidity level filter.\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "weather_humidity_forecast",
+          "description": "Retrieve a humidity forecast for a specific location and time frame. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city that you want to get the humidity for."
+              },
+              "days": {
+                "type": "integer",
+                "description": "Number of days for the forecast."
+              },
+              "min_humidity": {
+                "type": "integer",
+                "description": "Minimum level of humidity (in percentage) to filter the result. Default is 0."
+              }
+            },
+            "required": [
+              "location",
+              "days"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "get_team_score",
+          "description": "Retrieves the latest game score, individual player stats, and team stats for a specified sports team. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "team_name": {
+                "type": "string",
+                "description": "The name of the sports team."
+              },
+              "league": {
+                "type": "string",
+                "description": "The league that the team is part of."
+              },
+              "include_player_stats": {
+                "type": "boolean",
+                "default": false,
+                "description": "Indicates if individual player statistics should be included in the result. Default is false."
+              }
+            },
+            "required": [
+              "team_name",
+              "league"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241923-Wh5OeCQ1GNQoX5pvJxNo",
+    "object": "chat.completion",
+    "created": 1776241923,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to assist with your requests. Let me retrieve the information for you by calling the relevant functions.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_61644702",
+              "function": {
+                "name": "get_team_score",
+                "arguments": "{\"team_name\":\"Los Angeles Lakers\",\"league\":\"NBA\",\"include_player_stats\":true}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_67819160",
+              "function": {
+                "name": "get_team_score",
+                "arguments": "{\"team_name\":\"Manchester United\",\"league\":\"Premier League\",\"include_player_stats\":true}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_84637233",
+              "function": {
+                "name": "weather_humidity_forecast",
+                "arguments": "{\"location\":\"New York\",\"days\":5,\"min_humidity\":60}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_47828586",
+              "function": {
+                "name": "weather_humidity_forecast",
+                "arguments": "{\"location\":\"London\",\"days\":7,\"min_humidity\":0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 576,
+      "completion_tokens": 188,
+      "total_tokens": 764,
+      "cost": 0.0040369725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00407775,
+        "upstream_inference_prompt_cost": 0.00125775,
+        "upstream_inference_completions_cost": 0.00282
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241923-Wh5OeCQ1GNQoX5pvJxNo",
+    "object": "response",
+    "created_at": 1776241926,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'm happy to assist with your requests. Let me retrieve the information for you by calling the relevant functions.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_61644702",
+        "call_id": "call_61644702",
+        "name": "get_team_score",
+        "arguments": "{\"team_name\":\"Los Angeles Lakers\",\"league\":\"NBA\",\"include_player_stats\":true}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_67819160",
+        "call_id": "call_67819160",
+        "name": "get_team_score",
+        "arguments": "{\"team_name\":\"Manchester United\",\"league\":\"Premier League\",\"include_player_stats\":true}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_84637233",
+        "call_id": "call_84637233",
+        "name": "weather_humidity_forecast",
+        "arguments": "{\"location\":\"New York\",\"days\":5,\"min_humidity\":60}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_47828586",
+        "call_id": "call_47828586",
+        "name": "weather_humidity_forecast",
+        "arguments": "{\"location\":\"London\",\"days\":7,\"min_humidity\":0}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 576,
+      "completion_tokens": 188,
+      "total_tokens": 764,
+      "cost": 0.0040369725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00407775,
+        "upstream_inference_prompt_cost": 0.00125775,
+        "upstream_inference_completions_cost": 0.00282
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241923-Wh5OeCQ1GNQoX5pvJxNo",
+    "object": "chat.completion",
+    "created": 1776241923,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to assist with your requests. Let me retrieve the information for you by calling the relevant functions.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_61644702",
+              "function": {
+                "name": "get_team_score",
+                "arguments": "{\"team_name\":\"Los Angeles Lakers\",\"league\":\"NBA\",\"include_player_stats\":true}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_67819160",
+              "function": {
+                "name": "get_team_score",
+                "arguments": "{\"team_name\":\"Manchester United\",\"league\":\"Premier League\",\"include_player_stats\":true}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_84637233",
+              "function": {
+                "name": "weather_humidity_forecast",
+                "arguments": "{\"location\":\"New York\",\"days\":5,\"min_humidity\":60}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_47828586",
+              "function": {
+                "name": "weather_humidity_forecast",
+                "arguments": "{\"location\":\"London\",\"days\":7,\"min_humidity\":0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 576,
+      "completion_tokens": 188,
+      "total_tokens": 764,
+      "cost": 0.0040369725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00407775,
+        "upstream_inference_prompt_cost": 0.00125775,
+        "upstream_inference_completions_cost": 0.00282
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 3605.267,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "2f52cb6e-016e-4506-a3e4-d5a863c73a44"
+}

@@ -1,0 +1,258 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the area under the curve from x = -2 to x = 3 for the function y = x^3 using simpson method."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "integrate",
+        "description": "Calculate the area under a curve for a specified function between two x values. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "function": {
+              "type": "string",
+              "description": "The function to integrate, represented as a string. For example, 'x^3'"
+            },
+            "start_x": {
+              "type": "integer",
+              "description": "The starting x-value to integrate over."
+            },
+            "end_x": {
+              "type": "integer",
+              "description": "The ending x-value to integrate over."
+            },
+            "method": {
+              "type": "string",
+              "description": "The method of numerical integration to use. Choices are 'trapezoid' or 'simpson'. Default is 'trapezoid'."
+            }
+          },
+          "required": [
+            "function",
+            "start_x",
+            "end_x"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the area under the curve from x = -2 to x = 3 for the function y = x^3 using simpson method."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "integrate",
+          "description": "Calculate the area under a curve for a specified function between two x values. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "function": {
+                "type": "string",
+                "description": "The function to integrate, represented as a string. For example, 'x^3'"
+              },
+              "start_x": {
+                "type": "integer",
+                "description": "The starting x-value to integrate over."
+              },
+              "end_x": {
+                "type": "integer",
+                "description": "The ending x-value to integrate over."
+              },
+              "method": {
+                "type": "string",
+                "description": "The method of numerical integration to use. Choices are 'trapezoid' or 'simpson'. Default is 'trapezoid'."
+              }
+            },
+            "required": [
+              "function",
+              "start_x",
+              "end_x"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776238598-M4QBjksEsVr59cgbos6p",
+    "object": "chat.completion",
+    "created": 1776238598,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_21773337",
+              "function": {
+                "name": "integrate",
+                "arguments": "{\"function\":\"x^3\",\"start_x\":-2,\"end_x\":3,\"method\":\"simpson\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 403,
+      "completion_tokens": 49,
+      "total_tokens": 452,
+      "cost": 0.0019178775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00193725,
+        "upstream_inference_prompt_cost": 0.00120225,
+        "upstream_inference_completions_cost": 0.000735
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776238598-M4QBjksEsVr59cgbos6p",
+    "object": "response",
+    "created_at": 1776238600,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_21773337",
+        "call_id": "call_21773337",
+        "name": "integrate",
+        "arguments": "{\"function\":\"x^3\",\"start_x\":-2,\"end_x\":3,\"method\":\"simpson\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 403,
+      "completion_tokens": 49,
+      "total_tokens": 452,
+      "cost": 0.0019178775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00193725,
+        "upstream_inference_prompt_cost": 0.00120225,
+        "upstream_inference_completions_cost": 0.000735
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776238598-M4QBjksEsVr59cgbos6p",
+    "object": "chat.completion",
+    "created": 1776238598,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_21773337",
+              "function": {
+                "name": "integrate",
+                "arguments": "{\"function\":\"x^3\",\"start_x\":-2,\"end_x\":3,\"method\":\"simpson\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 403,
+      "completion_tokens": 49,
+      "total_tokens": 452,
+      "cost": 0.0019178775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00193725,
+        "upstream_inference_prompt_cost": 0.00120225,
+        "upstream_inference_completions_cost": 0.000735
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1808.57,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "7ab4109f-21f2-4d1b-a9a9-ff247c752f47"
+}

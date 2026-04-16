@@ -1,0 +1,396 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the heat capacity at constant pressure for air, given its temperature is 298K and volume is 10 m^3."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "get_lawsuit_details",
+        "description": "Retrieve the detailed information about a lawsuit based on its case number and the court location. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "case_number": {
+              "type": "string",
+              "description": "The case number of the lawsuit."
+            },
+            "court_location": {
+              "type": "string",
+              "description": "The location of the court where the case is filed."
+            },
+            "additional_details": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "attorneys",
+                  "plaintiffs",
+                  "defendants",
+                  "charges",
+                  "court_updates"
+                ]
+              },
+              "description": "Optional. Array containing additional details to be fetched. Default is empty array."
+            }
+          },
+          "required": [
+            "case_number",
+            "court_location"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "get_team_rank",
+        "description": "Get the team ranking in a sports league based on season and type. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "team_name": {
+              "type": "string",
+              "description": "The name of the sports team."
+            },
+            "league": {
+              "type": "string",
+              "description": "The name of the league in which the team competes."
+            },
+            "season": {
+              "type": "string",
+              "description": "The season for which the team's ranking is sought."
+            },
+            "type": {
+              "type": "string",
+              "description": "Type of the season: regular or playoff.",
+              "enum": [
+                "regular",
+                "playoff"
+              ]
+            }
+          },
+          "required": [
+            "team_name",
+            "league",
+            "season",
+            "type"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "calc_heat_capacity",
+        "description": "Calculate the heat capacity at constant pressure of air using its temperature and volume. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "temp": {
+              "type": "integer",
+              "description": "The temperature of the gas in Kelvin."
+            },
+            "volume": {
+              "type": "integer",
+              "description": "The volume of the gas in m^3."
+            },
+            "gas": {
+              "type": "string",
+              "description": "Type of gas, with air as default."
+            }
+          },
+          "required": [
+            "temp",
+            "volume"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the heat capacity at constant pressure for air, given its temperature is 298K and volume is 10 m^3."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_lawsuit_details",
+          "description": "Retrieve the detailed information about a lawsuit based on its case number and the court location. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "case_number": {
+                "type": "string",
+                "description": "The case number of the lawsuit."
+              },
+              "court_location": {
+                "type": "string",
+                "description": "The location of the court where the case is filed."
+              },
+              "additional_details": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "attorneys",
+                    "plaintiffs",
+                    "defendants",
+                    "charges",
+                    "court_updates"
+                  ]
+                },
+                "description": "Optional. Array containing additional details to be fetched. Default is empty array."
+              }
+            },
+            "required": [
+              "case_number",
+              "court_location"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "get_team_rank",
+          "description": "Get the team ranking in a sports league based on season and type. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "team_name": {
+                "type": "string",
+                "description": "The name of the sports team."
+              },
+              "league": {
+                "type": "string",
+                "description": "The name of the league in which the team competes."
+              },
+              "season": {
+                "type": "string",
+                "description": "The season for which the team's ranking is sought."
+              },
+              "type": {
+                "type": "string",
+                "description": "Type of the season: regular or playoff.",
+                "enum": [
+                  "regular",
+                  "playoff"
+                ]
+              }
+            },
+            "required": [
+              "team_name",
+              "league",
+              "season",
+              "type"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "calc_heat_capacity",
+          "description": "Calculate the heat capacity at constant pressure of air using its temperature and volume. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "temp": {
+                "type": "integer",
+                "description": "The temperature of the gas in Kelvin."
+              },
+              "volume": {
+                "type": "integer",
+                "description": "The volume of the gas in m^3."
+              },
+              "gas": {
+                "type": "string",
+                "description": "Type of gas, with air as default."
+              }
+            },
+            "required": [
+              "temp",
+              "volume"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240375-kD66F3b4U58FDkanKyt9",
+    "object": "chat.completion",
+    "created": 1776240376,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_90651859",
+              "function": {
+                "name": "calc_heat_capacity",
+                "arguments": "{\"temp\":298,\"volume\":10,\"gas\":\"air\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 637,
+      "completion_tokens": 40,
+      "total_tokens": 677,
+      "cost": 0.0010692,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 636,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00108,
+        "upstream_inference_prompt_cost": 0.00048,
+        "upstream_inference_completions_cost": 0.0006
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240375-kD66F3b4U58FDkanKyt9",
+    "object": "response",
+    "created_at": 1776240376,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_90651859",
+        "call_id": "call_90651859",
+        "name": "calc_heat_capacity",
+        "arguments": "{\"temp\":298,\"volume\":10,\"gas\":\"air\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 637,
+      "completion_tokens": 40,
+      "total_tokens": 677,
+      "cost": 0.0010692,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 636,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00108,
+        "upstream_inference_prompt_cost": 0.00048,
+        "upstream_inference_completions_cost": 0.0006
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240375-kD66F3b4U58FDkanKyt9",
+    "object": "chat.completion",
+    "created": 1776240376,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_90651859",
+              "function": {
+                "name": "calc_heat_capacity",
+                "arguments": "{\"temp\":298,\"volume\":10,\"gas\":\"air\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 637,
+      "completion_tokens": 40,
+      "total_tokens": 677,
+      "cost": 0.0010692,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 636,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00108,
+        "upstream_inference_prompt_cost": 0.00048,
+        "upstream_inference_completions_cost": 0.0006
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1633.131,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "0fb00198-ce24-4a73-81fc-7e54d5d4d781"
+}

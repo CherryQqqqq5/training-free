@@ -1,0 +1,355 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find overview about the Battle of Waterloo and the signing of the Treaty of Tordesillas."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "euro_history_treaty_info",
+        "description": "Retrieve specific information about a signed European treaty. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "treaty_name": {
+              "type": "string",
+              "description": "The name of the treaty."
+            },
+            "info_requested": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "signatories",
+                  "ratification date",
+                  "clauses",
+                  "overview"
+                ]
+              },
+              "description": "Specific aspects of the treaty for which to return information."
+            }
+          },
+          "required": [
+            "treaty_name",
+            "info_requested"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "euro_history_battle_details",
+        "description": "Retrieve detailed information about a specific European historical battle. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "battle_name": {
+              "type": "string",
+              "description": "The name of the historical battle."
+            },
+            "specific_info": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "overview",
+                  "causalities",
+                  "date"
+                ]
+              },
+              "description": "The specific types of information to return about the battle."
+            }
+          },
+          "required": [
+            "battle_name",
+            "specific_info"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find overview about the Battle of Waterloo and the signing of the Treaty of Tordesillas."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "euro_history_treaty_info",
+          "description": "Retrieve specific information about a signed European treaty. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "treaty_name": {
+                "type": "string",
+                "description": "The name of the treaty."
+              },
+              "info_requested": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "signatories",
+                    "ratification date",
+                    "clauses",
+                    "overview"
+                  ]
+                },
+                "description": "Specific aspects of the treaty for which to return information."
+              }
+            },
+            "required": [
+              "treaty_name",
+              "info_requested"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "euro_history_battle_details",
+          "description": "Retrieve detailed information about a specific European historical battle. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "battle_name": {
+                "type": "string",
+                "description": "The name of the historical battle."
+              },
+              "specific_info": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "overview",
+                    "causalities",
+                    "date"
+                  ]
+                },
+                "description": "The specific types of information to return about the battle."
+              }
+            },
+            "required": [
+              "battle_name",
+              "specific_info"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240576-5X8UEfiNwAgjy5vrEN42",
+    "object": "chat.completion",
+    "created": 1776240576,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help you with information about the Battle of Waterloo and the Treaty of Tordesillas. Let's start by retrieving the details for both.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_31247410",
+              "function": {
+                "name": "euro_history_battle_details",
+                "arguments": "{\"battle_name\":\"Battle of Waterloo\",\"specific_info\":[\"overview\"]}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_40537279",
+              "function": {
+                "name": "euro_history_treaty_info",
+                "arguments": "{\"treaty_name\":\"Treaty of Tordesillas\",\"info_requested\":[\"overview\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 454,
+      "completion_tokens": 114,
+      "total_tokens": 568,
+      "cost": 0.0030345975,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00306525,
+        "upstream_inference_prompt_cost": 0.00135525,
+        "upstream_inference_completions_cost": 0.00171
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240576-5X8UEfiNwAgjy5vrEN42",
+    "object": "response",
+    "created_at": 1776240578,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'm happy to help you with information about the Battle of Waterloo and the Treaty of Tordesillas. Let's start by retrieving the details for both.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_31247410",
+        "call_id": "call_31247410",
+        "name": "euro_history_battle_details",
+        "arguments": "{\"battle_name\":\"Battle of Waterloo\",\"specific_info\":[\"overview\"]}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_40537279",
+        "call_id": "call_40537279",
+        "name": "euro_history_treaty_info",
+        "arguments": "{\"treaty_name\":\"Treaty of Tordesillas\",\"info_requested\":[\"overview\"]}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 454,
+      "completion_tokens": 114,
+      "total_tokens": 568,
+      "cost": 0.0030345975,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00306525,
+        "upstream_inference_prompt_cost": 0.00135525,
+        "upstream_inference_completions_cost": 0.00171
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240576-5X8UEfiNwAgjy5vrEN42",
+    "object": "chat.completion",
+    "created": 1776240576,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to help you with information about the Battle of Waterloo and the Treaty of Tordesillas. Let's start by retrieving the details for both.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_31247410",
+              "function": {
+                "name": "euro_history_battle_details",
+                "arguments": "{\"battle_name\":\"Battle of Waterloo\",\"specific_info\":[\"overview\"]}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_40537279",
+              "function": {
+                "name": "euro_history_treaty_info",
+                "arguments": "{\"treaty_name\":\"Treaty of Tordesillas\",\"info_requested\":[\"overview\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 454,
+      "completion_tokens": 114,
+      "total_tokens": 568,
+      "cost": 0.0030345975,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00306525,
+        "upstream_inference_prompt_cost": 0.00135525,
+        "upstream_inference_completions_cost": 0.00171
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2644.376,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "79b12353-011a-4d0b-a5f2-71aafba69b58"
+}

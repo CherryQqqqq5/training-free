@@ -1,0 +1,306 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the final temperature when 2 moles of gas at 300 K are mixed with 3 moles of the same gas at 400 K."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_final_temperature",
+        "description": "Calculate the final temperature when different quantities of the same gas at different temperatures are mixed. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "quantity1": {
+              "type": "integer",
+              "description": "The quantity of the first sample of gas."
+            },
+            "temperature1": {
+              "type": "integer",
+              "description": "The temperature of the first sample of gas."
+            },
+            "quantity2": {
+              "type": "integer",
+              "description": "The quantity of the second sample of gas."
+            },
+            "temperature2": {
+              "type": "integer",
+              "description": "The temperature of the second sample of gas."
+            }
+          },
+          "required": [
+            "quantity1",
+            "temperature1",
+            "quantity2",
+            "temperature2"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "calculate_mass",
+        "description": "Calculate the mass of a gas given its quantity and molar mass. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "quantity": {
+              "type": "integer",
+              "description": "The quantity of the gas."
+            },
+            "molar_mass": {
+              "type": "integer",
+              "description": "The molar mass of the gas."
+            }
+          },
+          "required": [
+            "quantity",
+            "molar_mass"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the final temperature when 2 moles of gas at 300 K are mixed with 3 moles of the same gas at 400 K."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_final_temperature",
+          "description": "Calculate the final temperature when different quantities of the same gas at different temperatures are mixed. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "quantity1": {
+                "type": "integer",
+                "description": "The quantity of the first sample of gas."
+              },
+              "temperature1": {
+                "type": "integer",
+                "description": "The temperature of the first sample of gas."
+              },
+              "quantity2": {
+                "type": "integer",
+                "description": "The quantity of the second sample of gas."
+              },
+              "temperature2": {
+                "type": "integer",
+                "description": "The temperature of the second sample of gas."
+              }
+            },
+            "required": [
+              "quantity1",
+              "temperature1",
+              "quantity2",
+              "temperature2"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_mass",
+          "description": "Calculate the mass of a gas given its quantity and molar mass. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "quantity": {
+                "type": "integer",
+                "description": "The quantity of the gas."
+              },
+              "molar_mass": {
+                "type": "integer",
+                "description": "The molar mass of the gas."
+              }
+            },
+            "required": [
+              "quantity",
+              "molar_mass"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240050-hDNXSJQEttb2txhZjmKr",
+    "object": "chat.completion",
+    "created": 1776240050,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_91261241",
+              "function": {
+                "name": "calculate_final_temperature",
+                "arguments": "{\"quantity1\":2,\"temperature1\":300,\"quantity2\":3,\"temperature2\":400}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 471,
+      "completion_tokens": 48,
+      "total_tokens": 519,
+      "cost": 0.001064745,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 470,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0010755,
+        "upstream_inference_prompt_cost": 0.0003555,
+        "upstream_inference_completions_cost": 0.00072
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240050-hDNXSJQEttb2txhZjmKr",
+    "object": "response",
+    "created_at": 1776240051,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_91261241",
+        "call_id": "call_91261241",
+        "name": "calculate_final_temperature",
+        "arguments": "{\"quantity1\":2,\"temperature1\":300,\"quantity2\":3,\"temperature2\":400}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 471,
+      "completion_tokens": 48,
+      "total_tokens": 519,
+      "cost": 0.001064745,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 470,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0010755,
+        "upstream_inference_prompt_cost": 0.0003555,
+        "upstream_inference_completions_cost": 0.00072
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240050-hDNXSJQEttb2txhZjmKr",
+    "object": "chat.completion",
+    "created": 1776240050,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_91261241",
+              "function": {
+                "name": "calculate_final_temperature",
+                "arguments": "{\"quantity1\":2,\"temperature1\":300,\"quantity2\":3,\"temperature2\":400}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 471,
+      "completion_tokens": 48,
+      "total_tokens": 519,
+      "cost": 0.001064745,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 470,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0010755,
+        "upstream_inference_prompt_cost": 0.0003555,
+        "upstream_inference_completions_cost": 0.00072
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1680.617,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "f502ff1a-a8de-4a60-b39d-dc47f6a830a3"
+}

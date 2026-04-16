@@ -1,0 +1,529 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Could you help me plan a trip? I want to go to Paris for 7 days with a daily budget of $200, and I prefer exploring urban areas. Also, I'm trying to cook a dish called 'Chicken Alfredo', but I'm not sure if it fits my diet. Could you find a recipe for 'Chicken Alfredo' that has less than 800 calories? Additionally, I have a cooking measurement problem. I have a recipe that calls for 2 cups of flour, but I only have a scale. Can you convert 2 cups of flour into grams for me? Lastly, I'm doing a research project and need to run a linear regression model. The predictor variables are 'age', 'income', and 'education level', and the target variable is 'job satisfaction'. Could you also standardize the predictors for me?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "run_linear_regression",
+        "description": "Build a linear regression model using given predictor variables and a target variable. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "predictors": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Array containing the names of predictor variables."
+            },
+            "target": {
+              "type": "string",
+              "description": "The name of target variable."
+            },
+            "standardize": {
+              "type": "boolean",
+              "description": "Option to apply standardization on the predictors. Defaults to False."
+            }
+          },
+          "required": [
+            "predictors",
+            "target"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "travel_itinerary_generator",
+        "description": "Generate a travel itinerary based on specific destination, duration and daily budget, with preferred exploration type. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "destination": {
+              "type": "string",
+              "description": "Destination city of the trip."
+            },
+            "days": {
+              "type": "integer",
+              "description": "Number of days for the trip."
+            },
+            "daily_budget": {
+              "type": "integer",
+              "description": "The maximum daily budget for the trip."
+            },
+            "exploration_type": {
+              "type": "string",
+              "enum": [
+                "nature",
+                "urban",
+                "history",
+                "culture"
+              ],
+              "description": "The preferred exploration type.",
+              "default": "urban"
+            }
+          },
+          "required": [
+            "destination",
+            "days",
+            "daily_budget"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "cooking_conversion_convert",
+        "description": "Convert cooking measurements from one unit to another. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "quantity": {
+              "type": "integer",
+              "description": "The quantity to be converted."
+            },
+            "from_unit": {
+              "type": "string",
+              "description": "The unit to convert from."
+            },
+            "to_unit": {
+              "type": "string",
+              "description": "The unit to convert to."
+            },
+            "item": {
+              "type": "string",
+              "description": "The item to be converted."
+            }
+          },
+          "required": [
+            "quantity",
+            "from_unit",
+            "to_unit",
+            "item"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "find_recipe",
+        "description": "Locate a recipe based on name and its calorie content Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "recipeName": {
+              "type": "string",
+              "description": "The recipe's name."
+            },
+            "maxCalories": {
+              "type": "integer",
+              "description": "The maximum calorie content of the recipe.",
+              "default": 1000
+            }
+          },
+          "required": [
+            "recipeName"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Could you help me plan a trip? I want to go to Paris for 7 days with a daily budget of $200, and I prefer exploring urban areas. Also, I'm trying to cook a dish called 'Chicken Alfredo', but I'm not sure if it fits my diet. Could you find a recipe for 'Chicken Alfredo' that has less than 800 calories? Additionally, I have a cooking measurement problem. I have a recipe that calls for 2 cups of flour, but I only have a scale. Can you convert 2 cups of flour into grams for me? Lastly, I'm doing a research project and need to run a linear regression model. The predictor variables are 'age', 'income', and 'education level', and the target variable is 'job satisfaction'. Could you also standardize the predictors for me?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "run_linear_regression",
+          "description": "Build a linear regression model using given predictor variables and a target variable. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "predictors": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Array containing the names of predictor variables."
+              },
+              "target": {
+                "type": "string",
+                "description": "The name of target variable."
+              },
+              "standardize": {
+                "type": "boolean",
+                "description": "Option to apply standardization on the predictors. Defaults to False."
+              }
+            },
+            "required": [
+              "predictors",
+              "target"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "travel_itinerary_generator",
+          "description": "Generate a travel itinerary based on specific destination, duration and daily budget, with preferred exploration type. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "destination": {
+                "type": "string",
+                "description": "Destination city of the trip."
+              },
+              "days": {
+                "type": "integer",
+                "description": "Number of days for the trip."
+              },
+              "daily_budget": {
+                "type": "integer",
+                "description": "The maximum daily budget for the trip."
+              },
+              "exploration_type": {
+                "type": "string",
+                "enum": [
+                  "nature",
+                  "urban",
+                  "history",
+                  "culture"
+                ],
+                "description": "The preferred exploration type.",
+                "default": "urban"
+              }
+            },
+            "required": [
+              "destination",
+              "days",
+              "daily_budget"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "cooking_conversion_convert",
+          "description": "Convert cooking measurements from one unit to another. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "quantity": {
+                "type": "integer",
+                "description": "The quantity to be converted."
+              },
+              "from_unit": {
+                "type": "string",
+                "description": "The unit to convert from."
+              },
+              "to_unit": {
+                "type": "string",
+                "description": "The unit to convert to."
+              },
+              "item": {
+                "type": "string",
+                "description": "The item to be converted."
+              }
+            },
+            "required": [
+              "quantity",
+              "from_unit",
+              "to_unit",
+              "item"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "find_recipe",
+          "description": "Locate a recipe based on name and its calorie content Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "recipeName": {
+                "type": "string",
+                "description": "The recipe's name."
+              },
+              "maxCalories": {
+                "type": "integer",
+                "description": "The maximum calorie content of the recipe.",
+                "default": 1000
+              }
+            },
+            "required": [
+              "recipeName"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241859-7VQCKIGo2zhOG7h3qJii",
+    "object": "chat.completion",
+    "created": 1776241859,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to assist with all your requests. Let's tackle each one systematically by calling the relevant functions for your travel itinerary, recipe search, cooking measurement conversion, and linear regression model.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_24971875",
+              "function": {
+                "name": "travel_itinerary_generator",
+                "arguments": "{\"destination\":\"Paris\",\"days\":7,\"daily_budget\":200,\"exploration_type\":\"urban\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_56662269",
+              "function": {
+                "name": "find_recipe",
+                "arguments": "{\"recipeName\":\"Chicken Alfredo\",\"maxCalories\":800}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_67011311",
+              "function": {
+                "name": "cooking_conversion_convert",
+                "arguments": "{\"quantity\":2,\"from_unit\":\"cups\",\"to_unit\":\"grams\",\"item\":\"flour\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_43051939",
+              "function": {
+                "name": "run_linear_regression",
+                "arguments": "{\"predictors\":[\"age\",\"income\",\"education level\"],\"target\":\"job satisfaction\",\"standardize\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 840,
+      "completion_tokens": 214,
+      "total_tokens": 1054,
+      "cost": 0.0052071525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00525975,
+        "upstream_inference_prompt_cost": 0.00204975,
+        "upstream_inference_completions_cost": 0.00321
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241859-7VQCKIGo2zhOG7h3qJii",
+    "object": "response",
+    "created_at": 1776241862,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'm happy to assist with all your requests. Let's tackle each one systematically by calling the relevant functions for your travel itinerary, recipe search, cooking measurement conversion, and linear regression model.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_24971875",
+        "call_id": "call_24971875",
+        "name": "travel_itinerary_generator",
+        "arguments": "{\"destination\":\"Paris\",\"days\":7,\"daily_budget\":200,\"exploration_type\":\"urban\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_56662269",
+        "call_id": "call_56662269",
+        "name": "find_recipe",
+        "arguments": "{\"recipeName\":\"Chicken Alfredo\",\"maxCalories\":800}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_67011311",
+        "call_id": "call_67011311",
+        "name": "cooking_conversion_convert",
+        "arguments": "{\"quantity\":2,\"from_unit\":\"cups\",\"to_unit\":\"grams\",\"item\":\"flour\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_43051939",
+        "call_id": "call_43051939",
+        "name": "run_linear_regression",
+        "arguments": "{\"predictors\":[\"age\",\"income\",\"education level\"],\"target\":\"job satisfaction\",\"standardize\":true}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 840,
+      "completion_tokens": 214,
+      "total_tokens": 1054,
+      "cost": 0.0052071525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00525975,
+        "upstream_inference_prompt_cost": 0.00204975,
+        "upstream_inference_completions_cost": 0.00321
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241859-7VQCKIGo2zhOG7h3qJii",
+    "object": "chat.completion",
+    "created": 1776241859,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm happy to assist with all your requests. Let's tackle each one systematically by calling the relevant functions for your travel itinerary, recipe search, cooking measurement conversion, and linear regression model.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_24971875",
+              "function": {
+                "name": "travel_itinerary_generator",
+                "arguments": "{\"destination\":\"Paris\",\"days\":7,\"daily_budget\":200,\"exploration_type\":\"urban\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_56662269",
+              "function": {
+                "name": "find_recipe",
+                "arguments": "{\"recipeName\":\"Chicken Alfredo\",\"maxCalories\":800}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_67011311",
+              "function": {
+                "name": "cooking_conversion_convert",
+                "arguments": "{\"quantity\":2,\"from_unit\":\"cups\",\"to_unit\":\"grams\",\"item\":\"flour\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_43051939",
+              "function": {
+                "name": "run_linear_regression",
+                "arguments": "{\"predictors\":[\"age\",\"income\",\"education level\"],\"target\":\"job satisfaction\",\"standardize\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 840,
+      "completion_tokens": 214,
+      "total_tokens": 1054,
+      "cost": 0.0052071525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00525975,
+        "upstream_inference_prompt_cost": 0.00204975,
+        "upstream_inference_completions_cost": 0.00321
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 3679.861,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "49c3c711-3ab8-4a48-9733-9fb0072fff9d"
+}

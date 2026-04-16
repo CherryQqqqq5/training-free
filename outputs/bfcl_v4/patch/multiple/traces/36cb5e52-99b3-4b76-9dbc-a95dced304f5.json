@@ -1,0 +1,310 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find a book 'The Alchemist' in the library branches within New York city."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "library_reserve_book",
+        "description": "Reserves a book in the library if available. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "book_id": {
+              "type": "string",
+              "description": "The id of the book to reserve."
+            },
+            "branch_id": {
+              "type": "string",
+              "description": "The id of the library branch to reserve from."
+            },
+            "return_date": {
+              "type": "string",
+              "description": "The date the book is to be returned (optional). Default is ''"
+            }
+          },
+          "required": [
+            "book_id",
+            "branch_id"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "library_search_book",
+        "description": "Searches for a book in the library within the specified city. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "book_name": {
+              "type": "string",
+              "description": "The name of the book to search for."
+            },
+            "city": {
+              "type": "string",
+              "description": "The city to search within."
+            },
+            "availability": {
+              "type": "boolean",
+              "description": "If true, search for available copies. If false or omitted, search for any copy regardless of availability. Default is false"
+            },
+            "genre": {
+              "type": "string",
+              "description": "The genre of the book to filter search (optional). Default is ''"
+            }
+          },
+          "required": [
+            "book_name",
+            "city"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find a book 'The Alchemist' in the library branches within New York city."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "library_reserve_book",
+          "description": "Reserves a book in the library if available. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "book_id": {
+                "type": "string",
+                "description": "The id of the book to reserve."
+              },
+              "branch_id": {
+                "type": "string",
+                "description": "The id of the library branch to reserve from."
+              },
+              "return_date": {
+                "type": "string",
+                "description": "The date the book is to be returned (optional). Default is ''"
+              }
+            },
+            "required": [
+              "book_id",
+              "branch_id"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "library_search_book",
+          "description": "Searches for a book in the library within the specified city. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "book_name": {
+                "type": "string",
+                "description": "The name of the book to search for."
+              },
+              "city": {
+                "type": "string",
+                "description": "The city to search within."
+              },
+              "availability": {
+                "type": "boolean",
+                "description": "If true, search for available copies. If false or omitted, search for any copy regardless of availability. Default is false"
+              },
+              "genre": {
+                "type": "string",
+                "description": "The genre of the book to filter search (optional). Default is ''"
+              }
+            },
+            "required": [
+              "book_name",
+              "city"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240042-oWXeRjGFhJ6uNX0NHEcu",
+    "object": "chat.completion",
+    "created": 1776240042,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_64965387",
+              "function": {
+                "name": "library_search_book",
+                "arguments": "{\"book_name\":\"The Alchemist\",\"city\":\"New York\",\"availability\":false,\"genre\":\"\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 489,
+      "completion_tokens": 46,
+      "total_tokens": 535,
+      "cost": 0.0016698825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00168675,
+        "upstream_inference_prompt_cost": 0.00099675,
+        "upstream_inference_completions_cost": 0.00069
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240042-oWXeRjGFhJ6uNX0NHEcu",
+    "object": "response",
+    "created_at": 1776240043,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_64965387",
+        "call_id": "call_64965387",
+        "name": "library_search_book",
+        "arguments": "{\"book_name\":\"The Alchemist\",\"city\":\"New York\",\"availability\":false,\"genre\":\"\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 489,
+      "completion_tokens": 46,
+      "total_tokens": 535,
+      "cost": 0.0016698825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00168675,
+        "upstream_inference_prompt_cost": 0.00099675,
+        "upstream_inference_completions_cost": 0.00069
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240042-oWXeRjGFhJ6uNX0NHEcu",
+    "object": "chat.completion",
+    "created": 1776240042,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_64965387",
+              "function": {
+                "name": "library_search_book",
+                "arguments": "{\"book_name\":\"The Alchemist\",\"city\":\"New York\",\"availability\":false,\"genre\":\"\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 489,
+      "completion_tokens": 46,
+      "total_tokens": 535,
+      "cost": 0.0016698825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00168675,
+        "upstream_inference_prompt_cost": 0.00099675,
+        "upstream_inference_completions_cost": 0.00069
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1951.651,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "36cb5e52-99b3-4b76-9dbc-a95dced304f5"
+}

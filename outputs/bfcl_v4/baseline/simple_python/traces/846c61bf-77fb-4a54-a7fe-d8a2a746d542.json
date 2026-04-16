@@ -1,0 +1,240 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the derivative of the function 3x^2 + 2x - 1."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_derivative",
+        "description": "Calculate the derivative of a polynomial function. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "function": {
+              "type": "string",
+              "description": "The polynomial function."
+            },
+            "x_value": {
+              "type": "number",
+              "description": "The x-value at which the derivative is calculated. Optional, default to 0.00. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "function"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the derivative of the function 3x^2 + 2x - 1."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_derivative",
+          "description": "Calculate the derivative of a polynomial function. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "function": {
+                "type": "string",
+                "description": "The polynomial function."
+              },
+              "x_value": {
+                "type": "number",
+                "description": "The x-value at which the derivative is calculated. Optional, default to 0.00. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "function"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776237677-5tU2vawdzNFmvnDx21Z9",
+    "object": "chat.completion",
+    "created": 1776237677,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_01282933",
+              "function": {
+                "name": "calculate_derivative",
+                "arguments": "{\"function\":\"3*x**2 + 2*x - 1\",\"x_value\":0.0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 331,
+      "completion_tokens": 45,
+      "total_tokens": 376,
+      "cost": 0.000916245,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 330,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0009255,
+        "upstream_inference_prompt_cost": 0.0002505,
+        "upstream_inference_completions_cost": 0.000675
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776237677-5tU2vawdzNFmvnDx21Z9",
+    "object": "response",
+    "created_at": 1776237678,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_01282933",
+        "call_id": "call_01282933",
+        "name": "calculate_derivative",
+        "arguments": "{\"function\":\"3*x**2 + 2*x - 1\",\"x_value\":0.0}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 331,
+      "completion_tokens": 45,
+      "total_tokens": 376,
+      "cost": 0.000916245,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 330,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0009255,
+        "upstream_inference_prompt_cost": 0.0002505,
+        "upstream_inference_completions_cost": 0.000675
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776237677-5tU2vawdzNFmvnDx21Z9",
+    "object": "chat.completion",
+    "created": 1776237677,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_01282933",
+              "function": {
+                "name": "calculate_derivative",
+                "arguments": "{\"function\":\"3*x**2 + 2*x - 1\",\"x_value\":0.0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 331,
+      "completion_tokens": 45,
+      "total_tokens": 376,
+      "cost": 0.000916245,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 330,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0009255,
+        "upstream_inference_prompt_cost": 0.0002505,
+        "upstream_inference_completions_cost": 0.000675
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1525.262,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "846c61bf-77fb-4a54-a7fe-d8a2a746d542"
+}

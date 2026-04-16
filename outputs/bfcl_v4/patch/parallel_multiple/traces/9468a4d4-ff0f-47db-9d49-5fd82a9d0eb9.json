@@ -1,0 +1,379 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "\"Could you please tell me the ranking of the New York Yankees in the Major League Baseball for the 2019 season, then check the ranking of the Los Angeles Lakers in the National Basketball Association for the 2020 season, and finally, could you provide the air quality index for Los Angeles on December 25, 2020 and for New York on January 1, 2021?\""
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "air_quality",
+        "description": "Retrieve the air quality index for a specific location. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city that you want to get the air quality index for."
+            },
+            "date": {
+              "type": "string",
+              "description": "The date you want to get the air quality index for. Default is today."
+            }
+          },
+          "required": [
+            "location",
+            "date"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "sports_ranking",
+        "description": "Fetch the ranking of a specific sports team in a specific league Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "team": {
+              "type": "string",
+              "description": "The name of the team."
+            },
+            "league": {
+              "type": "string",
+              "description": "The name of the league."
+            },
+            "season": {
+              "type": "integer",
+              "description": "Optional parameter to specify the season, default is 2023 if not specified."
+            }
+          },
+          "required": [
+            "team",
+            "league"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "\"Could you please tell me the ranking of the New York Yankees in the Major League Baseball for the 2019 season, then check the ranking of the Los Angeles Lakers in the National Basketball Association for the 2020 season, and finally, could you provide the air quality index for Los Angeles on December 25, 2020 and for New York on January 1, 2021?\""
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "air_quality",
+          "description": "Retrieve the air quality index for a specific location. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city that you want to get the air quality index for."
+              },
+              "date": {
+                "type": "string",
+                "description": "The date you want to get the air quality index for. Default is today."
+              }
+            },
+            "required": [
+              "location",
+              "date"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "sports_ranking",
+          "description": "Fetch the ranking of a specific sports team in a specific league Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "team": {
+                "type": "string",
+                "description": "The name of the team."
+              },
+              "league": {
+                "type": "string",
+                "description": "The name of the league."
+              },
+              "season": {
+                "type": "integer",
+                "description": "Optional parameter to specify the season, default is 2023 if not specified."
+              }
+            },
+            "required": [
+              "team",
+              "league"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776241930-aDMtdN5olU0KnCRshjYu",
+    "object": "chat.completion",
+    "created": 1776241930,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'll help you with these requests by calling the appropriate functions to retrieve the information.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_05799137",
+              "function": {
+                "name": "sports_ranking",
+                "arguments": "{\"team\":\"New York Yankees\",\"league\":\"Major League Baseball\",\"season\":2019}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_39690431",
+              "function": {
+                "name": "sports_ranking",
+                "arguments": "{\"team\":\"Los Angeles Lakers\",\"league\":\"National Basketball Association\",\"season\":2020}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_09708048",
+              "function": {
+                "name": "air_quality",
+                "arguments": "{\"location\":\"Los Angeles\",\"date\":\"2020-12-25\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_82922996",
+              "function": {
+                "name": "air_quality",
+                "arguments": "{\"location\":\"New York\",\"date\":\"2021-01-01\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 497,
+      "completion_tokens": 178,
+      "total_tokens": 675,
+      "cost": 0.00301455,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 496,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.003045,
+        "upstream_inference_prompt_cost": 0.000375,
+        "upstream_inference_completions_cost": 0.00267
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776241930-aDMtdN5olU0KnCRshjYu",
+    "object": "response",
+    "created_at": 1776241932,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'll help you with these requests by calling the appropriate functions to retrieve the information.\n\n"
+          }
+        ]
+      },
+      {
+        "type": "function_call",
+        "id": "call_05799137",
+        "call_id": "call_05799137",
+        "name": "sports_ranking",
+        "arguments": "{\"team\":\"New York Yankees\",\"league\":\"Major League Baseball\",\"season\":2019}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_39690431",
+        "call_id": "call_39690431",
+        "name": "sports_ranking",
+        "arguments": "{\"team\":\"Los Angeles Lakers\",\"league\":\"National Basketball Association\",\"season\":2020}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_09708048",
+        "call_id": "call_09708048",
+        "name": "air_quality",
+        "arguments": "{\"location\":\"Los Angeles\",\"date\":\"2020-12-25\"}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_82922996",
+        "call_id": "call_82922996",
+        "name": "air_quality",
+        "arguments": "{\"location\":\"New York\",\"date\":\"2021-01-01\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 497,
+      "completion_tokens": 178,
+      "total_tokens": 675,
+      "cost": 0.00301455,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 496,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.003045,
+        "upstream_inference_prompt_cost": 0.000375,
+        "upstream_inference_completions_cost": 0.00267
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776241930-aDMtdN5olU0KnCRshjYu",
+    "object": "chat.completion",
+    "created": 1776241930,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'll help you with these requests by calling the appropriate functions to retrieve the information.\n\n",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_05799137",
+              "function": {
+                "name": "sports_ranking",
+                "arguments": "{\"team\":\"New York Yankees\",\"league\":\"Major League Baseball\",\"season\":2019}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_39690431",
+              "function": {
+                "name": "sports_ranking",
+                "arguments": "{\"team\":\"Los Angeles Lakers\",\"league\":\"National Basketball Association\",\"season\":2020}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 2,
+              "id": "call_09708048",
+              "function": {
+                "name": "air_quality",
+                "arguments": "{\"location\":\"Los Angeles\",\"date\":\"2020-12-25\"}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 3,
+              "id": "call_82922996",
+              "function": {
+                "name": "air_quality",
+                "arguments": "{\"location\":\"New York\",\"date\":\"2021-01-01\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 497,
+      "completion_tokens": 178,
+      "total_tokens": 675,
+      "cost": 0.00301455,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 496,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.003045,
+        "upstream_inference_prompt_cost": 0.000375,
+        "upstream_inference_completions_cost": 0.00267
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2777.005,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "9468a4d4-ff0f-47db-9d49-5fd82a9d0eb9"
+}

@@ -1,0 +1,380 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the BMI (Body Mass Index) of a person who weighs 70kg and is 1.75m tall."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_BMI",
+        "description": "Calculate the Body Mass Index (BMI) given a person's weight and height. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "weight_kg": {
+              "type": "integer",
+              "description": "The weight of the person in kilograms."
+            },
+            "height_m": {
+              "type": "number",
+              "description": "The height of the person in meters. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "weight_kg",
+            "height_m"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "soccer_get_last_match",
+        "description": "Retrieve the details of the last match played by a specified soccer club. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "team_name": {
+              "type": "string",
+              "description": "The name of the soccer club."
+            },
+            "include_stats": {
+              "type": "boolean",
+              "description": "If true, include match statistics like possession, shots on target etc. Default is false."
+            }
+          },
+          "required": [
+            "team_name"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "hotel_booking",
+        "description": "Books a hotel room given the location, room type, stay duration and any additional preferences. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city where you want to book the hotel."
+            },
+            "room_type": {
+              "type": "string",
+              "description": "Type of the room required. Options: 'single', 'double', 'deluxe', etc."
+            },
+            "duration": {
+              "type": "integer",
+              "description": "The number of nights you want to book the hotel for."
+            },
+            "start_date": {
+              "type": "string",
+              "description": "The date when your stay begins."
+            },
+            "preferences": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "pet_friendly",
+                  "gym",
+                  "swimming_pool",
+                  "free_breakfast",
+                  "parking"
+                ]
+              },
+              "description": "Optional preferences of stay at the hotel. Default is empty array."
+            }
+          },
+          "required": [
+            "location",
+            "room_type",
+            "duration",
+            "start_date"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the BMI (Body Mass Index) of a person who weighs 70kg and is 1.75m tall."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_BMI",
+          "description": "Calculate the Body Mass Index (BMI) given a person's weight and height. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "weight_kg": {
+                "type": "integer",
+                "description": "The weight of the person in kilograms."
+              },
+              "height_m": {
+                "type": "number",
+                "description": "The height of the person in meters. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "weight_kg",
+              "height_m"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "soccer_get_last_match",
+          "description": "Retrieve the details of the last match played by a specified soccer club. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "team_name": {
+                "type": "string",
+                "description": "The name of the soccer club."
+              },
+              "include_stats": {
+                "type": "boolean",
+                "description": "If true, include match statistics like possession, shots on target etc. Default is false."
+              }
+            },
+            "required": [
+              "team_name"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "hotel_booking",
+          "description": "Books a hotel room given the location, room type, stay duration and any additional preferences. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city where you want to book the hotel."
+              },
+              "room_type": {
+                "type": "string",
+                "description": "Type of the room required. Options: 'single', 'double', 'deluxe', etc."
+              },
+              "duration": {
+                "type": "integer",
+                "description": "The number of nights you want to book the hotel for."
+              },
+              "start_date": {
+                "type": "string",
+                "description": "The date when your stay begins."
+              },
+              "preferences": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "pet_friendly",
+                    "gym",
+                    "swimming_pool",
+                    "free_breakfast",
+                    "parking"
+                  ]
+                },
+                "description": "Optional preferences of stay at the hotel. Default is empty array."
+              }
+            },
+            "required": [
+              "location",
+              "room_type",
+              "duration",
+              "start_date"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239709-88zli2XSfiiL9UyPF8AI",
+    "object": "chat.completion",
+    "created": 1776239709,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_26368241",
+              "function": {
+                "name": "calculate_BMI",
+                "arguments": "{\"weight_kg\":70,\"height_m\":1.75}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 641,
+      "completion_tokens": 37,
+      "total_tokens": 678,
+      "cost": 0.0019876725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00200775,
+        "upstream_inference_prompt_cost": 0.00145275,
+        "upstream_inference_completions_cost": 0.000555
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239709-88zli2XSfiiL9UyPF8AI",
+    "object": "response",
+    "created_at": 1776239711,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_26368241",
+        "call_id": "call_26368241",
+        "name": "calculate_BMI",
+        "arguments": "{\"weight_kg\":70,\"height_m\":1.75}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 641,
+      "completion_tokens": 37,
+      "total_tokens": 678,
+      "cost": 0.0019876725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00200775,
+        "upstream_inference_prompt_cost": 0.00145275,
+        "upstream_inference_completions_cost": 0.000555
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239709-88zli2XSfiiL9UyPF8AI",
+    "object": "chat.completion",
+    "created": 1776239709,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_26368241",
+              "function": {
+                "name": "calculate_BMI",
+                "arguments": "{\"weight_kg\":70,\"height_m\":1.75}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 641,
+      "completion_tokens": 37,
+      "total_tokens": 678,
+      "cost": 0.0019876725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00200775,
+        "upstream_inference_prompt_cost": 0.00145275,
+        "upstream_inference_completions_cost": 0.000555
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2470.887,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "8216225b-7ce5-4f41-a55f-09c5f10fbf6d"
+}

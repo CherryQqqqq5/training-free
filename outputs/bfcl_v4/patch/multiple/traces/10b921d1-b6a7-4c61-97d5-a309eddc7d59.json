@@ -1,0 +1,334 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Book a ticket for the upcoming Eminem concert in New York City, I would like to get the one with backstage access."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "concert_book_ticket",
+        "description": "Book a ticket for a concert at a specific location with various add-ons like backstage pass. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "artist": {
+              "type": "string",
+              "description": "Name of the artist for the concert."
+            },
+            "location": {
+              "type": "string",
+              "description": "City where the concert will take place."
+            },
+            "add_ons": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Backstage Pass",
+                  "VIP Seating",
+                  "Parking Pass"
+                ]
+              },
+              "description": "Add-ons for the concert. Default empty array"
+            }
+          },
+          "required": [
+            "artist",
+            "location"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "festival_book_ticket",
+        "description": "Book a ticket for a festival at a specific location with various add-ons like camping access. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "festival": {
+              "type": "string",
+              "description": "Name of the festival."
+            },
+            "location": {
+              "type": "string",
+              "description": "City where the festival will take place."
+            },
+            "add_ons": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Camping Pass",
+                  "VIP Seating",
+                  "Parking Pass"
+                ]
+              },
+              "description": "Add-ons for the festival. Default empty array"
+            }
+          },
+          "required": [
+            "festival",
+            "location"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Book a ticket for the upcoming Eminem concert in New York City, I would like to get the one with backstage access."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "concert_book_ticket",
+          "description": "Book a ticket for a concert at a specific location with various add-ons like backstage pass. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "artist": {
+                "type": "string",
+                "description": "Name of the artist for the concert."
+              },
+              "location": {
+                "type": "string",
+                "description": "City where the concert will take place."
+              },
+              "add_ons": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "Backstage Pass",
+                    "VIP Seating",
+                    "Parking Pass"
+                  ]
+                },
+                "description": "Add-ons for the concert. Default empty array"
+              }
+            },
+            "required": [
+              "artist",
+              "location"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "festival_book_ticket",
+          "description": "Book a ticket for a festival at a specific location with various add-ons like camping access. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "festival": {
+                "type": "string",
+                "description": "Name of the festival."
+              },
+              "location": {
+                "type": "string",
+                "description": "City where the festival will take place."
+              },
+              "add_ons": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "Camping Pass",
+                    "VIP Seating",
+                    "Parking Pass"
+                  ]
+                },
+                "description": "Add-ons for the festival. Default empty array"
+              }
+            },
+            "required": [
+              "festival",
+              "location"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240134-GeWZ6Zqcg3CwayKDBGVQ",
+    "object": "chat.completion",
+    "created": 1776240134,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_75190838",
+              "function": {
+                "name": "concert_book_ticket",
+                "arguments": "{\"artist\":\"Eminem\",\"location\":\"New York City\",\"add_ons\":[\"Backstage Pass\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 496,
+      "completion_tokens": 47,
+      "total_tokens": 543,
+      "cost": 0.0010684575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 495,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00107925,
+        "upstream_inference_prompt_cost": 0.00037425,
+        "upstream_inference_completions_cost": 0.000705
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240134-GeWZ6Zqcg3CwayKDBGVQ",
+    "object": "response",
+    "created_at": 1776240135,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_75190838",
+        "call_id": "call_75190838",
+        "name": "concert_book_ticket",
+        "arguments": "{\"artist\":\"Eminem\",\"location\":\"New York City\",\"add_ons\":[\"Backstage Pass\"]}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 496,
+      "completion_tokens": 47,
+      "total_tokens": 543,
+      "cost": 0.0010684575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 495,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00107925,
+        "upstream_inference_prompt_cost": 0.00037425,
+        "upstream_inference_completions_cost": 0.000705
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240134-GeWZ6Zqcg3CwayKDBGVQ",
+    "object": "chat.completion",
+    "created": 1776240134,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_75190838",
+              "function": {
+                "name": "concert_book_ticket",
+                "arguments": "{\"artist\":\"Eminem\",\"location\":\"New York City\",\"add_ons\":[\"Backstage Pass\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 496,
+      "completion_tokens": 47,
+      "total_tokens": 543,
+      "cost": 0.0010684575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 495,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00107925,
+        "upstream_inference_prompt_cost": 0.00037425,
+        "upstream_inference_completions_cost": 0.000705
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1755.381,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "10b921d1-b6a7-4c61-97d5-a309eddc7d59"
+}

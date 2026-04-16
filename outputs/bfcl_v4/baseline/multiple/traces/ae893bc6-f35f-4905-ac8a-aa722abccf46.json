@@ -1,0 +1,324 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find out how fast an object was going if it started from rest and traveled a distance of 20 meters over 4 seconds due to a constant acceleration?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "kinematics_calculate_acceleration",
+        "description": "Calculates the acceleration of an object under given conditions. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "initial_speed": {
+              "type": "number",
+              "description": "The initial speed of the object. This is a float type value.",
+              "format": "float"
+            },
+            "final_speed": {
+              "type": "number",
+              "description": "The final speed of the object. This is a float type value.",
+              "format": "float"
+            },
+            "time": {
+              "type": "number",
+              "description": "The time in seconds it took the object to reach the final speed. This is a float type value.",
+              "format": "float"
+            },
+            "distance": {
+              "type": "number",
+              "description": "The distance in meters the object has traveled. This is a float type value.",
+              "default": 0,
+              "format": "float"
+            }
+          },
+          "required": [
+            "initial_speed",
+            "final_speed",
+            "time"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "kinematics_calculate_speed_from_rest",
+        "description": "Calculates the speed of an object that starts from rest under a constant acceleration over a specified distance. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "distance": {
+              "type": "integer",
+              "description": "The distance in meters the object has traveled."
+            },
+            "time": {
+              "type": "integer",
+              "description": "The time in seconds it took the object to travel."
+            },
+            "initial_speed": {
+              "type": "integer",
+              "description": "The initial speed of the object.",
+              "default": 0
+            }
+          },
+          "required": [
+            "distance",
+            "time"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find out how fast an object was going if it started from rest and traveled a distance of 20 meters over 4 seconds due to a constant acceleration?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "kinematics_calculate_acceleration",
+          "description": "Calculates the acceleration of an object under given conditions. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "initial_speed": {
+                "type": "number",
+                "description": "The initial speed of the object. This is a float type value.",
+                "format": "float"
+              },
+              "final_speed": {
+                "type": "number",
+                "description": "The final speed of the object. This is a float type value.",
+                "format": "float"
+              },
+              "time": {
+                "type": "number",
+                "description": "The time in seconds it took the object to reach the final speed. This is a float type value.",
+                "format": "float"
+              },
+              "distance": {
+                "type": "number",
+                "description": "The distance in meters the object has traveled. This is a float type value.",
+                "default": 0,
+                "format": "float"
+              }
+            },
+            "required": [
+              "initial_speed",
+              "final_speed",
+              "time"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "kinematics_calculate_speed_from_rest",
+          "description": "Calculates the speed of an object that starts from rest under a constant acceleration over a specified distance. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "distance": {
+                "type": "integer",
+                "description": "The distance in meters the object has traveled."
+              },
+              "time": {
+                "type": "integer",
+                "description": "The time in seconds it took the object to travel."
+              },
+              "initial_speed": {
+                "type": "integer",
+                "description": "The initial speed of the object.",
+                "default": 0
+              }
+            },
+            "required": [
+              "distance",
+              "time"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776239528-6gCpJHlsj256LIWSn3BY",
+    "object": "chat.completion",
+    "created": 1776239528,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_12622324",
+              "function": {
+                "name": "kinematics_calculate_speed_from_rest",
+                "arguments": "{\"distance\":20,\"time\":4}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 544,
+      "completion_tokens": 36,
+      "total_tokens": 580,
+      "cost": 0.0016847325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00170175,
+        "upstream_inference_prompt_cost": 0.00116175,
+        "upstream_inference_completions_cost": 0.00054
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776239528-6gCpJHlsj256LIWSn3BY",
+    "object": "response",
+    "created_at": 1776239529,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_12622324",
+        "call_id": "call_12622324",
+        "name": "kinematics_calculate_speed_from_rest",
+        "arguments": "{\"distance\":20,\"time\":4}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 544,
+      "completion_tokens": 36,
+      "total_tokens": 580,
+      "cost": 0.0016847325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00170175,
+        "upstream_inference_prompt_cost": 0.00116175,
+        "upstream_inference_completions_cost": 0.00054
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776239528-6gCpJHlsj256LIWSn3BY",
+    "object": "chat.completion",
+    "created": 1776239528,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_12622324",
+              "function": {
+                "name": "kinematics_calculate_speed_from_rest",
+                "arguments": "{\"distance\":20,\"time\":4}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 544,
+      "completion_tokens": 36,
+      "total_tokens": 580,
+      "cost": 0.0016847325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00170175,
+        "upstream_inference_prompt_cost": 0.00116175,
+        "upstream_inference_completions_cost": 0.00054
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1810.419,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "ae893bc6-f35f-4905-ac8a-aa722abccf46"
+}

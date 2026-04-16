@@ -1,0 +1,311 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the time required for a car moving at 50 m/s to travel a distance of 600 m. Also calculate the time required for a bullet moving at 400 m/s to cover a distance of 1000 m."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "physics_calculate_force",
+        "description": "Calculate the force required to move an object of a particular mass at a particular acceleration. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "mass": {
+              "type": "integer",
+              "description": "The mass of the object in kg."
+            },
+            "acceleration": {
+              "type": "integer",
+              "description": "The acceleration of the object in m/s^2."
+            }
+          },
+          "required": [
+            "mass",
+            "acceleration"
+          ]
+        },
+        "type": "function"
+      },
+      {
+        "name": "kinematics_calculate_time",
+        "description": "Calculate time required for an object to travel a particular distance at a particular velocity. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "velocity": {
+              "type": "integer",
+              "description": "The velocity of the object in m/s."
+            },
+            "distance": {
+              "type": "integer",
+              "description": "The distance covered by the object in meters."
+            }
+          },
+          "required": [
+            "velocity",
+            "distance"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the time required for a car moving at 50 m/s to travel a distance of 600 m. Also calculate the time required for a bullet moving at 400 m/s to cover a distance of 1000 m."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "physics_calculate_force",
+          "description": "Calculate the force required to move an object of a particular mass at a particular acceleration. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "mass": {
+                "type": "integer",
+                "description": "The mass of the object in kg."
+              },
+              "acceleration": {
+                "type": "integer",
+                "description": "The acceleration of the object in m/s^2."
+              }
+            },
+            "required": [
+              "mass",
+              "acceleration"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "kinematics_calculate_time",
+          "description": "Calculate time required for an object to travel a particular distance at a particular velocity. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "velocity": {
+                "type": "integer",
+                "description": "The velocity of the object in m/s."
+              },
+              "distance": {
+                "type": "integer",
+                "description": "The distance covered by the object in meters."
+              }
+            },
+            "required": [
+              "velocity",
+              "distance"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "raw_response": {
+    "id": "gen-1776240463-zjVx2kMVAKip40l52r5V",
+    "object": "chat.completion",
+    "created": 1776240463,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_55302114",
+              "function": {
+                "name": "kinematics_calculate_time",
+                "arguments": "{\"velocity\":50,\"distance\":600}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_06396555",
+              "function": {
+                "name": "kinematics_calculate_time",
+                "arguments": "{\"velocity\":400,\"distance\":1000}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 449,
+      "completion_tokens": 69,
+      "total_tokens": 518,
+      "cost": 0.0023514975,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00237525,
+        "upstream_inference_prompt_cost": 0.00134025,
+        "upstream_inference_completions_cost": 0.001035
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776240463-zjVx2kMVAKip40l52r5V",
+    "object": "response",
+    "created_at": 1776240465,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_55302114",
+        "call_id": "call_55302114",
+        "name": "kinematics_calculate_time",
+        "arguments": "{\"velocity\":50,\"distance\":600}"
+      },
+      {
+        "type": "function_call",
+        "id": "call_06396555",
+        "call_id": "call_06396555",
+        "name": "kinematics_calculate_time",
+        "arguments": "{\"velocity\":400,\"distance\":1000}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 449,
+      "completion_tokens": 69,
+      "total_tokens": 518,
+      "cost": 0.0023514975,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00237525,
+        "upstream_inference_prompt_cost": 0.00134025,
+        "upstream_inference_completions_cost": 0.001035
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776240463-zjVx2kMVAKip40l52r5V",
+    "object": "chat.completion",
+    "created": 1776240463,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_55302114",
+              "function": {
+                "name": "kinematics_calculate_time",
+                "arguments": "{\"velocity\":50,\"distance\":600}"
+              }
+            },
+            {
+              "type": "function",
+              "index": 1,
+              "id": "call_06396555",
+              "function": {
+                "name": "kinematics_calculate_time",
+                "arguments": "{\"velocity\":400,\"distance\":1000}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 449,
+      "completion_tokens": 69,
+      "total_tokens": 518,
+      "cost": 0.0023514975,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00237525,
+        "upstream_inference_prompt_cost": 0.00134025,
+        "upstream_inference_completions_cost": 0.001035
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2194.656,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "83e9716f-438d-48fd-bcae-c2e0c16adffa"
+}
