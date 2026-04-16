@@ -180,6 +180,7 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
         tool_map = _tool_schema_map(data)
         seen_failure_keys: set[tuple[str, int, str, str, str | None]] = set()
         inferred_no_tool_call_kind: str | None = None
+        raw_implies_text_tool_call = False
 
         def record_failure(case: FailureCase) -> None:
             # Validation issues can mirror failures already inferable from the raw response.
@@ -193,8 +194,10 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
         for choice in raw.get("choices", []):
             msg = choice.get("message", {})
             tool_calls = msg.get("tool_calls", [])
+            parsed = parse_text_tool_calls(msg.get("content", ""))
+            if parsed:
+                raw_implies_text_tool_call = True
             if tool_map and not tool_calls:
-                parsed = parse_text_tool_calls(msg.get("content", ""))
                 if parsed:
                     for call in parsed:
                         fn = call.get("function", {})
@@ -202,8 +205,10 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
                             fn["arguments"] = json.dumps(fn["arguments"], ensure_ascii=False)
                     tool_calls = parsed
 
-            if tool_map and not tool_calls:
+            if not tool_calls and not parsed:
                 inferred_no_tool_call_kind = _inferred_no_tool_call_kind(msg.get("content", ""))
+
+            if tool_map and not tool_calls:
                 if inferred_no_tool_call_kind != "clarification_request":
                     record_failure(
                         FailureCase(
@@ -313,8 +318,11 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
             issue_kind = issue.get("kind", "validation_issue")
             if issue_kind == "clarification_request":
                 continue
-            if issue_kind == "empty_tool_call" and inferred_no_tool_call_kind == "clarification_request":
-                continue
+            if issue_kind == "empty_tool_call":
+                if raw_implies_text_tool_call:
+                    continue
+                if inferred_no_tool_call_kind in {"clarification_request", "natural_language_termination"}:
+                    continue
             record_failure(
                 FailureCase(
                     trace_id=path.stem,

@@ -27,6 +27,83 @@ Here is a list of functions in json format that you can invoke.
 
 
 class MineFailuresTests(unittest.TestCase):
+    def test_ignores_validation_empty_tool_call_when_raw_has_json_action_block_without_prompt(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            trace_path = root / "trace.json"
+            trace_path.write_text(
+                json.dumps(
+                    {
+                        "request": {"model": "demo-model"},
+                        "request_original": {"model": "demo-model"},
+                        "raw_response": {
+                            "choices": [
+                                {
+                                    "message": {
+                                        "role": "assistant",
+                                        "content": json.dumps(
+                                            {
+                                                "action": "lookup_weather",
+                                                "action_input": {"city": "Shanghai", "days": 3},
+                                            }
+                                        ),
+                                    }
+                                }
+                            ]
+                        },
+                        "validation": {
+                            "issues": [
+                                {
+                                    "kind": "empty_tool_call",
+                                    "tool_name": None,
+                                }
+                            ]
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            failures = mine_failures(str(root))
+
+        self.assertEqual(failures, [])
+
+    def test_ignores_validation_empty_tool_call_when_raw_is_clarification_without_prompt(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            trace_path = root / "trace.json"
+            trace_path.write_text(
+                json.dumps(
+                    {
+                        "request": {"model": "demo-model"},
+                        "request_original": {"model": "demo-model"},
+                        "raw_response": {
+                            "choices": [
+                                {
+                                    "message": {
+                                        "role": "assistant",
+                                        "content": "Could you please provide the city before I look up the weather?",
+                                    }
+                                }
+                            ]
+                        },
+                        "validation": {
+                            "issues": [
+                                {
+                                    "kind": "empty_tool_call",
+                                    "tool_name": None,
+                                }
+                            ]
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            failures = mine_failures(str(root))
+
+        self.assertEqual(failures, [])
+
     def test_mines_no_failure_for_json_action_block(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
