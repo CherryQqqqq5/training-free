@@ -20,6 +20,74 @@ if _INJECTED_YAML_STUB:
 
 
 class RuntimeEngineTests(unittest.TestCase):
+    def test_unsupported_request_is_not_marked_as_empty_tool_call(self) -> None:
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir)
+            request = {
+                "model": "demo-model",
+                "tools": [
+                    {
+                        "type": "function",
+                        "function": {
+                            "name": "lookup_weather",
+                            "parameters": {
+                                "type": "object",
+                                "properties": {"city": {"type": "string"}},
+                                "required": ["city"],
+                            },
+                        },
+                    }
+                ],
+            }
+            response = {
+                "choices": [
+                    {
+                        "message": {
+                            "role": "assistant",
+                            "content": "I can't directly complete that because there is no function available to do it.",
+                        }
+                    }
+                ]
+            }
+
+            _, _, validation = engine.apply_response(request, response)
+
+        self.assertEqual([issue.kind for issue in validation.issues], ["unsupported_request"])
+
+    def test_malformed_output_is_not_marked_as_empty_tool_call(self) -> None:
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir)
+            request = {
+                "model": "demo-model",
+                "tools": [
+                    {
+                        "type": "function",
+                        "function": {
+                            "name": "lookup_weather",
+                            "parameters": {
+                                "type": "object",
+                                "properties": {"city": {"type": "string"}},
+                                "required": ["city"],
+                            },
+                        },
+                    }
+                ],
+            }
+            response = {
+                "choices": [
+                    {
+                        "message": {
+                            "role": "assistant",
+                            "content": "<",
+                        }
+                    }
+                ]
+            }
+
+            _, _, validation = engine.apply_response(request, response)
+
+        self.assertEqual([issue.kind for issue in validation.issues], ["malformed_output"])
+
     def test_json_action_block_is_parsed_into_tool_call(self) -> None:
         with tempfile.TemporaryDirectory() as rules_dir:
             engine = RuleEngine(rules_dir)

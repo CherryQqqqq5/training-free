@@ -8,8 +8,7 @@ from typing import Any, List
 from grc.types import FailureCase
 from grc.utils.jsonfix import parse_loose_json
 from grc.utils.text_tool_calls import (
-    looks_like_clarification_request,
-    looks_like_terminal_natural_language,
+    classify_no_tool_call_content,
     parse_text_tool_calls,
 )
 
@@ -162,11 +161,7 @@ def _python_matches_json_type(value: Any, expected: str) -> bool:
 def _inferred_no_tool_call_kind(content: Any) -> str | None:
     if not isinstance(content, str):
         return None
-    if looks_like_terminal_natural_language(content):
-        return "natural_language_termination"
-    if looks_like_clarification_request(content):
-        return "clarification_request"
-    return "empty_tool_call"
+    return classify_no_tool_call_content(content)
 
 
 def mine_failures(trace_dir: str) -> List[FailureCase]:
@@ -321,7 +316,7 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
             if issue_kind == "empty_tool_call":
                 if raw_implies_text_tool_call:
                     continue
-                if inferred_no_tool_call_kind in {"clarification_request", "natural_language_termination"}:
+                if inferred_no_tool_call_kind not in {None, "empty_tool_call"}:
                     continue
             record_failure(
                 FailureCase(

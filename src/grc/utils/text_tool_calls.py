@@ -14,7 +14,11 @@ _CLARIFICATION_REQUEST_RE = re.compile(
     r"could you (please )?(provide|tell me|specify)"
     r"|please (provide|tell me|specify)"
     r"|i still need"
+    r"|i need to know"
     r"|i need (a bit more information|the|your)"
+    r"|to proceed,? i require"
+    r"|i require the following information"
+    r"|you (haven't|have not) provided"
     r"|missing from your request"
     r"|once i have that information"
     r")",
@@ -24,7 +28,10 @@ _CLARIFICATION_PARAM_RE = re.compile(
     r"("
     r"stock symbol"
     r"|company name"
+    r"|company"
+    r"|name or symbol"
     r"|symbol of the stock"
+    r"|ticker"
     r"|zip code"
     r"|zip codes"
     r"|full address"
@@ -36,10 +43,43 @@ _CLARIFICATION_PARAM_RE = re.compile(
     r"|starting point"
     r"|sector"
     r"|location"
+    r"|target currency"
+    r"|currency"
+    r"|file name"
+    r"|name of the file"
+    r"|personal details"
+    r"|traveler information"
+    r"|first name"
+    r"|last name"
+    r"|date of birth"
+    r"|passport number"
     r"|address"
     r"|information"
     r"|details"
     r"|parameter"
+    r")",
+    re.IGNORECASE,
+)
+_UNSUPPORTED_REQUEST_RE = re.compile(
+    r"("
+    r"there is no function available"
+    r"|don't have a specific function available"
+    r"|do not have a specific function available"
+    r"|can't directly"
+    r"|cannot directly"
+    r"|my tools are focused on"
+    r"|outside the scope of the provided functions"
+    r"|none of the functions can be used"
+    r")",
+    re.IGNORECASE,
+)
+_HALLUCINATED_COMPLETION_RE = re.compile(
+    r"("
+    r"i('ve| have) already initiated"
+    r"|i('ve| have) already .*?(checked|started|called|initiated)"
+    r"|once i have the results"
+    r"|once i have the result"
+    r"|i('ve| have) noted that"
     r")",
     re.IGNORECASE,
 )
@@ -218,6 +258,17 @@ def looks_like_terminal_natural_language(content: str) -> bool:
     return any(marker in lowered for marker in terminal_markers)
 
 
+def looks_like_malformed_output(content: str) -> bool:
+    if not isinstance(content, str):
+        return False
+    stripped = content.strip()
+    if not stripped:
+        return False
+    if stripped in {"[]", "{}"}:
+        return False
+    return len(stripped) <= 3 and not any(ch.isalnum() for ch in stripped)
+
+
 def looks_like_clarification_request(content: str) -> bool:
     if not isinstance(content, str):
         return False
@@ -227,3 +278,35 @@ def looks_like_clarification_request(content: str) -> bool:
     if not _CLARIFICATION_REQUEST_RE.search(lowered):
         return False
     return bool(_CLARIFICATION_PARAM_RE.search(lowered))
+
+
+def looks_like_unsupported_request(content: str) -> bool:
+    if not isinstance(content, str):
+        return False
+    lowered = content.strip().lower()
+    if not lowered:
+        return False
+    return bool(_UNSUPPORTED_REQUEST_RE.search(lowered))
+
+
+def looks_like_hallucinated_completion(content: str) -> bool:
+    if not isinstance(content, str):
+        return False
+    lowered = content.strip().lower()
+    if not lowered:
+        return False
+    return bool(_HALLUCINATED_COMPLETION_RE.search(lowered))
+
+
+def classify_no_tool_call_content(content: str) -> str:
+    if looks_like_terminal_natural_language(content):
+        return "natural_language_termination"
+    if looks_like_malformed_output(content):
+        return "malformed_output"
+    if looks_like_hallucinated_completion(content):
+        return "hallucinated_completion"
+    if looks_like_unsupported_request(content):
+        return "unsupported_request"
+    if looks_like_clarification_request(content):
+        return "clarification_request"
+    return "empty_tool_call"

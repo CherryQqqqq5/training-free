@@ -19,8 +19,7 @@ from grc.types import (
 )
 from grc.utils.jsonfix import parse_loose_json
 from grc.utils.text_tool_calls import (
-    looks_like_clarification_request,
-    looks_like_terminal_natural_language,
+    classify_no_tool_call_content,
     parse_text_tool_calls,
 )
 
@@ -127,7 +126,12 @@ class RuleEngine:
         return False
 
     def _tool_guard_action(self, rule_hits: List[Rule], issue_kind: str) -> str:
-        if issue_kind == "clarification_request":
+        if issue_kind in {
+            "clarification_request",
+            "unsupported_request",
+            "hallucinated_completion",
+            "malformed_output",
+        }:
             return "record"
         for rule in rule_hits:
             guard = rule.action.tool_guard
@@ -207,25 +211,19 @@ class RuleEngine:
             global_rule_hits = self._matched_global_rules()
             if request_json.get("tools") and not tool_calls:
                 content = msg.get("content", "")
-                if looks_like_terminal_natural_language(content):
-                    issues = [
-                        ValidationIssue(
-                            kind="natural_language_termination",
-                            message="assistant ended turn with natural language without tool call",
-                        )
-                    ]
-                elif looks_like_clarification_request(content):
-                    issues = [
-                        ValidationIssue(
-                            kind="clarification_request",
-                            message="assistant requested missing user parameters before tool invocation",
-                        )
-                    ]
-                else:
-                    issues = [ValidationIssue(kind="empty_tool_call", message="no tool call emitted for tool-enabled request")]
+                issue_kind = classify_no_tool_call_content(content)
+                issue_messages = {
+                    "natural_language_termination": "assistant ended turn with natural language without tool call",
+                    "clarification_request": "assistant requested missing user parameters before tool invocation",
+                    "unsupported_request": "assistant refused because request appears unsupported by available tools",
+                    "hallucinated_completion": "assistant claimed progress or completion without emitting a tool call",
+                    "malformed_output": "assistant emitted malformed content instead of a tool call",
+                    "empty_tool_call": "no tool call emitted for tool-enabled request",
+                }
+                issues = [ValidationIssue(kind=issue_kind, message=issue_messages[issue_kind])]
                 validation.issues.extend(issues)
                 validation.rule_hits.extend(rule.rule_id for rule in global_rule_hits)
-                if issues[0].kind != "clarification_request":
+                if issues[0].kind not in {"clarification_request", "unsupported_request"}:
                     guarded = self._apply_empty_tool_guard(msg, issues, global_rule_hits)
                     validation.fallback_applied = validation.fallback_applied or guarded
                     if not guarded:

@@ -27,6 +27,41 @@ Here is a list of functions in json format that you can invoke.
 
 
 class MineFailuresTests(unittest.TestCase):
+    def test_ignores_prompt_backed_file_name_clarification_request(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            trace_path = root / "trace.json"
+            trace_path.write_text(
+                json.dumps(
+                    {
+                        "request": {
+                            "model": "demo-model",
+                            "messages": [{"role": "developer", "content": PROMPT_WITH_FUNCTIONS}],
+                        },
+                        "request_original": {
+                            "model": "demo-model",
+                            "input": [{"role": "developer", "content": PROMPT_WITH_FUNCTIONS}],
+                        },
+                        "raw_response": {
+                            "choices": [
+                                {
+                                    "message": {
+                                        "role": "assistant",
+                                        "content": "Could you please provide the name of the file you'd like me to display?",
+                                    }
+                                }
+                            ]
+                        },
+                        "validation": {"issues": []},
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            failures = mine_failures(str(root))
+
+        self.assertEqual(failures, [])
+
     def test_ignores_validation_empty_tool_call_when_raw_has_json_action_block_without_prompt(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -143,6 +178,114 @@ class MineFailuresTests(unittest.TestCase):
             failures = mine_failures(str(root))
 
         self.assertEqual(failures, [])
+
+    def test_classifies_prompt_backed_unsupported_request(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            trace_path = root / "trace.json"
+            trace_path.write_text(
+                json.dumps(
+                    {
+                        "request": {
+                            "model": "demo-model",
+                            "messages": [{"role": "developer", "content": PROMPT_WITH_FUNCTIONS}],
+                        },
+                        "request_original": {
+                            "model": "demo-model",
+                            "input": [{"role": "developer", "content": PROMPT_WITH_FUNCTIONS}],
+                        },
+                        "raw_response": {
+                            "choices": [
+                                {
+                                    "message": {
+                                        "role": "assistant",
+                                        "content": "I can't directly complete that because there is no function available to do it.",
+                                    }
+                                }
+                            ]
+                        },
+                        "validation": {"issues": []},
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            failures = mine_failures(str(root))
+
+        self.assertEqual(len(failures), 1)
+        self.assertEqual(failures[0].error_type, "unsupported_request")
+
+    def test_classifies_prompt_backed_malformed_output(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            trace_path = root / "trace.json"
+            trace_path.write_text(
+                json.dumps(
+                    {
+                        "request": {
+                            "model": "demo-model",
+                            "messages": [{"role": "developer", "content": PROMPT_WITH_FUNCTIONS}],
+                        },
+                        "request_original": {
+                            "model": "demo-model",
+                            "input": [{"role": "developer", "content": PROMPT_WITH_FUNCTIONS}],
+                        },
+                        "raw_response": {
+                            "choices": [
+                                {
+                                    "message": {
+                                        "role": "assistant",
+                                        "content": "<",
+                                    }
+                                }
+                            ]
+                        },
+                        "validation": {"issues": []},
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            failures = mine_failures(str(root))
+
+        self.assertEqual(len(failures), 1)
+        self.assertEqual(failures[0].error_type, "malformed_output")
+
+    def test_classifies_prompt_backed_hallucinated_completion(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            trace_path = root / "trace.json"
+            trace_path.write_text(
+                json.dumps(
+                    {
+                        "request": {
+                            "model": "demo-model",
+                            "messages": [{"role": "developer", "content": PROMPT_WITH_FUNCTIONS}],
+                        },
+                        "request_original": {
+                            "model": "demo-model",
+                            "input": [{"role": "developer", "content": PROMPT_WITH_FUNCTIONS}],
+                        },
+                        "raw_response": {
+                            "choices": [
+                                {
+                                    "message": {
+                                        "role": "assistant",
+                                        "content": "I've already initiated a tire pressure check. Once I have the results, I'll let you know.",
+                                    }
+                                }
+                            ]
+                        },
+                        "validation": {"issues": []},
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            failures = mine_failures(str(root))
+
+        self.assertEqual(len(failures), 1)
+        self.assertEqual(failures[0].error_type, "hallucinated_completion")
 
     def test_ignores_prompt_backed_clarification_request(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
