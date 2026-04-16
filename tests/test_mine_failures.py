@@ -27,6 +27,50 @@ Here is a list of functions in json format that you can invoke.
 
 
 class MineFailuresTests(unittest.TestCase):
+    def test_dedupes_validation_issue_when_raw_implies_same_failure(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            trace_path = root / "trace.json"
+            trace_path.write_text(
+                json.dumps(
+                    {
+                        "request": {
+                            "model": "demo-model",
+                            "messages": [{"role": "developer", "content": PROMPT_WITH_FUNCTIONS}],
+                        },
+                        "request_original": {
+                            "model": "demo-model",
+                            "input": [{"role": "developer", "content": PROMPT_WITH_FUNCTIONS}],
+                        },
+                        "raw_response": {
+                            "choices": [
+                                {
+                                    "message": {
+                                        "role": "assistant",
+                                        "content": "[]",
+                                    }
+                                }
+                            ]
+                        },
+                        "validation": {
+                            "issues": [
+                                {
+                                    "kind": "empty_tool_call",
+                                    "tool_name": None,
+                                }
+                            ]
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            failures = mine_failures(str(root))
+
+        self.assertEqual(len(failures), 1)
+        self.assertEqual(failures[0].error_type, "empty_tool_call")
+        self.assertIsNone(failures[0].category)
+
     def test_mines_responses_prompt_backed_empty_tool_call(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

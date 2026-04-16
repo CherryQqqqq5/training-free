@@ -164,6 +164,16 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
         raw = data.get("raw_response", {})
         validation = data.get("validation", {})
         tool_map = _tool_schema_map(data)
+        seen_failure_keys: set[tuple[str, int, str, str, str | None]] = set()
+
+        def record_failure(case: FailureCase) -> None:
+            # Validation issues can mirror failures already inferable from the raw response.
+            # Deduplicate on the semantic failure identity and keep the first record.
+            key = (case.trace_id, case.turn_index, case.tool_name, case.error_type, case.field_name)
+            if key in seen_failure_keys:
+                return
+            seen_failure_keys.add(key)
+            failures.append(case)
 
         for choice in raw.get("choices", []):
             msg = choice.get("message", {})
@@ -178,7 +188,7 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
                     tool_calls = parsed
 
             if tool_map and not tool_calls:
-                failures.append(
+                record_failure(
                     FailureCase(
                         trace_id=path.stem,
                         turn_index=0,
@@ -192,7 +202,7 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
             for turn_idx, tool_call in enumerate(tool_calls):
                 name = tool_call.get("function", {}).get("name")
                 if not name:
-                    failures.append(
+                    record_failure(
                         FailureCase(
                             trace_id=path.stem,
                             turn_index=turn_idx,
@@ -203,7 +213,7 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
                     continue
 
                 if name not in tool_map:
-                    failures.append(
+                    record_failure(
                         FailureCase(
                             trace_id=path.stem,
                             turn_index=turn_idx,
@@ -219,7 +229,7 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
                 try:
                     args = parse_loose_json(args_text) if isinstance(args_text, str) else args_text
                 except Exception:
-                    failures.append(
+                    record_failure(
                         FailureCase(
                             trace_id=path.stem,
                             turn_index=turn_idx,
@@ -230,7 +240,7 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
                     continue
 
                 if not isinstance(args, dict):
-                    failures.append(
+                    record_failure(
                         FailureCase(
                             trace_id=path.stem,
                             turn_index=turn_idx,
@@ -245,7 +255,7 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
 
                 for field in required:
                     if field not in args:
-                        failures.append(
+                        record_failure(
                             FailureCase(
                                 trace_id=path.stem,
                                 turn_index=turn_idx,
@@ -258,7 +268,7 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
 
                 for field, value in args.items():
                     if field not in props:
-                        failures.append(
+                        record_failure(
                             FailureCase(
                                 trace_id=path.stem,
                                 turn_index=turn_idx,
@@ -272,7 +282,7 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
 
                     expected = props.get(field, {}).get("type")
                     if expected and not _python_matches_json_type(value, expected):
-                        failures.append(
+                        record_failure(
                             FailureCase(
                                 trace_id=path.stem,
                                 turn_index=turn_idx,
@@ -285,7 +295,7 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
                         )
 
         for issue in validation.get("issues", []):
-            failures.append(
+            record_failure(
                 FailureCase(
                     trace_id=path.stem,
                     turn_index=0,
