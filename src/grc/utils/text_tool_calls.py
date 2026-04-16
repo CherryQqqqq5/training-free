@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import ast
+import json
 import re
 from typing import Any, Dict, List
+
+from grc.utils.jsonfix import parse_loose_json, strip_code_fence
 
 
 _CALL_BLOCK_RE = re.compile(r"\[(.*)\]", re.DOTALL)
@@ -95,9 +98,15 @@ def _parse_value(raw: str) -> Any:
         return raw.strip("'\"")
 
 
-def parse_text_tool_calls(content: str) -> List[Dict[str, Any]]:
-    if not isinstance(content, str):
-        return []
+def _build_text_tool_call(tool_name: str, arguments: Any, index: int) -> Dict[str, Any]:
+    return {
+        "id": f"textcall_{index}",
+        "type": "function",
+        "function": {"name": tool_name, "arguments": arguments},
+    }
+
+
+def _parse_bracket_tool_calls(content: str) -> List[Dict[str, Any]]:
     match = _CALL_BLOCK_RE.search(content.strip())
     if not match:
         return []
@@ -127,14 +136,68 @@ def parse_text_tool_calls(content: str) -> List[Dict[str, Any]]:
                     continue
                 args_obj[key] = _parse_value(value)
 
-        calls.append(
-            {
-                "id": f"textcall_{len(calls)}",
-                "type": "function",
-                "function": {"name": tool_name, "arguments": args_obj},
-            }
-        )
+        calls.append(_build_text_tool_call(tool_name, args_obj, len(calls)))
     return calls
+
+
+def _json_action_to_tool_calls(payload: Any) -> List[Dict[str, Any]]:
+    calls: List[Dict[str, Any]] = []
+    items = payload if isinstance(payload, list) else [payload]
+
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        tool_name = item.get("action")
+        if not isinstance(tool_name, str) or not tool_name.strip():
+            continue
+        arguments = item.get("action_input", {})
+        calls.append(_build_text_tool_call(tool_name.strip(), arguments, len(calls)))
+
+    return calls
+
+
+def _parse_json_action_tool_calls(content: str) -> List[Dict[str, Any]]:
+    text = strip_code_fence(content)
+    if not text or '"action"' not in text:
+        return []
+
+    decoder = json.JSONDecoder()
+    cursor = text.lstrip()
+    parsed_values: List[Any] = []
+
+    while cursor:
+        try:
+            value, offset = decoder.raw_decode(cursor)
+        except json.JSONDecodeError:
+            parsed_values = []
+            break
+        parsed_values.append(value)
+        cursor = cursor[offset:].lstrip()
+
+    if parsed_values:
+        calls: List[Dict[str, Any]] = []
+        for value in parsed_values:
+            calls.extend(_json_action_to_tool_calls(value))
+        if calls:
+            return calls
+
+    try:
+        payload = parse_loose_json(text)
+    except Exception:
+        return []
+
+    return _json_action_to_tool_calls(payload)
+
+
+def parse_text_tool_calls(content: str) -> List[Dict[str, Any]]:
+    if not isinstance(content, str):
+        return []
+
+    bracket_calls = _parse_bracket_tool_calls(content)
+    if bracket_calls:
+        return bracket_calls
+
+    return _parse_json_action_tool_calls(content)
 
 
 def looks_like_terminal_natural_language(content: str) -> bool:

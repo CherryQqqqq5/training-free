@@ -27,6 +27,46 @@ Here is a list of functions in json format that you can invoke.
 
 
 class MineFailuresTests(unittest.TestCase):
+    def test_mines_no_failure_for_json_action_block(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            trace_path = root / "trace.json"
+            trace_path.write_text(
+                json.dumps(
+                    {
+                        "request": {
+                            "model": "demo-model",
+                            "messages": [{"role": "developer", "content": PROMPT_WITH_FUNCTIONS}],
+                        },
+                        "request_original": {
+                            "model": "demo-model",
+                            "input": [{"role": "developer", "content": PROMPT_WITH_FUNCTIONS}],
+                        },
+                        "raw_response": {
+                            "choices": [
+                                {
+                                    "message": {
+                                        "role": "assistant",
+                                        "content": json.dumps(
+                                            {
+                                                "action": "lookup_weather",
+                                                "action_input": {"city": "Shanghai", "days": 3},
+                                            }
+                                        ),
+                                    }
+                                }
+                            ]
+                        },
+                        "validation": {"issues": []},
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            failures = mine_failures(str(root))
+
+        self.assertEqual(failures, [])
+
     def test_ignores_prompt_backed_clarification_request(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
