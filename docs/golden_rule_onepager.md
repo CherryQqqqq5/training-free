@@ -22,6 +22,12 @@ The compiler entry point for Phase-1 is `FailureTrace -> FailureIR -> RuleIR -> 
 
 Phase-1 still mines mostly schema-level failures, but the IR already reserves space for verification-hook categories and non-sanitizer triggers.
 
+Current P0 finding: the important boundary is no longer “schema vs non-schema” in the abstract. The immediate distinction is:
+
+- clarification that should be excluded from true failure counts
+- unsupported requests that should stay as policy/capability buckets
+- malformed or hallucinated no-tool responses that should become actual compiler targets
+
 ## Rule IR
 
 `RuleIR` is the explicit intermediate representation used by runtime and selector.
@@ -69,6 +75,25 @@ Every runtime response also emits a `ValidationRecord` with:
 - fallback status
 
 This is the contract between compiler output and experimental evaluation.
+
+## Current Phase-1 Evidence
+
+The current repo already resolved one concrete Phase-1 blocker: noisy failure attribution on baseline traces.
+
+On the `multi_turn_miss_param` baseline traces, the miner now:
+
+- parses bracket-style text tool calls
+- parses JSON `action/action_input` text blocks
+- excludes prompt-backed clarification requests from true failure counts
+- avoids copying stale `validation.empty_tool_call` into mined failures when raw content indicates a different class
+
+After that cleanup pass, the residual mined failures on that subset are a small set of high-value classes rather than a large pool of false `empty_tool_call`.
+
+That changes the next compiler target:
+
+- first target: `hallucinated_completion`
+- second target: `malformed_output`
+- explicit non-target for forced patching: `unsupported_request`
 
 ## Roadmap MVP fields ↔ repository IR
 
