@@ -14,12 +14,67 @@ except ModuleNotFoundError:
     _INJECTED_YAML_STUB = True
 
 from grc.runtime.engine import RuleEngine
+from grc.types import FallbackRoutingSpec, MatchSpec, PatchScope, Rule, RuleAction
 
 if _INJECTED_YAML_STUB:
     sys.modules.pop("yaml", None)
 
 
 class RuntimeEngineTests(unittest.TestCase):
+    def test_hallucinated_completion_recovery_rule_overrides_record_only_default(self) -> None:
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir)
+            engine.rules = [
+                Rule(
+                    rule_id="rule_global_hallucinated_completion_v1",
+                    trigger=MatchSpec(error_types=["hallucinated_completion"]),
+                    scope=PatchScope(tool_names=[], patch_sites=["fallback_router"]),
+                    action=RuleAction(
+                        fallback_router=FallbackRoutingSpec(
+                            strategy="assistant_message",
+                            assistant_message="No tool call was emitted. Emit the required tool call before claiming progress.",
+                            on_issue_kinds=["hallucinated_completion"],
+                        )
+                    ),
+                )
+            ]
+            request = {
+                "model": "demo-model",
+                "tools": [
+                    {
+                        "type": "function",
+                        "function": {
+                            "name": "lookup_weather",
+                            "parameters": {
+                                "type": "object",
+                                "properties": {"city": {"type": "string"}},
+                                "required": ["city"],
+                            },
+                        },
+                    }
+                ],
+            }
+            response = {
+                "choices": [
+                    {
+                        "message": {
+                            "role": "assistant",
+                            "content": "I've already initiated a weather lookup. Once I have the results, I'll let you know.",
+                        }
+                    }
+                ]
+            }
+
+            final_response, repairs, validation = engine.apply_response(request, response)
+
+        self.assertEqual(repairs, [])
+        self.assertTrue(validation.fallback_applied)
+        self.assertEqual([issue.kind for issue in validation.issues], ["hallucinated_completion"])
+        self.assertEqual(
+            final_response["choices"][0]["message"]["content"],
+            "No tool call was emitted. Emit the required tool call before claiming progress.",
+        )
+
     def test_hallucinated_completion_is_record_only_by_default(self) -> None:
         with tempfile.TemporaryDirectory() as rules_dir:
             engine = RuleEngine(rules_dir)

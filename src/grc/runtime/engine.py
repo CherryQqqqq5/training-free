@@ -121,15 +121,36 @@ class RuleEngine:
             if scoped_issue_kinds and not any(issue.kind in scoped_issue_kinds for issue in issues):
                 continue
             if strategy == "drop_tool_call":
-                tool_calls.pop(index)
-                return True
+                if 0 <= index < len(tool_calls):
+                    tool_calls.pop(index)
+                    return True
+                continue
             if strategy == "assistant_message":
-                tool_calls.pop(index)
                 fallback_message = rule.action.fallback_router.assistant_message or "Tool call removed after validation failure."
-                existing = message.get("content") or ""
-                message["content"] = f"{existing}\n{fallback_message}".strip()
+                if 0 <= index < len(tool_calls):
+                    tool_calls.pop(index)
+                    existing = message.get("content") or ""
+                    message["content"] = f"{existing}\n{fallback_message}".strip()
+                else:
+                    message["content"] = fallback_message
                 return True
         return False
+
+    def _has_explicit_no_tool_recovery(self, issue_kind: str, rule_hits: List[Rule]) -> bool:
+        for rule in rule_hits:
+            strategy = rule.action.fallback_router.strategy
+            if strategy == "record_only":
+                continue
+            scoped_issue_kinds = set(rule.action.fallback_router.on_issue_kinds)
+            if scoped_issue_kinds and issue_kind not in scoped_issue_kinds:
+                continue
+            return True
+        return False
+
+    def _should_attempt_no_tool_recovery(self, issue_kind: str, rule_hits: List[Rule]) -> bool:
+        if issue_kind not in self.record_only_no_tool_kinds:
+            return True
+        return self._has_explicit_no_tool_recovery(issue_kind, rule_hits)
 
     def _tool_guard_action(self, rule_hits: List[Rule], issue_kind: str) -> str:
         if issue_kind in {
@@ -229,7 +250,7 @@ class RuleEngine:
                 issues = [ValidationIssue(kind=issue_kind, message=issue_messages[issue_kind])]
                 validation.issues.extend(issues)
                 validation.rule_hits.extend(rule.rule_id for rule in global_rule_hits)
-                if issues[0].kind not in self.record_only_no_tool_kinds:
+                if self._should_attempt_no_tool_recovery(issues[0].kind, global_rule_hits):
                     guarded = self._apply_empty_tool_guard(msg, issues, global_rule_hits)
                     validation.fallback_applied = validation.fallback_applied or guarded
                     if not guarded:

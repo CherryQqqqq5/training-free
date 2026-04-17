@@ -111,9 +111,15 @@ def _python_matches_json_type(value: Any, expected: str) -> bool:
 
 
 def mine_failures(trace_dir: str) -> List[FailureCase]:
+    trace_root = Path(trace_dir)
+    if not trace_root.exists():
+        raise FileNotFoundError(f"trace_dir does not exist: {trace_dir}")
+    if not trace_root.is_dir():
+        raise NotADirectoryError(f"trace_dir is not a directory: {trace_dir}")
+
     failures: List[FailureCase] = []
 
-    for path in sorted(Path(trace_dir).glob("*.json")):
+    for path in sorted(trace_root.glob("*.json")):
         data = json.loads(path.read_text(encoding="utf-8"))
         req = data.get("request", {})
         raw = data.get("raw_response", {})

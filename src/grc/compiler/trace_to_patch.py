@@ -114,6 +114,12 @@ def _fallback_for_failure_ir(failure_ir: FailureIR) -> FallbackRoutingSpec:
             assistant_message="No valid tool call was emitted for the available tool set.",
             on_issue_kinds=["empty_tool_call"],
         )
+    if "hallucinated_completion" in error_types:
+        return FallbackRoutingSpec(
+            strategy="assistant_message",
+            assistant_message="No tool call was emitted. Emit the required tool call before claiming progress.",
+            on_issue_kinds=["hallucinated_completion"],
+        )
     if {"invalid_json_args", "non_object_args"} & error_types:
         return FallbackRoutingSpec(
             strategy="drop_tool_call",
@@ -162,6 +168,19 @@ def _prompt_fragments(tool_name: str, failure_ir: FailureIR) -> List[str]:
     return fragments
 
 
+def _global_prompt_fragments(failure_ir: FailureIR) -> List[str]:
+    error_types = set(failure_ir.error_types)
+    fragments: List[str] = []
+    if "hallucinated_completion" in error_types:
+        fragments.append(
+            "Do not claim that work has already started or completed unless you emit the corresponding tool call in the same response."
+        )
+        fragments.append(
+            "If a tool is required, emit the tool call directly instead of promising results that have not been requested yet."
+        )
+    return fragments
+
+
 def _build_global_guard_rule(grouped: DefaultDict[str, List[FailureCase]]) -> Rule | None:
     global_failures = grouped.get("__none__", [])
     if not global_failures:
@@ -181,6 +200,7 @@ def _build_global_guard_rule(grouped: DefaultDict[str, List[FailureCase]]) -> Ru
     )
     guard_action = _guard_action_for_failure_ir(failure_ir)
     fallback = _fallback_for_failure_ir(failure_ir)
+    prompt_fragments = _global_prompt_fragments(failure_ir)
 
     return Rule(
         rule_id="rule_global_tool_guard_v1",
@@ -189,6 +209,8 @@ def _build_global_guard_rule(grouped: DefaultDict[str, List[FailureCase]]) -> Ru
         trigger=MatchSpec(error_types=error_types, category_patterns=categories),
         scope=PatchScope(tool_names=[], patch_sites=["tool_guard", "verification_hook", "fallback_router"]),
         action=RuleAction(
+            prompt_fragments=prompt_fragments,
+            prompt_injection=PromptInjectionSpec(fragments=prompt_fragments),
             tool_guard=ToolGuardSpec(
                 enabled=True,
                 on_violation=guard_action,

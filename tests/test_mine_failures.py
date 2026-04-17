@@ -43,6 +43,21 @@ Here is a list of functions in json format that you can invoke.
 
 
 class MineFailuresTests(unittest.TestCase):
+    def test_raises_when_trace_dir_missing(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            missing = Path(tmp) / "missing_traces"
+            with self.assertRaises(FileNotFoundError):
+                mine_failures(str(missing))
+
+    def test_raises_when_trace_dir_is_file(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            trace_file = root / "trace.json"
+            trace_file.write_text("{}", encoding="utf-8")
+
+            with self.assertRaises(NotADirectoryError):
+                mine_failures(str(trace_file))
+
     def test_mines_from_tool_schema_snapshot_without_prompt_marker(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
