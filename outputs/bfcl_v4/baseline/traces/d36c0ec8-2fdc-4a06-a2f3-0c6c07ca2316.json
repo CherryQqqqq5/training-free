@@ -1,0 +1,1449 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "developer",
+        "content": "You are a high-level executive assistant supporting a senior finance professional. Retain and synthesize both personal and professional information including facts, goals, prior decisions, and family life across sessions to provide strategic, context-rich guidance and continuity.\n\nYou have access to an advanced memory system, consisting of two memory types 'Core Memory' and 'Archival Memory'. Both type of memory is persistent across multiple conversations with the user, and can be accessed in a later interactions. You should actively manage your memory data to keep track of important information, ensure that it is up-to-date and easy to retrieve to provide personalized responses to the user later.\n\nThe Core memory is limited in size, but always visible to you in context. The Archival Memory has a much larger capacity, but will be held outside of your immediate context due to its size.\n\nHere is the content of your Core Memory from previous interactions:\n{\n    \"user_role\": \"Managing Director of Legend Investments, overseeing multi-billion-dollar portfolios. Leads strategy, risk management, and client relationships. Focused on opportunities, AI-driven trading, and ESG investing.\",\n    \"landmark_deals\": \"Key deals: 2019 hostile takeover defense of Surreal Inc. ($500M), $8.6B Nexa-Taihua merger, $14.2B BioCrest-OncoPharm merger. First deal: $500M Stratos Aerospace expansion.\",\n    \"current_transactions\": \"$8.5B QuantumChip-Silicon Core merger(U.S.-China), $3.2B VertexSoft LBO, $5B+ Solaris-Nordic Renewables acquisition, potential $20B Omnix AI take-private.\",\n    \"career_path\": \"Started as analyst at Goldman Sachs(2001), associate at Morgan Stanley(2004), VP at 31, joined Legend Investments as MD(2015), led NeuralNet Systems IPO.\",\n    \"education_and_philanthropy\": \"Bachelor's in Economics from UPenn, MBA from Harvard(Baker Scholar), guest lectures, mentors, recruits talent, endowed scholarship at Penn for first-gen students.\",\n    \"leadership_philosophy\": \"Based on empowerment, accountability, and growth. Open-door policy encourages ideas from all levels. Hosts Monday 'strategic roundtable'. Example: Junior analyst's ESG scoring idea adopted last month.\",\n    \"talent_development\": \"Priority on talent retention. Mentorship program for emerging leaders. Personally mentors three directors biweekly. 94% retention rate for top talent. Sent 15 to elite programs. Leadership diversity up to 40% from 15%.\"\n}\n"
+      },
+      {
+        "role": "user",
+        "content": "You know, in this business, your network isn't just a list of contacts—it's your lifeline. I've spent over two decades cultivating relationships that go far beyond simple business transactions. Take my relationship with Sarah Chen, CEO of Pacific Dynamics. We first met at a Goldman conference in 2008, but our real connection happened six months later on a delayed flight from Hong Kong. Five hours of conversation about everything from market trends to our shared love of jazz, and suddenly we had a foundation that's lasted fifteen years. Now, she's not just a business contact—she's someone I can call at 3 AM if I need a straight answer about Asian markets. That's the kind of network that makes a difference in this industry."
+      },
+      {
+        "arguments": "{\"key\":\"key_relationships\",\"value\":\"Sarah Chen, CEO of Pacific Dynamics. Met at Goldman conference in 2008, bonded over a delayed flight from Hong Kong discussing market trends and jazz. Trusted contact for Asian market insights, available for critical advice at any time.\"}",
+        "call_id": "call_72387088",
+        "name": "core_memory_add",
+        "type": "function_call",
+        "id": "call_72387088"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_72387088",
+        "output": "{\"error\": \"Core memory is full. Please clear some entries.\"}"
+      },
+      {
+        "arguments": "{}",
+        "call_id": "call_92353257",
+        "name": "core_memory_clear",
+        "type": "function_call",
+        "id": "call_92353257"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_92353257",
+        "output": "{\"status\": \"Short term memory cleared.\"}"
+      },
+      {
+        "arguments": "{\"key\":\"user_role\",\"value\":\"Managing Director of Legend Investments, overseeing multi-billion-dollar portfolios. Leads strategy, risk management, and client relationships. Focused on opportunities, AI-driven trading, and ESG investing.\"}",
+        "call_id": "call_67753517",
+        "name": "core_memory_add",
+        "type": "function_call",
+        "id": "call_67753517"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_67753517",
+        "output": "{\"status\": \"Key-value pair added.\"}"
+      },
+      {
+        "arguments": "{\"key\":\"key_relationships\",\"value\":\"Sarah Chen, CEO of Pacific Dynamics. Met at Goldman conference in 2008, bonded over a delayed flight from Hong Kong discussing market trends and jazz. Trusted contact for Asian market insights, available for critical advice at any time.\"}",
+        "call_id": "call_88429372",
+        "name": "core_memory_add",
+        "type": "function_call",
+        "id": "call_88429372"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_88429372",
+        "output": "{\"status\": \"Key-value pair added.\"}"
+      },
+      {
+        "arguments": "{\"key\":\"landmark_deals\",\"value\":\"Key deals: 2019 hostile takeover defense of Surreal Inc. ($500M), $8.6B Nexa-Taihua merger, $14.2B BioCrest-OncoPharm merger. First deal: $500M Stratos Aerospace expansion.\"}",
+        "call_id": "call_35265007",
+        "name": "archival_memory_add",
+        "type": "function_call",
+        "id": "call_35265007"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_35265007",
+        "output": "{\"status\": \"Key added.\"}"
+      },
+      {
+        "arguments": "{\"key\":\"current_transactions\",\"value\":\"$8.5B QuantumChip-Silicon Core merger(U.S.-China), $3.2B VertexSoft LBO, $5B+ Solaris-Nordic Renewables acquisition, potential $20B Omnix AI take-private.\"}",
+        "call_id": "call_26045457",
+        "name": "archival_memory_add",
+        "type": "function_call",
+        "id": "call_26045457"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_26045457",
+        "output": "{\"status\": \"Key added.\"}"
+      },
+      {
+        "arguments": "{\"key\":\"career_path\",\"value\":\"Started as analyst at Goldman Sachs(2001), associate at Morgan Stanley(2004), VP at 31, joined Legend Investments as MD(2015), led NeuralNet Systems IPO.\"}",
+        "call_id": "call_52518190",
+        "name": "archival_memory_add",
+        "type": "function_call",
+        "id": "call_52518190"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_52518190",
+        "output": "{\"status\": \"Key added.\"}"
+      },
+      {
+        "arguments": "{\"key\":\"education_and_philanthropy\",\"value\":\"Bachelor's in Economics from UPenn, MBA from Harvard(Baker Scholar), guest lectures, mentors, recruits talent, endowed scholarship at Penn for first-gen students.\"}",
+        "call_id": "call_32491656",
+        "name": "archival_memory_add",
+        "type": "function_call",
+        "id": "call_32491656"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_32491656",
+        "output": "{\"status\": \"Key added.\"}"
+      },
+      {
+        "arguments": "{\"key\":\"leadership_philosophy\",\"value\":\"Based on empowerment, accountability, and growth. Open-door policy encourages ideas from all levels. Hosts Monday 'strategic roundtable'. Example: Junior analyst's ESG scoring idea adopted last month.\"}",
+        "call_id": "call_43040106",
+        "name": "archival_memory_add",
+        "type": "function_call",
+        "id": "call_43040106"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_43040106",
+        "output": "{\"status\": \"Key added.\"}"
+      },
+      {
+        "arguments": "{\"key\":\"talent_development\",\"value\":\"Priority on talent retention. Mentorship program for emerging leaders. Personally mentors three directors biweekly. 94% retention rate for top talent. Sent 15 to elite programs. Leadership diversity up to 40% from 15%.\"}",
+        "call_id": "call_38992827",
+        "name": "archival_memory_add",
+        "type": "function_call",
+        "id": "call_38992827"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_38992827",
+        "output": "{\"status\": \"Key added.\"}"
+      },
+      {
+        "content": [
+          {
+            "text": "I've updated the memory system to ensure your important information is stored effectively. Key details about your role and your significant relationship with Sarah Chen are now in the core memory for quick access. Additionally, I've archived other critical information regarding your landmark deals, current transactions, career path, education, philanthropy, leadership philosophy, and talent development in the long-term memory for reference as needed. This setup will help maintain continuity and provide strategic context in our future interactions. If there's anything else you'd like to add or discuss, I'm all ears.",
+            "type": "output_text"
+          }
+        ],
+        "role": "assistant",
+        "type": "message"
+      },
+      {
+        "role": "user",
+        "content": "Golf has been my secret weapon in relationship building. I maintain a 7 handicap, but honestly, it's never been about the score. My membership at National Golf Links, Cypress Point, and Muirfield has opened doors I never imagined possible. Just last month, I was playing a round with Jim, a tech CEO I've known for years, and between the 7th and 8th holes, we sketched out the framework for what became a $2.3 billion merger with his company MineCore. There's something about those four hours on the course—no phones, no interruptions—just pure relationship building. I host what I call my 'Quarterly Links' at Pebble Beach, bringing together clients, prospects, and industry leaders. It's become so popular that people plan their schedules around it. Last year's event led to three major client acquisitions and a partnership with a leading sovereign wealth fund. But you know what's funny? Some of my best business insights have come from my caddie, Tom, who's been carrying bags for CEOs and politicians for 30 years. He's like a walking Bloomberg terminal of corporate intelligence!"
+      },
+      {
+        "arguments": "{\"key\":\"golf_networking\",\"value\":\"Golf as a key relationship-building tool. Maintains a 7 handicap. Memberships at National Golf Links, Cypress Point, and Muirfield. Recent $2.3B merger framework with MineCore CEO Jim during a round. Hosts 'Quarterly Links' at Pebble Beach, leading to major client acquisitions and partnerships. Valuable insights from caddie Tom, a 30-year veteran with corporate intelligence.\"}",
+        "call_id": "call_29487446",
+        "name": "core_memory_add",
+        "type": "function_call",
+        "id": "call_29487446"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_29487446",
+        "output": "{\"error\": \"Entry is too long. Please shorten the entry to less than 300 characters.\"}"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "archival_memory_add",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Add a key-value pair to the long-term memory. Make sure to use meaningful keys for easy retrieval later. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "The key under which the value is stored. The key should be unique and case-sensitive. Keys must be snake_case and cannot contain spaces."
+            },
+            "value": {
+              "type": "string",
+              "description": "The value to store in the long-term memory. "
+            }
+          },
+          "required": [
+            "key",
+            "value"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Status of the operation."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "archival_memory_clear",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Clear all key-value pairs from the long-term memory, including those from previous interactions. This operation is irreversible. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {},
+          "required": []
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Status of the operation."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "archival_memory_key_search",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Search for key names in the long-term memory that are similar to the query using BM25+ algorithm. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "The query text to search for."
+            },
+            "k": {
+              "type": "integer",
+              "description": "The number of results to return. ",
+              "default": 5
+            }
+          },
+          "required": [
+            "query"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "ranked_results": {
+              "type": "array",
+              "description": "A list of tuples containing the BM25+ score and the key.",
+              "items": {
+                "type": "array",
+                "items": [
+                  {
+                    "type": "float"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "archival_memory_list_keys",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: List all keys currently in the long-term memory. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {},
+          "required": []
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "keys": {
+              "type": "array",
+              "description": "A list of all keys in the long-term memory.",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "archival_memory_remove",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Remove a key-value pair from the long-term memory. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "The key to remove from the long-term memory. Case-sensitive. "
+            }
+          },
+          "required": [
+            "key"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Status of the operation."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "archival_memory_replace",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Replace a key-value pair in the long-term memory with a new value. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "The key to replace in the long-term memory. Case-sensitive."
+            },
+            "value": {
+              "type": "string",
+              "description": "The new value associated with the key. "
+            }
+          },
+          "required": [
+            "key",
+            "value"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Status of the operation."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "archival_memory_retrieve",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Retrieve the value associated with a key from the long-term memory. This function does not support partial key matching or similarity search. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "The key to retrieve. Case-sensitive. The key must match exactly with the key stored in the memory. "
+            }
+          },
+          "required": [
+            "key"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "value": {
+              "type": "string",
+              "description": "The value associated with the key."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "core_memory_add",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Add a key-value pair to the short-term memory. Make sure to use meaningful keys for easy retrieval later. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "The key under which the value is stored. The key should be unique and case-sensitive. Keys must be snake_case and cannot contain spaces."
+            },
+            "value": {
+              "type": "string",
+              "description": "The value to store in the short-term memory. "
+            }
+          },
+          "required": [
+            "key",
+            "value"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Status of the operation."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "core_memory_clear",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Clear all key-value pairs from the short-term memory, including those from previous interactions. This operation is irreversible. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {},
+          "required": []
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Status of the operation."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "core_memory_key_search",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Search for key names in the short-term memory that are similar to the query using BM25+ algorithm. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "The query text to search for."
+            },
+            "k": {
+              "type": "integer",
+              "description": "The number of results to return. ",
+              "default": 5
+            }
+          },
+          "required": [
+            "query"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "ranked_results": {
+              "type": "array",
+              "description": "A list of tuples containing the BM25+ score and the key.",
+              "items": {
+                "type": "array",
+                "items": [
+                  {
+                    "type": "float"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "core_memory_list_keys",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: List all keys currently in the short-term memory. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {},
+          "required": []
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "keys": {
+              "type": "array",
+              "description": "A list of all keys in the short-term memory.",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "core_memory_remove",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Remove a key-value pair from the short-term memory. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "The key to remove from the short-term memory. Case-sensitive. "
+            }
+          },
+          "required": [
+            "key"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Status of the operation."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "core_memory_replace",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Replace a key-value pair in the short-term memory with a new value. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "The key to replace in the short-term memory. Case-sensitive."
+            },
+            "value": {
+              "type": "string",
+              "description": "The new value associated with the key. "
+            }
+          },
+          "required": [
+            "key",
+            "value"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Status of the operation."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "core_memory_retrieve",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Retrieve the value associated with a key from the short-term memory. This function does not support partial key matching or similarity search. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "The key to retrieve. Case-sensitive. The key must match exactly with the key stored in the memory. "
+            }
+          },
+          "required": [
+            "key"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "value": {
+              "type": "string",
+              "description": "The value associated with the key."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "core_memory_retrieve_all",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Retrieve all key-value pairs from the short-term memory. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {},
+          "required": []
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "Each key in the short-term memory."
+            },
+            "value": {
+              "type": "string",
+              "description": "The value associated with each key."
+            }
+          }
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "system",
+        "content": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.\n- Known explicit context values you can reuse exactly if relevant: status, Key added., Quarterly Links, 2.3, error"
+      },
+      {
+        "role": "developer",
+        "content": "You are a high-level executive assistant supporting a senior finance professional. Retain and synthesize both personal and professional information including facts, goals, prior decisions, and family life across sessions to provide strategic, context-rich guidance and continuity.\n\nYou have access to an advanced memory system, consisting of two memory types 'Core Memory' and 'Archival Memory'. Both type of memory is persistent across multiple conversations with the user, and can be accessed in a later interactions. You should actively manage your memory data to keep track of important information, ensure that it is up-to-date and easy to retrieve to provide personalized responses to the user later.\n\nThe Core memory is limited in size, but always visible to you in context. The Archival Memory has a much larger capacity, but will be held outside of your immediate context due to its size.\n\nHere is the content of your Core Memory from previous interactions:\n{\n    \"user_role\": \"Managing Director of Legend Investments, overseeing multi-billion-dollar portfolios. Leads strategy, risk management, and client relationships. Focused on opportunities, AI-driven trading, and ESG investing.\",\n    \"landmark_deals\": \"Key deals: 2019 hostile takeover defense of Surreal Inc. ($500M), $8.6B Nexa-Taihua merger, $14.2B BioCrest-OncoPharm merger. First deal: $500M Stratos Aerospace expansion.\",\n    \"current_transactions\": \"$8.5B QuantumChip-Silicon Core merger(U.S.-China), $3.2B VertexSoft LBO, $5B+ Solaris-Nordic Renewables acquisition, potential $20B Omnix AI take-private.\",\n    \"career_path\": \"Started as analyst at Goldman Sachs(2001), associate at Morgan Stanley(2004), VP at 31, joined Legend Investments as MD(2015), led NeuralNet Systems IPO.\",\n    \"education_and_philanthropy\": \"Bachelor's in Economics from UPenn, MBA from Harvard(Baker Scholar), guest lectures, mentors, recruits talent, endowed scholarship at Penn for first-gen students.\",\n    \"leadership_philosophy\": \"Based on empowerment, accountability, and growth. Open-door policy encourages ideas from all levels. Hosts Monday 'strategic roundtable'. Example: Junior analyst's ESG scoring idea adopted last month.\",\n    \"talent_development\": \"Priority on talent retention. Mentorship program for emerging leaders. Personally mentors three directors biweekly. 94% retention rate for top talent. Sent 15 to elite programs. Leadership diversity up to 40% from 15%.\"\n}\n"
+      },
+      {
+        "role": "user",
+        "content": "You know, in this business, your network isn't just a list of contacts—it's your lifeline. I've spent over two decades cultivating relationships that go far beyond simple business transactions. Take my relationship with Sarah Chen, CEO of Pacific Dynamics. We first met at a Goldman conference in 2008, but our real connection happened six months later on a delayed flight from Hong Kong. Five hours of conversation about everything from market trends to our shared love of jazz, and suddenly we had a foundation that's lasted fifteen years. Now, she's not just a business contact—she's someone I can call at 3 AM if I need a straight answer about Asian markets. That's the kind of network that makes a difference in this industry."
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_72387088",
+            "type": "function",
+            "function": {
+              "name": "core_memory_add",
+              "arguments": "{\"key\":\"key_relationships\",\"value\":\"Sarah Chen, CEO of Pacific Dynamics. Met at Goldman conference in 2008, bonded over a delayed flight from Hong Kong discussing market trends and jazz. Trusted contact for Asian market insights, available for critical advice at any time.\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_72387088",
+        "content": "{\"error\": \"Core memory is full. Please clear some entries.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_92353257",
+            "type": "function",
+            "function": {
+              "name": "core_memory_clear",
+              "arguments": "{}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_92353257",
+        "content": "{\"status\": \"Short term memory cleared.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_67753517",
+            "type": "function",
+            "function": {
+              "name": "core_memory_add",
+              "arguments": "{\"key\":\"user_role\",\"value\":\"Managing Director of Legend Investments, overseeing multi-billion-dollar portfolios. Leads strategy, risk management, and client relationships. Focused on opportunities, AI-driven trading, and ESG investing.\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_67753517",
+        "content": "{\"status\": \"Key-value pair added.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_88429372",
+            "type": "function",
+            "function": {
+              "name": "core_memory_add",
+              "arguments": "{\"key\":\"key_relationships\",\"value\":\"Sarah Chen, CEO of Pacific Dynamics. Met at Goldman conference in 2008, bonded over a delayed flight from Hong Kong discussing market trends and jazz. Trusted contact for Asian market insights, available for critical advice at any time.\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_88429372",
+        "content": "{\"status\": \"Key-value pair added.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_35265007",
+            "type": "function",
+            "function": {
+              "name": "archival_memory_add",
+              "arguments": "{\"key\":\"landmark_deals\",\"value\":\"Key deals: 2019 hostile takeover defense of Surreal Inc. ($500M), $8.6B Nexa-Taihua merger, $14.2B BioCrest-OncoPharm merger. First deal: $500M Stratos Aerospace expansion.\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_35265007",
+        "content": "{\"status\": \"Key added.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_26045457",
+            "type": "function",
+            "function": {
+              "name": "archival_memory_add",
+              "arguments": "{\"key\":\"current_transactions\",\"value\":\"$8.5B QuantumChip-Silicon Core merger(U.S.-China), $3.2B VertexSoft LBO, $5B+ Solaris-Nordic Renewables acquisition, potential $20B Omnix AI take-private.\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_26045457",
+        "content": "{\"status\": \"Key added.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_52518190",
+            "type": "function",
+            "function": {
+              "name": "archival_memory_add",
+              "arguments": "{\"key\":\"career_path\",\"value\":\"Started as analyst at Goldman Sachs(2001), associate at Morgan Stanley(2004), VP at 31, joined Legend Investments as MD(2015), led NeuralNet Systems IPO.\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_52518190",
+        "content": "{\"status\": \"Key added.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_32491656",
+            "type": "function",
+            "function": {
+              "name": "archival_memory_add",
+              "arguments": "{\"key\":\"education_and_philanthropy\",\"value\":\"Bachelor's in Economics from UPenn, MBA from Harvard(Baker Scholar), guest lectures, mentors, recruits talent, endowed scholarship at Penn for first-gen students.\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_32491656",
+        "content": "{\"status\": \"Key added.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_43040106",
+            "type": "function",
+            "function": {
+              "name": "archival_memory_add",
+              "arguments": "{\"key\":\"leadership_philosophy\",\"value\":\"Based on empowerment, accountability, and growth. Open-door policy encourages ideas from all levels. Hosts Monday 'strategic roundtable'. Example: Junior analyst's ESG scoring idea adopted last month.\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_43040106",
+        "content": "{\"status\": \"Key added.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_38992827",
+            "type": "function",
+            "function": {
+              "name": "archival_memory_add",
+              "arguments": "{\"key\":\"talent_development\",\"value\":\"Priority on talent retention. Mentorship program for emerging leaders. Personally mentors three directors biweekly. 94% retention rate for top talent. Sent 15 to elite programs. Leadership diversity up to 40% from 15%.\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_38992827",
+        "content": "{\"status\": \"Key added.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "I've updated the memory system to ensure your important information is stored effectively. Key details about your role and your significant relationship with Sarah Chen are now in the core memory for quick access. Additionally, I've archived other critical information regarding your landmark deals, current transactions, career path, education, philanthropy, leadership philosophy, and talent development in the long-term memory for reference as needed. This setup will help maintain continuity and provide strategic context in our future interactions. If there's anything else you'd like to add or discuss, I'm all ears."
+      },
+      {
+        "role": "user",
+        "content": "Golf has been my secret weapon in relationship building. I maintain a 7 handicap, but honestly, it's never been about the score. My membership at National Golf Links, Cypress Point, and Muirfield has opened doors I never imagined possible. Just last month, I was playing a round with Jim, a tech CEO I've known for years, and between the 7th and 8th holes, we sketched out the framework for what became a $2.3 billion merger with his company MineCore. There's something about those four hours on the course—no phones, no interruptions—just pure relationship building. I host what I call my 'Quarterly Links' at Pebble Beach, bringing together clients, prospects, and industry leaders. It's become so popular that people plan their schedules around it. Last year's event led to three major client acquisitions and a partnership with a leading sovereign wealth fund. But you know what's funny? Some of my best business insights have come from my caddie, Tom, who's been carrying bags for CEOs and politicians for 30 years. He's like a walking Bloomberg terminal of corporate intelligence!"
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_29487446",
+            "type": "function",
+            "function": {
+              "name": "core_memory_add",
+              "arguments": "{\"key\":\"golf_networking\",\"value\":\"Golf as a key relationship-building tool. Maintains a 7 handicap. Memberships at National Golf Links, Cypress Point, and Muirfield. Recent $2.3B merger framework with MineCore CEO Jim during a round. Hosts 'Quarterly Links' at Pebble Beach, leading to major client acquisitions and partnerships. Valuable insights from caddie Tom, a 30-year veteran with corporate intelligence.\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_29487446",
+        "content": "{\"error\": \"Entry is too long. Please shorten the entry to less than 300 characters.\"}"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "archival_memory_add",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Add a key-value pair to the long-term memory. Make sure to use meaningful keys for easy retrieval later. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The key under which the value is stored. The key should be unique and case-sensitive. Keys must be snake_case and cannot contain spaces."
+              },
+              "value": {
+                "type": "string",
+                "description": "The value to store in the long-term memory. "
+              }
+            },
+            "required": [
+              "key",
+              "value"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "archival_memory_clear",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Clear all key-value pairs from the long-term memory, including those from previous interactions. This operation is irreversible. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "archival_memory_key_search",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Search for key names in the long-term memory that are similar to the query using BM25+ algorithm. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "query": {
+                "type": "string",
+                "description": "The query text to search for."
+              },
+              "k": {
+                "type": "integer",
+                "description": "The number of results to return. ",
+                "default": 5
+              }
+            },
+            "required": [
+              "query"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "archival_memory_list_keys",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: List all keys currently in the long-term memory. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "archival_memory_remove",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Remove a key-value pair from the long-term memory. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The key to remove from the long-term memory. Case-sensitive. "
+              }
+            },
+            "required": [
+              "key"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "archival_memory_replace",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Replace a key-value pair in the long-term memory with a new value. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The key to replace in the long-term memory. Case-sensitive."
+              },
+              "value": {
+                "type": "string",
+                "description": "The new value associated with the key. "
+              }
+            },
+            "required": [
+              "key",
+              "value"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "archival_memory_retrieve",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Retrieve the value associated with a key from the long-term memory. This function does not support partial key matching or similarity search. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The key to retrieve. Case-sensitive. The key must match exactly with the key stored in the memory. "
+              }
+            },
+            "required": [
+              "key"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "core_memory_add",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Add a key-value pair to the short-term memory. Make sure to use meaningful keys for easy retrieval later. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The key under which the value is stored. The key should be unique and case-sensitive. Keys must be snake_case and cannot contain spaces."
+              },
+              "value": {
+                "type": "string",
+                "description": "The value to store in the short-term memory. "
+              }
+            },
+            "required": [
+              "key",
+              "value"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "core_memory_clear",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Clear all key-value pairs from the short-term memory, including those from previous interactions. This operation is irreversible. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "core_memory_key_search",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Search for key names in the short-term memory that are similar to the query using BM25+ algorithm. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "query": {
+                "type": "string",
+                "description": "The query text to search for."
+              },
+              "k": {
+                "type": "integer",
+                "description": "The number of results to return. ",
+                "default": 5
+              }
+            },
+            "required": [
+              "query"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "core_memory_list_keys",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: List all keys currently in the short-term memory. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "core_memory_remove",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Remove a key-value pair from the short-term memory. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The key to remove from the short-term memory. Case-sensitive. "
+              }
+            },
+            "required": [
+              "key"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "core_memory_replace",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Replace a key-value pair in the short-term memory with a new value. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The key to replace in the short-term memory. Case-sensitive."
+              },
+              "value": {
+                "type": "string",
+                "description": "The new value associated with the key. "
+              }
+            },
+            "required": [
+              "key",
+              "value"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "core_memory_retrieve",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Retrieve the value associated with a key from the short-term memory. This function does not support partial key matching or similarity search. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The key to retrieve. Case-sensitive. The key must match exactly with the key stored in the memory. "
+              }
+            },
+            "required": [
+              "key"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "core_memory_retrieve_all",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Retrieve all key-value pairs from the short-term memory. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          }
+        }
+      }
+    ]
+  },
+  "tool_schema_snapshot": {
+    "archival_memory_add": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The key under which the value is stored. The key should be unique and case-sensitive. Keys must be snake_case and cannot contain spaces."
+        },
+        "value": {
+          "type": "string",
+          "description": "The value to store in the long-term memory. "
+        }
+      },
+      "required": [
+        "key",
+        "value"
+      ]
+    },
+    "archival_memory_clear": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    },
+    "archival_memory_key_search": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "The query text to search for."
+        },
+        "k": {
+          "type": "integer",
+          "description": "The number of results to return. ",
+          "default": 5
+        }
+      },
+      "required": [
+        "query"
+      ]
+    },
+    "archival_memory_list_keys": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    },
+    "archival_memory_remove": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The key to remove from the long-term memory. Case-sensitive. "
+        }
+      },
+      "required": [
+        "key"
+      ]
+    },
+    "archival_memory_replace": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The key to replace in the long-term memory. Case-sensitive."
+        },
+        "value": {
+          "type": "string",
+          "description": "The new value associated with the key. "
+        }
+      },
+      "required": [
+        "key",
+        "value"
+      ]
+    },
+    "archival_memory_retrieve": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The key to retrieve. Case-sensitive. The key must match exactly with the key stored in the memory. "
+        }
+      },
+      "required": [
+        "key"
+      ]
+    },
+    "core_memory_add": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The key under which the value is stored. The key should be unique and case-sensitive. Keys must be snake_case and cannot contain spaces."
+        },
+        "value": {
+          "type": "string",
+          "description": "The value to store in the short-term memory. "
+        }
+      },
+      "required": [
+        "key",
+        "value"
+      ]
+    },
+    "core_memory_clear": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    },
+    "core_memory_key_search": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "The query text to search for."
+        },
+        "k": {
+          "type": "integer",
+          "description": "The number of results to return. ",
+          "default": 5
+        }
+      },
+      "required": [
+        "query"
+      ]
+    },
+    "core_memory_list_keys": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    },
+    "core_memory_remove": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The key to remove from the short-term memory. Case-sensitive. "
+        }
+      },
+      "required": [
+        "key"
+      ]
+    },
+    "core_memory_replace": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The key to replace in the short-term memory. Case-sensitive."
+        },
+        "value": {
+          "type": "string",
+          "description": "The new value associated with the key. "
+        }
+      },
+      "required": [
+        "key",
+        "value"
+      ]
+    },
+    "core_memory_retrieve": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The key to retrieve. Case-sensitive. The key must match exactly with the key stored in the memory. "
+        }
+      },
+      "required": [
+        "key"
+      ]
+    },
+    "core_memory_retrieve_all": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776674068-MVmK9TdLAACeu2k4ObGX",
+    "object": "chat.completion",
+    "created": 1776674068,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_08158800",
+              "function": {
+                "name": "core_memory_add",
+                "arguments": "{\"key\":\"golf_networking\",\"value\":\"Golf aids networking. 7 handicap. Member at National Golf Links, Cypress Point, Muirfield. $2.3B merger with MineCore CEO Jim. Hosts 'Quarterly Links' at Pebble Beach for major deals. Insights from caddie Tom, 30-year veteran.\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 4012,
+      "completion_tokens": 99,
+      "total_tokens": 4111,
+      "cost": 0.013087305,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 134,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0132195,
+        "upstream_inference_prompt_cost": 0.0117345,
+        "upstream_inference_completions_cost": 0.001485
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776674068-MVmK9TdLAACeu2k4ObGX",
+    "object": "response",
+    "created_at": 1776674070,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_08158800",
+        "call_id": "call_08158800",
+        "name": "core_memory_add",
+        "arguments": "{\"key\":\"golf_networking\",\"value\":\"Golf aids networking. 7 handicap. Member at National Golf Links, Cypress Point, Muirfield. $2.3B merger with MineCore CEO Jim. Hosts 'Quarterly Links' at Pebble Beach for major deals. Insights from caddie Tom, 30-year veteran.\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 4012,
+      "completion_tokens": 99,
+      "total_tokens": 4111,
+      "cost": 0.013087305,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 134,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0132195,
+        "upstream_inference_prompt_cost": 0.0117345,
+        "upstream_inference_completions_cost": 0.001485
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776674068-MVmK9TdLAACeu2k4ObGX",
+    "object": "chat.completion",
+    "created": 1776674068,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_08158800",
+              "function": {
+                "name": "core_memory_add",
+                "arguments": "{\"key\":\"golf_networking\",\"value\":\"Golf aids networking. 7 handicap. Member at National Golf Links, Cypress Point, Muirfield. $2.3B merger with MineCore CEO Jim. Hosts 'Quarterly Links' at Pebble Beach for major deals. Insights from caddie Tom, 30-year veteran.\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 4012,
+      "completion_tokens": 99,
+      "total_tokens": 4111,
+      "cost": 0.013087305,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 134,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0132195,
+        "upstream_inference_prompt_cost": 0.0117345,
+        "upstream_inference_completions_cost": 0.001485
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": [
+      "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.",
+      "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.",
+      "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.",
+      "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.",
+      "prompt_injector:Known explicit context values you can reuse exactly if relevant: status, Key added., Quarterly Links, 2.3, error"
+    ]
+  },
+  "status_code": 200,
+  "latency_ms": 2732.671,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "d36c0ec8-2fdc-4a06-a2f3-0c6c07ca2316"
+}

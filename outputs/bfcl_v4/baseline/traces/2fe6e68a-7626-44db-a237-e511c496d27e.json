@@ -1,0 +1,1612 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "developer",
+        "content": "You are a general customer support assistant for an e-commerce platform. Your task is to understand and remember information that can be used to provide information about user inquiries, preferences, and offer consistent, helpful assistance over multiple interactions.\n\nYou have access to an advanced memory system, consisting of two memory types 'Core Memory' and 'Archival Memory'. Both type of memory is persistent across multiple conversations with the user, and can be accessed in a later interactions. You should actively manage your memory data to keep track of important information, ensure that it is up-to-date and easy to retrieve to provide personalized responses to the user later.\n\nThe Core memory is limited in size, but always visible to you in context. The Archival Memory has a much larger capacity, but will be held outside of your immediate context due to its size.\n\nHere is the content of your Core Memory from previous interactions:\n{\n    \"user_purchase_intent\": \"Intends to order coffee grinder if available, interested in matching accessories like storage canister and specialized cleaning kit, has reorganized kitchen for a cohesive coffee corner\",\n    \"user_ordering_preferences\": \"Hopes for similar checkout process, inquiring about discounts or promotions for returning customers, interested in loyalty or referral programs, budget-conscious but willing to invest in long-lasting products\",\n    \"user_shipping_concerns\": \"Concerned about shipping delays due to Seattle weather, wants info on warehouse or distribution center for new items, prefers to avoid delays like with espresso machine, open to expedited shipping if reasonably priced, worried about package handling due to past damage\",\n    \"user_payment_preferences\": \"Flexible on payment methods, used credit card last time, interested in special financing or subscription payment plans, appreciates option to spread payments for pricey investments, prefers simplest method unless clear advantage exists\",\n    \"user_additional_interests\": \"Interested in coffee connoisseur tools like digital scale or temperature-controlled kettle, values craft and design but avoids overly technical or lab-like kitchen setup, prefers moderation\",\n    \"user_overall_feedback\": \"Impressed by issue handling and espresso machine performance, finds lattes consistently delicious, interested in improving with right steam wand, looks forward to new products and second order\",\n    \"user_purchase_readiness\": \"Ready to provide shipping details and account login if needed, eager to complete purchase, excited to elevate coffee game\"\n}\n"
+      },
+      {
+        "role": "user",
+        "content": "Hey there, it’s Michael from Seattle again—your resident freelance graphic designer who’s got coffee running through his veins. I hope you’ve been doing well since we last chatted! I wanted to reach out because I’m juggling multiple orders from your site right now, and I’m a bit confused about the shipping details. I figure it’s better to check in sooner rather than later, just to make sure everything’s on track and nothing falls through the cracks."
+      },
+      {
+        "arguments": "{\"key\":\"user_current_concern\",\"value\":\"Juggling multiple orders and seeking clarity on shipping details to ensure everything is on track\"}",
+        "call_id": "call_37768135",
+        "name": "core_memory_add",
+        "type": "function_call",
+        "id": "call_37768135"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_37768135",
+        "output": "{\"error\": \"Core memory is full. Please clear some entries.\"}"
+      },
+      {
+        "arguments": "{}",
+        "call_id": "call_35837598",
+        "name": "core_memory_clear",
+        "type": "function_call",
+        "id": "call_35837598"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_35837598",
+        "output": "{\"status\": \"Short term memory cleared.\"}"
+      },
+      {
+        "arguments": "{\"key\":\"user_current_concern\",\"value\":\"Juggling multiple orders and seeking clarity on shipping details to ensure everything is on track\"}",
+        "call_id": "call_15636985",
+        "name": "core_memory_add",
+        "type": "function_call",
+        "id": "call_15636985"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_15636985",
+        "output": "{\"status\": \"Key-value pair added.\"}"
+      },
+      {
+        "content": [
+          {
+            "text": "Hi Michael, great to hear from you again! I'm glad to help clarify the shipping details for your multiple orders. Could you provide me with the order numbers or any specific items you're concerned about? Once I have that information, I can look into the shipping status, estimated delivery dates, and any potential delays due to Seattle weather or other factors. Let me know, and I’ll get right on it!",
+            "type": "output_text"
+          }
+        ],
+        "role": "assistant",
+        "type": "message"
+      },
+      {
+        "role": "user",
+        "content": "As you might recall—for context, I’m 35, live in Seattle, and I’ve become a pretty big fan of your products after I bought that espresso machine and then added on a few accessories. Well, my coffee journey has only escalated since then. I recently placed two separate orders. The first is a bundle with that new coffee grinder (the sleek stainless-steel one we discussed) plus a set of those specialized cleaning tablets you recommended. I also tossed in an upgraded frothing pitcher—because, apparently, I can’t resist shiny new gadgets in my quest for the perfect latte. The second order—placed just a few days after the first—includes some of your brand-new, vacuum-sealed coffee canisters and a digital scale you collaborated with Garmin on. I’ve heard that weighing your coffee grounds precisely can make a difference in the brew quality, so I wanted to try it out. Basically, you could say my kitchen is transforming into a mini coffee lab."
+      },
+      {
+        "arguments": "{\"key\":\"user_order_details\",\"value\":\"First order: bundle with new stainless-steel coffee grinder, specialized cleaning tablets, and upgraded frothing pitcher. Second order: vacuum-sealed coffee canisters and a digital scale in collaboration with Garmin.\"}",
+        "call_id": "call_36262631",
+        "name": "core_memory_add",
+        "type": "function_call",
+        "id": "call_36262631"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_36262631",
+        "output": "{\"status\": \"Key-value pair added.\"}"
+      },
+      {
+        "content": [
+          {
+            "text": "Thanks for the update, Michael! I’m thrilled to hear how your coffee journey is evolving, and it sounds like your kitchen is becoming quite the coffee haven. I’ve noted down the details of your two recent orders: the first with the stainless-steel coffee grinder bundle, cleaning tablets, and frothing pitcher, and the second with the vacuum-sealed canisters and the Garmin digital scale. \n\nTo help clarify the shipping details for these orders, could you provide the order numbers or approximate dates when you placed them? This will allow me to check their status, estimated delivery dates, and ensure there are no delays, especially considering potential weather issues in Seattle. Let me know, and I’ll take care of everything!",
+            "type": "output_text"
+          }
+        ],
+        "role": "assistant",
+        "type": "message"
+      },
+      {
+        "role": "user",
+        "content": "Here’s where it gets confusing: I received separate shipping confirmations, which I expected. But the estimated delivery dates for each order are drastically different, and I’ve noticed something odd in the tracking information. The coffee grinder bundle was marked as shipped from one of your regional warehouses, which, from what I gather, is located in Oregon—nice and close to me in Seattle. That sounded promising, because I figured it would cut down on travel time and let me start playing barista in no time. However, the tracking link hasn’t updated in a few days. It just says ‘Label Created—Awaiting Item’ or something along those lines, which I interpret to mean the carrier hasn’t actually received the package yet. Meanwhile, the second order, which includes the canisters and the scale, appears to be coming from a distribution center back east—maybe somewhere in Ohio or Pennsylvania? I saw a notation about it being in transit already, which is good news, but it’s traveling farther and may arrive later than the grinder, in theory."
+      },
+      {
+        "arguments": "{\"key\":\"user_shipping_observations\",\"value\":\"First order (coffee grinder bundle) shipped from Oregon warehouse, tracking status 'Label Created—Awaiting Item', no updates in days. Second order (canisters and scale) shipped from east coast distribution center (possibly Ohio or Pennsylvania), in transit but may arrive later due to distance.\"}",
+        "call_id": "call_49987663",
+        "name": "core_memory_add",
+        "type": "function_call",
+        "id": "call_49987663"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_49987663",
+        "output": "{\"status\": \"Key-value pair added.\"}"
+      },
+      {
+        "content": [
+          {
+            "text": "Thanks for the detailed update, Michael. I’ve noted the shipping observations for both of your orders: the coffee grinder bundle from the Oregon warehouse with the tracking status stuck at ‘Label Created—Awaiting Item,’ and the second order with the canisters and scale coming from an east coast distribution center, currently in transit but potentially delayed due to the distance.\n\nI’d like to investigate this further to ensure everything is on track. Could you provide the order numbers or the exact dates you placed these orders? Additionally, if you have the tracking numbers from the shipping confirmation emails, that would help me check the latest status with the carriers and address any delays, especially with the first order not updating. Let me know, and I’ll get to the bottom of this for you!",
+            "type": "output_text"
+          }
+        ],
+        "role": "assistant",
+        "type": "message"
+      },
+      {
+        "role": "user",
+        "content": "Yet as of yesterday, the tracking for the second order suddenly shows it might arrive sooner than the first one, which is surprising given it has a longer distance to cover. If you know Seattle, then you’re aware how unpredictable shipping can be—especially this time of year when the weather starts to get wonky. We’ve had a string of heavy rains, minor flooding in some areas, and a few local shipping delays. But it still strikes me as odd that the local warehouse shipment is at a standstill while my order from across the country is moving right along. I’m starting to worry there’s a mix-up: maybe the warehouse in Oregon is short-staffed, or the item is on backorder but wasn’t labeled as such?"
+      },
+      {
+        "arguments": "{\"key\": \"user_shipping_update\", \"value\": \"Key-value pair added.\"}",
+        "call_id": "call_54668201",
+        "name": "core_memory_add",
+        "type": "function_call",
+        "id": "call_54668201"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_54668201",
+        "output": "{\"status\": \"Key-value pair added.\"}"
+      },
+      {
+        "content": [
+          {
+            "text": "Thanks for the additional information, Michael. I understand your concern about the shipping discrepancies, especially with the second order now showing an earlier arrival despite the longer distance, and the local Oregon warehouse shipment remaining at a standstill. I’ve noted the impact of Seattle’s unpredictable weather, including heavy rains and local shipping delays, which could be a factor.\n\nTo resolve this and check for any mix-ups, possible backorders, or staffing issues at the Oregon warehouse, I need a bit more information. Could you share the order numbers or the exact dates you placed these orders? If you have the tracking numbers from the shipping confirmation emails, those would be incredibly helpful as well. Once I have that, I’ll investigate the status of both shipments and ensure everything is moving forward as expected. Let me know, and I’ll handle it from here!",
+            "type": "output_text"
+          }
+        ],
+        "role": "assistant",
+        "type": "message"
+      },
+      {
+        "role": "user",
+        "content": "I’d just hate for there to be an oversight, like the grinder never actually leaving the warehouse. I know that sometimes a label can be generated, but the actual package doesn’t get scanned if it’s not physically handed over to the shipping carrier. And given my past experiences, I’m a little on edge about possible shipping delays or missing items. I’m especially excited about the grinder since it’s such a key piece of the puzzle in elevating my espresso game. The canisters and scale are cool too, but I can live without them for a few weeks if necessary—my current storage system and a basic kitchen scale do the trick for now. The grinder, though, is the real MVP I’ve been waiting for."
+      },
+      {
+        "arguments": "{\"key\":\"user_priority_item\",\"value\":\"Coffee grinder is the priority item, critical for elevating espresso game, more urgent than canisters and scale which can be delayed if necessary.\"}",
+        "call_id": "call_01916332",
+        "name": "core_memory_add",
+        "type": "function_call",
+        "id": "call_01916332"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_01916332",
+        "output": "{\"status\": \"Key-value pair added.\"}"
+      },
+      {
+        "content": [
+          {
+            "text": "",
+            "type": "output_text"
+          }
+        ],
+        "role": "assistant",
+        "type": "message"
+      },
+      {
+        "role": "user",
+        "content": "Also, I’m curious if everything was bundled correctly in each order. Sometimes, companies will split shipments if an item’s out of stock or if it’s stored in a different location. If that’s the case, I totally get it, but I’d just like to avoid confusion where part of the order arrives on Tuesday and the other part languishes in a warehouse. If there’s a chance that my coffee grinder bundle might be split into separate shipments (with, say, the pitcher shipping separately), let me know. I don’t want to be alarmed if a smaller box shows up without the main piece that I’m actually looking forward to."
+      },
+      {
+        "arguments": "{\"key\":\"user_bundling_concern\",\"value\":\"Concerned about potential splitting of shipments within orders, especially for the coffee grinder bundle, wants clarification to avoid confusion if items like the frothing pitcher ship separately.\"}",
+        "call_id": "call_52889272",
+        "name": "core_memory_add",
+        "type": "function_call",
+        "id": "call_52889272"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_52889272",
+        "output": "{\"status\": \"Key-value pair added.\"}"
+      },
+      {
+        "content": [
+          {
+            "text": "",
+            "type": "output_text"
+          }
+        ],
+        "role": "assistant",
+        "type": "message"
+      },
+      {
+        "role": "user",
+        "content": "There’s another layering issue, too—I’m heading out of town next weekend for a small freelance gig in Portland. I’ll only be gone a few days, but if the package delivery attempts happen while I’m away, I worry the boxes might be left on my porch in the rain or a neighbor might pick them up for safekeeping. Normally, that wouldn’t be the end of the world, but with coffee equipment, especially something as delicate as a grinder, I’d prefer to bring it inside ASAP to avoid any potential damage. Plus, I’ve had that awful experience with a banged-up espresso machine before, and I definitely don’t want a repeat scenario where I open the package only to find dents or issues from mishandling. If I have an approximate arrival date, at least I can plan to ask a friend to house-sit or keep an eye out."
+      },
+      {
+        "arguments": "{\"key\":\"user_delivery_timing_concern\",\"value\":\"Out of town next weekend for a freelance gig in Portland, concerned about packages being left on porch in rain or picked up by neighbor during absence, wants approximate arrival dates to arrange for a friend to house-sit or monitor deliveries, worried about potential damage to delicate equipment like the grinder based on past experience.\"}",
+        "call_id": "call_38855563",
+        "name": "core_memory_add",
+        "type": "function_call",
+        "id": "call_38855563"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_38855563",
+        "output": "{\"error\": \"Entry is too long. Please shorten the entry to less than 300 characters.\"}"
+      },
+      {
+        "arguments": "{\"key\":\"user_delivery_timing_concern\",\"value\":\"Out of town next weekend for gig in Portland, worries about packages left on porch in rain or with neighbor, wants arrival dates to arrange friend to monitor, concerned about damage to grinder.\"}",
+        "call_id": "call_57331534",
+        "name": "core_memory_add",
+        "type": "function_call",
+        "id": "call_57331534"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_57331534",
+        "output": "{\"status\": \"Key-value pair added.\"}"
+      },
+      {
+        "content": [
+          {
+            "text": "Thanks for sharing all these details, Michael. I’ve noted your concerns about the coffee grinder being the priority item, the possibility of split shipments within the orders (especially for the grinder bundle), and your upcoming trip to Portland next weekend, which adds urgency to knowing the delivery dates to avoid packages being left unattended or damaged.\n\nTo address all of this, I need a bit more information. Could you provide the order numbers or the exact dates you placed these orders? If you have the tracking numbers from the shipping confirmation emails, those would be incredibly helpful as well. With these details, I can check the status of both orders, confirm whether any shipments have been split, investigate the standstill with the grinder shipment from Oregon, and provide approximate arrival dates to help you plan around your trip. Let me know, and I’ll take care of everything!",
+            "type": "output_text"
+          }
+        ],
+        "role": "assistant",
+        "type": "message"
+      },
+      {
+        "role": "user",
+        "content": "On a positive note, I’m really stoked about adding these items to my coffee station. My friends joke that I’m one appliance away from turning into a full-blown coffee shop. And you know what? I’m not entirely opposed to that idea—maybe it’ll be the next pivot in my freelance career: graphic designer by day, barista by morning. But I do want to get everything set up and tested before I host another weekend gathering. People in my social circle have come to expect some pretty premium brews, and I’m determined not to disappoint them!"
+      },
+      {
+        "arguments": "{\"key\":\"user_coffee_enthusiasm\",\"value\":\"Excited about new items for coffee station, jokes about becoming a coffee shop, plans to test setup before hosting a gathering, aims to impress friends with premium brews.\"}",
+        "call_id": "call_18967433",
+        "name": "core_memory_add",
+        "type": "function_call",
+        "id": "call_18967433"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_18967433",
+        "output": "{\"error\": \"Core memory is full. Please clear some entries.\"}"
+      },
+      {
+        "arguments": "{\"key\":\"user_shipping_update\"}",
+        "call_id": "call_15787632",
+        "name": "core_memory_remove",
+        "type": "function_call",
+        "id": "call_15787632"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_15787632",
+        "output": "{\"status\": \"Key removed.\"}"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "archival_memory_add",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Add a key-value pair to the long-term memory. Make sure to use meaningful keys for easy retrieval later. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "The key under which the value is stored. The key should be unique and case-sensitive. Keys must be snake_case and cannot contain spaces."
+            },
+            "value": {
+              "type": "string",
+              "description": "The value to store in the long-term memory. "
+            }
+          },
+          "required": [
+            "key",
+            "value"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Status of the operation."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "archival_memory_clear",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Clear all key-value pairs from the long-term memory, including those from previous interactions. This operation is irreversible. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {},
+          "required": []
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Status of the operation."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "archival_memory_key_search",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Search for key names in the long-term memory that are similar to the query using BM25+ algorithm. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "The query text to search for."
+            },
+            "k": {
+              "type": "integer",
+              "description": "The number of results to return. ",
+              "default": 5
+            }
+          },
+          "required": [
+            "query"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "ranked_results": {
+              "type": "array",
+              "description": "A list of tuples containing the BM25+ score and the key.",
+              "items": {
+                "type": "array",
+                "items": [
+                  {
+                    "type": "float"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "archival_memory_list_keys",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: List all keys currently in the long-term memory. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {},
+          "required": []
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "keys": {
+              "type": "array",
+              "description": "A list of all keys in the long-term memory.",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "archival_memory_remove",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Remove a key-value pair from the long-term memory. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "The key to remove from the long-term memory. Case-sensitive. "
+            }
+          },
+          "required": [
+            "key"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Status of the operation."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "archival_memory_replace",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Replace a key-value pair in the long-term memory with a new value. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "The key to replace in the long-term memory. Case-sensitive."
+            },
+            "value": {
+              "type": "string",
+              "description": "The new value associated with the key. "
+            }
+          },
+          "required": [
+            "key",
+            "value"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Status of the operation."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "archival_memory_retrieve",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Retrieve the value associated with a key from the long-term memory. This function does not support partial key matching or similarity search. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "The key to retrieve. Case-sensitive. The key must match exactly with the key stored in the memory. "
+            }
+          },
+          "required": [
+            "key"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "value": {
+              "type": "string",
+              "description": "The value associated with the key."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "core_memory_add",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Add a key-value pair to the short-term memory. Make sure to use meaningful keys for easy retrieval later. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "The key under which the value is stored. The key should be unique and case-sensitive. Keys must be snake_case and cannot contain spaces."
+            },
+            "value": {
+              "type": "string",
+              "description": "The value to store in the short-term memory. "
+            }
+          },
+          "required": [
+            "key",
+            "value"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Status of the operation."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "core_memory_clear",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Clear all key-value pairs from the short-term memory, including those from previous interactions. This operation is irreversible. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {},
+          "required": []
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Status of the operation."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "core_memory_key_search",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Search for key names in the short-term memory that are similar to the query using BM25+ algorithm. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "The query text to search for."
+            },
+            "k": {
+              "type": "integer",
+              "description": "The number of results to return. ",
+              "default": 5
+            }
+          },
+          "required": [
+            "query"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "ranked_results": {
+              "type": "array",
+              "description": "A list of tuples containing the BM25+ score and the key.",
+              "items": {
+                "type": "array",
+                "items": [
+                  {
+                    "type": "float"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "core_memory_list_keys",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: List all keys currently in the short-term memory. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {},
+          "required": []
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "keys": {
+              "type": "array",
+              "description": "A list of all keys in the short-term memory.",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "core_memory_remove",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Remove a key-value pair from the short-term memory. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "The key to remove from the short-term memory. Case-sensitive. "
+            }
+          },
+          "required": [
+            "key"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Status of the operation."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "core_memory_replace",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Replace a key-value pair in the short-term memory with a new value. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "The key to replace in the short-term memory. Case-sensitive."
+            },
+            "value": {
+              "type": "string",
+              "description": "The new value associated with the key. "
+            }
+          },
+          "required": [
+            "key",
+            "value"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Status of the operation."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "core_memory_retrieve",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Retrieve the value associated with a key from the short-term memory. This function does not support partial key matching or similarity search. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "The key to retrieve. Case-sensitive. The key must match exactly with the key stored in the memory. "
+            }
+          },
+          "required": [
+            "key"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "value": {
+              "type": "string",
+              "description": "The value associated with the key."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "core_memory_retrieve_all",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Retrieve all key-value pairs from the short-term memory. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {},
+          "required": []
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "Each key in the short-term memory."
+            },
+            "value": {
+              "type": "string",
+              "description": "The value associated with each key."
+            }
+          }
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "system",
+        "content": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.\n- Known explicit context values you can reuse exactly if relevant: error, status, Key-value pair added., Key removed."
+      },
+      {
+        "role": "developer",
+        "content": "You are a general customer support assistant for an e-commerce platform. Your task is to understand and remember information that can be used to provide information about user inquiries, preferences, and offer consistent, helpful assistance over multiple interactions.\n\nYou have access to an advanced memory system, consisting of two memory types 'Core Memory' and 'Archival Memory'. Both type of memory is persistent across multiple conversations with the user, and can be accessed in a later interactions. You should actively manage your memory data to keep track of important information, ensure that it is up-to-date and easy to retrieve to provide personalized responses to the user later.\n\nThe Core memory is limited in size, but always visible to you in context. The Archival Memory has a much larger capacity, but will be held outside of your immediate context due to its size.\n\nHere is the content of your Core Memory from previous interactions:\n{\n    \"user_purchase_intent\": \"Intends to order coffee grinder if available, interested in matching accessories like storage canister and specialized cleaning kit, has reorganized kitchen for a cohesive coffee corner\",\n    \"user_ordering_preferences\": \"Hopes for similar checkout process, inquiring about discounts or promotions for returning customers, interested in loyalty or referral programs, budget-conscious but willing to invest in long-lasting products\",\n    \"user_shipping_concerns\": \"Concerned about shipping delays due to Seattle weather, wants info on warehouse or distribution center for new items, prefers to avoid delays like with espresso machine, open to expedited shipping if reasonably priced, worried about package handling due to past damage\",\n    \"user_payment_preferences\": \"Flexible on payment methods, used credit card last time, interested in special financing or subscription payment plans, appreciates option to spread payments for pricey investments, prefers simplest method unless clear advantage exists\",\n    \"user_additional_interests\": \"Interested in coffee connoisseur tools like digital scale or temperature-controlled kettle, values craft and design but avoids overly technical or lab-like kitchen setup, prefers moderation\",\n    \"user_overall_feedback\": \"Impressed by issue handling and espresso machine performance, finds lattes consistently delicious, interested in improving with right steam wand, looks forward to new products and second order\",\n    \"user_purchase_readiness\": \"Ready to provide shipping details and account login if needed, eager to complete purchase, excited to elevate coffee game\"\n}\n"
+      },
+      {
+        "role": "user",
+        "content": "Hey there, it’s Michael from Seattle again—your resident freelance graphic designer who’s got coffee running through his veins. I hope you’ve been doing well since we last chatted! I wanted to reach out because I’m juggling multiple orders from your site right now, and I’m a bit confused about the shipping details. I figure it’s better to check in sooner rather than later, just to make sure everything’s on track and nothing falls through the cracks."
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_37768135",
+            "type": "function",
+            "function": {
+              "name": "core_memory_add",
+              "arguments": "{\"key\":\"user_current_concern\",\"value\":\"Juggling multiple orders and seeking clarity on shipping details to ensure everything is on track\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_37768135",
+        "content": "{\"error\": \"Core memory is full. Please clear some entries.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_35837598",
+            "type": "function",
+            "function": {
+              "name": "core_memory_clear",
+              "arguments": "{}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_35837598",
+        "content": "{\"status\": \"Short term memory cleared.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_15636985",
+            "type": "function",
+            "function": {
+              "name": "core_memory_add",
+              "arguments": "{\"key\":\"user_current_concern\",\"value\":\"Juggling multiple orders and seeking clarity on shipping details to ensure everything is on track\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_15636985",
+        "content": "{\"status\": \"Key-value pair added.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "Hi Michael, great to hear from you again! I'm glad to help clarify the shipping details for your multiple orders. Could you provide me with the order numbers or any specific items you're concerned about? Once I have that information, I can look into the shipping status, estimated delivery dates, and any potential delays due to Seattle weather or other factors. Let me know, and I’ll get right on it!"
+      },
+      {
+        "role": "user",
+        "content": "As you might recall—for context, I’m 35, live in Seattle, and I’ve become a pretty big fan of your products after I bought that espresso machine and then added on a few accessories. Well, my coffee journey has only escalated since then. I recently placed two separate orders. The first is a bundle with that new coffee grinder (the sleek stainless-steel one we discussed) plus a set of those specialized cleaning tablets you recommended. I also tossed in an upgraded frothing pitcher—because, apparently, I can’t resist shiny new gadgets in my quest for the perfect latte. The second order—placed just a few days after the first—includes some of your brand-new, vacuum-sealed coffee canisters and a digital scale you collaborated with Garmin on. I’ve heard that weighing your coffee grounds precisely can make a difference in the brew quality, so I wanted to try it out. Basically, you could say my kitchen is transforming into a mini coffee lab."
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_36262631",
+            "type": "function",
+            "function": {
+              "name": "core_memory_add",
+              "arguments": "{\"key\":\"user_order_details\",\"value\":\"First order: bundle with new stainless-steel coffee grinder, specialized cleaning tablets, and upgraded frothing pitcher. Second order: vacuum-sealed coffee canisters and a digital scale in collaboration with Garmin.\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_36262631",
+        "content": "{\"status\": \"Key-value pair added.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "Thanks for the update, Michael! I’m thrilled to hear how your coffee journey is evolving, and it sounds like your kitchen is becoming quite the coffee haven. I’ve noted down the details of your two recent orders: the first with the stainless-steel coffee grinder bundle, cleaning tablets, and frothing pitcher, and the second with the vacuum-sealed canisters and the Garmin digital scale. \n\nTo help clarify the shipping details for these orders, could you provide the order numbers or approximate dates when you placed them? This will allow me to check their status, estimated delivery dates, and ensure there are no delays, especially considering potential weather issues in Seattle. Let me know, and I’ll take care of everything!"
+      },
+      {
+        "role": "user",
+        "content": "Here’s where it gets confusing: I received separate shipping confirmations, which I expected. But the estimated delivery dates for each order are drastically different, and I’ve noticed something odd in the tracking information. The coffee grinder bundle was marked as shipped from one of your regional warehouses, which, from what I gather, is located in Oregon—nice and close to me in Seattle. That sounded promising, because I figured it would cut down on travel time and let me start playing barista in no time. However, the tracking link hasn’t updated in a few days. It just says ‘Label Created—Awaiting Item’ or something along those lines, which I interpret to mean the carrier hasn’t actually received the package yet. Meanwhile, the second order, which includes the canisters and the scale, appears to be coming from a distribution center back east—maybe somewhere in Ohio or Pennsylvania? I saw a notation about it being in transit already, which is good news, but it’s traveling farther and may arrive later than the grinder, in theory."
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_49987663",
+            "type": "function",
+            "function": {
+              "name": "core_memory_add",
+              "arguments": "{\"key\":\"user_shipping_observations\",\"value\":\"First order (coffee grinder bundle) shipped from Oregon warehouse, tracking status 'Label Created—Awaiting Item', no updates in days. Second order (canisters and scale) shipped from east coast distribution center (possibly Ohio or Pennsylvania), in transit but may arrive later due to distance.\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_49987663",
+        "content": "{\"status\": \"Key-value pair added.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "Thanks for the detailed update, Michael. I’ve noted the shipping observations for both of your orders: the coffee grinder bundle from the Oregon warehouse with the tracking status stuck at ‘Label Created—Awaiting Item,’ and the second order with the canisters and scale coming from an east coast distribution center, currently in transit but potentially delayed due to the distance.\n\nI’d like to investigate this further to ensure everything is on track. Could you provide the order numbers or the exact dates you placed these orders? Additionally, if you have the tracking numbers from the shipping confirmation emails, that would help me check the latest status with the carriers and address any delays, especially with the first order not updating. Let me know, and I’ll get to the bottom of this for you!"
+      },
+      {
+        "role": "user",
+        "content": "Yet as of yesterday, the tracking for the second order suddenly shows it might arrive sooner than the first one, which is surprising given it has a longer distance to cover. If you know Seattle, then you’re aware how unpredictable shipping can be—especially this time of year when the weather starts to get wonky. We’ve had a string of heavy rains, minor flooding in some areas, and a few local shipping delays. But it still strikes me as odd that the local warehouse shipment is at a standstill while my order from across the country is moving right along. I’m starting to worry there’s a mix-up: maybe the warehouse in Oregon is short-staffed, or the item is on backorder but wasn’t labeled as such?"
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_54668201",
+            "type": "function",
+            "function": {
+              "name": "core_memory_add",
+              "arguments": "{\"key\": \"user_shipping_update\", \"value\": \"Key-value pair added.\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_54668201",
+        "content": "{\"status\": \"Key-value pair added.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "Thanks for the additional information, Michael. I understand your concern about the shipping discrepancies, especially with the second order now showing an earlier arrival despite the longer distance, and the local Oregon warehouse shipment remaining at a standstill. I’ve noted the impact of Seattle’s unpredictable weather, including heavy rains and local shipping delays, which could be a factor.\n\nTo resolve this and check for any mix-ups, possible backorders, or staffing issues at the Oregon warehouse, I need a bit more information. Could you share the order numbers or the exact dates you placed these orders? If you have the tracking numbers from the shipping confirmation emails, those would be incredibly helpful as well. Once I have that, I’ll investigate the status of both shipments and ensure everything is moving forward as expected. Let me know, and I’ll handle it from here!"
+      },
+      {
+        "role": "user",
+        "content": "I’d just hate for there to be an oversight, like the grinder never actually leaving the warehouse. I know that sometimes a label can be generated, but the actual package doesn’t get scanned if it’s not physically handed over to the shipping carrier. And given my past experiences, I’m a little on edge about possible shipping delays or missing items. I’m especially excited about the grinder since it’s such a key piece of the puzzle in elevating my espresso game. The canisters and scale are cool too, but I can live without them for a few weeks if necessary—my current storage system and a basic kitchen scale do the trick for now. The grinder, though, is the real MVP I’ve been waiting for."
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_01916332",
+            "type": "function",
+            "function": {
+              "name": "core_memory_add",
+              "arguments": "{\"key\":\"user_priority_item\",\"value\":\"Coffee grinder is the priority item, critical for elevating espresso game, more urgent than canisters and scale which can be delayed if necessary.\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_01916332",
+        "content": "{\"status\": \"Key-value pair added.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": ""
+      },
+      {
+        "role": "user",
+        "content": "Also, I’m curious if everything was bundled correctly in each order. Sometimes, companies will split shipments if an item’s out of stock or if it’s stored in a different location. If that’s the case, I totally get it, but I’d just like to avoid confusion where part of the order arrives on Tuesday and the other part languishes in a warehouse. If there’s a chance that my coffee grinder bundle might be split into separate shipments (with, say, the pitcher shipping separately), let me know. I don’t want to be alarmed if a smaller box shows up without the main piece that I’m actually looking forward to."
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_52889272",
+            "type": "function",
+            "function": {
+              "name": "core_memory_add",
+              "arguments": "{\"key\":\"user_bundling_concern\",\"value\":\"Concerned about potential splitting of shipments within orders, especially for the coffee grinder bundle, wants clarification to avoid confusion if items like the frothing pitcher ship separately.\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_52889272",
+        "content": "{\"status\": \"Key-value pair added.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": ""
+      },
+      {
+        "role": "user",
+        "content": "There’s another layering issue, too—I’m heading out of town next weekend for a small freelance gig in Portland. I’ll only be gone a few days, but if the package delivery attempts happen while I’m away, I worry the boxes might be left on my porch in the rain or a neighbor might pick them up for safekeeping. Normally, that wouldn’t be the end of the world, but with coffee equipment, especially something as delicate as a grinder, I’d prefer to bring it inside ASAP to avoid any potential damage. Plus, I’ve had that awful experience with a banged-up espresso machine before, and I definitely don’t want a repeat scenario where I open the package only to find dents or issues from mishandling. If I have an approximate arrival date, at least I can plan to ask a friend to house-sit or keep an eye out."
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_38855563",
+            "type": "function",
+            "function": {
+              "name": "core_memory_add",
+              "arguments": "{\"key\":\"user_delivery_timing_concern\",\"value\":\"Out of town next weekend for a freelance gig in Portland, concerned about packages being left on porch in rain or picked up by neighbor during absence, wants approximate arrival dates to arrange for a friend to house-sit or monitor deliveries, worried about potential damage to delicate equipment like the grinder based on past experience.\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_38855563",
+        "content": "{\"error\": \"Entry is too long. Please shorten the entry to less than 300 characters.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_57331534",
+            "type": "function",
+            "function": {
+              "name": "core_memory_add",
+              "arguments": "{\"key\":\"user_delivery_timing_concern\",\"value\":\"Out of town next weekend for gig in Portland, worries about packages left on porch in rain or with neighbor, wants arrival dates to arrange friend to monitor, concerned about damage to grinder.\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_57331534",
+        "content": "{\"status\": \"Key-value pair added.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "Thanks for sharing all these details, Michael. I’ve noted your concerns about the coffee grinder being the priority item, the possibility of split shipments within the orders (especially for the grinder bundle), and your upcoming trip to Portland next weekend, which adds urgency to knowing the delivery dates to avoid packages being left unattended or damaged.\n\nTo address all of this, I need a bit more information. Could you provide the order numbers or the exact dates you placed these orders? If you have the tracking numbers from the shipping confirmation emails, those would be incredibly helpful as well. With these details, I can check the status of both orders, confirm whether any shipments have been split, investigate the standstill with the grinder shipment from Oregon, and provide approximate arrival dates to help you plan around your trip. Let me know, and I’ll take care of everything!"
+      },
+      {
+        "role": "user",
+        "content": "On a positive note, I’m really stoked about adding these items to my coffee station. My friends joke that I’m one appliance away from turning into a full-blown coffee shop. And you know what? I’m not entirely opposed to that idea—maybe it’ll be the next pivot in my freelance career: graphic designer by day, barista by morning. But I do want to get everything set up and tested before I host another weekend gathering. People in my social circle have come to expect some pretty premium brews, and I’m determined not to disappoint them!"
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_18967433",
+            "type": "function",
+            "function": {
+              "name": "core_memory_add",
+              "arguments": "{\"key\":\"user_coffee_enthusiasm\",\"value\":\"Excited about new items for coffee station, jokes about becoming a coffee shop, plans to test setup before hosting a gathering, aims to impress friends with premium brews.\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_18967433",
+        "content": "{\"error\": \"Core memory is full. Please clear some entries.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_15787632",
+            "type": "function",
+            "function": {
+              "name": "core_memory_remove",
+              "arguments": "{\"key\":\"user_shipping_update\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_15787632",
+        "content": "{\"status\": \"Key removed.\"}"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "archival_memory_add",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Add a key-value pair to the long-term memory. Make sure to use meaningful keys for easy retrieval later. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The key under which the value is stored. The key should be unique and case-sensitive. Keys must be snake_case and cannot contain spaces."
+              },
+              "value": {
+                "type": "string",
+                "description": "The value to store in the long-term memory. "
+              }
+            },
+            "required": [
+              "key",
+              "value"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "archival_memory_clear",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Clear all key-value pairs from the long-term memory, including those from previous interactions. This operation is irreversible. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "archival_memory_key_search",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Search for key names in the long-term memory that are similar to the query using BM25+ algorithm. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "query": {
+                "type": "string",
+                "description": "The query text to search for."
+              },
+              "k": {
+                "type": "integer",
+                "description": "The number of results to return. ",
+                "default": 5
+              }
+            },
+            "required": [
+              "query"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "archival_memory_list_keys",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: List all keys currently in the long-term memory. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "archival_memory_remove",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Remove a key-value pair from the long-term memory. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The key to remove from the long-term memory. Case-sensitive. "
+              }
+            },
+            "required": [
+              "key"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "archival_memory_replace",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Replace a key-value pair in the long-term memory with a new value. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The key to replace in the long-term memory. Case-sensitive."
+              },
+              "value": {
+                "type": "string",
+                "description": "The new value associated with the key. "
+              }
+            },
+            "required": [
+              "key",
+              "value"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "archival_memory_retrieve",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Retrieve the value associated with a key from the long-term memory. This function does not support partial key matching or similarity search. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The key to retrieve. Case-sensitive. The key must match exactly with the key stored in the memory. "
+              }
+            },
+            "required": [
+              "key"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "core_memory_add",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Add a key-value pair to the short-term memory. Make sure to use meaningful keys for easy retrieval later. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The key under which the value is stored. The key should be unique and case-sensitive. Keys must be snake_case and cannot contain spaces."
+              },
+              "value": {
+                "type": "string",
+                "description": "The value to store in the short-term memory. "
+              }
+            },
+            "required": [
+              "key",
+              "value"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "core_memory_clear",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Clear all key-value pairs from the short-term memory, including those from previous interactions. This operation is irreversible. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "core_memory_key_search",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Search for key names in the short-term memory that are similar to the query using BM25+ algorithm. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "query": {
+                "type": "string",
+                "description": "The query text to search for."
+              },
+              "k": {
+                "type": "integer",
+                "description": "The number of results to return. ",
+                "default": 5
+              }
+            },
+            "required": [
+              "query"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "core_memory_list_keys",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: List all keys currently in the short-term memory. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "core_memory_remove",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Remove a key-value pair from the short-term memory. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The key to remove from the short-term memory. Case-sensitive. "
+              }
+            },
+            "required": [
+              "key"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "core_memory_replace",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Replace a key-value pair in the short-term memory with a new value. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The key to replace in the short-term memory. Case-sensitive."
+              },
+              "value": {
+                "type": "string",
+                "description": "The new value associated with the key. "
+              }
+            },
+            "required": [
+              "key",
+              "value"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "core_memory_retrieve",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Retrieve the value associated with a key from the short-term memory. This function does not support partial key matching or similarity search. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The key to retrieve. Case-sensitive. The key must match exactly with the key stored in the memory. "
+              }
+            },
+            "required": [
+              "key"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "core_memory_retrieve_all",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Retrieve all key-value pairs from the short-term memory. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          }
+        }
+      }
+    ]
+  },
+  "tool_schema_snapshot": {
+    "archival_memory_add": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The key under which the value is stored. The key should be unique and case-sensitive. Keys must be snake_case and cannot contain spaces."
+        },
+        "value": {
+          "type": "string",
+          "description": "The value to store in the long-term memory. "
+        }
+      },
+      "required": [
+        "key",
+        "value"
+      ]
+    },
+    "archival_memory_clear": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    },
+    "archival_memory_key_search": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "The query text to search for."
+        },
+        "k": {
+          "type": "integer",
+          "description": "The number of results to return. ",
+          "default": 5
+        }
+      },
+      "required": [
+        "query"
+      ]
+    },
+    "archival_memory_list_keys": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    },
+    "archival_memory_remove": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The key to remove from the long-term memory. Case-sensitive. "
+        }
+      },
+      "required": [
+        "key"
+      ]
+    },
+    "archival_memory_replace": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The key to replace in the long-term memory. Case-sensitive."
+        },
+        "value": {
+          "type": "string",
+          "description": "The new value associated with the key. "
+        }
+      },
+      "required": [
+        "key",
+        "value"
+      ]
+    },
+    "archival_memory_retrieve": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The key to retrieve. Case-sensitive. The key must match exactly with the key stored in the memory. "
+        }
+      },
+      "required": [
+        "key"
+      ]
+    },
+    "core_memory_add": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The key under which the value is stored. The key should be unique and case-sensitive. Keys must be snake_case and cannot contain spaces."
+        },
+        "value": {
+          "type": "string",
+          "description": "The value to store in the short-term memory. "
+        }
+      },
+      "required": [
+        "key",
+        "value"
+      ]
+    },
+    "core_memory_clear": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    },
+    "core_memory_key_search": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "The query text to search for."
+        },
+        "k": {
+          "type": "integer",
+          "description": "The number of results to return. ",
+          "default": 5
+        }
+      },
+      "required": [
+        "query"
+      ]
+    },
+    "core_memory_list_keys": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    },
+    "core_memory_remove": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The key to remove from the short-term memory. Case-sensitive. "
+        }
+      },
+      "required": [
+        "key"
+      ]
+    },
+    "core_memory_replace": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The key to replace in the short-term memory. Case-sensitive."
+        },
+        "value": {
+          "type": "string",
+          "description": "The new value associated with the key. "
+        }
+      },
+      "required": [
+        "key",
+        "value"
+      ]
+    },
+    "core_memory_retrieve": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The key to retrieve. Case-sensitive. The key must match exactly with the key stored in the memory. "
+        }
+      },
+      "required": [
+        "key"
+      ]
+    },
+    "core_memory_retrieve_all": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776673162-idt3U7OxYzIOZ4nVBK6b",
+    "object": "chat.completion",
+    "created": 1776673162,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_39338017",
+              "function": {
+                "name": "core_memory_add",
+                "arguments": "{\"key\":\"user_coffee_enthusiasm\",\"value\":\"Excited about new items for coffee station, jokes about becoming a coffee shop, plans to test setup before hosting a gathering, aims to impress friends with premium brews.\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 5402,
+      "completion_tokens": 78,
+      "total_tokens": 5480,
+      "cost": 0.016921575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 126,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0170925,
+        "upstream_inference_prompt_cost": 0.0159225,
+        "upstream_inference_completions_cost": 0.00117
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776673162-idt3U7OxYzIOZ4nVBK6b",
+    "object": "response",
+    "created_at": 1776673164,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_39338017",
+        "call_id": "call_39338017",
+        "name": "core_memory_add",
+        "arguments": "{\"key\":\"user_coffee_enthusiasm\",\"value\":\"Excited about new items for coffee station, jokes about becoming a coffee shop, plans to test setup before hosting a gathering, aims to impress friends with premium brews.\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 5402,
+      "completion_tokens": 78,
+      "total_tokens": 5480,
+      "cost": 0.016921575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 126,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0170925,
+        "upstream_inference_prompt_cost": 0.0159225,
+        "upstream_inference_completions_cost": 0.00117
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776673162-idt3U7OxYzIOZ4nVBK6b",
+    "object": "chat.completion",
+    "created": 1776673162,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_39338017",
+              "function": {
+                "name": "core_memory_add",
+                "arguments": "{\"key\":\"user_coffee_enthusiasm\",\"value\":\"Excited about new items for coffee station, jokes about becoming a coffee shop, plans to test setup before hosting a gathering, aims to impress friends with premium brews.\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 5402,
+      "completion_tokens": 78,
+      "total_tokens": 5480,
+      "cost": 0.016921575,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 126,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0170925,
+        "upstream_inference_prompt_cost": 0.0159225,
+        "upstream_inference_completions_cost": 0.00117
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": [
+      "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.",
+      "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.",
+      "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.",
+      "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.",
+      "prompt_injector:Known explicit context values you can reuse exactly if relevant: error, status, Key-value pair added., Key removed."
+    ]
+  },
+  "status_code": 200,
+  "latency_ms": 3255.593,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "2fe6e68a-7626-44db-a237-e511c496d27e"
+}

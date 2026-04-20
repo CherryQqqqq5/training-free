@@ -13,6 +13,13 @@ except ModuleNotFoundError:
 
 MAXIMIZE_KEYS = ("acc",)
 MINIMIZE_KEYS = ("cost", "latency", "regression")
+MANIFEST_MATCH_KEYS = (
+    "protocol_id",
+    "test_category",
+    "bfcl_model_alias",
+    "upstream_profile",
+    "upstream_model_route",
+)
 
 
 def _metric_value(metrics: Dict[str, object], key: str, default: float = 0.0) -> float:
@@ -76,12 +83,19 @@ def _load_yaml(path: Path) -> Dict[str, Any]:
 
 def _artifact_validity(metrics: Dict[str, Any], metrics_path: Path) -> list[str]:
     issues: list[str] = []
+    evaluation_status = str(metrics.get("evaluation_status") or "")
+    if evaluation_status != "complete":
+        issues.append(f"evaluation_status={evaluation_status or 'missing'}")
+
     metric_sources = metrics.get("metric_sources")
     if not isinstance(metric_sources, list) or not any(str(item).strip() for item in metric_sources):
         issues.append("metric_sources empty")
 
-    artifact_dir = metrics_path.parent
+    artifact_issues = metrics.get("artifact_validity_issues")
+    if isinstance(artifact_issues, list) and artifact_issues:
+        issues.extend(f"artifact: {item}" for item in artifact_issues)
 
+    artifact_dir = metrics_path.parent
     failure_summary_path = artifact_dir / "failure_summary.json"
     if failure_summary_path.exists():
         failure_summary = _load_json(failure_summary_path)
@@ -89,19 +103,54 @@ def _artifact_validity(metrics: Dict[str, Any], metrics_path: Path) -> list[str]
         if trace_count is None or float(trace_count) <= 0:
             issues.append("trace_count <= 0")
 
-    rule_path = artifact_dir / "rule.yaml"
-    if rule_path.exists():
-        rule_data = _load_yaml(rule_path)
-        if float(rule_data.get("source_failure_count") or 0) <= 0:
-            issues.append("source_failure_count <= 0")
-        rules = rule_data.get("rules")
-        if not isinstance(rules, list) or not rules:
-            issues.append("rules empty")
-
     return issues
 
 
-def select_patch(baseline_path: str, candidate_path: str) -> Dict[str, object]:
+def _validate_manifest_consistency(
+    baseline_manifest_path: str | None,
+    candidate_manifest_path: str | None,
+) -> list[str]:
+    if not baseline_manifest_path or not candidate_manifest_path:
+        return ["run manifest missing for baseline or candidate"]
+    baseline_manifest = _load_json(Path(baseline_manifest_path))
+    candidate_manifest = _load_json(Path(candidate_manifest_path))
+    issues: list[str] = []
+    for key in MANIFEST_MATCH_KEYS:
+        if str(baseline_manifest.get(key, "")) != str(candidate_manifest.get(key, "")):
+            issues.append(f"manifest mismatch on {key}")
+    return issues
+
+
+def _load_compile_status(path: str | None) -> Dict[str, Any]:
+    if not path:
+        return {}
+    return _load_json(Path(path))
+
+
+def _compile_status_block_reason(compile_status: Dict[str, Any]) -> str | None:
+    status = str(compile_status.get("status") or "")
+    if status in {"", "actionable_patch"}:
+        return None
+    if status in {
+        "no_failure_evidence",
+        "uncompilable_failure_evidence",
+        "evaluation_incomplete",
+        "candidate_invalid",
+        "candidate_does_not_dominate",
+        "compile_failed",
+    }:
+        return status
+    return f"compile_status_{status}"
+
+
+def select_patch(
+    baseline_path: str,
+    candidate_path: str,
+    *,
+    baseline_manifest_path: str | None = None,
+    candidate_manifest_path: str | None = None,
+    compile_status_path: str | None = None,
+) -> Dict[str, object]:
     baseline_file = Path(baseline_path)
     candidate_file = Path(candidate_path)
     baseline = _load_json(baseline_file)
@@ -130,27 +179,51 @@ def select_patch(baseline_path: str, candidate_path: str) -> Dict[str, object]:
     baseline_valid = not baseline_issues
     candidate_valid = not candidate_issues
 
-    if not baseline_valid or not candidate_valid:
-        blockers = []
-        if not baseline_valid:
-            blockers.append(f"baseline invalid: {', '.join(baseline_issues)}")
-        if not candidate_valid:
-            blockers.append(f"candidate invalid: {', '.join(candidate_issues)}")
+    compile_status = _load_compile_status(compile_status_path)
+    compile_block_reason = _compile_status_block_reason(compile_status)
+    manifest_issues = _validate_manifest_consistency(baseline_manifest_path, candidate_manifest_path)
+
+    if compile_block_reason == "no_failure_evidence":
         accept = False
-        reason = "selection blocked: " + "; ".join(blockers)
+        reason = "no_failure_evidence"
+    elif compile_block_reason == "uncompilable_failure_evidence":
+        accept = False
+        reason = "uncompilable_failure_evidence"
+    elif compile_block_reason == "compile_failed":
+        accept = False
+        reason = "candidate_invalid"
+    elif not baseline_valid or not candidate_valid:
+        accept = False
+        reason = "evaluation_incomplete" if any("evaluation_status" in issue for issue in candidate_issues) else "candidate_invalid"
+    elif manifest_issues:
+        accept = False
+        reason = "candidate_invalid"
     else:
         accept = dominates(candidate, baseline)
-        reason = "candidate dominates baseline on Pareto criteria" if accept else "candidate does not dominate baseline"
+        reason = "candidate_does_not_dominate" if not accept else "accepted"
+
+    detail_issues: list[str] = []
+    if not baseline_valid:
+        detail_issues.extend(f"baseline: {issue}" for issue in baseline_issues)
+    if not candidate_valid:
+        detail_issues.extend(f"candidate: {issue}" for issue in candidate_issues)
+    if manifest_issues:
+        detail_issues.extend(f"manifest: {issue}" for issue in manifest_issues)
+    if compile_block_reason and compile_block_reason not in {"no_failure_evidence", "uncompilable_failure_evidence"}:
+        detail_issues.append(f"compile: {compile_block_reason}")
 
     return {
         "accept": accept,
+        "reason": reason,
         "baseline": baseline,
         "candidate": candidate,
         "baseline_valid": baseline_valid,
         "candidate_valid": candidate_valid,
         "baseline_validity_issues": baseline_issues,
         "candidate_validity_issues": candidate_issues,
-        "reason": reason,
+        "manifest_validity_issues": manifest_issues,
+        "compile_status": compile_status,
+        "detail_issues": detail_issues,
         "subset_regressions": subset_regressions,
     }
 

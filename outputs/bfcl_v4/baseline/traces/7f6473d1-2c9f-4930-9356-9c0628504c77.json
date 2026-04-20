@@ -1,0 +1,1585 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "developer",
+        "content": "You are a general customer support assistant for an e-commerce platform. Your task is to understand and remember information that can be used to provide information about user inquiries, preferences, and offer consistent, helpful assistance over multiple interactions.\n\nYou have access to an advanced memory system, consisting of two memory types 'Core Memory' and 'Archival Memory'. Both type of memory is persistent across multiple conversations with the user, and can be accessed in a later interactions. You should actively manage your memory data to keep track of important information, ensure that it is up-to-date and easy to retrieve to provide personalized responses to the user later.\n\nThe Core memory is limited in size, but always visible to you in context. The Archival Memory has a much larger capacity, but will be held outside of your immediate context due to its size.\n\nHere is the content of your Core Memory from previous interactions:\n{\n    \"user_name\": \"Michael\",\n    \"user_age\": \"35\",\n    \"user_location\": \"Seattle\",\n    \"user_occupation\": \"Freelance Graphic Designer\",\n    \"user_interest\": \"High-quality coffee machine with design aesthetic\"\n}\n"
+      },
+      {
+        "role": "user",
+        "content": "Hello again! It's Michael here, and I'm hoping you can help me figure out what's going on with the espresso machine I ordered a little while back. I'm sure you remember me—I'm the guy from Seattle, 35 years old, freelancing in graphic design, and a total coffee enthusiast who just had to have that sleek, stainless-steel espresso maker with the steam wand. I was really excited about getting it before my small family gathering this week, but unfortunately, I'm noticing that the delivery date has already passed, and I haven't received any updates or the actual package. Needless to say, I'm starting to get pretty anxious about the whereabouts of my new machine."
+      },
+      {
+        "arguments": "{\"key\":\"order_espresso_machine\",\"value\":\"Michael ordered a stainless-steel espresso machine with a steam wand for a family gathering this week. The delivery date has passed, and he has not received any updates or the package.\"}",
+        "call_id": "call_12656424",
+        "name": "archival_memory_add",
+        "type": "function_call",
+        "id": "call_12656424"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_12656424",
+        "output": "{\"status\": \"Key added.\"}"
+      },
+      {
+        "content": [
+          {
+            "text": "Hi Michael, it's great to hear from you again. I'm sorry to hear about the delay with your espresso machine delivery. Let's get this sorted out for you. I'll need to check on the status of your order to provide you with the most accurate information. Could you please provide me with your order number or any other details related to the purchase, such as the date you placed the order? Once I have that, I can look into it right away.",
+            "type": "output_text"
+          }
+        ],
+        "role": "assistant",
+        "type": "message"
+      },
+      {
+        "role": "user",
+        "content": "It's been about a week since I placed my order, if I recall correctly. At the time, I remember we talked about how shipping might originate from out of state, so I had braced myself for a bit of a delay. But I checked the tracking link you provided—and it seems either it hasn't been updated in a few days, or it's still showing that my package is in transit somewhere well outside of Washington. I've tried refreshing the page, copying and pasting the tracking number again, and even using a different browser (because sometimes that magically solves weird glitches), but I'm still not seeing any new information. It's almost like the shipping status is stuck."
+      },
+      {
+        "arguments": "{\"key\":\"order_tracking_issue\",\"value\":\"Michael's espresso machine order tracking has not been updated in a few days, showing the package in transit outside of Washington despite attempts to refresh and troubleshoot.\"}",
+        "call_id": "call_12605914",
+        "name": "archival_memory_add",
+        "type": "function_call",
+        "id": "call_12605914"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_12605914",
+        "output": "{\"status\": \"Key added.\"}"
+      },
+      {
+        "content": [
+          {
+            "text": "I'm sorry to hear that the tracking information for your espresso machine hasn't been updated, Michael. I understand how frustrating this must be, especially with your family gathering approaching. Let's get to the bottom of this. Could you please share the tracking number with me so I can investigate further? Additionally, if you have the order number, that would be very helpful as well. I'll check on the status and see if there's any more recent information or if there are any issues with the shipping process.",
+            "type": "output_text"
+          }
+        ],
+        "role": "assistant",
+        "type": "message"
+      },
+      {
+        "role": "user",
+        "content": "Normally, I wouldn't be too stressed about something arriving a few days late, but I was hoping to have that espresso machine set up for a small get-together I'm hosting. It's nothing huge—just my siblings and a couple of close friends stopping by—but they all know I've invested in this fancy new coffee gadget and are excited to see it in action. Some of them are major coffee buffs themselves, and we even planned a little ‘latte art showdown' to see who could froth the best milk. Now that the espresso machine hasn't arrived, I'm scrambling to figure out if I need to pivot to a standard drip coffee maker or just head to the local coffee house for the morning brew."
+      },
+      {
+        "arguments": "{\"key\":\"event_plan_espresso_machine\",\"value\":\"Michael is hosting a small get-together with siblings and close friends, planning a latte art showdown with the espresso machine. He is considering alternatives like a drip coffee maker or local coffee house if the machine does not arrive.\"}",
+        "call_id": "call_97473143",
+        "name": "archival_memory_add",
+        "type": "function_call",
+        "id": "call_97473143"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_97473143",
+        "output": "{\"status\": \"Key added.\"}"
+      },
+      {
+        "content": [
+          {
+            "text": "I completely understand how disappointing this must be, Michael, especially with the latte art showdown planned for your get-together. I’m here to help get this resolved as quickly as possible. Could you please provide me with the tracking number and, if possible, the order number for your espresso machine? With those details, I can check on the latest status of your delivery and see if we can expedite it or find a solution to ensure you’re not left without options for your event.",
+            "type": "output_text"
+          }
+        ],
+        "role": "assistant",
+        "type": "message"
+      },
+      {
+        "role": "user",
+        "content": "What's really puzzling is that when I placed the order, the checkout page gave me a reasonable estimated delivery time of eleven business days, if memory serves. I chose regular shipping because I assumed it would be plenty of time before the event. Plus, I qualified for that free-shipping threshold after adding a couple of accessories like the stainless-steel frothing pitcher and some extra filters (which I'm not sure if they'll come in a separate package or not). As far as I can tell, everything was in stock when I ordered, so I didn't expect any back-order issues or a supply shortage."
+      },
+      {
+        "arguments": "{\"key\":\"order_details_espresso_machine\",\"value\":\"Michael ordered an espresso machine with an estimated delivery time of 11 business days using regular shipping. He also added a stainless-steel frothing pitcher and extra filters to qualify for free shipping. All items were in stock at the time of order, with no expected back-order or supply issues.\"}",
+        "call_id": "call_97187674",
+        "name": "archival_memory_add",
+        "type": "function_call",
+        "id": "call_97187674"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_97187674",
+        "output": "{\"status\": \"Key added.\"}"
+      },
+      {
+        "content": [
+          {
+            "text": "Thanks for the additional context, Michael. I understand your concern, especially since the estimated delivery time of 11 business days seemed reasonable for your event, and all items were in stock with no expected delays. To help get this sorted, could you please provide the tracking number and, if possible, the order number for your espresso machine and accessories? With those details, I can investigate the status of your shipment, including whether the frothing pitcher and filters are shipping separately, and see what options we have to resolve this for you.",
+            "type": "output_text"
+          }
+        ],
+        "role": "assistant",
+        "type": "message"
+      },
+      {
+        "role": "user",
+        "content": "I totally understand that shipping carriers can run into unexpected snags—weather delays, missed scans, or scheduling hiccups. Seattle's weather has been a bit rainy lately, which can sometimes cause complications. But I'd love to know if you're seeing the same thing on your end or if there's any new detail I might've missed. I don't want to come across as impatient, but I'd feel better if I had at least some updated timeline for when to expect the delivery. If the carrier has lost the package or something unusual has happened, I definitely need to know that sooner rather than later so we can initiate a replacement or see about expedited shipping."
+      },
+      {
+        "arguments": "{\"key\":\"shipping_concerns_espresso_machine\",\"value\":\"Michael acknowledges potential shipping delays due to weather or carrier issues, especially with recent rainy weather in Seattle. He is seeking an updated timeline for delivery and wants to be informed if the package is lost or if there are unusual circumstances, to initiate a replacement or expedited shipping if necessary.\"}",
+        "call_id": "call_97830324",
+        "name": "archival_memory_add",
+        "type": "function_call",
+        "id": "call_97830324"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_97830324",
+        "output": "{\"status\": \"Key added.\"}"
+      },
+      {
+        "content": [
+          {
+            "text": "I completely understand your concerns, Michael, especially with the rainy weather in Seattle potentially impacting shipping. I appreciate your patience and I’m here to help get clarity on this. To provide you with the most accurate and updated information regarding your espresso machine delivery, could you please share the tracking number and, if possible, the order number? Once I have those details, I can check the status on my end, confirm any delays or issues with the carrier, and explore options like a replacement or expedited shipping if needed.",
+            "type": "output_text"
+          }
+        ],
+        "role": "assistant",
+        "type": "message"
+      },
+      {
+        "role": "user",
+        "content": "Speaking of replacements, I'm curious about your process if the package is officially confirmed lost or damaged during transit. I remember reading on your site that you do have a customer-friendly return and exchange policy, but I'm not entirely sure how it works for delayed or lost shipments. Do you guys file a claim with the carrier on my behalf, or is that something I'd need to do myself? Hopefully, it won't come to that, but I'd like to be prepared if worst comes to worst. After all, we're talking about a decent chunk of change for this espresso machine, and I don't want it slipping through the cracks. I've been budgeting for this purchase for quite some time, and it's a gift to myself to upgrade my morning ritual."
+      },
+      {
+        "arguments": "{\"key\": \"replacement_policy_query\", \"value\": \"Key added.\"}",
+        "call_id": "call_15704749",
+        "name": "archival_memory_add",
+        "type": "function_call",
+        "id": "call_15704749"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_15704749",
+        "output": "{\"status\": \"Key added.\"}"
+      },
+      {
+        "content": [
+          {
+            "text": "I'm glad you're thinking ahead, Michael, and I understand how important this espresso machine is to you, especially as a budgeted gift to upgrade your morning ritual. I'm happy to clarify our process for lost or damaged shipments. In the event that a package is confirmed lost or damaged during transit, we typically handle the claim process with the carrier on your behalf to make things as hassle-free as possible for you. If a replacement or refund is needed, we'll coordinate that directly with you based on the situation and our return and exchange policy.\n\nTo ensure we don’t get to that point, could you please provide me with the tracking number and, if available, the order number for your espresso machine? With those details, I can check the current status of your shipment and address any issues immediately. If there are any problems, I'll ensure we take the necessary steps to get this resolved for you quickly.",
+            "type": "output_text"
+          }
+        ],
+        "role": "assistant",
+        "type": "message"
+      },
+      {
+        "role": "user",
+        "content": "I also want to make sure that if it does magically arrive in a day or two, I'm home to bring it in right away. We've had some issues with packages being delivered while it's raining, and you've probably heard my story of how soggy boxes can get destroyed on my doorstep. If there's an updated shipping schedule or if you find out the courier might drop it off tomorrow, let me know. I'll arrange my design work around it, so I can be available to greet the driver or at least quickly whisk the package inside. And if a signature is required, I definitely need to be here, otherwise it might float around on the truck for yet another day."
+      },
+      {
+        "arguments": "{\"key\":\"delivery_precautions_espresso_machine\",\"value\":\"Michael wants to ensure he is home for the delivery of the espresso machine to avoid rain damage to the package, as he has experienced issues with soggy boxes on his doorstep. He is willing to adjust his design work schedule to be available for delivery and needs to know if a signature is required to prevent further delays.\"}",
+        "call_id": "call_06109786",
+        "name": "archival_memory_add",
+        "type": "function_call",
+        "id": "call_06109786"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_06109786",
+        "output": "{\"status\": \"Key added.\"}"
+      },
+      {
+        "content": [
+          {
+            "text": "I completely understand your concern about ensuring the espresso machine arrives safely, Michael, especially given your past experiences with soggy packages in the rain. I’m happy to help coordinate so you can be home for the delivery and avoid any issues. To provide you with the most accurate and updated delivery schedule, including whether a signature is required, could you please share the tracking number and, if possible, the order number for your order? Once I have those details, I’ll check the status with the carrier and let you know the latest information so you can plan your schedule accordingly.",
+            "type": "output_text"
+          }
+        ],
+        "role": "assistant",
+        "type": "message"
+      },
+      {
+        "role": "user",
+        "content": "Anyway, I'd really appreciate your help in figuring out the next steps. I'm super excited to start using the machine and experiment with different coffee beans and latte art. But at this point, my main concern is just trying to nail down a realistic timeline. If you could either ping the shipping company for an update or let me know if there's some internal note in your system that indicates a delay, I'd be very grateful. The sooner I know what's happening, the sooner I can adjust my plans accordingly—whether that's dusting off my old French press or just telling my friends we'll do the latte ‘taste test' next time we hang out."
+      },
+      {
+        "arguments": "{\"key\":\"urgency_timeline_espresso_machine\",\"value\":\"Michael is eager to get a realistic timeline for the delivery of his espresso machine to adjust his plans, either using an old French press or postponing the latte taste test with friends. He is excited to experiment with coffee beans and latte art once the machine arrives.\"}",
+        "call_id": "call_55497874",
+        "name": "archival_memory_add",
+        "type": "function_call",
+        "id": "call_55497874"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_55497874",
+        "output": "{\"status\": \"Key added.\"}"
+      },
+      {
+        "content": [
+          {
+            "text": "I'm here to help you get a clear timeline for your espresso machine delivery, Michael. I understand how important this is for your plans, and I'm just as eager to get you experimenting with coffee beans and latte art. To provide the most accurate update, could you please share the tracking number and, if possible, the order number for your purchase? With those details, I can reach out to the shipping company for the latest status or check for any internal notes about delays in our system. I'll get back to you as soon as possible so you can adjust your plans accordingly.",
+            "type": "output_text"
+          }
+        ],
+        "role": "assistant",
+        "type": "message"
+      },
+      {
+        "role": "user",
+        "content": "In the meantime, I'll keep checking my emails in case there's an automated update from the courier. If you need any additional information from me—like my order number or the email address I used—just say the word, and I'll send it over. At this point, I'm crossing my fingers that this is just a routine delay and that the shipping status will magically update overnight. But if not, I'm sure we can find a workaround, or maybe get a replacement or expedited shipping. Thanks so much for looking into this, and I'm sorry for being a bit of a pest about it. I just really want everything to go smoothly, and I was so looking forward to unveiling my new setup to family and friends."
+      },
+      {
+        "arguments": "{\"key\":\"user_cooperation_espresso_machine\",\"value\":\"Michael is willing to provide additional information like his order number or email address if needed. He hopes for a routine delay with an overnight status update but is open to workarounds, replacements, or expedited shipping if necessary. He apologizes for being persistent and expresses his excitement to unveil the new espresso machine setup to family and friends.\"}",
+        "call_id": "call_81560830",
+        "name": "archival_memory_add",
+        "type": "function_call",
+        "id": "call_81560830"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_81560830",
+        "output": "{\"status\": \"Key added.\"}"
+      },
+      {
+        "content": [
+          {
+            "text": "No need to apologize at all, Michael. I completely understand your excitement and desire to have everything go smoothly for unveiling your new espresso machine to your family and friends. I'm here to assist and ensure we get this resolved as quickly as possible. To move forward, could you please provide me with your order number and the email address you used for the purchase? Additionally, if you have the tracking number handy, that would be incredibly helpful. With these details, I can check the latest status and work on any necessary solutions like expedited shipping or a replacement if needed. Thanks for your cooperation, and I’ll keep you updated every step of the way.",
+            "type": "output_text"
+          }
+        ],
+        "role": "assistant",
+        "type": "message"
+      },
+      {
+        "role": "user",
+        "content": "Let me know what you find out. I appreciate all the support so far, and I'm still stoked about finally getting my hands on that espresso machine—even if it ends up arriving a bit later than planned!"
+      },
+      {
+        "arguments": "{\"key\": \"user_appreciation_espresso_machine\", \"value\": \"Key added.\"}",
+        "call_id": "call_11154451",
+        "name": "archival_memory_add",
+        "type": "function_call",
+        "id": "call_11154451"
+      },
+      {
+        "type": "function_call_output",
+        "call_id": "call_11154451",
+        "output": "{\"status\": \"Key added.\"}"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "archival_memory_add",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Add a key-value pair to the long-term memory. Make sure to use meaningful keys for easy retrieval later. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "The key under which the value is stored. The key should be unique and case-sensitive. Keys must be snake_case and cannot contain spaces."
+            },
+            "value": {
+              "type": "string",
+              "description": "The value to store in the long-term memory. "
+            }
+          },
+          "required": [
+            "key",
+            "value"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Status of the operation."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "archival_memory_clear",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Clear all key-value pairs from the long-term memory, including those from previous interactions. This operation is irreversible. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {},
+          "required": []
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Status of the operation."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "archival_memory_key_search",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Search for key names in the long-term memory that are similar to the query using BM25+ algorithm. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "The query text to search for."
+            },
+            "k": {
+              "type": "integer",
+              "description": "The number of results to return. ",
+              "default": 5
+            }
+          },
+          "required": [
+            "query"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "ranked_results": {
+              "type": "array",
+              "description": "A list of tuples containing the BM25+ score and the key.",
+              "items": {
+                "type": "array",
+                "items": [
+                  {
+                    "type": "float"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "archival_memory_list_keys",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: List all keys currently in the long-term memory. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {},
+          "required": []
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "keys": {
+              "type": "array",
+              "description": "A list of all keys in the long-term memory.",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "archival_memory_remove",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Remove a key-value pair from the long-term memory. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "The key to remove from the long-term memory. Case-sensitive. "
+            }
+          },
+          "required": [
+            "key"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Status of the operation."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "archival_memory_replace",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Replace a key-value pair in the long-term memory with a new value. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "The key to replace in the long-term memory. Case-sensitive."
+            },
+            "value": {
+              "type": "string",
+              "description": "The new value associated with the key. "
+            }
+          },
+          "required": [
+            "key",
+            "value"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Status of the operation."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "archival_memory_retrieve",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Retrieve the value associated with a key from the long-term memory. This function does not support partial key matching or similarity search. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "The key to retrieve. Case-sensitive. The key must match exactly with the key stored in the memory. "
+            }
+          },
+          "required": [
+            "key"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "value": {
+              "type": "string",
+              "description": "The value associated with the key."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "core_memory_add",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Add a key-value pair to the short-term memory. Make sure to use meaningful keys for easy retrieval later. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "The key under which the value is stored. The key should be unique and case-sensitive. Keys must be snake_case and cannot contain spaces."
+            },
+            "value": {
+              "type": "string",
+              "description": "The value to store in the short-term memory. "
+            }
+          },
+          "required": [
+            "key",
+            "value"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Status of the operation."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "core_memory_clear",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Clear all key-value pairs from the short-term memory, including those from previous interactions. This operation is irreversible. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {},
+          "required": []
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Status of the operation."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "core_memory_key_search",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Search for key names in the short-term memory that are similar to the query using BM25+ algorithm. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "The query text to search for."
+            },
+            "k": {
+              "type": "integer",
+              "description": "The number of results to return. ",
+              "default": 5
+            }
+          },
+          "required": [
+            "query"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "ranked_results": {
+              "type": "array",
+              "description": "A list of tuples containing the BM25+ score and the key.",
+              "items": {
+                "type": "array",
+                "items": [
+                  {
+                    "type": "float"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "core_memory_list_keys",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: List all keys currently in the short-term memory. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {},
+          "required": []
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "keys": {
+              "type": "array",
+              "description": "A list of all keys in the short-term memory.",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "core_memory_remove",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Remove a key-value pair from the short-term memory. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "The key to remove from the short-term memory. Case-sensitive. "
+            }
+          },
+          "required": [
+            "key"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Status of the operation."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "core_memory_replace",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Replace a key-value pair in the short-term memory with a new value. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "The key to replace in the short-term memory. Case-sensitive."
+            },
+            "value": {
+              "type": "string",
+              "description": "The new value associated with the key. "
+            }
+          },
+          "required": [
+            "key",
+            "value"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Status of the operation."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "core_memory_retrieve",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Retrieve the value associated with a key from the short-term memory. This function does not support partial key matching or similarity search. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "The key to retrieve. Case-sensitive. The key must match exactly with the key stored in the memory. "
+            }
+          },
+          "required": [
+            "key"
+          ]
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "value": {
+              "type": "string",
+              "description": "The value associated with the key."
+            }
+          }
+        },
+        "type": "function"
+      },
+      {
+        "name": "core_memory_retrieve_all",
+        "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Retrieve all key-value pairs from the short-term memory. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {},
+          "required": []
+        },
+        "response": {
+          "type": "dict",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "Each key in the short-term memory."
+            },
+            "value": {
+              "type": "string",
+              "description": "The value associated with each key."
+            }
+          }
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "system",
+        "content": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.\n- Known explicit context values you can reuse exactly if relevant: status, Key added."
+      },
+      {
+        "role": "developer",
+        "content": "You are a general customer support assistant for an e-commerce platform. Your task is to understand and remember information that can be used to provide information about user inquiries, preferences, and offer consistent, helpful assistance over multiple interactions.\n\nYou have access to an advanced memory system, consisting of two memory types 'Core Memory' and 'Archival Memory'. Both type of memory is persistent across multiple conversations with the user, and can be accessed in a later interactions. You should actively manage your memory data to keep track of important information, ensure that it is up-to-date and easy to retrieve to provide personalized responses to the user later.\n\nThe Core memory is limited in size, but always visible to you in context. The Archival Memory has a much larger capacity, but will be held outside of your immediate context due to its size.\n\nHere is the content of your Core Memory from previous interactions:\n{\n    \"user_name\": \"Michael\",\n    \"user_age\": \"35\",\n    \"user_location\": \"Seattle\",\n    \"user_occupation\": \"Freelance Graphic Designer\",\n    \"user_interest\": \"High-quality coffee machine with design aesthetic\"\n}\n"
+      },
+      {
+        "role": "user",
+        "content": "Hello again! It's Michael here, and I'm hoping you can help me figure out what's going on with the espresso machine I ordered a little while back. I'm sure you remember me—I'm the guy from Seattle, 35 years old, freelancing in graphic design, and a total coffee enthusiast who just had to have that sleek, stainless-steel espresso maker with the steam wand. I was really excited about getting it before my small family gathering this week, but unfortunately, I'm noticing that the delivery date has already passed, and I haven't received any updates or the actual package. Needless to say, I'm starting to get pretty anxious about the whereabouts of my new machine."
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_12656424",
+            "type": "function",
+            "function": {
+              "name": "archival_memory_add",
+              "arguments": "{\"key\":\"order_espresso_machine\",\"value\":\"Michael ordered a stainless-steel espresso machine with a steam wand for a family gathering this week. The delivery date has passed, and he has not received any updates or the package.\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_12656424",
+        "content": "{\"status\": \"Key added.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "Hi Michael, it's great to hear from you again. I'm sorry to hear about the delay with your espresso machine delivery. Let's get this sorted out for you. I'll need to check on the status of your order to provide you with the most accurate information. Could you please provide me with your order number or any other details related to the purchase, such as the date you placed the order? Once I have that, I can look into it right away."
+      },
+      {
+        "role": "user",
+        "content": "It's been about a week since I placed my order, if I recall correctly. At the time, I remember we talked about how shipping might originate from out of state, so I had braced myself for a bit of a delay. But I checked the tracking link you provided—and it seems either it hasn't been updated in a few days, or it's still showing that my package is in transit somewhere well outside of Washington. I've tried refreshing the page, copying and pasting the tracking number again, and even using a different browser (because sometimes that magically solves weird glitches), but I'm still not seeing any new information. It's almost like the shipping status is stuck."
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_12605914",
+            "type": "function",
+            "function": {
+              "name": "archival_memory_add",
+              "arguments": "{\"key\":\"order_tracking_issue\",\"value\":\"Michael's espresso machine order tracking has not been updated in a few days, showing the package in transit outside of Washington despite attempts to refresh and troubleshoot.\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_12605914",
+        "content": "{\"status\": \"Key added.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "I'm sorry to hear that the tracking information for your espresso machine hasn't been updated, Michael. I understand how frustrating this must be, especially with your family gathering approaching. Let's get to the bottom of this. Could you please share the tracking number with me so I can investigate further? Additionally, if you have the order number, that would be very helpful as well. I'll check on the status and see if there's any more recent information or if there are any issues with the shipping process."
+      },
+      {
+        "role": "user",
+        "content": "Normally, I wouldn't be too stressed about something arriving a few days late, but I was hoping to have that espresso machine set up for a small get-together I'm hosting. It's nothing huge—just my siblings and a couple of close friends stopping by—but they all know I've invested in this fancy new coffee gadget and are excited to see it in action. Some of them are major coffee buffs themselves, and we even planned a little ‘latte art showdown' to see who could froth the best milk. Now that the espresso machine hasn't arrived, I'm scrambling to figure out if I need to pivot to a standard drip coffee maker or just head to the local coffee house for the morning brew."
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_97473143",
+            "type": "function",
+            "function": {
+              "name": "archival_memory_add",
+              "arguments": "{\"key\":\"event_plan_espresso_machine\",\"value\":\"Michael is hosting a small get-together with siblings and close friends, planning a latte art showdown with the espresso machine. He is considering alternatives like a drip coffee maker or local coffee house if the machine does not arrive.\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_97473143",
+        "content": "{\"status\": \"Key added.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "I completely understand how disappointing this must be, Michael, especially with the latte art showdown planned for your get-together. I’m here to help get this resolved as quickly as possible. Could you please provide me with the tracking number and, if possible, the order number for your espresso machine? With those details, I can check on the latest status of your delivery and see if we can expedite it or find a solution to ensure you’re not left without options for your event."
+      },
+      {
+        "role": "user",
+        "content": "What's really puzzling is that when I placed the order, the checkout page gave me a reasonable estimated delivery time of eleven business days, if memory serves. I chose regular shipping because I assumed it would be plenty of time before the event. Plus, I qualified for that free-shipping threshold after adding a couple of accessories like the stainless-steel frothing pitcher and some extra filters (which I'm not sure if they'll come in a separate package or not). As far as I can tell, everything was in stock when I ordered, so I didn't expect any back-order issues or a supply shortage."
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_97187674",
+            "type": "function",
+            "function": {
+              "name": "archival_memory_add",
+              "arguments": "{\"key\":\"order_details_espresso_machine\",\"value\":\"Michael ordered an espresso machine with an estimated delivery time of 11 business days using regular shipping. He also added a stainless-steel frothing pitcher and extra filters to qualify for free shipping. All items were in stock at the time of order, with no expected back-order or supply issues.\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_97187674",
+        "content": "{\"status\": \"Key added.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "Thanks for the additional context, Michael. I understand your concern, especially since the estimated delivery time of 11 business days seemed reasonable for your event, and all items were in stock with no expected delays. To help get this sorted, could you please provide the tracking number and, if possible, the order number for your espresso machine and accessories? With those details, I can investigate the status of your shipment, including whether the frothing pitcher and filters are shipping separately, and see what options we have to resolve this for you."
+      },
+      {
+        "role": "user",
+        "content": "I totally understand that shipping carriers can run into unexpected snags—weather delays, missed scans, or scheduling hiccups. Seattle's weather has been a bit rainy lately, which can sometimes cause complications. But I'd love to know if you're seeing the same thing on your end or if there's any new detail I might've missed. I don't want to come across as impatient, but I'd feel better if I had at least some updated timeline for when to expect the delivery. If the carrier has lost the package or something unusual has happened, I definitely need to know that sooner rather than later so we can initiate a replacement or see about expedited shipping."
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_97830324",
+            "type": "function",
+            "function": {
+              "name": "archival_memory_add",
+              "arguments": "{\"key\":\"shipping_concerns_espresso_machine\",\"value\":\"Michael acknowledges potential shipping delays due to weather or carrier issues, especially with recent rainy weather in Seattle. He is seeking an updated timeline for delivery and wants to be informed if the package is lost or if there are unusual circumstances, to initiate a replacement or expedited shipping if necessary.\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_97830324",
+        "content": "{\"status\": \"Key added.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "I completely understand your concerns, Michael, especially with the rainy weather in Seattle potentially impacting shipping. I appreciate your patience and I’m here to help get clarity on this. To provide you with the most accurate and updated information regarding your espresso machine delivery, could you please share the tracking number and, if possible, the order number? Once I have those details, I can check the status on my end, confirm any delays or issues with the carrier, and explore options like a replacement or expedited shipping if needed."
+      },
+      {
+        "role": "user",
+        "content": "Speaking of replacements, I'm curious about your process if the package is officially confirmed lost or damaged during transit. I remember reading on your site that you do have a customer-friendly return and exchange policy, but I'm not entirely sure how it works for delayed or lost shipments. Do you guys file a claim with the carrier on my behalf, or is that something I'd need to do myself? Hopefully, it won't come to that, but I'd like to be prepared if worst comes to worst. After all, we're talking about a decent chunk of change for this espresso machine, and I don't want it slipping through the cracks. I've been budgeting for this purchase for quite some time, and it's a gift to myself to upgrade my morning ritual."
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_15704749",
+            "type": "function",
+            "function": {
+              "name": "archival_memory_add",
+              "arguments": "{\"key\": \"replacement_policy_query\", \"value\": \"Key added.\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_15704749",
+        "content": "{\"status\": \"Key added.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "I'm glad you're thinking ahead, Michael, and I understand how important this espresso machine is to you, especially as a budgeted gift to upgrade your morning ritual. I'm happy to clarify our process for lost or damaged shipments. In the event that a package is confirmed lost or damaged during transit, we typically handle the claim process with the carrier on your behalf to make things as hassle-free as possible for you. If a replacement or refund is needed, we'll coordinate that directly with you based on the situation and our return and exchange policy.\n\nTo ensure we don’t get to that point, could you please provide me with the tracking number and, if available, the order number for your espresso machine? With those details, I can check the current status of your shipment and address any issues immediately. If there are any problems, I'll ensure we take the necessary steps to get this resolved for you quickly."
+      },
+      {
+        "role": "user",
+        "content": "I also want to make sure that if it does magically arrive in a day or two, I'm home to bring it in right away. We've had some issues with packages being delivered while it's raining, and you've probably heard my story of how soggy boxes can get destroyed on my doorstep. If there's an updated shipping schedule or if you find out the courier might drop it off tomorrow, let me know. I'll arrange my design work around it, so I can be available to greet the driver or at least quickly whisk the package inside. And if a signature is required, I definitely need to be here, otherwise it might float around on the truck for yet another day."
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_06109786",
+            "type": "function",
+            "function": {
+              "name": "archival_memory_add",
+              "arguments": "{\"key\":\"delivery_precautions_espresso_machine\",\"value\":\"Michael wants to ensure he is home for the delivery of the espresso machine to avoid rain damage to the package, as he has experienced issues with soggy boxes on his doorstep. He is willing to adjust his design work schedule to be available for delivery and needs to know if a signature is required to prevent further delays.\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_06109786",
+        "content": "{\"status\": \"Key added.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "I completely understand your concern about ensuring the espresso machine arrives safely, Michael, especially given your past experiences with soggy packages in the rain. I’m happy to help coordinate so you can be home for the delivery and avoid any issues. To provide you with the most accurate and updated delivery schedule, including whether a signature is required, could you please share the tracking number and, if possible, the order number for your order? Once I have those details, I’ll check the status with the carrier and let you know the latest information so you can plan your schedule accordingly."
+      },
+      {
+        "role": "user",
+        "content": "Anyway, I'd really appreciate your help in figuring out the next steps. I'm super excited to start using the machine and experiment with different coffee beans and latte art. But at this point, my main concern is just trying to nail down a realistic timeline. If you could either ping the shipping company for an update or let me know if there's some internal note in your system that indicates a delay, I'd be very grateful. The sooner I know what's happening, the sooner I can adjust my plans accordingly—whether that's dusting off my old French press or just telling my friends we'll do the latte ‘taste test' next time we hang out."
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_55497874",
+            "type": "function",
+            "function": {
+              "name": "archival_memory_add",
+              "arguments": "{\"key\":\"urgency_timeline_espresso_machine\",\"value\":\"Michael is eager to get a realistic timeline for the delivery of his espresso machine to adjust his plans, either using an old French press or postponing the latte taste test with friends. He is excited to experiment with coffee beans and latte art once the machine arrives.\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_55497874",
+        "content": "{\"status\": \"Key added.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "I'm here to help you get a clear timeline for your espresso machine delivery, Michael. I understand how important this is for your plans, and I'm just as eager to get you experimenting with coffee beans and latte art. To provide the most accurate update, could you please share the tracking number and, if possible, the order number for your purchase? With those details, I can reach out to the shipping company for the latest status or check for any internal notes about delays in our system. I'll get back to you as soon as possible so you can adjust your plans accordingly."
+      },
+      {
+        "role": "user",
+        "content": "In the meantime, I'll keep checking my emails in case there's an automated update from the courier. If you need any additional information from me—like my order number or the email address I used—just say the word, and I'll send it over. At this point, I'm crossing my fingers that this is just a routine delay and that the shipping status will magically update overnight. But if not, I'm sure we can find a workaround, or maybe get a replacement or expedited shipping. Thanks so much for looking into this, and I'm sorry for being a bit of a pest about it. I just really want everything to go smoothly, and I was so looking forward to unveiling my new setup to family and friends."
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_81560830",
+            "type": "function",
+            "function": {
+              "name": "archival_memory_add",
+              "arguments": "{\"key\":\"user_cooperation_espresso_machine\",\"value\":\"Michael is willing to provide additional information like his order number or email address if needed. He hopes for a routine delay with an overnight status update but is open to workarounds, replacements, or expedited shipping if necessary. He apologizes for being persistent and expresses his excitement to unveil the new espresso machine setup to family and friends.\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_81560830",
+        "content": "{\"status\": \"Key added.\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "No need to apologize at all, Michael. I completely understand your excitement and desire to have everything go smoothly for unveiling your new espresso machine to your family and friends. I'm here to assist and ensure we get this resolved as quickly as possible. To move forward, could you please provide me with your order number and the email address you used for the purchase? Additionally, if you have the tracking number handy, that would be incredibly helpful. With these details, I can check the latest status and work on any necessary solutions like expedited shipping or a replacement if needed. Thanks for your cooperation, and I’ll keep you updated every step of the way."
+      },
+      {
+        "role": "user",
+        "content": "Let me know what you find out. I appreciate all the support so far, and I'm still stoked about finally getting my hands on that espresso machine—even if it ends up arriving a bit later than planned!"
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_11154451",
+            "type": "function",
+            "function": {
+              "name": "archival_memory_add",
+              "arguments": "{\"key\": \"user_appreciation_espresso_machine\", \"value\": \"Key added.\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_11154451",
+        "content": "{\"status\": \"Key added.\"}"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "archival_memory_add",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Add a key-value pair to the long-term memory. Make sure to use meaningful keys for easy retrieval later. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The key under which the value is stored. The key should be unique and case-sensitive. Keys must be snake_case and cannot contain spaces."
+              },
+              "value": {
+                "type": "string",
+                "description": "The value to store in the long-term memory. "
+              }
+            },
+            "required": [
+              "key",
+              "value"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "archival_memory_clear",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Clear all key-value pairs from the long-term memory, including those from previous interactions. This operation is irreversible. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "archival_memory_key_search",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Search for key names in the long-term memory that are similar to the query using BM25+ algorithm. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "query": {
+                "type": "string",
+                "description": "The query text to search for."
+              },
+              "k": {
+                "type": "integer",
+                "description": "The number of results to return. ",
+                "default": 5
+              }
+            },
+            "required": [
+              "query"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "archival_memory_list_keys",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: List all keys currently in the long-term memory. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "archival_memory_remove",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Remove a key-value pair from the long-term memory. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The key to remove from the long-term memory. Case-sensitive. "
+              }
+            },
+            "required": [
+              "key"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "archival_memory_replace",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Replace a key-value pair in the long-term memory with a new value. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The key to replace in the long-term memory. Case-sensitive."
+              },
+              "value": {
+                "type": "string",
+                "description": "The new value associated with the key. "
+              }
+            },
+            "required": [
+              "key",
+              "value"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "archival_memory_retrieve",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Retrieve the value associated with a key from the long-term memory. This function does not support partial key matching or similarity search. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The key to retrieve. Case-sensitive. The key must match exactly with the key stored in the memory. "
+              }
+            },
+            "required": [
+              "key"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "core_memory_add",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Add a key-value pair to the short-term memory. Make sure to use meaningful keys for easy retrieval later. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The key under which the value is stored. The key should be unique and case-sensitive. Keys must be snake_case and cannot contain spaces."
+              },
+              "value": {
+                "type": "string",
+                "description": "The value to store in the short-term memory. "
+              }
+            },
+            "required": [
+              "key",
+              "value"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "core_memory_clear",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Clear all key-value pairs from the short-term memory, including those from previous interactions. This operation is irreversible. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "core_memory_key_search",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Search for key names in the short-term memory that are similar to the query using BM25+ algorithm. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "query": {
+                "type": "string",
+                "description": "The query text to search for."
+              },
+              "k": {
+                "type": "integer",
+                "description": "The number of results to return. ",
+                "default": 5
+              }
+            },
+            "required": [
+              "query"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "core_memory_list_keys",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: List all keys currently in the short-term memory. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "core_memory_remove",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Remove a key-value pair from the short-term memory. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The key to remove from the short-term memory. Case-sensitive. "
+              }
+            },
+            "required": [
+              "key"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "core_memory_replace",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Replace a key-value pair in the short-term memory with a new value. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The key to replace in the short-term memory. Case-sensitive."
+              },
+              "value": {
+                "type": "string",
+                "description": "The new value associated with the key. "
+              }
+            },
+            "required": [
+              "key",
+              "value"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "core_memory_retrieve",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Retrieve the value associated with a key from the short-term memory. This function does not support partial key matching or similarity search. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The key to retrieve. Case-sensitive. The key must match exactly with the key stored in the memory. "
+              }
+            },
+            "required": [
+              "key"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "core_memory_retrieve_all",
+          "description": "This tool belongs to the memory suite, which provides APIs to interact with a key-value based memory system. Tool description: Retrieve all key-value pairs from the short-term memory. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          }
+        }
+      }
+    ]
+  },
+  "tool_schema_snapshot": {
+    "archival_memory_add": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The key under which the value is stored. The key should be unique and case-sensitive. Keys must be snake_case and cannot contain spaces."
+        },
+        "value": {
+          "type": "string",
+          "description": "The value to store in the long-term memory. "
+        }
+      },
+      "required": [
+        "key",
+        "value"
+      ]
+    },
+    "archival_memory_clear": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    },
+    "archival_memory_key_search": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "The query text to search for."
+        },
+        "k": {
+          "type": "integer",
+          "description": "The number of results to return. ",
+          "default": 5
+        }
+      },
+      "required": [
+        "query"
+      ]
+    },
+    "archival_memory_list_keys": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    },
+    "archival_memory_remove": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The key to remove from the long-term memory. Case-sensitive. "
+        }
+      },
+      "required": [
+        "key"
+      ]
+    },
+    "archival_memory_replace": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The key to replace in the long-term memory. Case-sensitive."
+        },
+        "value": {
+          "type": "string",
+          "description": "The new value associated with the key. "
+        }
+      },
+      "required": [
+        "key",
+        "value"
+      ]
+    },
+    "archival_memory_retrieve": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The key to retrieve. Case-sensitive. The key must match exactly with the key stored in the memory. "
+        }
+      },
+      "required": [
+        "key"
+      ]
+    },
+    "core_memory_add": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The key under which the value is stored. The key should be unique and case-sensitive. Keys must be snake_case and cannot contain spaces."
+        },
+        "value": {
+          "type": "string",
+          "description": "The value to store in the short-term memory. "
+        }
+      },
+      "required": [
+        "key",
+        "value"
+      ]
+    },
+    "core_memory_clear": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    },
+    "core_memory_key_search": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "The query text to search for."
+        },
+        "k": {
+          "type": "integer",
+          "description": "The number of results to return. ",
+          "default": 5
+        }
+      },
+      "required": [
+        "query"
+      ]
+    },
+    "core_memory_list_keys": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    },
+    "core_memory_remove": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The key to remove from the short-term memory. Case-sensitive. "
+        }
+      },
+      "required": [
+        "key"
+      ]
+    },
+    "core_memory_replace": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The key to replace in the short-term memory. Case-sensitive."
+        },
+        "value": {
+          "type": "string",
+          "description": "The new value associated with the key. "
+        }
+      },
+      "required": [
+        "key",
+        "value"
+      ]
+    },
+    "core_memory_retrieve": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The key to retrieve. Case-sensitive. The key must match exactly with the key stored in the memory. "
+        }
+      },
+      "required": [
+        "key"
+      ]
+    },
+    "core_memory_retrieve_all": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776672860-OmxMhQ0RIgAKC8LPumQD",
+    "object": "chat.completion",
+    "created": 1776672860,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm glad to hear you're still excited about the espresso machine, Michael, even with the potential delay. I'm here to help get this sorted out for you. Could you please provide me with your order number, the email address used for the purchase, and if available, the tracking number? With these details, I can investigate the status of your shipment and provide you with the latest updates. I'll keep you informed every step of the way to ensure we get your machine to you as soon as possible.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 5469,
+      "completion_tokens": 99,
+      "total_tokens": 5568,
+      "cost": 0.00558657,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 5444,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.005643,
+        "upstream_inference_prompt_cost": 0.004158,
+        "upstream_inference_completions_cost": 0.001485
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776672860-OmxMhQ0RIgAKC8LPumQD",
+    "object": "response",
+    "created_at": 1776672862,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "I'm glad to hear you're still excited about the espresso machine, Michael, even with the potential delay. I'm here to help get this sorted out for you. Could you please provide me with your order number, the email address used for the purchase, and if available, the tracking number? With these details, I can investigate the status of your shipment and provide you with the latest updates. I'll keep you informed every step of the way to ensure we get your machine to you as soon as possible."
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 5469,
+      "completion_tokens": 99,
+      "total_tokens": 5568,
+      "cost": 0.00558657,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 5444,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.005643,
+        "upstream_inference_prompt_cost": 0.004158,
+        "upstream_inference_completions_cost": 0.001485
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776672860-OmxMhQ0RIgAKC8LPumQD",
+    "object": "chat.completion",
+    "created": 1776672860,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": "I'm glad to hear you're still excited about the espresso machine, Michael, even with the potential delay. I'm here to help get this sorted out for you. Could you please provide me with your order number, the email address used for the purchase, and if available, the tracking number? With these details, I can investigate the status of your shipment and provide you with the latest updates. I'll keep you informed every step of the way to ensure we get your machine to you as soon as possible.",
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": []
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 5469,
+      "completion_tokens": 99,
+      "total_tokens": 5568,
+      "cost": 0.00558657,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 5444,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.005643,
+        "upstream_inference_prompt_cost": 0.004158,
+        "upstream_inference_completions_cost": 0.001485
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [
+      {
+        "kind": "empty_tool_call",
+        "tool_name": null,
+        "field": null,
+        "message": "no tool call emitted for tool-enabled request",
+        "severity": "error",
+        "repaired": false
+      }
+    ],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": [
+      "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.",
+      "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.",
+      "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.",
+      "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.",
+      "prompt_injector:Known explicit context values you can reuse exactly if relevant: status, Key added."
+    ]
+  },
+  "status_code": 200,
+  "latency_ms": 2816.34,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "7f6473d1-2c9f-4930-9356-9c0628504c77"
+}

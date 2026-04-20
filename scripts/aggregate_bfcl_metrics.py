@@ -91,7 +91,8 @@ def _parse_numeric_token(value: Any) -> float | None:
     if not stripped or stripped.lower() in {"n/a", "na", "none", "null", "-"}:
         return None
 
-    token = stripped.removesuffix("%").replace(",", "").strip()
+    token = stripped[:-1] if stripped.endswith("%") else stripped
+    token = token.replace(",", "").strip()
     try:
         return float(token)
     except ValueError:
@@ -355,6 +356,58 @@ def compute_regression(baseline_path: Path | None, subsets: Dict[str, float]) ->
     return round(regression, 6)
 
 
+def _canonical_test_category_key(test_category: str) -> str:
+    return _normalize_label(test_category).replace(" ", "_")
+
+
+def _resolve_score_sources(metric_sources: list[str]) -> list[str]:
+    resolved = []
+    for source in metric_sources:
+        low = source.lower()
+        if "/score/" in low or "data_" in low or source.endswith((".csv", ".tsv")):
+            resolved.append(source)
+    return resolved
+
+
+def _resolve_result_json_paths(bfcl_root: Path) -> list[str]:
+    result_dir = bfcl_root / "result"
+    if not result_dir.exists():
+        return []
+    return [str(path) for path in sorted(result_dir.rglob("*.json")) if path.is_file()]
+
+
+def _assess_evaluation_status(
+    *,
+    overall: Dict[str, float],
+    subsets: Dict[str, float],
+    metric_sources: list[str],
+    failure_summary: Dict[str, Any],
+    bfcl_root: Path,
+    test_category: str,
+) -> tuple[str, list[str], list[str], list[str]]:
+    issues: list[str] = []
+    category_key = _canonical_test_category_key(test_category)
+    resolved_score_sources = _resolve_score_sources(metric_sources)
+    result_json_paths = _resolve_result_json_paths(bfcl_root)
+
+    if "acc" not in overall:
+        issues.append("overall acc missing")
+    if category_key and category_key not in subsets:
+        issues.append(f"subset metric missing for test_category={category_key}")
+    if not result_json_paths:
+        issues.append("no result json found")
+    if not resolved_score_sources:
+        issues.append("no score source resolved")
+    if not metric_sources:
+        issues.append("metric_sources empty")
+    trace_count = failure_summary.get("trace_count")
+    if not isinstance(trace_count, (int, float)) or float(trace_count) <= 0:
+        issues.append("trace summary invalid: trace_count <= 0")
+
+    status = "complete" if not issues else "incomplete"
+    return status, issues, resolved_score_sources, result_json_paths
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--bfcl-root", required=True)
@@ -382,12 +435,21 @@ def main() -> None:
     if latency and latency < 100 and failure_summary["mean_latency_ms"] >= 100:
         latency *= 1000.0
 
+    evaluation_status, artifact_issues, resolved_score_sources, result_json_paths = _assess_evaluation_status(
+        overall=overall,
+        subsets=subsets,
+        metric_sources=metric_sources,
+        failure_summary=failure_summary,
+        bfcl_root=bfcl_root,
+        test_category=args.test_category,
+    )
+
     metrics = {
         "label": args.label,
         "protocol_id": args.protocol_id,
         "model": args.model,
         "test_category": args.test_category,
-        "acc": overall.get("acc", 0.0),
+        "acc": overall.get("acc"),
         "cost": overall.get("cost", 0.0),
         "latency": latency,
         "regression": regression,
@@ -396,6 +458,10 @@ def main() -> None:
         "fallback_count": failure_summary["fallback_count"],
         "subsets": subsets,
         "metric_sources": metric_sources,
+        "resolved_score_sources": resolved_score_sources,
+        "result_json_paths": result_json_paths,
+        "evaluation_status": evaluation_status,
+        "artifact_validity_issues": artifact_issues,
         "bfcl_root": str(bfcl_root),
         "trace_dir": str(trace_dir),
     }

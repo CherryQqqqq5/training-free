@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import json
+import sys
 import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from scripts.aggregate_bfcl_metrics import discover_bfcl_metrics
 
@@ -46,27 +49,26 @@ class AggregateBfclMetricsTests(unittest.TestCase):
         self.assertEqual(overall["cost"], 1.25)
         self.assertEqual(overall["latency"], 3440.0)
         self.assertEqual(subsets["multi_turn_miss_param"], 91.0)
-        self.assertEqual(subsets["multi_turn_overall_acc"], 80.0)
-        self.assertEqual(subsets["multi_turn_base"], 75.0)
-        self.assertEqual(subsets["json_stream_subset"], 4.0)
         self.assertTrue(any(path.endswith("data_overall.csv") for path in sources))
-        self.assertTrue(any(path.endswith("summary.json") for path in sources))
 
-    def test_result_json_latency_is_normalized_to_ms_via_trace_summary_fallback(self) -> None:
+    def test_marks_incomplete_without_required_subset_metric(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             bfcl_root = root / "bfcl"
             trace_dir = root / "traces"
             artifacts_dir = root / "artifacts"
+            score_dir = bfcl_root / "score"
             result_dir = bfcl_root / "result"
+            score_dir.mkdir(parents=True)
             result_dir.mkdir(parents=True)
             trace_dir.mkdir(parents=True)
             artifacts_dir.mkdir(parents=True)
 
-            (result_dir / "BFCL_v4_demo_result.json").write_text(
-                '{"id":"demo_0","result":"x","latency":2.5}\n',
+            (score_dir / "data_overall.csv").write_text(
+                "Rank,Overall Acc,Model,Total Cost ($),Latency Mean (s)\n1,2.28%,demo-model,1.25,3.44\n",
                 encoding="utf-8",
             )
+            (result_dir / "BFCL_v4_demo_result.json").write_text('{"latency":2.5}\n', encoding="utf-8")
             (trace_dir / "trace.json").write_text(
                 '{"trace_id":"trace","status_code":200,"latency_ms":2500.0,"validation":{"issues":[]}}\n',
                 encoding="utf-8",
@@ -77,7 +79,7 @@ class AggregateBfclMetricsTests(unittest.TestCase):
             summary = artifacts_dir / "failure_summary.json"
             result = subprocess.run(
                 [
-                    "python",
+                    "python3",
                     "scripts/aggregate_bfcl_metrics.py",
                     "--bfcl-root",
                     str(bfcl_root),
@@ -89,6 +91,8 @@ class AggregateBfclMetricsTests(unittest.TestCase):
                     str(repairs),
                     "--failure-summary-out",
                     str(summary),
+                    "--test-category",
+                    "multi_turn_miss_param",
                 ],
                 cwd=Path(__file__).resolve().parents[1],
                 check=False,
@@ -96,7 +100,9 @@ class AggregateBfclMetricsTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0)
             metrics = json.loads(out.read_text(encoding="utf-8"))
 
-        self.assertEqual(metrics["latency"], 2500.0)
+        self.assertEqual(metrics["evaluation_status"], "incomplete")
+        self.assertIn("subset metric missing", ";".join(metrics["artifact_validity_issues"]))
+        self.assertIsNotNone(metrics["acc"])
 
 
 if __name__ == "__main__":

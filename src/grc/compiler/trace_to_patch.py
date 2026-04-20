@@ -1,11 +1,19 @@
 from __future__ import annotations
 
 import json
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 from typing import DefaultDict, Dict, List
 
-import yaml
+try:
+    import yaml
+except ModuleNotFoundError:
+    class _YamlCompat:
+        @staticmethod
+        def safe_dump(data, **kwargs):
+            return json.dumps(data, ensure_ascii=False, indent=2)
+
+    yaml = _YamlCompat()
 
 from grc.types import (
     FailureCase,
@@ -286,102 +294,185 @@ def _build_global_guard_rules(grouped: DefaultDict[str, List[FailureCase]]) -> L
     return rules
 
 
+def _high_value_error_types(failures: List[FailureCase]) -> List[str]:
+    counter = Counter(case.error_type for case in failures)
+    return [error_type for error_type, _ in counter.most_common()]
+
+
+def _status_payload(
+    *,
+    status: str,
+    patch_id: str,
+    source_failure_count: int,
+    failure_ir_count: int,
+    rule_count: int,
+    high_value_error_types: List[str],
+    reason: str,
+) -> Dict[str, object]:
+    return {
+        "status": status,
+        "patch_id": patch_id,
+        "source_failure_count": source_failure_count,
+        "failure_ir_count": failure_ir_count,
+        "rule_count": rule_count,
+        "high_value_error_types": high_value_error_types,
+        "reason": reason,
+    }
+
+
+def _write_compile_status(status: Dict[str, object], out_path: str, candidate_dir: str | None) -> None:
+    status_json = json.dumps(status, ensure_ascii=False, indent=2)
+    out_file = Path(out_path)
+    status_paths = {out_file.parent / "compile_status.json"}
+    if candidate_dir:
+        candidate_path = Path(candidate_dir)
+        candidate_path.mkdir(parents=True, exist_ok=True)
+        status_paths.add(candidate_path / "compile_status.json")
+    for path in status_paths:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(status_json, encoding="utf-8")
+
+
 def compile_patch(
     failure_jsonl: str,
     out_path: str,
     patch_id: str = "patch_auto_001",
     candidate_dir: str | None = None,
-) -> None:
-    grouped: DefaultDict[str, List[FailureCase]] = defaultdict(list)
-    failures = _load_failures(failure_jsonl)
-    for item in failures:
-        grouped[item.tool_name].append(item)
-
-    rules: List[Rule] = []
-    failure_irs = _build_failure_ir(grouped)
-    failure_ir_map = {item.tool_name: item for item in failure_irs}
-    rules.extend(_build_global_guard_rules(grouped))
-
-    for tool_name, failures in grouped.items():
-        if tool_name == "__none__":
-            continue
-
-        fields: Dict[str, FieldConstraint] = {}
-        for case in failures:
-            if not case.field_name:
-                continue
-            field_constraint = fields.get(case.field_name, FieldConstraint())
-            if case.expected_type:
-                field_constraint.type = case.expected_type
-            if case.error_type == "missing_required":
-                field_constraint.required = True
-            fields[case.field_name] = field_constraint
-
-        spec = ToolSanitizerSpec(
-            repair_json=True,
-            coerce_types=True,
-            strip_unknown_keys=True,
-            fill_defaults=True,
-            fields=fields,
-        )
-
-        failure_ir = failure_ir_map[tool_name]
-        prompt_fragments = _prompt_fragments(tool_name, failure_ir)
-        guard_action = _guard_action_for_failure_ir(failure_ir)
-        fallback = _fallback_for_failure_ir(failure_ir)
-        verification = _verification_contract_for_failure_ir(failure_ir)
-        rules.append(
-            Rule(
-                rule_id=f"rule_{tool_name}_arg_sanitizer_v1",
-                priority=10,
-                enabled=True,
-                trigger=MatchSpec(
-                    tool_names=[tool_name],
-                    error_types=failure_ir.error_types,
-                    category_patterns=failure_ir.categories,
-                ),
-                scope=PatchScope(tool_names=[tool_name], patch_sites=PATCH_SITES),
-                action=RuleAction(
-                    prompt_fragments=prompt_fragments,
-                    prompt_injection=PromptInjectionSpec(fragments=prompt_fragments),
-                    tool_guard=ToolGuardSpec(
-                        enabled=True,
-                        on_violation=guard_action,
-                        on_unknown_tool=guard_action,
-                        on_empty_tool_call="record",
-                        assistant_message=fallback.assistant_message,
-                    ),
-                    arg_sanitizer={tool_name: spec},
-                    verification=verification,
-                    fallback_router=fallback,
-                ),
-                validation_contract=verification,
-            )
-        )
-
-    bundle = PatchBundle(
-        patch_id=patch_id,
-        rules=rules,
-        failure_ir=failure_irs,
-        source_failure_count=len(failures),
-        metadata={
-            "compiler": "trace_to_patch",
-            "failure_jsonl": str(Path(failure_jsonl)),
-            "candidate_dir": candidate_dir,
-        },
-    )
+) -> Dict[str, object]:
     out_file = Path(out_path)
     out_file.parent.mkdir(parents=True, exist_ok=True)
-    out_file.write_text(
-        yaml.safe_dump(bundle.model_dump(mode="python"), sort_keys=False, allow_unicode=True),
-        encoding="utf-8",
-    )
 
-    if candidate_dir:
-        candidate_path = Path(candidate_dir)
-        candidate_path.mkdir(parents=True, exist_ok=True)
-        (candidate_path / "rule.yaml").write_text(out_file.read_text(encoding="utf-8"), encoding="utf-8")
-        (candidate_path / "failure_summary.json").write_text(
-            json.dumps(_failure_summary(failure_irs, len(failures), patch_id), ensure_ascii=False, indent=2),
-            encoding="utf-8",
+    try:
+        grouped: DefaultDict[str, List[FailureCase]] = defaultdict(list)
+        failures = _load_failures(failure_jsonl)
+        for item in failures:
+            grouped[item.tool_name].append(item)
+
+        rules: List[Rule] = []
+        failure_irs = _build_failure_ir(grouped)
+        failure_ir_map = {item.tool_name: item for item in failure_irs}
+        rules.extend(_build_global_guard_rules(grouped))
+
+        for tool_name, failures_for_tool in grouped.items():
+            if tool_name == "__none__":
+                continue
+
+            fields: Dict[str, FieldConstraint] = {}
+            for case in failures_for_tool:
+                if not case.field_name:
+                    continue
+                field_constraint = fields.get(case.field_name, FieldConstraint())
+                if case.expected_type:
+                    field_constraint.type = case.expected_type
+                if case.error_type == "missing_required":
+                    field_constraint.required = True
+                fields[case.field_name] = field_constraint
+
+            spec = ToolSanitizerSpec(
+                repair_json=True,
+                coerce_types=True,
+                strip_unknown_keys=True,
+                fill_defaults=True,
+                fields=fields,
+            )
+
+            failure_ir = failure_ir_map[tool_name]
+            prompt_fragments = _prompt_fragments(tool_name, failure_ir)
+            guard_action = _guard_action_for_failure_ir(failure_ir)
+            fallback = _fallback_for_failure_ir(failure_ir)
+            verification = _verification_contract_for_failure_ir(failure_ir)
+            rules.append(
+                Rule(
+                    rule_id=f"rule_{tool_name}_arg_sanitizer_v1",
+                    priority=10,
+                    enabled=True,
+                    trigger=MatchSpec(
+                        tool_names=[tool_name],
+                        error_types=failure_ir.error_types,
+                        category_patterns=failure_ir.categories,
+                    ),
+                    scope=PatchScope(tool_names=[tool_name], patch_sites=PATCH_SITES),
+                    action=RuleAction(
+                        prompt_fragments=prompt_fragments,
+                        prompt_injection=PromptInjectionSpec(fragments=prompt_fragments),
+                        tool_guard=ToolGuardSpec(
+                            enabled=True,
+                            on_violation=guard_action,
+                            on_unknown_tool=guard_action,
+                            on_empty_tool_call="record",
+                            assistant_message=fallback.assistant_message,
+                        ),
+                        arg_sanitizer={tool_name: spec},
+                        verification=verification,
+                        fallback_router=fallback,
+                    ),
+                    validation_contract=verification,
+                )
+            )
+
+        bundle = PatchBundle(
+            patch_id=patch_id,
+            rules=rules,
+            failure_ir=failure_irs,
+            source_failure_count=len(failures),
+            metadata={
+                "compiler": "trace_to_patch",
+                "failure_jsonl": str(Path(failure_jsonl)),
+                "candidate_dir": candidate_dir,
+            },
         )
+        payload = bundle.model_dump(mode="python")
+        out_file.write_text(yaml.safe_dump(payload, sort_keys=False, allow_unicode=True), encoding="utf-8")
+
+        if candidate_dir:
+            candidate_path = Path(candidate_dir)
+            candidate_path.mkdir(parents=True, exist_ok=True)
+            (candidate_path / "rule.yaml").write_text(out_file.read_text(encoding="utf-8"), encoding="utf-8")
+            (candidate_path / "failure_summary.json").write_text(
+                json.dumps(_failure_summary(failure_irs, len(failures), patch_id), ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+
+        if len(failures) == 0:
+            status = _status_payload(
+                status="no_failure_evidence",
+                patch_id=patch_id,
+                source_failure_count=0,
+                failure_ir_count=0,
+                rule_count=len(rules),
+                high_value_error_types=[],
+                reason="mined failures is empty",
+            )
+        elif len(failure_irs) == 0 or len(rules) == 0:
+            status = _status_payload(
+                status="uncompilable_failure_evidence",
+                patch_id=patch_id,
+                source_failure_count=len(failures),
+                failure_ir_count=len(failure_irs),
+                rule_count=len(rules),
+                high_value_error_types=_high_value_error_types(failures),
+                reason="compiler could not synthesize non-empty rules from mined failures",
+            )
+        else:
+            status = _status_payload(
+                status="actionable_patch",
+                patch_id=patch_id,
+                source_failure_count=len(failures),
+                failure_ir_count=len(failure_irs),
+                rule_count=len(rules),
+                high_value_error_types=_high_value_error_types(failures),
+                reason="rule bundle compiled successfully",
+            )
+    except Exception as exc:
+        status = _status_payload(
+            status="compile_failed",
+            patch_id=patch_id,
+            source_failure_count=0,
+            failure_ir_count=0,
+            rule_count=0,
+            high_value_error_types=[],
+            reason=f"compile exception: {type(exc).__name__}: {exc}",
+        )
+
+    _write_compile_status(status, out_path, candidate_dir)
+    return status

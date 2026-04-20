@@ -46,14 +46,17 @@ def compile(
 ) -> None:
     from grc.compiler.trace_to_patch import compile_patch
 
-    compile_patch(failures, out, patch_id=patch_id, candidate_dir=candidate_dir)
-    print(f"wrote patch -> {out}")
+    status = compile_patch(failures, out, patch_id=patch_id, candidate_dir=candidate_dir)
+    print(json.dumps(status, ensure_ascii=False, indent=2))
 
 
 @app.command()
 def select(
     baseline_metrics: str = typer.Option(..., "--baseline-metrics"),
     candidate_metrics: str = typer.Option(..., "--candidate-metrics"),
+    baseline_manifest: str | None = typer.Option(None, "--baseline-manifest"),
+    candidate_manifest: str | None = typer.Option(None, "--candidate-manifest"),
+    compile_status: str | None = typer.Option(None, "--compile-status"),
     candidate_dir: str | None = typer.Option(None, "--candidate-dir"),
     rule_path: str | None = typer.Option(None, "--rule-path"),
     accepted_dir: str | None = typer.Option(None, "--accepted-dir"),
@@ -63,7 +66,13 @@ def select(
 ) -> None:
     from grc.selector.pareto import select_patch, write_selection_outputs
 
-    decision = select_patch(baseline_metrics, candidate_metrics)
+    decision = select_patch(
+        baseline_metrics,
+        candidate_metrics,
+        baseline_manifest_path=baseline_manifest,
+        candidate_manifest_path=candidate_manifest,
+        compile_status_path=compile_status,
+    )
     write_selection_outputs(decision, candidate_dir, rule_path, accepted_dir, rejected_dir, active_dir, out)
     print(json.dumps(decision, ensure_ascii=False, indent=2))
 
