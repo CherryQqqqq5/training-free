@@ -19,7 +19,6 @@ MANIFEST_MATCH_KEYS = (
     "bfcl_model_alias",
     "upstream_profile",
     "upstream_model_route",
-    "lane",
 )
 
 
@@ -116,9 +115,20 @@ def _validate_manifest_consistency(
     baseline_manifest = _load_json(Path(baseline_manifest_path))
     candidate_manifest = _load_json(Path(candidate_manifest_path))
     issues: list[str] = []
+
+    # Equality checks for core experiment identity
     for key in MANIFEST_MATCH_KEYS:
         if str(baseline_manifest.get(key, "")) != str(candidate_manifest.get(key, "")):
             issues.append(f"manifest mismatch on {key}")
+
+    # Special lane pairing validation (baseline vs candidate must form a valid pair)
+    baseline_lane = str(baseline_manifest.get("lane", ""))
+    candidate_lane = str(candidate_manifest.get("lane", ""))
+    if baseline_lane != "compatibility_baseline":
+        issues.append(f"baseline lane must be compatibility_baseline, got {baseline_lane}")
+    if candidate_lane != "compiler_patch":
+        issues.append(f"candidate lane must be compiler_patch, got {candidate_lane}")
+
     return issues
 
 

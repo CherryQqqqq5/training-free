@@ -412,7 +412,7 @@ def _assess_evaluation_status(
             for p in relevant_patterns
         )
         for k in subsets.keys()
-    ) or bool(subsets)
+    )
 
     if category_key and not has_relevant_subset:
         issues.append(
