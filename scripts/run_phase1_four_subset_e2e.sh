@@ -5,6 +5,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 source "${REPO_ROOT}/configs/bfcl_v4_phase1.env"
+BFCL_RUNTIME_CONFIG_DEFAULT="${GRC_BFCL_RUNTIME_CONFIG:-${REPO_ROOT}/configs/runtime_bfcl_structured.yaml}"
 if [[ -f "${REPO_ROOT}/configs/bfcl_v4_openrouter.env" ]]; then
   # shellcheck source=/dev/null
   source "${REPO_ROOT}/configs/bfcl_v4_openrouter.env"
@@ -35,7 +36,7 @@ for CAT in "${CATEGORIES[@]}"; do
     "${BASELINE_ROOT}" \
     "8011" \
     "${CAT}" \
-    "${REPO_ROOT}/configs/runtime.yaml" \
+    "${BFCL_RUNTIME_CONFIG_DEFAULT}" \
     "${REPO_ROOT}/rules/baseline_empty" \
     "${BASELINE_ROOT}/traces" \
     "${BASELINE_ROOT}/artifacts"
@@ -52,7 +53,7 @@ for CAT in "${CATEGORIES[@]}"; do
     "${PATCH_ROOT}" \
     "8012" \
     "${CAT}" \
-    "${REPO_ROOT}/configs/runtime.yaml" \
+    "${BFCL_RUNTIME_CONFIG_DEFAULT}" \
     "${CANDIDATE_DIR}" \
     "${PATCH_ROOT}/traces" \
     "${CANDIDATE_DIR}" \

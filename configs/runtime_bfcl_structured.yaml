@@ -1,0 +1,53 @@
+timeout_sec: 120
+
+runtime_policy:
+  # Preserve current conservative runtime behavior for general traffic, but add
+  # an opt-in compatibility mode for strict function-calling evaluators.
+  record_only_no_tool_kinds:
+    - clarification_request
+    - unsupported_request
+    - hallucinated_completion
+    - malformed_output
+    - natural_language_termination
+
+  # BFCL's FC decoder assumes tool-enabled turns yield structured function-call
+  # payloads. When the upstream model emits text-only clarification or terminal
+  # prose instead, coerce those no-tool responses to empty content so the
+  # evaluator does not try to decode arbitrary text as function-call objects.
+  coerce_no_tool_response_to_empty_kinds:
+    - clarification_request
+    - unsupported_request
+    - hallucinated_completion
+    - malformed_output
+    - natural_language_termination
+
+  # Request-side guidance for strict tool clients: bias the model toward
+  # emitting the next tool call, grounding path-sensitive actions in the latest
+  # working state, and reusing explicit literals from prior turns/tool outputs.
+  inject_structured_tool_guidance: true
+  inject_context_literal_hints: true
+
+  # Response-side cleanup: when a tool call still contains references like
+  # "the file I previously mentioned", resolve them against explicit literals
+  # already present in the conversation/tool state.
+  resolve_contextual_string_args: true
+
+upstream:
+  active_profile: "openrouter"
+  base_url: "https://YOUR_UPSTREAM_OPENAI_COMPATIBLE_ENDPOINT/v1"
+  api_key_env: "OPENAI_API_KEY"
+  model: "gpt-5.4"
+  profiles:
+    novacode:
+      base_url_env: "NOVACODE_BASE_URL"
+      base_url: "https://ai.novacode.top/v1"
+      api_key_env: "NOVACODE_API_KEY"
+      model: "gpt-5.4"
+    openrouter:
+      base_url_env: "OPENROUTER_BASE_URL"
+      base_url: "https://openrouter.ai/api/v1"
+      api_key_env: "OPENROUTER_API_KEY"
+      model: "x-ai/grok-3-beta"
+      http_referer_env: "OPENROUTER_HTTP_REFERER"
+      title_env: "OPENROUTER_X_TITLE"
+      default_title: "golden-rule-compiler"

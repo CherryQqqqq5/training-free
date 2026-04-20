@@ -1,0 +1,274 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "How much will 20000 Japanese Yen be in United States Dollar?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "convert_currency",
+        "description": "Converts an amount from a particular currency to another currency. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "base_currency": {
+              "type": "string",
+              "description": "The base currency in which the original amount is present."
+            },
+            "target_currency": {
+              "type": "string",
+              "description": "The currency to which you want to convert."
+            },
+            "amount": {
+              "type": "integer",
+              "description": "The amount you want to convert."
+            }
+          },
+          "required": [
+            "base_currency",
+            "target_currency",
+            "amount"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "How much will 20000 Japanese Yen be in United States Dollar?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "convert_currency",
+          "description": "Converts an amount from a particular currency to another currency. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "base_currency": {
+                "type": "string",
+                "description": "The base currency in which the original amount is present."
+              },
+              "target_currency": {
+                "type": "string",
+                "description": "The currency to which you want to convert."
+              },
+              "amount": {
+                "type": "integer",
+                "description": "The amount you want to convert."
+              }
+            },
+            "required": [
+              "base_currency",
+              "target_currency",
+              "amount"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "tool_schema_snapshot": {
+    "convert_currency": {
+      "type": "object",
+      "properties": {
+        "base_currency": {
+          "type": "string",
+          "description": "The base currency in which the original amount is present."
+        },
+        "target_currency": {
+          "type": "string",
+          "description": "The currency to which you want to convert."
+        },
+        "amount": {
+          "type": "integer",
+          "description": "The amount you want to convert."
+        }
+      },
+      "required": [
+        "base_currency",
+        "target_currency",
+        "amount"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776518155-QigW0S2qDsjQD9humJ4C",
+    "object": "chat.completion",
+    "created": 1776518155,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_60161081",
+              "function": {
+                "name": "convert_currency",
+                "arguments": "{\"base_currency\":\"JPY\",\"target_currency\":\"USD\",\"amount\":20000}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 339,
+      "completion_tokens": 41,
+      "total_tokens": 380,
+      "cost": 0.0011501325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00116175,
+        "upstream_inference_prompt_cost": 0.00054675,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776518155-QigW0S2qDsjQD9humJ4C",
+    "object": "response",
+    "created_at": 1776518157,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_60161081",
+        "call_id": "call_60161081",
+        "name": "convert_currency",
+        "arguments": "{\"base_currency\":\"JPY\",\"target_currency\":\"USD\",\"amount\":20000}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 339,
+      "completion_tokens": 41,
+      "total_tokens": 380,
+      "cost": 0.0011501325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00116175,
+        "upstream_inference_prompt_cost": 0.00054675,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776518155-QigW0S2qDsjQD9humJ4C",
+    "object": "chat.completion",
+    "created": 1776518155,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_60161081",
+              "function": {
+                "name": "convert_currency",
+                "arguments": "{\"base_currency\":\"JPY\",\"target_currency\":\"USD\",\"amount\":20000}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 339,
+      "completion_tokens": 41,
+      "total_tokens": 380,
+      "cost": 0.0011501325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00116175,
+        "upstream_inference_prompt_cost": 0.00054675,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2210.11,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "8e660f56-b855-490b-b52c-b1d9b387d283"
+}

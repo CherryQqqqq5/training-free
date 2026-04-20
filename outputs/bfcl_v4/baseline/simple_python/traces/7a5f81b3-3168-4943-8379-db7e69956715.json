@@ -1,0 +1,289 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the Population Density for Brazil in 2022 if the population is 213 million and the land area is 8.5 million square kilometers."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_density",
+        "description": "Calculate the population density of a specific country in a specific year. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "country": {
+              "type": "string",
+              "description": "The country for which the density needs to be calculated."
+            },
+            "year": {
+              "type": "string",
+              "description": "The year in which the density is to be calculated."
+            },
+            "population": {
+              "type": "integer",
+              "description": "The population of the country."
+            },
+            "land_area": {
+              "type": "integer",
+              "description": "The land area of the country in square kilometers."
+            }
+          },
+          "required": [
+            "country",
+            "year",
+            "population",
+            "land_area"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the Population Density for Brazil in 2022 if the population is 213 million and the land area is 8.5 million square kilometers."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_density",
+          "description": "Calculate the population density of a specific country in a specific year. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "country": {
+                "type": "string",
+                "description": "The country for which the density needs to be calculated."
+              },
+              "year": {
+                "type": "string",
+                "description": "The year in which the density is to be calculated."
+              },
+              "population": {
+                "type": "integer",
+                "description": "The population of the country."
+              },
+              "land_area": {
+                "type": "integer",
+                "description": "The land area of the country in square kilometers."
+              }
+            },
+            "required": [
+              "country",
+              "year",
+              "population",
+              "land_area"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "tool_schema_snapshot": {
+    "calculate_density": {
+      "type": "object",
+      "properties": {
+        "country": {
+          "type": "string",
+          "description": "The country for which the density needs to be calculated."
+        },
+        "year": {
+          "type": "string",
+          "description": "The year in which the density is to be calculated."
+        },
+        "population": {
+          "type": "integer",
+          "description": "The population of the country."
+        },
+        "land_area": {
+          "type": "integer",
+          "description": "The land area of the country in square kilometers."
+        }
+      },
+      "required": [
+        "country",
+        "year",
+        "population",
+        "land_area"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776517339-se6SGICf3jBAEeV7xqQI",
+    "object": "chat.completion",
+    "created": 1776517339,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_71151227",
+              "function": {
+                "name": "calculate_density",
+                "arguments": "{\"country\":\"Brazil\",\"year\":\"2022\",\"population\":213000000,\"land_area\":8500000}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 376,
+      "completion_tokens": 49,
+      "total_tokens": 425,
+      "cost": 0.001376595,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0013905,
+        "upstream_inference_prompt_cost": 0.0006555,
+        "upstream_inference_completions_cost": 0.000735
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776517339-se6SGICf3jBAEeV7xqQI",
+    "object": "response",
+    "created_at": 1776517340,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_71151227",
+        "call_id": "call_71151227",
+        "name": "calculate_density",
+        "arguments": "{\"country\":\"Brazil\",\"year\":\"2022\",\"population\":213000000,\"land_area\":8500000}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 376,
+      "completion_tokens": 49,
+      "total_tokens": 425,
+      "cost": 0.001376595,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0013905,
+        "upstream_inference_prompt_cost": 0.0006555,
+        "upstream_inference_completions_cost": 0.000735
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776517339-se6SGICf3jBAEeV7xqQI",
+    "object": "chat.completion",
+    "created": 1776517339,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_71151227",
+              "function": {
+                "name": "calculate_density",
+                "arguments": "{\"country\":\"Brazil\",\"year\":\"2022\",\"population\":213000000,\"land_area\":8500000}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 376,
+      "completion_tokens": 49,
+      "total_tokens": 425,
+      "cost": 0.001376595,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0013905,
+        "upstream_inference_prompt_cost": 0.0006555,
+        "upstream_inference_completions_cost": 0.000735
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2300.984,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "7a5f81b3-3168-4943-8379-db7e69956715"
+}

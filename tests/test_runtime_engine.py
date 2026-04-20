@@ -21,6 +21,210 @@ if _INJECTED_YAML_STUB:
 
 
 class RuntimeEngineTests(unittest.TestCase):
+    def test_apply_request_does_not_inject_global_prompts_by_default(self) -> None:
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir)
+            engine.rules = [
+                Rule(
+                    rule_id="rule_global_no_tool_empty_tool_call_v1",
+                    trigger=MatchSpec(error_types=["empty_tool_call"]),
+                    scope=PatchScope(tool_names=[], patch_sites=["prompt_injector"]),
+                    action=RuleAction(
+                        prompt_fragments=["Emit the next tool call instead of explanatory prose."],
+                    ),
+                )
+            ]
+            request = {
+                "model": "demo-model",
+                "messages": [{"role": "user", "content": "What's the weather in Shanghai?"}],
+                "tools": [
+                    {
+                        "type": "function",
+                        "function": {
+                            "name": "lookup_weather",
+                            "parameters": {
+                                "type": "object",
+                                "properties": {"city": {"type": "string"}},
+                                "required": ["city"],
+                            },
+                        },
+                    }
+                ],
+            }
+
+            patched, request_patches = engine.apply_request(request)
+
+        self.assertEqual(patched["messages"], request["messages"])
+        self.assertEqual(request_patches, [])
+
+    def test_apply_request_can_opt_in_global_prompt_injection(self) -> None:
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir, runtime_policy={"allow_global_prompt_injection": True})
+            engine.rules = [
+                Rule(
+                    rule_id="rule_global_no_tool_empty_tool_call_v1",
+                    trigger=MatchSpec(error_types=["empty_tool_call"]),
+                    scope=PatchScope(tool_names=[], patch_sites=["prompt_injector"]),
+                    action=RuleAction(
+                        prompt_injection={"fragments": ["Emit the next tool call instead of explanatory prose."]},
+                    ),
+                )
+            ]
+            request = {
+                "model": "demo-model",
+                "messages": [{"role": "user", "content": "What's the weather in Shanghai?"}],
+                "tools": [
+                    {
+                        "type": "function",
+                        "function": {
+                            "name": "lookup_weather",
+                            "parameters": {
+                                "type": "object",
+                                "properties": {"city": {"type": "string"}},
+                                "required": ["city"],
+                            },
+                        },
+                    }
+                ],
+            }
+
+            patched, request_patches = engine.apply_request(request)
+
+        self.assertEqual(patched["messages"][0]["role"], "system")
+        self.assertIn("Emit the next tool call instead of explanatory prose.", patched["messages"][0]["content"])
+        self.assertEqual(
+            request_patches,
+            ["prompt_injector:Emit the next tool call instead of explanatory prose."],
+        )
+
+    def test_apply_request_ignores_rules_without_prompt_injector_patch_site(self) -> None:
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir)
+            engine.rules = [
+                Rule(
+                    rule_id="rule_lookup_weather_verification_only_v1",
+                    trigger=MatchSpec(tool_names=["lookup_weather"]),
+                    scope=PatchScope(tool_names=["lookup_weather"], patch_sites=["verification_hook"]),
+                    action=RuleAction(
+                        prompt_fragments=["This prompt should not be injected."],
+                    ),
+                )
+            ]
+            request = {
+                "model": "demo-model",
+                "messages": [{"role": "user", "content": "What's the weather in Shanghai?"}],
+                "tools": [
+                    {
+                        "type": "function",
+                        "function": {
+                            "name": "lookup_weather",
+                            "parameters": {
+                                "type": "object",
+                                "properties": {"city": {"type": "string"}},
+                                "required": ["city"],
+                            },
+                        },
+                    }
+                ],
+            }
+
+            patched, request_patches = engine.apply_request(request)
+
+        self.assertEqual(patched["messages"], request["messages"])
+        self.assertEqual(request_patches, [])
+
+    def test_apply_request_can_inject_structured_tool_guidance(self) -> None:
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(
+                rules_dir,
+                runtime_policy={
+                    "inject_structured_tool_guidance": True,
+                    "inject_context_literal_hints": True,
+                },
+            )
+            request = {
+                "model": "demo-model",
+                "messages": [
+                    {"role": "user", "content": "Create a file named 'Annual_Report_2023.docx' inside 'communal'."}
+                ],
+                "tools": [
+                    {
+                        "type": "function",
+                        "function": {
+                            "name": "touch",
+                            "parameters": {
+                                "type": "object",
+                                "properties": {"file_name": {"type": "string"}},
+                                "required": ["file_name"],
+                            },
+                        },
+                    }
+                ],
+            }
+
+            patched, request_patches = engine.apply_request(request)
+
+        self.assertEqual(patched["messages"][0]["role"], "system")
+        system_text = patched["messages"][0]["content"]
+        self.assertIn("emit the next tool call instead of explanatory prose", system_text)
+        self.assertIn("Known explicit context values you can reuse exactly if relevant", system_text)
+        self.assertIn("Annual_Report_2023.docx", system_text)
+        self.assertTrue(any(patch.startswith("prompt_injector:For tool-enabled turns") for patch in request_patches))
+
+    def test_engine_strips_narration_when_tool_calls_are_present(self) -> None:
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir)
+            request = {
+                "model": "demo-model",
+                "tools": [
+                    {
+                        "type": "function",
+                        "function": {
+                            "name": "lookup_weather",
+                            "parameters": {
+                                "type": "object",
+                                "properties": {"city": {"type": "string"}},
+                                "required": ["city"],
+                            },
+                        },
+                    }
+                ],
+            }
+            response = {
+                "choices": [
+                    {
+                        "message": {
+                            "role": "assistant",
+                            "content": "I'll fetch the weather now.",
+                            "tool_calls": [
+                                {
+                                    "id": "call_1",
+                                    "type": "function",
+                                    "function": {
+                                        "name": "lookup_weather",
+                                        "arguments": json.dumps({"city": "Shanghai"}),
+                                    },
+                                }
+                            ],
+                        }
+                    }
+                ]
+            }
+
+            final_response, repairs, validation = engine.apply_response(request, response)
+
+        self.assertEqual(final_response["choices"][0]["message"]["content"], "")
+        self.assertEqual(
+            repairs,
+            [
+                {
+                    "kind": "strip_assistant_content_with_tool_calls",
+                    "reason": "assistant narration removed because the same message already emits tool calls",
+                }
+            ],
+        )
+        self.assertEqual(validation.repairs, repairs)
+
     def test_hallucinated_completion_recovery_rule_overrides_record_only_default(self) -> None:
         with tempfile.TemporaryDirectory() as rules_dir:
             engine = RuleEngine(rules_dir)
@@ -75,6 +279,246 @@ class RuntimeEngineTests(unittest.TestCase):
             "No tool call was emitted. Emit the required tool call before claiming progress.",
         )
 
+    def test_no_tool_text_can_be_coerced_to_empty_for_structured_clients(self) -> None:
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(
+                rules_dir,
+                runtime_policy={"coerce_no_tool_response_to_empty_kinds": ["clarification_request"]},
+            )
+            request = {
+                "model": "demo-model",
+                "tools": [
+                    {
+                        "type": "function",
+                        "function": {
+                            "name": "lookup_weather",
+                            "parameters": {
+                                "type": "object",
+                                "properties": {"city": {"type": "string"}},
+                                "required": ["city"],
+                            },
+                        },
+                    }
+                ],
+            }
+            response = {
+                "choices": [
+                    {
+                        "message": {
+                            "role": "assistant",
+                            "content": "Could you please specify which city you'd like me to check?",
+                        }
+                    }
+                ]
+            }
+
+            final_response, repairs, validation = engine.apply_response(request, response)
+
+        self.assertEqual(final_response["choices"][0]["message"]["content"], "")
+        self.assertEqual(
+            repairs,
+            [
+                {
+                    "kind": "coerce_no_tool_text_to_empty",
+                    "issue_kind": "clarification_request",
+                    "reason": "assistant emitted text-only content on a tool-enabled turn; coerced to empty response for structured tool clients",
+                }
+            ],
+        )
+        self.assertEqual([issue.kind for issue in validation.issues], ["clarification_request"])
+        self.assertFalse(validation.fallback_applied)
+
+    def test_explicit_no_tool_recovery_takes_precedence_over_empty_coercion(self) -> None:
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(
+                rules_dir,
+                runtime_policy={"coerce_no_tool_response_to_empty_kinds": ["clarification_request"]},
+            )
+            engine.rules = [
+                Rule(
+                    rule_id="rule_global_clarification_request_v1",
+                    trigger=MatchSpec(error_types=["clarification_request"]),
+                    scope=PatchScope(tool_names=[], patch_sites=["fallback_router"]),
+                    action=RuleAction(
+                        fallback_router=FallbackRoutingSpec(
+                            strategy="assistant_message",
+                            assistant_message="Provide the next tool call instead of asking again.",
+                            on_issue_kinds=["clarification_request"],
+                        )
+                    ),
+                )
+            ]
+            request = {
+                "model": "demo-model",
+                "tools": [
+                    {
+                        "type": "function",
+                        "function": {
+                            "name": "lookup_weather",
+                            "parameters": {
+                                "type": "object",
+                                "properties": {"city": {"type": "string"}},
+                                "required": ["city"],
+                            },
+                        },
+                    }
+                ],
+            }
+            response = {
+                "choices": [
+                    {
+                        "message": {
+                            "role": "assistant",
+                            "content": "Could you please specify which city you'd like me to check?",
+                        }
+                    }
+                ]
+            }
+
+            final_response, repairs, validation = engine.apply_response(request, response)
+
+        self.assertEqual(
+            final_response["choices"][0]["message"]["content"],
+            "Provide the next tool call instead of asking again.",
+        )
+        self.assertEqual(repairs, [])
+        self.assertTrue(validation.fallback_applied)
+
+    def test_contextual_string_arg_resolution_reuses_prior_file_literal(self) -> None:
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(
+                rules_dir,
+                runtime_policy={"resolve_contextual_string_args": True},
+            )
+            request = {
+                "model": "demo-model",
+                "messages": [
+                    {"role": "user", "content": "Please create 'Annual_Report_2023.docx' in the communal folder."},
+                    {"role": "user", "content": "Now count words in the file I previously mentioned."},
+                ],
+                "tools": [
+                    {
+                        "type": "function",
+                        "function": {
+                            "name": "wc",
+                            "parameters": {
+                                "type": "object",
+                                "properties": {
+                                    "file_name": {
+                                        "type": "string",
+                                        "description": "Name of the file to inspect.",
+                                    },
+                                    "mode": {"type": "string"},
+                                },
+                                "required": ["file_name", "mode"],
+                            },
+                        },
+                    }
+                ],
+            }
+            response = {
+                "choices": [
+                    {
+                        "message": {
+                            "role": "assistant",
+                            "tool_calls": [
+                                {
+                                    "id": "call_1",
+                                    "type": "function",
+                                    "function": {
+                                        "name": "wc",
+                                        "arguments": json.dumps(
+                                            {"file_name": "the file I previously mentioned", "mode": "w"}
+                                        ),
+                                    },
+                                }
+                            ],
+                        }
+                    }
+                ]
+            }
+
+            final_response, repairs, validation = engine.apply_response(request, response)
+
+        self.assertEqual(
+            json.loads(final_response["choices"][0]["message"]["tool_calls"][0]["function"]["arguments"]),
+            {"file_name": "Annual_Report_2023.docx", "mode": "w"},
+        )
+        self.assertIn(
+            {
+                "kind": "resolve_contextual_string_arg",
+                "field": "file_name",
+                "from": "the file I previously mentioned",
+                "to": "Annual_Report_2023.docx",
+                "tool_name": "wc",
+            },
+            repairs,
+        )
+        self.assertEqual(validation.issues, [])
+
+    def test_no_tool_recovery_uses_matching_global_rule_only(self) -> None:
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir)
+            engine.rules = [
+                Rule(
+                    rule_id="rule_global_empty_tool_call_v1",
+                    trigger=MatchSpec(error_types=["empty_tool_call"]),
+                    scope=PatchScope(tool_names=[], patch_sites=["fallback_router"]),
+                    action=RuleAction(
+                        fallback_router=FallbackRoutingSpec(
+                            strategy="assistant_message",
+                            assistant_message="Emit the next tool call.",
+                            on_issue_kinds=["empty_tool_call"],
+                        )
+                    ),
+                ),
+                Rule(
+                    rule_id="rule_global_nl_termination_v1",
+                    trigger=MatchSpec(error_types=["natural_language_termination"]),
+                    scope=PatchScope(tool_names=[], patch_sites=["fallback_router"]),
+                    action=RuleAction(
+                        fallback_router=FallbackRoutingSpec(
+                            strategy="assistant_message",
+                            assistant_message="Do not terminate early.",
+                            on_issue_kinds=["natural_language_termination"],
+                        )
+                    ),
+                ),
+            ]
+            request = {
+                "model": "demo-model",
+                "tools": [
+                    {
+                        "type": "function",
+                        "function": {
+                            "name": "lookup_weather",
+                            "parameters": {
+                                "type": "object",
+                                "properties": {"city": {"type": "string"}},
+                                "required": ["city"],
+                            },
+                        },
+                    }
+                ],
+            }
+            response = {
+                "choices": [
+                    {
+                        "message": {
+                            "role": "assistant",
+                            "content": "Task is complete.",
+                        }
+                    }
+                ]
+            }
+
+            final_response, repairs, validation = engine.apply_response(request, response)
+
+        self.assertEqual(repairs, [])
+        self.assertTrue(validation.fallback_applied)
+        self.assertEqual([issue.kind for issue in validation.issues], ["natural_language_termination"])
+        self.assertEqual(final_response["choices"][0]["message"]["content"], "Do not terminate early.")
+
     def test_hallucinated_completion_is_record_only_by_default(self) -> None:
         with tempfile.TemporaryDirectory() as rules_dir:
             engine = RuleEngine(rules_dir)
@@ -114,6 +558,81 @@ class RuntimeEngineTests(unittest.TestCase):
             final_response["choices"][0]["message"]["content"],
             "I've already initiated a weather lookup. Once I have the results, I'll let you know.",
         )
+
+    def test_tool_specific_fallback_uses_matching_issue_rule_only(self) -> None:
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir)
+            engine.rules = [
+                Rule(
+                    rule_id="rule_lookup_weather_invalid_json_v1",
+                    trigger=MatchSpec(tool_names=["lookup_weather"], error_types=["invalid_json_args"]),
+                    scope=PatchScope(tool_names=["lookup_weather"], patch_sites=["fallback_router"]),
+                    action=RuleAction(
+                        fallback_router=FallbackRoutingSpec(
+                            strategy="assistant_message",
+                            assistant_message="Arguments must be valid JSON.",
+                            on_issue_kinds=["invalid_json_args"],
+                        )
+                    ),
+                ),
+                Rule(
+                    rule_id="rule_lookup_weather_missing_required_v1",
+                    trigger=MatchSpec(tool_names=["lookup_weather"], error_types=["missing_required"]),
+                    scope=PatchScope(tool_names=["lookup_weather"], patch_sites=["fallback_router"]),
+                    action=RuleAction(
+                        fallback_router=FallbackRoutingSpec(
+                            strategy="assistant_message",
+                            assistant_message="Missing required fields.",
+                            on_issue_kinds=["missing_required"],
+                        )
+                    ),
+                ),
+            ]
+            request = {
+                "model": "demo-model",
+                "tools": [
+                    {
+                        "type": "function",
+                        "function": {
+                            "name": "lookup_weather",
+                            "parameters": {
+                                "type": "object",
+                                "properties": {
+                                    "city": {"type": "string"},
+                                    "days": {"type": "integer"},
+                                },
+                                "required": ["city"],
+                            },
+                        },
+                    }
+                ],
+            }
+            response = {
+                "choices": [
+                    {
+                        "message": {
+                            "role": "assistant",
+                            "tool_calls": [
+                                {
+                                    "id": "call_1",
+                                    "type": "function",
+                                    "function": {
+                                        "name": "lookup_weather",
+                                        "arguments": json.dumps({"days": 3}),
+                                    },
+                                }
+                            ],
+                        }
+                    }
+                ]
+            }
+
+            final_response, repairs, validation = engine.apply_response(request, response)
+
+        self.assertEqual(repairs, [])
+        self.assertTrue(validation.fallback_applied)
+        self.assertEqual([issue.kind for issue in validation.issues], ["missing_required"])
+        self.assertEqual(final_response["choices"][0]["message"]["content"], "Missing required fields.")
 
     def test_natural_language_termination_is_record_only_by_default(self) -> None:
         with tempfile.TemporaryDirectory() as rules_dir:

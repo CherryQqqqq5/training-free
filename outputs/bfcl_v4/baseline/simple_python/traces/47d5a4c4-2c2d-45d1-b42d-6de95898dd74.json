@@ -1,0 +1,316 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Fetch all records for students studying Science in 'Bluebird High School' from the StudentDB."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "db_fetch_records",
+        "description": "Fetch records from a specified database table based on certain conditions. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "database_name": {
+              "type": "string",
+              "description": "The name of the database."
+            },
+            "table_name": {
+              "type": "string",
+              "description": "The name of the table from which records need to be fetched."
+            },
+            "conditions": {
+              "type": "object",
+              "properties": {
+                "department": {
+                  "type": "string",
+                  "description": "The name of the department of students."
+                },
+                "school": {
+                  "type": "string",
+                  "description": "The name of the school students are enrolled in."
+                }
+              },
+              "description": "The conditions based on which records are to be fetched."
+            },
+            "fetch_limit": {
+              "type": "integer",
+              "description": "Limits the number of records to be fetched. Default is 0, which means no limit."
+            }
+          },
+          "required": [
+            "database_name",
+            "table_name",
+            "conditions"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Fetch all records for students studying Science in 'Bluebird High School' from the StudentDB."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "db_fetch_records",
+          "description": "Fetch records from a specified database table based on certain conditions. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "database_name": {
+                "type": "string",
+                "description": "The name of the database."
+              },
+              "table_name": {
+                "type": "string",
+                "description": "The name of the table from which records need to be fetched."
+              },
+              "conditions": {
+                "type": "object",
+                "properties": {
+                  "department": {
+                    "type": "string",
+                    "description": "The name of the department of students."
+                  },
+                  "school": {
+                    "type": "string",
+                    "description": "The name of the school students are enrolled in."
+                  }
+                },
+                "description": "The conditions based on which records are to be fetched."
+              },
+              "fetch_limit": {
+                "type": "integer",
+                "description": "Limits the number of records to be fetched. Default is 0, which means no limit."
+              }
+            },
+            "required": [
+              "database_name",
+              "table_name",
+              "conditions"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "tool_schema_snapshot": {
+    "db_fetch_records": {
+      "type": "object",
+      "properties": {
+        "database_name": {
+          "type": "string",
+          "description": "The name of the database."
+        },
+        "table_name": {
+          "type": "string",
+          "description": "The name of the table from which records need to be fetched."
+        },
+        "conditions": {
+          "type": "object",
+          "properties": {
+            "department": {
+              "type": "string",
+              "description": "The name of the department of students."
+            },
+            "school": {
+              "type": "string",
+              "description": "The name of the school students are enrolled in."
+            }
+          },
+          "description": "The conditions based on which records are to be fetched."
+        },
+        "fetch_limit": {
+          "type": "integer",
+          "description": "Limits the number of records to be fetched. Default is 0, which means no limit."
+        }
+      },
+      "required": [
+        "database_name",
+        "table_name",
+        "conditions"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776517402-dXomcBpkK6ZaDg8CCnIC",
+    "object": "chat.completion",
+    "created": 1776517402,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_33333180",
+              "function": {
+                "name": "db_fetch_records",
+                "arguments": "{\"database_name\":\"StudentDB\",\"table_name\":\"students\",\"conditions\":{\"department\":\"Science\",\"school\":\"Bluebird High School\"},\"fetch_limit\":0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 419,
+      "completion_tokens": 60,
+      "total_tokens": 479,
+      "cost": 0.0016698825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00168675,
+        "upstream_inference_prompt_cost": 0.00078675,
+        "upstream_inference_completions_cost": 0.0009
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776517402-dXomcBpkK6ZaDg8CCnIC",
+    "object": "response",
+    "created_at": 1776517404,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_33333180",
+        "call_id": "call_33333180",
+        "name": "db_fetch_records",
+        "arguments": "{\"database_name\":\"StudentDB\",\"table_name\":\"students\",\"conditions\":{\"department\":\"Science\",\"school\":\"Bluebird High School\"},\"fetch_limit\":0}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 419,
+      "completion_tokens": 60,
+      "total_tokens": 479,
+      "cost": 0.0016698825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00168675,
+        "upstream_inference_prompt_cost": 0.00078675,
+        "upstream_inference_completions_cost": 0.0009
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776517402-dXomcBpkK6ZaDg8CCnIC",
+    "object": "chat.completion",
+    "created": 1776517402,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_33333180",
+              "function": {
+                "name": "db_fetch_records",
+                "arguments": "{\"database_name\":\"StudentDB\",\"table_name\":\"students\",\"conditions\":{\"department\":\"Science\",\"school\":\"Bluebird High School\"},\"fetch_limit\":0}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 419,
+      "completion_tokens": 60,
+      "total_tokens": 479,
+      "cost": 0.0016698825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00168675,
+        "upstream_inference_prompt_cost": 0.00078675,
+        "upstream_inference_completions_cost": 0.0009
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2213.316,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "47d5a4c4-2c2d-45d1-b42d-6de95898dd74"
+}

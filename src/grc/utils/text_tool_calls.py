@@ -203,6 +203,85 @@ def _parse_json_action_tool_calls(content: str) -> List[Dict[str, Any]]:
     return _json_action_to_tool_calls(payload)
 
 
+def _ast_literal_or_source(node: ast.AST, source: str) -> Any:
+    try:
+        return ast.literal_eval(node)
+    except Exception:
+        segment = ast.get_source_segment(source, node)
+        if isinstance(segment, str):
+            return segment.strip()
+        return ""
+
+
+def _call_node_to_tool_call(node: ast.Call, source: str, index: int) -> Dict[str, Any] | None:
+    if node.args:
+        return None
+    if not isinstance(node.func, ast.Name):
+        return None
+
+    args_obj: Dict[str, Any] = {}
+    for keyword in node.keywords:
+        if keyword.arg is None:
+            return None
+        args_obj[keyword.arg] = _ast_literal_or_source(keyword.value, source)
+
+    return _build_text_tool_call(node.func.id, args_obj, index)
+
+
+def _parse_python_style_tool_calls(content: str) -> List[Dict[str, Any]]:
+    text = strip_code_fence(content).strip()
+    if not text or "(" not in text or ")" not in text:
+        return []
+
+    line_candidates = [line.strip() for line in text.splitlines() if line.strip()]
+    if len(line_candidates) > 1 and all("(" in line and line.endswith(")") for line in line_candidates):
+        calls: List[Dict[str, Any]] = []
+        for line in line_candidates:
+            try:
+                parsed = ast.parse(line, mode="eval")
+            except SyntaxError:
+                return []
+            if not isinstance(parsed.body, ast.Call):
+                return []
+            tool_call = _call_node_to_tool_call(parsed.body, line, len(calls))
+            if tool_call is None:
+                return []
+            tool_call["id"] = f"textcall_{len(calls)}"
+            calls.append(tool_call)
+        return calls
+
+    candidate_expressions = [text]
+
+    for expression in candidate_expressions:
+        try:
+            parsed = ast.parse(expression, mode="eval")
+        except SyntaxError:
+            continue
+
+        nodes: List[ast.Call] = []
+        body = parsed.body
+        if isinstance(body, ast.Call):
+            nodes = [body]
+        elif isinstance(body, (ast.List, ast.Tuple)):
+            if not all(isinstance(element, ast.Call) for element in body.elts):
+                continue
+            nodes = list(body.elts)
+        else:
+            continue
+
+        calls: List[Dict[str, Any]] = []
+        for index, node in enumerate(nodes):
+            tool_call = _call_node_to_tool_call(node, expression, index)
+            if tool_call is None:
+                calls = []
+                break
+            calls.append(tool_call)
+        if calls:
+            return calls
+
+    return []
+
+
 def parse_text_tool_calls(content: str) -> List[Dict[str, Any]]:
     if not isinstance(content, str):
         return []
@@ -211,7 +290,11 @@ def parse_text_tool_calls(content: str) -> List[Dict[str, Any]]:
     if bracket_calls:
         return bracket_calls
 
-    return _parse_json_action_tool_calls(content)
+    json_action_calls = _parse_json_action_tool_calls(content)
+    if json_action_calls:
+        return json_action_calls
+
+    return _parse_python_style_tool_calls(content)
 
 
 def looks_like_terminal_natural_language(content: str) -> bool:

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 import time
 from pathlib import Path
@@ -36,27 +37,82 @@ def _responses_content_to_text(content: Any) -> str:
     return ""
 
 
+def _responses_json_text(value: Any) -> str:
+    if isinstance(value, str):
+        return value
+    if value is None:
+        return ""
+    if isinstance(value, (dict, list)):
+        return json.dumps(value, ensure_ascii=False)
+    return str(value)
+
+
+def _responses_function_call_to_chat_tool_call(item: Dict[str, Any], index: int) -> Dict[str, Any] | None:
+    name = item.get("name")
+    if not isinstance(name, str) or not name.strip():
+        return None
+
+    call_id = item.get("call_id") or item.get("id") or f"resp_call_{index}"
+    return {
+        "id": str(call_id),
+        "type": "function",
+        "function": {
+            "name": name.strip(),
+            "arguments": _responses_json_text(item.get("arguments", "{}")),
+        },
+    }
+
+
 def _responses_input_to_messages(input_value: Any) -> list[Dict[str, Any]]:
     if isinstance(input_value, str):
         return [{"role": "user", "content": input_value}]
 
     if isinstance(input_value, list):
         messages: list[Dict[str, Any]] = []
-        for item in input_value:
+        pending_assistant_index: int | None = None
+        for index, item in enumerate(input_value):
             if isinstance(item, str):
                 messages.append({"role": "user", "content": item})
+                pending_assistant_index = None
                 continue
             if not isinstance(item, dict):
                 continue
 
+            item_type = item.get("type")
+            if item_type == "function_call":
+                tool_call = _responses_function_call_to_chat_tool_call(item, index)
+                if tool_call is None:
+                    pending_assistant_index = None
+                    continue
+                if pending_assistant_index is None:
+                    messages.append({"role": "assistant", "content": "", "tool_calls": [tool_call]})
+                    pending_assistant_index = len(messages) - 1
+                else:
+                    assistant_message = messages[pending_assistant_index]
+                    assistant_message.setdefault("tool_calls", []).append(tool_call)
+                continue
+
+            if item_type == "function_call_output":
+                call_id = item.get("call_id") or item.get("id")
+                messages.append(
+                    {
+                        "role": "tool",
+                        "tool_call_id": str(call_id or f"resp_call_{index}"),
+                        "content": _responses_json_text(item.get("output")),
+                    }
+                )
+                pending_assistant_index = None
+                continue
+
             role = item.get("role") or "user"
             # Responses API sometimes uses {"type":"message", ...}
-            if item.get("type") == "message":
+            if item_type == "message":
                 role = item.get("role") or role
 
             text = _responses_content_to_text(item.get("content"))
-            if text:
+            if text or item_type == "message":
                 messages.append({"role": role, "content": text})
+                pending_assistant_index = len(messages) - 1 if role == "assistant" else None
 
         if messages:
             return messages

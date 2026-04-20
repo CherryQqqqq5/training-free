@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import re
 from pathlib import Path
-from typing import Any, List
+from typing import Any, Iterable, List
 
 from grc.types import FailureCase
 from grc.utils.jsonfix import parse_loose_json
@@ -17,6 +17,31 @@ _FUNCTION_LIST_MARKER_RE = re.compile(
     r"Here is a list of functions in json format that you can invoke\.\n(\[.*\])\s*$",
     re.DOTALL,
 )
+_FILE_LITERAL_RE = re.compile(r"\b[\w.-]+\.[A-Za-z0-9]{1,8}\b")
+_QUOTED_LITERAL_RE = re.compile(r"'([^']+)'|\"([^\"]+)\"")
+_REQUESTED_VALUE_RE = re.compile(
+    r"(?:provide|confirm|specify|share|clarify|tell me|let me know)(?:\s+(?:the|which|what|a|an|specific))?\s+([^?.!,]+)",
+    re.IGNORECASE,
+)
+_GENERIC_CONTEXT_TOKENS = {
+    "information",
+    "details",
+    "detail",
+    "value",
+    "parameter",
+    "parameters",
+    "input",
+    "inputs",
+    "required",
+    "missing",
+    "needed",
+    "available",
+    "specific",
+    "please",
+    "before",
+}
+_FILE_CONTEXT_HINT_RE = re.compile(r"\b(file|filename|document|report)\b", re.IGNORECASE)
+_PATH_CONTEXT_HINT_RE = re.compile(r"\b(directory|folder|path)\b", re.IGNORECASE)
 
 def _extract_tools_from_prompt_text(text: Any) -> dict[str, dict[str, Any]]:
     if not isinstance(text, str):
@@ -110,6 +135,96 @@ def _python_matches_json_type(value: Any, expected: str) -> bool:
     return True
 
 
+def _collect_context_strings(value: Any) -> List[str]:
+    strings: List[str] = []
+
+    def visit(item: Any, *, parent_role: str | None = None) -> None:
+        if isinstance(item, str):
+            if item.strip():
+                strings.append(item)
+            return
+        if isinstance(item, list):
+            for child in item:
+                visit(child, parent_role=parent_role)
+            return
+        if not isinstance(item, dict):
+            return
+
+        role = item.get("role")
+        item_type = item.get("type")
+        if role in {"developer", "system"}:
+            return
+        if item_type in {"function_call", "function_call_output"}:
+            for key in ("arguments", "output", "content"):
+                if key in item:
+                    visit(item.get(key), parent_role=role)
+            return
+        if role in {"user", "assistant", "tool"}:
+            visit(item.get("content"), parent_role=role)
+            return
+        for key, value in item.items():
+            if key in {"role", "type", "name", "id", "call_id"}:
+                continue
+            visit(value, parent_role=parent_role)
+
+    visit(value)
+    return strings
+
+
+def _context_tokens(strings: Iterable[str]) -> set[str]:
+    tokens: set[str] = set()
+    for text in strings:
+        for token in re.findall(r"[a-z0-9_./-]+", text.lower()):
+            if len(token) <= 2 or token in _GENERIC_CONTEXT_TOKENS:
+                continue
+            tokens.add(token)
+    return tokens
+
+
+def _requested_value_tokens(content: str) -> set[str]:
+    match = _REQUESTED_VALUE_RE.search(content)
+    if not match:
+        return set()
+    phrase = match.group(1)
+    return {
+        token
+        for token in re.findall(r"[a-z0-9_./-]+", phrase.lower())
+        if len(token) > 2 and token not in _GENERIC_CONTEXT_TOKENS
+    }
+
+
+def _is_redundant_clarification_request(data: dict[str, Any], content: str) -> bool:
+    if not isinstance(content, str) or not content.strip():
+        return False
+
+    context_strings = _collect_context_strings(
+        [
+            data.get("request", {}).get("messages"),
+            data.get("request_original", {}).get("messages"),
+            data.get("request_original", {}).get("input"),
+        ]
+    )
+    if not context_strings:
+        return False
+
+    context_blob = "\n".join(context_strings)
+    lowered = content.lower()
+    if _FILE_CONTEXT_HINT_RE.search(lowered):
+        if _FILE_LITERAL_RE.search(context_blob):
+            return True
+        if any(match.group(1) or match.group(2) for match in _QUOTED_LITERAL_RE.finditer(context_blob)):
+            return True
+    if _PATH_CONTEXT_HINT_RE.search(lowered):
+        if any("/" in text or "\\" in text for text in context_strings):
+            return True
+
+    requested_tokens = _requested_value_tokens(content)
+    if not requested_tokens:
+        return False
+
+    return bool(requested_tokens & _context_tokens(context_strings))
+
+
 def mine_failures(trace_dir: str) -> List[FailureCase]:
     trace_root = Path(trace_dir)
     if not trace_root.exists():
@@ -127,6 +242,7 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
         tool_map = _tool_schema_map(data)
         seen_failure_keys: set[tuple[str, int, str, str, str | None]] = set()
         inferred_no_tool_call_kind: str | None = None
+        redundant_clarification_detected = False
         raw_implies_text_tool_call = False
 
         def record_failure(case: FailureCase) -> None:
@@ -154,9 +270,24 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
 
             if not tool_calls and not parsed:
                 inferred_no_tool_call_kind = classify_no_tool_call_content(msg.get("content", ""), tool_map)
+                if inferred_no_tool_call_kind == "clarification_request":
+                    redundant_clarification_detected = _is_redundant_clarification_request(
+                        data,
+                        msg.get("content", ""),
+                    )
 
             if tool_map and not tool_calls:
-                if inferred_no_tool_call_kind != "clarification_request":
+                if inferred_no_tool_call_kind == "clarification_request":
+                    if redundant_clarification_detected:
+                        record_failure(
+                            FailureCase(
+                                trace_id=path.stem,
+                                turn_index=0,
+                                tool_name="__none__",
+                                error_type="redundant_clarification_request",
+                            )
+                        )
+                else:
                     record_failure(
                         FailureCase(
                             trace_id=path.stem,
@@ -264,6 +395,17 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
         for issue in validation.get("issues", []):
             issue_kind = issue.get("kind", "validation_issue")
             if issue_kind == "clarification_request":
+                if redundant_clarification_detected:
+                    record_failure(
+                        FailureCase(
+                            trace_id=path.stem,
+                            turn_index=0,
+                            tool_name=issue.get("tool_name") or "__none__",
+                            error_type="redundant_clarification_request",
+                            field_name=issue.get("field"),
+                            category="verification_hook",
+                        )
+                    )
                 continue
             if issue_kind == "empty_tool_call":
                 if raw_implies_text_tool_call:

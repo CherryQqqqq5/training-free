@@ -1,0 +1,268 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the required water daily intake for a person with weight 70 kg."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_daily_water_intake",
+        "description": "Calculate the recommended daily water intake for a person based on their weight. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "weight": {
+              "type": "integer",
+              "description": "The weight of the person in kilograms."
+            },
+            "activity_level": {
+              "type": "string",
+              "description": "The level of physical activity of the person. Default is 'moderate'."
+            },
+            "climate": {
+              "type": "string",
+              "description": "The climate of the area where the person lives. Default is 'temperate'."
+            }
+          },
+          "required": [
+            "weight"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the required water daily intake for a person with weight 70 kg."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_daily_water_intake",
+          "description": "Calculate the recommended daily water intake for a person based on their weight. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "weight": {
+                "type": "integer",
+                "description": "The weight of the person in kilograms."
+              },
+              "activity_level": {
+                "type": "string",
+                "description": "The level of physical activity of the person. Default is 'moderate'."
+              },
+              "climate": {
+                "type": "string",
+                "description": "The climate of the area where the person lives. Default is 'temperate'."
+              }
+            },
+            "required": [
+              "weight"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "tool_schema_snapshot": {
+    "calculate_daily_water_intake": {
+      "type": "object",
+      "properties": {
+        "weight": {
+          "type": "integer",
+          "description": "The weight of the person in kilograms."
+        },
+        "activity_level": {
+          "type": "string",
+          "description": "The level of physical activity of the person. Default is 'moderate'."
+        },
+        "climate": {
+          "type": "string",
+          "description": "The climate of the area where the person lives. Default is 'temperate'."
+        }
+      },
+      "required": [
+        "weight"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776517678-DzCPumUlQT6wbl3iJN8Y",
+    "object": "chat.completion",
+    "created": 1776517678,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_88799791",
+              "function": {
+                "name": "calculate_daily_water_intake",
+                "arguments": "{\"weight\":70}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 351,
+      "completion_tokens": 28,
+      "total_tokens": 379,
+      "cost": 0.000990495,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0010005,
+        "upstream_inference_prompt_cost": 0.0005805,
+        "upstream_inference_completions_cost": 0.00042
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776517678-DzCPumUlQT6wbl3iJN8Y",
+    "object": "response",
+    "created_at": 1776517679,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_88799791",
+        "call_id": "call_88799791",
+        "name": "calculate_daily_water_intake",
+        "arguments": "{\"weight\":70}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 351,
+      "completion_tokens": 28,
+      "total_tokens": 379,
+      "cost": 0.000990495,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0010005,
+        "upstream_inference_prompt_cost": 0.0005805,
+        "upstream_inference_completions_cost": 0.00042
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776517678-DzCPumUlQT6wbl3iJN8Y",
+    "object": "chat.completion",
+    "created": 1776517678,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_88799791",
+              "function": {
+                "name": "calculate_daily_water_intake",
+                "arguments": "{\"weight\":70}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 351,
+      "completion_tokens": 28,
+      "total_tokens": 379,
+      "cost": 0.000990495,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0010005,
+        "upstream_inference_prompt_cost": 0.0005805,
+        "upstream_inference_completions_cost": 0.00042
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1722.743,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "3253b374-11f1-4dba-9e09-7601bb694e3d"
+}

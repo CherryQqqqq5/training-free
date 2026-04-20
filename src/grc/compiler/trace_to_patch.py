@@ -46,6 +46,20 @@ def _build_failure_ir(grouped: DefaultDict[str, List[FailureCase]]) -> List[Fail
     failure_irs: List[FailureIR] = []
     for tool_name, failures in grouped.items():
         if tool_name == "__none__":
+            for error_type in sorted({case.error_type for case in failures}):
+                scoped_failures = [case for case in failures if case.error_type == error_type]
+                failure_irs.append(
+                    FailureIR(
+                        failure_id=f"failure_ir_global_{error_type}",
+                        tool_name="__none__",
+                        error_types=[error_type],
+                        field_names=[],
+                        expected_types={},
+                        categories=sorted({case.category for case in scoped_failures if case.category}),
+                        evidence_count=len(scoped_failures),
+                        trace_ids=sorted({case.trace_id for case in scoped_failures}),
+                    )
+                )
             continue
 
         expected_types: Dict[str, str] = {}
@@ -171,6 +185,17 @@ def _prompt_fragments(tool_name: str, failure_ir: FailureIR) -> List[str]:
 def _global_prompt_fragments(failure_ir: FailureIR) -> List[str]:
     error_types = set(failure_ir.error_types)
     fragments: List[str] = []
+    if "empty_tool_call" in error_types:
+        fragments.append(
+            "When tools are available and the request is actionable from the current conversation state, emit the next tool call instead of replying with explanatory prose."
+        )
+        fragments.append(
+            "Do not ask the user to repeat or reconfirm information that is already available from prior turns, tool outputs, or the current working state."
+        )
+    if "natural_language_termination" in error_types:
+        fragments.append(
+            "Do not end the turn with a natural-language completion if additional tool actions are still required to satisfy the request."
+        )
     if "hallucinated_completion" in error_types:
         fragments.append(
             "Do not claim that work has already started or completed unless you emit the corresponding tool call in the same response."
@@ -178,51 +203,87 @@ def _global_prompt_fragments(failure_ir: FailureIR) -> List[str]:
         fragments.append(
             "If a tool is required, emit the tool call directly instead of promising results that have not been requested yet."
         )
+    if "redundant_clarification_request" in error_types:
+        fragments.append(
+            "Before asking the user for missing details, inspect prior user turns, tool outputs, and current state for explicit values that were already provided."
+        )
+        fragments.append(
+            "If a file name, path, identifier, or previously confirmed target already appears in the conversation or tool state, reuse it and emit the next tool call instead of asking again."
+        )
+    if "unsupported_request" in error_types:
+        fragments.append(
+            "Before concluding that a request is unsupported, verify whether the available tools and current conversation state already provide a valid next action."
+        )
+    if {"empty_tool_call", "natural_language_termination", "hallucinated_completion"} & error_types:
+        fragments.append(
+            "If you emit tool calls in a response, keep the response focused on those tool calls and avoid adding a free-form status summary in the same message."
+        )
     return fragments
 
 
-def _build_global_guard_rule(grouped: DefaultDict[str, List[FailureCase]]) -> Rule | None:
+def _no_tool_verification_contract() -> VerificationContract:
+    return VerificationContract(
+        require_known_tool=False,
+        require_object_args=False,
+        require_required_fields=False,
+        require_known_fields=False,
+        require_type_match=False,
+        max_repairs=None,
+    )
+
+
+def _build_global_guard_rules(grouped: DefaultDict[str, List[FailureCase]]) -> List[Rule]:
     global_failures = grouped.get("__none__", [])
     if not global_failures:
-        return None
+        return []
 
-    error_types = sorted({case.error_type for case in global_failures})
-    categories = sorted({case.category for case in global_failures if case.category})
-    failure_ir = FailureIR(
-        failure_id="failure_ir_global_tool_guard",
-        tool_name="__none__",
-        error_types=error_types,
-        field_names=[],
-        expected_types={},
-        categories=categories,
-        evidence_count=len(global_failures),
-        trace_ids=sorted({case.trace_id for case in global_failures}),
-    )
-    guard_action = _guard_action_for_failure_ir(failure_ir)
-    fallback = _fallback_for_failure_ir(failure_ir)
-    prompt_fragments = _global_prompt_fragments(failure_ir)
+    rules: List[Rule] = []
+    for error_type in sorted({case.error_type for case in global_failures}):
+        scoped_failures = [case for case in global_failures if case.error_type == error_type]
+        categories = sorted({case.category for case in scoped_failures if case.category})
+        failure_ir = FailureIR(
+            failure_id=f"failure_ir_global_{error_type}",
+            tool_name="__none__",
+            error_types=[error_type],
+            field_names=[],
+            expected_types={},
+            categories=categories,
+            evidence_count=len(scoped_failures),
+            trace_ids=sorted({case.trace_id for case in scoped_failures}),
+        )
+        prompt_fragments = _global_prompt_fragments(failure_ir)
+        verification = _no_tool_verification_contract()
 
-    return Rule(
-        rule_id="rule_global_tool_guard_v1",
-        priority=100,
-        enabled=True,
-        trigger=MatchSpec(error_types=error_types, category_patterns=categories),
-        scope=PatchScope(tool_names=[], patch_sites=["tool_guard", "verification_hook", "fallback_router"]),
-        action=RuleAction(
-            prompt_fragments=prompt_fragments,
-            prompt_injection=PromptInjectionSpec(fragments=prompt_fragments),
-            tool_guard=ToolGuardSpec(
+        rules.append(
+            Rule(
+                rule_id=f"rule_global_no_tool_{error_type}_v1",
+                priority=100,
                 enabled=True,
-                on_violation=guard_action,
-                on_unknown_tool=guard_action,
-                on_empty_tool_call="assistant_message" if "empty_tool_call" in error_types else "record",
-                assistant_message=fallback.assistant_message or "Invalid tool emission removed by guard.",
-            ),
-            verification=_verification_contract_for_failure_ir(failure_ir),
-            fallback_router=fallback,
-        ),
-        validation_contract=_verification_contract_for_failure_ir(failure_ir),
-    )
+                trigger=MatchSpec(error_types=[error_type], category_patterns=categories),
+                scope=PatchScope(
+                    tool_names=[],
+                    patch_sites=["tool_guard", "verification_hook", "fallback_router"],
+                ),
+                action=RuleAction(
+                    prompt_fragments=prompt_fragments,
+                    prompt_injection=PromptInjectionSpec(fragments=[]),
+                    tool_guard=ToolGuardSpec(
+                        enabled=True,
+                        on_violation="record",
+                        on_unknown_tool="record",
+                        on_empty_tool_call="record",
+                    ),
+                    verification=verification,
+                    fallback_router=FallbackRoutingSpec(
+                        strategy="record_only",
+                        on_issue_kinds=[error_type],
+                    ),
+                ),
+                validation_contract=verification,
+            )
+        )
+
+    return rules
 
 
 def compile_patch(
@@ -239,9 +300,7 @@ def compile_patch(
     rules: List[Rule] = []
     failure_irs = _build_failure_ir(grouped)
     failure_ir_map = {item.tool_name: item for item in failure_irs}
-    global_guard_rule = _build_global_guard_rule(grouped)
-    if global_guard_rule is not None:
-        rules.append(global_guard_rule)
+    rules.extend(_build_global_guard_rules(grouped))
 
     for tool_name, failures in grouped.items():
         if tool_name == "__none__":

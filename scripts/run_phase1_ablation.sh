@@ -3,6 +3,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 source "${REPO_ROOT}/configs/bfcl_v4_phase1.env"
+BFCL_RUNTIME_CONFIG_DEFAULT="${GRC_BFCL_RUNTIME_CONFIG:-${REPO_ROOT}/configs/runtime_bfcl_structured.yaml}"
 
 RUN_ID="${1:-$(date +%Y%m%d_%H%M%S)}"
 PATCH_ID="${2:-patch_${RUN_ID}}"
@@ -24,7 +25,7 @@ bash "${REPO_ROOT}/scripts/run_bfcl_v4_baseline.sh" \
   "${BASELINE_ROOT}" \
   "8011" \
   "${TEST_CATEGORY}" \
-  "${REPO_ROOT}/configs/runtime.yaml" \
+  "${BFCL_RUNTIME_CONFIG_DEFAULT}" \
   "${REPO_ROOT}/rules/baseline_empty" \
   "${BASELINE_ROOT}/traces" \
   "${BASELINE_ROOT}/artifacts"
@@ -41,7 +42,7 @@ bash "${REPO_ROOT}/scripts/run_bfcl_v4_patch.sh" \
   "${PATCH_ROOT}" \
   "8012" \
   "${TEST_CATEGORY}" \
-  "${REPO_ROOT}/configs/runtime.yaml" \
+  "${BFCL_RUNTIME_CONFIG_DEFAULT}" \
   "${CANDIDATE_DIR}" \
   "${PATCH_ROOT}/traces" \
   "${CANDIDATE_DIR}" \

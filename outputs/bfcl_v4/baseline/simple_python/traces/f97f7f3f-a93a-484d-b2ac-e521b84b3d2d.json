@@ -1,0 +1,274 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find social behaviors and patterns in a group size of 50 with extroverted members being 15 and introverted members being 35."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "group_dynamics_pattern",
+        "description": "Examine the social dynamics and interactions within a group based on the personality traits and group size. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "total": {
+              "type": "integer",
+              "description": "The total group size."
+            },
+            "extroverts": {
+              "type": "integer",
+              "description": "The number of extroverted members in the group."
+            },
+            "introverts": {
+              "type": "integer",
+              "description": "The number of introverted members in the group."
+            }
+          },
+          "required": [
+            "total",
+            "extroverts",
+            "introverts"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find social behaviors and patterns in a group size of 50 with extroverted members being 15 and introverted members being 35."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "group_dynamics_pattern",
+          "description": "Examine the social dynamics and interactions within a group based on the personality traits and group size. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "integer",
+                "description": "The total group size."
+              },
+              "extroverts": {
+                "type": "integer",
+                "description": "The number of extroverted members in the group."
+              },
+              "introverts": {
+                "type": "integer",
+                "description": "The number of introverted members in the group."
+              }
+            },
+            "required": [
+              "total",
+              "extroverts",
+              "introverts"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "tool_schema_snapshot": {
+    "group_dynamics_pattern": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "integer",
+          "description": "The total group size."
+        },
+        "extroverts": {
+          "type": "integer",
+          "description": "The number of extroverted members in the group."
+        },
+        "introverts": {
+          "type": "integer",
+          "description": "The number of introverted members in the group."
+        }
+      },
+      "required": [
+        "total",
+        "extroverts",
+        "introverts"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776517739-PNe2N0Pe1ZBY6FgIFlPp",
+    "object": "chat.completion",
+    "created": 1776517739,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_23467166",
+              "function": {
+                "name": "group_dynamics_pattern",
+                "arguments": "{\"total\":50,\"extroverts\":15,\"introverts\":35}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 361,
+      "completion_tokens": 42,
+      "total_tokens": 403,
+      "cost": 0.0012303225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00124275,
+        "upstream_inference_prompt_cost": 0.00061275,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776517739-PNe2N0Pe1ZBY6FgIFlPp",
+    "object": "response",
+    "created_at": 1776517740,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_23467166",
+        "call_id": "call_23467166",
+        "name": "group_dynamics_pattern",
+        "arguments": "{\"total\":50,\"extroverts\":15,\"introverts\":35}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 361,
+      "completion_tokens": 42,
+      "total_tokens": 403,
+      "cost": 0.0012303225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00124275,
+        "upstream_inference_prompt_cost": 0.00061275,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776517739-PNe2N0Pe1ZBY6FgIFlPp",
+    "object": "chat.completion",
+    "created": 1776517739,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_23467166",
+              "function": {
+                "name": "group_dynamics_pattern",
+                "arguments": "{\"total\":50,\"extroverts\":15,\"introverts\":35}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 361,
+      "completion_tokens": 42,
+      "total_tokens": 403,
+      "cost": 0.0012303225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00124275,
+        "upstream_inference_prompt_cost": 0.00061275,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2008.763,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "f97f7f3f-a93a-484d-b2ac-e521b84b3d2d"
+}

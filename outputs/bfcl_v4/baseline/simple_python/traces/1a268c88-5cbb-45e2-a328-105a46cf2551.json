@@ -1,0 +1,259 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find concerts near me in Seattle that plays jazz music."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "concert_find_nearby",
+        "description": "Locate nearby concerts based on specific criteria like genre. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city and state, e.g. Seattle, WA"
+            },
+            "genre": {
+              "type": "string",
+              "description": "Genre of music to be played at the concert."
+            }
+          },
+          "required": [
+            "location",
+            "genre"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find concerts near me in Seattle that plays jazz music."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "concert_find_nearby",
+          "description": "Locate nearby concerts based on specific criteria like genre. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city and state, e.g. Seattle, WA"
+              },
+              "genre": {
+                "type": "string",
+                "description": "Genre of music to be played at the concert."
+              }
+            },
+            "required": [
+              "location",
+              "genre"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "tool_schema_snapshot": {
+    "concert_find_nearby": {
+      "type": "object",
+      "properties": {
+        "location": {
+          "type": "string",
+          "description": "The city and state, e.g. Seattle, WA"
+        },
+        "genre": {
+          "type": "string",
+          "description": "Genre of music to be played at the concert."
+        }
+      },
+      "required": [
+        "location",
+        "genre"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776517896-LoaoqNQUFGQFPTxYpDs8",
+    "object": "chat.completion",
+    "created": 1776517896,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_65481886",
+              "function": {
+                "name": "concert_find_nearby",
+                "arguments": "{\"location\":\"Seattle, WA\",\"genre\":\"Jazz\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 316,
+      "completion_tokens": 36,
+      "total_tokens": 352,
+      "cost": 0.001005345,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0010155,
+        "upstream_inference_prompt_cost": 0.0004755,
+        "upstream_inference_completions_cost": 0.00054
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776517896-LoaoqNQUFGQFPTxYpDs8",
+    "object": "response",
+    "created_at": 1776517897,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_65481886",
+        "call_id": "call_65481886",
+        "name": "concert_find_nearby",
+        "arguments": "{\"location\":\"Seattle, WA\",\"genre\":\"Jazz\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 316,
+      "completion_tokens": 36,
+      "total_tokens": 352,
+      "cost": 0.001005345,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0010155,
+        "upstream_inference_prompt_cost": 0.0004755,
+        "upstream_inference_completions_cost": 0.00054
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776517896-LoaoqNQUFGQFPTxYpDs8",
+    "object": "chat.completion",
+    "created": 1776517896,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_65481886",
+              "function": {
+                "name": "concert_find_nearby",
+                "arguments": "{\"location\":\"Seattle, WA\",\"genre\":\"Jazz\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 316,
+      "completion_tokens": 36,
+      "total_tokens": 352,
+      "cost": 0.001005345,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0010155,
+        "upstream_inference_prompt_cost": 0.0004755,
+        "upstream_inference_completions_cost": 0.00054
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1889.22,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "1a268c88-5cbb-45e2-a328-105a46cf2551"
+}

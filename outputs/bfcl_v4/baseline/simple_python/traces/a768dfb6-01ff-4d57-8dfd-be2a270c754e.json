@@ -1,0 +1,283 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find the shortest distance between two cities, New York and Los Angeles, through the train and you can transfer."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "city_distance_find_shortest",
+        "description": "Calculates the shortest distance between two cities via available public transportation. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "start_city": {
+              "type": "string",
+              "description": "The city you are starting from. The parameter is in the format of city name."
+            },
+            "end_city": {
+              "type": "string",
+              "description": "The city you are heading to.The parameter is in the format of city name."
+            },
+            "transportation": {
+              "type": "string",
+              "description": "Preferred mode of public transportation. Default is 'bus'."
+            },
+            "allow_transfer": {
+              "type": "boolean",
+              "description": "Allows transfer between different transportation if true. Default is false."
+            }
+          },
+          "required": [
+            "start_city",
+            "end_city"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find the shortest distance between two cities, New York and Los Angeles, through the train and you can transfer."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "city_distance_find_shortest",
+          "description": "Calculates the shortest distance between two cities via available public transportation. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "start_city": {
+                "type": "string",
+                "description": "The city you are starting from. The parameter is in the format of city name."
+              },
+              "end_city": {
+                "type": "string",
+                "description": "The city you are heading to.The parameter is in the format of city name."
+              },
+              "transportation": {
+                "type": "string",
+                "description": "Preferred mode of public transportation. Default is 'bus'."
+              },
+              "allow_transfer": {
+                "type": "boolean",
+                "description": "Allows transfer between different transportation if true. Default is false."
+              }
+            },
+            "required": [
+              "start_city",
+              "end_city"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "tool_schema_snapshot": {
+    "city_distance_find_shortest": {
+      "type": "object",
+      "properties": {
+        "start_city": {
+          "type": "string",
+          "description": "The city you are starting from. The parameter is in the format of city name."
+        },
+        "end_city": {
+          "type": "string",
+          "description": "The city you are heading to.The parameter is in the format of city name."
+        },
+        "transportation": {
+          "type": "string",
+          "description": "Preferred mode of public transportation. Default is 'bus'."
+        },
+        "allow_transfer": {
+          "type": "boolean",
+          "description": "Allows transfer between different transportation if true. Default is false."
+        }
+      },
+      "required": [
+        "start_city",
+        "end_city"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776517393-V6Q3LYqsQYGCG2gkD7yZ",
+    "object": "chat.completion",
+    "created": 1776517393,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_61426367",
+              "function": {
+                "name": "city_distance_find_shortest",
+                "arguments": "{\"start_city\":\"New York\",\"end_city\":\"Los Angeles\",\"transportation\":\"train\",\"allow_transfer\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 390,
+      "completion_tokens": 51,
+      "total_tokens": 441,
+      "cost": 0.0014501025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00146475,
+        "upstream_inference_prompt_cost": 0.00069975,
+        "upstream_inference_completions_cost": 0.000765
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776517393-V6Q3LYqsQYGCG2gkD7yZ",
+    "object": "response",
+    "created_at": 1776517395,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_61426367",
+        "call_id": "call_61426367",
+        "name": "city_distance_find_shortest",
+        "arguments": "{\"start_city\":\"New York\",\"end_city\":\"Los Angeles\",\"transportation\":\"train\",\"allow_transfer\":true}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 390,
+      "completion_tokens": 51,
+      "total_tokens": 441,
+      "cost": 0.0014501025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00146475,
+        "upstream_inference_prompt_cost": 0.00069975,
+        "upstream_inference_completions_cost": 0.000765
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776517393-V6Q3LYqsQYGCG2gkD7yZ",
+    "object": "chat.completion",
+    "created": 1776517393,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_61426367",
+              "function": {
+                "name": "city_distance_find_shortest",
+                "arguments": "{\"start_city\":\"New York\",\"end_city\":\"Los Angeles\",\"transportation\":\"train\",\"allow_transfer\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 390,
+      "completion_tokens": 51,
+      "total_tokens": 441,
+      "cost": 0.0014501025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00146475,
+        "upstream_inference_prompt_cost": 0.00069975,
+        "upstream_inference_completions_cost": 0.000765
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2582.458,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "a768dfb6-01ff-4d57-8dfd-be2a270c754e"
+}

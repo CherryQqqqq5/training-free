@@ -1,0 +1,271 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Generate an image of a circle with a radius of 50 pixels and color 'Red'."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "generate_circle_image",
+        "description": "Generates a circle image based on the given radius and color Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "radius": {
+              "type": "integer",
+              "description": "The radius of the circle in pixels."
+            },
+            "color": {
+              "type": "string",
+              "description": "The color of the circle."
+            },
+            "background": {
+              "type": "string",
+              "description": "Optional: The color of the background, default is white."
+            }
+          },
+          "required": [
+            "radius",
+            "color"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Generate an image of a circle with a radius of 50 pixels and color 'Red'."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "generate_circle_image",
+          "description": "Generates a circle image based on the given radius and color Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "radius": {
+                "type": "integer",
+                "description": "The radius of the circle in pixels."
+              },
+              "color": {
+                "type": "string",
+                "description": "The color of the circle."
+              },
+              "background": {
+                "type": "string",
+                "description": "Optional: The color of the background, default is white."
+              }
+            },
+            "required": [
+              "radius",
+              "color"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "tool_schema_snapshot": {
+    "generate_circle_image": {
+      "type": "object",
+      "properties": {
+        "radius": {
+          "type": "integer",
+          "description": "The radius of the circle in pixels."
+        },
+        "color": {
+          "type": "string",
+          "description": "The color of the circle."
+        },
+        "background": {
+          "type": "string",
+          "description": "Optional: The color of the background, default is white."
+        }
+      },
+      "required": [
+        "radius",
+        "color"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776517816-hzhBeAsUPcPr1tRJwBDK",
+    "object": "chat.completion",
+    "created": 1776517816,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_03399300",
+              "function": {
+                "name": "generate_circle_image",
+                "arguments": "{\"radius\":50,\"color\":\"Red\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 337,
+      "completion_tokens": 33,
+      "total_tokens": 370,
+      "cost": 0.001023165,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0010335,
+        "upstream_inference_prompt_cost": 0.0005385,
+        "upstream_inference_completions_cost": 0.000495
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776517816-hzhBeAsUPcPr1tRJwBDK",
+    "object": "response",
+    "created_at": 1776517818,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_03399300",
+        "call_id": "call_03399300",
+        "name": "generate_circle_image",
+        "arguments": "{\"radius\":50,\"color\":\"Red\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 337,
+      "completion_tokens": 33,
+      "total_tokens": 370,
+      "cost": 0.001023165,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0010335,
+        "upstream_inference_prompt_cost": 0.0005385,
+        "upstream_inference_completions_cost": 0.000495
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776517816-hzhBeAsUPcPr1tRJwBDK",
+    "object": "chat.completion",
+    "created": 1776517816,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_03399300",
+              "function": {
+                "name": "generate_circle_image",
+                "arguments": "{\"radius\":50,\"color\":\"Red\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 337,
+      "completion_tokens": 33,
+      "total_tokens": 370,
+      "cost": 0.001023165,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0010335,
+        "upstream_inference_prompt_cost": 0.0005385,
+        "upstream_inference_completions_cost": 0.000495
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1846.173,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "04104e42-1a33-4074-9490-78b2cf993e0e"
+}

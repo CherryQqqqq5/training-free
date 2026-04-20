@@ -1,0 +1,277 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the final velocity of an object, knowing that it started from rest, accelerated at a rate of 9.8 m/s^2 for a duration of 5 seconds."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_final_velocity",
+        "description": "Calculate the final velocity of an object under constant acceleration, knowing its initial velocity, acceleration, and time of acceleration. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "initial_velocity": {
+              "type": "integer",
+              "description": "The initial velocity of the object."
+            },
+            "acceleration": {
+              "type": "number",
+              "description": "The acceleration of the object. This is a float type value.",
+              "format": "float"
+            },
+            "time": {
+              "type": "integer",
+              "description": "The time of acceleration."
+            }
+          },
+          "required": [
+            "initial_velocity",
+            "acceleration",
+            "time"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the final velocity of an object, knowing that it started from rest, accelerated at a rate of 9.8 m/s^2 for a duration of 5 seconds."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_final_velocity",
+          "description": "Calculate the final velocity of an object under constant acceleration, knowing its initial velocity, acceleration, and time of acceleration. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "initial_velocity": {
+                "type": "integer",
+                "description": "The initial velocity of the object."
+              },
+              "acceleration": {
+                "type": "number",
+                "description": "The acceleration of the object. This is a float type value.",
+                "format": "float"
+              },
+              "time": {
+                "type": "integer",
+                "description": "The time of acceleration."
+              }
+            },
+            "required": [
+              "initial_velocity",
+              "acceleration",
+              "time"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "tool_schema_snapshot": {
+    "calculate_final_velocity": {
+      "type": "object",
+      "properties": {
+        "initial_velocity": {
+          "type": "integer",
+          "description": "The initial velocity of the object."
+        },
+        "acceleration": {
+          "type": "number",
+          "description": "The acceleration of the object. This is a float type value.",
+          "format": "float"
+        },
+        "time": {
+          "type": "integer",
+          "description": "The time of acceleration."
+        }
+      },
+      "required": [
+        "initial_velocity",
+        "acceleration",
+        "time"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776517254-FqO0Wr0P5xOT46qZFKjl",
+    "object": "chat.completion",
+    "created": 1776517254,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_90867408",
+              "function": {
+                "name": "calculate_final_velocity",
+                "arguments": "{\"initial_velocity\":0,\"acceleration\":9.8,\"time\":5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 372,
+      "completion_tokens": 41,
+      "total_tokens": 413,
+      "cost": 0.001245915,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0012585,
+        "upstream_inference_prompt_cost": 0.0006435,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776517254-FqO0Wr0P5xOT46qZFKjl",
+    "object": "response",
+    "created_at": 1776517255,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_90867408",
+        "call_id": "call_90867408",
+        "name": "calculate_final_velocity",
+        "arguments": "{\"initial_velocity\":0,\"acceleration\":9.8,\"time\":5}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 372,
+      "completion_tokens": 41,
+      "total_tokens": 413,
+      "cost": 0.001245915,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0012585,
+        "upstream_inference_prompt_cost": 0.0006435,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776517254-FqO0Wr0P5xOT46qZFKjl",
+    "object": "chat.completion",
+    "created": 1776517254,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_90867408",
+              "function": {
+                "name": "calculate_final_velocity",
+                "arguments": "{\"initial_velocity\":0,\"acceleration\":9.8,\"time\":5}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 372,
+      "completion_tokens": 41,
+      "total_tokens": 413,
+      "cost": 0.001245915,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0012585,
+        "upstream_inference_prompt_cost": 0.0006435,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1985.464,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "2c45fd57-5900-42f4-916a-e77ba8fb6fff"
+}

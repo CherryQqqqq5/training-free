@@ -1,0 +1,289 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Predict house price in San Francisco based on its area of 2500 square feet, number of rooms as 5 and year of construction is 1990."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "predict_house_price",
+        "description": "Predict house price based on area, number of rooms and year of construction. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "area": {
+              "type": "integer",
+              "description": "Area of the house in square feet."
+            },
+            "rooms": {
+              "type": "integer",
+              "description": "Number of rooms in the house."
+            },
+            "year": {
+              "type": "integer",
+              "description": "Year when the house was constructed."
+            },
+            "location": {
+              "type": "string",
+              "description": "The location or city of the house."
+            }
+          },
+          "required": [
+            "area",
+            "rooms",
+            "year",
+            "location"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Predict house price in San Francisco based on its area of 2500 square feet, number of rooms as 5 and year of construction is 1990."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "predict_house_price",
+          "description": "Predict house price based on area, number of rooms and year of construction. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "area": {
+                "type": "integer",
+                "description": "Area of the house in square feet."
+              },
+              "rooms": {
+                "type": "integer",
+                "description": "Number of rooms in the house."
+              },
+              "year": {
+                "type": "integer",
+                "description": "Year when the house was constructed."
+              },
+              "location": {
+                "type": "string",
+                "description": "The location or city of the house."
+              }
+            },
+            "required": [
+              "area",
+              "rooms",
+              "year",
+              "location"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "tool_schema_snapshot": {
+    "predict_house_price": {
+      "type": "object",
+      "properties": {
+        "area": {
+          "type": "integer",
+          "description": "Area of the house in square feet."
+        },
+        "rooms": {
+          "type": "integer",
+          "description": "Number of rooms in the house."
+        },
+        "year": {
+          "type": "integer",
+          "description": "Year when the house was constructed."
+        },
+        "location": {
+          "type": "string",
+          "description": "The location or city of the house."
+        }
+      },
+      "required": [
+        "area",
+        "rooms",
+        "year",
+        "location"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776517492-esXXlIV6I5axzQcfzaGD",
+    "object": "chat.completion",
+    "created": 1776517492,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_49530904",
+              "function": {
+                "name": "predict_house_price",
+                "arguments": "{\"area\":2500,\"rooms\":5,\"year\":1990,\"location\":\"San Francisco\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 371,
+      "completion_tokens": 48,
+      "total_tokens": 419,
+      "cost": 0.0013491225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00136275,
+        "upstream_inference_prompt_cost": 0.00064275,
+        "upstream_inference_completions_cost": 0.00072
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776517492-esXXlIV6I5axzQcfzaGD",
+    "object": "response",
+    "created_at": 1776517494,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_49530904",
+        "call_id": "call_49530904",
+        "name": "predict_house_price",
+        "arguments": "{\"area\":2500,\"rooms\":5,\"year\":1990,\"location\":\"San Francisco\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 371,
+      "completion_tokens": 48,
+      "total_tokens": 419,
+      "cost": 0.0013491225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00136275,
+        "upstream_inference_prompt_cost": 0.00064275,
+        "upstream_inference_completions_cost": 0.00072
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776517492-esXXlIV6I5axzQcfzaGD",
+    "object": "chat.completion",
+    "created": 1776517492,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_49530904",
+              "function": {
+                "name": "predict_house_price",
+                "arguments": "{\"area\":2500,\"rooms\":5,\"year\":1990,\"location\":\"San Francisco\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 371,
+      "completion_tokens": 48,
+      "total_tokens": 419,
+      "cost": 0.0013491225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00136275,
+        "upstream_inference_prompt_cost": 0.00064275,
+        "upstream_inference_completions_cost": 0.00072
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2210.26,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "6583c6ed-3e91-4d21-9660-79c2dd5376be"
+}

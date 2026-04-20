@@ -1,0 +1,295 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "I want to find 5 restaurants nearby my location, Manhattan, offering Thai food and a vegan menu."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "find_restaurants",
+        "description": "Locate nearby restaurants based on location and food preferences. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The specific location or area. The location should be in the format of District, City."
+            },
+            "food_type": {
+              "type": "string",
+              "description": "The type of food preferred."
+            },
+            "number": {
+              "type": "integer",
+              "description": "Number of results to return."
+            },
+            "dietary_requirements": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Special dietary requirements, e.g. vegan, gluten-free. Default is empty list."
+            }
+          },
+          "required": [
+            "location",
+            "food_type",
+            "number"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "I want to find 5 restaurants nearby my location, Manhattan, offering Thai food and a vegan menu."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "find_restaurants",
+          "description": "Locate nearby restaurants based on location and food preferences. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The specific location or area. The location should be in the format of District, City."
+              },
+              "food_type": {
+                "type": "string",
+                "description": "The type of food preferred."
+              },
+              "number": {
+                "type": "integer",
+                "description": "Number of results to return."
+              },
+              "dietary_requirements": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Special dietary requirements, e.g. vegan, gluten-free. Default is empty list."
+              }
+            },
+            "required": [
+              "location",
+              "food_type",
+              "number"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "tool_schema_snapshot": {
+    "find_restaurants": {
+      "type": "object",
+      "properties": {
+        "location": {
+          "type": "string",
+          "description": "The specific location or area. The location should be in the format of District, City."
+        },
+        "food_type": {
+          "type": "string",
+          "description": "The type of food preferred."
+        },
+        "number": {
+          "type": "integer",
+          "description": "Number of results to return."
+        },
+        "dietary_requirements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Special dietary requirements, e.g. vegan, gluten-free. Default is empty list."
+        }
+      },
+      "required": [
+        "location",
+        "food_type",
+        "number"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776517379-uc9IQKEzj51YD3sjs1Kq",
+    "object": "chat.completion",
+    "created": 1776517379,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_46008640",
+              "function": {
+                "name": "find_restaurants",
+                "arguments": "{\"location\":\"Manhattan, New York\",\"food_type\":\"Thai\",\"number\":5,\"dietary_requirements\":[\"vegan\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 382,
+      "completion_tokens": 54,
+      "total_tokens": 436,
+      "cost": 0.0014708925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00148575,
+        "upstream_inference_prompt_cost": 0.00067575,
+        "upstream_inference_completions_cost": 0.00081
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776517379-uc9IQKEzj51YD3sjs1Kq",
+    "object": "response",
+    "created_at": 1776517381,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_46008640",
+        "call_id": "call_46008640",
+        "name": "find_restaurants",
+        "arguments": "{\"location\":\"Manhattan, New York\",\"food_type\":\"Thai\",\"number\":5,\"dietary_requirements\":[\"vegan\"]}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 382,
+      "completion_tokens": 54,
+      "total_tokens": 436,
+      "cost": 0.0014708925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00148575,
+        "upstream_inference_prompt_cost": 0.00067575,
+        "upstream_inference_completions_cost": 0.00081
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776517379-uc9IQKEzj51YD3sjs1Kq",
+    "object": "chat.completion",
+    "created": 1776517379,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_46008640",
+              "function": {
+                "name": "find_restaurants",
+                "arguments": "{\"location\":\"Manhattan, New York\",\"food_type\":\"Thai\",\"number\":5,\"dietary_requirements\":[\"vegan\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 382,
+      "completion_tokens": 54,
+      "total_tokens": 436,
+      "cost": 0.0014708925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00148575,
+        "upstream_inference_prompt_cost": 0.00067575,
+        "upstream_inference_completions_cost": 0.00081
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2575.674,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "56f0d7d0-f34b-4da8-8874-c78f7ec367a1"
+}

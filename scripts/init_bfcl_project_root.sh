@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Initialize BFCL_PROJECT_ROOT with .env and optional test_case_ids (no venv).
 # Use this when dependencies are already installed (e.g. conda env `tf`).
+# The BFCL runners will rewrite connection-related .env keys per run so the
+# fixture stays aligned with the local proxy endpoint and port.
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"

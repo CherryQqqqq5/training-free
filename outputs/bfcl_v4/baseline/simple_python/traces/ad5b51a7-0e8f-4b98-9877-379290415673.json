@@ -1,0 +1,304 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Book a hotel room with king size bed in Los Angeles for 2 nights starting from 15th October,2023."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "hotel_bookings_book_room",
+        "description": "Book a hotel room based on specific criteria like location, room type, and check-in and check-out dates. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city and state where you want to book the hotel, e.g. Los Angeles, CA"
+            },
+            "room_type": {
+              "type": "string",
+              "description": "Preferred type of room in the hotel, e.g. king size, queen size, deluxe, suite etc."
+            },
+            "check_in_date": {
+              "type": "string",
+              "description": "Check-in date for the hotel. Format - DD-MM-YYYY."
+            },
+            "no_of_nights": {
+              "type": "integer",
+              "description": "Number of nights for the stay."
+            },
+            "no_of_rooms": {
+              "type": "integer",
+              "description": "Number of rooms to book. Default is 1.",
+              "default": 1
+            }
+          },
+          "required": [
+            "location",
+            "room_type",
+            "check_in_date",
+            "no_of_nights"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Book a hotel room with king size bed in Los Angeles for 2 nights starting from 15th October,2023."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "hotel_bookings_book_room",
+          "description": "Book a hotel room based on specific criteria like location, room type, and check-in and check-out dates. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city and state where you want to book the hotel, e.g. Los Angeles, CA"
+              },
+              "room_type": {
+                "type": "string",
+                "description": "Preferred type of room in the hotel, e.g. king size, queen size, deluxe, suite etc."
+              },
+              "check_in_date": {
+                "type": "string",
+                "description": "Check-in date for the hotel. Format - DD-MM-YYYY."
+              },
+              "no_of_nights": {
+                "type": "integer",
+                "description": "Number of nights for the stay."
+              },
+              "no_of_rooms": {
+                "type": "integer",
+                "description": "Number of rooms to book. Default is 1.",
+                "default": 1
+              }
+            },
+            "required": [
+              "location",
+              "room_type",
+              "check_in_date",
+              "no_of_nights"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "tool_schema_snapshot": {
+    "hotel_bookings_book_room": {
+      "type": "object",
+      "properties": {
+        "location": {
+          "type": "string",
+          "description": "The city and state where you want to book the hotel, e.g. Los Angeles, CA"
+        },
+        "room_type": {
+          "type": "string",
+          "description": "Preferred type of room in the hotel, e.g. king size, queen size, deluxe, suite etc."
+        },
+        "check_in_date": {
+          "type": "string",
+          "description": "Check-in date for the hotel. Format - DD-MM-YYYY."
+        },
+        "no_of_nights": {
+          "type": "integer",
+          "description": "Number of nights for the stay."
+        },
+        "no_of_rooms": {
+          "type": "integer",
+          "description": "Number of rooms to book. Default is 1.",
+          "default": 1
+        }
+      },
+      "required": [
+        "location",
+        "room_type",
+        "check_in_date",
+        "no_of_nights"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776518134-bde7F3AM37KCncfLZu75",
+    "object": "chat.completion",
+    "created": 1776518134,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_07977507",
+              "function": {
+                "name": "hotel_bookings_book_room",
+                "arguments": "{\"location\":\"Los Angeles, CA\",\"room_type\":\"king size\",\"check_in_date\":\"15-10-2023\",\"no_of_nights\":2,\"no_of_rooms\":1}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 443,
+      "completion_tokens": 70,
+      "total_tokens": 513,
+      "cost": 0.0023485275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00237225,
+        "upstream_inference_prompt_cost": 0.00132225,
+        "upstream_inference_completions_cost": 0.00105
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776518134-bde7F3AM37KCncfLZu75",
+    "object": "response",
+    "created_at": 1776518136,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_07977507",
+        "call_id": "call_07977507",
+        "name": "hotel_bookings_book_room",
+        "arguments": "{\"location\":\"Los Angeles, CA\",\"room_type\":\"king size\",\"check_in_date\":\"15-10-2023\",\"no_of_nights\":2,\"no_of_rooms\":1}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 443,
+      "completion_tokens": 70,
+      "total_tokens": 513,
+      "cost": 0.0023485275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00237225,
+        "upstream_inference_prompt_cost": 0.00132225,
+        "upstream_inference_completions_cost": 0.00105
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776518134-bde7F3AM37KCncfLZu75",
+    "object": "chat.completion",
+    "created": 1776518134,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_07977507",
+              "function": {
+                "name": "hotel_bookings_book_room",
+                "arguments": "{\"location\":\"Los Angeles, CA\",\"room_type\":\"king size\",\"check_in_date\":\"15-10-2023\",\"no_of_nights\":2,\"no_of_rooms\":1}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 443,
+      "completion_tokens": 70,
+      "total_tokens": 513,
+      "cost": 0.0023485275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00237225,
+        "upstream_inference_prompt_cost": 0.00132225,
+        "upstream_inference_completions_cost": 0.00105
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2431.824,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "ad5b51a7-0e8f-4b98-9877-379290415673"
+}

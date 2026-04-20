@@ -1,0 +1,256 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "What is the circumference of a circle with a radius of 4 inches?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_circumference",
+        "description": "Calculates the circumference of a circle with a given radius. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "radius": {
+              "type": "integer",
+              "description": "The radius of the circle in the unit given."
+            },
+            "unit": {
+              "type": "string",
+              "description": "The unit of measurement for the radius. Default is 'cm'."
+            }
+          },
+          "required": [
+            "radius"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What is the circumference of a circle with a radius of 4 inches?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_circumference",
+          "description": "Calculates the circumference of a circle with a given radius. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "radius": {
+                "type": "integer",
+                "description": "The radius of the circle in the unit given."
+              },
+              "unit": {
+                "type": "string",
+                "description": "The unit of measurement for the radius. Default is 'cm'."
+              }
+            },
+            "required": [
+              "radius"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "tool_schema_snapshot": {
+    "calculate_circumference": {
+      "type": "object",
+      "properties": {
+        "radius": {
+          "type": "integer",
+          "description": "The radius of the circle in the unit given."
+        },
+        "unit": {
+          "type": "string",
+          "description": "The unit of measurement for the radius. Default is 'cm'."
+        }
+      },
+      "required": [
+        "radius"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776517194-OVtP1HI8JsrKNA2tRGyI",
+    "object": "chat.completion",
+    "created": 1776517194,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_88536871",
+              "function": {
+                "name": "calculate_circumference",
+                "arguments": "{\"radius\":4,\"unit\":\"inches\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 323,
+      "completion_tokens": 35,
+      "total_tokens": 358,
+      "cost": 0.0010135125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00102375,
+        "upstream_inference_prompt_cost": 0.00049875,
+        "upstream_inference_completions_cost": 0.000525
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776517194-OVtP1HI8JsrKNA2tRGyI",
+    "object": "response",
+    "created_at": 1776517196,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_88536871",
+        "call_id": "call_88536871",
+        "name": "calculate_circumference",
+        "arguments": "{\"radius\":4,\"unit\":\"inches\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 323,
+      "completion_tokens": 35,
+      "total_tokens": 358,
+      "cost": 0.0010135125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00102375,
+        "upstream_inference_prompt_cost": 0.00049875,
+        "upstream_inference_completions_cost": 0.000525
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776517194-OVtP1HI8JsrKNA2tRGyI",
+    "object": "chat.completion",
+    "created": 1776517194,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_88536871",
+              "function": {
+                "name": "calculate_circumference",
+                "arguments": "{\"radius\":4,\"unit\":\"inches\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 323,
+      "completion_tokens": 35,
+      "total_tokens": 358,
+      "cost": 0.0010135125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00102375,
+        "upstream_inference_prompt_cost": 0.00049875,
+        "upstream_inference_completions_cost": 0.000525
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1995.408,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "65ed796f-b929-4dc8-a98d-c94dddf7c8e8"
+}

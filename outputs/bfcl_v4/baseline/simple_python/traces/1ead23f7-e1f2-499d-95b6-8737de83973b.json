@@ -1,0 +1,268 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Retrieve the sequence of DNA molecule with id `DNA123`."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "fetch_DNA_sequence",
+        "description": "Retrieve the sequence of a DNA molecule with the given id from a public database. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "DNA_id": {
+              "type": "string",
+              "description": "Unique ID of the DNA molecule in the database."
+            },
+            "format": {
+              "type": "string",
+              "description": "Optional parameter to get sequence in specific format (default to 'fasta')."
+            },
+            "upstream": {
+              "type": "integer",
+              "description": "Optional parameter to include certain number of base pairs upstream the DNA sequence (default to 0)."
+            }
+          },
+          "required": [
+            "DNA_id"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Retrieve the sequence of DNA molecule with id `DNA123`."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "fetch_DNA_sequence",
+          "description": "Retrieve the sequence of a DNA molecule with the given id from a public database. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "DNA_id": {
+                "type": "string",
+                "description": "Unique ID of the DNA molecule in the database."
+              },
+              "format": {
+                "type": "string",
+                "description": "Optional parameter to get sequence in specific format (default to 'fasta')."
+              },
+              "upstream": {
+                "type": "integer",
+                "description": "Optional parameter to include certain number of base pairs upstream the DNA sequence (default to 0)."
+              }
+            },
+            "required": [
+              "DNA_id"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "tool_schema_snapshot": {
+    "fetch_DNA_sequence": {
+      "type": "object",
+      "properties": {
+        "DNA_id": {
+          "type": "string",
+          "description": "Unique ID of the DNA molecule in the database."
+        },
+        "format": {
+          "type": "string",
+          "description": "Optional parameter to get sequence in specific format (default to 'fasta')."
+        },
+        "upstream": {
+          "type": "integer",
+          "description": "Optional parameter to include certain number of base pairs upstream the DNA sequence (default to 0)."
+        }
+      },
+      "required": [
+        "DNA_id"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776517309-A2AsKJNjbjYmzhNqZZ5T",
+    "object": "chat.completion",
+    "created": 1776517309,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_17602440",
+              "function": {
+                "name": "fetch_DNA_sequence",
+                "arguments": "{\"DNA_id\":\"DNA123\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 354,
+      "completion_tokens": 30,
+      "total_tokens": 384,
+      "cost": 0.0010313325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00104175,
+        "upstream_inference_prompt_cost": 0.00059175,
+        "upstream_inference_completions_cost": 0.00045
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776517309-A2AsKJNjbjYmzhNqZZ5T",
+    "object": "response",
+    "created_at": 1776517310,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_17602440",
+        "call_id": "call_17602440",
+        "name": "fetch_DNA_sequence",
+        "arguments": "{\"DNA_id\":\"DNA123\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 354,
+      "completion_tokens": 30,
+      "total_tokens": 384,
+      "cost": 0.0010313325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00104175,
+        "upstream_inference_prompt_cost": 0.00059175,
+        "upstream_inference_completions_cost": 0.00045
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776517309-A2AsKJNjbjYmzhNqZZ5T",
+    "object": "chat.completion",
+    "created": 1776517309,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_17602440",
+              "function": {
+                "name": "fetch_DNA_sequence",
+                "arguments": "{\"DNA_id\":\"DNA123\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 354,
+      "completion_tokens": 30,
+      "total_tokens": 384,
+      "cost": 0.0010313325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00104175,
+        "upstream_inference_prompt_cost": 0.00059175,
+        "upstream_inference_completions_cost": 0.00045
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2011.414,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "1ead23f7-e1f2-499d-95b6-8737de83973b"
+}

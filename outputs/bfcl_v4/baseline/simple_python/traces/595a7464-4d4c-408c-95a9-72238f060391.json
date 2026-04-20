@@ -1,0 +1,274 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find all multi-player games released in 2019 with an ESRB rating of 'Everyone'"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "game_list_get_games",
+        "description": "Get a list of video games based on release year, multiplayer functionality and ESRB rating Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "release_year": {
+              "type": "integer",
+              "description": "The year the game was released."
+            },
+            "multiplayer": {
+              "type": "boolean",
+              "description": "Whether the game has multiplayer functionality."
+            },
+            "ESRB_rating": {
+              "type": "string",
+              "description": "The ESRB rating of the game."
+            }
+          },
+          "required": [
+            "release_year",
+            "multiplayer",
+            "ESRB_rating"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find all multi-player games released in 2019 with an ESRB rating of 'Everyone'"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "game_list_get_games",
+          "description": "Get a list of video games based on release year, multiplayer functionality and ESRB rating Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "release_year": {
+                "type": "integer",
+                "description": "The year the game was released."
+              },
+              "multiplayer": {
+                "type": "boolean",
+                "description": "Whether the game has multiplayer functionality."
+              },
+              "ESRB_rating": {
+                "type": "string",
+                "description": "The ESRB rating of the game."
+              }
+            },
+            "required": [
+              "release_year",
+              "multiplayer",
+              "ESRB_rating"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "tool_schema_snapshot": {
+    "game_list_get_games": {
+      "type": "object",
+      "properties": {
+        "release_year": {
+          "type": "integer",
+          "description": "The year the game was released."
+        },
+        "multiplayer": {
+          "type": "boolean",
+          "description": "Whether the game has multiplayer functionality."
+        },
+        "ESRB_rating": {
+          "type": "string",
+          "description": "The ESRB rating of the game."
+        }
+      },
+      "required": [
+        "release_year",
+        "multiplayer",
+        "ESRB_rating"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776518017-HxFgBHS9Bl1jJmBx1thC",
+    "object": "chat.completion",
+    "created": 1776518017,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_91552775",
+              "function": {
+                "name": "game_list_get_games",
+                "arguments": "{\"release_year\":2019,\"multiplayer\":true,\"ESRB_rating\":\"Everyone\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 350,
+      "completion_tokens": 44,
+      "total_tokens": 394,
+      "cost": 0.0012273525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00123975,
+        "upstream_inference_prompt_cost": 0.00057975,
+        "upstream_inference_completions_cost": 0.00066
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776518017-HxFgBHS9Bl1jJmBx1thC",
+    "object": "response",
+    "created_at": 1776518019,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_91552775",
+        "call_id": "call_91552775",
+        "name": "game_list_get_games",
+        "arguments": "{\"release_year\":2019,\"multiplayer\":true,\"ESRB_rating\":\"Everyone\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 350,
+      "completion_tokens": 44,
+      "total_tokens": 394,
+      "cost": 0.0012273525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00123975,
+        "upstream_inference_prompt_cost": 0.00057975,
+        "upstream_inference_completions_cost": 0.00066
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776518017-HxFgBHS9Bl1jJmBx1thC",
+    "object": "chat.completion",
+    "created": 1776518017,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_91552775",
+              "function": {
+                "name": "game_list_get_games",
+                "arguments": "{\"release_year\":2019,\"multiplayer\":true,\"ESRB_rating\":\"Everyone\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 350,
+      "completion_tokens": 44,
+      "total_tokens": 394,
+      "cost": 0.0012273525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00123975,
+        "upstream_inference_prompt_cost": 0.00057975,
+        "upstream_inference_completions_cost": 0.00066
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2354.275,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "595a7464-4d4c-408c-95a9-72238f060391"
+}

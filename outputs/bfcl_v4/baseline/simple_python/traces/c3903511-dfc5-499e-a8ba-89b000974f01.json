@@ -1,0 +1,295 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Get me the directions from New York to Los Angeles avoiding highways and toll roads."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "map_service_get_directions",
+        "description": "Retrieve directions from a starting location to an ending location, including options for route preferences. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "start": {
+              "type": "string",
+              "description": "Starting location for the route."
+            },
+            "end": {
+              "type": "string",
+              "description": "Ending location for the route."
+            },
+            "avoid": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "tolls",
+                  "highways",
+                  "ferries"
+                ]
+              },
+              "description": "Route features to avoid. Default is ['highways', 'ferries']"
+            }
+          },
+          "required": [
+            "start",
+            "end"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Get me the directions from New York to Los Angeles avoiding highways and toll roads."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "map_service_get_directions",
+          "description": "Retrieve directions from a starting location to an ending location, including options for route preferences. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "start": {
+                "type": "string",
+                "description": "Starting location for the route."
+              },
+              "end": {
+                "type": "string",
+                "description": "Ending location for the route."
+              },
+              "avoid": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "tolls",
+                    "highways",
+                    "ferries"
+                  ]
+                },
+                "description": "Route features to avoid. Default is ['highways', 'ferries']"
+              }
+            },
+            "required": [
+              "start",
+              "end"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "tool_schema_snapshot": {
+    "map_service_get_directions": {
+      "type": "object",
+      "properties": {
+        "start": {
+          "type": "string",
+          "description": "Starting location for the route."
+        },
+        "end": {
+          "type": "string",
+          "description": "Ending location for the route."
+        },
+        "avoid": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "tolls",
+              "highways",
+              "ferries"
+            ]
+          },
+          "description": "Route features to avoid. Default is ['highways', 'ferries']"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776517702-FMbkGpL7Mq6zXbyJ2JnE",
+    "object": "chat.completion",
+    "created": 1776517702,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_10660206",
+              "function": {
+                "name": "map_service_get_directions",
+                "arguments": "{\"start\":\"New York\",\"end\":\"Los Angeles\",\"avoid\":[\"highways\",\"tolls\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 360,
+      "completion_tokens": 48,
+      "total_tokens": 408,
+      "cost": 0.0017753175,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00179325,
+        "upstream_inference_prompt_cost": 0.00107325,
+        "upstream_inference_completions_cost": 0.00072
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776517702-FMbkGpL7Mq6zXbyJ2JnE",
+    "object": "response",
+    "created_at": 1776517704,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_10660206",
+        "call_id": "call_10660206",
+        "name": "map_service_get_directions",
+        "arguments": "{\"start\":\"New York\",\"end\":\"Los Angeles\",\"avoid\":[\"highways\",\"tolls\"]}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 360,
+      "completion_tokens": 48,
+      "total_tokens": 408,
+      "cost": 0.0017753175,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00179325,
+        "upstream_inference_prompt_cost": 0.00107325,
+        "upstream_inference_completions_cost": 0.00072
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776517702-FMbkGpL7Mq6zXbyJ2JnE",
+    "object": "chat.completion",
+    "created": 1776517702,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_10660206",
+              "function": {
+                "name": "map_service_get_directions",
+                "arguments": "{\"start\":\"New York\",\"end\":\"Los Angeles\",\"avoid\":[\"highways\",\"tolls\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 360,
+      "completion_tokens": 48,
+      "total_tokens": 408,
+      "cost": 0.0017753175,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00179325,
+        "upstream_inference_prompt_cost": 0.00107325,
+        "upstream_inference_completions_cost": 0.00072
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1901.204,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "c3903511-dfc5-499e-a8ba-89b000974f01"
+}

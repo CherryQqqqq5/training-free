@@ -1,0 +1,295 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find me a multiplayer game with rating above 4.5 and compatible with Windows 10."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "multiplayer_game_finder",
+        "description": "Locate multiplayer games that match specific criteria such as rating, platform compatibility, genre, etc. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "platform": {
+              "type": "string",
+              "description": "The platform you want the game to be compatible with, e.g. Windows 10, PS5."
+            },
+            "rating": {
+              "type": "number",
+              "description": "Desired minimum game rating on a 5.0 scale. This is a float type value.",
+              "format": "float"
+            },
+            "genre": {
+              "type": "string",
+              "description": "Desired game genre, e.g. Action, Adventure, Racing. Default is 'Action'.",
+              "enum": [
+                "Action",
+                "Adventure",
+                "Racing",
+                "Strategy",
+                "Simulation"
+              ]
+            }
+          },
+          "required": [
+            "platform",
+            "rating"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find me a multiplayer game with rating above 4.5 and compatible with Windows 10."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "multiplayer_game_finder",
+          "description": "Locate multiplayer games that match specific criteria such as rating, platform compatibility, genre, etc. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "platform": {
+                "type": "string",
+                "description": "The platform you want the game to be compatible with, e.g. Windows 10, PS5."
+              },
+              "rating": {
+                "type": "number",
+                "description": "Desired minimum game rating on a 5.0 scale. This is a float type value.",
+                "format": "float"
+              },
+              "genre": {
+                "type": "string",
+                "description": "Desired game genre, e.g. Action, Adventure, Racing. Default is 'Action'.",
+                "enum": [
+                  "Action",
+                  "Adventure",
+                  "Racing",
+                  "Strategy",
+                  "Simulation"
+                ]
+              }
+            },
+            "required": [
+              "platform",
+              "rating"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "tool_schema_snapshot": {
+    "multiplayer_game_finder": {
+      "type": "object",
+      "properties": {
+        "platform": {
+          "type": "string",
+          "description": "The platform you want the game to be compatible with, e.g. Windows 10, PS5."
+        },
+        "rating": {
+          "type": "number",
+          "description": "Desired minimum game rating on a 5.0 scale. This is a float type value.",
+          "format": "float"
+        },
+        "genre": {
+          "type": "string",
+          "description": "Desired game genre, e.g. Action, Adventure, Racing. Default is 'Action'.",
+          "enum": [
+            "Action",
+            "Adventure",
+            "Racing",
+            "Strategy",
+            "Simulation"
+          ]
+        }
+      },
+      "required": [
+        "platform",
+        "rating"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776518041-664m9P9IVIJxhFvdL28b",
+    "object": "chat.completion",
+    "created": 1776518041,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_59607117",
+              "function": {
+                "name": "multiplayer_game_finder",
+                "arguments": "{\"platform\":\"Windows 10\",\"rating\":4.5,\"genre\":\"Action\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 396,
+      "completion_tokens": 45,
+      "total_tokens": 441,
+      "cost": 0.0013788225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00139275,
+        "upstream_inference_prompt_cost": 0.00071775,
+        "upstream_inference_completions_cost": 0.000675
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776518041-664m9P9IVIJxhFvdL28b",
+    "object": "response",
+    "created_at": 1776518042,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_59607117",
+        "call_id": "call_59607117",
+        "name": "multiplayer_game_finder",
+        "arguments": "{\"platform\":\"Windows 10\",\"rating\":4.5,\"genre\":\"Action\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 396,
+      "completion_tokens": 45,
+      "total_tokens": 441,
+      "cost": 0.0013788225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00139275,
+        "upstream_inference_prompt_cost": 0.00071775,
+        "upstream_inference_completions_cost": 0.000675
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776518041-664m9P9IVIJxhFvdL28b",
+    "object": "chat.completion",
+    "created": 1776518041,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_59607117",
+              "function": {
+                "name": "multiplayer_game_finder",
+                "arguments": "{\"platform\":\"Windows 10\",\"rating\":4.5,\"genre\":\"Action\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 396,
+      "completion_tokens": 45,
+      "total_tokens": 441,
+      "cost": 0.0013788225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00139275,
+        "upstream_inference_prompt_cost": 0.00071775,
+        "upstream_inference_completions_cost": 0.000675
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2094.516,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "2e2be0e9-8efe-498c-98f6-4137bc21da7e"
+}

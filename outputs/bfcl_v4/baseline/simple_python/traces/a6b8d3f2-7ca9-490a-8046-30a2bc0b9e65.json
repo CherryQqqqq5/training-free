@@ -1,0 +1,298 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Get information about the pop concerts in New York for next month."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "concert_info_get",
+        "description": "Retrieve information about concerts based on specific genre, location and date. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city where the concert will take place."
+            },
+            "date": {
+              "type": "string",
+              "description": "Time frame to get the concert for."
+            },
+            "genre": {
+              "type": "string",
+              "description": "Genre of the concert.",
+              "enum": [
+                "Pop",
+                "Rock",
+                "Country",
+                "Classical",
+                "Electronic",
+                "Hip-Hop"
+              ]
+            }
+          },
+          "required": [
+            "location",
+            "date",
+            "genre"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Get information about the pop concerts in New York for next month."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "concert_info_get",
+          "description": "Retrieve information about concerts based on specific genre, location and date. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city where the concert will take place."
+              },
+              "date": {
+                "type": "string",
+                "description": "Time frame to get the concert for."
+              },
+              "genre": {
+                "type": "string",
+                "description": "Genre of the concert.",
+                "enum": [
+                  "Pop",
+                  "Rock",
+                  "Country",
+                  "Classical",
+                  "Electronic",
+                  "Hip-Hop"
+                ]
+              }
+            },
+            "required": [
+              "location",
+              "date",
+              "genre"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "tool_schema_snapshot": {
+    "concert_info_get": {
+      "type": "object",
+      "properties": {
+        "location": {
+          "type": "string",
+          "description": "The city where the concert will take place."
+        },
+        "date": {
+          "type": "string",
+          "description": "Time frame to get the concert for."
+        },
+        "genre": {
+          "type": "string",
+          "description": "Genre of the concert.",
+          "enum": [
+            "Pop",
+            "Rock",
+            "Country",
+            "Classical",
+            "Electronic",
+            "Hip-Hop"
+          ]
+        }
+      },
+      "required": [
+        "location",
+        "date",
+        "genre"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776517885-T8DxvzhqNMDn7rNF1n4F",
+    "object": "chat.completion",
+    "created": 1776517885,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_15255149",
+              "function": {
+                "name": "concert_info_get",
+                "arguments": "{\"location\":\"New York\",\"date\":\"next month\",\"genre\":\"Pop\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 346,
+      "completion_tokens": 41,
+      "total_tokens": 387,
+      "cost": 0.0011709225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00118275,
+        "upstream_inference_prompt_cost": 0.00056775,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776517885-T8DxvzhqNMDn7rNF1n4F",
+    "object": "response",
+    "created_at": 1776517886,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_15255149",
+        "call_id": "call_15255149",
+        "name": "concert_info_get",
+        "arguments": "{\"location\":\"New York\",\"date\":\"next month\",\"genre\":\"Pop\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 346,
+      "completion_tokens": 41,
+      "total_tokens": 387,
+      "cost": 0.0011709225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00118275,
+        "upstream_inference_prompt_cost": 0.00056775,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776517885-T8DxvzhqNMDn7rNF1n4F",
+    "object": "chat.completion",
+    "created": 1776517885,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_15255149",
+              "function": {
+                "name": "concert_info_get",
+                "arguments": "{\"location\":\"New York\",\"date\":\"next month\",\"genre\":\"Pop\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 346,
+      "completion_tokens": 41,
+      "total_tokens": 387,
+      "cost": 0.0011709225,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00118275,
+        "upstream_inference_prompt_cost": 0.00056775,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2001.1,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "a6b8d3f2-7ca9-490a-8046-30a2bc0b9e65"
+}

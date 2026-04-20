@@ -1,0 +1,271 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Who won the last match between Chicago Bulls and Los Angeles Lakers?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "sports_match_results",
+        "description": "Returns the results of a given match between two teams. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "team1": {
+              "type": "string",
+              "description": "The name of the first team."
+            },
+            "team2": {
+              "type": "string",
+              "description": "The name of the second team."
+            },
+            "season": {
+              "type": "string",
+              "description": "The season when the match happened. Default is the current season."
+            }
+          },
+          "required": [
+            "team1",
+            "team2"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Who won the last match between Chicago Bulls and Los Angeles Lakers?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "sports_match_results",
+          "description": "Returns the results of a given match between two teams. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "team1": {
+                "type": "string",
+                "description": "The name of the first team."
+              },
+              "team2": {
+                "type": "string",
+                "description": "The name of the second team."
+              },
+              "season": {
+                "type": "string",
+                "description": "The season when the match happened. Default is the current season."
+              }
+            },
+            "required": [
+              "team1",
+              "team2"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "tool_schema_snapshot": {
+    "sports_match_results": {
+      "type": "object",
+      "properties": {
+        "team1": {
+          "type": "string",
+          "description": "The name of the first team."
+        },
+        "team2": {
+          "type": "string",
+          "description": "The name of the second team."
+        },
+        "season": {
+          "type": "string",
+          "description": "The season when the match happened. Default is the current season."
+        }
+      },
+      "required": [
+        "team1",
+        "team2"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776517977-z0hOYheQCLoRTHynXhYY",
+    "object": "chat.completion",
+    "created": 1776517977,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_84458217",
+              "function": {
+                "name": "sports_match_results",
+                "arguments": "{\"team1\":\"Chicago Bulls\",\"team2\":\"Los Angeles Lakers\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 336,
+      "completion_tokens": 38,
+      "total_tokens": 374,
+      "cost": 0.001094445,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0011055,
+        "upstream_inference_prompt_cost": 0.0005355,
+        "upstream_inference_completions_cost": 0.00057
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776517977-z0hOYheQCLoRTHynXhYY",
+    "object": "response",
+    "created_at": 1776517978,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_84458217",
+        "call_id": "call_84458217",
+        "name": "sports_match_results",
+        "arguments": "{\"team1\":\"Chicago Bulls\",\"team2\":\"Los Angeles Lakers\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 336,
+      "completion_tokens": 38,
+      "total_tokens": 374,
+      "cost": 0.001094445,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0011055,
+        "upstream_inference_prompt_cost": 0.0005355,
+        "upstream_inference_completions_cost": 0.00057
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776517977-z0hOYheQCLoRTHynXhYY",
+    "object": "chat.completion",
+    "created": 1776517977,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_84458217",
+              "function": {
+                "name": "sports_match_results",
+                "arguments": "{\"team1\":\"Chicago Bulls\",\"team2\":\"Los Angeles Lakers\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 336,
+      "completion_tokens": 38,
+      "total_tokens": 374,
+      "cost": 0.001094445,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0011055,
+        "upstream_inference_prompt_cost": 0.0005355,
+        "upstream_inference_completions_cost": 0.00057
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1927.908,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "7deafa03-55fa-42ab-8ce7-18b8e53af5aa"
+}

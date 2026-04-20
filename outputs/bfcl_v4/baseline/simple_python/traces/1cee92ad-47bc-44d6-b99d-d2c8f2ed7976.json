@@ -1,0 +1,271 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the batting average for a baseball player who has 180 hits and 600 at-bats. Round to 3 decimals."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_batting_average",
+        "description": "Calculate the batting average for a baseball player based on their number of hits and at-bats. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "hits": {
+              "type": "integer",
+              "description": "The number of hits."
+            },
+            "at_bats": {
+              "type": "integer",
+              "description": "The number of at-bats."
+            },
+            "decimal_places": {
+              "type": "integer",
+              "description": "The number of decimal places to return in the batting average. Default is 3."
+            }
+          },
+          "required": [
+            "hits",
+            "at_bats"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the batting average for a baseball player who has 180 hits and 600 at-bats. Round to 3 decimals."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_batting_average",
+          "description": "Calculate the batting average for a baseball player based on their number of hits and at-bats. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "hits": {
+                "type": "integer",
+                "description": "The number of hits."
+              },
+              "at_bats": {
+                "type": "integer",
+                "description": "The number of at-bats."
+              },
+              "decimal_places": {
+                "type": "integer",
+                "description": "The number of decimal places to return in the batting average. Default is 3."
+              }
+            },
+            "required": [
+              "hits",
+              "at_bats"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "tool_schema_snapshot": {
+    "calculate_batting_average": {
+      "type": "object",
+      "properties": {
+        "hits": {
+          "type": "integer",
+          "description": "The number of hits."
+        },
+        "at_bats": {
+          "type": "integer",
+          "description": "The number of at-bats."
+        },
+        "decimal_places": {
+          "type": "integer",
+          "description": "The number of decimal places to return in the batting average. Default is 3."
+        }
+      },
+      "required": [
+        "hits",
+        "at_bats"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776517926-dgRiuNQb5wHMFnRz9Xea",
+    "object": "chat.completion",
+    "created": 1776517926,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_77013919",
+              "function": {
+                "name": "calculate_batting_average",
+                "arguments": "{\"hits\":180,\"at_bats\":600,\"decimal_places\":3}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 361,
+      "completion_tokens": 42,
+      "total_tokens": 403,
+      "cost": 0.0012258675,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 211,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00123825,
+        "upstream_inference_prompt_cost": 0.00060825,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776517926-dgRiuNQb5wHMFnRz9Xea",
+    "object": "response",
+    "created_at": 1776517927,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_77013919",
+        "call_id": "call_77013919",
+        "name": "calculate_batting_average",
+        "arguments": "{\"hits\":180,\"at_bats\":600,\"decimal_places\":3}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 361,
+      "completion_tokens": 42,
+      "total_tokens": 403,
+      "cost": 0.0012258675,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 211,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00123825,
+        "upstream_inference_prompt_cost": 0.00060825,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776517926-dgRiuNQb5wHMFnRz9Xea",
+    "object": "chat.completion",
+    "created": 1776517926,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_77013919",
+              "function": {
+                "name": "calculate_batting_average",
+                "arguments": "{\"hits\":180,\"at_bats\":600,\"decimal_places\":3}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 361,
+      "completion_tokens": 42,
+      "total_tokens": 403,
+      "cost": 0.0012258675,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 211,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00123825,
+        "upstream_inference_prompt_cost": 0.00060825,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2289.103,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "1cee92ad-47bc-44d6-b99d-d2c8f2ed7976"
+}

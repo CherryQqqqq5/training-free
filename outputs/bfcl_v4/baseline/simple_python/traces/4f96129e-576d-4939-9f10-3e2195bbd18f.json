@@ -1,0 +1,271 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the final velocity of an object falling from a 150 meter building, assuming initial velocity is zero."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_final_velocity",
+        "description": "Calculate the final velocity of a free falling object given the height it's dropped from, the initial velocity and acceleration due to gravity. Ignore air resistance. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "height": {
+              "type": "integer",
+              "description": "The height the object is dropped from, in meters."
+            },
+            "initial_velocity": {
+              "type": "integer",
+              "description": "The initial velocity of the object in m/s. Default is zero."
+            },
+            "gravity": {
+              "type": "number",
+              "description": "Acceleration due to gravity. Default value is 9.81 m/s^2, earth's gravity. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "height"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the final velocity of an object falling from a 150 meter building, assuming initial velocity is zero."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_final_velocity",
+          "description": "Calculate the final velocity of a free falling object given the height it's dropped from, the initial velocity and acceleration due to gravity. Ignore air resistance. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "height": {
+                "type": "integer",
+                "description": "The height the object is dropped from, in meters."
+              },
+              "initial_velocity": {
+                "type": "integer",
+                "description": "The initial velocity of the object in m/s. Default is zero."
+              },
+              "gravity": {
+                "type": "number",
+                "description": "Acceleration due to gravity. Default value is 9.81 m/s^2, earth's gravity. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "height"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "tool_schema_snapshot": {
+    "calculate_final_velocity": {
+      "type": "object",
+      "properties": {
+        "height": {
+          "type": "integer",
+          "description": "The height the object is dropped from, in meters."
+        },
+        "initial_velocity": {
+          "type": "integer",
+          "description": "The initial velocity of the object in m/s. Default is zero."
+        },
+        "gravity": {
+          "type": "number",
+          "description": "Acceleration due to gravity. Default value is 9.81 m/s^2, earth's gravity. This is a float type value.",
+          "format": "float"
+        }
+      },
+      "required": [
+        "height"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776517239-miU6PHEgiISFRVzOiz8k",
+    "object": "chat.completion",
+    "created": 1776517239,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_78013157",
+              "function": {
+                "name": "calculate_final_velocity",
+                "arguments": "{\"height\":150,\"initial_velocity\":0,\"gravity\":9.81}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 385,
+      "completion_tokens": 41,
+      "total_tokens": 426,
+      "cost": 0.0012867525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00129975,
+        "upstream_inference_prompt_cost": 0.00068475,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776517239-miU6PHEgiISFRVzOiz8k",
+    "object": "response",
+    "created_at": 1776517240,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_78013157",
+        "call_id": "call_78013157",
+        "name": "calculate_final_velocity",
+        "arguments": "{\"height\":150,\"initial_velocity\":0,\"gravity\":9.81}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 385,
+      "completion_tokens": 41,
+      "total_tokens": 426,
+      "cost": 0.0012867525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00129975,
+        "upstream_inference_prompt_cost": 0.00068475,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776517239-miU6PHEgiISFRVzOiz8k",
+    "object": "chat.completion",
+    "created": 1776517239,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_78013157",
+              "function": {
+                "name": "calculate_final_velocity",
+                "arguments": "{\"height\":150,\"initial_velocity\":0,\"gravity\":9.81}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 385,
+      "completion_tokens": 41,
+      "total_tokens": 426,
+      "cost": 0.0012867525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00129975,
+        "upstream_inference_prompt_cost": 0.00068475,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1816.677,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "4f96129e-576d-4939-9f10-3e2195bbd18f"
+}

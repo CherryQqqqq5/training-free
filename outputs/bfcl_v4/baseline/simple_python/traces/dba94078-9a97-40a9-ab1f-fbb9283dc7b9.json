@@ -1,0 +1,271 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Get the player stats of Cristiano Ronaldo in the 2019-2020 season"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "soccer_stat_get_player_stats",
+        "description": "Retrieve soccer player statistics for a given season. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "player_name": {
+              "type": "string",
+              "description": "Name of the player."
+            },
+            "season": {
+              "type": "string",
+              "description": "Soccer season, usually specified by two years."
+            },
+            "league": {
+              "type": "string",
+              "description": "Optional - the soccer league, defaults to all leagues if not specified."
+            }
+          },
+          "required": [
+            "player_name",
+            "season"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Get the player stats of Cristiano Ronaldo in the 2019-2020 season"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "soccer_stat_get_player_stats",
+          "description": "Retrieve soccer player statistics for a given season. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "player_name": {
+                "type": "string",
+                "description": "Name of the player."
+              },
+              "season": {
+                "type": "string",
+                "description": "Soccer season, usually specified by two years."
+              },
+              "league": {
+                "type": "string",
+                "description": "Optional - the soccer league, defaults to all leagues if not specified."
+              }
+            },
+            "required": [
+              "player_name",
+              "season"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "tool_schema_snapshot": {
+    "soccer_stat_get_player_stats": {
+      "type": "object",
+      "properties": {
+        "player_name": {
+          "type": "string",
+          "description": "Name of the player."
+        },
+        "season": {
+          "type": "string",
+          "description": "Soccer season, usually specified by two years."
+        },
+        "league": {
+          "type": "string",
+          "description": "Optional - the soccer league, defaults to all leagues if not specified."
+        }
+      },
+      "required": [
+        "player_name",
+        "season"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776517928-IqW4YslTSrtrxxHPkoTx",
+    "object": "chat.completion",
+    "created": 1776517928,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_78738819",
+              "function": {
+                "name": "soccer_stat_get_player_stats",
+                "arguments": "{\"player_name\":\"Cristiano Ronaldo\",\"season\":\"2019-2020\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 340,
+      "completion_tokens": 43,
+      "total_tokens": 383,
+      "cost": 0.0011828025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00119475,
+        "upstream_inference_prompt_cost": 0.00054975,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776517928-IqW4YslTSrtrxxHPkoTx",
+    "object": "response",
+    "created_at": 1776517930,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_78738819",
+        "call_id": "call_78738819",
+        "name": "soccer_stat_get_player_stats",
+        "arguments": "{\"player_name\":\"Cristiano Ronaldo\",\"season\":\"2019-2020\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 340,
+      "completion_tokens": 43,
+      "total_tokens": 383,
+      "cost": 0.0011828025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00119475,
+        "upstream_inference_prompt_cost": 0.00054975,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776517928-IqW4YslTSrtrxxHPkoTx",
+    "object": "chat.completion",
+    "created": 1776517928,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_78738819",
+              "function": {
+                "name": "soccer_stat_get_player_stats",
+                "arguments": "{\"player_name\":\"Cristiano Ronaldo\",\"season\":\"2019-2020\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 340,
+      "completion_tokens": 43,
+      "total_tokens": 383,
+      "cost": 0.0011828025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00119475,
+        "upstream_inference_prompt_cost": 0.00054975,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1977.715,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "dba94078-9a97-40a9-ab1f-fbb9283dc7b9"
+}

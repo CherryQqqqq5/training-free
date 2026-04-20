@@ -1,0 +1,292 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the distance between two GPS coordinates (33.4484 N, 112.0740 W) and (34.0522 N, 118.2437 W) in miles."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "calculate_distance",
+        "description": "Calculate the distance between two GPS coordinates. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "coord1": {
+              "type": "array",
+              "description": "The first coordinate as (latitude, longitude).",
+              "items": {
+                "type": "number"
+              }
+            },
+            "coord2": {
+              "type": "array",
+              "description": "The second coordinate as (latitude, longitude).",
+              "items": {
+                "type": "number"
+              }
+            },
+            "unit": {
+              "type": "string",
+              "description": "The unit of distance. Options: 'miles', 'kilometers'."
+            }
+          },
+          "required": [
+            "coord1",
+            "coord2",
+            "unit"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Calculate the distance between two GPS coordinates (33.4484 N, 112.0740 W) and (34.0522 N, 118.2437 W) in miles."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_distance",
+          "description": "Calculate the distance between two GPS coordinates. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "coord1": {
+                "type": "array",
+                "description": "The first coordinate as (latitude, longitude).",
+                "items": {
+                  "type": "number"
+                }
+              },
+              "coord2": {
+                "type": "array",
+                "description": "The second coordinate as (latitude, longitude).",
+                "items": {
+                  "type": "number"
+                }
+              },
+              "unit": {
+                "type": "string",
+                "description": "The unit of distance. Options: 'miles', 'kilometers'."
+              }
+            },
+            "required": [
+              "coord1",
+              "coord2",
+              "unit"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "tool_schema_snapshot": {
+    "calculate_distance": {
+      "type": "object",
+      "properties": {
+        "coord1": {
+          "type": "array",
+          "description": "The first coordinate as (latitude, longitude).",
+          "items": {
+            "type": "number"
+          }
+        },
+        "coord2": {
+          "type": "array",
+          "description": "The second coordinate as (latitude, longitude).",
+          "items": {
+            "type": "number"
+          }
+        },
+        "unit": {
+          "type": "string",
+          "description": "The unit of distance. Options: 'miles', 'kilometers'."
+        }
+      },
+      "required": [
+        "coord1",
+        "coord2",
+        "unit"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776517387-nD8qNZmWGAWaqJ2Mj463",
+    "object": "chat.completion",
+    "created": 1776517387,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_24664080",
+              "function": {
+                "name": "calculate_distance",
+                "arguments": "{\"coord1\":[33.4484,-112.074],\"coord2\":[34.0522,-118.2437],\"unit\":\"miles\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 378,
+      "completion_tokens": 58,
+      "total_tokens": 436,
+      "cost": 0.0019772775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00199725,
+        "upstream_inference_prompt_cost": 0.00112725,
+        "upstream_inference_completions_cost": 0.00087
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776517387-nD8qNZmWGAWaqJ2Mj463",
+    "object": "response",
+    "created_at": 1776517389,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_24664080",
+        "call_id": "call_24664080",
+        "name": "calculate_distance",
+        "arguments": "{\"coord1\":[33.4484,-112.074],\"coord2\":[34.0522,-118.2437],\"unit\":\"miles\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 378,
+      "completion_tokens": 58,
+      "total_tokens": 436,
+      "cost": 0.0019772775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00199725,
+        "upstream_inference_prompt_cost": 0.00112725,
+        "upstream_inference_completions_cost": 0.00087
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776517387-nD8qNZmWGAWaqJ2Mj463",
+    "object": "chat.completion",
+    "created": 1776517387,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_24664080",
+              "function": {
+                "name": "calculate_distance",
+                "arguments": "{\"coord1\":[33.4484,-112.074],\"coord2\":[34.0522,-118.2437],\"unit\":\"miles\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 378,
+      "completion_tokens": 58,
+      "total_tokens": 436,
+      "cost": 0.0019772775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 3,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00199725,
+        "upstream_inference_prompt_cost": 0.00112725,
+        "upstream_inference_completions_cost": 0.00087
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2202.083,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "d49b68de-2e78-42db-9d8b-c4bcc6d29998"
+}

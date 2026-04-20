@@ -1,0 +1,271 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Get me two tickets for next Eminem concert in New York City."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "concert_booking_book_ticket",
+        "description": "Book concert tickets for a specific artist in a specified city. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "artist": {
+              "type": "string",
+              "description": "The artist you want to book tickets for."
+            },
+            "city": {
+              "type": "string",
+              "description": "The city where the concert is."
+            },
+            "num_tickets": {
+              "type": "integer",
+              "description": "Number of tickets required. Default is 1."
+            }
+          },
+          "required": [
+            "artist",
+            "city"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Get me two tickets for next Eminem concert in New York City."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "concert_booking_book_ticket",
+          "description": "Book concert tickets for a specific artist in a specified city. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "artist": {
+                "type": "string",
+                "description": "The artist you want to book tickets for."
+              },
+              "city": {
+                "type": "string",
+                "description": "The city where the concert is."
+              },
+              "num_tickets": {
+                "type": "integer",
+                "description": "Number of tickets required. Default is 1."
+              }
+            },
+            "required": [
+              "artist",
+              "city"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "tool_schema_snapshot": {
+    "concert_booking_book_ticket": {
+      "type": "object",
+      "properties": {
+        "artist": {
+          "type": "string",
+          "description": "The artist you want to book tickets for."
+        },
+        "city": {
+          "type": "string",
+          "description": "The city where the concert is."
+        },
+        "num_tickets": {
+          "type": "integer",
+          "description": "Number of tickets required. Default is 1."
+        }
+      },
+      "required": [
+        "artist",
+        "city"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776517894-fh3OHgpxnD4IlNNbQbVf",
+    "object": "chat.completion",
+    "created": 1776517894,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_79044112",
+              "function": {
+                "name": "concert_booking_book_ticket",
+                "arguments": "{\"artist\":\"Eminem\",\"city\":\"New York City\",\"num_tickets\":2}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 337,
+      "completion_tokens": 46,
+      "total_tokens": 383,
+      "cost": 0.001216215,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0012285,
+        "upstream_inference_prompt_cost": 0.0005385,
+        "upstream_inference_completions_cost": 0.00069
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776517894-fh3OHgpxnD4IlNNbQbVf",
+    "object": "response",
+    "created_at": 1776517895,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_79044112",
+        "call_id": "call_79044112",
+        "name": "concert_booking_book_ticket",
+        "arguments": "{\"artist\":\"Eminem\",\"city\":\"New York City\",\"num_tickets\":2}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 337,
+      "completion_tokens": 46,
+      "total_tokens": 383,
+      "cost": 0.001216215,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0012285,
+        "upstream_inference_prompt_cost": 0.0005385,
+        "upstream_inference_completions_cost": 0.00069
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776517894-fh3OHgpxnD4IlNNbQbVf",
+    "object": "chat.completion",
+    "created": 1776517894,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_79044112",
+              "function": {
+                "name": "concert_booking_book_ticket",
+                "arguments": "{\"artist\":\"Eminem\",\"city\":\"New York City\",\"num_tickets\":2}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 337,
+      "completion_tokens": 46,
+      "total_tokens": 383,
+      "cost": 0.001216215,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 210,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0012285,
+        "upstream_inference_prompt_cost": 0.0005385,
+        "upstream_inference_completions_cost": 0.00069
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2079.257,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "bc681404-5781-4498-93ea-5a96fa90f398"
+}

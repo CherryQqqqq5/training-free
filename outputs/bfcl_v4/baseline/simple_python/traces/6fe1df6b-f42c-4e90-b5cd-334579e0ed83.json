@@ -1,0 +1,319 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Book a hotel room for two adults and one child in Paris, France from July 10, 2022 to July 20, 2022."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "hotel_booking_book",
+        "description": "Book a hotel room given the city, date, and the number of adults and children. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "city": {
+              "type": "string",
+              "description": "The city where the hotel is located."
+            },
+            "from_date": {
+              "type": "string",
+              "description": "The start date of the booking. The format is MM-DD-YYYY."
+            },
+            "to_date": {
+              "type": "string",
+              "description": "The end date of the booking. The format is MM-DD-YYYY."
+            },
+            "adults": {
+              "type": "integer",
+              "description": "The number of adults for the booking."
+            },
+            "children": {
+              "type": "integer",
+              "description": "The number of children for the booking."
+            },
+            "room_type": {
+              "type": "string",
+              "description": "The type of the room, default is 'Standard'. Options are 'Standard', 'Deluxe', 'Suite'.",
+              "default": "Standard"
+            }
+          },
+          "required": [
+            "city",
+            "from_date",
+            "to_date",
+            "adults",
+            "children"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Book a hotel room for two adults and one child in Paris, France from July 10, 2022 to July 20, 2022."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "hotel_booking_book",
+          "description": "Book a hotel room given the city, date, and the number of adults and children. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "city": {
+                "type": "string",
+                "description": "The city where the hotel is located."
+              },
+              "from_date": {
+                "type": "string",
+                "description": "The start date of the booking. The format is MM-DD-YYYY."
+              },
+              "to_date": {
+                "type": "string",
+                "description": "The end date of the booking. The format is MM-DD-YYYY."
+              },
+              "adults": {
+                "type": "integer",
+                "description": "The number of adults for the booking."
+              },
+              "children": {
+                "type": "integer",
+                "description": "The number of children for the booking."
+              },
+              "room_type": {
+                "type": "string",
+                "description": "The type of the room, default is 'Standard'. Options are 'Standard', 'Deluxe', 'Suite'.",
+                "default": "Standard"
+              }
+            },
+            "required": [
+              "city",
+              "from_date",
+              "to_date",
+              "adults",
+              "children"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "tool_schema_snapshot": {
+    "hotel_booking_book": {
+      "type": "object",
+      "properties": {
+        "city": {
+          "type": "string",
+          "description": "The city where the hotel is located."
+        },
+        "from_date": {
+          "type": "string",
+          "description": "The start date of the booking. The format is MM-DD-YYYY."
+        },
+        "to_date": {
+          "type": "string",
+          "description": "The end date of the booking. The format is MM-DD-YYYY."
+        },
+        "adults": {
+          "type": "integer",
+          "description": "The number of adults for the booking."
+        },
+        "children": {
+          "type": "integer",
+          "description": "The number of children for the booking."
+        },
+        "room_type": {
+          "type": "string",
+          "description": "The type of the room, default is 'Standard'. Options are 'Standard', 'Deluxe', 'Suite'.",
+          "default": "Standard"
+        }
+      },
+      "required": [
+        "city",
+        "from_date",
+        "to_date",
+        "adults",
+        "children"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776518131-uGPbBIxWzaG5m7QEO0HQ",
+    "object": "chat.completion",
+    "created": 1776518131,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_61121269",
+              "function": {
+                "name": "hotel_booking_book",
+                "arguments": "{\"city\":\"Paris, France\",\"from_date\":\"07-10-2022\",\"to_date\":\"07-20-2022\",\"adults\":2,\"children\":1,\"room_type\":\"Standard\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 452,
+      "completion_tokens": 74,
+      "total_tokens": 526,
+      "cost": 0.0019757925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00199575,
+        "upstream_inference_prompt_cost": 0.00088575,
+        "upstream_inference_completions_cost": 0.00111
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776518131-uGPbBIxWzaG5m7QEO0HQ",
+    "object": "response",
+    "created_at": 1776518133,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_61121269",
+        "call_id": "call_61121269",
+        "name": "hotel_booking_book",
+        "arguments": "{\"city\":\"Paris, France\",\"from_date\":\"07-10-2022\",\"to_date\":\"07-20-2022\",\"adults\":2,\"children\":1,\"room_type\":\"Standard\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 452,
+      "completion_tokens": 74,
+      "total_tokens": 526,
+      "cost": 0.0019757925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00199575,
+        "upstream_inference_prompt_cost": 0.00088575,
+        "upstream_inference_completions_cost": 0.00111
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776518131-uGPbBIxWzaG5m7QEO0HQ",
+    "object": "chat.completion",
+    "created": 1776518131,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_61121269",
+              "function": {
+                "name": "hotel_booking_book",
+                "arguments": "{\"city\":\"Paris, France\",\"from_date\":\"07-10-2022\",\"to_date\":\"07-20-2022\",\"adults\":2,\"children\":1,\"room_type\":\"Standard\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 452,
+      "completion_tokens": 74,
+      "total_tokens": 526,
+      "cost": 0.0019757925,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00199575,
+        "upstream_inference_prompt_cost": 0.00088575,
+        "upstream_inference_completions_cost": 0.00111
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 2725.501,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "6fe1df6b-f42c-4e90-b5cd-334579e0ed83"
+}

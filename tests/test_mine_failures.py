@@ -444,6 +444,48 @@ class MineFailuresTests(unittest.TestCase):
 
         self.assertEqual(failures, [])
 
+    def test_mines_redundant_clarification_when_file_name_already_exists_in_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            trace_path = root / "trace.json"
+            trace_path.write_text(
+                json.dumps(
+                    {
+                        "request": {
+                            "model": "demo-model",
+                            "messages": [
+                                {"role": "developer", "content": PROMPT_WITH_FILE_TOOL},
+                                {"role": "user", "content": "Please display 'previous_report.pdf' from the current directory."},
+                            ],
+                        },
+                        "request_original": {
+                            "model": "demo-model",
+                            "input": [
+                                {"role": "user", "content": "Please display 'previous_report.pdf' from the current directory."}
+                            ],
+                        },
+                        "raw_response": {
+                            "choices": [
+                                {
+                                    "message": {
+                                        "role": "assistant",
+                                        "content": "Could you please provide the name of the file you'd like me to display?",
+                                    }
+                                }
+                            ]
+                        },
+                        "validation": {"issues": []},
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            failures = mine_failures(str(root))
+
+        self.assertEqual(len(failures), 1)
+        self.assertEqual(failures[0].error_type, "redundant_clarification_request")
+        self.assertEqual(failures[0].tool_name, "__none__")
+
     def test_dedupes_validation_issue_when_raw_implies_same_failure(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

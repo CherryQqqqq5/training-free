@@ -1,0 +1,271 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find Italian restaurants near New York city that serves gluten-free options."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tools": [
+      {
+        "name": "restaurant_finder",
+        "description": "Locate restaurants based on certain criteria such as cuisine, city, and dietary preferences. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "city": {
+              "type": "string",
+              "description": "City where you are looking for the restaurant."
+            },
+            "cuisine": {
+              "type": "string",
+              "description": "Type of cuisine you are interested in."
+            },
+            "diet": {
+              "type": "string",
+              "description": "Dietary preferences. e.g. 'Vegetarian', 'Gluten-free', etc. Default 'Vegetarian'."
+            }
+          },
+          "required": [
+            "city",
+            "cuisine"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Find Italian restaurants near New York city that serves gluten-free options."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "restaurant_finder",
+          "description": "Locate restaurants based on certain criteria such as cuisine, city, and dietary preferences. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "city": {
+                "type": "string",
+                "description": "City where you are looking for the restaurant."
+              },
+              "cuisine": {
+                "type": "string",
+                "description": "Type of cuisine you are interested in."
+              },
+              "diet": {
+                "type": "string",
+                "description": "Dietary preferences. e.g. 'Vegetarian', 'Gluten-free', etc. Default 'Vegetarian'."
+              }
+            },
+            "required": [
+              "city",
+              "cuisine"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "tool_schema_snapshot": {
+    "restaurant_finder": {
+      "type": "object",
+      "properties": {
+        "city": {
+          "type": "string",
+          "description": "City where you are looking for the restaurant."
+        },
+        "cuisine": {
+          "type": "string",
+          "description": "Type of cuisine you are interested in."
+        },
+        "diet": {
+          "type": "string",
+          "description": "Dietary preferences. e.g. 'Vegetarian', 'Gluten-free', etc. Default 'Vegetarian'."
+        }
+      },
+      "required": [
+        "city",
+        "cuisine"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776518064-Kujsz0y9DsTjpPEo5YOv",
+    "object": "chat.completion",
+    "created": 1776518064,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_74554917",
+              "function": {
+                "name": "restaurant_finder",
+                "arguments": "{\"city\":\"New York\",\"cuisine\":\"Italian\",\"diet\":\"Gluten-free\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 354,
+      "completion_tokens": 43,
+      "total_tokens": 397,
+      "cost": 0.0012243825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00123675,
+        "upstream_inference_prompt_cost": 0.00059175,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776518064-Kujsz0y9DsTjpPEo5YOv",
+    "object": "response",
+    "created_at": 1776518065,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_74554917",
+        "call_id": "call_74554917",
+        "name": "restaurant_finder",
+        "arguments": "{\"city\":\"New York\",\"cuisine\":\"Italian\",\"diet\":\"Gluten-free\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 354,
+      "completion_tokens": 43,
+      "total_tokens": 397,
+      "cost": 0.0012243825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00123675,
+        "upstream_inference_prompt_cost": 0.00059175,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776518064-Kujsz0y9DsTjpPEo5YOv",
+    "object": "chat.completion",
+    "created": 1776518064,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_74554917",
+              "function": {
+                "name": "restaurant_finder",
+                "arguments": "{\"city\":\"New York\",\"cuisine\":\"Italian\",\"diet\":\"Gluten-free\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 354,
+      "completion_tokens": 43,
+      "total_tokens": 397,
+      "cost": 0.0012243825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 209,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00123675,
+        "upstream_inference_prompt_cost": 0.00059175,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": []
+  },
+  "status_code": 200,
+  "latency_ms": 1977.56,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "61dd44a2-3b8b-4399-a3c7-7ca3118744a8"
+}
