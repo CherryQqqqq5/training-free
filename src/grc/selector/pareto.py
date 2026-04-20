@@ -19,6 +19,7 @@ MANIFEST_MATCH_KEYS = (
     "bfcl_model_alias",
     "upstream_profile",
     "upstream_model_route",
+    "lane",
 )
 
 

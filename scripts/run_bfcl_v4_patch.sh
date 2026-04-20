@@ -58,6 +58,8 @@ manifest = {
     "upstream_model_route": os.environ.get("GRC_UPSTREAM_MODEL", ""),
     "protocol_id": os.environ.get("GRC_PROTOCOL_ID", ""),
     "test_category": os.environ.get("TEST_CATEGORY", ""),
+    "lane": "compiler_patch",
+    "source": "failure_to_policy",
     "git_sha": git_sha,
     "git_dirty": git_dirty == "true",
     "runtime_config_path": os.environ.get("CONFIG_PATH", ""),

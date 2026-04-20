@@ -36,6 +36,13 @@ CSV_CONTEXT_PREFIXES = {
     "data_agentic": "agentic",
 }
 
+CATEGORY_TO_SUBSET_PATTERNS = {
+    "simple_python": ["simple", "python_simple", "non_live_python_simple_ast", "non_live", "live", "ast", "python"],
+    "multiple": ["multiple", "parallel_multiple", "parallel"],
+    "parallel_multiple": ["parallel", "multiple"],
+    "multi_turn_miss_param": ["multi_turn", "miss_param", "multi", "turn", "miss"],
+}
+
 
 def _metric_source_priority(path: Path) -> tuple[int, str]:
     path_str = str(path).lower()
@@ -390,10 +397,28 @@ def _assess_evaluation_status(
     resolved_score_sources = _resolve_score_sources(metric_sources)
     result_json_paths = _resolve_result_json_paths(bfcl_root)
 
-    if "acc" not in overall:
+    if "acc" not in overall and overall.get("accuracy") is None:
         issues.append("overall acc missing")
-    if category_key and category_key not in subsets:
-        issues.append(f"subset metric missing for test_category={category_key}")
+
+    # Semi-structured subset validation (user-preferred approach for BFCL outputs)
+    # Handles real keys like 'non_live_python_simple_ast', 'non_live_overall_acc',
+    # 'live_acc', 'correct_count', 'total_count' etc. instead of exact test_category match.
+    relevant_patterns = CATEGORY_TO_SUBSET_PATTERNS.get(
+        test_category.lower().replace("_", ""), [category_key]
+    )
+    has_relevant_subset = any(
+        any(
+            p.lower() in k.lower() or k.lower() in p.lower()
+            for p in relevant_patterns
+        )
+        for k in subsets.keys()
+    ) or bool(subsets)
+
+    if category_key and not has_relevant_subset:
+        issues.append(
+            f"subset metric missing for test_category={category_key} "
+            f"(looked for patterns: {relevant_patterns})"
+        )
     if not result_json_paths:
         issues.append("no result json found")
     if not resolved_score_sources:

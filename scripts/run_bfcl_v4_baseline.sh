@@ -58,6 +58,8 @@ manifest = {
     "upstream_model_route": os.environ.get("GRC_UPSTREAM_MODEL", ""),
     "protocol_id": os.environ.get("GRC_PROTOCOL_ID", ""),
     "test_category": os.environ.get("TEST_CATEGORY", ""),
+    "lane": "compatibility_baseline",
+    "source": "bfcl_adapter",
     "git_sha": git_sha,
     "git_dirty": git_dirty == "true",
     "runtime_config_path": os.environ.get("CONFIG_PATH", ""),
@@ -105,6 +107,17 @@ clean_run_state
 
 mkdir -p "${BFCL_ROOT}" "${TRACE_DIR}" "${ARTIFACT_DIR}"
 mkdir -p "${RULES_DIR}"
+
+# Restore baseline rules dir guard (experiment hygiene - prevent accidental pollution of compatibility baseline)
+if [[ "${GRC_ALLOW_DIRTY_BASELINE_RULES:-0}" != "1" ]]; then
+  mapfile -t BASELINE_RULE_FILES < <(find "${RULES_DIR}" -maxdepth 1 -type f -name '*.yaml' | sort)
+  if [[ "${#BASELINE_RULE_FILES[@]}" -gt 0 ]]; then
+    echo "baseline rules dir must be empty of YAML patches: ${RULES_DIR}" >&2
+    printf 'found baseline rule files:\n' >&2
+    printf '  %s\n' "${BASELINE_RULE_FILES[@]}" >&2
+    exit 1
+  fi
+fi
 
 export BFCL_MODEL TEST_CATEGORY CONFIG_PATH
 export BFCL_PROJECT_ROOT="${BFCL_ROOT}"
