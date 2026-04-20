@@ -404,7 +404,7 @@ def _assess_evaluation_status(
     # Handles real keys like 'non_live_python_simple_ast', 'non_live_overall_acc',
     # 'live_acc', 'correct_count', 'total_count' etc. instead of exact test_category match.
     relevant_patterns = CATEGORY_TO_SUBSET_PATTERNS.get(
-        test_category.lower().replace("_", ""), [category_key]
+        test_category.lower(), [category_key]
     )
     has_relevant_subset = any(
         any(
