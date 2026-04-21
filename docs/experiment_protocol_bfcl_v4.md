@@ -16,7 +16,8 @@ These values are pinned in [`configs/bfcl_v4_phase1.env`](/Users/cherry/Document
 - default upstream relay profile: `openrouter` (override with `GRC_UPSTREAM_PROFILE=novacode` if needed)
 - default BFCL evaluator alias: `gpt-4o-mini-2024-07-18-FC`
 - default OpenRouter upstream route: `x-ai/grok-3-beta`
-- runtime config: [`configs/runtime.yaml`](/Users/cherry/Documents/trainingfree/configs/runtime.yaml)
+- default BFCL runtime config: [`configs/runtime_bfcl_structured.yaml`](/Users/cherry/.codex/worktrees/3253/training-free/configs/runtime_bfcl_structured.yaml)
+- generic runtime config: [`configs/runtime.yaml`](/Users/cherry/.codex/worktrees/3253/training-free/configs/runtime.yaml)
 - recommended override path: `GRC_UPSTREAM_BASE_URL`
 
 `base_url` and API key env var are operator supplied, but Phase-1 runs must keep evaluator version, BFCL alias, upstream route, and endpoint protocol fixed across baseline and candidate runs. The proxy now accepts relay profiles:
@@ -27,6 +28,8 @@ These values are pinned in [`configs/bfcl_v4_phase1.env`](/Users/cherry/Document
 `GRC_BFCL_MODEL` is passed to `bfcl --model`. `GRC_UPSTREAM_MODEL` is the real provider model sent by `grc serve`; do not set it to a BFCL `*-FC` alias.
 
 The proxy accepts `GRC_UPSTREAM_PROFILE`, `GRC_UPSTREAM_BASE_URL`, `GRC_UPSTREAM_MODEL`, and provider-specific env vars so runs do not require editing the tracked config file.
+
+Benchmark-specific compatibility rules belong in the BFCL runner/config layer, not in generic runtime defaults. The BFCL runners therefore default to `configs/runtime_bfcl_structured.yaml`, while the core runtime remains conservative under `configs/runtime.yaml`.
 
 ## Suite Selection
 
@@ -57,10 +60,12 @@ Each run must emit:
 - `metrics.json`
 - `repairs.jsonl`
 - `failure_summary.json`
+- `run_manifest.json`
 
 Each candidate directory must additionally contain:
 
 - `rule.yaml`
+- `compile_status.json`
 - `accept.json`
 
 Archive rule:
@@ -88,6 +93,24 @@ Phase-1 aggregation records:
 - `fallback_count`
 - derived `regression` versus baseline subset scores
 
+Aggregation additionally records experiment validity metadata:
+
+- `evaluation_status`
+- `artifact_validity_issues`
+- `resolved_result_sources`
+- `resolved_score_sources`
+
+`evaluation_status=complete` means the run can recover:
+
+- overall `acc`
+- at least one subset metric for the current `test_category`
+- at least one result source
+- at least one score source
+- non-empty `metric_sources`
+- a valid trace summary (`trace_count > 0`)
+
+If any of the above is missing, the run is `incomplete` and must not enter Pareto selection. Incomplete runs are not represented as synthetic `acc=0.0` candidates.
+
 The selector compares baseline and candidate on a Pareto-style rule over `acc`, `cost`, `latency`, and `regression`.
 
 ## Accept / Reject Rule
@@ -101,3 +124,16 @@ Accept a candidate only if it dominates baseline:
 - at least one of the above is strictly better
 
 Otherwise reject the candidate and archive its evidence under `rules/rejected/`.
+
+Before Pareto comparison, the selector must also verify:
+
+- baseline and candidate both have `evaluation_status=complete`
+- candidate `compile_status` is `actionable_patch`
+- baseline and candidate `run_manifest.json` agree on:
+  - `protocol_id`
+  - `test_category`
+  - `bfcl_model_alias`
+  - `upstream_profile`
+  - `upstream_model_route`
+
+`git_dirty` does not block a run, but it must be recorded in the manifest and treated as a reproducibility warning.

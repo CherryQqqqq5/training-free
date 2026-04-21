@@ -217,6 +217,35 @@ tests/                   selector 与 BFCL aggregation 测试
 
 环境变量固定入口见 [configs/bfcl_v4_phase1.env](configs/bfcl_v4_phase1.env)。
 
+### 闭环状态机与实验分层
+
+当前 Phase-1 闭环不再把“写出了一个 `rule.yaml`”等同于“形成了有效 candidate”。`compile` 现在会额外产出 `compile_status.json`，并把结果区分为:
+
+1. `actionable_patch`
+2. `no_failure_evidence`
+3. `uncompilable_failure_evidence`
+4. `compile_failed`
+
+只有 `actionable_patch` 会继续进入 patch benchmark。
+
+同时，baseline / candidate 运行都会写出 `run_manifest.json`，显式记录:
+
+1. `bfcl_model_alias`
+2. `upstream_profile`
+3. `upstream_model_route`
+4. `protocol_id`
+5. `test_category`
+6. `git_sha`
+7. `git_dirty`
+8. `runtime_config_path`
+
+selector 会先校验 manifest 一致性，再比较 Pareto 指标。
+
+为避免把“benchmark 兼容性修复”误写成“compiler patch 增益”，仓库现在固定区分两条线:
+
+1. `compatibility baseline`: BFCL wrapper / layout / protocol compatibility
+2. `compiler patch candidate`: mine/compile 产生的 failure-to-policy patch
+
 ## 快速开始
 
 推荐工作流: **conda + OpenRouter**。
@@ -277,6 +306,8 @@ bash scripts/run_phase1_smoke.sh
 bash scripts/run_bfcl_v4_baseline.sh "${GRC_BFCL_MODEL}"
 ```
 
+默认会走 BFCL 专用运行时配置 [`configs/runtime_bfcl_structured.yaml`](/Users/cherry/.codex/worktrees/3253/training-free/configs/runtime_bfcl_structured.yaml)，把 benchmark 特有的严格结构化兼容逻辑限制在 runner 层，不污染通用 [`configs/runtime.yaml`](/Users/cherry/.codex/worktrees/3253/training-free/configs/runtime.yaml)。如果你要强制改回别的配置，显式传第 5 个参数，或设置 `GRC_BFCL_RUNTIME_CONFIG`。
+
 子集 ablation:
 
 ```bash
@@ -314,7 +345,7 @@ bash scripts/run_bfcl_v4_patch.sh \
   outputs/bfcl_v4/patch/simple_python \
   8012 \
   "simple_python" \
-  configs/runtime.yaml \
+  configs/runtime_bfcl_structured.yaml \
   rules/candidates/patch_simple_python_001 \
   outputs/bfcl_v4/patch/simple_python/traces \
   rules/candidates/patch_simple_python_001 \
