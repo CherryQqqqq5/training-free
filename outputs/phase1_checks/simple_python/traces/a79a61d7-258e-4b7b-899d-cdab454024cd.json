@@ -1,0 +1,297 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find all Patent lawsuit cases of Facebook in 2018."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tool_choice": "required",
+    "tools": [
+      {
+        "name": "get_lawsuit_cases",
+        "description": "Retrieve all lawsuit cases related to a specific company during a particular year. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "company_name": {
+              "type": "string",
+              "description": "The name of the company."
+            },
+            "year": {
+              "type": "integer",
+              "description": "The specific year to search for lawsuit cases."
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "open",
+                "closed",
+                "all"
+              ],
+              "description": "The status of the lawsuit cases to retrieve. If not specified, defaults to 'all'."
+            }
+          },
+          "required": [
+            "company_name",
+            "year"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3",
+    "messages": [
+      {
+        "role": "system",
+        "content": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+      },
+      {
+        "role": "user",
+        "content": "Find all Patent lawsuit cases of Facebook in 2018."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_lawsuit_cases",
+          "description": "Retrieve all lawsuit cases related to a specific company during a particular year. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "company_name": {
+                "type": "string",
+                "description": "The name of the company."
+              },
+              "year": {
+                "type": "integer",
+                "description": "The specific year to search for lawsuit cases."
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "open",
+                  "closed",
+                  "all"
+                ],
+                "description": "The status of the lawsuit cases to retrieve. If not specified, defaults to 'all'."
+              }
+            },
+            "required": [
+              "company_name",
+              "year"
+            ]
+          }
+        }
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "tool_schema_snapshot": {
+    "get_lawsuit_cases": {
+      "type": "object",
+      "properties": {
+        "company_name": {
+          "type": "string",
+          "description": "The name of the company."
+        },
+        "year": {
+          "type": "integer",
+          "description": "The specific year to search for lawsuit cases."
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "open",
+            "closed",
+            "all"
+          ],
+          "description": "The status of the lawsuit cases to retrieve. If not specified, defaults to 'all'."
+        }
+      },
+      "required": [
+        "company_name",
+        "year"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776744776-OdCAZQxngXmBF744KquJ",
+    "object": "chat.completion",
+    "created": 1776744776,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_95115617",
+              "function": {
+                "name": "get_lawsuit_cases",
+                "arguments": "{\"company_name\":\"Facebook\",\"year\":2018,\"status\":\"all\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 344,
+      "completion_tokens": 43,
+      "total_tokens": 387,
+      "cost": 0.00121473,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001227,
+        "upstream_inference_prompt_cost": 0.000582,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776744776-OdCAZQxngXmBF744KquJ",
+    "object": "response",
+    "created_at": 1776744778,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_95115617",
+        "call_id": "call_95115617",
+        "name": "get_lawsuit_cases",
+        "arguments": "{\"company_name\":\"Facebook\",\"year\":2018,\"status\":\"all\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 344,
+      "completion_tokens": 43,
+      "total_tokens": 387,
+      "cost": 0.00121473,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001227,
+        "upstream_inference_prompt_cost": 0.000582,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776744776-OdCAZQxngXmBF744KquJ",
+    "object": "chat.completion",
+    "created": 1776744776,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_95115617",
+              "function": {
+                "name": "get_lawsuit_cases",
+                "arguments": "{\"company_name\":\"Facebook\",\"year\":2018,\"status\":\"all\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 344,
+      "completion_tokens": 43,
+      "total_tokens": 387,
+      "cost": 0.00121473,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001227,
+        "upstream_inference_prompt_cost": 0.000582,
+        "upstream_inference_completions_cost": 0.000645
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": [
+      "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.",
+      "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.",
+      "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.",
+      "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+    ]
+  },
+  "status_code": 200,
+  "latency_ms": 1977.925,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "a79a61d7-258e-4b7b-899d-cdab454024cd"
+}

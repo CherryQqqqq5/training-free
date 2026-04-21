@@ -1,0 +1,303 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the compounded interest on an initial deposit of $5000 at an annual interest rate of 3% for 5 years, compounded quarterly."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tool_choice": "required",
+    "tools": [
+      {
+        "name": "calculate_compounded_interest",
+        "description": "Calculate the compounded interest for a given initial deposit, interest rate, time and number of times the interest is compounded per unit time. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "principal": {
+              "type": "integer",
+              "description": "The initial amount of money that is being invested or loaned."
+            },
+            "rate": {
+              "type": "number",
+              "description": "The annual interest rate. This is a float type value.",
+              "format": "float"
+            },
+            "time": {
+              "type": "integer",
+              "description": "The number of time periods the money is invested or loaned for."
+            },
+            "n": {
+              "type": "integer",
+              "description": "The number of times that interest is compounded per unit time."
+            }
+          },
+          "required": [
+            "principal",
+            "rate",
+            "time",
+            "n"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3",
+    "messages": [
+      {
+        "role": "system",
+        "content": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+      },
+      {
+        "role": "user",
+        "content": "Calculate the compounded interest on an initial deposit of $5000 at an annual interest rate of 3% for 5 years, compounded quarterly."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_compounded_interest",
+          "description": "Calculate the compounded interest for a given initial deposit, interest rate, time and number of times the interest is compounded per unit time. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "principal": {
+                "type": "integer",
+                "description": "The initial amount of money that is being invested or loaned."
+              },
+              "rate": {
+                "type": "number",
+                "description": "The annual interest rate. This is a float type value.",
+                "format": "float"
+              },
+              "time": {
+                "type": "integer",
+                "description": "The number of time periods the money is invested or loaned for."
+              },
+              "n": {
+                "type": "integer",
+                "description": "The number of times that interest is compounded per unit time."
+              }
+            },
+            "required": [
+              "principal",
+              "rate",
+              "time",
+              "n"
+            ]
+          }
+        }
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "tool_schema_snapshot": {
+    "calculate_compounded_interest": {
+      "type": "object",
+      "properties": {
+        "principal": {
+          "type": "integer",
+          "description": "The initial amount of money that is being invested or loaned."
+        },
+        "rate": {
+          "type": "number",
+          "description": "The annual interest rate. This is a float type value.",
+          "format": "float"
+        },
+        "time": {
+          "type": "integer",
+          "description": "The number of time periods the money is invested or loaned for."
+        },
+        "n": {
+          "type": "integer",
+          "description": "The number of times that interest is compounded per unit time."
+        }
+      },
+      "required": [
+        "principal",
+        "rate",
+        "time",
+        "n"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776744727-q7xiiE0bdbws8vfTZ91p",
+    "object": "chat.completion",
+    "created": 1776744727,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_25573369",
+              "function": {
+                "name": "calculate_compounded_interest",
+                "arguments": "{\"principal\":5000,\"rate\":0.03,\"time\":5,\"n\":4}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 393,
+      "completion_tokens": 48,
+      "total_tokens": 441,
+      "cost": 0.0014322825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 201,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00144675,
+        "upstream_inference_prompt_cost": 0.00072675,
+        "upstream_inference_completions_cost": 0.00072
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776744727-q7xiiE0bdbws8vfTZ91p",
+    "object": "response",
+    "created_at": 1776744728,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_25573369",
+        "call_id": "call_25573369",
+        "name": "calculate_compounded_interest",
+        "arguments": "{\"principal\":5000,\"rate\":0.03,\"time\":5,\"n\":4}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 393,
+      "completion_tokens": 48,
+      "total_tokens": 441,
+      "cost": 0.0014322825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 201,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00144675,
+        "upstream_inference_prompt_cost": 0.00072675,
+        "upstream_inference_completions_cost": 0.00072
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776744727-q7xiiE0bdbws8vfTZ91p",
+    "object": "chat.completion",
+    "created": 1776744727,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_25573369",
+              "function": {
+                "name": "calculate_compounded_interest",
+                "arguments": "{\"principal\":5000,\"rate\":0.03,\"time\":5,\"n\":4}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 393,
+      "completion_tokens": 48,
+      "total_tokens": 441,
+      "cost": 0.0014322825,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 201,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00144675,
+        "upstream_inference_prompt_cost": 0.00072675,
+        "upstream_inference_completions_cost": 0.00072
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": [
+      "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.",
+      "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.",
+      "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.",
+      "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+    ]
+  },
+  "status_code": 200,
+  "latency_ms": 2148.694,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "f478ba33-3d50-4d2a-8d10-f8d9571385de"
+}

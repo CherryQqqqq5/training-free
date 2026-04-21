@@ -1,0 +1,315 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the final temperature when 20 kg of water at 30 degree Celsius is mixed with 15 kg of water at 60 degree Celsius."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tool_choice": "required",
+    "tools": [
+      {
+        "name": "calculate_final_temperature",
+        "description": "Calculates the final equilibrium temperature after mixing two bodies with different masses and temperatures Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "mass1": {
+              "type": "integer",
+              "description": "The mass of the first body (kg)."
+            },
+            "temperature1": {
+              "type": "integer",
+              "description": "The initial temperature of the first body (Celsius)."
+            },
+            "mass2": {
+              "type": "integer",
+              "description": "The mass of the second body (kg)."
+            },
+            "temperature2": {
+              "type": "integer",
+              "description": "The initial temperature of the second body (Celsius)."
+            },
+            "specific_heat_capacity": {
+              "type": "number",
+              "description": "The specific heat capacity of the bodies in kJ/kg/K. If not provided, will default to that of water at room temperature, which is 4.2 kJ/kg/K. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "mass1",
+            "temperature1",
+            "mass2",
+            "temperature2"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3",
+    "messages": [
+      {
+        "role": "system",
+        "content": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+      },
+      {
+        "role": "user",
+        "content": "Calculate the final temperature when 20 kg of water at 30 degree Celsius is mixed with 15 kg of water at 60 degree Celsius."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_final_temperature",
+          "description": "Calculates the final equilibrium temperature after mixing two bodies with different masses and temperatures Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "mass1": {
+                "type": "integer",
+                "description": "The mass of the first body (kg)."
+              },
+              "temperature1": {
+                "type": "integer",
+                "description": "The initial temperature of the first body (Celsius)."
+              },
+              "mass2": {
+                "type": "integer",
+                "description": "The mass of the second body (kg)."
+              },
+              "temperature2": {
+                "type": "integer",
+                "description": "The initial temperature of the second body (Celsius)."
+              },
+              "specific_heat_capacity": {
+                "type": "number",
+                "description": "The specific heat capacity of the bodies in kJ/kg/K. If not provided, will default to that of water at room temperature, which is 4.2 kJ/kg/K. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "mass1",
+              "temperature1",
+              "mass2",
+              "temperature2"
+            ]
+          }
+        }
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "tool_schema_snapshot": {
+    "calculate_final_temperature": {
+      "type": "object",
+      "properties": {
+        "mass1": {
+          "type": "integer",
+          "description": "The mass of the first body (kg)."
+        },
+        "temperature1": {
+          "type": "integer",
+          "description": "The initial temperature of the first body (Celsius)."
+        },
+        "mass2": {
+          "type": "integer",
+          "description": "The mass of the second body (kg)."
+        },
+        "temperature2": {
+          "type": "integer",
+          "description": "The initial temperature of the second body (Celsius)."
+        },
+        "specific_heat_capacity": {
+          "type": "number",
+          "description": "The specific heat capacity of the bodies in kJ/kg/K. If not provided, will default to that of water at room temperature, which is 4.2 kJ/kg/K. This is a float type value.",
+          "format": "float"
+        }
+      },
+      "required": [
+        "mass1",
+        "temperature1",
+        "mass2",
+        "temperature2"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776744496-YSQOgikNnUXFj3y6D40T",
+    "object": "chat.completion",
+    "created": 1776744496,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_39313833",
+              "function": {
+                "name": "calculate_final_temperature",
+                "arguments": "{\"mass1\":20,\"temperature1\":30,\"mass2\":15,\"temperature2\":60,\"specific_heat_capacity\":4.2}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 437,
+      "completion_tokens": 59,
+      "total_tokens": 496,
+      "cost": 0.0017263125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 201,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00174375,
+        "upstream_inference_prompt_cost": 0.00085875,
+        "upstream_inference_completions_cost": 0.000885
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776744496-YSQOgikNnUXFj3y6D40T",
+    "object": "response",
+    "created_at": 1776744498,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_39313833",
+        "call_id": "call_39313833",
+        "name": "calculate_final_temperature",
+        "arguments": "{\"mass1\":20,\"temperature1\":30,\"mass2\":15,\"temperature2\":60,\"specific_heat_capacity\":4.2}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 437,
+      "completion_tokens": 59,
+      "total_tokens": 496,
+      "cost": 0.0017263125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 201,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00174375,
+        "upstream_inference_prompt_cost": 0.00085875,
+        "upstream_inference_completions_cost": 0.000885
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776744496-YSQOgikNnUXFj3y6D40T",
+    "object": "chat.completion",
+    "created": 1776744496,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_39313833",
+              "function": {
+                "name": "calculate_final_temperature",
+                "arguments": "{\"mass1\":20,\"temperature1\":30,\"mass2\":15,\"temperature2\":60,\"specific_heat_capacity\":4.2}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 437,
+      "completion_tokens": 59,
+      "total_tokens": 496,
+      "cost": 0.0017263125,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 201,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00174375,
+        "upstream_inference_prompt_cost": 0.00085875,
+        "upstream_inference_completions_cost": 0.000885
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": [
+      "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.",
+      "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.",
+      "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.",
+      "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+    ]
+  },
+  "status_code": 200,
+  "latency_ms": 2167.439,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "7293f8fb-818b-43b7-b5ac-e9ab3fb8b35a"
+}

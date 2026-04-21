@@ -1,0 +1,191 @@
+{
+  "base_url": "http://127.0.0.1:8011",
+  "config_path": "/cephfs/qiuyn/training-free/configs/runtime_bfcl_structured.yaml",
+  "trace_dir": ".../traces",
+  "expected_api_key_env": "OPENROUTER_API_KEY",
+  "environment_check": {
+    "expected_api_key_env": "OPENROUTER_API_KEY",
+    "is_set": true,
+    "reason": "ok"
+  },
+  "checks": [
+    {
+      "name": "chat_tool_call",
+      "request_path": "/v1/chat/completions",
+      "http_status": 200,
+      "passed": true,
+      "reason": "ok",
+      "response": {
+        "id": "gen-1776744325-l06pkXXk5FQ7qSZOcm3t",
+        "object": "chat.completion",
+        "created": 1776744325,
+        "model": "x-ai/grok-3",
+        "provider": "xAI",
+        "system_fingerprint": null,
+        "service_tier": "default",
+        "choices": [
+          {
+            "index": 0,
+            "logprobs": null,
+            "finish_reason": "tool_calls",
+            "native_finish_reason": "completed",
+            "message": {
+              "role": "assistant",
+              "content": null,
+              "refusal": null,
+              "reasoning": null,
+              "tool_calls": [
+                {
+                  "type": "function",
+                  "index": 0,
+                  "id": "call_91545465",
+                  "function": {
+                    "name": "echo",
+                    "arguments": "{\"text\":\"ping\"}"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 384,
+          "completion_tokens": 25,
+          "total_tokens": 409,
+          "cost": 0.0012689325,
+          "is_byok": false,
+          "prompt_tokens_details": {
+            "cached_tokens": 109,
+            "cache_write_tokens": 0,
+            "audio_tokens": 0,
+            "video_tokens": 0
+          },
+          "cost_details": {
+            "upstream_inference_cost": 0.00128175,
+            "upstream_inference_prompt_cost": 0.00090675,
+            "upstream_inference_completions_cost": 0.000375
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 0,
+            "image_tokens": 0,
+            "audio_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "name": "responses_tool_call",
+      "request_path": "/v1/responses",
+      "http_status": 200,
+      "passed": true,
+      "reason": "ok",
+      "response": {
+        "id": "gen-1776744327-cmPtB02usk879cArDhVQ",
+        "object": "response",
+        "created_at": 1776744328,
+        "model": "x-ai/grok-3",
+        "output": [
+          {
+            "type": "function_call",
+            "id": "call_98738425",
+            "call_id": "call_98738425",
+            "name": "echo",
+            "arguments": "{\"text\":\"ping\"}"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 384,
+          "completion_tokens": 25,
+          "total_tokens": 409,
+          "cost": 0.0006585975,
+          "is_byok": false,
+          "prompt_tokens_details": {
+            "cached_tokens": 383,
+            "cache_write_tokens": 0,
+            "audio_tokens": 0,
+            "video_tokens": 0
+          },
+          "cost_details": {
+            "upstream_inference_cost": 0.00066525,
+            "upstream_inference_prompt_cost": 0.00029025,
+            "upstream_inference_completions_cost": 0.000375
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 0,
+            "image_tokens": 0,
+            "audio_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "name": "chat_text_response",
+      "request_path": "/v1/chat/completions",
+      "http_status": 200,
+      "passed": true,
+      "reason": "ok",
+      "response": {
+        "id": "gen-1776744328-Zrdvdch8IbpHToydEP94",
+        "object": "chat.completion",
+        "created": 1776744328,
+        "model": "x-ai/grok-3",
+        "provider": "xAI",
+        "system_fingerprint": null,
+        "service_tier": "default",
+        "choices": [
+          {
+            "index": 0,
+            "logprobs": null,
+            "finish_reason": "stop",
+            "native_finish_reason": "completed",
+            "message": {
+              "role": "assistant",
+              "content": "PONG",
+              "refusal": null,
+              "reasoning": null,
+              "tool_calls": []
+            }
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 14,
+          "completion_tokens": 2,
+          "total_tokens": 16,
+          "cost": 6.6825e-05,
+          "is_byok": false,
+          "prompt_tokens_details": {
+            "cached_tokens": 2,
+            "cache_write_tokens": 0,
+            "audio_tokens": 0,
+            "video_tokens": 0
+          },
+          "cost_details": {
+            "upstream_inference_cost": 6.75e-05,
+            "upstream_inference_prompt_cost": 3.75e-05,
+            "upstream_inference_completions_cost": 3e-05
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 0,
+            "image_tokens": 0,
+            "audio_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "name": "trace_emission",
+      "request_path": null,
+      "http_status": null,
+      "passed": true,
+      "reason": "ok",
+      "response": {
+        "new_traces": [
+          "24fdca1e-d650-498c-b015-5ad0c8f4b362.json",
+          "4299e86c-e505-405e-a5aa-0682f103483d.json",
+          "45df83dc-5265-4e1f-b76e-d5b03cafd5e7.json"
+        ]
+      }
+    }
+  ],
+  "passed": true
+}

@@ -1,0 +1,309 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Book a direct flight from San Francisco to London for 2022-04-27 afternoon"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tool_choice": "required",
+    "tools": [
+      {
+        "name": "flight_book",
+        "description": "Book a direct flight for a specific date and time from departure location to destination location. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "departure_location": {
+              "type": "string",
+              "description": "The location you are departing from."
+            },
+            "destination_location": {
+              "type": "string",
+              "description": "The location you are flying to."
+            },
+            "date": {
+              "type": "string",
+              "description": "The date of the flight. Accepts standard date format e.g., 2022-04-28."
+            },
+            "time": {
+              "type": "string",
+              "description": "Preferred time of flight. Default is 'morning'."
+            },
+            "direct_flight": {
+              "type": "boolean",
+              "description": "If set to true, only direct flights will be searched. Default is false."
+            }
+          },
+          "required": [
+            "departure_location",
+            "destination_location",
+            "date"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3",
+    "messages": [
+      {
+        "role": "system",
+        "content": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+      },
+      {
+        "role": "user",
+        "content": "Book a direct flight from San Francisco to London for 2022-04-27 afternoon"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "flight_book",
+          "description": "Book a direct flight for a specific date and time from departure location to destination location. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "departure_location": {
+                "type": "string",
+                "description": "The location you are departing from."
+              },
+              "destination_location": {
+                "type": "string",
+                "description": "The location you are flying to."
+              },
+              "date": {
+                "type": "string",
+                "description": "The date of the flight. Accepts standard date format e.g., 2022-04-28."
+              },
+              "time": {
+                "type": "string",
+                "description": "Preferred time of flight. Default is 'morning'."
+              },
+              "direct_flight": {
+                "type": "boolean",
+                "description": "If set to true, only direct flights will be searched. Default is false."
+              }
+            },
+            "required": [
+              "departure_location",
+              "destination_location",
+              "date"
+            ]
+          }
+        }
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "tool_schema_snapshot": {
+    "flight_book": {
+      "type": "object",
+      "properties": {
+        "departure_location": {
+          "type": "string",
+          "description": "The location you are departing from."
+        },
+        "destination_location": {
+          "type": "string",
+          "description": "The location you are flying to."
+        },
+        "date": {
+          "type": "string",
+          "description": "The date of the flight. Accepts standard date format e.g., 2022-04-28."
+        },
+        "time": {
+          "type": "string",
+          "description": "Preferred time of flight. Default is 'morning'."
+        },
+        "direct_flight": {
+          "type": "boolean",
+          "description": "If set to true, only direct flights will be searched. Default is false."
+        }
+      },
+      "required": [
+        "departure_location",
+        "destination_location",
+        "date"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776745161-kr1zmboWOtg2JaNOuNxM",
+    "object": "chat.completion",
+    "created": 1776745161,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_93137932",
+              "function": {
+                "name": "flight_book",
+                "arguments": "{\"departure_location\":\"San Francisco\",\"destination_location\":\"London\",\"date\":\"2022-04-27\",\"time\":\"afternoon\",\"direct_flight\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 396,
+      "completion_tokens": 60,
+      "total_tokens": 456,
+      "cost": 0.00162162,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001638,
+        "upstream_inference_prompt_cost": 0.000738,
+        "upstream_inference_completions_cost": 0.0009
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776745161-kr1zmboWOtg2JaNOuNxM",
+    "object": "response",
+    "created_at": 1776745163,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_93137932",
+        "call_id": "call_93137932",
+        "name": "flight_book",
+        "arguments": "{\"departure_location\":\"San Francisco\",\"destination_location\":\"London\",\"date\":\"2022-04-27\",\"time\":\"afternoon\",\"direct_flight\":true}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 396,
+      "completion_tokens": 60,
+      "total_tokens": 456,
+      "cost": 0.00162162,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001638,
+        "upstream_inference_prompt_cost": 0.000738,
+        "upstream_inference_completions_cost": 0.0009
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776745161-kr1zmboWOtg2JaNOuNxM",
+    "object": "chat.completion",
+    "created": 1776745161,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_93137932",
+              "function": {
+                "name": "flight_book",
+                "arguments": "{\"departure_location\":\"San Francisco\",\"destination_location\":\"London\",\"date\":\"2022-04-27\",\"time\":\"afternoon\",\"direct_flight\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 396,
+      "completion_tokens": 60,
+      "total_tokens": 456,
+      "cost": 0.00162162,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001638,
+        "upstream_inference_prompt_cost": 0.000738,
+        "upstream_inference_completions_cost": 0.0009
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": [
+      "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.",
+      "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.",
+      "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.",
+      "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+    ]
+  },
+  "status_code": 200,
+  "latency_ms": 2419.313,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "9150c7ea-ccfd-4e66-a455-972d6e689136"
+}

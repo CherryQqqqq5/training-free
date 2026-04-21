@@ -46,17 +46,32 @@ def compile(
 ) -> None:
     from grc.compiler.trace_to_patch import compile_patch
 
-    status = compile_patch(failures, out, patch_id=patch_id, candidate_dir=candidate_dir)
-    print(json.dumps(status, ensure_ascii=False, indent=2))
+    status_path = (Path(candidate_dir) / "compile_status.json") if candidate_dir else Path(out).with_name("compile_status.json")
+    try:
+        compile_status = compile_patch(failures, out, patch_id=patch_id, candidate_dir=candidate_dir)
+    except Exception as exc:
+        compile_status = {
+            "status": "compile_failed",
+            "patch_id": patch_id,
+            "source_failure_count": None,
+            "failure_ir_count": None,
+            "rule_count": None,
+            "high_value_error_types": [],
+            "reason": f"compile raised {exc.__class__.__name__}: {exc}",
+        }
+        status_path.parent.mkdir(parents=True, exist_ok=True)
+        status_path.write_text(json.dumps(compile_status, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(json.dumps(compile_status, ensure_ascii=False, indent=2))
+        raise typer.Exit(code=1)
+
+    print(f"wrote patch -> {out}")
+    print(json.dumps(compile_status, ensure_ascii=False, indent=2))
 
 
 @app.command()
 def select(
     baseline_metrics: str = typer.Option(..., "--baseline-metrics"),
     candidate_metrics: str = typer.Option(..., "--candidate-metrics"),
-    baseline_manifest: str | None = typer.Option(None, "--baseline-manifest"),
-    candidate_manifest: str | None = typer.Option(None, "--candidate-manifest"),
-    compile_status: str | None = typer.Option(None, "--compile-status"),
     candidate_dir: str | None = typer.Option(None, "--candidate-dir"),
     rule_path: str | None = typer.Option(None, "--rule-path"),
     accepted_dir: str | None = typer.Option(None, "--accepted-dir"),
@@ -66,13 +81,7 @@ def select(
 ) -> None:
     from grc.selector.pareto import select_patch, write_selection_outputs
 
-    decision = select_patch(
-        baseline_metrics,
-        candidate_metrics,
-        baseline_manifest_path=baseline_manifest,
-        candidate_manifest_path=candidate_manifest,
-        compile_status_path=compile_status,
-    )
+    decision = select_patch(baseline_metrics, candidate_metrics)
     write_selection_outputs(decision, candidate_dir, rule_path, accepted_dir, rejected_dir, active_dir, out)
     print(json.dumps(decision, ensure_ascii=False, indent=2))
 

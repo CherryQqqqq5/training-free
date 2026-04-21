@@ -1,0 +1,285 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find the details of the court case identified by docket number 123456 in Texas. Don't return full text"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tool_choice": "required",
+    "tools": [
+      {
+        "name": "court_case_search",
+        "description": "Retrieves details about a court case using its docket number and location. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "docket_number": {
+              "type": "string",
+              "description": "The docket number for the case."
+            },
+            "location": {
+              "type": "string",
+              "description": "The location where the case is registered, in the format: state, e.g., Texas"
+            },
+            "full_text": {
+              "type": "boolean",
+              "default": "false",
+              "description": "Option to return the full text of the case ruling."
+            }
+          },
+          "required": [
+            "docket_number",
+            "location"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3",
+    "messages": [
+      {
+        "role": "system",
+        "content": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+      },
+      {
+        "role": "user",
+        "content": "Find the details of the court case identified by docket number 123456 in Texas. Don't return full text"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "court_case_search",
+          "description": "Retrieves details about a court case using its docket number and location. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "docket_number": {
+                "type": "string",
+                "description": "The docket number for the case."
+              },
+              "location": {
+                "type": "string",
+                "description": "The location where the case is registered, in the format: state, e.g., Texas"
+              },
+              "full_text": {
+                "type": "boolean",
+                "default": "false",
+                "description": "Option to return the full text of the case ruling."
+              }
+            },
+            "required": [
+              "docket_number",
+              "location"
+            ]
+          }
+        }
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "tool_schema_snapshot": {
+    "court_case_search": {
+      "type": "object",
+      "properties": {
+        "docket_number": {
+          "type": "string",
+          "description": "The docket number for the case."
+        },
+        "location": {
+          "type": "string",
+          "description": "The location where the case is registered, in the format: state, e.g., Texas"
+        },
+        "full_text": {
+          "type": "boolean",
+          "default": "false",
+          "description": "Option to return the full text of the case ruling."
+        }
+      },
+      "required": [
+        "docket_number",
+        "location"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776744760-6fwp5jIuyTH03iyQ2IWu",
+    "object": "chat.completion",
+    "created": 1776744760,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_29117165",
+              "function": {
+                "name": "court_case_search",
+                "arguments": "{\"docket_number\":\"123456\",\"location\":\"Texas\",\"full_text\":false}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 352,
+      "completion_tokens": 41,
+      "total_tokens": 393,
+      "cost": 0.00120879,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001221,
+        "upstream_inference_prompt_cost": 0.000606,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776744760-6fwp5jIuyTH03iyQ2IWu",
+    "object": "response",
+    "created_at": 1776744761,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_29117165",
+        "call_id": "call_29117165",
+        "name": "court_case_search",
+        "arguments": "{\"docket_number\":\"123456\",\"location\":\"Texas\",\"full_text\":false}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 352,
+      "completion_tokens": 41,
+      "total_tokens": 393,
+      "cost": 0.00120879,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001221,
+        "upstream_inference_prompt_cost": 0.000606,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776744760-6fwp5jIuyTH03iyQ2IWu",
+    "object": "chat.completion",
+    "created": 1776744760,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_29117165",
+              "function": {
+                "name": "court_case_search",
+                "arguments": "{\"docket_number\":\"123456\",\"location\":\"Texas\",\"full_text\":false}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 352,
+      "completion_tokens": 41,
+      "total_tokens": 393,
+      "cost": 0.00120879,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001221,
+        "upstream_inference_prompt_cost": 0.000606,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": [
+      "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.",
+      "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.",
+      "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.",
+      "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+    ]
+  },
+  "status_code": 200,
+  "latency_ms": 1866.099,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "d01eed7e-b702-417a-9048-d4e7aa3c83ff"
+}

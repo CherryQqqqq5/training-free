@@ -1,0 +1,297 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "What are the opening hours of the Metropolitan Museum of Art on Saturday?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tool_choice": "required",
+    "tools": [
+      {
+        "name": "get_museum_hours",
+        "description": "Retrieve opening hours of a specified museum for the specified day. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "museum_name": {
+              "type": "string",
+              "description": "The name of the museum."
+            },
+            "day": {
+              "type": "string",
+              "description": "Day of the week.",
+              "enum": [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+                "Sunday"
+              ]
+            }
+          },
+          "required": [
+            "museum_name",
+            "day"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3",
+    "messages": [
+      {
+        "role": "system",
+        "content": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+      },
+      {
+        "role": "user",
+        "content": "What are the opening hours of the Metropolitan Museum of Art on Saturday?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_museum_hours",
+          "description": "Retrieve opening hours of a specified museum for the specified day. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "museum_name": {
+                "type": "string",
+                "description": "The name of the museum."
+              },
+              "day": {
+                "type": "string",
+                "description": "Day of the week.",
+                "enum": [
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Friday",
+                  "Saturday",
+                  "Sunday"
+                ]
+              }
+            },
+            "required": [
+              "museum_name",
+              "day"
+            ]
+          }
+        }
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "tool_schema_snapshot": {
+    "get_museum_hours": {
+      "type": "object",
+      "properties": {
+        "museum_name": {
+          "type": "string",
+          "description": "The name of the museum."
+        },
+        "day": {
+          "type": "string",
+          "description": "Day of the week.",
+          "enum": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday"
+          ]
+        }
+      },
+      "required": [
+        "museum_name",
+        "day"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776745563-g9bhgXe6CS0Wt5FpoVyI",
+    "object": "chat.completion",
+    "created": 1776745563,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_50980515",
+              "function": {
+                "name": "get_museum_hours",
+                "arguments": "{\"museum_name\":\"Metropolitan Museum of Art\",\"day\":\"Saturday\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 319,
+      "completion_tokens": 39,
+      "total_tokens": 358,
+      "cost": 0.0010788525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 201,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00108975,
+        "upstream_inference_prompt_cost": 0.00050475,
+        "upstream_inference_completions_cost": 0.000585
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776745563-g9bhgXe6CS0Wt5FpoVyI",
+    "object": "response",
+    "created_at": 1776745565,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_50980515",
+        "call_id": "call_50980515",
+        "name": "get_museum_hours",
+        "arguments": "{\"museum_name\":\"Metropolitan Museum of Art\",\"day\":\"Saturday\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 319,
+      "completion_tokens": 39,
+      "total_tokens": 358,
+      "cost": 0.0010788525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 201,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00108975,
+        "upstream_inference_prompt_cost": 0.00050475,
+        "upstream_inference_completions_cost": 0.000585
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776745563-g9bhgXe6CS0Wt5FpoVyI",
+    "object": "chat.completion",
+    "created": 1776745563,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_50980515",
+              "function": {
+                "name": "get_museum_hours",
+                "arguments": "{\"museum_name\":\"Metropolitan Museum of Art\",\"day\":\"Saturday\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 319,
+      "completion_tokens": 39,
+      "total_tokens": 358,
+      "cost": 0.0010788525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 201,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00108975,
+        "upstream_inference_prompt_cost": 0.00050475,
+        "upstream_inference_completions_cost": 0.000585
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": [
+      "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.",
+      "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.",
+      "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.",
+      "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+    ]
+  },
+  "status_code": 200,
+  "latency_ms": 1937.322,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "1e3f7bf2-5a0b-4cb0-8f21-544356f02090"
+}

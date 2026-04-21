@@ -1,0 +1,282 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Search for current lawsuits filed against Apple in Santa Clara County."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tool_choice": "required",
+    "tools": [
+      {
+        "name": "lawsuit_search",
+        "description": "Retrieve all lawsuits involving a particular entity from specified jurisdiction. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "entity": {
+              "type": "string",
+              "description": "The entity involved in lawsuits."
+            },
+            "county": {
+              "type": "string",
+              "description": "The jurisdiction for the lawsuit search for example Alameda county."
+            },
+            "state": {
+              "type": "string",
+              "description": "The state for the lawsuit search. Default is California."
+            }
+          },
+          "required": [
+            "entity",
+            "county"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3",
+    "messages": [
+      {
+        "role": "system",
+        "content": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+      },
+      {
+        "role": "user",
+        "content": "Search for current lawsuits filed against Apple in Santa Clara County."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "lawsuit_search",
+          "description": "Retrieve all lawsuits involving a particular entity from specified jurisdiction. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "entity": {
+                "type": "string",
+                "description": "The entity involved in lawsuits."
+              },
+              "county": {
+                "type": "string",
+                "description": "The jurisdiction for the lawsuit search for example Alameda county."
+              },
+              "state": {
+                "type": "string",
+                "description": "The state for the lawsuit search. Default is California."
+              }
+            },
+            "required": [
+              "entity",
+              "county"
+            ]
+          }
+        }
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "tool_schema_snapshot": {
+    "lawsuit_search": {
+      "type": "object",
+      "properties": {
+        "entity": {
+          "type": "string",
+          "description": "The entity involved in lawsuits."
+        },
+        "county": {
+          "type": "string",
+          "description": "The jurisdiction for the lawsuit search for example Alameda county."
+        },
+        "state": {
+          "type": "string",
+          "description": "The state for the lawsuit search. Default is California."
+        }
+      },
+      "required": [
+        "entity",
+        "county"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776744788-iDx1RKCLUVtZr2tqwUEi",
+    "object": "chat.completion",
+    "created": 1776744788,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_73338888",
+              "function": {
+                "name": "lawsuit_search",
+                "arguments": "{\"entity\":\"Apple\",\"county\":\"Santa Clara County\",\"state\":\"California\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 323,
+      "completion_tokens": 41,
+      "total_tokens": 364,
+      "cost": 0.001118205,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 202,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0011295,
+        "upstream_inference_prompt_cost": 0.0005145,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776744788-iDx1RKCLUVtZr2tqwUEi",
+    "object": "response",
+    "created_at": 1776744790,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_73338888",
+        "call_id": "call_73338888",
+        "name": "lawsuit_search",
+        "arguments": "{\"entity\":\"Apple\",\"county\":\"Santa Clara County\",\"state\":\"California\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 323,
+      "completion_tokens": 41,
+      "total_tokens": 364,
+      "cost": 0.001118205,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 202,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0011295,
+        "upstream_inference_prompt_cost": 0.0005145,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776744788-iDx1RKCLUVtZr2tqwUEi",
+    "object": "chat.completion",
+    "created": 1776744788,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_73338888",
+              "function": {
+                "name": "lawsuit_search",
+                "arguments": "{\"entity\":\"Apple\",\"county\":\"Santa Clara County\",\"state\":\"California\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 323,
+      "completion_tokens": 41,
+      "total_tokens": 364,
+      "cost": 0.001118205,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 202,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0011295,
+        "upstream_inference_prompt_cost": 0.0005145,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": [
+      "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.",
+      "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.",
+      "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.",
+      "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+    ]
+  },
+  "status_code": 200,
+  "latency_ms": 1979.703,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "e5fb1e49-90df-416c-9c18-9ecad6b269b9"
+}

@@ -1,0 +1,270 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Who was the full name of the president of the United States in 1861?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tool_choice": "required",
+    "tools": [
+      {
+        "name": "US_president_in_year",
+        "description": "Retrieve the name of the U.S. president in a given year. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "year": {
+              "type": "integer",
+              "description": "The year in question."
+            },
+            "full_name": {
+              "type": "boolean",
+              "default": true,
+              "description": "Option to return full name with middle initial, if applicable."
+            }
+          },
+          "required": [
+            "year"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3",
+    "messages": [
+      {
+        "role": "system",
+        "content": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+      },
+      {
+        "role": "user",
+        "content": "Who was the full name of the president of the United States in 1861?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "US_president_in_year",
+          "description": "Retrieve the name of the U.S. president in a given year. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "year": {
+                "type": "integer",
+                "description": "The year in question."
+              },
+              "full_name": {
+                "type": "boolean",
+                "default": true,
+                "description": "Option to return full name with middle initial, if applicable."
+              }
+            },
+            "required": [
+              "year"
+            ]
+          }
+        }
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "tool_schema_snapshot": {
+    "US_president_in_year": {
+      "type": "object",
+      "properties": {
+        "year": {
+          "type": "integer",
+          "description": "The year in question."
+        },
+        "full_name": {
+          "type": "boolean",
+          "default": true,
+          "description": "Option to return full name with middle initial, if applicable."
+        }
+      },
+      "required": [
+        "year"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776745215-mIMkrBZnWN768TXYYxza",
+    "object": "chat.completion",
+    "created": 1776745215,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_14218205",
+              "function": {
+                "name": "US_president_in_year",
+                "arguments": "{\"year\":1861,\"full_name\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 316,
+      "completion_tokens": 35,
+      "total_tokens": 351,
+      "cost": 0.00101277,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001023,
+        "upstream_inference_prompt_cost": 0.000498,
+        "upstream_inference_completions_cost": 0.000525
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776745215-mIMkrBZnWN768TXYYxza",
+    "object": "response",
+    "created_at": 1776745217,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_14218205",
+        "call_id": "call_14218205",
+        "name": "US_president_in_year",
+        "arguments": "{\"year\":1861,\"full_name\":true}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 316,
+      "completion_tokens": 35,
+      "total_tokens": 351,
+      "cost": 0.00101277,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001023,
+        "upstream_inference_prompt_cost": 0.000498,
+        "upstream_inference_completions_cost": 0.000525
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776745215-mIMkrBZnWN768TXYYxza",
+    "object": "chat.completion",
+    "created": 1776745215,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_14218205",
+              "function": {
+                "name": "US_president_in_year",
+                "arguments": "{\"year\":1861,\"full_name\":true}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 316,
+      "completion_tokens": 35,
+      "total_tokens": 351,
+      "cost": 0.00101277,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001023,
+        "upstream_inference_prompt_cost": 0.000498,
+        "upstream_inference_completions_cost": 0.000525
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": [
+      "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.",
+      "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.",
+      "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.",
+      "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+    ]
+  },
+  "status_code": 200,
+  "latency_ms": 2016.085,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "451e9004-c5e6-44a8-b9bc-6d4b9ac03d28"
+}

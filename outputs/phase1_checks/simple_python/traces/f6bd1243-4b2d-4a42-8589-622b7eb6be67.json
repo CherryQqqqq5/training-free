@@ -1,0 +1,282 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Who won the last match between Chicago Bulls and Los Angeles Lakers?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tool_choice": "required",
+    "tools": [
+      {
+        "name": "sports_match_results",
+        "description": "Returns the results of a given match between two teams. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "team1": {
+              "type": "string",
+              "description": "The name of the first team."
+            },
+            "team2": {
+              "type": "string",
+              "description": "The name of the second team."
+            },
+            "season": {
+              "type": "string",
+              "description": "The season when the match happened. Default is the current season."
+            }
+          },
+          "required": [
+            "team1",
+            "team2"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3",
+    "messages": [
+      {
+        "role": "system",
+        "content": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+      },
+      {
+        "role": "user",
+        "content": "Who won the last match between Chicago Bulls and Los Angeles Lakers?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "sports_match_results",
+          "description": "Returns the results of a given match between two teams. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "team1": {
+                "type": "string",
+                "description": "The name of the first team."
+              },
+              "team2": {
+                "type": "string",
+                "description": "The name of the second team."
+              },
+              "season": {
+                "type": "string",
+                "description": "The season when the match happened. Default is the current season."
+              }
+            },
+            "required": [
+              "team1",
+              "team2"
+            ]
+          }
+        }
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "tool_schema_snapshot": {
+    "sports_match_results": {
+      "type": "object",
+      "properties": {
+        "team1": {
+          "type": "string",
+          "description": "The name of the first team."
+        },
+        "team2": {
+          "type": "string",
+          "description": "The name of the second team."
+        },
+        "season": {
+          "type": "string",
+          "description": "The season when the match happened. Default is the current season."
+        }
+      },
+      "required": [
+        "team1",
+        "team2"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776745398-EqzfBivr1BZ1XTxksom3",
+    "object": "chat.completion",
+    "created": 1776745398,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_35304744",
+              "function": {
+                "name": "sports_match_results",
+                "arguments": "{\"team1\":\"Chicago Bulls\",\"team2\":\"Los Angeles Lakers\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 327,
+      "completion_tokens": 38,
+      "total_tokens": 365,
+      "cost": 0.0010877625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 201,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00109875,
+        "upstream_inference_prompt_cost": 0.00052875,
+        "upstream_inference_completions_cost": 0.00057
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776745398-EqzfBivr1BZ1XTxksom3",
+    "object": "response",
+    "created_at": 1776745399,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_35304744",
+        "call_id": "call_35304744",
+        "name": "sports_match_results",
+        "arguments": "{\"team1\":\"Chicago Bulls\",\"team2\":\"Los Angeles Lakers\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 327,
+      "completion_tokens": 38,
+      "total_tokens": 365,
+      "cost": 0.0010877625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 201,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00109875,
+        "upstream_inference_prompt_cost": 0.00052875,
+        "upstream_inference_completions_cost": 0.00057
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776745398-EqzfBivr1BZ1XTxksom3",
+    "object": "chat.completion",
+    "created": 1776745398,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_35304744",
+              "function": {
+                "name": "sports_match_results",
+                "arguments": "{\"team1\":\"Chicago Bulls\",\"team2\":\"Los Angeles Lakers\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 327,
+      "completion_tokens": 38,
+      "total_tokens": 365,
+      "cost": 0.0010877625,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 201,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00109875,
+        "upstream_inference_prompt_cost": 0.00052875,
+        "upstream_inference_completions_cost": 0.00057
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": [
+      "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.",
+      "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.",
+      "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.",
+      "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+    ]
+  },
+  "status_code": 200,
+  "latency_ms": 1898.192,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "f6bd1243-4b2d-4a42-8589-622b7eb6be67"
+}

@@ -1,0 +1,282 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the company's return on equity given its net income of $2,000,000, shareholder's equity of $10,000,000, and dividends paid of $200,000."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tool_choice": "required",
+    "tools": [
+      {
+        "name": "calculate_return_on_equity",
+        "description": "Calculate a company's return on equity based on its net income, shareholder's equity, and dividends paid. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "net_income": {
+              "type": "integer",
+              "description": "The company's net income."
+            },
+            "shareholder_equity": {
+              "type": "integer",
+              "description": "The company's total shareholder's equity."
+            },
+            "dividends_paid": {
+              "type": "integer",
+              "description": "The total dividends paid by the company. Optional. If not given, default to 0."
+            }
+          },
+          "required": [
+            "net_income",
+            "shareholder_equity"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3",
+    "messages": [
+      {
+        "role": "system",
+        "content": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+      },
+      {
+        "role": "user",
+        "content": "Calculate the company's return on equity given its net income of $2,000,000, shareholder's equity of $10,000,000, and dividends paid of $200,000."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_return_on_equity",
+          "description": "Calculate a company's return on equity based on its net income, shareholder's equity, and dividends paid. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "net_income": {
+                "type": "integer",
+                "description": "The company's net income."
+              },
+              "shareholder_equity": {
+                "type": "integer",
+                "description": "The company's total shareholder's equity."
+              },
+              "dividends_paid": {
+                "type": "integer",
+                "description": "The total dividends paid by the company. Optional. If not given, default to 0."
+              }
+            },
+            "required": [
+              "net_income",
+              "shareholder_equity"
+            ]
+          }
+        }
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "tool_schema_snapshot": {
+    "calculate_return_on_equity": {
+      "type": "object",
+      "properties": {
+        "net_income": {
+          "type": "integer",
+          "description": "The company's net income."
+        },
+        "shareholder_equity": {
+          "type": "integer",
+          "description": "The company's total shareholder's equity."
+        },
+        "dividends_paid": {
+          "type": "integer",
+          "description": "The total dividends paid by the company. Optional. If not given, default to 0."
+        }
+      },
+      "required": [
+        "net_income",
+        "shareholder_equity"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776744683-siD7fIK2rDgYqUXgJ7xv",
+    "object": "chat.completion",
+    "created": 1776744683,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_46220136",
+              "function": {
+                "name": "calculate_return_on_equity",
+                "arguments": "{\"net_income\":2000000,\"shareholder_equity\":10000000,\"dividends_paid\":200000}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 373,
+      "completion_tokens": 51,
+      "total_tokens": 424,
+      "cost": 0.0014174325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 201,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00143175,
+        "upstream_inference_prompt_cost": 0.00066675,
+        "upstream_inference_completions_cost": 0.000765
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776744683-siD7fIK2rDgYqUXgJ7xv",
+    "object": "response",
+    "created_at": 1776744684,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_46220136",
+        "call_id": "call_46220136",
+        "name": "calculate_return_on_equity",
+        "arguments": "{\"net_income\":2000000,\"shareholder_equity\":10000000,\"dividends_paid\":200000}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 373,
+      "completion_tokens": 51,
+      "total_tokens": 424,
+      "cost": 0.0014174325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 201,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00143175,
+        "upstream_inference_prompt_cost": 0.00066675,
+        "upstream_inference_completions_cost": 0.000765
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776744683-siD7fIK2rDgYqUXgJ7xv",
+    "object": "chat.completion",
+    "created": 1776744683,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_46220136",
+              "function": {
+                "name": "calculate_return_on_equity",
+                "arguments": "{\"net_income\":2000000,\"shareholder_equity\":10000000,\"dividends_paid\":200000}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 373,
+      "completion_tokens": 51,
+      "total_tokens": 424,
+      "cost": 0.0014174325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 201,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00143175,
+        "upstream_inference_prompt_cost": 0.00066675,
+        "upstream_inference_completions_cost": 0.000765
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": [
+      "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.",
+      "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.",
+      "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.",
+      "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+    ]
+  },
+  "status_code": 200,
+  "latency_ms": 2137.75,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "1a011b61-aad4-4f70-8658-244c1ccf5d7b"
+}

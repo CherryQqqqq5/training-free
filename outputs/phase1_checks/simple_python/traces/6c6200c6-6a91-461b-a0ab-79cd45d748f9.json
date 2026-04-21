@@ -1,0 +1,318 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Determine the winner in a Poker game with John having a Hand of 8♥, 10♥, J♥, Q♥, K♥ and Mike having 9♠, J♠, 10♠, Q♠, K♠."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tool_choice": "required",
+    "tools": [
+      {
+        "name": "card_games_poker_determine_winner",
+        "description": "Determines the winner in a game of Poker based on the cards in each players' hands. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "player1": {
+              "type": "string",
+              "description": "The first player's name."
+            },
+            "hand1": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "The list of cards (as strings) in first player's hand. E.g ['10♠', 'J♠']"
+            },
+            "player2": {
+              "type": "string",
+              "description": "The second player's name."
+            },
+            "hand2": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "The list of cards (as strings) in second player's hand. E.g ['9♥', '10♥']"
+            }
+          },
+          "required": [
+            "player1",
+            "hand1",
+            "player2",
+            "hand2"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3",
+    "messages": [
+      {
+        "role": "system",
+        "content": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+      },
+      {
+        "role": "user",
+        "content": "Determine the winner in a Poker game with John having a Hand of 8♥, 10♥, J♥, Q♥, K♥ and Mike having 9♠, J♠, 10♠, Q♠, K♠."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "card_games_poker_determine_winner",
+          "description": "Determines the winner in a game of Poker based on the cards in each players' hands. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "player1": {
+                "type": "string",
+                "description": "The first player's name."
+              },
+              "hand1": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "The list of cards (as strings) in first player's hand. E.g ['10♠', 'J♠']"
+              },
+              "player2": {
+                "type": "string",
+                "description": "The second player's name."
+              },
+              "hand2": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "The list of cards (as strings) in second player's hand. E.g ['9♥', '10♥']"
+              }
+            },
+            "required": [
+              "player1",
+              "hand1",
+              "player2",
+              "hand2"
+            ]
+          }
+        }
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "tool_schema_snapshot": {
+    "card_games_poker_determine_winner": {
+      "type": "object",
+      "properties": {
+        "player1": {
+          "type": "string",
+          "description": "The first player's name."
+        },
+        "hand1": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The list of cards (as strings) in first player's hand. E.g ['10♠', 'J♠']"
+        },
+        "player2": {
+          "type": "string",
+          "description": "The second player's name."
+        },
+        "hand2": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The list of cards (as strings) in second player's hand. E.g ['9♥', '10♥']"
+        }
+      },
+      "required": [
+        "player1",
+        "hand1",
+        "player2",
+        "hand2"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776745431-s7oOujv3Y4OsNscOH0NI",
+    "object": "chat.completion",
+    "created": 1776745431,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_89953850",
+              "function": {
+                "name": "card_games_poker_determine_winner",
+                "arguments": "{\"player1\":\"John\",\"hand1\":[\"8♥\",\"10♥\",\"J♥\",\"Q♥\",\"K♥\"],\"player2\":\"Mike\",\"hand2\":[\"9♠\",\"J♠\",\"10♠\",\"Q♠\",\"K♠\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 441,
+      "completion_tokens": 93,
+      "total_tokens": 534,
+      "cost": 0.00224532,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.002268,
+        "upstream_inference_prompt_cost": 0.000873,
+        "upstream_inference_completions_cost": 0.001395
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776745431-s7oOujv3Y4OsNscOH0NI",
+    "object": "response",
+    "created_at": 1776745433,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_89953850",
+        "call_id": "call_89953850",
+        "name": "card_games_poker_determine_winner",
+        "arguments": "{\"player1\":\"John\",\"hand1\":[\"8♥\",\"10♥\",\"J♥\",\"Q♥\",\"K♥\"],\"player2\":\"Mike\",\"hand2\":[\"9♠\",\"J♠\",\"10♠\",\"Q♠\",\"K♠\"]}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 441,
+      "completion_tokens": 93,
+      "total_tokens": 534,
+      "cost": 0.00224532,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.002268,
+        "upstream_inference_prompt_cost": 0.000873,
+        "upstream_inference_completions_cost": 0.001395
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776745431-s7oOujv3Y4OsNscOH0NI",
+    "object": "chat.completion",
+    "created": 1776745431,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_89953850",
+              "function": {
+                "name": "card_games_poker_determine_winner",
+                "arguments": "{\"player1\":\"John\",\"hand1\":[\"8♥\",\"10♥\",\"J♥\",\"Q♥\",\"K♥\"],\"player2\":\"Mike\",\"hand2\":[\"9♠\",\"J♠\",\"10♠\",\"Q♠\",\"K♠\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 441,
+      "completion_tokens": 93,
+      "total_tokens": 534,
+      "cost": 0.00224532,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.002268,
+        "upstream_inference_prompt_cost": 0.000873,
+        "upstream_inference_completions_cost": 0.001395
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": [
+      "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.",
+      "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.",
+      "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.",
+      "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+    ]
+  },
+  "status_code": 200,
+  "latency_ms": 3682.075,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "6c6200c6-6a91-461b-a0ab-79cd45d748f9"
+}

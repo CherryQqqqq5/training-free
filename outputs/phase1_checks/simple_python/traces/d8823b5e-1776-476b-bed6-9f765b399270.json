@@ -1,0 +1,289 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the neuronal activity based on synaptic input rate of 200 and weight 0.5 and decay rate of 0.1."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tool_choice": "required",
+    "tools": [
+      {
+        "name": "calculate_neuronal_activity",
+        "description": "Calculate the neuronal activity (rate of firing) based on a given input synaptic rate, weight of inputs, and decay rate. Higher input or weight increases firing rate and higher decay rate decreases it. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "input_synaptic_rate": {
+              "type": "integer",
+              "description": "The synaptic input rate, usually represented as number of inputs per second."
+            },
+            "weight": {
+              "type": "number",
+              "description": "The weight of the input, denoting its influence on the neuron's state. Default is 1.0. This is a float type value.",
+              "format": "float"
+            },
+            "decay_rate": {
+              "type": "number",
+              "description": "The rate at which the neuron's potential decays in the absence of inputs. This is a float type value.",
+              "format": "float"
+            }
+          },
+          "required": [
+            "input_synaptic_rate",
+            "decay_rate"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3",
+    "messages": [
+      {
+        "role": "system",
+        "content": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.\n- Known explicit context values you can reuse exactly if relevant: 0.5, 0.1"
+      },
+      {
+        "role": "user",
+        "content": "Calculate the neuronal activity based on synaptic input rate of 200 and weight 0.5 and decay rate of 0.1."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_neuronal_activity",
+          "description": "Calculate the neuronal activity (rate of firing) based on a given input synaptic rate, weight of inputs, and decay rate. Higher input or weight increases firing rate and higher decay rate decreases it. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "input_synaptic_rate": {
+                "type": "integer",
+                "description": "The synaptic input rate, usually represented as number of inputs per second."
+              },
+              "weight": {
+                "type": "number",
+                "description": "The weight of the input, denoting its influence on the neuron's state. Default is 1.0. This is a float type value.",
+                "format": "float"
+              },
+              "decay_rate": {
+                "type": "number",
+                "description": "The rate at which the neuron's potential decays in the absence of inputs. This is a float type value.",
+                "format": "float"
+              }
+            },
+            "required": [
+              "input_synaptic_rate",
+              "decay_rate"
+            ]
+          }
+        }
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "tool_schema_snapshot": {
+    "calculate_neuronal_activity": {
+      "type": "object",
+      "properties": {
+        "input_synaptic_rate": {
+          "type": "integer",
+          "description": "The synaptic input rate, usually represented as number of inputs per second."
+        },
+        "weight": {
+          "type": "number",
+          "description": "The weight of the input, denoting its influence on the neuron's state. Default is 1.0. This is a float type value.",
+          "format": "float"
+        },
+        "decay_rate": {
+          "type": "number",
+          "description": "The rate at which the neuron's potential decays in the absence of inputs. This is a float type value.",
+          "format": "float"
+        }
+      },
+      "required": [
+        "input_synaptic_rate",
+        "decay_rate"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776745177-btGZMZ6x9gAZ0uqmsJAV",
+    "object": "chat.completion",
+    "created": 1776745177,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_03896883",
+              "function": {
+                "name": "calculate_neuronal_activity",
+                "arguments": "{\"input_synaptic_rate\":200,\"weight\":0.5,\"decay_rate\":0.1}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 441,
+      "completion_tokens": 48,
+      "total_tokens": 489,
+      "cost": 0.0017441325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 125,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00176175,
+        "upstream_inference_prompt_cost": 0.00104175,
+        "upstream_inference_completions_cost": 0.00072
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776745177-btGZMZ6x9gAZ0uqmsJAV",
+    "object": "response",
+    "created_at": 1776745178,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_03896883",
+        "call_id": "call_03896883",
+        "name": "calculate_neuronal_activity",
+        "arguments": "{\"input_synaptic_rate\":200,\"weight\":0.5,\"decay_rate\":0.1}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 441,
+      "completion_tokens": 48,
+      "total_tokens": 489,
+      "cost": 0.0017441325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 125,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00176175,
+        "upstream_inference_prompt_cost": 0.00104175,
+        "upstream_inference_completions_cost": 0.00072
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776745177-btGZMZ6x9gAZ0uqmsJAV",
+    "object": "chat.completion",
+    "created": 1776745177,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_03896883",
+              "function": {
+                "name": "calculate_neuronal_activity",
+                "arguments": "{\"input_synaptic_rate\":200,\"weight\":0.5,\"decay_rate\":0.1}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 441,
+      "completion_tokens": 48,
+      "total_tokens": 489,
+      "cost": 0.0017441325,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 125,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00176175,
+        "upstream_inference_prompt_cost": 0.00104175,
+        "upstream_inference_completions_cost": 0.00072
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": [
+      "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.",
+      "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.",
+      "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.",
+      "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.",
+      "prompt_injector:Known explicit context values you can reuse exactly if relevant: 0.5, 0.1"
+    ]
+  },
+  "status_code": 200,
+  "latency_ms": 1922.158,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "d8823b5e-1776-476b-bed6-9f765b399270"
+}

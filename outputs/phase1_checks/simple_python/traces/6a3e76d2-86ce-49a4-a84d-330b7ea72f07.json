@@ -1,0 +1,285 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Get the latest game score and statistics for Los Angeles Lakers in NBA."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tool_choice": "required",
+    "tools": [
+      {
+        "name": "get_team_score",
+        "description": "Retrieves the latest game score, individual player stats, and team stats for a specified sports team. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "team_name": {
+              "type": "string",
+              "description": "The name of the sports team."
+            },
+            "league": {
+              "type": "string",
+              "description": "The league that the team is part of."
+            },
+            "include_player_stats": {
+              "type": "boolean",
+              "default": false,
+              "description": "Indicates if individual player statistics should be included in the result. Default is false."
+            }
+          },
+          "required": [
+            "team_name",
+            "league"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3",
+    "messages": [
+      {
+        "role": "system",
+        "content": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+      },
+      {
+        "role": "user",
+        "content": "Get the latest game score and statistics for Los Angeles Lakers in NBA."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_team_score",
+          "description": "Retrieves the latest game score, individual player stats, and team stats for a specified sports team. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "team_name": {
+                "type": "string",
+                "description": "The name of the sports team."
+              },
+              "league": {
+                "type": "string",
+                "description": "The league that the team is part of."
+              },
+              "include_player_stats": {
+                "type": "boolean",
+                "default": false,
+                "description": "Indicates if individual player statistics should be included in the result. Default is false."
+              }
+            },
+            "required": [
+              "team_name",
+              "league"
+            ]
+          }
+        }
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "tool_schema_snapshot": {
+    "get_team_score": {
+      "type": "object",
+      "properties": {
+        "team_name": {
+          "type": "string",
+          "description": "The name of the sports team."
+        },
+        "league": {
+          "type": "string",
+          "description": "The league that the team is part of."
+        },
+        "include_player_stats": {
+          "type": "boolean",
+          "default": false,
+          "description": "Indicates if individual player statistics should be included in the result. Default is false."
+        }
+      },
+      "required": [
+        "team_name",
+        "league"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776745400-QKN01VuEgMwUv2N2hjXE",
+    "object": "chat.completion",
+    "created": 1776745400,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_52084585",
+              "function": {
+                "name": "get_team_score",
+                "arguments": "{\"team_name\":\"Los Angeles Lakers\",\"league\":\"NBA\",\"include_player_stats\":false}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 346,
+      "completion_tokens": 42,
+      "total_tokens": 388,
+      "cost": 0.001201365,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 202,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0012135,
+        "upstream_inference_prompt_cost": 0.0005835,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776745400-QKN01VuEgMwUv2N2hjXE",
+    "object": "response",
+    "created_at": 1776745401,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_52084585",
+        "call_id": "call_52084585",
+        "name": "get_team_score",
+        "arguments": "{\"team_name\":\"Los Angeles Lakers\",\"league\":\"NBA\",\"include_player_stats\":false}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 346,
+      "completion_tokens": 42,
+      "total_tokens": 388,
+      "cost": 0.001201365,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 202,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0012135,
+        "upstream_inference_prompt_cost": 0.0005835,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776745400-QKN01VuEgMwUv2N2hjXE",
+    "object": "chat.completion",
+    "created": 1776745400,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_52084585",
+              "function": {
+                "name": "get_team_score",
+                "arguments": "{\"team_name\":\"Los Angeles Lakers\",\"league\":\"NBA\",\"include_player_stats\":false}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 346,
+      "completion_tokens": 42,
+      "total_tokens": 388,
+      "cost": 0.001201365,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 202,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0012135,
+        "upstream_inference_prompt_cost": 0.0005835,
+        "upstream_inference_completions_cost": 0.00063
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "fallback_applied": false,
+    "request_patches": [
+      "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.",
+      "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.",
+      "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.",
+      "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+    ]
+  },
+  "status_code": 200,
+  "latency_ms": 1934.001,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "6a3e76d2-86ce-49a4-a84d-330b7ea72f07"
+}
