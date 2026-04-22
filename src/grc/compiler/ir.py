@@ -40,6 +40,15 @@ class PromptInjectionSpec(BaseModel):
     position: str = "prepend_system"
 
 
+class DecisionPolicySpec(BaseModel):
+    request_predicates: List[str] = Field(default_factory=list)
+    recommended_tools: List[str] = Field(default_factory=list)
+    continue_condition: Optional[str] = None
+    stop_condition: Optional[str] = None
+    forbidden_terminations: List[str] = Field(default_factory=list)
+    evidence_requirements: List[str] = Field(default_factory=list)
+
+
 class ToolGuardSpec(BaseModel):
     enabled: bool = True
     on_violation: str = "record"
@@ -74,6 +83,7 @@ class RetentionPolicy(BaseModel):
 class RuleAction(BaseModel):
     prompt_fragments: List[str] = Field(default_factory=list)
     prompt_injection: PromptInjectionSpec = Field(default_factory=PromptInjectionSpec)
+    decision_policy: DecisionPolicySpec = Field(default_factory=DecisionPolicySpec)
     arg_sanitizer: Dict[str, ToolSanitizerSpec] = Field(default_factory=dict)
     tool_guard: ToolGuardSpec = Field(default_factory=ToolGuardSpec)
     verification: VerificationContract = Field(default_factory=VerificationContract)
