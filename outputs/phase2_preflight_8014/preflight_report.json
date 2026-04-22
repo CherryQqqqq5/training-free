@@ -1,0 +1,67 @@
+{
+  "base_url": "http://127.0.0.1:8014",
+  "config_path": "/cephfs/qiuyn/training-free/configs/runtime_bfcl_structured.yaml",
+  "trace_dir": "/cephfs/qiuyn/training-free/outputs/phase2_preflight_8014/traces",
+  "expected_api_key_env": "OPENROUTER_API_KEY",
+  "environment_check": {
+    "expected_api_key_env": "OPENROUTER_API_KEY",
+    "is_set": true,
+    "reason": "ok"
+  },
+  "checks": [
+    {
+      "name": "chat_tool_call",
+      "request_path": "/v1/chat/completions",
+      "http_status": 401,
+      "passed": false,
+      "reason": "http 401: {'error': {'message': 'Missing Authentication header', 'code': 401}}",
+      "response": {
+        "error": {
+          "message": "Missing Authentication header",
+          "code": 401
+        }
+      }
+    },
+    {
+      "name": "responses_tool_call",
+      "request_path": "/v1/responses",
+      "http_status": 401,
+      "passed": false,
+      "reason": "http 401: {'error': {'message': 'Missing Authentication header', 'code': 401}}",
+      "response": {
+        "error": {
+          "message": "Missing Authentication header",
+          "code": 401
+        }
+      }
+    },
+    {
+      "name": "chat_text_response",
+      "request_path": "/v1/chat/completions",
+      "http_status": 401,
+      "passed": false,
+      "reason": "http 401: {'error': {'message': 'Missing Authentication header', 'code': 401}}",
+      "response": {
+        "error": {
+          "message": "Missing Authentication header",
+          "code": 401
+        }
+      }
+    },
+    {
+      "name": "trace_emission",
+      "request_path": null,
+      "http_status": null,
+      "passed": true,
+      "reason": "ok",
+      "response": {
+        "new_traces": [
+          "61f266bf-0c2d-4c89-abd8-1bc53fd3f434.json",
+          "8e80ad36-8822-4698-adcb-0610a9ac7907.json",
+          "98165e4f-6060-4725-bfbd-903ed8c672f6.json"
+        ]
+      }
+    }
+  ],
+  "passed": false
+}

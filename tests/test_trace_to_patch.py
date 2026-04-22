@@ -34,6 +34,64 @@ def _load_bundle(path: Path) -> dict:
 
 
 class TraceToPatchTests(unittest.TestCase):
+    def test_compile_patch_emits_actionable_continuation_rule(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            failure_path = root / "failures.jsonl"
+            out_path = root / "rule.yaml"
+            failure_path.write_text(
+                json.dumps(
+                    {
+                        "trace_id": "trace_1",
+                        "turn_index": 0,
+                        "tool_name": "__none__",
+                        "error_type": "actionable_no_tool_decision",
+                        "request_predicates": ["tools_available", "prior_explicit_literals_present"],
+                        "request_literals": ["report.txt"],
+                    }
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+
+            compile_status = compile_patch(str(failure_path), str(out_path), patch_id="patch_actionable_no_tool_v1")
+            bundle = _load_bundle(out_path)
+
+        self.assertEqual(compile_status["status"], "actionable_patch")
+        self.assertEqual(len(bundle["rules"]), 1)
+        rule = bundle["rules"][0]
+        self.assertEqual(
+            rule["rule_id"],
+            "rule_global_no_tool_actionable_no_tool_decision_prior_explicit_literals_present_tools_available_v1",
+        )
+        self.assertEqual(rule["trigger"]["request_predicates"], ["prior_explicit_literals_present", "tools_available"])
+        self.assertEqual(rule["scope"]["patch_sites"], ["prompt_injector", "policy_executor"])
+        self.assertEqual(
+            rule["action"]["decision_policy"]["request_predicates"],
+            ["prior_explicit_literals_present", "tools_available"],
+        )
+        self.assertEqual(
+            rule["action"]["decision_policy"]["forbidden_terminations"],
+            ["prose_only_no_tool_termination"],
+        )
+        self.assertEqual(
+            rule["action"]["decision_policy"]["evidence_requirements"],
+            ["prior_explicit_literals_present", "tools_available"],
+        )
+        self.assertEqual(
+            rule["validation_contract"]["forbidden_terminations"],
+            [],
+        )
+        self.assertEqual(
+            rule["validation_contract"]["evidence_requirements"],
+            [],
+        )
+        self.assertFalse(rule["action"]["tool_guard"]["enabled"])
+        self.assertEqual(rule["action"]["fallback_router"]["strategy"], "record_only")
+        self.assertEqual(rule["action"]["fallback_router"]["on_issue_kinds"], [])
+        self.assertTrue(rule["action"]["prompt_injection"]["fragments"])
+        self.assertFalse(any("report.txt" in fragment for fragment in rule["action"]["prompt_fragments"]))
+
     def test_compile_patch_emits_split_global_hallucinated_completion_rule(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -74,6 +132,15 @@ class TraceToPatchTests(unittest.TestCase):
             rule["action"]["fallback_router"]["on_issue_kinds"],
             ["hallucinated_completion"],
         )
+        self.assertEqual(rule["action"]["decision_policy"]["request_predicates"], [])
+        self.assertEqual(
+            rule["action"]["decision_policy"]["forbidden_terminations"],
+            ["claim_progress_without_corresponding_tool_call"],
+        )
+        self.assertEqual(
+            rule["action"]["decision_policy"]["continue_condition"],
+            "emit the concrete tool call before describing progress or completion",
+        )
         self.assertFalse(rule["validation_contract"]["require_known_tool"])
         self.assertIn(
             "Do not claim that work has already started or completed",
@@ -107,6 +174,11 @@ class TraceToPatchTests(unittest.TestCase):
         self.assertEqual(rule["scope"]["patch_sites"], ["tool_guard", "verification_hook", "fallback_router"])
         self.assertEqual(rule["action"]["prompt_injection"]["fragments"], [])
         self.assertEqual(rule["action"]["fallback_router"]["strategy"], "record_only")
+        self.assertEqual(
+            rule["action"]["decision_policy"]["continue_condition"],
+            "a tool-enabled turn produced no tool call and should continue with a concrete tool action",
+        )
+        self.assertEqual(rule["action"]["decision_policy"]["forbidden_terminations"], [])
         self.assertTrue(
             any("emit the next tool call instead of replying with explanatory prose" in fragment for fragment in prompt_fragments)
         )
@@ -184,6 +256,14 @@ class TraceToPatchTests(unittest.TestCase):
         rule = bundle["rules"][0]
         self.assertEqual(rule["rule_id"], "rule_global_no_tool_redundant_clarification_request_v1")
         self.assertEqual(rule["action"]["fallback_router"]["strategy"], "record_only")
+        self.assertEqual(
+            rule["action"]["decision_policy"]["evidence_requirements"],
+            ["prior_explicit_literals_present"],
+        )
+        self.assertEqual(
+            rule["action"]["decision_policy"]["continue_condition"],
+            "reuse already available explicit literals before asking the user to restate them",
+        )
         self.assertTrue(
             any("inspect prior user turns, tool outputs, and current state" in fragment for fragment in rule["action"]["prompt_fragments"])
         )

@@ -8,6 +8,7 @@ from typing import DefaultDict, Dict, List
 import yaml
 
 from grc.types import (
+    DecisionPolicySpec,
     FailureCase,
     FailureIR,
     FieldConstraint,
@@ -39,6 +40,8 @@ def _compile_status_path(out_path: str, candidate_dir: str | None) -> Path:
 
 
 def _is_actionable_rule(rule: Rule) -> bool:
+    if rule.trigger.request_predicates:
+        return True
     if rule.action.prompt_fragments or rule.action.prompt_injection.fragments:
         return True
     if rule.action.arg_sanitizer:
@@ -52,6 +55,8 @@ def _is_actionable_rule(rule: Rule) -> bool:
             verification.require_known_fields,
             verification.require_type_match,
             verification.max_repairs is not None,
+            bool(verification.forbidden_terminations),
+            bool(verification.evidence_requirements),
         ]
     ):
         return True
@@ -85,11 +90,18 @@ def _build_failure_ir(grouped: DefaultDict[str, List[FailureCase]]) -> List[Fail
     failure_irs: List[FailureIR] = []
     for tool_name, failures in grouped.items():
         if tool_name == "__none__":
-            for error_type in sorted({case.error_type for case in failures}):
-                scoped_failures = [case for case in failures if case.error_type == error_type]
+            groups: DefaultDict[tuple[str, tuple[str, ...]], List[FailureCase]] = defaultdict(list)
+            for case in failures:
+                predicates = tuple(sorted(case.request_predicates)) if case.error_type == "actionable_no_tool_decision" else ()
+                groups[(case.error_type, predicates)].append(case)
+            for (error_type, request_predicates), scoped_failures in sorted(groups.items()):
                 failure_irs.append(
                     FailureIR(
-                        failure_id=f"failure_ir_global_{error_type}",
+                        failure_id=(
+                            f"failure_ir_global_{error_type}"
+                            if not request_predicates
+                            else f"failure_ir_global_{error_type}_{'_'.join(request_predicates)}"
+                        ),
                         tool_name="__none__",
                         error_types=[error_type],
                         field_names=[],
@@ -97,6 +109,15 @@ def _build_failure_ir(grouped: DefaultDict[str, List[FailureCase]]) -> List[Fail
                         categories=sorted({case.category for case in scoped_failures if case.category}),
                         evidence_count=len(scoped_failures),
                         trace_ids=sorted({case.trace_id for case in scoped_failures}),
+                        request_predicates=list(request_predicates),
+                        request_literals=sorted(
+                            {
+                                literal
+                                for case in scoped_failures
+                                for literal in case.request_literals
+                                if isinstance(literal, str) and literal.strip()
+                            }
+                        )[:8],
                     )
                 )
             continue
@@ -121,6 +142,15 @@ def _build_failure_ir(grouped: DefaultDict[str, List[FailureCase]]) -> List[Fail
                 categories=categories,
                 evidence_count=len(failures),
                 trace_ids=trace_ids,
+                request_predicates=sorted({predicate for case in failures for predicate in case.request_predicates}),
+                request_literals=sorted(
+                    {
+                        literal
+                        for case in failures
+                        for literal in case.request_literals
+                        if isinstance(literal, str) and literal.strip()
+                    }
+                )[:8],
             )
         )
 
@@ -260,6 +290,66 @@ def _global_prompt_fragments(failure_ir: FailureIR) -> List[str]:
     return fragments
 
 
+def _actionable_no_tool_prompt_fragments(failure_ir: FailureIR) -> List[str]:
+    fragments = [
+        "When tools are available and the current request already contains enough local evidence to continue, emit the next tool call instead of ending the turn with explanatory prose.",
+        "Do not end a tool-enabled turn with prose-only status updates when the next action can be grounded from the current request, prior explicit literals, or prior tool outputs.",
+    ]
+    predicates = set(failure_ir.request_predicates)
+    if "prior_explicit_literals_present" in predicates:
+        fragments.append(
+            "Reuse explicit file names, paths, identifiers, or quoted literals already present in the request context before asking for clarification or stopping."
+        )
+    if "prior_tool_outputs_present" in predicates:
+        fragments.append(
+            "Use prior tool outputs as grounding for the next tool call instead of switching into natural-language explanation."
+        )
+    return fragments
+
+
+def _global_decision_policy_for_failure_ir(failure_ir: FailureIR) -> DecisionPolicySpec:
+    error_types = set(failure_ir.error_types)
+    predicates = list(failure_ir.request_predicates)
+    policy = DecisionPolicySpec(request_predicates=predicates)
+
+    if "actionable_no_tool_decision" in error_types:
+        policy.forbidden_terminations = ["prose_only_no_tool_termination"]
+        policy.evidence_requirements = list(predicates)
+        policy.continue_condition = "tools remain available and locally grounded evidence supports another tool action"
+        policy.stop_condition = "do not stop with prose-only narration while the matched local continuation evidence still holds"
+        return policy
+
+    if "empty_tool_call" in error_types:
+        policy.continue_condition = "a tool-enabled turn produced no tool call and should continue with a concrete tool action"
+        policy.stop_condition = "only stop without a tool call when the request is genuinely non-actionable from the current local state"
+        return policy
+
+    if "natural_language_termination" in error_types:
+        policy.forbidden_terminations = ["natural_language_completion_without_required_tool"]
+        policy.continue_condition = "do not close the turn in natural language while a next tool action is still locally grounded"
+        policy.stop_condition = "natural-language completion is admissible only after tool use is no longer required"
+        return policy
+
+    if "hallucinated_completion" in error_types:
+        policy.forbidden_terminations = ["claim_progress_without_corresponding_tool_call"]
+        policy.continue_condition = "emit the concrete tool call before describing progress or completion"
+        policy.stop_condition = "progress claims are only admissible after the corresponding tool action has actually been emitted"
+        return policy
+
+    if "redundant_clarification_request" in error_types:
+        policy.evidence_requirements = ["prior_explicit_literals_present"]
+        policy.continue_condition = "reuse already available explicit literals before asking the user to restate them"
+        policy.stop_condition = "clarification is only admissible when the required explicit literal is not already present in local context"
+        return policy
+
+    if "unsupported_request" in error_types:
+        policy.continue_condition = "check the available tools and current state before concluding that a request is unsupported"
+        policy.stop_condition = "an unsupported conclusion is only admissible after local tool/state checks fail to reveal a valid next action"
+        return policy
+
+    return policy
+
+
 def _no_tool_verification_contract() -> VerificationContract:
     return VerificationContract(
         require_known_tool=False,
@@ -277,11 +367,19 @@ def _build_global_guard_rules(grouped: DefaultDict[str, List[FailureCase]]) -> L
         return []
 
     rules: List[Rule] = []
-    for error_type in sorted({case.error_type for case in global_failures}):
-        scoped_failures = [case for case in global_failures if case.error_type == error_type]
+    groups: DefaultDict[tuple[str, tuple[str, ...]], List[FailureCase]] = defaultdict(list)
+    for case in global_failures:
+        predicates = tuple(sorted(case.request_predicates)) if case.error_type == "actionable_no_tool_decision" else ()
+        groups[(case.error_type, predicates)].append(case)
+
+    for (error_type, request_predicates), scoped_failures in sorted(groups.items()):
         categories = sorted({case.category for case in scoped_failures if case.category})
         failure_ir = FailureIR(
-            failure_id=f"failure_ir_global_{error_type}",
+            failure_id=(
+                f"failure_ir_global_{error_type}"
+                if not request_predicates
+                else f"failure_ir_global_{error_type}_{'_'.join(request_predicates)}"
+            ),
             tool_name="__none__",
             error_types=[error_type],
             field_names=[],
@@ -289,36 +387,77 @@ def _build_global_guard_rules(grouped: DefaultDict[str, List[FailureCase]]) -> L
             categories=categories,
             evidence_count=len(scoped_failures),
             trace_ids=sorted({case.trace_id for case in scoped_failures}),
+            request_predicates=list(request_predicates),
+            request_literals=sorted(
+                {
+                    literal
+                    for case in scoped_failures
+                    for literal in case.request_literals
+                    if isinstance(literal, str) and literal.strip()
+                }
+            )[:8],
         )
-        prompt_fragments = _global_prompt_fragments(failure_ir)
+        prompt_fragments = (
+            _actionable_no_tool_prompt_fragments(failure_ir)
+            if error_type == "actionable_no_tool_decision"
+            else _global_prompt_fragments(failure_ir)
+        )
         verification = _no_tool_verification_contract()
+        decision_policy = _global_decision_policy_for_failure_ir(failure_ir)
+        policy_first = error_type == "actionable_no_tool_decision"
+        if policy_first:
+            patch_sites = ["prompt_injector", "policy_executor"]
+            tool_guard = ToolGuardSpec(
+                enabled=False,
+                on_violation="record",
+                on_unknown_tool="record",
+                on_empty_tool_call="record",
+            )
+            fallback_router = FallbackRoutingSpec(strategy="record_only")
+            validation_contract = VerificationContract()
+        else:
+            patch_sites = ["tool_guard", "verification_hook", "fallback_router"]
+            tool_guard = ToolGuardSpec(
+                enabled=True,
+                on_violation="record",
+                on_unknown_tool="record",
+                on_empty_tool_call="record",
+            )
+            fallback_router = FallbackRoutingSpec(
+                strategy="record_only",
+                on_issue_kinds=[error_type],
+            )
+            validation_contract = verification
 
         rules.append(
             Rule(
-                rule_id=f"rule_global_no_tool_{error_type}_v1",
+                rule_id=(
+                    f"rule_global_no_tool_{error_type}_v1"
+                    if not request_predicates
+                    else f"rule_global_no_tool_{error_type}_{'_'.join(request_predicates)}_v1"
+                ),
                 priority=100,
                 enabled=True,
-                trigger=MatchSpec(error_types=[error_type], category_patterns=categories),
+                trigger=MatchSpec(
+                    error_types=[error_type],
+                    category_patterns=categories,
+                    request_predicates=list(request_predicates),
+                ),
                 scope=PatchScope(
                     tool_names=[],
-                    patch_sites=["tool_guard", "verification_hook", "fallback_router"],
+                    patch_sites=patch_sites,
                 ),
                 action=RuleAction(
                     prompt_fragments=prompt_fragments,
-                    prompt_injection=PromptInjectionSpec(fragments=[]),
-                    tool_guard=ToolGuardSpec(
-                        enabled=True,
-                        on_violation="record",
-                        on_unknown_tool="record",
-                        on_empty_tool_call="record",
+                    prompt_injection=PromptInjectionSpec(
+                        fragments=prompt_fragments if policy_first else []
                     ),
+                    decision_policy=decision_policy,
+                    tool_guard=tool_guard,
                     verification=verification,
-                    fallback_router=FallbackRoutingSpec(
-                        strategy="record_only",
-                        on_issue_kinds=[error_type],
-                    ),
+                    fallback_router=fallback_router,
                 ),
-                validation_contract=verification,
+                validation_contract=validation_contract,
             )
         )
 

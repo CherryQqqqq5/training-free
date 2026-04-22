@@ -27,6 +27,7 @@ class MatchSpec(BaseModel):
     tool_names: List[str] = Field(default_factory=list)
     error_types: List[str] = Field(default_factory=list)
     category_patterns: List[str] = Field(default_factory=list)
+    request_predicates: List[str] = Field(default_factory=list)
 
 
 class PatchScope(BaseModel):
@@ -54,6 +55,8 @@ class VerificationContract(BaseModel):
     require_known_fields: bool = True
     require_type_match: bool = True
     max_repairs: Optional[int] = None
+    forbidden_terminations: List[str] = Field(default_factory=list)
+    evidence_requirements: List[str] = Field(default_factory=list)
 
 
 class FallbackRoutingSpec(BaseModel):
@@ -102,6 +105,8 @@ class FailureCase(BaseModel):
     expected_type: Optional[str] = None
     observed_value: Any = None
     category: Optional[str] = None
+    request_predicates: List[str] = Field(default_factory=list)
+    request_literals: List[str] = Field(default_factory=list)
 
 
 class FailureIR(BaseModel):
@@ -113,6 +118,8 @@ class FailureIR(BaseModel):
     categories: List[str] = Field(default_factory=list)
     evidence_count: int = 0
     trace_ids: List[str] = Field(default_factory=list)
+    request_predicates: List[str] = Field(default_factory=list)
+    request_literals: List[str] = Field(default_factory=list)
 
 
 class ValidationIssue(BaseModel):

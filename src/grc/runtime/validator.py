@@ -87,3 +87,26 @@ def validate_tool_arguments(
         )
 
     return issues
+
+
+def validate_termination_admissibility(
+    issue_kind: str,
+    contract: VerificationContract,
+    observed_predicates: List[str],
+) -> List[ValidationIssue]:
+    if issue_kind not in {"actionable_no_tool_decision", "post_tool_prose_summary"}:
+        return []
+    if "prose_only_no_tool_termination" not in contract.forbidden_terminations:
+        return []
+
+    required = set(contract.evidence_requirements)
+    observed = set(observed_predicates)
+    if required and not required.issubset(observed):
+        return []
+
+    return [
+        ValidationIssue(
+            kind="termination_inadmissible",
+            message="prose-only termination is not admissible under the matched continuation policy",
+        )
+    ]

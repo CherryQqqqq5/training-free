@@ -5,6 +5,8 @@ import shutil
 from pathlib import Path
 from typing import Any, Dict
 
+from grc.selector.history import append_history, build_history_record
+
 try:
     import yaml
 except ModuleNotFoundError:
@@ -20,6 +22,10 @@ MANIFEST_MATCH_KEYS = (
     "upstream_profile",
     "upstream_model_route",
 )
+TARGET_UPLIFT_TAU = 0.5
+COST_BUDGET_RATIO = 0.10
+LATENCY_BUDGET_RATIO = 0.10
+SUBSET_REGRESSION_CAP = 0.5
 
 
 def _metric_value(metrics: Dict[str, object], key: str, default: float = 0.0) -> float:
@@ -36,6 +42,35 @@ def dominates(a: Dict[str, float], b: Dict[str, float]) -> bool:
         _metric_value(a, key) < _metric_value(b, key) for key in MINIMIZE_KEYS
     )
     return maximize_ok and minimize_ok and strict
+
+
+def _target_metric(metrics: Dict[str, Any]) -> float:
+    test_category = str(metrics.get("test_category") or "").strip()
+    subsets = metrics.get("subsets")
+    if test_category and isinstance(subsets, dict) and test_category in subsets:
+        return _metric_value(subsets, test_category)
+    return _metric_value(metrics, "acc")
+
+
+def _within_budget(candidate: Dict[str, Any], baseline: Dict[str, Any]) -> tuple[bool, list[str]]:
+    issues: list[str] = []
+    base_cost = _metric_value(baseline, "cost")
+    cand_cost = _metric_value(candidate, "cost")
+    allowed_cost = base_cost + max(1.0, base_cost) * COST_BUDGET_RATIO
+    if cand_cost > allowed_cost:
+        issues.append(f"cost budget exceeded: {cand_cost:.3f} > {allowed_cost:.3f}")
+
+    base_latency = _metric_value(baseline, "latency")
+    cand_latency = _metric_value(candidate, "latency")
+    allowed_latency = base_latency + max(1.0, base_latency) * LATENCY_BUDGET_RATIO
+    if cand_latency > allowed_latency:
+        issues.append(f"latency budget exceeded: {cand_latency:.3f} > {allowed_latency:.3f}")
+
+    if _metric_value(candidate, "regression") > SUBSET_REGRESSION_CAP:
+        issues.append(
+            f"subset regression exceeded cap: {_metric_value(candidate, 'regression'):.3f} > {SUBSET_REGRESSION_CAP:.3f}"
+        )
+    return not issues, issues
 
 
 def _load_json(path: Path) -> Dict[str, Any]:
@@ -135,6 +170,13 @@ def _load_manifest(metrics_path: Path) -> Dict[str, Any]:
     return _load_json(manifest_path)
 
 
+def _load_paired_rerun(metrics_path: Path) -> Dict[str, Any]:
+    paired_path = metrics_path.parent / "paired_rerun.json"
+    if not paired_path.exists():
+        return {}
+    return _load_json(paired_path)
+
+
 def _manifest_consistency_issues(
     baseline_manifest: Dict[str, Any],
     candidate_manifest: Dict[str, Any],
@@ -176,6 +218,9 @@ def select_patch(baseline_path: str, candidate_path: str) -> Dict[str, object]:
 
     baseline_issues = _artifact_validity(baseline, baseline_file)
     candidate_issues = _artifact_validity(candidate, candidate_file)
+    paired_rerun = _load_paired_rerun(candidate_file)
+    if "paired_rerun_consistent" not in candidate and "paired_rerun_consistent" in paired_rerun:
+        candidate["paired_rerun_consistent"] = paired_rerun.get("paired_rerun_consistent")
     baseline_valid = not baseline_issues
     candidate_valid = not candidate_issues
     baseline_manifest = _load_manifest(baseline_file)
@@ -203,13 +248,28 @@ def select_patch(baseline_path: str, candidate_path: str) -> Dict[str, object]:
         else:
             decision_code = "candidate_invalid"
     else:
-        accept = dominates(candidate, baseline)
-        if accept:
-            decision_code = "accepted"
-            reason = "candidate dominates baseline on Pareto criteria"
-        else:
+        budget_ok, budget_issues = _within_budget(candidate, baseline)
+        paired_consistent = bool(candidate.get("paired_rerun_consistent"))
+        target_delta = _target_metric(candidate) - _target_metric(baseline)
+        if not budget_ok:
+            accept = False
             decision_code = "candidate_does_not_dominate"
-            reason = "candidate does not dominate baseline"
+            reason = "candidate exceeds bounded acceptance budget: " + "; ".join(budget_issues)
+        elif paired_consistent and target_delta > TARGET_UPLIFT_TAU:
+            accept = True
+            decision_code = "accepted"
+            reason = "candidate passed bounded acceptance with stable uplift"
+        elif target_delta > 0:
+            accept = False
+            decision_code = "retained"
+            if paired_consistent:
+                reason = "candidate shows positive uplift but does not clear the acceptance threshold"
+            else:
+                reason = "candidate shows positive uplift but paired rerun consistency is not established"
+        else:
+            accept = False
+            decision_code = "candidate_does_not_dominate"
+            reason = "candidate did not produce positive target-slice uplift"
 
     return {
         "accept": accept,
@@ -224,8 +284,10 @@ def select_patch(baseline_path: str, candidate_path: str) -> Dict[str, object]:
         "candidate_validity_issues": candidate_issues,
         "manifest_valid": manifest_valid,
         "manifest_consistency_issues": manifest_issues,
+        "paired_rerun": paired_rerun,
         "reason": reason,
         "subset_regressions": subset_regressions,
+        "target_delta": (_target_metric(candidate) - _target_metric(baseline)) if baseline and candidate else 0.0,
     }
 
 
@@ -262,6 +324,17 @@ def write_selection_outputs(
     if not source or not source.exists():
         return
 
+    history_root = None
+    for candidate in (accepted_dir, rejected_dir, active_dir):
+        if candidate:
+            history_root = Path(candidate).parent
+            break
+    if history_root is not None:
+        append_history(
+            history_root / "history.jsonl",
+            build_history_record(decision, rule_path=str(source)),
+        )
+
     if patch_id is None:
         patch_id = source.stem
         try:
@@ -270,7 +343,8 @@ def write_selection_outputs(
         except Exception:
             pass
 
-    target_root = accepted_dir if decision.get("accept") else rejected_dir
+    decision_code = str(decision.get("decision_code") or "")
+    target_root = accepted_dir if decision.get("accept") else (rejected_dir if decision_code != "retained" else None)
     if target_root:
         target_dir = Path(target_root) / patch_id
         if candidate_dir and Path(candidate_dir).exists():
@@ -279,7 +353,7 @@ def write_selection_outputs(
             target_dir.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source, target_dir / "rule.yaml")
 
-    if accepted_dir and rejected_dir:
+    if accepted_dir and rejected_dir and decision_code != "retained":
         stale_root = rejected_dir if decision.get("accept") else accepted_dir
         stale_dir = Path(stale_root) / patch_id
         if stale_dir.exists():

@@ -9,8 +9,9 @@ from typing import Any, Dict, List, Tuple
 import yaml
 
 from grc.runtime.sanitizer import sanitize_tool_call
-from grc.runtime.validator import validate_tool_arguments
+from grc.runtime.validator import validate_termination_admissibility, validate_tool_arguments
 from grc.types import (
+    DecisionPolicySpec,
     PatchBundle,
     Rule,
     ToolSanitizerSpec,
@@ -51,6 +52,7 @@ class RuleEngine:
         self.inject_structured_tool_guidance = bool(self.runtime_policy.get("inject_structured_tool_guidance", False))
         self.inject_context_literal_hints = bool(self.runtime_policy.get("inject_context_literal_hints", False))
         self.resolve_contextual_string_args = bool(self.runtime_policy.get("resolve_contextual_string_args", False))
+        self.force_actionable_tool_choice = bool(self.runtime_policy.get("force_actionable_tool_choice", True))
         self.rules: List[Rule] = self._load_rules()
 
     _QUOTED_LITERAL_RE = re.compile(
@@ -91,10 +93,95 @@ class RuleEngine:
                     return spec
         return None
 
-    def _matched_rules(self, tool_name: str | None = None, issue_kind: str | None = None) -> List[Rule]:
+    def _has_prior_tool_outputs(self, request_json: Dict[str, Any]) -> bool:
+        def visit(item: Any) -> bool:
+            if isinstance(item, list):
+                return any(visit(child) for child in item)
+            if not isinstance(item, dict):
+                return False
+            if item.get("role") == "tool" or item.get("type") == "function_call_output":
+                return True
+            return any(visit(value) for key, value in item.items() if key not in {"id", "call_id", "name"})
+
+        return any(
+            visit(candidate)
+            for candidate in (
+                request_json.get("messages"),
+                request_json.get("input"),
+            )
+        )
+
+    def _observable_request_predicates(self, request_json: Dict[str, Any]) -> set[str]:
+        predicates: set[str] = set()
+        if self._tool_schema_map(request_json):
+            predicates.add("tools_available")
+        if self._collect_context_literals(request_json):
+            predicates.add("prior_explicit_literals_present")
+        if self._has_prior_tool_outputs(request_json):
+            predicates.add("prior_tool_outputs_present")
+        return predicates
+
+    def _request_predicates_met(self, predicates: List[str], request_json: Dict[str, Any] | None) -> bool:
+        if not predicates:
+            return True
+        if request_json is None:
+            return False
+        return set(predicates).issubset(self._observable_request_predicates(request_json))
+
+    @staticmethod
+    def _rule_request_predicates(rule: Rule) -> List[str]:
+        policy = getattr(rule.action, "decision_policy", None)
+        policy_predicates = list(getattr(policy, "request_predicates", []) or [])
+        if policy_predicates:
+            return policy_predicates
+        return list(rule.trigger.request_predicates)
+
+    @staticmethod
+    def _rule_contract(rule: Rule) -> VerificationContract:
+        contract = copy.deepcopy(rule.validation_contract or rule.action.verification)
+        policy = RuleEngine._rule_decision_policy(rule)
+        if policy is None:
+            return contract
+        forbidden = list(getattr(policy, "forbidden_terminations", []) or [])
+        evidence = list(getattr(policy, "evidence_requirements", []) or [])
+        if forbidden:
+            contract.forbidden_terminations = forbidden
+        if evidence:
+            contract.evidence_requirements = evidence
+        return contract
+
+    @staticmethod
+    def _rule_decision_policy(rule: Rule) -> DecisionPolicySpec | None:
+        policy = getattr(rule.action, "decision_policy", None)
+        if policy is None:
+            return None
+        if any(
+            [
+                bool(getattr(policy, "request_predicates", []) or []),
+                bool(getattr(policy, "recommended_tools", []) or []),
+                bool(getattr(policy, "continue_condition", None)),
+                bool(getattr(policy, "stop_condition", None)),
+                bool(getattr(policy, "forbidden_terminations", []) or []),
+                bool(getattr(policy, "evidence_requirements", []) or []),
+            ]
+        ):
+            return policy
+        return None
+
+    def _is_policy_rule(self, rule: Rule) -> bool:
+        return self._rule_decision_policy(rule) is not None
+
+    def _matched_rules(
+        self,
+        tool_name: str | None = None,
+        issue_kind: str | None = None,
+        request_json: Dict[str, Any] | None = None,
+    ) -> List[Rule]:
         matched: List[Rule] = []
         for rule in self.rules:
             names = rule.trigger.tool_names
+            if not self._request_predicates_met(self._rule_request_predicates(rule), request_json):
+                continue
             if tool_name is None and not names:
                 if issue_kind and rule.trigger.error_types and issue_kind not in rule.trigger.error_types:
                     continue
@@ -105,15 +192,43 @@ class RuleEngine:
                 matched.append(rule)
         return matched
 
-    def _matched_global_rules(self, issue_kind: str | None = None) -> List[Rule]:
+    def _matched_global_rules(
+        self,
+        issue_kind: str | None = None,
+        request_json: Dict[str, Any] | None = None,
+    ) -> List[Rule]:
         matched: List[Rule] = []
         for rule in self.rules:
             if rule.trigger.tool_names:
                 continue
             if issue_kind and rule.trigger.error_types and issue_kind not in rule.trigger.error_types:
                 continue
+            if not self._request_predicates_met(self._rule_request_predicates(rule), request_json):
+                continue
             matched.append(rule)
         return matched
+
+    def _matched_policy_rules(
+        self,
+        issue_kind: str | None = None,
+        request_json: Dict[str, Any] | None = None,
+    ) -> List[Rule]:
+        return [
+            rule
+            for rule in self._matched_global_rules(issue_kind=issue_kind, request_json=request_json)
+            if self._is_policy_rule(rule)
+        ]
+
+    def _matched_compatibility_rules(
+        self,
+        issue_kind: str | None = None,
+        request_json: Dict[str, Any] | None = None,
+    ) -> List[Rule]:
+        return [
+            rule
+            for rule in self._matched_global_rules(issue_kind=issue_kind, request_json=request_json)
+            if not self._is_policy_rule(rule)
+        ]
 
     def _rule_prompt_fragments(self, rule: Rule) -> List[str]:
         injected = list(rule.action.prompt_injection.fragments)
@@ -123,6 +238,23 @@ class RuleEngine:
 
     def _collect_context_literals(self, request_json: Dict[str, Any]) -> List[str]:
         values: List[str] = []
+        ignored_literals = {
+            "current_working_directory",
+            "current_directory_content",
+            "matches",
+            "result",
+            "message",
+            "messages",
+            "error",
+            "errors",
+            "status",
+            "sent_status",
+            "added_status",
+            "login_status",
+            "user_id",
+            "message_id",
+            "new_id",
+        }
 
         def looks_like_literal(value: str) -> bool:
             cleaned = value.strip()
@@ -145,6 +277,8 @@ class RuleEngine:
             cleaned = str(value).strip()
             if not looks_like_literal(cleaned):
                 return
+            if cleaned.lower() in ignored_literals:
+                return
             if cleaned not in values:
                 values.append(cleaned)
 
@@ -165,19 +299,58 @@ class RuleEngine:
                 continue
             content = message.get("content")
             if isinstance(content, str):
-                for match in self._QUOTED_LITERAL_RE.finditer(content):
-                    add_value(match.group(1) or match.group(2) or "")
-                for token in self._PATH_TOKEN_RE.findall(content):
-                    add_value(token)
-                for token in self._FILE_TOKEN_RE.findall(content):
-                    add_value(token)
                 try:
                     parsed = json.loads(content)
                 except Exception:
                     parsed = None
                 if parsed is not None:
                     visit_jsonlike(parsed)
+                    continue
+                for match in self._QUOTED_LITERAL_RE.finditer(content):
+                    add_value(match.group(1) or match.group(2) or "")
+                for token in self._PATH_TOKEN_RE.findall(content):
+                    add_value(token)
+                for token in self._FILE_TOKEN_RE.findall(content):
+                    add_value(token)
         return values[:12]
+
+    def _conversation_items(self, request_json: Dict[str, Any]) -> List[Dict[str, Any]]:
+        for key in ("messages", "input"):
+            items = request_json.get(key)
+            if isinstance(items, list):
+                return [item for item in items if isinstance(item, dict)]
+        return []
+
+    def _last_observed_role(self, request_json: Dict[str, Any]) -> str | None:
+        for item in reversed(self._conversation_items(request_json)):
+            role = item.get("role")
+            if isinstance(role, str) and role:
+                return role
+            if item.get("type") == "function_call_output":
+                return "tool"
+        return None
+
+    def _is_post_tool_prose_summary(
+        self,
+        base_kind: str,
+        text: str,
+        request_json: Dict[str, Any],
+        observed_predicates: List[str],
+    ) -> bool:
+        if base_kind not in {"empty_tool_call", "hallucinated_completion", "natural_language_termination"}:
+            return False
+        if not text:
+            return False
+        if "prior_tool_outputs_present" not in observed_predicates:
+            return False
+        if self._last_observed_role(request_json) != "tool":
+            return False
+        stripped = text.strip()
+        if "?" in stripped:
+            return False
+        if stripped.startswith(("{", "[")):
+            return False
+        return True
 
     def _structured_tool_guidance_fragments(self, request_json: Dict[str, Any]) -> List[str]:
         if not request_json.get("tools") or not self.inject_structured_tool_guidance:
@@ -208,6 +381,7 @@ class RuleEngine:
             if patch_sites and "prompt_injector" not in patch_sites:
                 continue
             names = set(rule.trigger.tool_names)
+            rule_predicates = self._rule_request_predicates(rule)
             if names and not (names & request_tool_names):
                 continue
             # Global rules that are mined from response-side failure classes do not have
@@ -215,11 +389,20 @@ class RuleEngine:
             # post-hoc failure summaries into blanket prompt pollution, which regresses
             # otherwise healthy traces. Keep them opt-in until request-side predicates
             # exist in the IR.
-            if not names and not allow_global_prompt_injection:
+            if not names and not rule_predicates and not allow_global_prompt_injection:
+                continue
+            if not self._request_predicates_met(rule_predicates, request_json):
                 continue
             fragments.extend(self._rule_prompt_fragments(rule))
         # Preserve order while dropping duplicates.
         return list(dict.fromkeys(fragment for fragment in fragments if fragment))
+
+    @staticmethod
+    def _is_actionable_continuation_rule(rule: Rule) -> bool:
+        if "actionable_no_tool_decision" not in rule.trigger.error_types:
+            return False
+        contract = rule.validation_contract or rule.action.verification
+        return "prose_only_no_tool_termination" in contract.forbidden_terminations
 
     def _literal_intent(self, field_name: str, field_spec: Dict[str, Any]) -> str:
         lowered = f"{field_name} {field_spec.get('description', '')}".lower()
@@ -320,19 +503,20 @@ class RuleEngine:
     def apply_request(self, request_json: Dict[str, Any]) -> Tuple[Dict[str, Any], List[str]]:
         patched = copy.deepcopy(request_json)
         fragments = self._collect_prompt_fragments(patched)
-        if not fragments:
-            return patched, []
+        request_patches: List[str] = []
 
-        system_text = "[Golden Rule Compiler]\n" + "\n".join(f"- {fragment}" for fragment in fragments)
-        messages = list(patched.get("messages", []))
-        if messages and messages[0].get("role") == "system":
-            existing = messages[0].get("content", "")
-            merged = f"{existing}\n\n{system_text}".strip() if existing else system_text
-            messages[0]["content"] = merged
-        else:
-            messages.insert(0, {"role": "system", "content": system_text})
-        patched["messages"] = messages
-        request_patches = [f"prompt_injector:{fragment}" for fragment in fragments]
+        if fragments:
+            system_text = "[Golden Rule Compiler]\n" + "\n".join(f"- {fragment}" for fragment in fragments)
+            messages = list(patched.get("messages", []))
+            if messages and messages[0].get("role") == "system":
+                existing = messages[0].get("content", "")
+                merged = f"{existing}\n\n{system_text}".strip() if existing else system_text
+                messages[0]["content"] = merged
+            else:
+                messages.insert(0, {"role": "system", "content": system_text})
+            patched["messages"] = messages
+            request_patches.extend(f"prompt_injector:{fragment}" for fragment in fragments)
+
         return patched, request_patches
 
     def _apply_fallback(self, message: Dict[str, Any], tool_calls: List[Dict[str, Any]], index: int, issues: List[ValidationIssue], rule_hits: List[Rule]) -> bool:
@@ -407,6 +591,7 @@ class RuleEngine:
             "unsupported_request",
             "hallucinated_completion",
             "malformed_output",
+            "post_tool_prose_summary",
         }:
             return "record"
         for rule in rule_hits:
@@ -457,10 +642,78 @@ class RuleEngine:
 
     def _verification_contract(self, rule_hits: List[Rule]) -> VerificationContract:
         if rule_hits:
-            return rule_hits[0].validation_contract or rule_hits[0].action.verification
+            return self._rule_contract(rule_hits[0])
         if self.rules:
-            return self.rules[0].validation_contract
+            return self._rule_contract(self.rules[0])
         return VerificationContract()
+
+    def _policy_contract(
+        self,
+        policy_rule_hits: List[Rule],
+    ) -> VerificationContract:
+        if policy_rule_hits:
+            return self._rule_contract(policy_rule_hits[0])
+        return VerificationContract()
+
+    def _classify_no_tool_issue(
+        self,
+        content: str,
+        request_json: Dict[str, Any],
+        tool_schema_map: Dict[str, Dict[str, Any]],
+    ) -> tuple[str, List[str]]:
+        base_kind = classify_no_tool_call_content(content, tool_schema_map)
+        observed_predicates = sorted(self._observable_request_predicates(request_json))
+        text = content.strip() if isinstance(content, str) else ""
+        actionable_bases = {
+            "empty_tool_call",
+            "hallucinated_completion",
+            "natural_language_termination",
+            "malformed_output",
+        }
+        if self._is_post_tool_prose_summary(base_kind, text, request_json, observed_predicates):
+            return "post_tool_prose_summary", observed_predicates
+        if (
+            base_kind in actionable_bases
+            and text
+            and "tools_available" in observed_predicates
+            and (
+                "prior_explicit_literals_present" in observed_predicates
+                or "prior_tool_outputs_present" in observed_predicates
+            )
+        ):
+            return "actionable_no_tool_decision", observed_predicates
+        return base_kind, observed_predicates
+
+    def _evaluate_no_tool_policy(
+        self,
+        content: str,
+        request_json: Dict[str, Any],
+        tool_schema_map: Dict[str, Dict[str, Any]],
+    ) -> tuple[str, List[str], List[ValidationIssue], List[Rule]]:
+        issue_kind, observed_predicates = self._classify_no_tool_issue(content, request_json, tool_schema_map)
+        policy_rule_hits = self._matched_policy_rules(issue_kind, request_json=request_json)
+        if issue_kind == "post_tool_prose_summary" and not policy_rule_hits:
+            policy_rule_hits = self._matched_policy_rules(
+                "actionable_no_tool_decision",
+                request_json=request_json,
+            )
+        issue_messages = {
+            "natural_language_termination": "assistant ended turn with natural language without tool call",
+            "clarification_request": "assistant requested missing user parameters before tool invocation",
+            "clarification_no_tool": "assistant requested clarification instead of continuing with the available tool context",
+            "unsupported_request": "assistant refused because request appears unsupported by available tools",
+            "unsupported_no_tool": "assistant treated the request as unsupported instead of using the available tools",
+            "hallucinated_completion": "assistant claimed progress or completion without emitting a tool call",
+            "malformed_output": "assistant emitted malformed content instead of a tool call",
+            "empty_tool_call": "no tool call emitted for tool-enabled request",
+            "post_tool_prose_summary": "assistant emitted a prose-only summary immediately after a successful tool result instead of continuing structurally",
+            "actionable_no_tool_decision": "assistant ended a tool-enabled turn with prose instead of the next locally grounded tool action",
+        }
+        issues = [ValidationIssue(kind=issue_kind, message=issue_messages[issue_kind])]
+        if policy_rule_hits:
+            contract = self._policy_contract(policy_rule_hits)
+            issues.extend(validate_termination_admissibility(issue_kind, contract, observed_predicates))
+        return issue_kind, observed_predicates, issues, policy_rule_hits
 
     def _strip_assistant_narration_with_tool_calls(
         self,
@@ -517,34 +770,30 @@ class RuleEngine:
             all_repairs.extend(narration_repairs)
             if request_json.get("tools") and not tool_calls:
                 content = msg.get("content", "")
-                issue_kind = classify_no_tool_call_content(content, tool_schema_map)
-                global_rule_hits = self._matched_global_rules(issue_kind)
-                issue_messages = {
-                    "natural_language_termination": "assistant ended turn with natural language without tool call",
-                    "clarification_request": "assistant requested missing user parameters before tool invocation",
-                    "unsupported_request": "assistant refused because request appears unsupported by available tools",
-                    "hallucinated_completion": "assistant claimed progress or completion without emitting a tool call",
-                    "malformed_output": "assistant emitted malformed content instead of a tool call",
-                    "empty_tool_call": "no tool call emitted for tool-enabled request",
-                }
-                issues = [ValidationIssue(kind=issue_kind, message=issue_messages[issue_kind])]
+                issue_kind, observed_predicates, issues, policy_rule_hits = self._evaluate_no_tool_policy(
+                    content,
+                    request_json,
+                    tool_schema_map,
+                )
+                compatibility_rule_hits = self._matched_compatibility_rules(issue_kind, request_json=request_json)
                 validation.issues.extend(issues)
-                validation.rule_hits.extend(rule.rule_id for rule in global_rule_hits)
-                if self._should_coerce_no_tool_text_to_empty(issues[0].kind, global_rule_hits):
+                validation.rule_hits.extend(rule.rule_id for rule in policy_rule_hits)
+                validation.rule_hits.extend(rule.rule_id for rule in compatibility_rule_hits)
+                if self._should_coerce_no_tool_text_to_empty(issues[0].kind, compatibility_rule_hits):
                     coercion_repairs = self._coerce_no_tool_text_to_empty(msg, issues[0].kind)
                     all_repairs.extend(coercion_repairs)
                     continue
-                if self._should_attempt_no_tool_recovery(issues[0].kind, global_rule_hits):
-                    guarded = self._apply_empty_tool_guard(msg, issues, global_rule_hits)
+                if self._should_attempt_no_tool_recovery(issues[0].kind, compatibility_rule_hits):
+                    guarded = self._apply_empty_tool_guard(msg, issues, compatibility_rule_hits)
                     validation.fallback_applied = validation.fallback_applied or guarded
                     if not guarded:
-                        applied = self._apply_fallback(msg, tool_calls, 0, issues, global_rule_hits)
+                        applied = self._apply_fallback(msg, tool_calls, 0, issues, compatibility_rule_hits)
                         validation.fallback_applied = validation.fallback_applied or applied
             for index in range(len(tool_calls) - 1, -1, -1):
                 tool_call = tool_calls[index]
                 name = tool_call.get("function", {}).get("name")
                 if not name:
-                    effective_rule_hits = self._matched_global_rules("wrong_tool_name")
+                    effective_rule_hits = self._matched_global_rules("wrong_tool_name", request_json=request_json)
                     issues = [ValidationIssue(kind="wrong_tool_name", message="tool call missing function name")]
                     validation.issues.extend(issues)
                     validation.rule_hits.extend(rule.rule_id for rule in effective_rule_hits)
@@ -555,7 +804,7 @@ class RuleEngine:
                         validation.fallback_applied = validation.fallback_applied or applied
                     continue
 
-                rule_hits = self._matched_rules(name)
+                rule_hits = self._matched_rules(name, request_json=request_json)
                 validation.rule_hits.extend(rule.rule_id for rule in rule_hits)
                 schema = tool_schema_map.get(name, {})
                 if not schema:
@@ -567,7 +816,7 @@ class RuleEngine:
                         )
                     ]
                     validation.issues.extend(issues)
-                    effective_rule_hits = rule_hits or self._matched_global_rules("tool_guard_violation")
+                    effective_rule_hits = rule_hits or self._matched_global_rules("tool_guard_violation", request_json=request_json)
                     validation.rule_hits.extend(rule.rule_id for rule in effective_rule_hits)
                     guarded = self._apply_tool_guard(msg, tool_calls, index, issues, effective_rule_hits)
                     validation.fallback_applied = validation.fallback_applied or guarded

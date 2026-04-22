@@ -20,7 +20,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-grc serve \
+PYTHONPATH="${REPO_ROOT}/src${PYTHONPATH:+:${PYTHONPATH}}" python -m grc.cli serve \
   --config "${CONFIG_PATH}" \
   --rules-dir "${REPO_ROOT}/rules/baseline_empty" \
   --trace-dir "${TRACE_DIR}" \

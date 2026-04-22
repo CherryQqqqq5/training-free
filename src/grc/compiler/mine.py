@@ -42,6 +42,7 @@ _GENERIC_CONTEXT_TOKENS = {
 }
 _FILE_CONTEXT_HINT_RE = re.compile(r"\b(file|filename|document|report)\b", re.IGNORECASE)
 _PATH_CONTEXT_HINT_RE = re.compile(r"\b(directory|folder|path)\b", re.IGNORECASE)
+_PATH_TOKEN_RE = re.compile(r"\b(?:[A-Za-z0-9_.-]+/[A-Za-z0-9_./-]+)\b")
 
 def _extract_tools_from_prompt_text(text: Any) -> dict[str, dict[str, Any]]:
     if not isinstance(text, str):
@@ -225,6 +226,106 @@ def _is_redundant_clarification_request(data: dict[str, Any], content: str) -> b
     return bool(requested_tokens & _context_tokens(context_strings))
 
 
+def _has_prior_tool_outputs(data: dict[str, Any]) -> bool:
+    def visit(item: Any) -> bool:
+        if isinstance(item, list):
+            return any(visit(child) for child in item)
+        if not isinstance(item, dict):
+            return False
+        if item.get("role") == "tool" or item.get("type") == "function_call_output":
+            return True
+        return any(visit(value) for key, value in item.items() if key not in {"id", "call_id", "name"})
+
+    return any(
+        visit(candidate)
+        for candidate in (
+            data.get("request", {}).get("messages"),
+            data.get("request_original", {}).get("messages"),
+            data.get("request_original", {}).get("input"),
+        )
+    )
+
+
+def _explicit_context_literals(data: dict[str, Any]) -> list[str]:
+    context_strings = _collect_context_strings(
+        [
+            data.get("request", {}).get("messages"),
+            data.get("request_original", {}).get("messages"),
+            data.get("request_original", {}).get("input"),
+        ]
+    )
+    literals: list[str] = []
+
+    def add_literal(value: str) -> None:
+        cleaned = str(value).strip()
+        if not cleaned or cleaned in literals:
+            return
+        literals.append(cleaned)
+
+    for text in context_strings:
+        for token in _PATH_TOKEN_RE.findall(text):
+            add_literal(token)
+        for token in _FILE_LITERAL_RE.findall(text):
+            add_literal(token)
+    return literals
+
+
+def _request_local_no_tool_predicates(
+    data: dict[str, Any],
+    tool_map: dict[str, dict[str, Any]],
+    *,
+    explicit_literals: list[str] | None = None,
+) -> list[str]:
+    predicates: list[str] = []
+    if tool_map:
+        predicates.append("tools_available")
+    if explicit_literals is None:
+        explicit_literals = _explicit_context_literals(data)
+    if explicit_literals:
+        predicates.append("prior_explicit_literals_present")
+    if _has_prior_tool_outputs(data):
+        predicates.append("prior_tool_outputs_present")
+    return predicates
+
+
+def _classify_no_tool_subfamily(
+    data: dict[str, Any],
+    base_kind: str | None,
+    tool_map: dict[str, dict[str, Any]],
+    *,
+    explicit_literals: list[str] | None = None,
+    redundant_clarification_detected: bool = False,
+) -> tuple[str | None, list[str]]:
+    predicates = _request_local_no_tool_predicates(data, tool_map, explicit_literals=explicit_literals)
+    issue_kind = base_kind or "empty_tool_call"
+
+    if issue_kind == "clarification_request":
+        if redundant_clarification_detected:
+            return "redundant_clarification_request", predicates
+        return "clarification_no_tool", predicates
+
+    if issue_kind == "unsupported_request":
+        return "unsupported_no_tool", predicates
+
+    actionable_bases = {
+        "empty_tool_call",
+        "hallucinated_completion",
+        "natural_language_termination",
+        "malformed_output",
+    }
+    if (
+        issue_kind in actionable_bases
+        and "tools_available" in predicates
+        and (
+            "prior_explicit_literals_present" in predicates
+            or "prior_tool_outputs_present" in predicates
+        )
+    ):
+        return "actionable_no_tool_decision", predicates
+
+    return issue_kind, predicates
+
+
 def mine_failures(trace_dir: str) -> List[FailureCase]:
     trace_root = Path(trace_dir)
     if not trace_root.exists():
@@ -240,8 +341,11 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
         raw = data.get("raw_response", {})
         validation = data.get("validation", {})
         tool_map = _tool_schema_map(data)
+        explicit_literals = _explicit_context_literals(data)
         seen_failure_keys: set[tuple[str, int, str, str, str | None]] = set()
         inferred_no_tool_call_kind: str | None = None
+        inferred_no_tool_subfamily: str | None = None
+        inferred_no_tool_predicates: list[str] = []
         redundant_clarification_detected = False
         raw_implies_text_tool_call = False
 
@@ -275,25 +379,28 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
                         data,
                         msg.get("content", ""),
                     )
+                inferred_no_tool_subfamily, inferred_no_tool_predicates = _classify_no_tool_subfamily(
+                    data,
+                    inferred_no_tool_call_kind,
+                    tool_map,
+                    explicit_literals=explicit_literals,
+                    redundant_clarification_detected=redundant_clarification_detected,
+                )
 
             if tool_map and not tool_calls:
-                if inferred_no_tool_call_kind == "clarification_request":
-                    if redundant_clarification_detected:
-                        record_failure(
-                            FailureCase(
-                                trace_id=path.stem,
-                                turn_index=0,
-                                tool_name="__none__",
-                                error_type="redundant_clarification_request",
-                            )
-                        )
-                else:
+                if inferred_no_tool_subfamily:
                     record_failure(
                         FailureCase(
                             trace_id=path.stem,
                             turn_index=0,
                             tool_name="__none__",
-                            error_type=inferred_no_tool_call_kind or "empty_tool_call",
+                            error_type=inferred_no_tool_subfamily,
+                            request_predicates=inferred_no_tool_predicates,
+                            request_literals=(
+                                list(explicit_literals)
+                                if inferred_no_tool_subfamily == "actionable_no_tool_decision"
+                                else []
+                            ),
                         )
                     )
 
@@ -410,16 +517,31 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
             if issue_kind == "empty_tool_call":
                 if raw_implies_text_tool_call:
                     continue
-                if inferred_no_tool_call_kind not in {None, "empty_tool_call"}:
+                if inferred_no_tool_subfamily not in {None, "empty_tool_call", "actionable_no_tool_decision"}:
                     continue
             record_failure(
                 FailureCase(
                     trace_id=path.stem,
                     turn_index=0,
                     tool_name=issue.get("tool_name") or "__none__",
-                    error_type=issue_kind,
+                    error_type=(
+                        inferred_no_tool_subfamily
+                        if issue_kind == "empty_tool_call" and inferred_no_tool_subfamily
+                        else issue_kind
+                    ),
                     field_name=issue.get("field"),
                     category="verification_hook",
+                    request_predicates=(
+                        inferred_no_tool_predicates
+                        if issue_kind == "empty_tool_call" and inferred_no_tool_predicates
+                        else []
+                    ),
+                    request_literals=(
+                        list(explicit_literals)
+                        if issue_kind == "empty_tool_call"
+                        and inferred_no_tool_subfamily == "actionable_no_tool_decision"
+                        else []
+                    ),
                 )
             )
 

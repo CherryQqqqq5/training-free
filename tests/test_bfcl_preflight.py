@@ -7,6 +7,7 @@ import sys
 import tempfile
 import types
 import unittest
+from unittest import mock
 from pathlib import Path
 
 
@@ -35,6 +36,76 @@ if _INJECTED_YAML_STUB:
 
 
 class BfclPreflightTests(unittest.TestCase):
+    def test_post_json_includes_authorization_header_when_openai_api_key_set(self) -> None:
+        captured_headers: dict[str, str] = {}
+
+        class _FakeResponse:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, exc_type, exc, tb):
+                return False
+
+            def getcode(self) -> int:
+                return 200
+
+            def read(self) -> bytes:
+                return b"{}"
+
+        def _fake_urlopen(request, timeout=120):  # type: ignore[no-untyped-def]
+            nonlocal captured_headers
+            captured_headers = dict(request.header_items())
+            return _FakeResponse()
+
+        previous = os.environ.get("OPENAI_API_KEY")
+        try:
+            os.environ["OPENAI_API_KEY"] = "dummy"
+            with mock.patch("urllib.request.urlopen", side_effect=_fake_urlopen):
+                status, payload = MODULE._post_json("http://127.0.0.1:8011", "/v1/chat/completions", {"x": 1})
+            self.assertEqual(status, 200)
+            self.assertEqual(payload, {})
+            self.assertEqual(captured_headers.get("Authorization"), "Bearer dummy")
+        finally:
+            if previous is None:
+                os.environ.pop("OPENAI_API_KEY", None)
+            else:
+                os.environ["OPENAI_API_KEY"] = previous
+
+    def test_post_json_falls_back_to_dummy_authorization_when_openai_api_key_missing(self) -> None:
+        captured_headers: dict[str, str] = {}
+
+        class _FakeResponse:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, exc_type, exc, tb):
+                return False
+
+            def getcode(self) -> int:
+                return 200
+
+            def read(self) -> bytes:
+                return b"{}"
+
+        def _fake_urlopen(request, timeout=120):  # type: ignore[no-untyped-def]
+            nonlocal captured_headers
+            captured_headers = dict(request.header_items())
+            return _FakeResponse()
+
+        previous = os.environ.get("OPENAI_API_KEY")
+        try:
+            os.environ.pop("OPENAI_API_KEY", None)
+            with mock.patch("urllib.request.urlopen", side_effect=_fake_urlopen):
+                status, payload = MODULE._post_json("http://127.0.0.1:8011", "/v1/chat/completions", {"x": 1})
+            self.assertEqual(status, 200)
+            self.assertEqual(payload, {})
+            self.assertEqual(captured_headers.get("Authorization"), "Bearer dummy")
+        finally:
+            if previous is None:
+                os.environ.pop("OPENAI_API_KEY", None)
+            else:
+                os.environ["OPENAI_API_KEY"] = previous
+
     def test_validate_chat_tool_response_accepts_expected_tool_call(self) -> None:
         payload = {
             "choices": [
