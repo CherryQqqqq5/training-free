@@ -20,6 +20,8 @@ NO_CANDIDATE_PATH="${CANDIDATE_DIR}/no_candidate.json"
 EVALUATION_INCOMPLETE_PATH="${CANDIDATE_DIR}/evaluation_incomplete.json"
 BASELINE_METRICS="${BASELINE_ROOT}/artifacts/metrics.json"
 CANDIDATE_METRICS="${CANDIDATE_DIR}/metrics.json"
+PAIRED_RERUN_PATH="${CANDIDATE_DIR}/paired_rerun.json"
+PAIRED_RERUN_ENABLED="${GRC_BFCL_PAIRED_RERUN:-1}"
 
 mkdir -p "${REPO_ROOT}/rules/candidates" "${REPO_ROOT}/rules/accepted" "${REPO_ROOT}/rules/rejected" "${REPO_ROOT}/rules/active"
 export GRC_RUN_ID="${RUN_ID}"
@@ -68,6 +70,28 @@ if [[ "${EVALUATION_STATUS}" != "complete" ]]; then
     "${CANDIDATE_METRICS}" "${EVALUATION_INCOMPLETE_PATH}"
   echo "skipped select: ${EVALUATION_STATUS}"
   exit 0
+fi
+
+if [[ "${PAIRED_RERUN_ENABLED}" == "1" ]]; then
+  RERUN_ROOT="${PATCH_ROOT}_rerun"
+  RERUN_ARTIFACT_DIR="${CANDIDATE_DIR}/rerun"
+  export GRC_RUN_ID="${RUN_ID}_rerun"
+  bash "${REPO_ROOT}/scripts/run_bfcl_v4_patch.sh" \
+    "${BFCL_MODEL}" \
+    "${RERUN_ROOT}" \
+    "8013" \
+    "${TEST_CATEGORY}" \
+    "${BFCL_RUNTIME_CONFIG_DEFAULT}" \
+    "${CANDIDATE_DIR}" \
+    "${RERUN_ROOT}/traces" \
+    "${RERUN_ARTIFACT_DIR}" \
+    "${BASELINE_METRICS}"
+  export GRC_RUN_ID="${RUN_ID}"
+  python "${REPO_ROOT}/scripts/assess_paired_rerun.py" \
+    --baseline "${BASELINE_METRICS}" \
+    --primary "${CANDIDATE_METRICS}" \
+    --rerun "${RERUN_ARTIFACT_DIR}/metrics.json" \
+    --out "${PAIRED_RERUN_PATH}"
 fi
 
 grc select \

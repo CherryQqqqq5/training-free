@@ -53,10 +53,13 @@ def _resolve_expected_api_key_env(config_path: str) -> str:
 
 
 def _post_json(base_url: str, path: str, payload: dict[str, Any]) -> tuple[int, Any]:
+    headers = {"Content-Type": "application/json"}
+    api_key = os.environ.get("OPENAI_API_KEY") or "dummy"
+    headers["Authorization"] = f"Bearer {api_key}"
     request = urllib.request.Request(
         f"{base_url.rstrip('/')}{path}",
         data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
-        headers={"Content-Type": "application/json"},
+        headers=headers,
         method="POST",
     )
     try:

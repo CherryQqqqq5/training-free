@@ -30,6 +30,20 @@ grc_wait_proxy_healthy() {
   return 1
 }
 
+grc_assert_fresh_port() {
+  local port="$1"
+  if curl -fsS "http://127.0.0.1:${port}/health" >/dev/null 2>&1; then
+    if [[ "${GRC_REUSE_PROXY:-0}" == "1" ]]; then
+      echo "reusing existing grc proxy on port ${port}" >&2
+      return 0
+    fi
+    echo "error: port ${port} already has a healthy grc proxy" >&2
+    echo "       refusing to reuse an existing proxy by default because it can hide stale code during evaluation" >&2
+    echo "       stop the old proxy or set GRC_REUSE_PROXY=1 if reuse is intentional" >&2
+    return 1
+  fi
+}
+
 bfcl_fix_result_layout() {
   local bfcl_root="$1"
   local nested_result_dir="${bfcl_root}/${bfcl_root}/result"
@@ -43,6 +57,7 @@ bfcl_fix_result_layout() {
 }
 
 BFCL_CLI=(python "${REPO_ROOT}/scripts/run_bfcl_cli.py")
+GRC_CLI=(python -m grc.cli)
 
 validate_model_split() {
   if [[ -z "${BFCL_MODEL}" ]]; then
@@ -159,7 +174,8 @@ trap cleanup EXIT
 
 PROXY_LOG="${GRC_PROXY_LOG:-/tmp/grc_baseline_proxy.log}"
 if [[ "${GRC_START_PROXY:-1}" == "1" ]]; then
-  grc serve \
+  grc_assert_fresh_port "${PORT}"
+  PYTHONPATH="${REPO_ROOT}/src${PYTHONPATH:+:${PYTHONPATH}}" "${GRC_CLI[@]}" serve \
     --config "${CONFIG_PATH}" \
     --rules-dir "${RULES_DIR}" \
     --trace-dir "${TRACE_DIR}" \

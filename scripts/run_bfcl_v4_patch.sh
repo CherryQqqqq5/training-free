@@ -28,6 +28,20 @@ grc_wait_proxy_healthy() {
   return 1
 }
 
+grc_assert_fresh_port() {
+  local port="$1"
+  if curl -fsS "http://127.0.0.1:${port}/health" >/dev/null 2>&1; then
+    if [[ "${GRC_REUSE_PROXY:-0}" == "1" ]]; then
+      echo "reusing existing grc proxy on port ${port}" >&2
+      return 0
+    fi
+    echo "error: port ${port} already has a healthy grc proxy" >&2
+    echo "       refusing to reuse an existing proxy by default because it can hide stale code during evaluation" >&2
+    echo "       stop the old proxy or set GRC_REUSE_PROXY=1 if reuse is intentional" >&2
+    return 1
+  fi
+}
+
 bfcl_fix_result_layout() {
   local bfcl_root="$1"
   local nested_result_dir="${bfcl_root}/${bfcl_root}/result"
@@ -41,6 +55,7 @@ bfcl_fix_result_layout() {
 }
 
 BFCL_CLI=(python "${REPO_ROOT}/scripts/run_bfcl_cli.py")
+GRC_CLI=(python -m grc.cli)
 
 validate_model_split() {
   if [[ -z "${BFCL_MODEL}" ]]; then
@@ -101,7 +116,28 @@ clean_run_state() {
     "${BFCL_ROOT}/result" \
     "${BFCL_ROOT}/score" \
     "${BFCL_ROOT:?}/${BFCL_ROOT#/}/result" \
-    "${TRACE_DIR}"
+    "${TRACE_DIR}" \
+    "${RUN_ROOT}/resolved_rules"
+}
+
+resolve_rules_source() {
+  local input_path="$1"
+  local resolved_dir="${RUN_ROOT}/resolved_rules"
+
+  if [[ -d "${input_path}" ]]; then
+    echo "${input_path}"
+    return 0
+  fi
+
+  if [[ -f "${input_path}" ]]; then
+    mkdir -p "${resolved_dir}"
+    cp "${input_path}" "${resolved_dir}/rule.yaml"
+    echo "${resolved_dir}"
+    return 0
+  fi
+
+  echo "error: rules source does not exist: ${input_path}" >&2
+  return 1
 }
 
 BFCL_MODEL="${1:-${GRC_BFCL_MODEL}}"
@@ -109,7 +145,7 @@ RUN_ROOT="${2:-${REPO_ROOT}/outputs/bfcl_v4/patch}"
 PORT="${3:-8012}"
 TEST_CATEGORY="${4:-${GRC_BFCL_TEST_CATEGORY}}"
 CONFIG_PATH="${5:-${BFCL_RUNTIME_CONFIG_DEFAULT}}"
-RULES_DIR="${6:-${REPO_ROOT}/rules/active}"
+RULES_INPUT="${6:-${REPO_ROOT}/rules/active}"
 TRACE_DIR="${7:-${RUN_ROOT}/traces}"
 ARTIFACT_DIR="${8:-${RUN_ROOT}/artifacts}"
 BASELINE_METRICS="${9:-}"
@@ -121,6 +157,7 @@ RUN_ID="${GRC_RUN_ID:-$(date -u +%Y%m%dT%H%M%SZ)}"
 validate_model_split
 ensure_upstream_auth
 clean_run_state
+RULES_DIR="$(resolve_rules_source "${RULES_INPUT}")"
 
 mkdir -p "${BFCL_ROOT}" "${TRACE_DIR}" "${ARTIFACT_DIR}"
 export BFCL_PROJECT_ROOT="${BFCL_ROOT}"
@@ -146,7 +183,8 @@ trap cleanup EXIT
 
 PROXY_LOG="${GRC_PROXY_LOG:-/tmp/grc_patch_proxy.log}"
 if [[ "${GRC_START_PROXY:-1}" == "1" ]]; then
-  grc serve \
+  grc_assert_fresh_port "${PORT}"
+  PYTHONPATH="${REPO_ROOT}/src${PYTHONPATH:+:${PYTHONPATH}}" "${GRC_CLI[@]}" serve \
     --config "${CONFIG_PATH}" \
     --rules-dir "${RULES_DIR}" \
     --trace-dir "${TRACE_DIR}" \
@@ -219,6 +257,8 @@ python "${REPO_ROOT}/scripts/aggregate_bfcl_metrics.py" "${AGGREGATE_ARGS[@]}"
 RULE_PATH=""
 if [[ -f "${RULES_DIR}/rule.yaml" ]]; then
   RULE_PATH="${RULES_DIR}/rule.yaml"
+elif [[ -f "${RULES_INPUT}" ]]; then
+  RULE_PATH="${RULES_INPUT}"
 fi
 
 MANIFEST_ARGS=(

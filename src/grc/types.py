@@ -1,4 +1,5 @@
 from grc.compiler.ir import (
+    DecisionPolicySpec,
     FailureCase,
     FailureIR,
     FieldConstraint,
@@ -20,6 +21,7 @@ from grc.compiler.ir import (
 __all__ = [
     "FailureCase",
     "FailureIR",
+    "DecisionPolicySpec",
     "FieldConstraint",
     "FallbackRoutingSpec",
     "MatchSpec",

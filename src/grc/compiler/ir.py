@@ -27,6 +27,7 @@ class MatchSpec(BaseModel):
     tool_names: List[str] = Field(default_factory=list)
     error_types: List[str] = Field(default_factory=list)
     category_patterns: List[str] = Field(default_factory=list)
+    request_predicates: List[str] = Field(default_factory=list)
 
 
 class PatchScope(BaseModel):
@@ -37,6 +38,15 @@ class PatchScope(BaseModel):
 class PromptInjectionSpec(BaseModel):
     fragments: List[str] = Field(default_factory=list)
     position: str = "prepend_system"
+
+
+class DecisionPolicySpec(BaseModel):
+    request_predicates: List[str] = Field(default_factory=list)
+    recommended_tools: List[str] = Field(default_factory=list)
+    continue_condition: Optional[str] = None
+    stop_condition: Optional[str] = None
+    forbidden_terminations: List[str] = Field(default_factory=list)
+    evidence_requirements: List[str] = Field(default_factory=list)
 
 
 class ToolGuardSpec(BaseModel):
@@ -54,6 +64,8 @@ class VerificationContract(BaseModel):
     require_known_fields: bool = True
     require_type_match: bool = True
     max_repairs: Optional[int] = None
+    forbidden_terminations: List[str] = Field(default_factory=list)
+    evidence_requirements: List[str] = Field(default_factory=list)
 
 
 class FallbackRoutingSpec(BaseModel):
@@ -71,6 +83,7 @@ class RetentionPolicy(BaseModel):
 class RuleAction(BaseModel):
     prompt_fragments: List[str] = Field(default_factory=list)
     prompt_injection: PromptInjectionSpec = Field(default_factory=PromptInjectionSpec)
+    decision_policy: DecisionPolicySpec = Field(default_factory=DecisionPolicySpec)
     arg_sanitizer: Dict[str, ToolSanitizerSpec] = Field(default_factory=dict)
     tool_guard: ToolGuardSpec = Field(default_factory=ToolGuardSpec)
     verification: VerificationContract = Field(default_factory=VerificationContract)
@@ -102,6 +115,8 @@ class FailureCase(BaseModel):
     expected_type: Optional[str] = None
     observed_value: Any = None
     category: Optional[str] = None
+    request_predicates: List[str] = Field(default_factory=list)
+    request_literals: List[str] = Field(default_factory=list)
 
 
 class FailureIR(BaseModel):
@@ -113,6 +128,8 @@ class FailureIR(BaseModel):
     categories: List[str] = Field(default_factory=list)
     evidence_count: int = 0
     trace_ids: List[str] = Field(default_factory=list)
+    request_predicates: List[str] = Field(default_factory=list)
+    request_literals: List[str] = Field(default_factory=list)
 
 
 class ValidationIssue(BaseModel):

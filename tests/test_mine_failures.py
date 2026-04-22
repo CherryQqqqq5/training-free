@@ -106,7 +106,7 @@ class MineFailuresTests(unittest.TestCase):
         self.assertEqual(failures[0].field_name, "days")
         self.assertEqual(failures[0].expected_type, "integer")
 
-    def test_ignores_prompt_backed_file_name_clarification_request(self) -> None:
+    def test_splits_prompt_backed_file_name_clarification_into_non_actionable_subfamily(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             trace_path = root / "trace.json"
@@ -139,7 +139,9 @@ class MineFailuresTests(unittest.TestCase):
 
             failures = mine_failures(str(root))
 
-        self.assertEqual(failures, [])
+        self.assertEqual(len(failures), 1)
+        self.assertEqual(failures[0].error_type, "clarification_no_tool")
+        self.assertEqual(failures[0].request_predicates, ["tools_available"])
 
     def test_does_not_treat_unrelated_file_name_request_as_clarification(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -176,6 +178,133 @@ class MineFailuresTests(unittest.TestCase):
 
         self.assertEqual(len(failures), 1)
         self.assertEqual(failures[0].error_type, "empty_tool_call")
+
+    def test_splits_actionable_no_tool_decision_using_prior_explicit_literals(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            trace_path = root / "trace.json"
+            trace_path.write_text(
+                json.dumps(
+                    {
+                        "request": {
+                            "model": "demo-model",
+                            "messages": [
+                                {"role": "user", "content": "Copy 'report.txt' into the backup directory."},
+                                {"role": "developer", "content": PROMPT_WITH_FILE_TOOL},
+                            ],
+                        },
+                        "request_original": {
+                            "model": "demo-model",
+                            "input": [
+                                {"role": "user", "content": "Copy 'report.txt' into the backup directory."},
+                                {"role": "developer", "content": PROMPT_WITH_FILE_TOOL},
+                            ],
+                        },
+                        "raw_response": {
+                            "choices": [
+                                {
+                                    "message": {
+                                        "role": "assistant",
+                                        "content": "I will prepare that copy now.",
+                                    }
+                                }
+                            ]
+                        },
+                        "validation": {"issues": []},
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            failures = mine_failures(str(root))
+
+        self.assertEqual(len(failures), 1)
+        self.assertEqual(failures[0].error_type, "actionable_no_tool_decision")
+        self.assertEqual(
+            failures[0].request_predicates,
+            ["tools_available", "prior_explicit_literals_present"],
+        )
+        self.assertEqual(failures[0].request_literals, ["report.txt"])
+
+    def test_does_not_treat_arbitrary_quoted_string_as_actionable_literal(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            trace_path = root / "trace.json"
+            trace_path.write_text(
+                json.dumps(
+                    {
+                        "request": {
+                            "model": "demo-model",
+                            "messages": [
+                                {"role": "user", "content": "Please handle \"that one\" for me."},
+                                {"role": "developer", "content": PROMPT_WITH_FILE_TOOL},
+                            ],
+                        },
+                        "request_original": {
+                            "model": "demo-model",
+                            "input": [
+                                {"role": "user", "content": "Please handle \"that one\" for me."},
+                                {"role": "developer", "content": PROMPT_WITH_FILE_TOOL},
+                            ],
+                        },
+                        "raw_response": {
+                            "choices": [
+                                {
+                                    "message": {
+                                        "role": "assistant",
+                                        "content": "I will take care of that now.",
+                                    }
+                                }
+                            ]
+                        },
+                        "validation": {"issues": []},
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            failures = mine_failures(str(root))
+
+        self.assertEqual(len(failures), 1)
+        self.assertEqual(failures[0].error_type, "empty_tool_call")
+        self.assertEqual(failures[0].request_literals, [])
+
+    def test_splits_unsupported_no_tool(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            trace_path = root / "trace.json"
+            trace_path.write_text(
+                json.dumps(
+                    {
+                        "request": {
+                            "model": "demo-model",
+                            "messages": [{"role": "developer", "content": PROMPT_WITH_FUNCTIONS}],
+                        },
+                        "request_original": {
+                            "model": "demo-model",
+                            "input": [{"role": "developer", "content": PROMPT_WITH_FUNCTIONS}],
+                        },
+                        "raw_response": {
+                            "choices": [
+                                {
+                                    "message": {
+                                        "role": "assistant",
+                                        "content": "I can't directly complete that because there is no function available to do it.",
+                                    }
+                                }
+                            ]
+                        },
+                        "validation": {"issues": []},
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            failures = mine_failures(str(root))
+
+        self.assertEqual(len(failures), 1)
+        self.assertEqual(failures[0].error_type, "unsupported_no_tool")
+        self.assertEqual(failures[0].request_predicates, ["tools_available"])
 
     def test_ignores_validation_empty_tool_call_when_raw_has_json_action_block_without_prompt(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -328,7 +457,7 @@ class MineFailuresTests(unittest.TestCase):
             failures = mine_failures(str(root))
 
         self.assertEqual(len(failures), 1)
-        self.assertEqual(failures[0].error_type, "unsupported_request")
+        self.assertEqual(failures[0].error_type, "unsupported_no_tool")
 
     def test_classifies_prompt_backed_malformed_output(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -402,7 +531,7 @@ class MineFailuresTests(unittest.TestCase):
         self.assertEqual(len(failures), 1)
         self.assertEqual(failures[0].error_type, "hallucinated_completion")
 
-    def test_ignores_prompt_backed_clarification_request(self) -> None:
+    def test_splits_prompt_backed_clarification_request_into_non_actionable_subfamily(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             trace_path = root / "trace.json"
@@ -442,7 +571,9 @@ class MineFailuresTests(unittest.TestCase):
 
             failures = mine_failures(str(root))
 
-        self.assertEqual(failures, [])
+        self.assertEqual(len(failures), 1)
+        self.assertEqual(failures[0].error_type, "clarification_no_tool")
+        self.assertEqual(failures[0].request_predicates, ["tools_available"])
 
     def test_mines_redundant_clarification_when_file_name_already_exists_in_context(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

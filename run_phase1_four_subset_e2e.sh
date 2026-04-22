@@ -1,100 +1,104 @@
 #!/usr/bin/env bash
-# Phase-1 closed loop: baseline -> mine -> compile -> patch run -> select, for four BFCL categories.
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")" && pwd)"
-if [[ -d "${REPO_ROOT}/scripts" ]]; then
-  source "${REPO_ROOT}/configs/bfcl_v4_phase1.env"
-else
-  REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-  source "${REPO_ROOT}/configs/bfcl_v4_phase1.env"
-fi
+cd "$REPO_ROOT"
 
-BFCL_RUNTIME_CONFIG_DEFAULT="${GRC_BFCL_RUNTIME_CONFIG:-${REPO_ROOT}/configs/runtime_bfcl_structured.yaml}"
-if [[ -f "${REPO_ROOT}/configs/bfcl_v4_openrouter.env" ]]; then
-  source "${REPO_ROOT}/configs/bfcl_v4_openrouter.env"
-fi
+# ===== Required env =====
+: "${OPENROUTER_API_KEY:?OPENROUTER_API_KEY is required}"
 
-BFCL_MODEL="${1:-${GRC_BFCL_MODEL}}"
-RUN_ID="${2:-phase1_four}"
-CATEGORIES=(simple_python multiple parallel_multiple multi_turn_miss_param)
+# ===== Stable runtime env =====
+export OPENAI_API_KEY="${OPENAI_API_KEY:-dummy}"
+export OPENAI_BASE_URL="${OPENAI_BASE_URL:-http://127.0.0.1:8011/v1}"
 
-mkdir -p "${REPO_ROOT}/rules/candidates" "${REPO_ROOT}/rules/accepted" "${REPO_ROOT}/rules/rejected" "${REPO_ROOT}/rules/active" "${REPO_ROOT}/outputs/reports"
+export GRC_UPSTREAM_PROFILE="${GRC_UPSTREAM_PROFILE:-openrouter}"
+export GRC_UPSTREAM_BASE_URL="${GRC_UPSTREAM_BASE_URL:-https://openrouter.ai/api/v1}"
+export GRC_UPSTREAM_MODEL="${GRC_UPSTREAM_MODEL:-x-ai/grok-3-beta}"
+export OPENROUTER_HTTP_REFERER="${OPENROUTER_HTTP_REFERER:-https://github.com/CherryQqqqq5/training-free}"
 
-for CAT in "${CATEGORIES[@]}"; do
+MODEL_ALIAS="${MODEL_ALIAS:-openrouter__grok-3-beta}"
+SUBSETS=("simple_python" "multiple" "parallel_multiple" "multi_turn_miss_param")
+
+# ===== Ensure alias exists in bfcl_eval =====
+python - <<'PY'
+from pathlib import Path
+import bfcl_eval.constants.model_config as mc
+p = Path(mc.__file__)
+s = p.read_text(encoding="utf-8")
+needle = 'MODEL_CONFIG_MAPPING["openrouter__grok-3-beta"]'
+if needle not in s:
+    s += '\nMODEL_CONFIG_MAPPING["openrouter__grok-3-beta"] = MODEL_CONFIG_MAPPING["gpt-4o-2024-11-20"]\n'
+    p.write_text(s, encoding="utf-8")
+print("alias ready: openrouter__grok-3-beta")
+PY
+
+mkdir -p outputs/reports rules/candidates rules/accepted rules/rejected rules/active
+
+run_one_subset () {
+  local subset="$1"
+  local base_root="outputs/bfcl_v4/baseline/${subset}"
+  local patch_root="outputs/bfcl_v4/patch/${subset}"
+  local failures_out="outputs/reports/${subset}_failures.jsonl"
+  local patch_id="patch_${subset}_001"
+  local cand_dir="rules/candidates/${patch_id}"
+  local rule_path="${cand_dir}/rule.yaml"
+
   echo
-  echo "==================== ${CAT} ===================="
+  echo "==================== ${subset} ===================="
 
-  BASELINE_ROOT="${REPO_ROOT}/outputs/bfcl_v4/baseline/${CAT}"
-  PATCH_ROOT="${REPO_ROOT}/outputs/bfcl_v4/patch/${CAT}"
-  FAILURES_OUT="${REPO_ROOT}/outputs/reports/${RUN_ID}_${CAT}_failures.jsonl"
-  PATCH_ID="${RUN_ID}_${CAT}"
-  CANDIDATE_DIR="${REPO_ROOT}/rules/candidates/${PATCH_ID}"
-  RULE_PATH="${CANDIDATE_DIR}/rule.yaml"
-  COMPILE_STATUS_PATH="${CANDIDATE_DIR}/compile_status.json"
-  BASELINE_METRICS="${BASELINE_ROOT}/artifacts/metrics.json"
-  CANDIDATE_METRICS="${CANDIDATE_DIR}/metrics.json"
-  BASELINE_MANIFEST="${BASELINE_ROOT}/artifacts/run_manifest.json"
-  CANDIDATE_MANIFEST="${CANDIDATE_DIR}/run_manifest.json"
+  # clean old run for reproducibility
+  rm -rf "${base_root}" "${patch_root}" "${cand_dir}"
+  mkdir -p "${cand_dir}"
 
-  bash "${REPO_ROOT}/scripts/run_bfcl_v4_baseline.sh"     "${BFCL_MODEL}"     "${BASELINE_ROOT}"     "8011"     "${CAT}"     "${BFCL_RUNTIME_CONFIG_DEFAULT}"     "${REPO_ROOT}/rules/baseline_empty"     "${BASELINE_ROOT}/traces"     "${BASELINE_ROOT}/artifacts"     "${RUN_ID}_baseline_${CAT}"
+  # 1) baseline
+  export GRC_BFCL_TEST_CATEGORY="${subset}"
+  bash scripts/run_bfcl_v4_baseline.sh "${MODEL_ALIAS}" "${base_root}"
 
-  grc mine --trace-dir "${BASELINE_ROOT}/traces" --out "${FAILURES_OUT}"
-  grc compile --failures "${FAILURES_OUT}" --out "${RULE_PATH}" --patch-id "${PATCH_ID}" --candidate-dir "${CANDIDATE_DIR}"
+  # 2) mine
+  grc mine --trace-dir "${base_root}/traces" --out "${failures_out}"
 
-  COMPILE_STATUS="$(python3 - "${COMPILE_STATUS_PATH}" <<"PY"
-import json, sys
-try:
-    print(json.loads(open(sys.argv[1], encoding="utf-8").read()).get("status", "compile_failed"))
-except Exception:
-    print("compile_failed")
-PY
-)"
+  # 3) compile
+  grc compile \
+    --failures "${failures_out}" \
+    --out "${rule_path}" \
+    --patch-id "${patch_id}" \
+    --candidate-dir "${cand_dir}"
 
-  if [[ "${COMPILE_STATUS}" != "actionable_patch" ]]; then
-    python3 - "${CANDIDATE_DIR}/no_candidate.json" "${COMPILE_STATUS}" "${COMPILE_STATUS_PATH}" <<"PY"
-import json, sys
-out_path, reason, status_path = sys.argv[1:4]
-status_payload = {}
-try:
-    status_payload = json.loads(open(status_path, encoding="utf-8").read())
-except Exception:
-    pass
-with open(out_path, "w", encoding="utf-8") as handle:
-    json.dump({"stop_reason": reason, "compile_status": status_payload}, handle, ensure_ascii=False, indent=2)
-PY
-    echo "skip patch benchmark due to compile status: ${COMPILE_STATUS}"
-    continue
-  fi
+  # 4) patch run
+  bash scripts/run_bfcl_v4_patch.sh \
+    "${MODEL_ALIAS}" \
+    "${patch_root}" \
+    8012 \
+    "${subset}" \
+    configs/runtime.yaml \
+    "${cand_dir}" \
+    "${patch_root}/traces" \
+    "${cand_dir}" \
+    "${base_root}/artifacts/metrics.json"
 
-  bash "${REPO_ROOT}/scripts/run_bfcl_v4_patch.sh"     "${BFCL_MODEL}"     "${PATCH_ROOT}"     "8012"     "${CAT}"     "${BFCL_RUNTIME_CONFIG_DEFAULT}"     "${CANDIDATE_DIR}"     "${PATCH_ROOT}/traces"     "${CANDIDATE_DIR}"     "${BASELINE_METRICS}"     "${RULE_PATH}"     "${RUN_ID}_candidate_${CAT}"
+  # 5) select
+  grc select \
+    --baseline-metrics "${base_root}/artifacts/metrics.json" \
+    --candidate-metrics "${cand_dir}/metrics.json" \
+    --candidate-dir "${cand_dir}" \
+    --rule-path "${rule_path}" \
+    --accepted-dir rules/accepted \
+    --rejected-dir rules/rejected \
+    --active-dir rules/active \
+    --out "${cand_dir}/accept.json"
 
-  EVAL_STATUS="$(python3 - "${CANDIDATE_METRICS}" <<"PY"
-import json, sys
-try:
-    print(json.loads(open(sys.argv[1], encoding="utf-8").read()).get("evaluation_status", "incomplete"))
-except Exception:
-    print("incomplete")
-PY
-)"
+  echo "done: ${subset}"
+}
 
-  if [[ "${EVAL_STATUS}" != "complete" ]]; then
-    python3 - "${CANDIDATE_DIR}/evaluation_incomplete.json" "${CANDIDATE_METRICS}" <<"PY"
-import json, sys
-out_path, metrics_path = sys.argv[1:3]
-payload = {"stop_reason": "evaluation_incomplete"}
-try:
-    payload["metrics"] = json.loads(open(metrics_path, encoding="utf-8").read())
-except Exception as exc:
-    payload["metrics_read_error"] = str(exc)
-with open(out_path, "w", encoding="utf-8") as handle:
-    json.dump(payload, handle, ensure_ascii=False, indent=2)
-PY
-    echo "skip select due to evaluation_status=${EVAL_STATUS}"
-    continue
-  fi
-
-  grc select     --baseline-metrics "${BASELINE_METRICS}"     --candidate-metrics "${CANDIDATE_METRICS}"     --baseline-manifest "${BASELINE_MANIFEST}"     --candidate-manifest "${CANDIDATE_MANIFEST}"     --compile-status "${COMPILE_STATUS_PATH}"     --candidate-dir "${CANDIDATE_DIR}"     --rule-path "${RULE_PATH}"     --accepted-dir "${REPO_ROOT}/rules/accepted"     --rejected-dir "${REPO_ROOT}/rules/rejected"     --active-dir "${REPO_ROOT}/rules/active"     --out "${CANDIDATE_DIR}/accept.json"
-
-  echo "done: ${CAT}"
+for s in "${SUBSETS[@]}"; do
+  run_one_subset "$s"
 done
+
+unset GRC_BFCL_TEST_CATEGORY
+
+echo
+echo "All subsets finished."
+echo "Check:"
+echo "  - outputs/bfcl_v4/baseline/<subset>/artifacts/metrics.json"
+echo "  - rules/candidates/patch_<subset>_001/accept.json"
+echo "  - rules/accepted/ and rules/rejected/"
