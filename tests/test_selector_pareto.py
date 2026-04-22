@@ -373,7 +373,6 @@ class ParetoSelectionTests(unittest.TestCase):
             self.assertFalse((rejected_dir / "patch_sync_002").exists())
             self.assertFalse((active_dir / "patch_sync_002.yaml").exists())
 
-<<<<<<< HEAD
     def test_write_selection_outputs_appends_searchable_history_record(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -488,9 +487,6 @@ class ParetoSelectionTests(unittest.TestCase):
             )
 
         self.assertEqual([item["patch_id"] for item in matches], ["keep_me"])
-
-=======
->>>>>>> origin/main
 
 if __name__ == "__main__":
     unittest.main()

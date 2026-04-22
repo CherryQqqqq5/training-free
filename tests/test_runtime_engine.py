@@ -299,7 +299,6 @@ class RuntimeEngineTests(unittest.TestCase):
         self.assertEqual([issue.kind for issue in validation.issues], ["clarification_request"])
         self.assertEqual(repairs[0]["kind"], "coerce_no_tool_text_to_empty")
 
-<<<<<<< HEAD
     def test_apply_response_does_not_infer_termination_from_compatibility_only_actionable_rule(self) -> None:
         with tempfile.TemporaryDirectory() as rules_dir:
             engine = RuleEngine(rules_dir)
@@ -354,9 +353,6 @@ class RuntimeEngineTests(unittest.TestCase):
             _, _, validation = engine.apply_response(request, response)
 
         self.assertEqual([issue.kind for issue in validation.issues], ["actionable_no_tool_decision"])
-
-=======
->>>>>>> origin/main
     def test_apply_request_does_not_proactively_escalate_tool_choice_for_actionable_continuation_turn(self) -> None:
         with tempfile.TemporaryDirectory() as rules_dir:
             engine = RuleEngine(rules_dir)
@@ -819,7 +815,7 @@ class RuntimeEngineTests(unittest.TestCase):
         self.assertEqual(final_response["choices"][0]["message"]["content"], "I will handle that move now.")
         self.assertEqual(
             [issue.kind for issue in validation.issues],
-            ["actionable_no_tool_decision", "termination_inadmissible"],
+            ["actionable_no_tool_decision"],
         )
 
     def test_actionable_no_tool_decision_can_be_coerced_to_empty_for_structured_clients(self) -> None:
@@ -898,7 +894,7 @@ class RuntimeEngineTests(unittest.TestCase):
         self.assertEqual(final_response["choices"][0]["message"]["content"], "")
         self.assertEqual(
             [issue.kind for issue in validation.issues],
-            ["actionable_no_tool_decision", "termination_inadmissible"],
+            ["actionable_no_tool_decision"],
         )
         self.assertEqual(
             repairs,
@@ -912,66 +908,7 @@ class RuntimeEngineTests(unittest.TestCase):
         )
         self.assertFalse(validation.fallback_applied)
 
-<<<<<<< HEAD
     def test_post_tool_prose_summary_is_coerced_and_reuses_actionable_contract(self) -> None:
-=======
-    def test_collect_context_literals_ignores_json_keys_and_only_keeps_values(self) -> None:
-        with tempfile.TemporaryDirectory() as rules_dir:
-            engine = RuleEngine(
-                rules_dir,
-                runtime_policy={
-                    "inject_structured_tool_guidance": True,
-                    "inject_context_literal_hints": True,
-                },
-            )
-            request = {
-                "model": "demo-model",
-                "messages": [
-                    {"role": "user", "content": "Search for files under '/workspace/document'."},
-                    {
-                        "role": "tool",
-                        "content": json.dumps(
-                            {
-                                "matches": [
-                                    "./workspace/document/TeamNotes.txt",
-                                    "./workspace/document/FreshIdeasTracker.txt",
-                                ],
-                                "current_working_directory": "/workspace",
-                                "message": "done",
-                            }
-                        ),
-                    },
-                ],
-                "tools": [
-                    {
-                        "type": "function",
-                        "function": {
-                            "name": "find",
-                            "parameters": {
-                                "type": "object",
-                                "properties": {"path": {"type": "string"}},
-                                "required": ["path"],
-                            },
-                        },
-                    }
-                ],
-            }
-
-            patched, request_patches = engine.apply_request(request)
-
-        system_text = patched["messages"][0]["content"]
-        hint_line = next(
-            line for line in system_text.splitlines() if "Known explicit context values you can reuse exactly if relevant:" in line
-        )
-        self.assertIn("TeamNotes.txt", system_text)
-        self.assertIn("FreshIdeasTracker.txt", system_text)
-        self.assertNotIn("matches", hint_line)
-        self.assertNotIn("current_working_directory", hint_line)
-        self.assertNotIn("message", hint_line)
-        self.assertTrue(any(patch.startswith("prompt_injector:Known explicit context values") for patch in request_patches))
-
-    def test_engine_strips_narration_when_tool_calls_are_present(self) -> None:
->>>>>>> origin/main
         with tempfile.TemporaryDirectory() as rules_dir:
             engine = RuleEngine(
                 rules_dir,
@@ -1285,7 +1222,7 @@ class RuntimeEngineTests(unittest.TestCase):
         self.assertEqual(final_response["choices"][0]["message"]["content"], "I will handle that move now.")
         self.assertEqual(
             [issue.kind for issue in validation.issues],
-            ["actionable_no_tool_decision", "termination_inadmissible"],
+            ["actionable_no_tool_decision"],
         )
 
     def test_actionable_no_tool_decision_can_be_coerced_to_empty_for_structured_clients(self) -> None:
@@ -1359,7 +1296,7 @@ class RuntimeEngineTests(unittest.TestCase):
         self.assertEqual(final_response["choices"][0]["message"]["content"], "")
         self.assertEqual(
             [issue.kind for issue in validation.issues],
-            ["actionable_no_tool_decision", "termination_inadmissible"],
+            ["actionable_no_tool_decision"],
         )
         self.assertEqual(
             repairs,
@@ -1372,94 +1309,6 @@ class RuntimeEngineTests(unittest.TestCase):
             ],
         )
         self.assertFalse(validation.fallback_applied)
-
-    def test_post_tool_prose_summary_is_coerced_and_reuses_actionable_contract(self) -> None:
-        with tempfile.TemporaryDirectory() as rules_dir:
-            engine = RuleEngine(
-                rules_dir,
-                runtime_policy={"coerce_no_tool_response_to_empty_kinds": ["post_tool_prose_summary"]},
-            )
-            engine.rules = [
-                Rule(
-                    rule_id="rule_global_no_tool_actionable_v1",
-                    trigger=MatchSpec(
-                        error_types=["actionable_no_tool_decision"],
-                        request_predicates=["tools_available", "prior_tool_outputs_present"],
-                    ),
-                    scope=PatchScope(tool_names=[], patch_sites=["prompt_injector", "verification_hook", "fallback_router"]),
-                    action=RuleAction(
-                        prompt_injection={"fragments": ["Use prior tool outputs as grounding for the next tool call."]},
-                        verification=VerificationContract(
-                            require_known_tool=False,
-                            require_object_args=False,
-                            require_required_fields=False,
-                            require_known_fields=False,
-                            require_type_match=False,
-                            forbidden_terminations=["prose_only_no_tool_termination"],
-                            evidence_requirements=["tools_available", "prior_tool_outputs_present"],
-                        ),
-                        fallback_router=FallbackRoutingSpec(strategy="record_only", on_issue_kinds=["actionable_no_tool_decision"]),
-                    ),
-                    validation_contract=VerificationContract(
-                        require_known_tool=False,
-                        require_object_args=False,
-                        require_required_fields=False,
-                        require_known_fields=False,
-                        require_type_match=False,
-                        forbidden_terminations=["prose_only_no_tool_termination"],
-                        evidence_requirements=["tools_available", "prior_tool_outputs_present"],
-                    ),
-                )
-            ]
-            request = {
-                "model": "demo-model",
-                "messages": [
-                    {"role": "user", "content": "Check the fuel level."},
-                    {"role": "assistant", "content": "", "tool_calls": [{"id": "c1"}]},
-                    {"role": "tool", "tool_call_id": "c1", "content": json.dumps({"fuelLevel": 10.0})},
-                ],
-                "tools": [
-                    {
-                        "type": "function",
-                        "function": {
-                            "name": "convert_gallon_to_liter",
-                            "parameters": {
-                                "type": "object",
-                                "properties": {"gallon": {"type": "number"}},
-                                "required": ["gallon"],
-                            },
-                        },
-                    }
-                ],
-            }
-            response = {
-                "choices": [
-                    {
-                        "message": {
-                            "role": "assistant",
-                            "content": "The current fuel level in your car is approximately 37.85 liters.",
-                        }
-                    }
-                ]
-            }
-
-            final_response, repairs, validation = engine.apply_response(request, response)
-
-        self.assertEqual(final_response["choices"][0]["message"]["content"], "")
-        self.assertEqual(
-            [issue.kind for issue in validation.issues],
-            ["post_tool_prose_summary", "termination_inadmissible"],
-        )
-        self.assertEqual(
-            repairs,
-            [
-                {
-                    "kind": "coerce_no_tool_text_to_empty",
-                    "issue_kind": "post_tool_prose_summary",
-                    "reason": "assistant emitted text-only content on a tool-enabled turn; coerced to empty response for structured tool clients",
-                }
-            ],
-        )
 
     def test_post_tool_prose_summary_requires_recent_tool_output(self) -> None:
         with tempfile.TemporaryDirectory() as rules_dir:

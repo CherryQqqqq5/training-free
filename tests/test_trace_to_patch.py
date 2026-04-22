@@ -65,11 +65,7 @@ class TraceToPatchTests(unittest.TestCase):
             "rule_global_no_tool_actionable_no_tool_decision_prior_explicit_literals_present_tools_available_v1",
         )
         self.assertEqual(rule["trigger"]["request_predicates"], ["prior_explicit_literals_present", "tools_available"])
-<<<<<<< HEAD
         self.assertEqual(rule["scope"]["patch_sites"], ["prompt_injector", "policy_executor"])
-=======
-        self.assertEqual(rule["scope"]["patch_sites"], ["prompt_injector", "verification_hook", "fallback_router"])
->>>>>>> origin/main
         self.assertEqual(
             rule["action"]["decision_policy"]["request_predicates"],
             ["prior_explicit_literals_present", "tools_available"],
@@ -84,7 +80,6 @@ class TraceToPatchTests(unittest.TestCase):
         )
         self.assertEqual(
             rule["validation_contract"]["forbidden_terminations"],
-<<<<<<< HEAD
             [],
         )
         self.assertEqual(
@@ -94,14 +89,6 @@ class TraceToPatchTests(unittest.TestCase):
         self.assertFalse(rule["action"]["tool_guard"]["enabled"])
         self.assertEqual(rule["action"]["fallback_router"]["strategy"], "record_only")
         self.assertEqual(rule["action"]["fallback_router"]["on_issue_kinds"], [])
-=======
-            ["prose_only_no_tool_termination"],
-        )
-        self.assertEqual(
-            rule["validation_contract"]["evidence_requirements"],
-            ["prior_explicit_literals_present", "tools_available"],
-        )
->>>>>>> origin/main
         self.assertTrue(rule["action"]["prompt_injection"]["fragments"])
         self.assertFalse(any("report.txt" in fragment for fragment in rule["action"]["prompt_fragments"]))
 
