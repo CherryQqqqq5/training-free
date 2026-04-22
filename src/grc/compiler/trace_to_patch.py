@@ -404,9 +404,36 @@ def _build_global_guard_rules(grouped: DefaultDict[str, List[FailureCase]]) -> L
         )
         verification = _no_tool_verification_contract()
         decision_policy = _global_decision_policy_for_failure_ir(failure_ir)
+<<<<<<< HEAD
+        policy_first = error_type == "actionable_no_tool_decision"
+        if policy_first:
+            patch_sites = ["prompt_injector", "policy_executor"]
+            tool_guard = ToolGuardSpec(
+                enabled=False,
+                on_violation="record",
+                on_unknown_tool="record",
+                on_empty_tool_call="record",
+            )
+            fallback_router = FallbackRoutingSpec(strategy="record_only")
+            validation_contract = VerificationContract()
+        else:
+            patch_sites = ["tool_guard", "verification_hook", "fallback_router"]
+            tool_guard = ToolGuardSpec(
+                enabled=True,
+                on_violation="record",
+                on_unknown_tool="record",
+                on_empty_tool_call="record",
+            )
+            fallback_router = FallbackRoutingSpec(
+                strategy="record_only",
+                on_issue_kinds=[error_type],
+            )
+            validation_contract = verification
+=======
         if error_type == "actionable_no_tool_decision":
             verification.forbidden_terminations = list(decision_policy.forbidden_terminations)
             verification.evidence_requirements = list(decision_policy.evidence_requirements)
+>>>>>>> origin/main
 
         rules.append(
             Rule(
@@ -424,15 +451,22 @@ def _build_global_guard_rules(grouped: DefaultDict[str, List[FailureCase]]) -> L
                 ),
                 scope=PatchScope(
                     tool_names=[],
+<<<<<<< HEAD
+                    patch_sites=patch_sites,
+=======
                     patch_sites=(
                         ["prompt_injector", "verification_hook", "fallback_router"]
                         if error_type == "actionable_no_tool_decision"
                         else ["tool_guard", "verification_hook", "fallback_router"]
                     ),
+>>>>>>> origin/main
                 ),
                 action=RuleAction(
                     prompt_fragments=prompt_fragments,
                     prompt_injection=PromptInjectionSpec(
+<<<<<<< HEAD
+                        fragments=prompt_fragments if policy_first else []
+=======
                         fragments=prompt_fragments if error_type == "actionable_no_tool_decision" else []
                     ),
                     decision_policy=decision_policy,
@@ -441,14 +475,14 @@ def _build_global_guard_rules(grouped: DefaultDict[str, List[FailureCase]]) -> L
                         on_violation="record",
                         on_unknown_tool="record",
                         on_empty_tool_call="record",
+>>>>>>> origin/main
                     ),
+                    decision_policy=decision_policy,
+                    tool_guard=tool_guard,
                     verification=verification,
-                    fallback_router=FallbackRoutingSpec(
-                        strategy="record_only",
-                        on_issue_kinds=[error_type],
-                    ),
+                    fallback_router=fallback_router,
                 ),
-                validation_contract=verification,
+                validation_contract=validation_contract,
             )
         )
 

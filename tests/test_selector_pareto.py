@@ -5,6 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from grc.selector.history import load_history, query_history
 from grc.selector.pareto import select_patch, write_selection_outputs
 
 
@@ -372,6 +373,124 @@ class ParetoSelectionTests(unittest.TestCase):
             self.assertFalse((rejected_dir / "patch_sync_002").exists())
             self.assertFalse((active_dir / "patch_sync_002.yaml").exists())
 
+<<<<<<< HEAD
+    def test_write_selection_outputs_appends_searchable_history_record(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            candidate_dir = root / "patch_sync_003"
+            accepted_dir = root / "accepted"
+            rejected_dir = root / "rejected"
+            active_dir = root / "active"
+            candidate_dir.mkdir()
+            accepted_dir.mkdir()
+            rejected_dir.mkdir()
+            active_dir.mkdir()
+
+            rule_path = candidate_dir / "rule.yaml"
+            rule_path.write_text(
+                json.dumps(
+                    {
+                        "patch_id": "patch_sync_003",
+                        "rules": [
+                            {
+                                "rule_id": "rule_global_no_tool_actionable_v1",
+                                "trigger": {"error_types": ["actionable_no_tool_decision"]},
+                                "action": {
+                                    "decision_policy": {
+                                        "request_predicates": ["tools_available", "prior_explicit_literals_present"],
+                                        "forbidden_terminations": ["prose_only_no_tool_termination"],
+                                    }
+                                },
+                            }
+                        ],
+                        "source_failure_count": 2,
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            write_selection_outputs(
+                {
+                    "accept": False,
+                    "decision_code": "retained",
+                    "target_delta": 0.7,
+                    "candidate_valid": True,
+                    "manifest_valid": True,
+                    "subset_regressions": [],
+                    "candidate": {
+                        "acc": 1.1,
+                        "cost": 2.0,
+                        "latency": 210.0,
+                        "regression": 0.0,
+                        "evaluation_status": "complete",
+                    },
+                    "paired_rerun": {"paired_rerun_consistent": True},
+                },
+                str(candidate_dir),
+                str(rule_path),
+                str(accepted_dir),
+                str(rejected_dir),
+                str(active_dir),
+                None,
+            )
+
+            history_path = root / "history.jsonl"
+            records = load_history(history_path)
+
+        self.assertEqual(len(records), 1)
+        self.assertEqual(records[0]["decision_code"], "retained")
+        self.assertEqual(records[0]["error_families"], ["actionable_no_tool_decision"])
+        self.assertEqual(
+            records[0]["request_predicates"],
+            ["prior_explicit_literals_present", "tools_available"],
+        )
+        self.assertTrue(records[0]["reusable_for_search"])
+
+    def test_query_history_only_returns_reusable_records_and_uses_behavior_keys(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            history_path = root / "history.jsonl"
+            history_path.write_text(
+                "\n".join(
+                    [
+                        json.dumps(
+                            {
+                                "patch_id": "keep_me",
+                                "decision_code": "retained",
+                                "error_families": ["actionable_no_tool_decision"],
+                                "request_predicates": ["prior_explicit_literals_present", "tools_available"],
+                                "policy_fingerprints": ["abc123"],
+                                "reusable_for_search": True,
+                            }
+                        ),
+                        json.dumps(
+                            {
+                                "patch_id": "reject_me",
+                                "decision_code": "candidate_does_not_dominate",
+                                "error_families": ["actionable_no_tool_decision"],
+                                "request_predicates": ["prior_explicit_literals_present", "tools_available"],
+                                "policy_fingerprints": ["abc123"],
+                                "reusable_for_search": False,
+                                "test_category": "multi_turn_miss_param",
+                            }
+                        ),
+                    ]
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+
+            matches = query_history(
+                history_path,
+                error_family="actionable_no_tool_decision",
+                request_predicates=["tools_available", "prior_explicit_literals_present"],
+                policy_fingerprint="abc123",
+            )
+
+        self.assertEqual([item["patch_id"] for item in matches], ["keep_me"])
+
+=======
+>>>>>>> origin/main
 
 if __name__ == "__main__":
     unittest.main()

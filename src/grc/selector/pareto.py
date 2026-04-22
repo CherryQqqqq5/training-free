@@ -5,6 +5,8 @@ import shutil
 from pathlib import Path
 from typing import Any, Dict
 
+from grc.selector.history import append_history, build_history_record
+
 try:
     import yaml
 except ModuleNotFoundError:
@@ -321,6 +323,17 @@ def write_selection_outputs(
 
     if not source or not source.exists():
         return
+
+    history_root = None
+    for candidate in (accepted_dir, rejected_dir, active_dir):
+        if candidate:
+            history_root = Path(candidate).parent
+            break
+    if history_root is not None:
+        append_history(
+            history_root / "history.jsonl",
+            build_history_record(decision, rule_path=str(source)),
+        )
 
     if patch_id is None:
         patch_id = source.stem
