@@ -402,6 +402,34 @@ action:
             ["prompt_injector:Continue with the next grounded tool call."],
         )
 
+
+    def test_apply_request_injects_recommended_policy_tool_bias(self) -> None:
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir)
+            engine.rules = [
+                Rule(
+                    rule_id="rule_global_no_tool_actionable_recommended_v1",
+                    trigger=MatchSpec(error_types=["actionable_no_tool_decision"]),
+                    scope=PatchScope(tool_names=[], patch_sites=["prompt_injector", "policy_executor"]),
+                    action=RuleAction(
+                        decision_policy={
+                            "request_predicates": ["tools_available", "prior_explicit_literals_present"],
+                            "recommended_tools": ["move_file"],
+                            "forbidden_terminations": ["prose_only_no_tool_termination"],
+                            "evidence_requirements": ["tools_available", "prior_explicit_literals_present"],
+                        },
+                    ),
+                    validation_contract=VerificationContract(),
+                )
+            ]
+
+            patched, request_patches = engine.apply_request(self._make_move_file_request())
+
+        self.assertEqual(patched["messages"][0]["role"], "system")
+        self.assertIn("Policy next-tool recommendation: prefer `move_file`", patched["messages"][0]["content"])
+        self.assertIn("prompt_injector:Policy next-tool recommendation: prefer `move_file`", request_patches[0])
+        self.assertIsNone(patched.get("tool_choice"))
+
     def test_apply_response_uses_decision_policy_contract_when_validation_contract_is_empty(self) -> None:
         _, _, validation = self._run_no_tool_response(
             rules=[self._make_actionable_policy_rule()],

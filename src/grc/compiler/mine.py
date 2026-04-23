@@ -293,6 +293,64 @@ def _request_local_no_tool_predicates(
     return predicates
 
 
+def _schema_text_tokens(tool_name: str, schema: dict[str, Any]) -> set[str]:
+    values: list[str] = [tool_name]
+
+    def visit(item: Any) -> None:
+        if isinstance(item, str):
+            values.append(item)
+            return
+        if isinstance(item, list):
+            for child in item:
+                visit(child)
+            return
+        if isinstance(item, dict):
+            for key, value in item.items():
+                values.append(str(key))
+                visit(value)
+
+    visit(schema)
+    return _context_tokens(values)
+
+
+def _rank_recommended_tools(
+    data: dict[str, Any],
+    tool_map: dict[str, dict[str, Any]],
+    explicit_literals: list[str],
+) -> list[str]:
+    if not tool_map:
+        return []
+    if len(tool_map) == 1:
+        return list(tool_map.keys())
+
+    context_strings = _collect_context_strings(
+        [
+            data.get("request", {}).get("messages"),
+            data.get("request_original", {}).get("messages"),
+            data.get("request_original", {}).get("input"),
+            explicit_literals,
+        ]
+    )
+    context_tokens = _context_tokens(context_strings)
+    has_file_literal = any(_FILE_LITERAL_RE.search(item) for item in explicit_literals)
+    has_path_literal = any("/" in item or "\\" in item for item in explicit_literals)
+
+    scored: list[tuple[float, str]] = []
+    for name, schema in tool_map.items():
+        schema_tokens = _schema_text_tokens(name, schema)
+        overlap = len(context_tokens & schema_tokens)
+        literal_bonus = 0.0
+        if has_file_literal and schema_tokens & {"file", "filename", "file_name", "path", "source", "destination"}:
+            literal_bonus += 1.0
+        if has_path_literal and schema_tokens & {"path", "directory", "folder", "dir"}:
+            literal_bonus += 1.0
+        score = float(overlap) + literal_bonus
+        if score > 0:
+            scored.append((score, name))
+
+    return [name for _, name in sorted(scored, key=lambda item: (-item[0], item[1]))[:3]]
+
+
 def _classify_no_tool_subfamily(
     data: dict[str, Any],
     base_kind: str | None,
@@ -338,6 +396,7 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
         inferred_no_tool_predicates: list[str] = []
         redundant_clarification_detected = False
         raw_implies_text_tool_call = False
+        recommended_tools = _rank_recommended_tools(data, tool_map, explicit_literals)
 
         def record_failure(case: FailureCase) -> None:
             # Validation issues can mirror failures already inferable from the raw response.
@@ -441,6 +500,7 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
                                 if inferred_no_tool_classification
                                 else {}
                             ),
+                            recommended_tools=recommended_tools,
                         )
                     )
 
@@ -587,6 +647,7 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
                         if issue_kind in {"empty_tool_call", "empty_completion"} and inferred_no_tool_classification
                         else {}
                     ),
+                    recommended_tools=recommended_tools if tool_map else [],
                 )
             )
 

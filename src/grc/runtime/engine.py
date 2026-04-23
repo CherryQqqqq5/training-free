@@ -372,8 +372,42 @@ class RuleEngine:
                 )
         return fragments
 
+    def _recommended_policy_tools(self, request_json: Dict[str, Any]) -> List[str]:
+        request_tool_names = set(self._tool_schema_map(request_json).keys())
+        if not request_tool_names:
+            return []
+        recommended: List[str] = []
+        for rule in self.rules:
+            patch_sites = set(rule.scope.patch_sites)
+            if patch_sites and not ({"prompt_injector", "policy_executor"} & patch_sites):
+                continue
+            policy = self._rule_decision_policy(rule)
+            if policy is None:
+                continue
+            if not self._request_predicates_met(self._rule_request_predicates(rule), request_json):
+                continue
+            for tool_name in policy.recommended_tools:
+                if tool_name in request_tool_names and tool_name not in recommended:
+                    recommended.append(tool_name)
+        return recommended[:3]
+
+    def _recommended_policy_tool_fragments(self, request_json: Dict[str, Any]) -> List[str]:
+        recommended = self._recommended_policy_tools(request_json)
+        if not recommended:
+            return []
+        if len(recommended) == 1:
+            return [
+                f"Policy next-tool recommendation: prefer `{recommended[0]}` as the next tool action when its required arguments are locally grounded; do not end this turn with prose-only narration while the policy predicates still hold."
+            ]
+        return [
+            "Policy next-tool recommendations: prefer one of "
+            + ", ".join(f"`{tool}`" for tool in recommended)
+            + " as the next tool action when required arguments are locally grounded; do not end this turn with prose-only narration while the policy predicates still hold."
+        ]
+
     def _collect_prompt_fragments(self, request_json: Dict[str, Any]) -> List[str]:
         fragments: List[str] = self._structured_tool_guidance_fragments(request_json)
+        fragments.extend(self._recommended_policy_tool_fragments(request_json))
         request_tool_names = set(self._tool_schema_map(request_json).keys())
         allow_global_prompt_injection = bool(self.runtime_policy.get("allow_global_prompt_injection", False))
         for rule in self.rules:

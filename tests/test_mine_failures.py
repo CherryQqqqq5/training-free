@@ -225,6 +225,7 @@ class MineFailuresTests(unittest.TestCase):
             ["tools_available", "prior_explicit_literals_present"],
         )
         self.assertEqual(failures[0].request_literals, ["report.txt"])
+        self.assertEqual(failures[0].recommended_tools, ["cat"])
 
     def test_does_not_treat_arbitrary_quoted_string_as_actionable_literal(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

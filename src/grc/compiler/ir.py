@@ -121,6 +121,7 @@ class FailureCase(BaseModel):
     request_predicates: List[str] = Field(default_factory=list)
     request_literals: List[str] = Field(default_factory=list)
     predicate_evidence: Dict[str, bool] = Field(default_factory=dict)
+    recommended_tools: List[str] = Field(default_factory=list)
 
 
 class FailureIR(BaseModel):
@@ -138,6 +139,7 @@ class FailureIR(BaseModel):
     request_predicates: List[str] = Field(default_factory=list)
     request_literals: List[str] = Field(default_factory=list)
     predicate_evidence: Dict[str, int] = Field(default_factory=dict)
+    recommended_tools: List[str] = Field(default_factory=list)
 
 
 class ValidationIssue(BaseModel):

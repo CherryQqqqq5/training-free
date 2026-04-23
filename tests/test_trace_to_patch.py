@@ -52,6 +52,7 @@ class TraceToPatchTests(unittest.TestCase):
                         "failure_label": "(PRE_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
                         "request_predicates": ["tools_available", "prior_explicit_literals_present"],
                         "request_literals": ["report.txt"],
+                        "recommended_tools": ["move_file"],
                     }
                 )
                 + "\n",
@@ -84,6 +85,7 @@ class TraceToPatchTests(unittest.TestCase):
             rule["action"]["decision_policy"]["forbidden_terminations"],
             ["prose_only_no_tool_termination"],
         )
+        self.assertEqual(rule["action"]["decision_policy"]["recommended_tools"], ["move_file"])
         self.assertEqual(
             rule["action"]["decision_policy"]["evidence_requirements"],
             ["prior_explicit_literals_present", "tools_available"],
@@ -91,11 +93,13 @@ class TraceToPatchTests(unittest.TestCase):
         self.assertEqual(rule["validation_contract"]["forbidden_terminations"], [])
         self.assertEqual(rule["validation_contract"]["evidence_requirements"], [])
         self.assertTrue(rule["action"]["prompt_injection"]["fragments"])
+        self.assertTrue(any("`move_file`" in fragment for fragment in rule["action"]["prompt_fragments"]))
         self.assertFalse(any("report.txt" in fragment for fragment in rule["action"]["prompt_fragments"]))
         self.assertEqual(
             policy_units["policy_units"][0]["source_failure_signature"]["type"],
             "ACTIONABLE_NO_TOOL_DECISION",
         )
+        self.assertEqual(policy_units["policy_units"][0]["recommended_tools"], ["move_file"])
 
     def test_compile_patch_emits_post_tool_policy_first_rule(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -114,6 +118,7 @@ class TraceToPatchTests(unittest.TestCase):
                         "failure_type": "POST_TOOL_PROSE_SUMMARY",
                         "failure_label": "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
                         "request_predicates": ["tools_available", "prior_tool_outputs_present"],
+                        "recommended_tools": ["convert_gallon_to_liter"],
                     }
                 )
                 + "\n",
@@ -146,6 +151,7 @@ class TraceToPatchTests(unittest.TestCase):
             rule["action"]["decision_policy"]["evidence_requirements"],
             ["prior_tool_outputs_present", "tools_available"],
         )
+        self.assertEqual(rule["action"]["decision_policy"]["recommended_tools"], ["convert_gallon_to_liter"])
         self.assertIn(
             "prior tool outputs already provide enough local evidence",
             rule["action"]["decision_policy"]["continue_condition"],

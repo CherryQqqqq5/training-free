@@ -100,6 +100,17 @@ def _taxonomy_fields(failures: List[FailureCase]) -> Dict[str, object]:
     }
 
 
+def _recommended_tools_from_failures(failures: List[FailureCase]) -> List[str]:
+    recommended: List[str] = []
+    for case in failures:
+        for tool_name in case.recommended_tools:
+            if isinstance(tool_name, str) and tool_name.strip() and tool_name not in recommended:
+                recommended.append(tool_name)
+        if case.tool_name != "__none__" and case.tool_name not in recommended:
+            recommended.append(case.tool_name)
+    return recommended[:3]
+
+
 def _build_failure_ir(grouped: DefaultDict[str, List[FailureCase]]) -> List[FailureIR]:
     failure_irs: List[FailureIR] = []
     for tool_name, failures in grouped.items():
@@ -137,6 +148,7 @@ def _build_failure_ir(grouped: DefaultDict[str, List[FailureCase]]) -> List[Fail
                             }
                         )[:8],
                         predicate_evidence=taxonomy["predicate_evidence"],
+                        recommended_tools=_recommended_tools_from_failures(scoped_failures),
                     )
                 )
             continue
@@ -175,6 +187,7 @@ def _build_failure_ir(grouped: DefaultDict[str, List[FailureCase]]) -> List[Fail
                     }
                 )[:8],
                 predicate_evidence=taxonomy["predicate_evidence"],
+                recommended_tools=_recommended_tools_from_failures(failures),
             )
         )
 
@@ -209,6 +222,7 @@ def _failure_summary(
                 "failure_types": item.failure_types,
                 "failure_labels": item.failure_labels,
                 "field_names": item.field_names,
+                "recommended_tools": item.recommended_tools,
             }
             for item in failure_irs
         ],
@@ -393,6 +407,11 @@ def _actionable_no_tool_prompt_fragments(failure_ir: FailureIR) -> List[str]:
         fragments.append(
             "Use prior tool outputs as grounding for the next tool call instead of switching into natural-language explanation."
         )
+    if failure_ir.recommended_tools:
+        fragments.append(
+            "When these tools are present in the request, prefer the next locally grounded tool from this policy recommendation set: "
+            + ", ".join(f"`{tool}`" for tool in failure_ir.recommended_tools)
+        )
     return fragments
 
 
@@ -410,13 +429,21 @@ def _post_tool_prose_prompt_fragments(failure_ir: FailureIR) -> List[str]:
         fragments.append(
             "Carry forward explicit literals from the request context when turning the tool result into the next action."
         )
+    if failure_ir.recommended_tools:
+        fragments.append(
+            "After the tool result, prefer the next locally grounded tool from this policy recommendation set when available: "
+            + ", ".join(f"`{tool}`" for tool in failure_ir.recommended_tools)
+        )
     return fragments
 
 
 def _global_decision_policy_for_failure_ir(failure_ir: FailureIR) -> DecisionPolicySpec:
     error_types = set(failure_ir.error_types)
     predicates = list(failure_ir.request_predicates)
-    policy = DecisionPolicySpec(request_predicates=predicates)
+    policy = DecisionPolicySpec(
+        request_predicates=predicates,
+        recommended_tools=list(failure_ir.recommended_tools),
+    )
 
     if "actionable_no_tool_decision" in error_types:
         policy.forbidden_terminations = ["prose_only_no_tool_termination"]
@@ -510,6 +537,7 @@ def _build_global_guard_rules(grouped: DefaultDict[str, List[FailureCase]]) -> L
                     if isinstance(literal, str) and literal.strip()
                 }
             )[:8],
+            recommended_tools=_recommended_tools_from_failures(scoped_failures),
         )
         if error_type == "actionable_no_tool_decision":
             prompt_fragments = _actionable_no_tool_prompt_fragments(failure_ir)
