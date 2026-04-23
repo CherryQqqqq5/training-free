@@ -15,6 +15,7 @@ This table summarizes the currently available `multi_turn_miss_param` Phase-2 ru
 | `iter_004_execute` / `fresh_02` target | `multi_turn_miss_param` | 42.0% | 84 / 200 | Fresh policy proposal for `(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)` with explicit-context literals | Evidence Only until rerun + selector finalization |
 | `iter_004_execute` / `fresh_02` holdout | `simple_python` | 95.0% | 380 / 400 | No validation issues; only 5 contextual string repairs | Safety holdout passes so far |
 | `iter_004_execute` / `fresh_02` paired rerun | `multi_turn_miss_param` | Pending | Pending | Rerun active; final metrics, paired-rerun report, accept decision not emitted yet | Pending |
+| `required_next_tool_choice_v1` | `multi_turn_miss_param` + `simple_python` holdout | In Progress | N/A | Soft vs required next-tool validation launched on clean `main` with fixed `fresh_02` ruleset | Pending |
 
 ## Current `iter_004_execute` Status
 
@@ -39,3 +40,10 @@ This table summarizes the currently available `multi_turn_miss_param` Phase-2 ru
 - `primary_v2`, `primary_v3`, and `primary_v4` are useful for trend discussion, but only `primary_v4` and `iter_004_execute` currently have directly inspected server-side artifacts in this pass.
 - `rerun_v4=43.5%` remains the strongest historical top-line evidence, but its artifacts were not found under the current new-server output tree.
 - `iter_004_execute` is the first current-server evolution execute run with completed target and clean holdout metrics, but it is still pending paired rerun and selector acceptance.
+
+## Required Next-Tool Validation
+
+- Launch snapshot: `docs/required_next_tool_choice_validation_2026-04-23.md`
+- Validation root: `/cephfs/qiuyn/training-free/outputs/phase2_validation/required_next_tool_choice_v1`
+- Compact artifacts will land under: `outputs/artifacts/phase2/required_next_tool_choice_v1`
+- This run is protocol-first and should remain `Pending` until `validation_summary.json` exists.
