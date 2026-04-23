@@ -110,6 +110,45 @@ class Phase2EvolutionIterationTests(unittest.TestCase):
 
         self.assertEqual(selected, reuse)
 
+    def test_execute_rejects_unbounded_candidate_count(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            baseline = root / "baseline"
+            target = root / "target"
+            holdout = root / "holdout"
+            history = root / "history.jsonl"
+            out = root / "out"
+            for path in (baseline / "traces", target / "traces", holdout / "traces"):
+                path.mkdir(parents=True)
+            history.write_text("", encoding="utf-8")
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "scripts/run_phase2_evolution_iteration.py",
+                    "--repo-root",
+                    str(root),
+                    "--baseline-run-root",
+                    str(baseline),
+                    "--target-run-root",
+                    str(target),
+                    "--holdout-run-root",
+                    str(holdout),
+                    "--history",
+                    str(history),
+                    "--out-root",
+                    str(out),
+                    "--execute",
+                    "--max-candidates",
+                    "4",
+                ],
+                cwd=str(REPO_ROOT),
+                capture_output=True,
+                text=True,
+            )
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("1 to 3", result.stderr + result.stdout)
+
     def test_execute_writes_summary_from_real_artifacts(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -243,3 +282,52 @@ class Phase2EvolutionIterationTests(unittest.TestCase):
         self.assertEqual(status["returncode"], 7)
         self.assertEqual(failure["step"], "target_run")
         self.assertIn("before-fail", log_text)
+
+    def test_candidate_selection_failure_writes_failure_state(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            baseline = root / "baseline"
+            target = root / "target"
+            holdout = root / "holdout"
+            history = root / "history.jsonl"
+            out = root / "out"
+            for path in (baseline / "traces", target / "traces", holdout / "traces", baseline / "artifacts", holdout / "artifacts"):
+                path.mkdir(parents=True)
+            history.write_text("", encoding="utf-8")
+
+            def fake_run(command: str, *, step_name: str, out_root: Path) -> None:
+                proposal_root = out / "proposals"
+                candidate_dir = proposal_root / "fresh_00"
+                if step_name == "propose":
+                    candidate_dir.mkdir(parents=True, exist_ok=True)
+                    (candidate_dir / "compile_status.json").write_text(json.dumps({"status": "uncompilable_failure_evidence"}), encoding="utf-8")
+                    (proposal_root / "proposal_summary.json").write_text(
+                        json.dumps({"proposals": [{"candidate_dir": str(candidate_dir), "proposal_mode": "fresh"}]}),
+                        encoding="utf-8",
+                    )
+
+            argv = [
+                "run_phase2_evolution_iteration.py",
+                "--repo-root",
+                str(root),
+                "--baseline-run-root",
+                str(baseline),
+                "--target-run-root",
+                str(target),
+                "--holdout-run-root",
+                str(holdout),
+                "--history",
+                str(history),
+                "--out-root",
+                str(out),
+                "--execute",
+            ]
+            with patch.object(sys, "argv", argv):
+                with patch.object(runner, "_run_logged_command", side_effect=fake_run):
+                    with self.assertRaises(SystemExit):
+                        runner.main()
+
+            failure = json.loads((out / "failure_state.json").read_text(encoding="utf-8"))
+
+        self.assertEqual(failure["step"], "select_candidate")
+        self.assertIn("no executable candidate", failure["reason"])

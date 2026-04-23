@@ -138,6 +138,16 @@ def _run_logged_command(command: str, *, step_name: str, out_root: Path) -> None
         raise subprocess.CalledProcessError(result.returncode, command)
 
 
+def _write_failure_state(out_root: Path, *, step_name: str, reason: str, **extra: Any) -> None:
+    payload = {
+        "step": step_name,
+        "status": "failed",
+        "reason": reason,
+    }
+    payload.update(extra)
+    _json_dump(out_root / "failure_state.json", payload)
+
+
 def _build_command_plan(
     *,
     repo_root: Path,
@@ -224,8 +234,8 @@ def main() -> None:
         raise SystemExit("executable mode requires --holdout-run-root")
     if args.execute and args.holdout_category != "simple_python":
         raise SystemExit("executable mode currently requires simple_python as the clean holdout")
-    if args.execute and args.max_candidates != 1:
-        raise SystemExit("executable mode currently only supports --max-candidates 1")
+    if args.execute and not (1 <= args.max_candidates <= 3):
+        raise SystemExit("executable mode currently supports 1 to 3 bounded candidate proposals")
 
     skipped_optional: list[dict[str, Any]] = []
     for label, path in args.optional_rerun_root:
@@ -283,7 +293,17 @@ def main() -> None:
     for key in ("taxonomy", "mine", "propose"):
         _run_logged_command(planned_command_map[key], step_name=key, out_root=out_root)
 
-    candidate_dir = _select_candidate_dir(proposal_summary_path, args.max_candidates)
+    try:
+        candidate_dir = _select_candidate_dir(proposal_summary_path, args.max_candidates)
+    except SystemExit as exc:
+        _write_failure_state(
+            out_root,
+            step_name="select_candidate",
+            reason=str(exc),
+            proposal_summary_path=str(proposal_summary_path),
+            max_candidates=args.max_candidates,
+        )
+        raise
     execute_command_map = _build_command_plan(
         repo_root=repo_root,
         baseline_root=baseline_root,
