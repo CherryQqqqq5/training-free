@@ -130,7 +130,7 @@ class Phase2EvolutionIterationTests(unittest.TestCase):
                 encoding="utf-8",
             )
 
-            def fake_run(command: str) -> None:
+            def fake_run(command: str, *, step_name: str, out_root: Path) -> None:
                 out.mkdir(parents=True, exist_ok=True)
                 proposal_root = out / "proposals"
                 candidate_dir = proposal_root / "fresh_00"
@@ -212,7 +212,7 @@ class Phase2EvolutionIterationTests(unittest.TestCase):
                 "--execute",
             ]
             with patch.object(sys, "argv", argv):
-                with patch.object(runner, "_run_command", side_effect=fake_run):
+                with patch.object(runner, "_run_logged_command", side_effect=fake_run):
                     runner.main()
 
             summary = json.loads((out / "evolution_iteration_summary.json").read_text(encoding="utf-8"))
@@ -223,3 +223,23 @@ class Phase2EvolutionIterationTests(unittest.TestCase):
         self.assertEqual(summary["target_delta"], 3.5)
         self.assertEqual(summary["holdout_delta"], 1.0)
         self.assertEqual(summary["clean_slice_regression"], 0.0)
+
+    def test_logged_command_writes_failure_state_and_log(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "out"
+
+            with self.assertRaises(subprocess.CalledProcessError):
+                runner._run_logged_command(
+                    "echo before-fail && exit 7",
+                    step_name="target_run",
+                    out_root=out,
+                )
+
+            status = json.loads((out / "step_status" / "target_run.json").read_text(encoding="utf-8"))
+            failure = json.loads((out / "failure_state.json").read_text(encoding="utf-8"))
+            log_text = (out / "logs" / "target_run.log").read_text(encoding="utf-8")
+
+        self.assertEqual(status["status"], "failed")
+        self.assertEqual(status["returncode"], 7)
+        self.assertEqual(failure["step"], "target_run")
+        self.assertIn("before-fail", log_text)

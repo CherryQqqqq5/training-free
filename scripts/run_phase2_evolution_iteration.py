@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import subprocess
+import time
 from pathlib import Path
 from typing import Any
 
@@ -92,6 +93,49 @@ def _select_candidate_dir(proposal_summary_path: Path, max_candidates: int) -> P
 
 def _run_command(command: str) -> None:
     subprocess.run(command, shell=True, check=True, executable="/bin/bash")
+
+
+def _run_logged_command(command: str, *, step_name: str, out_root: Path) -> None:
+    logs_dir = out_root / "logs"
+    status_dir = out_root / "step_status"
+    logs_dir.mkdir(parents=True, exist_ok=True)
+    status_dir.mkdir(parents=True, exist_ok=True)
+    log_path = logs_dir / f"{step_name}.log"
+    status_path = status_dir / f"{step_name}.json"
+    started_at = time.time()
+    status = {
+        "step": step_name,
+        "status": "running",
+        "command": command,
+        "log_path": str(log_path),
+        "started_at": started_at,
+    }
+    _json_dump(status_path, status)
+    with log_path.open("w", encoding="utf-8") as log_file:
+        log_file.write(f"$ {command}\n\n")
+        log_file.flush()
+        result = subprocess.run(
+            command,
+            shell=True,
+            executable="/bin/bash",
+            stdout=log_file,
+            stderr=subprocess.STDOUT,
+        )
+    finished_at = time.time()
+    status.update(
+        {
+            "status": "completed" if result.returncode == 0 else "failed",
+            "returncode": result.returncode,
+            "finished_at": finished_at,
+            "duration_sec": round(finished_at - started_at, 3),
+        }
+    )
+    _json_dump(status_path, status)
+    if result.returncode != 0:
+        failure = dict(status)
+        failure["reason"] = f"step `{step_name}` exited with status {result.returncode}"
+        _json_dump(out_root / "failure_state.json", failure)
+        raise subprocess.CalledProcessError(result.returncode, command)
 
 
 def _build_command_plan(
@@ -237,7 +281,7 @@ def main() -> None:
         return
 
     for key in ("taxonomy", "mine", "propose"):
-        _run_command(planned_command_map[key])
+        _run_logged_command(planned_command_map[key], step_name=key, out_root=out_root)
 
     candidate_dir = _select_candidate_dir(proposal_summary_path, args.max_candidates)
     execute_command_map = _build_command_plan(
@@ -252,7 +296,7 @@ def main() -> None:
         candidate_dir=candidate_dir,
     )
     for key in ("target_run", "holdout_run", "rerun", "paired_rerun", "select"):
-        _run_command(execute_command_map[key])
+        _run_logged_command(execute_command_map[key], step_name=key, out_root=out_root)
 
     taxonomy_report = _load_json(out_root / "taxonomy_report.json")
     proposal_summary = _proposal_summary(proposal_summary_path)
