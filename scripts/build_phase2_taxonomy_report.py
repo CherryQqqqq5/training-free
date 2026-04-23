@@ -31,14 +31,23 @@ def _load_json(path: Path | None) -> dict[str, Any]:
 def _metrics_summary(path: Path | None) -> dict[str, Any]:
     metrics = _load_json(path)
     subsets = metrics.get("subsets")
-    accuracy = metrics.get("acc")
-    if accuracy is None and isinstance(subsets, dict):
-        category = metrics.get("test_category")
-        if category in subsets:
-            accuracy = subsets.get(category)
+    category = metrics.get("test_category")
+    accuracy = None
+    accuracy_source = None
+    if isinstance(subsets, dict) and category in subsets:
+        accuracy = subsets.get(category)
+        accuracy_source = f"subsets.{category}"
+    if accuracy is None:
+        accuracy = metrics.get("acc")
+        if accuracy is not None:
+            accuracy_source = "acc"
+    correct_count = metrics.get("correct_count")
+    if correct_count is None and isinstance(subsets, dict):
+        correct_count = subsets.get("correct_count")
     return {
         "accuracy": accuracy,
-        "correct_count": metrics.get("correct_count"),
+        "accuracy_source": accuracy_source,
+        "correct_count": correct_count,
         "metrics_path": str(path) if path else None,
     }
 
@@ -83,6 +92,7 @@ def summarize_run(label: str, trace_dir: Path, metrics_path: Path | None = None)
         "trace_dir": str(trace_dir),
         "failure_count": total,
         "accuracy": metrics["accuracy"],
+        "accuracy_source": metrics["accuracy_source"],
         "correct_count": metrics["correct_count"],
         "taxonomy_distribution": rows,
         "top_failure_families": rows[:0] + [
@@ -145,12 +155,13 @@ def _render_markdown(run_summaries: list[dict[str, Any]], merged_rows: list[dict
     lines = ["# Phase-2 Taxonomy Report", ""]
     lines.append("## Runs")
     lines.append("")
-    lines.append("| Run | Accuracy | Correct Count | Failure Count | Top-3 Families |")
-    lines.append("| --- | ---: | ---: | ---: | --- |")
+    lines.append("| Run | Accuracy | Accuracy Source | Correct Count | Failure Count | Top-3 Families |")
+    lines.append("| --- | ---: | --- | ---: | ---: | --- |")
     for summary in run_summaries:
         top = ", ".join(item["failure_label"] for item in summary.get("top_failure_families") or []) or "-"
         lines.append(
             f"| {summary['run']} | {summary.get('accuracy', '-') if summary.get('accuracy') is not None else '-'} | "
+            f"{summary.get('accuracy_source', '-') if summary.get('accuracy_source') is not None else '-'} | "
             f"{summary.get('correct_count', '-') if summary.get('correct_count') is not None else '-'} | "
             f"{summary.get('failure_count', 0)} | {top} |"
         )

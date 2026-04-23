@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import re
 from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any
@@ -30,6 +32,130 @@ def _load_json(path: Path | None) -> dict[str, Any]:
     return data if isinstance(data, dict) else {}
 
 
+def _normalize_text(value: str) -> str:
+    return re.sub(r"\s+", " ", value.strip().lower())
+
+
+def _collect_user_texts(value: Any) -> list[str]:
+    texts: list[str] = []
+
+    def add_text(item: Any) -> None:
+        if isinstance(item, str) and item.strip():
+            texts.append(item.strip())
+            return
+        if isinstance(item, list):
+            for child in item:
+                add_text(child)
+            return
+        if not isinstance(item, dict):
+            return
+        for key in ("text", "content", "input_text"):
+            if key in item:
+                add_text(item.get(key))
+
+    def visit(item: Any) -> None:
+        if isinstance(item, list):
+            for child in item:
+                visit(child)
+            return
+        if not isinstance(item, dict):
+            return
+        if item.get("role") == "user":
+            add_text(item.get("content"))
+            return
+        for key, child in item.items():
+            if key in {"id", "call_id", "name"}:
+                continue
+            visit(child)
+
+    visit(value)
+    return texts
+
+
+def _request_fingerprint(value: Any) -> str | None:
+    normalized = [_normalize_text(text) for text in _collect_user_texts(value)]
+    normalized = [text for text in normalized if text]
+    if not normalized:
+        return None
+    return "fp:" + hashlib.sha1(" || ".join(normalized).encode("utf-8")).hexdigest()
+
+
+def _load_success_map(path: Path | None) -> dict[str, bool]:
+    if path is None or not path.exists():
+        return {}
+    raw = path.read_text(encoding="utf-8")
+    try:
+        data = json.loads(raw)
+    except Exception:
+        data = None
+    mapping: dict[str, bool] = {}
+    if isinstance(data, dict):
+        record_like = any(key in data for key in ("id", "case_id", "test_id", "prompt", "valid", "correct"))
+        if record_like:
+            case_id = None
+            for key in ("id", "case_id", "test_id"):
+                value = data.get(key)
+                if isinstance(value, str) and value.strip():
+                    case_id = value
+                    break
+            if not case_id:
+                case_id = _request_fingerprint((data.get("prompt") or {}).get("question"))
+            success_value = None
+            if isinstance(data.get("valid"), bool):
+                success_value = bool(data["valid"])
+            elif isinstance(data.get("correct"), bool):
+                success_value = bool(data["correct"])
+            fingerprint = _request_fingerprint((data.get("prompt") or {}).get("question"))
+            if case_id and success_value is not None:
+                mapping[case_id] = success_value
+            if fingerprint and success_value is not None:
+                mapping[fingerprint] = success_value
+            return mapping
+        for key, value in data.items():
+            if isinstance(value, bool):
+                mapping[str(key)] = value
+            elif isinstance(value, (int, float)):
+                mapping[str(key)] = bool(value)
+            elif isinstance(value, dict):
+                if isinstance(value.get("valid"), bool):
+                    mapping[str(key)] = bool(value["valid"])
+                elif isinstance(value.get("correct"), bool):
+                    mapping[str(key)] = bool(value["correct"])
+        return mapping
+
+    for line in raw.splitlines():
+        if not line.strip():
+            continue
+        try:
+            item = json.loads(line)
+        except Exception:
+            continue
+        if not isinstance(item, dict):
+            continue
+        case_id = None
+        for key in ("id", "case_id", "test_id"):
+            value = item.get(key)
+            if isinstance(value, str) and value.strip():
+                case_id = value
+                break
+        if not case_id:
+            case_id = _request_fingerprint((item.get("prompt") or {}).get("question"))
+        if not case_id:
+            continue
+        success_value = None
+        if isinstance(item.get("valid"), bool):
+            success_value = bool(item["valid"])
+        elif isinstance(item.get("correct"), bool):
+            success_value = bool(item["correct"])
+        fingerprint = _request_fingerprint((item.get("prompt") or {}).get("question"))
+        if success_value is None:
+            continue
+        mapping[case_id] = success_value
+        if fingerprint:
+            mapping[fingerprint] = success_value
+    return mapping
+
+
 def _case_id(payload: dict[str, Any], trace_id: str) -> str:
     for key in ("case_id", "test_id", "id"):
         value = payload.get(key)
@@ -40,6 +166,13 @@ def _case_id(payload: dict[str, Any], trace_id: str) -> str:
         value = request.get(key) if isinstance(request, dict) else None
         if isinstance(value, str) and value.strip():
             return value
+    request_fingerprint = _request_fingerprint(
+        request.get("input") if isinstance(request, dict) else None
+    ) or _request_fingerprint(
+        request.get("messages") if isinstance(request, dict) else None
+    )
+    if request_fingerprint:
+        return request_fingerprint
     return trace_id
 
 
@@ -66,6 +199,42 @@ def _repair_kinds(payload: dict[str, Any]) -> list[str]:
     return kinds
 
 
+def _has_prior_tool_output(payload: dict[str, Any]) -> bool:
+    def visit(item: Any) -> bool:
+        if isinstance(item, list):
+            return any(visit(child) for child in item)
+        if not isinstance(item, dict):
+            return False
+        if item.get("role") == "tool" or item.get("type") == "function_call_output":
+            return True
+        return any(visit(value) for key, value in item.items() if key not in {"id", "call_id", "name"})
+
+    return any(
+        visit(candidate)
+        for candidate in (
+            payload.get("request", {}).get("messages") if isinstance(payload.get("request"), dict) else None,
+            payload.get("request_original", {}).get("messages") if isinstance(payload.get("request_original"), dict) else None,
+            payload.get("request_original", {}).get("input") if isinstance(payload.get("request_original"), dict) else None,
+        )
+    )
+
+
+def _issue_request_predicates(issue: dict[str, Any], payload: dict[str, Any]) -> list[str]:
+    predicates: list[str] = []
+    issue_predicates = issue.get("request_predicates")
+    if isinstance(issue_predicates, list):
+        predicates.extend(str(item) for item in issue_predicates if str(item).strip())
+    evidence = issue.get("predicate_evidence")
+    if isinstance(evidence, dict):
+        if evidence.get("has_sufficient_literals") and "prior_explicit_literals_present" not in predicates:
+            predicates.append("prior_explicit_literals_present")
+        if evidence.get("tool_output_sufficient") and "prior_tool_outputs_present" not in predicates:
+            predicates.append("prior_tool_outputs_present")
+    if _has_prior_tool_output(payload) and "prior_tool_outputs_present" not in predicates:
+        predicates.append("prior_tool_outputs_present")
+    return predicates
+
+
 def repair_records(trace_dir: Path, *, run_id: str, success_map: dict[str, Any] | None = None) -> list[dict[str, Any]]:
     success_map = success_map or {}
     records: list[dict[str, Any]] = []
@@ -81,16 +250,25 @@ def repair_records(trace_dir: Path, *, run_id: str, success_map: dict[str, Any] 
         for issue in issues:
             if not isinstance(issue, dict):
                 continue
-            classification = classify_error_type(str(issue.get("kind") or "validation_issue"))
+            request_predicates = _issue_request_predicates(issue, payload)
+            classification = classify_error_type(
+                str(issue.get("kind") or "validation_issue"),
+                request_predicates=request_predicates,
+                has_prior_tool_output="prior_tool_outputs_present" in request_predicates,
+            )
+            failure_stage = str(issue.get("stage") or classification.stage.value)
+            failure_type = str(issue.get("failure_type") or classification.failure_type.value)
+            failure_label = str(issue.get("failure_label") or f"({failure_stage},{failure_type})")
             records.append(
                 {
                     "case_id": case_id,
                     "run_id": run_id,
                     "trace_id": trace_id,
-                    "failure_stage": classification.stage.value,
-                    "failure_type": classification.failure_type.value,
-                    "failure_label": classification.label,
+                    "failure_stage": failure_stage,
+                    "failure_type": failure_type,
+                    "failure_label": failure_label,
                     "legacy_error_type": str(issue.get("kind") or "validation_issue"),
+                    "request_predicates": request_predicates,
                     "repairs_applied": repairs,
                     "final_success": success_map.get(case_id),
                 }
@@ -200,9 +378,9 @@ def main() -> None:
     parser.add_argument("--out-md", help="Optional markdown summary path.")
     args = parser.parse_args()
 
-    success_map = _load_json(Path(args.success_map) if args.success_map else None)
-    success_map.update(_load_json(Path(args.score_json) if args.score_json else None))
-    success_map.update(_load_json(Path(args.result_json) if args.result_json else None))
+    success_map = _load_success_map(Path(args.success_map) if args.success_map else None)
+    success_map.update(_load_success_map(Path(args.score_json) if args.score_json else None))
+    success_map.update(_load_success_map(Path(args.result_json) if args.result_json else None))
     records = repair_records(Path(args.trace_dir), run_id=args.run_id, success_map=success_map)
     ablation_acc = dict(args.ablation or [])
     summary = summarize_repairs(records, ablation_acc=ablation_acc)

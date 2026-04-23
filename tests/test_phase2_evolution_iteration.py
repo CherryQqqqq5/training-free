@@ -7,6 +7,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
+REPO_ROOT = Path(__file__).resolve().parent.parent
+
 
 class Phase2EvolutionIterationTests(unittest.TestCase):
     def test_dry_run_emits_planned_commands(self) -> None:
@@ -39,10 +41,13 @@ class Phase2EvolutionIterationTests(unittest.TestCase):
                     "--dry-run",
                 ],
                 check=True,
-                cwd="/Users/cherry/mnt/training-free",
+                cwd=str(REPO_ROOT),
             )
             summary = json.loads((out / "evolution_iteration_summary.json").read_text(encoding="utf-8"))
         self.assertIn("run_bfcl_v4_patch.sh", "\n".join(summary["planned_commands"]))
+        self.assertIn("--baseline ", "\n".join(summary["planned_commands"]))
+        self.assertIn("--candidate-dir", "\n".join(summary["planned_commands"]))
+        self.assertIn("fresh_00", "\n".join(summary["planned_commands"]))
 
     def test_execute_requires_holdout(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -70,7 +75,7 @@ class Phase2EvolutionIterationTests(unittest.TestCase):
                     str(out),
                     "--execute",
                 ],
-                cwd="/Users/cherry/mnt/training-free",
+                cwd=str(REPO_ROOT),
                 capture_output=True,
                 text=True,
             )
