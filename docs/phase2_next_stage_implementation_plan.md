@@ -52,6 +52,16 @@ Do not hard-code `rerun_v4` as present. Add path discovery and fail clearly if a
 
 Checked-in local `outputs/` fixtures are not authoritative for Phase-2 verification because they may be stale and missing `run_manifest.json`. Use server artifacts or explicit run roots.
 
+## Execution Status Update (2026-04-23)
+
+Current server run: `/cephfs/qiuyn/training-free/outputs/phase2_evolution/iter_004_execute`.
+
+- Minimal execute mode is no longer only a dry-run path for the current-server experiment: it selected executable proposal `fresh_02` and completed both target and holdout BFCL commands.
+- Target `multi_turn_miss_param`: `42.0%` (`84 / 200`), `+5.5 pp` over baseline and `+2.0 pp` over `primary_v4`.
+- Holdout `simple_python`: `95.0%` (`380 / 400`), matching baseline and showing no measured holdout regression in this run.
+- Paired rerun is still active, so selector acceptance, history update, and `evolution_iteration_summary.json` remain pending.
+- The current run should be treated as evidence that the execute path can run target + holdout, not yet as a completed evolution-loop claim.
+
 ## Implementation Changes
 
 ### 1. Make Taxonomy The First Analysis Axis

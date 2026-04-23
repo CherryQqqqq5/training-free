@@ -102,6 +102,38 @@
 从分布上看，当前最活跃的是 `decision_adjacent` repair；但从 failure 残余上看，decision 层问题仍然很重。  
 因此下一步的重心应该从“repair 继续加码”转向“policy 真正接管”。
 
+## iter_004_execute 当前补充
+
+截至 2026-04-23 本次检查，`iter_004_execute` 已完成 target 和 holdout，paired rerun 仍在运行。
+
+### target: `multi_turn_miss_param`
+
+- accuracy: `42.0%` (`84 / 200`)
+- trace count: `2734`
+- all stored trace HTTP status: `200`
+- request patches present: `2733` traces
+- residual validation issues:
+  - `empty_completion = 480`
+  - `termination_inadmissible = 344`
+  - `post_tool_prose_summary = 282`
+  - `clarification_request = 87`
+  - `actionable_no_tool_decision = 62`
+- repairs:
+  - `coerce_no_tool_text_to_empty = 431`
+  - `resolve_contextual_string_arg = 62`
+  - `strip_assistant_content_with_tool_calls = 33`
+- `force_terminated = 0`
+
+### holdout: `simple_python`
+
+- accuracy: `95.0%` (`380 / 400`), matching the baseline holdout.
+- validation issues: `0`
+- repairs: only `resolve_contextual_string_arg = 5`
+- `force_terminated = 0`
+
+Interpretation: the current candidate improves the target over baseline and `primary_v4` without observed `simple_python` regression, but it is still not a formal claim because paired rerun and selector acceptance are pending. Residual target failures remain concentrated in empty/no-tool and wrong-stop behavior, so the next policy work should still focus on `ACTIONABLE_NO_TOOL_DECISION` and `POST_TOOL_PROSE_SUMMARY`, not broad compatibility expansion.
+
+
 ## 下一步建议
 
 ### 1. 不要继续把主要精力放在新增 repair 种类上
