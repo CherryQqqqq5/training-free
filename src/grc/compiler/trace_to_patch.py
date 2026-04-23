@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 from typing import DefaultDict, Dict, List
 
@@ -86,6 +86,20 @@ def _load_failures(failure_jsonl: str) -> List[FailureCase]:
     return failures
 
 
+def _taxonomy_fields(failures: List[FailureCase]) -> Dict[str, object]:
+    predicate_evidence: Counter[str] = Counter()
+    for case in failures:
+        for key, value in (case.predicate_evidence or {}).items():
+            if value:
+                predicate_evidence[key] += 1
+    return {
+        "stages": sorted({case.stage for case in failures if case.stage}),
+        "failure_types": sorted({case.failure_type for case in failures if case.failure_type}),
+        "failure_labels": sorted({case.failure_label for case in failures if case.failure_label}),
+        "predicate_evidence": dict(sorted(predicate_evidence.items())),
+    }
+
+
 def _build_failure_ir(grouped: DefaultDict[str, List[FailureCase]]) -> List[FailureIR]:
     failure_irs: List[FailureIR] = []
     for tool_name, failures in grouped.items():
@@ -95,6 +109,7 @@ def _build_failure_ir(grouped: DefaultDict[str, List[FailureCase]]) -> List[Fail
                 predicates = tuple(sorted(case.request_predicates)) if case.error_type == "actionable_no_tool_decision" else ()
                 groups[(case.error_type, predicates)].append(case)
             for (error_type, request_predicates), scoped_failures in sorted(groups.items()):
+                taxonomy = _taxonomy_fields(scoped_failures)
                 failure_irs.append(
                     FailureIR(
                         failure_id=(
@@ -104,6 +119,9 @@ def _build_failure_ir(grouped: DefaultDict[str, List[FailureCase]]) -> List[Fail
                         ),
                         tool_name="__none__",
                         error_types=[error_type],
+                        stages=taxonomy["stages"],
+                        failure_types=taxonomy["failure_types"],
+                        failure_labels=taxonomy["failure_labels"],
                         field_names=[],
                         expected_types={},
                         categories=sorted({case.category for case in scoped_failures if case.category}),
@@ -118,10 +136,12 @@ def _build_failure_ir(grouped: DefaultDict[str, List[FailureCase]]) -> List[Fail
                                 if isinstance(literal, str) and literal.strip()
                             }
                         )[:8],
+                        predicate_evidence=taxonomy["predicate_evidence"],
                     )
                 )
             continue
 
+        taxonomy = _taxonomy_fields(failures)
         expected_types: Dict[str, str] = {}
         field_names = sorted({case.field_name for case in failures if case.field_name})
         error_types = sorted({case.error_type for case in failures})
@@ -137,6 +157,9 @@ def _build_failure_ir(grouped: DefaultDict[str, List[FailureCase]]) -> List[Fail
                 failure_id=f"failure_ir_{tool_name}",
                 tool_name=tool_name,
                 error_types=error_types,
+                stages=taxonomy["stages"],
+                failure_types=taxonomy["failure_types"],
+                failure_labels=taxonomy["failure_labels"],
                 field_names=field_names,
                 expected_types=expected_types,
                 categories=categories,
@@ -151,27 +174,93 @@ def _build_failure_ir(grouped: DefaultDict[str, List[FailureCase]]) -> List[Fail
                         if isinstance(literal, str) and literal.strip()
                     }
                 )[:8],
+                predicate_evidence=taxonomy["predicate_evidence"],
             )
         )
 
     return failure_irs
 
 
-def _failure_summary(failure_irs: List[FailureIR], total_failures: int, patch_id: str) -> Dict[str, object]:
+def _failure_summary(
+    failure_irs: List[FailureIR],
+    failures: List[FailureCase],
+    patch_id: str,
+) -> Dict[str, object]:
+    taxonomy_distribution = Counter(
+        case.failure_label or f"({case.stage or 'UNKNOWN'},{case.failure_type or case.error_type})"
+        for case in failures
+    )
+    top_families = [
+        {"failure_label": label, "count": count}
+        for label, count in taxonomy_distribution.most_common(3)
+    ]
     return {
         "patch_id": patch_id,
-        "source_failure_count": total_failures,
+        "source_failure_count": len(failures),
         "failure_ir_count": len(failure_irs),
+        "taxonomy_distribution": dict(sorted(taxonomy_distribution.items())),
+        "top_failure_families": top_families,
         "tools": [
             {
                 "tool_name": item.tool_name,
                 "evidence_count": item.evidence_count,
                 "error_types": item.error_types,
+                "stages": item.stages,
+                "failure_types": item.failure_types,
+                "failure_labels": item.failure_labels,
                 "field_names": item.field_names,
             }
             for item in failure_irs
         ],
     }
+
+
+def _policy_units_from_rules(rules: List[Rule], failure_irs: List[FailureIR]) -> Dict[str, object]:
+    units: list[Dict[str, object]] = []
+    for rule in rules:
+        policy = rule.action.decision_policy
+        has_policy = any(
+            [
+                policy.request_predicates,
+                policy.recommended_tools,
+                policy.continue_condition,
+                policy.stop_condition,
+                policy.forbidden_terminations,
+                policy.evidence_requirements,
+            ]
+        )
+        if not has_policy:
+            continue
+        error_type = rule.trigger.error_types[0] if rule.trigger.error_types else "*"
+        source_ir = next((item for item in failure_irs if error_type in item.error_types), None)
+        units.append(
+            {
+                "name": f"policy_{rule.rule_id}",
+                "rule_id": rule.rule_id,
+                "trigger": {
+                    "error_types": list(rule.trigger.error_types),
+                    "request_predicates": list(rule.trigger.request_predicates),
+                    "category_patterns": list(rule.trigger.category_patterns),
+                },
+                "recommended_tools": list(policy.recommended_tools),
+                "continue_condition": policy.continue_condition,
+                "stop_condition": policy.stop_condition,
+                "forbidden_terminations": list(policy.forbidden_terminations),
+                "evidence_requirements": list(policy.evidence_requirements),
+                "confidence": 0.8,
+                "source_failure_signature": {
+                    "stage": (source_ir.stages[0] if source_ir and source_ir.stages else "*"),
+                    "type": (source_ir.failure_types[0] if source_ir and source_ir.failure_types else error_type),
+                    "tool_schema_hash": "*",
+                    "literals_pattern": (
+                        "explicit_context_literals"
+                        if source_ir and source_ir.request_literals
+                        else "no_explicit_literals"
+                    ),
+                },
+            }
+        )
+    return {"policy_units": units}
 
 
 def _guard_action_for_failure_ir(failure_ir: FailureIR) -> str:
@@ -402,32 +491,15 @@ def _build_global_guard_rules(grouped: DefaultDict[str, List[FailureCase]]) -> L
             if error_type == "actionable_no_tool_decision"
             else _global_prompt_fragments(failure_ir)
         )
-        verification = _no_tool_verification_contract()
         decision_policy = _global_decision_policy_for_failure_ir(failure_ir)
-        policy_first = error_type == "actionable_no_tool_decision"
-        if policy_first:
+        verification = _no_tool_verification_contract()
+        validation_contract = verification
+        patch_sites = ["tool_guard", "verification_hook", "fallback_router"]
+        if error_type == "actionable_no_tool_decision":
             patch_sites = ["prompt_injector", "policy_executor"]
-            tool_guard = ToolGuardSpec(
-                enabled=False,
-                on_violation="record",
-                on_unknown_tool="record",
-                on_empty_tool_call="record",
-            )
-            fallback_router = FallbackRoutingSpec(strategy="record_only")
+            verification.forbidden_terminations = list(decision_policy.forbidden_terminations)
+            verification.evidence_requirements = list(decision_policy.evidence_requirements)
             validation_contract = VerificationContract()
-        else:
-            patch_sites = ["tool_guard", "verification_hook", "fallback_router"]
-            tool_guard = ToolGuardSpec(
-                enabled=True,
-                on_violation="record",
-                on_unknown_tool="record",
-                on_empty_tool_call="record",
-            )
-            fallback_router = FallbackRoutingSpec(
-                strategy="record_only",
-                on_issue_kinds=[error_type],
-            )
-            validation_contract = verification
 
         rules.append(
             Rule(
@@ -450,12 +522,20 @@ def _build_global_guard_rules(grouped: DefaultDict[str, List[FailureCase]]) -> L
                 action=RuleAction(
                     prompt_fragments=prompt_fragments,
                     prompt_injection=PromptInjectionSpec(
-                        fragments=prompt_fragments if policy_first else []
+                        fragments=prompt_fragments if error_type == "actionable_no_tool_decision" else []
                     ),
                     decision_policy=decision_policy,
-                    tool_guard=tool_guard,
+                    tool_guard=ToolGuardSpec(
+                        enabled=True,
+                        on_violation="record",
+                        on_unknown_tool="record",
+                        on_empty_tool_call="record",
+                    ),
                     verification=verification,
-                    fallback_router=fallback_router,
+                    fallback_router=FallbackRoutingSpec(
+                        strategy="record_only",
+                        on_issue_kinds=[error_type],
+                    ),
                 ),
                 validation_contract=validation_contract,
             )
@@ -471,8 +551,8 @@ def compile_patch(
     candidate_dir: str | None = None,
 ) -> Dict[str, object]:
     grouped: DefaultDict[str, List[FailureCase]] = defaultdict(list)
-    failures = _load_failures(failure_jsonl)
-    for item in failures:
+    failure_cases = _load_failures(failure_jsonl)
+    for item in failure_cases:
         grouped[item.tool_name].append(item)
 
     rules: List[Rule] = []
@@ -480,12 +560,12 @@ def compile_patch(
     failure_ir_map = {item.tool_name: item for item in failure_irs}
     rules.extend(_build_global_guard_rules(grouped))
 
-    for tool_name, failures in grouped.items():
+    for tool_name, tool_failures in grouped.items():
         if tool_name == "__none__":
             continue
 
         fields: Dict[str, FieldConstraint] = {}
-        for case in failures:
+        for case in tool_failures:
             if not case.field_name:
                 continue
             field_constraint = fields.get(case.field_name, FieldConstraint())
@@ -541,7 +621,7 @@ def compile_patch(
         patch_id=patch_id,
         rules=rules,
         failure_ir=failure_irs,
-        source_failure_count=len(failures),
+        source_failure_count=len(failure_cases),
         metadata={
             "compiler": "trace_to_patch",
             "failure_jsonl": str(Path(failure_jsonl)),
@@ -555,8 +635,8 @@ def compile_patch(
         encoding="utf-8",
     )
 
-    high_value_error_types = sorted({item.error_type for item in failures if item.error_type})
-    source_failure_count = len(failures)
+    high_value_error_types = sorted({item.error_type for item in failure_cases if item.error_type})
+    source_failure_count = len(failure_cases)
     failure_ir_count = len(failure_irs)
     rule_count = len(rules)
     actionable_rule_count = sum(1 for rule in rules if _is_actionable_rule(rule))
@@ -589,7 +669,11 @@ def compile_patch(
         candidate_path.mkdir(parents=True, exist_ok=True)
         (candidate_path / "rule.yaml").write_text(out_file.read_text(encoding="utf-8"), encoding="utf-8")
         (candidate_path / "failure_summary.json").write_text(
-            json.dumps(_failure_summary(failure_irs, len(failures), patch_id), ensure_ascii=False, indent=2),
+            json.dumps(_failure_summary(failure_irs, failure_cases, patch_id), ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+        (candidate_path / "policy_unit.yaml").write_text(
+            yaml.safe_dump(_policy_units_from_rules(rules, failure_irs), sort_keys=False, allow_unicode=True),
             encoding="utf-8",
         )
     return compile_status

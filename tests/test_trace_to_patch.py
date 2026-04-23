@@ -39,6 +39,7 @@ class TraceToPatchTests(unittest.TestCase):
             root = Path(tmp)
             failure_path = root / "failures.jsonl"
             out_path = root / "rule.yaml"
+            candidate_dir = root / "candidate"
             failure_path.write_text(
                 json.dumps(
                     {
@@ -46,6 +47,9 @@ class TraceToPatchTests(unittest.TestCase):
                         "turn_index": 0,
                         "tool_name": "__none__",
                         "error_type": "actionable_no_tool_decision",
+                        "stage": "PRE_TOOL",
+                        "failure_type": "ACTIONABLE_NO_TOOL_DECISION",
+                        "failure_label": "(PRE_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
                         "request_predicates": ["tools_available", "prior_explicit_literals_present"],
                         "request_literals": ["report.txt"],
                     }
@@ -54,8 +58,14 @@ class TraceToPatchTests(unittest.TestCase):
                 encoding="utf-8",
             )
 
-            compile_status = compile_patch(str(failure_path), str(out_path), patch_id="patch_actionable_no_tool_v1")
+            compile_status = compile_patch(
+                str(failure_path),
+                str(out_path),
+                patch_id="patch_actionable_no_tool_v1",
+                candidate_dir=str(candidate_dir),
+            )
             bundle = _load_bundle(out_path)
+            policy_units = _load_bundle(candidate_dir / "policy_unit.yaml")
 
         self.assertEqual(compile_status["status"], "actionable_patch")
         self.assertEqual(len(bundle["rules"]), 1)
@@ -78,19 +88,14 @@ class TraceToPatchTests(unittest.TestCase):
             rule["action"]["decision_policy"]["evidence_requirements"],
             ["prior_explicit_literals_present", "tools_available"],
         )
-        self.assertEqual(
-            rule["validation_contract"]["forbidden_terminations"],
-            [],
-        )
-        self.assertEqual(
-            rule["validation_contract"]["evidence_requirements"],
-            [],
-        )
-        self.assertFalse(rule["action"]["tool_guard"]["enabled"])
-        self.assertEqual(rule["action"]["fallback_router"]["strategy"], "record_only")
-        self.assertEqual(rule["action"]["fallback_router"]["on_issue_kinds"], [])
+        self.assertEqual(rule["validation_contract"]["forbidden_terminations"], [])
+        self.assertEqual(rule["validation_contract"]["evidence_requirements"], [])
         self.assertTrue(rule["action"]["prompt_injection"]["fragments"])
         self.assertFalse(any("report.txt" in fragment for fragment in rule["action"]["prompt_fragments"]))
+        self.assertEqual(
+            policy_units["policy_units"][0]["source_failure_signature"]["type"],
+            "ACTIONABLE_NO_TOOL_DECISION",
+        )
 
     def test_compile_patch_emits_split_global_hallucinated_completion_rule(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
