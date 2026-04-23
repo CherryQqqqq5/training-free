@@ -8,8 +8,15 @@ from typing import Any, Dict, List, Tuple
 
 import yaml
 
+from grc.compiler.failure_taxonomy import classify_error_type
+from grc.runtime.policy_executor import (
+    classify_no_tool_policy_issue,
+    evaluate_no_tool_policy,
+    is_policy_rule,
+    partition_matching_rules,
+)
 from grc.runtime.sanitizer import sanitize_tool_call
-from grc.runtime.validator import validate_termination_admissibility, validate_tool_arguments
+from grc.runtime.validator import validate_tool_arguments
 from grc.types import (
     DecisionPolicySpec,
     PatchBundle,
@@ -20,10 +27,7 @@ from grc.types import (
     VerificationContract,
 )
 from grc.utils.jsonfix import parse_loose_json
-from grc.utils.text_tool_calls import (
-    classify_no_tool_call_content,
-    parse_text_tool_calls,
-)
+from grc.utils.text_tool_calls import parse_text_tool_calls
 from grc.utils.tool_schema import tool_map_from_tools_payload
 
 
@@ -169,7 +173,7 @@ class RuleEngine:
         return None
 
     def _is_policy_rule(self, rule: Rule) -> bool:
-        return self._rule_decision_policy(rule) is not None
+        return is_policy_rule(rule)
 
     def _matched_rules(
         self,
@@ -213,22 +217,18 @@ class RuleEngine:
         issue_kind: str | None = None,
         request_json: Dict[str, Any] | None = None,
     ) -> List[Rule]:
-        return [
-            rule
-            for rule in self._matched_global_rules(issue_kind=issue_kind, request_json=request_json)
-            if self._is_policy_rule(rule)
-        ]
+        return partition_matching_rules(
+            self._matched_global_rules(issue_kind=issue_kind, request_json=request_json)
+        )[0]
 
     def _matched_compatibility_rules(
         self,
         issue_kind: str | None = None,
         request_json: Dict[str, Any] | None = None,
     ) -> List[Rule]:
-        return [
-            rule
-            for rule in self._matched_global_rules(issue_kind=issue_kind, request_json=request_json)
-            if not self._is_policy_rule(rule)
-        ]
+        return partition_matching_rules(
+            self._matched_global_rules(issue_kind=issue_kind, request_json=request_json)
+        )[1]
 
     def _rule_prompt_fragments(self, rule: Rule) -> List[str]:
         injected = list(rule.action.prompt_injection.fragments)
@@ -329,28 +329,6 @@ class RuleEngine:
             if item.get("type") == "function_call_output":
                 return "tool"
         return None
-
-    def _is_post_tool_prose_summary(
-        self,
-        base_kind: str,
-        text: str,
-        request_json: Dict[str, Any],
-        observed_predicates: List[str],
-    ) -> bool:
-        if base_kind not in {"empty_tool_call", "hallucinated_completion", "natural_language_termination"}:
-            return False
-        if not text:
-            return False
-        if "prior_tool_outputs_present" not in observed_predicates:
-            return False
-        if self._last_observed_role(request_json) != "tool":
-            return False
-        stripped = text.strip()
-        if "?" in stripped:
-            return False
-        if stripped.startswith(("{", "[")):
-            return False
-        return True
 
     def _structured_tool_guidance_fragments(self, request_json: Dict[str, Any]) -> List[str]:
         if not request_json.get("tools") or not self.inject_structured_tool_guidance:
@@ -647,73 +625,38 @@ class RuleEngine:
             return self._rule_contract(self.rules[0])
         return VerificationContract()
 
-    def _policy_contract(
-        self,
-        policy_rule_hits: List[Rule],
-    ) -> VerificationContract:
-        if policy_rule_hits:
-            return self._rule_contract(policy_rule_hits[0])
-        return VerificationContract()
-
-    def _classify_no_tool_issue(
-        self,
-        content: str,
-        request_json: Dict[str, Any],
-        tool_schema_map: Dict[str, Dict[str, Any]],
-    ) -> tuple[str, List[str]]:
-        base_kind = classify_no_tool_call_content(content, tool_schema_map)
-        observed_predicates = sorted(self._observable_request_predicates(request_json))
-        text = content.strip() if isinstance(content, str) else ""
-        actionable_bases = {
-            "empty_tool_call",
-            "hallucinated_completion",
-            "natural_language_termination",
-            "malformed_output",
-        }
-        if self._is_post_tool_prose_summary(base_kind, text, request_json, observed_predicates):
-            return "post_tool_prose_summary", observed_predicates
-        if (
-            base_kind in actionable_bases
-            and text
-            and "tools_available" in observed_predicates
-            and (
-                "prior_explicit_literals_present" in observed_predicates
-                or "prior_tool_outputs_present" in observed_predicates
-            )
-        ):
-            return "actionable_no_tool_decision", observed_predicates
-        return base_kind, observed_predicates
-
     def _evaluate_no_tool_policy(
         self,
         content: str,
         request_json: Dict[str, Any],
         tool_schema_map: Dict[str, Dict[str, Any]],
-    ) -> tuple[str, List[str], List[ValidationIssue], List[Rule]]:
-        issue_kind, observed_predicates = self._classify_no_tool_issue(content, request_json, tool_schema_map)
+    ) -> tuple[str, List[str], List[ValidationIssue], List[Rule], List[Rule]]:
+        observed_predicates = sorted(self._observable_request_predicates(request_json))
+        issue_kind = classify_no_tool_policy_issue(
+            content,
+            tool_schema_map,
+            observed_predicates,
+            self._last_observed_role(request_json),
+        )
         policy_rule_hits = self._matched_policy_rules(issue_kind, request_json=request_json)
         if issue_kind == "post_tool_prose_summary" and not policy_rule_hits:
             policy_rule_hits = self._matched_policy_rules(
                 "actionable_no_tool_decision",
                 request_json=request_json,
             )
-        issue_messages = {
-            "natural_language_termination": "assistant ended turn with natural language without tool call",
-            "clarification_request": "assistant requested missing user parameters before tool invocation",
-            "clarification_no_tool": "assistant requested clarification instead of continuing with the available tool context",
-            "unsupported_request": "assistant refused because request appears unsupported by available tools",
-            "unsupported_no_tool": "assistant treated the request as unsupported instead of using the available tools",
-            "hallucinated_completion": "assistant claimed progress or completion without emitting a tool call",
-            "malformed_output": "assistant emitted malformed content instead of a tool call",
-            "empty_tool_call": "no tool call emitted for tool-enabled request",
-            "post_tool_prose_summary": "assistant emitted a prose-only summary immediately after a successful tool result instead of continuing structurally",
-            "actionable_no_tool_decision": "assistant ended a tool-enabled turn with prose instead of the next locally grounded tool action",
-        }
-        issues = [ValidationIssue(kind=issue_kind, message=issue_messages[issue_kind])]
-        if policy_rule_hits:
-            contract = self._policy_contract(policy_rule_hits)
-            issues.extend(validate_termination_admissibility(issue_kind, contract, observed_predicates))
-        return issue_kind, observed_predicates, issues, policy_rule_hits
+        compatibility_rule_hits = self._matched_compatibility_rules(issue_kind, request_json=request_json)
+        if issue_kind == "post_tool_prose_summary" and not compatibility_rule_hits:
+            compatibility_rule_hits = self._matched_compatibility_rules(
+                "actionable_no_tool_decision",
+                request_json=request_json,
+            )
+        issues = evaluate_no_tool_policy(
+            issue_kind,
+            observed_predicates,
+            policy_rule_hits,
+            self._rule_contract,
+        )
+        return issue_kind, observed_predicates, issues, policy_rule_hits, compatibility_rule_hits
 
     def _strip_assistant_narration_with_tool_calls(
         self,
@@ -770,24 +713,23 @@ class RuleEngine:
             all_repairs.extend(narration_repairs)
             if request_json.get("tools") and not tool_calls:
                 content = msg.get("content", "")
-                issue_kind, observed_predicates, issues, policy_rule_hits = self._evaluate_no_tool_policy(
+                issue_kind, observed_predicates, issues, policy_rule_hits, compatibility_rule_hits = self._evaluate_no_tool_policy(
                     content,
                     request_json,
                     tool_schema_map,
                 )
-                compatibility_rule_hits = self._matched_compatibility_rules(issue_kind, request_json=request_json)
+                effective_rule_hits = policy_rule_hits or compatibility_rule_hits
                 validation.issues.extend(issues)
-                validation.rule_hits.extend(rule.rule_id for rule in policy_rule_hits)
-                validation.rule_hits.extend(rule.rule_id for rule in compatibility_rule_hits)
-                if self._should_coerce_no_tool_text_to_empty(issues[0].kind, compatibility_rule_hits):
+                validation.rule_hits.extend(rule.rule_id for rule in effective_rule_hits)
+                if self._should_coerce_no_tool_text_to_empty(issues[0].kind, effective_rule_hits):
                     coercion_repairs = self._coerce_no_tool_text_to_empty(msg, issues[0].kind)
                     all_repairs.extend(coercion_repairs)
                     continue
-                if self._should_attempt_no_tool_recovery(issues[0].kind, compatibility_rule_hits):
-                    guarded = self._apply_empty_tool_guard(msg, issues, compatibility_rule_hits)
+                if self._should_attempt_no_tool_recovery(issues[0].kind, effective_rule_hits):
+                    guarded = self._apply_empty_tool_guard(msg, issues, effective_rule_hits)
                     validation.fallback_applied = validation.fallback_applied or guarded
                     if not guarded:
-                        applied = self._apply_fallback(msg, tool_calls, 0, issues, compatibility_rule_hits)
+                        applied = self._apply_fallback(msg, tool_calls, 0, issues, effective_rule_hits)
                         validation.fallback_applied = validation.fallback_applied or applied
             for index in range(len(tool_calls) - 1, -1, -1):
                 tool_call = tool_calls[index]
@@ -902,4 +844,14 @@ class RuleEngine:
 
         validation.rule_hits = list(dict.fromkeys(validation.rule_hits))
         validation.repairs = all_repairs
+        validation.repair_kinds = list(
+            dict.fromkeys(
+                str(repair.get("kind"))
+                for repair in all_repairs
+                if isinstance(repair, dict) and str(repair.get("kind") or "").strip()
+            )
+        )
+        validation.failure_labels = list(
+            dict.fromkeys(classify_error_type(issue.kind).label for issue in validation.issues)
+        )
         return final_response, all_repairs, validation

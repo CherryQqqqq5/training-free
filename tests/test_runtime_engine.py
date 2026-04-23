@@ -21,6 +21,180 @@ if _INJECTED_YAML_STUB:
 
 
 class RuntimeEngineTests(unittest.TestCase):
+    def _make_move_file_request(self, *, messages=None) -> dict:
+        return {
+            "model": "demo-model",
+            "messages": messages or [{"role": "user", "content": "Move 'report.txt' into the archive."}],
+            "tools": [
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "move_file",
+                        "parameters": {
+                            "type": "object",
+                            "properties": {"file_name": {"type": "string"}},
+                            "required": ["file_name"],
+                        },
+                    },
+                }
+            ],
+        }
+
+    def _make_text_response(self, content: str | None) -> dict:
+        return {
+            "choices": [
+                {
+                    "message": {
+                        "role": "assistant",
+                        "content": content,
+                    }
+                }
+            ]
+        }
+
+    @staticmethod
+    def _expected_empty_repair(issue_kind: str) -> list[dict]:
+        return [
+            {
+                "kind": "coerce_no_tool_text_to_empty",
+                "issue_kind": issue_kind,
+                "reason": "assistant emitted text-only content on a tool-enabled turn; coerced to empty response for structured tool clients",
+            }
+        ]
+
+    def _make_post_tool_summary_request(self) -> dict:
+        return {
+            "model": "demo-model",
+            "messages": [
+                {"role": "user", "content": "Check the fuel level."},
+                {"role": "assistant", "content": "", "tool_calls": [{"id": "c1"}]},
+                {"role": "tool", "tool_call_id": "c1", "content": json.dumps({"fuelLevel": 10.0})},
+            ],
+            "tools": [
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "convert_gallon_to_liter",
+                        "parameters": {
+                            "type": "object",
+                            "properties": {"gallon": {"type": "number"}},
+                            "required": ["gallon"],
+                        },
+                    },
+                }
+            ],
+        }
+
+    def _run_no_tool_response(
+        self,
+        *,
+        rules: list[Rule] | None = None,
+        request: dict | None = None,
+        response: dict | None = None,
+        runtime_policy: dict | None = None,
+    ) -> tuple[dict, list[dict], object]:
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir, runtime_policy=runtime_policy)
+            engine.rules = list(rules or [])
+            final_response, repairs, validation = engine.apply_response(
+                request or self._make_move_file_request(),
+                response or self._make_text_response("I'll move report.txt into the archive now."),
+            )
+        return final_response, repairs, validation
+
+    def _make_actionable_policy_rule(
+        self,
+        *,
+        request_predicates=None,
+        forbidden_terminations=None,
+        evidence_requirements=None,
+    ) -> Rule:
+        request_predicates = (
+            ["tools_available", "prior_explicit_literals_present"]
+            if request_predicates is None
+            else request_predicates
+        )
+        forbidden_terminations = (
+            ["prose_only_no_tool_termination"]
+            if forbidden_terminations is None
+            else forbidden_terminations
+        )
+        evidence_requirements = (
+            list(request_predicates)
+            if evidence_requirements is None
+            else evidence_requirements
+        )
+        return Rule(
+            rule_id="rule_global_no_tool_actionable_v1",
+            trigger=MatchSpec(
+                error_types=["actionable_no_tool_decision"],
+                request_predicates=request_predicates,
+            ),
+            scope=PatchScope(tool_names=[], patch_sites=["prompt_injector", "policy_executor", "fallback_router"]),
+            action=RuleAction(
+                prompt_injection={"fragments": ["Emit the next tool call instead of prose-only termination."]},
+                decision_policy={
+                    "request_predicates": request_predicates,
+                    "forbidden_terminations": forbidden_terminations,
+                    "evidence_requirements": evidence_requirements,
+                },
+                fallback_router=FallbackRoutingSpec(
+                    strategy="record_only",
+                    on_issue_kinds=["actionable_no_tool_decision"],
+                ),
+            ),
+            validation_contract=VerificationContract(),
+        )
+
+    def _make_compatibility_actionable_rule(
+        self,
+        *,
+        request_predicates=None,
+        forbidden_terminations=None,
+        evidence_requirements=None,
+    ) -> Rule:
+        request_predicates = (
+            ["tools_available", "prior_explicit_literals_present"]
+            if request_predicates is None
+            else request_predicates
+        )
+        forbidden_terminations = (
+            ["prose_only_no_tool_termination"]
+            if forbidden_terminations is None
+            else forbidden_terminations
+        )
+        evidence_requirements = (
+            list(request_predicates)
+            if evidence_requirements is None
+            else evidence_requirements
+        )
+        contract = VerificationContract(
+            require_known_tool=False,
+            require_object_args=False,
+            require_required_fields=False,
+            require_known_fields=False,
+            require_type_match=False,
+            forbidden_terminations=forbidden_terminations,
+            evidence_requirements=evidence_requirements,
+        )
+        return Rule(
+            rule_id="rule_global_no_tool_actionable_compat_v1",
+            trigger=MatchSpec(
+                error_types=["actionable_no_tool_decision"],
+                request_predicates=request_predicates,
+            ),
+            scope=PatchScope(tool_names=[], patch_sites=["prompt_injector", "verification_hook", "fallback_router"]),
+            action=RuleAction(
+                prompt_injection={"fragments": ["Emit the next tool call instead of prose-only termination."]},
+                verification=contract,
+                fallback_router=FallbackRoutingSpec(
+                    strategy="record_only",
+                    on_issue_kinds=["actionable_no_tool_decision"],
+                ),
+            ),
+            validation_contract=contract,
+        )
+
     def test_apply_request_does_not_inject_global_prompts_by_default(self) -> None:
         with tempfile.TemporaryDirectory() as rules_dir:
             engine = RuleEngine(rules_dir)
@@ -190,62 +364,52 @@ class RuntimeEngineTests(unittest.TestCase):
         )
 
     def test_apply_response_uses_decision_policy_contract_when_validation_contract_is_empty(self) -> None:
-        with tempfile.TemporaryDirectory() as rules_dir:
-            engine = RuleEngine(rules_dir)
-            engine.rules = [
-                Rule(
-                    rule_id="rule_global_no_tool_actionable_policy_only_v1",
-                    trigger=MatchSpec(error_types=["actionable_no_tool_decision"]),
-                    scope=PatchScope(tool_names=[], patch_sites=["prompt_injector", "verification_hook", "fallback_router"]),
-                    action=RuleAction(
-                        prompt_injection={"fragments": ["Continue with the next grounded tool call."]},
-                        decision_policy={
-                            "request_predicates": ["tools_available", "prior_explicit_literals_present"],
-                            "forbidden_terminations": ["prose_only_no_tool_termination"],
-                            "evidence_requirements": ["tools_available", "prior_explicit_literals_present"],
-                        },
-                        fallback_router=FallbackRoutingSpec(
-                            strategy="record_only",
-                            on_issue_kinds=["actionable_no_tool_decision"],
-                        ),
-                    ),
-                    validation_contract=VerificationContract(),
-                )
-            ]
-            request = {
-                "model": "demo-model",
-                "messages": [{"role": "user", "content": "Move 'report.txt' into the archive."}],
-                "tools": [
-                    {
-                        "type": "function",
-                        "function": {
-                            "name": "move_file",
-                            "parameters": {
-                                "type": "object",
-                                "properties": {"file_name": {"type": "string"}},
-                                "required": ["file_name"],
-                            },
-                        },
-                    }
-                ],
-            }
-            response = {
-                "choices": [
-                    {
-                        "message": {
-                            "role": "assistant",
-                            "content": "I'll move report.txt into the archive now.",
-                        }
-                    }
-                ]
-            }
-
-            _, _, validation = engine.apply_response(request, response)
+        _, _, validation = self._run_no_tool_response(
+            rules=[self._make_actionable_policy_rule()],
+        )
 
         self.assertEqual(
             [issue.kind for issue in validation.issues],
             ["actionable_no_tool_decision", "termination_inadmissible"],
         )
+
+    def test_apply_response_does_not_infer_termination_from_compatibility_only_actionable_rule(self) -> None:
+        _, _, validation = self._run_no_tool_response(
+            rules=[self._make_compatibility_actionable_rule()],
+        )
+
+        self.assertEqual([issue.kind for issue in validation.issues], ["actionable_no_tool_decision"])
+
+    def test_apply_response_does_not_add_termination_when_policy_evidence_is_unmet(self) -> None:
+        _, _, validation = self._run_no_tool_response(
+            rules=[
+                self._make_actionable_policy_rule(
+                    evidence_requirements=["tools_available", "prior_explicit_literals_present", "prior_tool_outputs_present"]
+                )
+            ],
+        )
+
+        self.assertEqual([issue.kind for issue in validation.issues], ["actionable_no_tool_decision"])
+
+    def test_apply_response_does_not_add_termination_when_policy_forbidden_termination_is_absent(self) -> None:
+        _, _, validation = self._run_no_tool_response(
+            rules=[self._make_actionable_policy_rule(forbidden_terminations=[])],
+        )
+
+        self.assertEqual([issue.kind for issue in validation.issues], ["actionable_no_tool_decision"])
+
+    def test_post_tool_prose_summary_requires_policy_rule_to_add_termination(self) -> None:
+        _, _, validation = self._run_no_tool_response(
+            rules=[
+                self._make_compatibility_actionable_rule(
+                    request_predicates=["tools_available", "prior_tool_outputs_present"],
+                )
+            ],
+            request=self._make_post_tool_summary_request(),
+            response=self._make_text_response("The current fuel level in your car is approximately 37.85 liters."),
+        )
+
+        self.assertEqual([issue.kind for issue in validation.issues], ["post_tool_prose_summary"])
 
     def test_apply_response_falls_back_to_compatibility_rules_when_no_decision_policy_exists(self) -> None:
         with tempfile.TemporaryDirectory() as rules_dir:
@@ -298,61 +462,6 @@ class RuntimeEngineTests(unittest.TestCase):
         self.assertEqual(final_response["choices"][0]["message"]["content"], "")
         self.assertEqual([issue.kind for issue in validation.issues], ["clarification_request"])
         self.assertEqual(repairs[0]["kind"], "coerce_no_tool_text_to_empty")
-
-    def test_apply_response_does_not_infer_termination_from_compatibility_only_actionable_rule(self) -> None:
-        with tempfile.TemporaryDirectory() as rules_dir:
-            engine = RuleEngine(rules_dir)
-            engine.rules = [
-                Rule(
-                    rule_id="rule_global_no_tool_actionable_compat_only_v1",
-                    trigger=MatchSpec(
-                        error_types=["actionable_no_tool_decision"],
-                        request_predicates=["tools_available", "prior_explicit_literals_present"],
-                    ),
-                    scope=PatchScope(tool_names=[], patch_sites=["fallback_router"]),
-                    action=RuleAction(
-                        fallback_router=FallbackRoutingSpec(
-                            strategy="record_only",
-                            on_issue_kinds=["actionable_no_tool_decision"],
-                        )
-                    ),
-                    validation_contract=VerificationContract(
-                        forbidden_terminations=["prose_only_no_tool_termination"],
-                        evidence_requirements=["tools_available", "prior_explicit_literals_present"],
-                    ),
-                )
-            ]
-            request = {
-                "model": "demo-model",
-                "messages": [{"role": "user", "content": "Move 'report.txt' into the archive."}],
-                "tools": [
-                    {
-                        "type": "function",
-                        "function": {
-                            "name": "move_file",
-                            "parameters": {
-                                "type": "object",
-                                "properties": {"file_name": {"type": "string"}},
-                                "required": ["file_name"],
-                            },
-                        },
-                    }
-                ],
-            }
-            response = {
-                "choices": [
-                    {
-                        "message": {
-                            "role": "assistant",
-                            "content": "I'll move report.txt into the archive now.",
-                        }
-                    }
-                ]
-            }
-
-            _, _, validation = engine.apply_response(request, response)
-
-        self.assertEqual([issue.kind for issue in validation.issues], ["actionable_no_tool_decision"])
 
     def test_apply_request_does_not_proactively_escalate_tool_choice_for_actionable_continuation_turn(self) -> None:
         with tempfile.TemporaryDirectory() as rules_dir:
@@ -742,326 +851,52 @@ class RuntimeEngineTests(unittest.TestCase):
         self.assertEqual([issue.kind for issue in validation.issues], ["clarification_request"])
         self.assertFalse(validation.fallback_applied)
 
-    def test_actionable_no_tool_decision_adds_termination_inadmissible_issue(self) -> None:
-        with tempfile.TemporaryDirectory() as rules_dir:
-            engine = RuleEngine(rules_dir)
-            engine.rules = [
-                Rule(
-                    rule_id="rule_global_no_tool_actionable_v1",
-                    trigger=MatchSpec(
-                        error_types=["actionable_no_tool_decision"],
-                        request_predicates=["tools_available", "prior_explicit_literals_present"],
-                    ),
-                    scope=PatchScope(tool_names=[], patch_sites=["prompt_injector", "verification_hook", "fallback_router"]),
-                    action=RuleAction(
-                        prompt_injection={"fragments": ["Emit the next tool call instead of prose-only termination."]},
-                        decision_policy={
-                            "request_predicates": ["tools_available", "prior_explicit_literals_present"],
-                            "forbidden_terminations": ["prose_only_no_tool_termination"],
-                            "evidence_requirements": ["tools_available", "prior_explicit_literals_present"],
-                        },
-                        verification=VerificationContract(
-                            require_known_tool=False,
-                            require_object_args=False,
-                            require_required_fields=False,
-                            require_known_fields=False,
-                            require_type_match=False,
-                            forbidden_terminations=["prose_only_no_tool_termination"],
-                            evidence_requirements=["tools_available", "prior_explicit_literals_present"],
-                        ),
-                        fallback_router=FallbackRoutingSpec(strategy="record_only", on_issue_kinds=["actionable_no_tool_decision"]),
-                    ),
-                    validation_contract=VerificationContract(
-                        require_known_tool=False,
-                        require_object_args=False,
-                        require_required_fields=False,
-                        require_known_fields=False,
-                        require_type_match=False,
-                        forbidden_terminations=["prose_only_no_tool_termination"],
-                        evidence_requirements=["tools_available", "prior_explicit_literals_present"],
-                    ),
-                )
-            ]
-            request = {
-                "model": "demo-model",
-                "messages": [{"role": "user", "content": "Move 'report.txt' into the archive."}],
-                "tools": [
-                    {
-                        "type": "function",
-                        "function": {
-                            "name": "move_file",
-                            "parameters": {
-                                "type": "object",
-                                "properties": {"file_name": {"type": "string"}},
-                                "required": ["file_name"],
-                            },
-                        },
-                    }
-                ],
-            }
-            response = {
-                "choices": [
-                    {
-                        "message": {
-                            "role": "assistant",
-                            "content": "I will handle that move now.",
-                        }
-                    }
-                ]
-            }
-
-            final_response, repairs, validation = engine.apply_response(request, response)
-
-        self.assertEqual(repairs, [])
-        self.assertEqual(final_response["choices"][0]["message"]["content"], "I will handle that move now.")
-        self.assertEqual(
-            [issue.kind for issue in validation.issues],
-            ["actionable_no_tool_decision", "termination_inadmissible"],
-        )
-
     def test_actionable_no_tool_decision_can_be_coerced_to_empty_for_structured_clients(self) -> None:
-        with tempfile.TemporaryDirectory() as rules_dir:
-            engine = RuleEngine(
-                rules_dir,
-                runtime_policy={"coerce_no_tool_response_to_empty_kinds": ["actionable_no_tool_decision"]},
-            )
-            engine.rules = [
-                Rule(
-                    rule_id="rule_global_no_tool_actionable_v1",
-                    trigger=MatchSpec(
-                        error_types=["actionable_no_tool_decision"],
-                        request_predicates=["tools_available", "prior_explicit_literals_present"],
-                    ),
-                    scope=PatchScope(tool_names=[], patch_sites=["prompt_injector", "verification_hook", "fallback_router"]),
-                    action=RuleAction(
-                        prompt_injection={"fragments": ["Emit the next tool call instead of prose-only termination."]},
-                        decision_policy={
-                            "request_predicates": ["tools_available", "prior_explicit_literals_present"],
-                            "forbidden_terminations": ["prose_only_no_tool_termination"],
-                            "evidence_requirements": ["tools_available", "prior_explicit_literals_present"],
-                        },
-                        verification=VerificationContract(
-                            require_known_tool=False,
-                            require_object_args=False,
-                            require_required_fields=False,
-                            require_known_fields=False,
-                            require_type_match=False,
-                            forbidden_terminations=["prose_only_no_tool_termination"],
-                            evidence_requirements=["tools_available", "prior_explicit_literals_present"],
-                        ),
-                        fallback_router=FallbackRoutingSpec(strategy="record_only", on_issue_kinds=["actionable_no_tool_decision"]),
-                    ),
-                    validation_contract=VerificationContract(
-                        require_known_tool=False,
-                        require_object_args=False,
-                        require_required_fields=False,
-                        require_known_fields=False,
-                        require_type_match=False,
-                        forbidden_terminations=["prose_only_no_tool_termination"],
-                        evidence_requirements=["tools_available", "prior_explicit_literals_present"],
-                    ),
-                )
-            ]
-            request = {
-                "model": "demo-model",
-                "messages": [{"role": "user", "content": "Move 'report.txt' into the archive."}],
-                "tools": [
-                    {
-                        "type": "function",
-                        "function": {
-                            "name": "move_file",
-                            "parameters": {
-                                "type": "object",
-                                "properties": {"file_name": {"type": "string"}},
-                                "required": ["file_name"],
-                            },
-                        },
-                    }
-                ],
-            }
-            response = {
-                "choices": [
-                    {
-                        "message": {
-                            "role": "assistant",
-                            "content": "I've moved the file into the archive.",
-                        }
-                    }
-                ]
-            }
-
-            final_response, repairs, validation = engine.apply_response(request, response)
+        final_response, repairs, validation = self._run_no_tool_response(
+            rules=[self._make_actionable_policy_rule()],
+            response=self._make_text_response("I've moved the file into the archive."),
+            runtime_policy={"coerce_no_tool_response_to_empty_kinds": ["actionable_no_tool_decision"]},
+        )
 
         self.assertEqual(final_response["choices"][0]["message"]["content"], "")
         self.assertEqual(
             [issue.kind for issue in validation.issues],
             ["actionable_no_tool_decision", "termination_inadmissible"],
         )
-        self.assertEqual(
-            repairs,
-            [
-                {
-                    "kind": "coerce_no_tool_text_to_empty",
-                    "issue_kind": "actionable_no_tool_decision",
-                    "reason": "assistant emitted text-only content on a tool-enabled turn; coerced to empty response for structured tool clients",
-                }
-            ],
-        )
+        self.assertEqual(repairs, self._expected_empty_repair("actionable_no_tool_decision"))
         self.assertFalse(validation.fallback_applied)
 
     def test_post_tool_prose_summary_is_coerced_and_reuses_actionable_contract(self) -> None:
-        with tempfile.TemporaryDirectory() as rules_dir:
-            engine = RuleEngine(
-                rules_dir,
-                runtime_policy={"coerce_no_tool_response_to_empty_kinds": ["post_tool_prose_summary"]},
-            )
-            engine.rules = [
-                Rule(
-                    rule_id="rule_global_no_tool_actionable_v1",
-                    trigger=MatchSpec(
-                        error_types=["actionable_no_tool_decision"],
-                        request_predicates=["tools_available", "prior_tool_outputs_present"],
-                    ),
-                    scope=PatchScope(tool_names=[], patch_sites=["prompt_injector", "verification_hook", "fallback_router"]),
-                    action=RuleAction(
-                        prompt_injection={"fragments": ["Use prior tool outputs as grounding for the next tool call."]},
-                        decision_policy={
-                            "request_predicates": ["tools_available", "prior_tool_outputs_present"],
-                            "forbidden_terminations": ["prose_only_no_tool_termination"],
-                            "evidence_requirements": ["tools_available", "prior_tool_outputs_present"],
-                        },
-                        verification=VerificationContract(
-                            require_known_tool=False,
-                            require_object_args=False,
-                            require_required_fields=False,
-                            require_known_fields=False,
-                            require_type_match=False,
-                            forbidden_terminations=["prose_only_no_tool_termination"],
-                            evidence_requirements=["tools_available", "prior_tool_outputs_present"],
-                        ),
-                        fallback_router=FallbackRoutingSpec(strategy="record_only", on_issue_kinds=["actionable_no_tool_decision"]),
-                    ),
-                    validation_contract=VerificationContract(
-                        require_known_tool=False,
-                        require_object_args=False,
-                        require_required_fields=False,
-                        require_known_fields=False,
-                        require_type_match=False,
-                        forbidden_terminations=["prose_only_no_tool_termination"],
-                        evidence_requirements=["tools_available", "prior_tool_outputs_present"],
-                    ),
+        final_response, repairs, validation = self._run_no_tool_response(
+            rules=[
+                self._make_actionable_policy_rule(
+                    request_predicates=["tools_available", "prior_tool_outputs_present"],
                 )
-            ]
-            request = {
-                "model": "demo-model",
-                "messages": [
-                    {"role": "user", "content": "Check the fuel level."},
-                    {"role": "assistant", "content": "", "tool_calls": [{"id": "c1"}]},
-                    {"role": "tool", "tool_call_id": "c1", "content": json.dumps({"fuelLevel": 10.0})},
-                ],
-                "tools": [
-                    {
-                        "type": "function",
-                        "function": {
-                            "name": "convert_gallon_to_liter",
-                            "parameters": {
-                                "type": "object",
-                                "properties": {"gallon": {"type": "number"}},
-                                "required": ["gallon"],
-                            },
-                        },
-                    }
-                ],
-            }
-            response = {
-                "choices": [
-                    {
-                        "message": {
-                            "role": "assistant",
-                            "content": "The current fuel level in your car is approximately 37.85 liters.",
-                        }
-                    }
-                ]
-            }
-
-            final_response, repairs, validation = engine.apply_response(request, response)
+            ],
+            request=self._make_post_tool_summary_request(),
+            response=self._make_text_response("The current fuel level in your car is approximately 37.85 liters."),
+            runtime_policy={"coerce_no_tool_response_to_empty_kinds": ["post_tool_prose_summary"]},
+        )
 
         self.assertEqual(final_response["choices"][0]["message"]["content"], "")
         self.assertEqual(
             [issue.kind for issue in validation.issues],
             ["post_tool_prose_summary", "termination_inadmissible"],
         )
-        self.assertEqual(
-            repairs,
-            [
-                {
-                    "kind": "coerce_no_tool_text_to_empty",
-                    "issue_kind": "post_tool_prose_summary",
-                    "reason": "assistant emitted text-only content on a tool-enabled turn; coerced to empty response for structured tool clients",
-                }
-            ],
-        )
+        self.assertEqual(repairs, self._expected_empty_repair("post_tool_prose_summary"))
 
     def test_post_tool_prose_summary_requires_recent_tool_output(self) -> None:
-        with tempfile.TemporaryDirectory() as rules_dir:
-            engine = RuleEngine(rules_dir)
-            request = {
-                "model": "demo-model",
-                "messages": [{"role": "user", "content": "Move 'report.txt' into the archive."}],
-                "tools": [
-                    {
-                        "type": "function",
-                        "function": {
-                            "name": "move_file",
-                            "parameters": {
-                                "type": "object",
-                                "properties": {"file_name": {"type": "string"}},
-                                "required": ["file_name"],
-                            },
-                        },
-                    }
-                ],
-            }
-            response = {
-                "choices": [
-                    {
-                        "message": {
-                            "role": "assistant",
-                            "content": "I've moved the file into the archive.",
-                        }
-                    }
-                ]
-            }
-
-            _, _, validation = engine.apply_response(request, response)
+        _, _, validation = self._run_no_tool_response(
+            request=self._make_move_file_request(),
+            response=self._make_text_response("I've moved the file into the archive."),
+        )
 
         self.assertEqual([issue.kind for issue in validation.issues], ["actionable_no_tool_decision"])
 
     def test_actionable_rule_does_not_fire_without_matching_predicates(self) -> None:
         with tempfile.TemporaryDirectory() as rules_dir:
             engine = RuleEngine(rules_dir)
-            engine.rules = [
-                Rule(
-                    rule_id="rule_global_no_tool_actionable_v1",
-                    trigger=MatchSpec(
-                        error_types=["actionable_no_tool_decision"],
-                        request_predicates=["tools_available", "prior_explicit_literals_present"],
-                    ),
-                    scope=PatchScope(tool_names=[], patch_sites=["prompt_injector", "verification_hook"]),
-                    action=RuleAction(
-                        prompt_injection={"fragments": ["Emit the next tool call instead of prose-only termination."]},
-                    ),
-                    validation_contract=VerificationContract(
-                        require_known_tool=False,
-                        require_object_args=False,
-                        require_required_fields=False,
-                        require_known_fields=False,
-                        require_type_match=False,
-                        forbidden_terminations=["prose_only_no_tool_termination"],
-                        evidence_requirements=["tools_available", "prior_explicit_literals_present"],
-                    ),
-                )
-            ]
+            engine.rules = [self._make_actionable_policy_rule()]
             request = {
                 "model": "demo-model",
                 "messages": [{"role": "user", "content": "Check the weather."}],
@@ -1100,55 +935,9 @@ class RuntimeEngineTests(unittest.TestCase):
     def test_blank_no_tool_response_stays_empty_tool_call_even_with_actionable_predicates(self) -> None:
         with tempfile.TemporaryDirectory() as rules_dir:
             engine = RuleEngine(rules_dir)
-            engine.rules = [
-                Rule(
-                    rule_id="rule_global_no_tool_actionable_v1",
-                    trigger=MatchSpec(
-                        error_types=["actionable_no_tool_decision"],
-                        request_predicates=["tools_available", "prior_explicit_literals_present"],
-                    ),
-                    scope=PatchScope(tool_names=[], patch_sites=["prompt_injector", "verification_hook"]),
-                    action=RuleAction(
-                        prompt_injection={"fragments": ["Emit the next tool call instead of prose-only termination."]},
-                    ),
-                    validation_contract=VerificationContract(
-                        require_known_tool=False,
-                        require_object_args=False,
-                        require_required_fields=False,
-                        require_known_fields=False,
-                        require_type_match=False,
-                        forbidden_terminations=["prose_only_no_tool_termination"],
-                        evidence_requirements=["tools_available", "prior_explicit_literals_present"],
-                    ),
-                )
-            ]
-            request = {
-                "model": "demo-model",
-                "messages": [{"role": "user", "content": "Move 'report.txt' into the archive."}],
-                "tools": [
-                    {
-                        "type": "function",
-                        "function": {
-                            "name": "move_file",
-                            "parameters": {
-                                "type": "object",
-                                "properties": {"file_name": {"type": "string"}},
-                                "required": ["file_name"],
-                            },
-                        },
-                    }
-                ],
-            }
-            response = {
-                "choices": [
-                    {
-                        "message": {
-                            "role": "assistant",
-                            "content": "",
-                        }
-                    }
-                ]
-            }
+            engine.rules = [self._make_actionable_policy_rule()]
+            request = self._make_move_file_request()
+            response = self._make_text_response("")
 
             _, _, validation = engine.apply_response(request, response)
 
