@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 import sys
 import tempfile
 import types
@@ -21,6 +22,44 @@ if _INJECTED_YAML_STUB:
 
 
 class RuntimeEngineTests(unittest.TestCase):
+    @unittest.skipIf(_INJECTED_YAML_STUB, "PyYAML unavailable")
+    def test_rule_loader_ignores_policy_unit_metadata_yaml(self) -> None:
+        with tempfile.TemporaryDirectory() as rules_dir_raw:
+            rules_dir = Path(rules_dir_raw)
+            (rules_dir / "policy_unit.yaml").write_text(
+                """
+policy_units:
+  - name: avoid_premature_termination
+    trigger:
+      - tools_available
+    request_predicates:
+      - tools_available
+""".strip(),
+                encoding="utf-8",
+            )
+            (rules_dir / "rule.yaml").write_text(
+                """
+rule_id: runtime_rule
+priority: 7
+enabled: true
+trigger:
+  error_types:
+    - actionable_no_tool_decision
+scope:
+  patch_sites:
+    - policy_executor
+action:
+  decision_policy:
+    forbidden_terminations:
+      - prose_only_no_tool_termination
+""".strip(),
+                encoding="utf-8",
+            )
+
+            engine = RuleEngine(rules_dir_raw)
+
+        self.assertEqual([rule.rule_id for rule in engine.rules], ["runtime_rule"])
+
     def _make_move_file_request(self, *, messages=None) -> dict:
         return {
             "model": "demo-model",

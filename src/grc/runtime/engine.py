@@ -81,6 +81,10 @@ class RuleEngine:
             if "rules" in data:
                 bundle = PatchBundle(**data)
                 rules.extend(bundle.rules)
+            elif "policy_units" in data:
+                # Candidate directories can include policy_unit.yaml next to rule.yaml.
+                # Policy units are selector/compiler metadata, not runtime Rule docs.
+                continue
             elif data:
                 rules.append(Rule(**data))
         return sorted((rule for rule in rules if rule.enabled), key=lambda item: item.priority, reverse=True)
