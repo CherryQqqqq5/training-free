@@ -11,6 +11,16 @@ except ModuleNotFoundError:
     yaml = None
 
 
+def _load_json(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
 def _load_yaml(path: Path) -> dict[str, Any]:
     if not path.exists():
         return {}
@@ -124,16 +134,34 @@ def _policy_units(candidate_dir: Path | None) -> list[dict[str, Any]]:
     return synthesized
 
 
+def _proposal_metadata(candidate_dir: Path | None) -> dict[str, Any]:
+    if candidate_dir is None:
+        return {}
+    return _load_json(candidate_dir / "proposal_metadata.json")
+
+
 def history_record_from_selection(decision: dict[str, Any], candidate_dir: str | None) -> dict[str, Any]:
     candidate_path = Path(candidate_dir) if candidate_dir else None
     units = _policy_units(candidate_path)
     candidate = decision.get("candidate") if isinstance(decision.get("candidate"), dict) else {}
+    proposal_metadata = _proposal_metadata(candidate_path)
+    compile_status = _load_json(candidate_path / "compile_status.json") if candidate_path else {}
+    decision_code = str(decision.get("decision_code") or "")
     return {
         "decision_code": decision.get("decision_code"),
         "accept": bool(decision.get("accept")),
         "target_delta": decision.get("target_delta"),
         "selection_score": decision.get("selection_score"),
         "patch_id": candidate_path.name if candidate_path else None,
+        "proposal_kind": proposal_metadata.get("proposal_mode") or proposal_metadata.get("proposal_kind"),
+        "reuse_source_patch_id": proposal_metadata.get("reuse_source_patch_id"),
+        "reuse_source_fingerprint": proposal_metadata.get("source_history_fingerprint"),
+        "subset_family": proposal_metadata.get("target_category"),
+        "regression_profile": {
+            "regression": candidate.get("regression"),
+            "subset_regressions": decision.get("subset_regressions") or [],
+        },
+        "compile_status": str(compile_status.get("status") or proposal_metadata.get("compile_status") or "unknown"),
         "error_families": sorted(
             {
                 error
@@ -151,9 +179,11 @@ def history_record_from_selection(decision: dict[str, Any], candidate_dir: str |
             }
         ),
         "policy_fingerprints": [policy_fingerprint(unit) for unit in units],
-        "reusable_for_search": decision.get("decision_code") in {"accepted", "retained"}
+        "reusable_for_search": decision_code in {"accepted", "retained"}
         and decision.get("candidate_valid") is not False
-        and decision.get("manifest_valid") is not False,
+        and decision.get("manifest_valid") is not False
+        and str(compile_status.get("status") or proposal_metadata.get("compile_status") or "ok")
+        not in {"compile_failed", "incomplete", "rejected_before_eval"},
         "failure_signatures": [
             unit.get("source_failure_signature")
             for unit in units
@@ -213,8 +243,13 @@ def query_history(
 def retrieve(history_path: Path, signature: dict[str, Any], *, top_k: int = 5) -> list[dict[str, Any]]:
     wanted_stage = signature.get("stage")
     wanted_type = signature.get("type")
-    matches: list[dict[str, Any]] = []
+    wanted_hash = signature.get("tool_schema_hash")
+    wanted_literals = signature.get("literals_pattern")
+    wanted_predicates = set(signature.get("request_predicates") or [])
+    matches: list[tuple[int, dict[str, Any]]] = []
     for record in load_history(history_path):
+        if not record.get("reusable_for_search"):
+            continue
         signatures = record.get("failure_signatures") or []
         if not isinstance(signatures, list):
             continue
@@ -222,6 +257,31 @@ def retrieve(history_path: Path, signature: dict[str, Any], *, top_k: int = 5) -
             if not isinstance(item, dict):
                 continue
             if item.get("stage") == wanted_stage and item.get("type") == wanted_type:
-                matches.append(record)
+                score = 10
+                reasons = ["stage_type_exact"]
+                if wanted_hash and item.get("tool_schema_hash") == wanted_hash:
+                    score += 4
+                    reasons.append("tool_schema_hash_exact")
+                elif wanted_hash and (item.get("tool_schema_hash") == "*" or wanted_hash == "*"):
+                    score += 1
+                    reasons.append("tool_schema_hash_wildcard")
+                if wanted_literals and item.get("literals_pattern") == wanted_literals:
+                    score += 3
+                    reasons.append("literals_pattern_exact")
+                record_predicates = set(record.get("request_predicates") or [])
+                overlap = wanted_predicates & record_predicates
+                if overlap:
+                    score += len(overlap)
+                    reasons.append("request_predicate_overlap")
+                enriched = dict(record)
+                enriched["match_score"] = score
+                enriched["match_reasons"] = reasons
+                enriched["matched_fields"] = {
+                    "stage": item.get("stage"),
+                    "type": item.get("type"),
+                    "tool_schema_hash": item.get("tool_schema_hash"),
+                    "literals_pattern": item.get("literals_pattern"),
+                }
+                matches.append((score, enriched))
                 break
-    return matches[:top_k]
+    return [record for _, record in sorted(matches, key=lambda pair: pair[0], reverse=True)[:top_k]]

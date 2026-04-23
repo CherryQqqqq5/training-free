@@ -38,11 +38,18 @@ policy_units:
             )
             matches = retrieve(
                 history_path,
-                {"stage": "PRE_TOOL", "type": "ACTIONABLE_NO_TOOL_DECISION"},
+                {
+                    "stage": "PRE_TOOL",
+                    "type": "ACTIONABLE_NO_TOOL_DECISION",
+                    "tool_schema_hash": "*",
+                    "literals_pattern": "explicit_context_literals",
+                    "request_predicates": ["tools_available"],
+                },
             )
             history_text = history_path.read_text(encoding="utf-8")
 
         self.assertEqual(record["decision_code"], "retained")
         self.assertEqual(record["error_families"], ["actionable_no_tool_decision"])
         self.assertEqual(len(matches), 1)
+        self.assertGreaterEqual(matches[0]["match_score"], 10)
         self.assertEqual(json.loads(history_text)["decision_code"], "retained")

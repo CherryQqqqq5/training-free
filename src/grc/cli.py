@@ -86,5 +86,29 @@ def select(
     print(json.dumps(decision, ensure_ascii=False, indent=2))
 
 
+@app.command()
+def propose(
+    failures: str = typer.Option(..., "--failures"),
+    history: str = typer.Option(..., "--history"),
+    out_dir: str = typer.Option(..., "--out-dir"),
+    top_k_signatures: int = typer.Option(3, "--top-k-signatures"),
+    target_category: str = typer.Option("multi_turn_miss_param", "--target-category"),
+    holdout_category: str = typer.Option("simple_python", "--holdout-category"),
+    iteration_id: str | None = typer.Option(None, "--iteration-id"),
+) -> None:
+    from grc.compiler.policy_proposal import generate_proposals
+
+    summary = generate_proposals(
+        Path(failures),
+        Path(history),
+        Path(out_dir),
+        top_k_signatures_count=top_k_signatures,
+        target_category=target_category,
+        holdout_category=holdout_category,
+        iteration_id=iteration_id,
+    )
+    print(json.dumps(summary, ensure_ascii=False, indent=2))
+
+
 if __name__ == "__main__":
     app()

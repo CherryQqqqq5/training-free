@@ -8,6 +8,20 @@ from typing import Any
 
 from grc.compiler.failure_taxonomy import classify_error_type
 
+COMPATIBILITY_REPAIRS = {
+    "resolve_contextual_string_arg",
+    "repair_json",
+    "coerce_types",
+    "drop_unknown_key",
+    "fill_default",
+    "arguments_changed",
+}
+DECISION_ADJACENT_REPAIRS = {
+    "coerce_no_tool_text_to_empty",
+    "termination_to_tool_retry",
+    "strip_assistant_content_with_tool_calls",
+}
+
 
 def _load_json(path: Path | None) -> dict[str, Any]:
     if path is None or not path.exists():
@@ -27,6 +41,14 @@ def _case_id(payload: dict[str, Any], trace_id: str) -> str:
         if isinstance(value, str) and value.strip():
             return value
     return trace_id
+
+
+def classify_repair(repair: str) -> str:
+    if repair in COMPATIBILITY_REPAIRS:
+        return "compatibility"
+    if repair in DECISION_ADJACENT_REPAIRS or repair.startswith("termination") or "no_tool" in repair:
+        return "decision_adjacent"
+    return "unknown"
 
 
 def _repair_kinds(payload: dict[str, Any]) -> list[str]:
@@ -82,20 +104,27 @@ def summarize_repairs(records: list[dict[str, Any]], ablation_acc: dict[str, flo
     repair_failure_counts: dict[str, Counter[str]] = defaultdict(Counter)
     repair_success_counts: Counter[str] = Counter()
     repair_known_success: Counter[str] = Counter()
+    family_applied_counts: dict[tuple[str, str], int] = defaultdict(int)
+    family_known_success: dict[tuple[str, str], int] = defaultdict(int)
+    family_success_counts: dict[tuple[str, str], int] = defaultdict(int)
 
     for record in records:
         for repair in record.get("repairs_applied") or []:
             repair_failure_counts[repair][record["failure_label"]] += 1
+            family_applied_counts[(record["failure_label"], repair)] += 1
             if record.get("final_success") is not None:
                 repair_known_success[repair] += 1
+                family_known_success[(record["failure_label"], repair)] += 1
                 if bool(record["final_success"]):
                     repair_success_counts[repair] += 1
+                    family_success_counts[(record["failure_label"], repair)] += 1
 
     for repair, by_failure in sorted(repair_failure_counts.items()):
         applied = sum(by_failure.values())
         target_failure_count = sum(failure_totals[label] for label in by_failure)
         repair_stats[repair] = {
             "applied": applied,
+            "repair_class": classify_repair(repair),
             "coverage": (applied / target_failure_count if target_failure_count else 0.0),
             "success": (
                 repair_success_counts[repair] / repair_known_success[repair]
@@ -112,10 +141,42 @@ def summarize_repairs(records: list[dict[str, Any]], ablation_acc: dict[str, flo
                 without = ablation_acc.get(repair)
                 stats["attribution_gain"] = (full_acc - without) if without is not None else None
 
+    repair_by_family: list[dict[str, Any]] = []
+    family_summary_index: dict[str, dict[str, Any]] = {}
+    for (failure_label, repair), applied in sorted(family_applied_counts.items()):
+        repair_class = classify_repair(repair)
+        failure_total = failure_totals[failure_label]
+        success_known = family_known_success[(failure_label, repair)]
+        success_count = family_success_counts[(failure_label, repair)]
+        row = {
+            "failure_label": failure_label,
+            "repair": repair,
+            "repair_class": repair_class,
+            "coverage": (applied / failure_total if failure_total else 0.0),
+            "success": (success_count / success_known if success_known else None),
+            "attribution_gain": repair_stats.get(repair, {}).get("attribution_gain"),
+            "applied": applied,
+        }
+        repair_by_family.append(row)
+        family_summary = family_summary_index.setdefault(
+            failure_label,
+            {
+                "failure_label": failure_label,
+                "total_failures": failure_total,
+                "compatibility_repair_coverage": 0.0,
+                "decision_adjacent_repair_coverage": 0.0,
+                "unknown_repair_coverage": 0.0,
+            },
+        )
+        key = f"{repair_class}_repair_coverage"
+        family_summary[key] += row["coverage"]
+
     return {
         "record_count": len(records),
         "failure_totals": dict(sorted(failure_totals.items())),
         "repairs": repair_stats,
+        "repair_by_family": repair_by_family,
+        "family_summary": list(family_summary_index.values()),
     }
 
 
@@ -131,12 +192,17 @@ def main() -> None:
     parser.add_argument("--trace-dir", required=True)
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--success-map", help="Optional JSON map from case_id to boolean success.")
+    parser.add_argument("--score-json", help="Optional score JSON with per-case success information.")
+    parser.add_argument("--result-json", help="Optional result JSON fallback with per-case success information.")
     parser.add_argument("--ablation", action="append", type=_parse_ablation, help="NAME=ACC, use full=ACC for full run.")
     parser.add_argument("--records-out", help="Optional JSONL records path.")
     parser.add_argument("--summary-out", help="Optional JSON summary path.")
+    parser.add_argument("--out-md", help="Optional markdown summary path.")
     args = parser.parse_args()
 
     success_map = _load_json(Path(args.success_map) if args.success_map else None)
+    success_map.update(_load_json(Path(args.score_json) if args.score_json else None))
+    success_map.update(_load_json(Path(args.result_json) if args.result_json else None))
     records = repair_records(Path(args.trace_dir), run_id=args.run_id, success_map=success_map)
     ablation_acc = dict(args.ablation or [])
     summary = summarize_repairs(records, ablation_acc=ablation_acc)
@@ -153,7 +219,21 @@ def main() -> None:
         summary_path = Path(args.summary_out)
         summary_path.parent.mkdir(parents=True, exist_ok=True)
         summary_path.write_text(rendered + "\n", encoding="utf-8")
-    else:
+    if args.out_md:
+        md_path = Path(args.out_md)
+        md_path.parent.mkdir(parents=True, exist_ok=True)
+        lines = ["# Repair Contribution Report", "", "## Repair By Family", "", "| Failure Label | Repair | Class | Applied | Coverage | Success | Gain |", "| --- | --- | --- | ---: | ---: | ---: | ---: |"]
+        for row in summary["repair_by_family"]:
+            success = "-" if row["success"] is None else f"{row['success']:.4f}"
+            gain = "-" if row["attribution_gain"] is None else f"{row['attribution_gain']:.4f}"
+            lines.append(f"| {row['failure_label']} | {row['repair']} | {row['repair_class']} | {row['applied']} | {row['coverage']:.4f} | {success} | {gain} |")
+        lines.extend(["", "## Family Summary", "", "| Failure Label | Total Failures | Compatibility Coverage | Decision-Adjacent Coverage | Unknown Coverage |", "| --- | ---: | ---: | ---: | ---: |"])
+        for row in summary["family_summary"]:
+            lines.append(
+                f"| {row['failure_label']} | {row['total_failures']} | {row['compatibility_repair_coverage']:.4f} | {row['decision_adjacent_repair_coverage']:.4f} | {row['unknown_repair_coverage']:.4f} |"
+            )
+        md_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    if not args.summary_out:
         print(rendered)
 
 

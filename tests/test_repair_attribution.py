@@ -32,5 +32,7 @@ class RepairAttributionTests(unittest.TestCase):
         self.assertEqual(records[0]["failure_type"], "ACTIONABLE_NO_TOOL_DECISION")
         self.assertEqual(records[0]["repairs_applied"], ["coerce_no_tool_text_to_empty"])
         self.assertEqual(summary["repairs"]["coerce_no_tool_text_to_empty"]["applied"], 1)
+        self.assertEqual(summary["repairs"]["coerce_no_tool_text_to_empty"]["repair_class"], "decision_adjacent")
         self.assertEqual(summary["repairs"]["coerce_no_tool_text_to_empty"]["success"], 1.0)
         self.assertEqual(summary["repairs"]["coerce_no_tool_text_to_empty"]["attribution_gain"], 3.5)
+        self.assertEqual(summary["repair_by_family"][0]["failure_label"], "(PRE_TOOL,ACTIONABLE_NO_TOOL_DECISION)")
