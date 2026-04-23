@@ -1,0 +1,314 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find state law cases related to land disputes in the past 5 years from 2015 to 2021 in New York."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tool_choice": "required",
+    "tools": [
+      {
+        "name": "law_case_search",
+        "description": "Search and retrieve law cases based on the topic, timeline, and location. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "topic": {
+              "type": "string",
+              "description": "The subject matter of the case."
+            },
+            "year_range": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "The start and end year for searching cases."
+            },
+            "location": {
+              "type": "string",
+              "description": "The location where the case is being heard."
+            },
+            "judicial_system": {
+              "type": "string",
+              "description": "The specific judicial system in which to search (e.g. 'federal', 'state').",
+              "default": "all"
+            }
+          },
+          "required": [
+            "topic",
+            "year_range",
+            "location"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "system",
+        "content": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+      },
+      {
+        "role": "user",
+        "content": "Find state law cases related to land disputes in the past 5 years from 2015 to 2021 in New York."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "law_case_search",
+          "description": "Search and retrieve law cases based on the topic, timeline, and location. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "topic": {
+                "type": "string",
+                "description": "The subject matter of the case."
+              },
+              "year_range": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "The start and end year for searching cases."
+              },
+              "location": {
+                "type": "string",
+                "description": "The location where the case is being heard."
+              },
+              "judicial_system": {
+                "type": "string",
+                "description": "The specific judicial system in which to search (e.g. 'federal', 'state').",
+                "default": "all"
+              }
+            },
+            "required": [
+              "topic",
+              "year_range",
+              "location"
+            ]
+          }
+        }
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "tool_schema_snapshot": {
+    "law_case_search": {
+      "type": "object",
+      "properties": {
+        "topic": {
+          "type": "string",
+          "description": "The subject matter of the case."
+        },
+        "year_range": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "The start and end year for searching cases."
+        },
+        "location": {
+          "type": "string",
+          "description": "The location where the case is being heard."
+        },
+        "judicial_system": {
+          "type": "string",
+          "description": "The specific judicial system in which to search (e.g. 'federal', 'state').",
+          "default": "all"
+        }
+      },
+      "required": [
+        "topic",
+        "year_range",
+        "location"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776946240-KKaDIA53LKGee2sJX9uK",
+    "object": "chat.completion",
+    "created": 1776946240,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_25875855",
+              "function": {
+                "name": "law_case_search",
+                "arguments": "{\"topic\":\"land disputes\",\"year_range\":[2015,2021],\"location\":\"New York\",\"judicial_system\":\"state\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 381,
+      "completion_tokens": 55,
+      "total_tokens": 436,
+      "cost": 0.00150282,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001518,
+        "upstream_inference_prompt_cost": 0.000693,
+        "upstream_inference_completions_cost": 0.000825
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776946240-KKaDIA53LKGee2sJX9uK",
+    "object": "response",
+    "created_at": 1776946242,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_25875855",
+        "call_id": "call_25875855",
+        "name": "law_case_search",
+        "arguments": "{\"topic\":\"land disputes\",\"year_range\":[2015,2021],\"location\":\"New York\",\"judicial_system\":\"state\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 381,
+      "completion_tokens": 55,
+      "total_tokens": 436,
+      "cost": 0.00150282,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001518,
+        "upstream_inference_prompt_cost": 0.000693,
+        "upstream_inference_completions_cost": 0.000825
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776946240-KKaDIA53LKGee2sJX9uK",
+    "object": "chat.completion",
+    "created": 1776946240,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_25875855",
+              "function": {
+                "name": "law_case_search",
+                "arguments": "{\"topic\":\"land disputes\",\"year_range\":[2015,2021],\"location\":\"New York\",\"judicial_system\":\"state\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 381,
+      "completion_tokens": 55,
+      "total_tokens": 436,
+      "cost": 0.00150282,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001518,
+        "upstream_inference_prompt_cost": 0.000693,
+        "upstream_inference_completions_cost": 0.000825
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "repair_kinds": [],
+    "failure_labels": [],
+    "request_predicates": [],
+    "response_shapes": [],
+    "last_observed_role": null,
+    "fallback_applied": false,
+    "request_patches": [
+      "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.",
+      "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.",
+      "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.",
+      "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+    ]
+  },
+  "status_code": 200,
+  "latency_ms": 2061.227,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "651643ed-b4a8-4afe-a1c3-954d9639afdf"
+}

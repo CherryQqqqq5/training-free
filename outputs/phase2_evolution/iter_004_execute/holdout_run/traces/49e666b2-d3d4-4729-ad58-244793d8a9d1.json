@@ -1,0 +1,287 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Get me the travel distance and duration from the Eiffel Tower to the Louvre Museum"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tool_choice": "required",
+    "tools": [
+      {
+        "name": "maps_get_distance_duration",
+        "description": "Retrieve the travel distance and estimated travel time from one location to another via car Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "start_location": {
+              "type": "string",
+              "description": "Starting point of the journey"
+            },
+            "end_location": {
+              "type": "string",
+              "description": "Ending point of the journey"
+            },
+            "traffic": {
+              "type": "boolean",
+              "description": "If true, considers current traffic. Default is false."
+            }
+          },
+          "required": [
+            "start_location",
+            "end_location"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "system",
+        "content": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+      },
+      {
+        "role": "user",
+        "content": "Get me the travel distance and duration from the Eiffel Tower to the Louvre Museum"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "maps_get_distance_duration",
+          "description": "Retrieve the travel distance and estimated travel time from one location to another via car Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "start_location": {
+                "type": "string",
+                "description": "Starting point of the journey"
+              },
+              "end_location": {
+                "type": "string",
+                "description": "Ending point of the journey"
+              },
+              "traffic": {
+                "type": "boolean",
+                "description": "If true, considers current traffic. Default is false."
+              }
+            },
+            "required": [
+              "start_location",
+              "end_location"
+            ]
+          }
+        }
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "tool_schema_snapshot": {
+    "maps_get_distance_duration": {
+      "type": "object",
+      "properties": {
+        "start_location": {
+          "type": "string",
+          "description": "Starting point of the journey"
+        },
+        "end_location": {
+          "type": "string",
+          "description": "Ending point of the journey"
+        },
+        "traffic": {
+          "type": "boolean",
+          "description": "If true, considers current traffic. Default is false."
+        }
+      },
+      "required": [
+        "start_location",
+        "end_location"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776946729-IyUHkkG35ltqglbOCp2X",
+    "object": "chat.completion",
+    "created": 1776946729,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_97817771",
+              "function": {
+                "name": "maps_get_distance_duration",
+                "arguments": "{\"start_location\":\"Eiffel Tower\",\"end_location\":\"Louvre Museum\",\"traffic\":false}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 328,
+      "completion_tokens": 44,
+      "total_tokens": 372,
+      "cost": 0.00118206,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001194,
+        "upstream_inference_prompt_cost": 0.000534,
+        "upstream_inference_completions_cost": 0.00066
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776946729-IyUHkkG35ltqglbOCp2X",
+    "object": "response",
+    "created_at": 1776946730,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_97817771",
+        "call_id": "call_97817771",
+        "name": "maps_get_distance_duration",
+        "arguments": "{\"start_location\":\"Eiffel Tower\",\"end_location\":\"Louvre Museum\",\"traffic\":false}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 328,
+      "completion_tokens": 44,
+      "total_tokens": 372,
+      "cost": 0.00118206,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001194,
+        "upstream_inference_prompt_cost": 0.000534,
+        "upstream_inference_completions_cost": 0.00066
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776946729-IyUHkkG35ltqglbOCp2X",
+    "object": "chat.completion",
+    "created": 1776946729,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_97817771",
+              "function": {
+                "name": "maps_get_distance_duration",
+                "arguments": "{\"start_location\":\"Eiffel Tower\",\"end_location\":\"Louvre Museum\",\"traffic\":false}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 328,
+      "completion_tokens": 44,
+      "total_tokens": 372,
+      "cost": 0.00118206,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001194,
+        "upstream_inference_prompt_cost": 0.000534,
+        "upstream_inference_completions_cost": 0.00066
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "repair_kinds": [],
+    "failure_labels": [],
+    "request_predicates": [],
+    "response_shapes": [],
+    "last_observed_role": null,
+    "fallback_applied": false,
+    "request_patches": [
+      "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.",
+      "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.",
+      "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.",
+      "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+    ]
+  },
+  "status_code": 200,
+  "latency_ms": 1841.901,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "49e666b2-d3d4-4729-ad58-244793d8a9d1"
+}

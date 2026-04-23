@@ -1,0 +1,293 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the area under the curve y=3x^2 + 2x - 4, between x = -1 and x = 2."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tool_choice": "required",
+    "tools": [
+      {
+        "name": "mathematics_calculate_area_under_curve",
+        "description": "Calculate the area under the curve for a given polynomial function within a specified interval. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "polynomial": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "description": "The coefficients of the polynomial, in decreasing order of exponent, where the first element is the coefficient for x^n, the second element is the coefficient for x^(n-1), and so on. The last element is the constant term."
+            },
+            "limits": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "description": "A list of two numbers specifying the lower and upper limit for the integration interval."
+            }
+          },
+          "required": [
+            "polynomial",
+            "limits"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "system",
+        "content": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+      },
+      {
+        "role": "user",
+        "content": "Calculate the area under the curve y=3x^2 + 2x - 4, between x = -1 and x = 2."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "mathematics_calculate_area_under_curve",
+          "description": "Calculate the area under the curve for a given polynomial function within a specified interval. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "polynomial": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "description": "The coefficients of the polynomial, in decreasing order of exponent, where the first element is the coefficient for x^n, the second element is the coefficient for x^(n-1), and so on. The last element is the constant term."
+              },
+              "limits": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "description": "A list of two numbers specifying the lower and upper limit for the integration interval."
+              }
+            },
+            "required": [
+              "polynomial",
+              "limits"
+            ]
+          }
+        }
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "tool_schema_snapshot": {
+    "mathematics_calculate_area_under_curve": {
+      "type": "object",
+      "properties": {
+        "polynomial": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "The coefficients of the polynomial, in decreasing order of exponent, where the first element is the coefficient for x^n, the second element is the coefficient for x^(n-1), and so on. The last element is the constant term."
+        },
+        "limits": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "A list of two numbers specifying the lower and upper limit for the integration interval."
+        }
+      },
+      "required": [
+        "polynomial",
+        "limits"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776946084-m7biazZ2jlJlqwTHKsJd",
+    "object": "chat.completion",
+    "created": 1776946084,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_37578660",
+              "function": {
+                "name": "mathematics_calculate_area_under_curve",
+                "arguments": "{\"polynomial\":[3,2,-4],\"limits\":[-1,2]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 392,
+      "completion_tokens": 47,
+      "total_tokens": 439,
+      "cost": 0.00141669,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001431,
+        "upstream_inference_prompt_cost": 0.000726,
+        "upstream_inference_completions_cost": 0.000705
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776946084-m7biazZ2jlJlqwTHKsJd",
+    "object": "response",
+    "created_at": 1776946086,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_37578660",
+        "call_id": "call_37578660",
+        "name": "mathematics_calculate_area_under_curve",
+        "arguments": "{\"polynomial\":[3,2,-4],\"limits\":[-1,2]}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 392,
+      "completion_tokens": 47,
+      "total_tokens": 439,
+      "cost": 0.00141669,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001431,
+        "upstream_inference_prompt_cost": 0.000726,
+        "upstream_inference_completions_cost": 0.000705
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776946084-m7biazZ2jlJlqwTHKsJd",
+    "object": "chat.completion",
+    "created": 1776946084,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_37578660",
+              "function": {
+                "name": "mathematics_calculate_area_under_curve",
+                "arguments": "{\"polynomial\":[3,2,-4],\"limits\":[-1,2]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 392,
+      "completion_tokens": 47,
+      "total_tokens": 439,
+      "cost": 0.00141669,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001431,
+        "upstream_inference_prompt_cost": 0.000726,
+        "upstream_inference_completions_cost": 0.000705
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "repair_kinds": [],
+    "failure_labels": [],
+    "request_predicates": [],
+    "response_shapes": [],
+    "last_observed_role": null,
+    "fallback_applied": false,
+    "request_patches": [
+      "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.",
+      "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.",
+      "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.",
+      "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+    ]
+  },
+  "status_code": 200,
+  "latency_ms": 2043.594,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "cfe7aabb-8244-4ceb-b6fa-f446219effc0"
+}

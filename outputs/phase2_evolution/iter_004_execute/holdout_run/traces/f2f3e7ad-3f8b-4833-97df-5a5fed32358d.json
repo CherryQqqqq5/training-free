@@ -1,0 +1,288 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find the highest score achieved by any player in the online game 'Overwatch' on PC globally."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tool_choice": "required",
+    "tools": [
+      {
+        "name": "game_score_highest",
+        "description": "Retrieve the highest score achieved by any player in a specific game. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "game": {
+              "type": "string",
+              "description": "The name of the online game."
+            },
+            "platform": {
+              "type": "string",
+              "description": "The platform where the game is played, e.g. PC, Xbox, Playstation"
+            },
+            "region": {
+              "type": "string",
+              "description": "The geographic region of the player. Defaults to 'Global'"
+            }
+          },
+          "required": [
+            "game",
+            "platform"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "system",
+        "content": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.\n- Known explicit context values you can reuse exactly if relevant: Overwatch"
+      },
+      {
+        "role": "user",
+        "content": "Find the highest score achieved by any player in the online game 'Overwatch' on PC globally."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "game_score_highest",
+          "description": "Retrieve the highest score achieved by any player in a specific game. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "game": {
+                "type": "string",
+                "description": "The name of the online game."
+              },
+              "platform": {
+                "type": "string",
+                "description": "The platform where the game is played, e.g. PC, Xbox, Playstation"
+              },
+              "region": {
+                "type": "string",
+                "description": "The geographic region of the player. Defaults to 'Global'"
+              }
+            },
+            "required": [
+              "game",
+              "platform"
+            ]
+          }
+        }
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "tool_schema_snapshot": {
+    "game_score_highest": {
+      "type": "object",
+      "properties": {
+        "game": {
+          "type": "string",
+          "description": "The name of the online game."
+        },
+        "platform": {
+          "type": "string",
+          "description": "The platform where the game is played, e.g. PC, Xbox, Playstation"
+        },
+        "region": {
+          "type": "string",
+          "description": "The geographic region of the player. Defaults to 'Global'"
+        }
+      },
+      "required": [
+        "game",
+        "platform"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776946621-dAtz8B0N5QXxvda9nMmC",
+    "object": "chat.completion",
+    "created": 1776946621,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_51063724",
+              "function": {
+                "name": "game_score_highest",
+                "arguments": "{\"game\":\"Overwatch\",\"platform\":\"PC\",\"region\":\"Global\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 356,
+      "completion_tokens": 41,
+      "total_tokens": 397,
+      "cost": 0.001661715,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 2,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0016785,
+        "upstream_inference_prompt_cost": 0.0010635,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776946621-dAtz8B0N5QXxvda9nMmC",
+    "object": "response",
+    "created_at": 1776946623,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_51063724",
+        "call_id": "call_51063724",
+        "name": "game_score_highest",
+        "arguments": "{\"game\":\"Overwatch\",\"platform\":\"PC\",\"region\":\"Global\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 356,
+      "completion_tokens": 41,
+      "total_tokens": 397,
+      "cost": 0.001661715,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 2,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0016785,
+        "upstream_inference_prompt_cost": 0.0010635,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776946621-dAtz8B0N5QXxvda9nMmC",
+    "object": "chat.completion",
+    "created": 1776946621,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_51063724",
+              "function": {
+                "name": "game_score_highest",
+                "arguments": "{\"game\":\"Overwatch\",\"platform\":\"PC\",\"region\":\"Global\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 356,
+      "completion_tokens": 41,
+      "total_tokens": 397,
+      "cost": 0.001661715,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 2,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0016785,
+        "upstream_inference_prompt_cost": 0.0010635,
+        "upstream_inference_completions_cost": 0.000615
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "repair_kinds": [],
+    "failure_labels": [],
+    "request_predicates": [],
+    "response_shapes": [],
+    "last_observed_role": null,
+    "fallback_applied": false,
+    "request_patches": [
+      "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.",
+      "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.",
+      "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.",
+      "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.",
+      "prompt_injector:Known explicit context values you can reuse exactly if relevant: Overwatch"
+    ]
+  },
+  "status_code": 200,
+  "latency_ms": 2117.022,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "f2f3e7ad-3f8b-4833-97df-5a5fed32358d"
+}

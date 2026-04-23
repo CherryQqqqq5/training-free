@@ -1,0 +1,287 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find out if an individual John Doe with a birthday 01-01-1980 has any prior felony convictions in California."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tool_choice": "required",
+    "tools": [
+      {
+        "name": "criminal_history_check_felonies",
+        "description": "This function checks if an individual has any prior felony convictions based on their full name and birth date. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "full_name": {
+              "type": "string",
+              "description": "The full name of the individual."
+            },
+            "birth_date": {
+              "type": "string",
+              "description": "The birth date of the individual. Must be in MM-DD-YYYY format."
+            },
+            "state": {
+              "type": "string",
+              "description": "The state to search the criminal record in. Default to 'None', which the function will search across all states."
+            }
+          },
+          "required": [
+            "full_name",
+            "birth_date"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "system",
+        "content": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+      },
+      {
+        "role": "user",
+        "content": "Find out if an individual John Doe with a birthday 01-01-1980 has any prior felony convictions in California."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "criminal_history_check_felonies",
+          "description": "This function checks if an individual has any prior felony convictions based on their full name and birth date. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "full_name": {
+                "type": "string",
+                "description": "The full name of the individual."
+              },
+              "birth_date": {
+                "type": "string",
+                "description": "The birth date of the individual. Must be in MM-DD-YYYY format."
+              },
+              "state": {
+                "type": "string",
+                "description": "The state to search the criminal record in. Default to 'None', which the function will search across all states."
+              }
+            },
+            "required": [
+              "full_name",
+              "birth_date"
+            ]
+          }
+        }
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "tool_schema_snapshot": {
+    "criminal_history_check_felonies": {
+      "type": "object",
+      "properties": {
+        "full_name": {
+          "type": "string",
+          "description": "The full name of the individual."
+        },
+        "birth_date": {
+          "type": "string",
+          "description": "The birth date of the individual. Must be in MM-DD-YYYY format."
+        },
+        "state": {
+          "type": "string",
+          "description": "The state to search the criminal record in. Default to 'None', which the function will search across all states."
+        }
+      },
+      "required": [
+        "full_name",
+        "birth_date"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776946206-hxfYog3BR9AgKFqZakOT",
+    "object": "chat.completion",
+    "created": 1776946206,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_22996215",
+              "function": {
+                "name": "criminal_history_check_felonies",
+                "arguments": "{\"full_name\":\"John Doe\",\"birth_date\":\"01-01-1980\",\"state\":\"California\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 370,
+      "completion_tokens": 50,
+      "total_tokens": 420,
+      "cost": 0.0013959,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00141,
+        "upstream_inference_prompt_cost": 0.00066,
+        "upstream_inference_completions_cost": 0.00075
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776946206-hxfYog3BR9AgKFqZakOT",
+    "object": "response",
+    "created_at": 1776946207,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_22996215",
+        "call_id": "call_22996215",
+        "name": "criminal_history_check_felonies",
+        "arguments": "{\"full_name\":\"John Doe\",\"birth_date\":\"01-01-1980\",\"state\":\"California\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 370,
+      "completion_tokens": 50,
+      "total_tokens": 420,
+      "cost": 0.0013959,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00141,
+        "upstream_inference_prompt_cost": 0.00066,
+        "upstream_inference_completions_cost": 0.00075
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776946206-hxfYog3BR9AgKFqZakOT",
+    "object": "chat.completion",
+    "created": 1776946206,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_22996215",
+              "function": {
+                "name": "criminal_history_check_felonies",
+                "arguments": "{\"full_name\":\"John Doe\",\"birth_date\":\"01-01-1980\",\"state\":\"California\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 370,
+      "completion_tokens": 50,
+      "total_tokens": 420,
+      "cost": 0.0013959,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00141,
+        "upstream_inference_prompt_cost": 0.00066,
+        "upstream_inference_completions_cost": 0.00075
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "repair_kinds": [],
+    "failure_labels": [],
+    "request_predicates": [],
+    "response_shapes": [],
+    "last_observed_role": null,
+    "fallback_applied": false,
+    "request_patches": [
+      "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.",
+      "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.",
+      "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.",
+      "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+    ]
+  },
+  "status_code": 200,
+  "latency_ms": 2025.264,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "e522ab8b-e522-4493-a259-1119e4210de3"
+}

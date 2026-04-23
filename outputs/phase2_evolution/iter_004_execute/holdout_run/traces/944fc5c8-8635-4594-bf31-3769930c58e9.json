@@ -1,0 +1,288 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the speed of an object in km/h if it traveled 450 meters in 20 seconds."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tool_choice": "required",
+    "tools": [
+      {
+        "name": "calculate_speed",
+        "description": "Calculate the speed of an object based on the distance travelled and the time taken. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "distance": {
+              "type": "integer",
+              "description": "The distance the object travelled in meters."
+            },
+            "time": {
+              "type": "integer",
+              "description": "The time it took for the object to travel in seconds."
+            },
+            "to_unit": {
+              "type": "string",
+              "description": "The unit in which the speed should be calculated, default is m/s."
+            }
+          },
+          "required": [
+            "distance",
+            "time"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "system",
+        "content": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.\n- Known explicit context values you can reuse exactly if relevant: km/h"
+      },
+      {
+        "role": "user",
+        "content": "Calculate the speed of an object in km/h if it traveled 450 meters in 20 seconds."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_speed",
+          "description": "Calculate the speed of an object based on the distance travelled and the time taken. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "distance": {
+                "type": "integer",
+                "description": "The distance the object travelled in meters."
+              },
+              "time": {
+                "type": "integer",
+                "description": "The time it took for the object to travel in seconds."
+              },
+              "to_unit": {
+                "type": "string",
+                "description": "The unit in which the speed should be calculated, default is m/s."
+              }
+            },
+            "required": [
+              "distance",
+              "time"
+            ]
+          }
+        }
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "tool_schema_snapshot": {
+    "calculate_speed": {
+      "type": "object",
+      "properties": {
+        "distance": {
+          "type": "integer",
+          "description": "The distance the object travelled in meters."
+        },
+        "time": {
+          "type": "integer",
+          "description": "The time it took for the object to travel in seconds."
+        },
+        "to_unit": {
+          "type": "string",
+          "description": "The unit in which the speed should be calculated, default is m/s."
+        }
+      },
+      "required": [
+        "distance",
+        "time"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776946080-8FJIyRfs3jltlJtSNb0s",
+    "object": "chat.completion",
+    "created": 1776946080,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_01621577",
+              "function": {
+                "name": "calculate_speed",
+                "arguments": "{\"distance\":450,\"time\":20,\"to_unit\":\"km/h\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 358,
+      "completion_tokens": 40,
+      "total_tokens": 398,
+      "cost": 0.001385505,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 122,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0013995,
+        "upstream_inference_prompt_cost": 0.0007995,
+        "upstream_inference_completions_cost": 0.0006
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776946080-8FJIyRfs3jltlJtSNb0s",
+    "object": "response",
+    "created_at": 1776946081,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_01621577",
+        "call_id": "call_01621577",
+        "name": "calculate_speed",
+        "arguments": "{\"distance\":450,\"time\":20,\"to_unit\":\"km/h\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 358,
+      "completion_tokens": 40,
+      "total_tokens": 398,
+      "cost": 0.001385505,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 122,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0013995,
+        "upstream_inference_prompt_cost": 0.0007995,
+        "upstream_inference_completions_cost": 0.0006
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776946080-8FJIyRfs3jltlJtSNb0s",
+    "object": "chat.completion",
+    "created": 1776946080,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_01621577",
+              "function": {
+                "name": "calculate_speed",
+                "arguments": "{\"distance\":450,\"time\":20,\"to_unit\":\"km/h\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 358,
+      "completion_tokens": 40,
+      "total_tokens": 398,
+      "cost": 0.001385505,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 122,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0013995,
+        "upstream_inference_prompt_cost": 0.0007995,
+        "upstream_inference_completions_cost": 0.0006
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "repair_kinds": [],
+    "failure_labels": [],
+    "request_predicates": [],
+    "response_shapes": [],
+    "last_observed_role": null,
+    "fallback_applied": false,
+    "request_patches": [
+      "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.",
+      "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.",
+      "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.",
+      "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.",
+      "prompt_injector:Known explicit context values you can reuse exactly if relevant: km/h"
+    ]
+  },
+  "status_code": 200,
+  "latency_ms": 1809.582,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "944fc5c8-8635-4594-bf31-3769930c58e9"
+}

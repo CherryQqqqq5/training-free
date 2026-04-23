@@ -1,0 +1,302 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Give me the schedule of Manchester United for the next 6 games in Premier League."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tool_choice": "required",
+    "tools": [
+      {
+        "name": "sports_team_get_schedule",
+        "description": "Fetches the schedule of the specified sports team for the specified number of games in the given league. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "team_name": {
+              "type": "string",
+              "description": "The name of the sports team."
+            },
+            "num_of_games": {
+              "type": "integer",
+              "description": "Number of games for which to fetch the schedule."
+            },
+            "league": {
+              "type": "string",
+              "description": "The name of the sports league. If not provided, the function will fetch the schedule for all games, regardless of the league."
+            },
+            "location": {
+              "type": "string",
+              "description": "Optional. The city or venue where games are to be held. If not provided, default that all venues will be considered."
+            }
+          },
+          "required": [
+            "team_name",
+            "num_of_games",
+            "league"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "system",
+        "content": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+      },
+      {
+        "role": "user",
+        "content": "Give me the schedule of Manchester United for the next 6 games in Premier League."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "sports_team_get_schedule",
+          "description": "Fetches the schedule of the specified sports team for the specified number of games in the given league. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "team_name": {
+                "type": "string",
+                "description": "The name of the sports team."
+              },
+              "num_of_games": {
+                "type": "integer",
+                "description": "Number of games for which to fetch the schedule."
+              },
+              "league": {
+                "type": "string",
+                "description": "The name of the sports league. If not provided, the function will fetch the schedule for all games, regardless of the league."
+              },
+              "location": {
+                "type": "string",
+                "description": "Optional. The city or venue where games are to be held. If not provided, default that all venues will be considered."
+              }
+            },
+            "required": [
+              "team_name",
+              "num_of_games",
+              "league"
+            ]
+          }
+        }
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "tool_schema_snapshot": {
+    "sports_team_get_schedule": {
+      "type": "object",
+      "properties": {
+        "team_name": {
+          "type": "string",
+          "description": "The name of the sports team."
+        },
+        "num_of_games": {
+          "type": "integer",
+          "description": "Number of games for which to fetch the schedule."
+        },
+        "league": {
+          "type": "string",
+          "description": "The name of the sports league. If not provided, the function will fetch the schedule for all games, regardless of the league."
+        },
+        "location": {
+          "type": "string",
+          "description": "Optional. The city or venue where games are to be held. If not provided, default that all venues will be considered."
+        }
+      },
+      "required": [
+        "team_name",
+        "num_of_games",
+        "league"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776946574-U9LJ19KqlKeh15cGelQc",
+    "object": "chat.completion",
+    "created": 1776946574,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_52339033",
+              "function": {
+                "name": "sports_team_get_schedule",
+                "arguments": "{\"team_name\":\"Manchester United\",\"num_of_games\":6,\"league\":\"Premier League\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 395,
+      "completion_tokens": 45,
+      "total_tokens": 440,
+      "cost": 0.0013936725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 201,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00140775,
+        "upstream_inference_prompt_cost": 0.00073275,
+        "upstream_inference_completions_cost": 0.000675
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776946574-U9LJ19KqlKeh15cGelQc",
+    "object": "response",
+    "created_at": 1776946575,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_52339033",
+        "call_id": "call_52339033",
+        "name": "sports_team_get_schedule",
+        "arguments": "{\"team_name\":\"Manchester United\",\"num_of_games\":6,\"league\":\"Premier League\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 395,
+      "completion_tokens": 45,
+      "total_tokens": 440,
+      "cost": 0.0013936725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 201,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00140775,
+        "upstream_inference_prompt_cost": 0.00073275,
+        "upstream_inference_completions_cost": 0.000675
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776946574-U9LJ19KqlKeh15cGelQc",
+    "object": "chat.completion",
+    "created": 1776946574,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_52339033",
+              "function": {
+                "name": "sports_team_get_schedule",
+                "arguments": "{\"team_name\":\"Manchester United\",\"num_of_games\":6,\"league\":\"Premier League\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 395,
+      "completion_tokens": 45,
+      "total_tokens": 440,
+      "cost": 0.0013936725,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 201,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00140775,
+        "upstream_inference_prompt_cost": 0.00073275,
+        "upstream_inference_completions_cost": 0.000675
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "repair_kinds": [],
+    "failure_labels": [],
+    "request_predicates": [],
+    "response_shapes": [],
+    "last_observed_role": null,
+    "fallback_applied": false,
+    "request_patches": [
+      "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.",
+      "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.",
+      "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.",
+      "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+    ]
+  },
+  "status_code": 200,
+  "latency_ms": 1897.855,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "461942c0-6c18-4b62-976c-b79f5a920911"
+}

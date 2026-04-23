@@ -1,0 +1,314 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find the closest sushi restaurant with a patio in Boston."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tool_choice": "required",
+    "tools": [
+      {
+        "name": "restaurant_search_find_closest",
+        "description": "Locate the closest sushi restaurant based on certain criteria, such as the presence of a patio. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city, for instance Boston, MA"
+            },
+            "cuisine": {
+              "type": "string",
+              "description": "Type of food like Sushi."
+            },
+            "amenities": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Patio",
+                  "Wi-Fi",
+                  "Happy Hour",
+                  "Wheelchair Accessible"
+                ]
+              },
+              "description": "Preferred amenities in the restaurant. Default 'Wi-Fi'."
+            }
+          },
+          "required": [
+            "location",
+            "cuisine"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "system",
+        "content": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+      },
+      {
+        "role": "user",
+        "content": "Find the closest sushi restaurant with a patio in Boston."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "restaurant_search_find_closest",
+          "description": "Locate the closest sushi restaurant based on certain criteria, such as the presence of a patio. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city, for instance Boston, MA"
+              },
+              "cuisine": {
+                "type": "string",
+                "description": "Type of food like Sushi."
+              },
+              "amenities": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "Patio",
+                    "Wi-Fi",
+                    "Happy Hour",
+                    "Wheelchair Accessible"
+                  ]
+                },
+                "description": "Preferred amenities in the restaurant. Default 'Wi-Fi'."
+              }
+            },
+            "required": [
+              "location",
+              "cuisine"
+            ]
+          }
+        }
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "tool_schema_snapshot": {
+    "restaurant_search_find_closest": {
+      "type": "object",
+      "properties": {
+        "location": {
+          "type": "string",
+          "description": "The city, for instance Boston, MA"
+        },
+        "cuisine": {
+          "type": "string",
+          "description": "Type of food like Sushi."
+        },
+        "amenities": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Patio",
+              "Wi-Fi",
+              "Happy Hour",
+              "Wheelchair Accessible"
+            ]
+          },
+          "description": "Preferred amenities in the restaurant. Default 'Wi-Fi'."
+        }
+      },
+      "required": [
+        "location",
+        "cuisine"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776946656-G5IEtDleTLJruX165BiC",
+    "object": "chat.completion",
+    "created": 1776946656,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_80615199",
+              "function": {
+                "name": "restaurant_search_find_closest",
+                "arguments": "{\"location\":\"Boston, MA\",\"cuisine\":\"Sushi\",\"amenities\":[\"Patio\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 354,
+      "completion_tokens": 47,
+      "total_tokens": 401,
+      "cost": 0.00130383,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001317,
+        "upstream_inference_prompt_cost": 0.000612,
+        "upstream_inference_completions_cost": 0.000705
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776946656-G5IEtDleTLJruX165BiC",
+    "object": "response",
+    "created_at": 1776946658,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_80615199",
+        "call_id": "call_80615199",
+        "name": "restaurant_search_find_closest",
+        "arguments": "{\"location\":\"Boston, MA\",\"cuisine\":\"Sushi\",\"amenities\":[\"Patio\"]}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 354,
+      "completion_tokens": 47,
+      "total_tokens": 401,
+      "cost": 0.00130383,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001317,
+        "upstream_inference_prompt_cost": 0.000612,
+        "upstream_inference_completions_cost": 0.000705
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776946656-G5IEtDleTLJruX165BiC",
+    "object": "chat.completion",
+    "created": 1776946656,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_80615199",
+              "function": {
+                "name": "restaurant_search_find_closest",
+                "arguments": "{\"location\":\"Boston, MA\",\"cuisine\":\"Sushi\",\"amenities\":[\"Patio\"]}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 354,
+      "completion_tokens": 47,
+      "total_tokens": 401,
+      "cost": 0.00130383,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001317,
+        "upstream_inference_prompt_cost": 0.000612,
+        "upstream_inference_completions_cost": 0.000705
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "repair_kinds": [],
+    "failure_labels": [],
+    "request_predicates": [],
+    "response_shapes": [],
+    "last_observed_role": null,
+    "fallback_applied": false,
+    "request_patches": [
+      "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.",
+      "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.",
+      "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.",
+      "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+    ]
+  },
+  "status_code": 200,
+  "latency_ms": 2479.655,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "693e468a-e204-4af4-bb09-602a3df4a422"
+}

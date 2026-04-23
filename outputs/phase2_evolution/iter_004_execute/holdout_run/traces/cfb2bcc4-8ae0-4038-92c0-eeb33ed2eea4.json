@@ -1,0 +1,314 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find the top rated modern sculpture exhibition happening in New York in the upcoming month."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tool_choice": "required",
+    "tools": [
+      {
+        "name": "find_exhibition",
+        "description": "Locate the most popular exhibitions based on criteria like location, time, art form, and user ratings. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city and state where the exhibition is held, e.g., New York City, NY."
+            },
+            "art_form": {
+              "type": "string",
+              "description": "The form of art the exhibition is displaying e.g., sculpture."
+            },
+            "month": {
+              "type": "string",
+              "description": "The month of exhibition. Default value will return upcoming events if not specified."
+            },
+            "user_ratings": {
+              "type": "string",
+              "enum": [
+                "low",
+                "average",
+                "high"
+              ],
+              "description": "Select exhibitions with user rating threshold. Default is 'low'"
+            }
+          },
+          "required": [
+            "location",
+            "art_form"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "system",
+        "content": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+      },
+      {
+        "role": "user",
+        "content": "Find the top rated modern sculpture exhibition happening in New York in the upcoming month."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "find_exhibition",
+          "description": "Locate the most popular exhibitions based on criteria like location, time, art form, and user ratings. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city and state where the exhibition is held, e.g., New York City, NY."
+              },
+              "art_form": {
+                "type": "string",
+                "description": "The form of art the exhibition is displaying e.g., sculpture."
+              },
+              "month": {
+                "type": "string",
+                "description": "The month of exhibition. Default value will return upcoming events if not specified."
+              },
+              "user_ratings": {
+                "type": "string",
+                "enum": [
+                  "low",
+                  "average",
+                  "high"
+                ],
+                "description": "Select exhibitions with user rating threshold. Default is 'low'"
+              }
+            },
+            "required": [
+              "location",
+              "art_form"
+            ]
+          }
+        }
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "tool_schema_snapshot": {
+    "find_exhibition": {
+      "type": "object",
+      "properties": {
+        "location": {
+          "type": "string",
+          "description": "The city and state where the exhibition is held, e.g., New York City, NY."
+        },
+        "art_form": {
+          "type": "string",
+          "description": "The form of art the exhibition is displaying e.g., sculpture."
+        },
+        "month": {
+          "type": "string",
+          "description": "The month of exhibition. Default value will return upcoming events if not specified."
+        },
+        "user_ratings": {
+          "type": "string",
+          "enum": [
+            "low",
+            "average",
+            "high"
+          ],
+          "description": "Select exhibitions with user rating threshold. Default is 'low'"
+        }
+      },
+      "required": [
+        "location",
+        "art_form"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776946437-fJz34ZUbcIzoJqL502S9",
+    "object": "chat.completion",
+    "created": 1776946437,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_61078172",
+              "function": {
+                "name": "find_exhibition",
+                "arguments": "{\"location\":\"New York City, NY\",\"art_form\":\"sculpture\",\"month\":\"upcoming\",\"user_ratings\":\"high\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 388,
+      "completion_tokens": 54,
+      "total_tokens": 442,
+      "cost": 0.00150876,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001524,
+        "upstream_inference_prompt_cost": 0.000714,
+        "upstream_inference_completions_cost": 0.00081
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776946437-fJz34ZUbcIzoJqL502S9",
+    "object": "response",
+    "created_at": 1776946439,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_61078172",
+        "call_id": "call_61078172",
+        "name": "find_exhibition",
+        "arguments": "{\"location\":\"New York City, NY\",\"art_form\":\"sculpture\",\"month\":\"upcoming\",\"user_ratings\":\"high\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 388,
+      "completion_tokens": 54,
+      "total_tokens": 442,
+      "cost": 0.00150876,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001524,
+        "upstream_inference_prompt_cost": 0.000714,
+        "upstream_inference_completions_cost": 0.00081
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776946437-fJz34ZUbcIzoJqL502S9",
+    "object": "chat.completion",
+    "created": 1776946437,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_61078172",
+              "function": {
+                "name": "find_exhibition",
+                "arguments": "{\"location\":\"New York City, NY\",\"art_form\":\"sculpture\",\"month\":\"upcoming\",\"user_ratings\":\"high\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 388,
+      "completion_tokens": 54,
+      "total_tokens": 442,
+      "cost": 0.00150876,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001524,
+        "upstream_inference_prompt_cost": 0.000714,
+        "upstream_inference_completions_cost": 0.00081
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "repair_kinds": [],
+    "failure_labels": [],
+    "request_predicates": [],
+    "response_shapes": [],
+    "last_observed_role": null,
+    "fallback_applied": false,
+    "request_patches": [
+      "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.",
+      "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.",
+      "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.",
+      "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+    ]
+  },
+  "status_code": 200,
+  "latency_ms": 2133.707,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "cfb2bcc4-8ae0-4038-92c0-eeb33ed2eea4"
+}

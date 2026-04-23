@@ -1,0 +1,272 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Find an all vegan restaurant in New York that opens until at least 11 PM."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tool_choice": "required",
+    "tools": [
+      {
+        "name": "vegan_restaurant_find_nearby",
+        "description": "Locate nearby vegan restaurants based on specific criteria like operating hours. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city and state, e.g. New York, NY, you should format it as City, State."
+            },
+            "operating_hours": {
+              "type": "integer",
+              "description": "Preferred latest closing time of the restaurant. E.g. if 11 is given, then restaurants that close at or after 11 PM will be considered. This is in 24 hour format. Default is 24."
+            }
+          },
+          "required": [
+            "location"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "system",
+        "content": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+      },
+      {
+        "role": "user",
+        "content": "Find an all vegan restaurant in New York that opens until at least 11 PM."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "vegan_restaurant_find_nearby",
+          "description": "Locate nearby vegan restaurants based on specific criteria like operating hours. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city and state, e.g. New York, NY, you should format it as City, State."
+              },
+              "operating_hours": {
+                "type": "integer",
+                "description": "Preferred latest closing time of the restaurant. E.g. if 11 is given, then restaurants that close at or after 11 PM will be considered. This is in 24 hour format. Default is 24."
+              }
+            },
+            "required": [
+              "location"
+            ]
+          }
+        }
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "tool_schema_snapshot": {
+    "vegan_restaurant_find_nearby": {
+      "type": "object",
+      "properties": {
+        "location": {
+          "type": "string",
+          "description": "The city and state, e.g. New York, NY, you should format it as City, State."
+        },
+        "operating_hours": {
+          "type": "integer",
+          "description": "Preferred latest closing time of the restaurant. E.g. if 11 is given, then restaurants that close at or after 11 PM will be considered. This is in 24 hour format. Default is 24."
+        }
+      },
+      "required": [
+        "location"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776945931-05YV6cs6Md2k901bYrJV",
+    "object": "chat.completion",
+    "created": 1776945931,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_12734863",
+              "function": {
+                "name": "vegan_restaurant_find_nearby",
+                "arguments": "{\"location\":\"New York, NY\",\"operating_hours\":23}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 361,
+      "completion_tokens": 39,
+      "total_tokens": 400,
+      "cost": 0.00120582,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001218,
+        "upstream_inference_prompt_cost": 0.000633,
+        "upstream_inference_completions_cost": 0.000585
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776945931-05YV6cs6Md2k901bYrJV",
+    "object": "response",
+    "created_at": 1776945933,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_12734863",
+        "call_id": "call_12734863",
+        "name": "vegan_restaurant_find_nearby",
+        "arguments": "{\"location\":\"New York, NY\",\"operating_hours\":23}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 361,
+      "completion_tokens": 39,
+      "total_tokens": 400,
+      "cost": 0.00120582,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001218,
+        "upstream_inference_prompt_cost": 0.000633,
+        "upstream_inference_completions_cost": 0.000585
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776945931-05YV6cs6Md2k901bYrJV",
+    "object": "chat.completion",
+    "created": 1776945931,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_12734863",
+              "function": {
+                "name": "vegan_restaurant_find_nearby",
+                "arguments": "{\"location\":\"New York, NY\",\"operating_hours\":23}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 361,
+      "completion_tokens": 39,
+      "total_tokens": 400,
+      "cost": 0.00120582,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001218,
+        "upstream_inference_prompt_cost": 0.000633,
+        "upstream_inference_completions_cost": 0.000585
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "repair_kinds": [],
+    "failure_labels": [],
+    "request_predicates": [],
+    "response_shapes": [],
+    "last_observed_role": null,
+    "fallback_applied": false,
+    "request_patches": [
+      "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.",
+      "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.",
+      "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.",
+      "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+    ]
+  },
+  "status_code": 200,
+  "latency_ms": 1844.165,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "24784d42-0344-40b7-8406-019181dca9d3"
+}

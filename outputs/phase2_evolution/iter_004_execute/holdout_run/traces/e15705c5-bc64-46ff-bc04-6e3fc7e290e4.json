@@ -1,0 +1,291 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Who was the victim in the case docket numbered 2022/AL2562 in California?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tool_choice": "required",
+    "tools": [
+      {
+        "name": "get_case_info",
+        "description": "Retrieve case details using a specific case docket number and court location. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "docket": {
+              "type": "string",
+              "description": "Docket number for the specific court case."
+            },
+            "court": {
+              "type": "string",
+              "description": "Court in which the case was heard."
+            },
+            "info_type": {
+              "type": "string",
+              "description": "Specify the information type needed for the case. i.e., victim, accused, verdict etc."
+            }
+          },
+          "required": [
+            "docket",
+            "court",
+            "info_type"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "system",
+        "content": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.\n- Known explicit context values you can reuse exactly if relevant: 2022/AL2562"
+      },
+      {
+        "role": "user",
+        "content": "Who was the victim in the case docket numbered 2022/AL2562 in California?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_case_info",
+          "description": "Retrieve case details using a specific case docket number and court location. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "docket": {
+                "type": "string",
+                "description": "Docket number for the specific court case."
+              },
+              "court": {
+                "type": "string",
+                "description": "Court in which the case was heard."
+              },
+              "info_type": {
+                "type": "string",
+                "description": "Specify the information type needed for the case. i.e., victim, accused, verdict etc."
+              }
+            },
+            "required": [
+              "docket",
+              "court",
+              "info_type"
+            ]
+          }
+        }
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "tool_schema_snapshot": {
+    "get_case_info": {
+      "type": "object",
+      "properties": {
+        "docket": {
+          "type": "string",
+          "description": "Docket number for the specific court case."
+        },
+        "court": {
+          "type": "string",
+          "description": "Court in which the case was heard."
+        },
+        "info_type": {
+          "type": "string",
+          "description": "Specify the information type needed for the case. i.e., victim, accused, verdict etc."
+        }
+      },
+      "required": [
+        "docket",
+        "court",
+        "info_type"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776946213-khFNIFOoF23Gn62IylpY",
+    "object": "chat.completion",
+    "created": 1776946213,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_40015629",
+              "function": {
+                "name": "get_case_info",
+                "arguments": "{\"docket\":\"2022/AL2562\",\"court\":\"California\",\"info_type\":\"victim\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 366,
+      "completion_tokens": 46,
+      "total_tokens": 412,
+      "cost": 0.0014961375,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 123,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00151125,
+        "upstream_inference_prompt_cost": 0.00082125,
+        "upstream_inference_completions_cost": 0.00069
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776946213-khFNIFOoF23Gn62IylpY",
+    "object": "response",
+    "created_at": 1776946215,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_40015629",
+        "call_id": "call_40015629",
+        "name": "get_case_info",
+        "arguments": "{\"docket\":\"2022/AL2562\",\"court\":\"California\",\"info_type\":\"victim\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 366,
+      "completion_tokens": 46,
+      "total_tokens": 412,
+      "cost": 0.0014961375,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 123,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00151125,
+        "upstream_inference_prompt_cost": 0.00082125,
+        "upstream_inference_completions_cost": 0.00069
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776946213-khFNIFOoF23Gn62IylpY",
+    "object": "chat.completion",
+    "created": 1776946213,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_40015629",
+              "function": {
+                "name": "get_case_info",
+                "arguments": "{\"docket\":\"2022/AL2562\",\"court\":\"California\",\"info_type\":\"victim\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 366,
+      "completion_tokens": 46,
+      "total_tokens": 412,
+      "cost": 0.0014961375,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 123,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00151125,
+        "upstream_inference_prompt_cost": 0.00082125,
+        "upstream_inference_completions_cost": 0.00069
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "repair_kinds": [],
+    "failure_labels": [],
+    "request_predicates": [],
+    "response_shapes": [],
+    "last_observed_role": null,
+    "fallback_applied": false,
+    "request_patches": [
+      "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.",
+      "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.",
+      "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.",
+      "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.",
+      "prompt_injector:Known explicit context values you can reuse exactly if relevant: 2022/AL2562"
+    ]
+  },
+  "status_code": 200,
+  "latency_ms": 2235.539,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "e15705c5-bc64-46ff-bc04-6e3fc7e290e4"
+}

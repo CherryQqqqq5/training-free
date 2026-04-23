@@ -1,0 +1,315 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Send an email to John Doe at john.doe@example.com with the subject 'Meeting' and body 'Let's meet at 10 AM tomorrow'."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tool_choice": "required",
+    "tools": [
+      {
+        "name": "send_email",
+        "description": "Send an email to the specified email address. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "to": {
+              "type": "string",
+              "description": "The email address to send to."
+            },
+            "subject": {
+              "type": "string",
+              "description": "The subject of the email."
+            },
+            "body": {
+              "type": "string",
+              "description": "The body content of the email."
+            },
+            "cc": {
+              "type": "string",
+              "description": "The email address to carbon copy. Default is empty if not specified."
+            },
+            "bcc": {
+              "type": "string",
+              "description": "The email address to blind carbon copy. Default is empty if not specified."
+            }
+          },
+          "required": [
+            "to",
+            "subject",
+            "body"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "system",
+        "content": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.\n- Known explicit context values you can reuse exactly if relevant: Meeting, john.doe, example.com"
+      },
+      {
+        "role": "user",
+        "content": "Send an email to John Doe at john.doe@example.com with the subject 'Meeting' and body 'Let's meet at 10 AM tomorrow'."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "send_email",
+          "description": "Send an email to the specified email address. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "to": {
+                "type": "string",
+                "description": "The email address to send to."
+              },
+              "subject": {
+                "type": "string",
+                "description": "The subject of the email."
+              },
+              "body": {
+                "type": "string",
+                "description": "The body content of the email."
+              },
+              "cc": {
+                "type": "string",
+                "description": "The email address to carbon copy. Default is empty if not specified."
+              },
+              "bcc": {
+                "type": "string",
+                "description": "The email address to blind carbon copy. Default is empty if not specified."
+              }
+            },
+            "required": [
+              "to",
+              "subject",
+              "body"
+            ]
+          }
+        }
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "tool_schema_snapshot": {
+    "send_email": {
+      "type": "object",
+      "properties": {
+        "to": {
+          "type": "string",
+          "description": "The email address to send to."
+        },
+        "subject": {
+          "type": "string",
+          "description": "The subject of the email."
+        },
+        "body": {
+          "type": "string",
+          "description": "The body content of the email."
+        },
+        "cc": {
+          "type": "string",
+          "description": "The email address to carbon copy. Default is empty if not specified."
+        },
+        "bcc": {
+          "type": "string",
+          "description": "The email address to blind carbon copy. Default is empty if not specified."
+        }
+      },
+      "required": [
+        "to",
+        "subject",
+        "body"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776946318-erkiiKjSUqIugesb1lpS",
+    "object": "chat.completion",
+    "created": 1776946318,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_98825551",
+              "function": {
+                "name": "send_email",
+                "arguments": "{\"to\":\"john.doe@example.com\",\"subject\":\"Meeting\",\"body\":\"Let's meet at 10 AM tomorrow\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 399,
+      "completion_tokens": 48,
+      "total_tokens": 447,
+      "cost": 0.001626075,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 122,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0016425,
+        "upstream_inference_prompt_cost": 0.0009225,
+        "upstream_inference_completions_cost": 0.00072
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776946318-erkiiKjSUqIugesb1lpS",
+    "object": "response",
+    "created_at": 1776946319,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_98825551",
+        "call_id": "call_98825551",
+        "name": "send_email",
+        "arguments": "{\"to\":\"john.doe@example.com\",\"subject\":\"Meeting\",\"body\":\"Let's meet at 10 AM tomorrow\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 399,
+      "completion_tokens": 48,
+      "total_tokens": 447,
+      "cost": 0.001626075,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 122,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0016425,
+        "upstream_inference_prompt_cost": 0.0009225,
+        "upstream_inference_completions_cost": 0.00072
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776946318-erkiiKjSUqIugesb1lpS",
+    "object": "chat.completion",
+    "created": 1776946318,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_98825551",
+              "function": {
+                "name": "send_email",
+                "arguments": "{\"to\":\"john.doe@example.com\",\"subject\":\"Meeting\",\"body\":\"Let's meet at 10 AM tomorrow\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 399,
+      "completion_tokens": 48,
+      "total_tokens": 447,
+      "cost": 0.001626075,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 122,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0016425,
+        "upstream_inference_prompt_cost": 0.0009225,
+        "upstream_inference_completions_cost": 0.00072
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "repair_kinds": [],
+    "failure_labels": [],
+    "request_predicates": [],
+    "response_shapes": [],
+    "last_observed_role": null,
+    "fallback_applied": false,
+    "request_patches": [
+      "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.",
+      "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.",
+      "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.",
+      "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.",
+      "prompt_injector:Known explicit context values you can reuse exactly if relevant: Meeting, john.doe, example.com"
+    ]
+  },
+  "status_code": 200,
+  "latency_ms": 2143.614,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "0e60be2e-e936-459d-8b5b-91e05f0e7dc7"
+}

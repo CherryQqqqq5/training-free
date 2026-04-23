@@ -1,0 +1,323 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Create an itinerary for a 7 days trip to Tokyo with daily budgets not exceeding $100 and prefer exploring nature."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tool_choice": "required",
+    "tools": [
+      {
+        "name": "travel_itinerary_generator",
+        "description": "Generate a travel itinerary based on specific destination, duration and daily budget, with preferred exploration type. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "destination": {
+              "type": "string",
+              "description": "Destination city of the trip."
+            },
+            "days": {
+              "type": "integer",
+              "description": "Number of days for the trip."
+            },
+            "daily_budget": {
+              "type": "integer",
+              "description": "The maximum daily budget for the trip."
+            },
+            "exploration_type": {
+              "type": "string",
+              "enum": [
+                "nature",
+                "urban",
+                "history",
+                "culture"
+              ],
+              "description": "The preferred exploration type.",
+              "default": "urban"
+            }
+          },
+          "required": [
+            "destination",
+            "days",
+            "daily_budget"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "system",
+        "content": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+      },
+      {
+        "role": "user",
+        "content": "Create an itinerary for a 7 days trip to Tokyo with daily budgets not exceeding $100 and prefer exploring nature."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "travel_itinerary_generator",
+          "description": "Generate a travel itinerary based on specific destination, duration and daily budget, with preferred exploration type. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "destination": {
+                "type": "string",
+                "description": "Destination city of the trip."
+              },
+              "days": {
+                "type": "integer",
+                "description": "Number of days for the trip."
+              },
+              "daily_budget": {
+                "type": "integer",
+                "description": "The maximum daily budget for the trip."
+              },
+              "exploration_type": {
+                "type": "string",
+                "enum": [
+                  "nature",
+                  "urban",
+                  "history",
+                  "culture"
+                ],
+                "description": "The preferred exploration type.",
+                "default": "urban"
+              }
+            },
+            "required": [
+              "destination",
+              "days",
+              "daily_budget"
+            ]
+          }
+        }
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "tool_schema_snapshot": {
+    "travel_itinerary_generator": {
+      "type": "object",
+      "properties": {
+        "destination": {
+          "type": "string",
+          "description": "Destination city of the trip."
+        },
+        "days": {
+          "type": "integer",
+          "description": "Number of days for the trip."
+        },
+        "daily_budget": {
+          "type": "integer",
+          "description": "The maximum daily budget for the trip."
+        },
+        "exploration_type": {
+          "type": "string",
+          "enum": [
+            "nature",
+            "urban",
+            "history",
+            "culture"
+          ],
+          "description": "The preferred exploration type.",
+          "default": "urban"
+        }
+      },
+      "required": [
+        "destination",
+        "days",
+        "daily_budget"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776945930-FUwChZxnZigIDaiem84g",
+    "object": "chat.completion",
+    "created": 1776945930,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_40204853",
+              "function": {
+                "name": "travel_itinerary_generator",
+                "arguments": "{\"destination\":\"Tokyo\",\"days\":7,\"daily_budget\":100,\"exploration_type\":\"nature\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 369,
+      "completion_tokens": 49,
+      "total_tokens": 418,
+      "cost": 0.00137808,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001392,
+        "upstream_inference_prompt_cost": 0.000657,
+        "upstream_inference_completions_cost": 0.000735
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776945930-FUwChZxnZigIDaiem84g",
+    "object": "response",
+    "created_at": 1776945931,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_40204853",
+        "call_id": "call_40204853",
+        "name": "travel_itinerary_generator",
+        "arguments": "{\"destination\":\"Tokyo\",\"days\":7,\"daily_budget\":100,\"exploration_type\":\"nature\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 369,
+      "completion_tokens": 49,
+      "total_tokens": 418,
+      "cost": 0.00137808,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001392,
+        "upstream_inference_prompt_cost": 0.000657,
+        "upstream_inference_completions_cost": 0.000735
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776945930-FUwChZxnZigIDaiem84g",
+    "object": "chat.completion",
+    "created": 1776945930,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_40204853",
+              "function": {
+                "name": "travel_itinerary_generator",
+                "arguments": "{\"destination\":\"Tokyo\",\"days\":7,\"daily_budget\":100,\"exploration_type\":\"nature\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 369,
+      "completion_tokens": 49,
+      "total_tokens": 418,
+      "cost": 0.00137808,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001392,
+        "upstream_inference_prompt_cost": 0.000657,
+        "upstream_inference_completions_cost": 0.000735
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "repair_kinds": [],
+    "failure_labels": [],
+    "request_predicates": [],
+    "response_shapes": [],
+    "last_observed_role": null,
+    "fallback_applied": false,
+    "request_patches": [
+      "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.",
+      "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.",
+      "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.",
+      "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+    ]
+  },
+  "status_code": 200,
+  "latency_ms": 1784.884,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "c4e6b027-6b15-457f-96d2-c109cfca8f91"
+}

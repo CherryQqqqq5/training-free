@@ -1,0 +1,57 @@
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ /cephfs/qiuyn/training-free/src/grc/cli.py:22 in serve                       │
+│                                                                              │
+│    19 │   import uvicorn                                                     │
+│    20 │   from grc.runtime.proxy import create_app                           │
+│    21 │                                                                      │
+│ ❱  22 │   uvicorn.run(create_app(config, rules_dir, trace_dir), host=host, p │
+│    23                                                                        │
+│    24                                                                        │
+│    25 @app.command()                                                         │
+│                                                                              │
+│ /cephfs/qiuyn/training-free/src/grc/runtime/proxy.py:248 in create_app       │
+│                                                                              │
+│   245                                                                        │
+│   246 def create_app(config_path: str, rules_dir: str, trace_dir: str) -> Fa │
+│   247 │   cfg = yaml.safe_load(Path(config_path).read_text(encoding="utf-8") │
+│ ❱ 248 │   engine = RuleEngine(rules_dir, runtime_policy=cfg.get("runtime_pol │
+│   249 │   trace_store = TraceStore(trace_dir)                                │
+│   250 │                                                                      │
+│   251 │   upstream_cfg = _resolve_upstream_config(cfg)                       │
+│                                                                              │
+│ /cephfs/qiuyn/training-free/src/grc/runtime/engine.py:60 in __init__         │
+│                                                                              │
+│    57 │   │   self.inject_context_literal_hints = bool(self.runtime_policy.g │
+│    58 │   │   self.resolve_contextual_string_args = bool(self.runtime_policy │
+│    59 │   │   self.force_actionable_tool_choice = bool(self.runtime_policy.g │
+│ ❱  60 │   │   self.rules: List[Rule] = self._load_rules()                    │
+│    61 │                                                                      │
+│    62 │   _QUOTED_LITERAL_RE = re.compile(                                   │
+│    63 │   │   r"(?<![A-Za-z0-9])'([^'\n]{1,120})'(?![A-Za-z0-9])|\"([^\"\n]{ │
+│                                                                              │
+│ /cephfs/qiuyn/training-free/src/grc/runtime/engine.py:85 in _load_rules      │
+│                                                                              │
+│    82 │   │   │   │   bundle = PatchBundle(**data)                           │
+│    83 │   │   │   │   rules.extend(bundle.rules)                             │
+│    84 │   │   │   elif data:                                                 │
+│ ❱  85 │   │   │   │   rules.append(Rule(**data))                             │
+│    86 │   │   return sorted((rule for rule in rules if rule.enabled), key=la │
+│    87 │                                                                      │
+│    88 │   def _tool_schema_map(self, request_json: Dict[str, Any]) -> Dict[s │
+│                                                                              │
+│ /cephfs/qiuyn/training-free/.venv/lib/python3.10/site-packages/pydantic/main │
+│ .py:250 in __init__                                                          │
+│                                                                              │
+│    247 │   │   """                                                           │
+│    248 │   │   # `__tracebackhide__` tells pytest and some other tools to om │
+│    249 │   │   __tracebackhide__ = True                                      │
+│ ❱  250 │   │   validated_self = self.__pydantic_validator__.validate_python( │
+│    251 │   │   if self is not validated_self:                                │
+│    252 │   │   │   warnings.warn(                                            │
+│    253 │   │   │   │   'A custom validator is returning a value other than ` │
+╰──────────────────────────────────────────────────────────────────────────────╯
+ValidationError: 1 validation error for Rule
+rule_id
+  Field required [type=missing, input_value={'policy_units': 
+[{'name'...it_context_literals'}}]}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing

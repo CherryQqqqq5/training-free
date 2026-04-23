@@ -1,0 +1,287 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Calculate the derivative of the function 2x^2 at x = 1."
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tool_choice": "required",
+    "tools": [
+      {
+        "name": "calculus_derivative",
+        "description": "Compute the derivative of a function at a specific value. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "function": {
+              "type": "string",
+              "description": "The function to calculate the derivative of."
+            },
+            "value": {
+              "type": "integer",
+              "description": "The value where the derivative needs to be calculated at."
+            },
+            "function_variable": {
+              "type": "string",
+              "description": "The variable present in the function, for instance x or y, etc. Default is 'x'."
+            }
+          },
+          "required": [
+            "function",
+            "value"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "system",
+        "content": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+      },
+      {
+        "role": "user",
+        "content": "Calculate the derivative of the function 2x^2 at x = 1."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculus_derivative",
+          "description": "Compute the derivative of a function at a specific value. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "function": {
+                "type": "string",
+                "description": "The function to calculate the derivative of."
+              },
+              "value": {
+                "type": "integer",
+                "description": "The value where the derivative needs to be calculated at."
+              },
+              "function_variable": {
+                "type": "string",
+                "description": "The variable present in the function, for instance x or y, etc. Default is 'x'."
+              }
+            },
+            "required": [
+              "function",
+              "value"
+            ]
+          }
+        }
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "tool_schema_snapshot": {
+    "calculus_derivative": {
+      "type": "object",
+      "properties": {
+        "function": {
+          "type": "string",
+          "description": "The function to calculate the derivative of."
+        },
+        "value": {
+          "type": "integer",
+          "description": "The value where the derivative needs to be calculated at."
+        },
+        "function_variable": {
+          "type": "string",
+          "description": "The variable present in the function, for instance x or y, etc. Default is 'x'."
+        }
+      },
+      "required": [
+        "function",
+        "value"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776945890-VLZyg2Y9cR8dt2SV2SWG",
+    "object": "chat.completion",
+    "created": 1776945890,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_33314962",
+              "function": {
+                "name": "calculus_derivative",
+                "arguments": "{\"function\":\"2*x**2\",\"value\":1}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 342,
+      "completion_tokens": 36,
+      "total_tokens": 378,
+      "cost": 0.00110484,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001116,
+        "upstream_inference_prompt_cost": 0.000576,
+        "upstream_inference_completions_cost": 0.00054
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776945890-VLZyg2Y9cR8dt2SV2SWG",
+    "object": "response",
+    "created_at": 1776945892,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_33314962",
+        "call_id": "call_33314962",
+        "name": "calculus_derivative",
+        "arguments": "{\"function\":\"2*x**2\",\"value\":1}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 342,
+      "completion_tokens": 36,
+      "total_tokens": 378,
+      "cost": 0.00110484,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001116,
+        "upstream_inference_prompt_cost": 0.000576,
+        "upstream_inference_completions_cost": 0.00054
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776945890-VLZyg2Y9cR8dt2SV2SWG",
+    "object": "chat.completion",
+    "created": 1776945890,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_33314962",
+              "function": {
+                "name": "calculus_derivative",
+                "arguments": "{\"function\":\"2*x**2\",\"value\":1}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 342,
+      "completion_tokens": 36,
+      "total_tokens": 378,
+      "cost": 0.00110484,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001116,
+        "upstream_inference_prompt_cost": 0.000576,
+        "upstream_inference_completions_cost": 0.00054
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "repair_kinds": [],
+    "failure_labels": [],
+    "request_predicates": [],
+    "response_shapes": [],
+    "last_observed_role": null,
+    "fallback_applied": false,
+    "request_patches": [
+      "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.",
+      "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.",
+      "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.",
+      "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+    ]
+  },
+  "status_code": 200,
+  "latency_ms": 2191.994,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "cd12010b-cead-4fb0-82a9-7d17a7247c28"
+}

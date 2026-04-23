@@ -1,0 +1,284 @@
+{
+  "request_original": {
+    "input": [
+      {
+        "role": "user",
+        "content": "What key signature does C# major have?"
+      }
+    ],
+    "model": "gpt-4o-mini-2024-07-18",
+    "store": false,
+    "temperature": 0.001,
+    "tool_choice": "required",
+    "tools": [
+      {
+        "name": "music_theory_key_signature",
+        "description": "Return the key signature of a major or minor scale. Note that the provided function is in Python 3 syntax.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "The root of the scale, e.g., 'C', 'F#', 'Ab'."
+            },
+            "scale_type": {
+              "type": "string",
+              "enum": [
+                "major",
+                "minor"
+              ],
+              "description": "Type of the scale, either 'major' or 'minor'. Default is 'major'."
+            }
+          },
+          "required": [
+            "key"
+          ]
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "request": {
+    "model": "x-ai/grok-3-beta",
+    "messages": [
+      {
+        "role": "system",
+        "content": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+      },
+      {
+        "role": "user",
+        "content": "What key signature does C# major have?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "music_theory_key_signature",
+          "description": "Return the key signature of a major or minor scale. Note that the provided function is in Python 3 syntax.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "The root of the scale, e.g., 'C', 'F#', 'Ab'."
+              },
+              "scale_type": {
+                "type": "string",
+                "enum": [
+                  "major",
+                  "minor"
+                ],
+                "description": "Type of the scale, either 'major' or 'minor'. Default is 'major'."
+              }
+            },
+            "required": [
+              "key"
+            ]
+          }
+        }
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "tool_schema_snapshot": {
+    "music_theory_key_signature": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The root of the scale, e.g., 'C', 'F#', 'Ab'."
+        },
+        "scale_type": {
+          "type": "string",
+          "enum": [
+            "major",
+            "minor"
+          ],
+          "description": "Type of the scale, either 'major' or 'minor'. Default is 'major'."
+        }
+      },
+      "required": [
+        "key"
+      ]
+    }
+  },
+  "raw_response": {
+    "id": "gen-1776946511-UZNFMSzb7CuXmZICZHQ5",
+    "object": "chat.completion",
+    "created": 1776946511,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_71178924",
+              "function": {
+                "name": "music_theory_key_signature",
+                "arguments": "{\"key\":\"C#\",\"scale_type\":\"major\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 329,
+      "completion_tokens": 37,
+      "total_tokens": 366,
+      "cost": 0.00108108,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001092,
+        "upstream_inference_prompt_cost": 0.000537,
+        "upstream_inference_completions_cost": 0.000555
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_response": {
+    "id": "gen-1776946511-UZNFMSzb7CuXmZICZHQ5",
+    "object": "response",
+    "created_at": 1776946512,
+    "model": "x-ai/grok-3",
+    "output": [
+      {
+        "type": "function_call",
+        "id": "call_71178924",
+        "call_id": "call_71178924",
+        "name": "music_theory_key_signature",
+        "arguments": "{\"key\":\"C#\",\"scale_type\":\"major\"}"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 329,
+      "completion_tokens": 37,
+      "total_tokens": 366,
+      "cost": 0.00108108,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001092,
+        "upstream_inference_prompt_cost": 0.000537,
+        "upstream_inference_completions_cost": 0.000555
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "final_chat_response": {
+    "id": "gen-1776946511-UZNFMSzb7CuXmZICZHQ5",
+    "object": "chat.completion",
+    "created": 1776946511,
+    "model": "x-ai/grok-3",
+    "provider": "xAI",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "native_finish_reason": "completed",
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "refusal": null,
+          "reasoning": null,
+          "tool_calls": [
+            {
+              "type": "function",
+              "index": 0,
+              "id": "call_71178924",
+              "function": {
+                "name": "music_theory_key_signature",
+                "arguments": "{\"key\":\"C#\",\"scale_type\":\"major\"}"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 329,
+      "completion_tokens": 37,
+      "total_tokens": 366,
+      "cost": 0.00108108,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 200,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001092,
+        "upstream_inference_prompt_cost": 0.000537,
+        "upstream_inference_completions_cost": 0.000555
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  },
+  "repairs": [],
+  "validation": {
+    "trace_id": null,
+    "rule_hits": [],
+    "issues": [],
+    "repairs": [],
+    "repair_kinds": [],
+    "failure_labels": [],
+    "request_predicates": [],
+    "response_shapes": [],
+    "last_observed_role": null,
+    "fallback_applied": false,
+    "request_patches": [
+      "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.",
+      "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.",
+      "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.",
+      "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message."
+    ]
+  },
+  "status_code": 200,
+  "latency_ms": 1992.633,
+  "upstream_profile": "openrouter",
+  "upstream_model": "x-ai/grok-3-beta",
+  "upstream_base_url": "https://openrouter.ai/api/v1",
+  "request_endpoint": "/v1/responses",
+  "trace_id": "277d2a1f-9d12-499a-80b1-93908c4482bc"
+}
