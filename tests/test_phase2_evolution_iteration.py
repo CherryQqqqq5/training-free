@@ -106,7 +106,7 @@ class Phase2EvolutionIterationTests(unittest.TestCase):
                 encoding="utf-8",
             )
 
-            selected = runner._select_candidate_dir(proposal_summary, max_candidates=2)
+            selected = runner._select_candidate_dir(proposal_summary, max_candidates=1)
 
         self.assertEqual(selected, reuse)
 
@@ -203,20 +203,20 @@ class Phase2EvolutionIterationTests(unittest.TestCase):
                         ),
                         encoding="utf-8",
                     )
-                elif "run_bfcl_v4_patch.sh" in command and "candidate_run_rerun" not in command and "simple_python" not in command:
+                elif step_name.endswith("_target_run"):
                     candidate_dir.mkdir(parents=True, exist_ok=True)
                     (candidate_dir / "metrics.json").write_text(
                         json.dumps({"test_category": "multi_turn_miss_param", "subsets": {"multi_turn_miss_param": 40.0}}),
                         encoding="utf-8",
                     )
-                elif "run_bfcl_v4_patch.sh" in command and "simple_python" in command:
-                    holdout_artifacts = out / "holdout_run" / "artifacts"
+                elif step_name.endswith("_holdout_run"):
+                    holdout_artifacts = out / "candidate_runs" / candidate_dir.name / "holdout" / "artifacts"
                     holdout_artifacts.mkdir(parents=True, exist_ok=True)
                     (holdout_artifacts / "metrics.json").write_text(
                         json.dumps({"test_category": "simple_python", "subsets": {"simple_python": 91.0}}),
                         encoding="utf-8",
                     )
-                elif "run_bfcl_v4_patch.sh" in command and "candidate_run_rerun" in command:
+                elif step_name.endswith("_rerun"):
                     rerun_dir = candidate_dir / "rerun"
                     rerun_dir.mkdir(parents=True, exist_ok=True)
                     (rerun_dir / "metrics.json").write_text(
@@ -258,6 +258,7 @@ class Phase2EvolutionIterationTests(unittest.TestCase):
 
         self.assertEqual(summary["mode"], "execute")
         self.assertEqual(summary["selected_proposal_mode"], "fresh")
+        self.assertEqual(summary["evaluated_candidate_count"], 1)
         self.assertEqual(summary["accepted_count"], 1)
         self.assertEqual(summary["target_delta"], 3.5)
         self.assertEqual(summary["holdout_delta"], 1.0)

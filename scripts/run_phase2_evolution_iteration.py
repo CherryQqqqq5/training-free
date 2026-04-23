@@ -24,12 +24,15 @@ def _load_json(path: Path | None) -> dict[str, Any]:
     return data if isinstance(data, dict) else {}
 
 
-def _candidate_dirs(proposal_summary_path: Path, max_candidates: int) -> list[Path]:
+def _candidate_dirs(proposal_summary_path: Path, max_candidates: int, *, runnable_only: bool = False) -> list[Path]:
     if not proposal_summary_path.exists():
         return []
     data = json.loads(proposal_summary_path.read_text(encoding="utf-8"))
     proposals = data.get("proposals") or []
-    return [Path(item["candidate_dir"]) for item in proposals[:max_candidates] if isinstance(item, dict) and item.get("candidate_dir")]
+    dirs = [Path(item["candidate_dir"]) for item in proposals if isinstance(item, dict) and item.get("candidate_dir")]
+    if runnable_only:
+        dirs = [candidate_dir for candidate_dir in dirs if _candidate_is_actionable(candidate_dir)]
+    return dirs[:max_candidates]
 
 
 def _parse_optional_run(value: str) -> tuple[str, Path]:
@@ -66,6 +69,11 @@ def _proposal_metadata(candidate_dir: Path) -> dict[str, Any]:
     return _load_json(candidate_dir / "proposal_metadata.json")
 
 
+def _candidate_is_actionable(candidate_dir: Path) -> bool:
+    status = str(_compile_status(candidate_dir).get("status") or _proposal_metadata(candidate_dir).get("compile_status") or "")
+    return status == "actionable_patch"
+
+
 def _proposal_summary(proposal_summary_path: Path) -> dict[str, Any]:
     return _load_json(proposal_summary_path)
 
@@ -81,14 +89,10 @@ def _proposal_count_by_mode(summary: dict[str, Any]) -> dict[str, int]:
 
 
 def _select_candidate_dir(proposal_summary_path: Path, max_candidates: int) -> Path:
-    candidates = _candidate_dirs(proposal_summary_path, max_candidates)
+    candidates = _candidate_dirs(proposal_summary_path, max_candidates, runnable_only=True)
     if not candidates:
         raise SystemExit(f"no proposal candidates found in {proposal_summary_path}")
-    for candidate_dir in candidates:
-        status = str(_compile_status(candidate_dir).get("status") or _proposal_metadata(candidate_dir).get("compile_status") or "")
-        if status == "actionable_patch":
-            return candidate_dir
-    raise SystemExit("no executable candidate proposals found within the allowed proposal set")
+    return candidates[0]
 
 
 def _run_command(command: str) -> None:
@@ -159,6 +163,13 @@ def _build_command_plan(
     target_category: str,
     holdout_category: str,
     candidate_dir: Path | None,
+    candidate_run_root: Path | None = None,
+    holdout_run_root_override: Path | None = None,
+    rerun_root_override: Path | None = None,
+    target_port: int = 8022,
+    holdout_port: int = 8012,
+    rerun_port: int = 8013,
+    selection_root: Path | None = None,
 ) -> dict[str, str]:
     proposal_root = out_root / "proposals"
     taxonomy_json = out_root / "taxonomy_report.json"
@@ -168,25 +179,26 @@ def _build_command_plan(
         candidate_dir = _first_candidate_dir(proposal_root)
     candidate_rule_path = candidate_dir / "rule.yaml"
     candidate_metrics = candidate_dir / "metrics.json"
-    candidate_run_root = out_root / "candidate_run"
+    candidate_run_root = candidate_run_root or (out_root / "candidate_run")
     candidate_trace_dir = candidate_run_root / "traces"
-    holdout_run_root = out_root / "holdout_run"
+    holdout_run_root = holdout_run_root_override or (out_root / "holdout_run")
     holdout_trace_dir = holdout_run_root / "traces"
     holdout_artifact_dir = holdout_run_root / "artifacts"
-    rerun_root = out_root / "candidate_run_rerun"
+    rerun_root = rerun_root_override or (out_root / "candidate_run_rerun")
     rerun_trace_dir = rerun_root / "traces"
     rerun_artifact_dir = candidate_dir / "rerun"
     holdout_baseline_metrics = (holdout_root / "artifacts/metrics.json") if holdout_root else None
+    selection_root = selection_root or out_root
 
     commands = {
         "taxonomy": f"cd {repo_root} && PYTHONPATH=src python scripts/build_phase2_taxonomy_report.py --run baseline={baseline_root / 'traces'} --run primary_v4={target_root / 'traces'} --metrics baseline={baseline_root / 'artifacts/metrics.json'} --metrics primary_v4={target_root / 'artifacts/metrics.json'} --out-json {taxonomy_json} --out-md {taxonomy_md}",
         "mine": f"cd {repo_root} && PYTHONPATH=src python -m grc.cli mine --trace-dir {target_root / 'traces'} --out {failures_path}",
         "propose": f"cd {repo_root} && PYTHONPATH=src python -m grc.cli propose --failures {failures_path} --history {history} --out-dir {proposal_root} --top-k-signatures 3 --target-category {target_category} --holdout-category {holdout_category}",
-        "target_run": f"cd {repo_root} && bash scripts/run_bfcl_v4_patch.sh \"$GRC_BFCL_MODEL\" {candidate_run_root} 8022 {target_category} {repo_root / 'configs/runtime_bfcl_structured.yaml'} {candidate_dir} {candidate_trace_dir} {candidate_dir} {baseline_root / 'artifacts/metrics.json'}",
-        "holdout_run": f"cd {repo_root} && bash scripts/run_bfcl_v4_patch.sh \"$GRC_BFCL_MODEL\" {holdout_run_root} 8012 {holdout_category} {repo_root / 'configs/runtime_bfcl_structured.yaml'} {candidate_dir} {holdout_trace_dir} {holdout_artifact_dir} {holdout_baseline_metrics}",
-        "rerun": f"cd {repo_root} && bash scripts/run_bfcl_v4_patch.sh \"$GRC_BFCL_MODEL\" {rerun_root} 8013 {target_category} {repo_root / 'configs/runtime_bfcl_structured.yaml'} {candidate_dir} {rerun_trace_dir} {rerun_artifact_dir} {baseline_root / 'artifacts/metrics.json'}",
+        "target_run": f"cd {repo_root} && bash scripts/run_bfcl_v4_patch.sh \"$GRC_BFCL_MODEL\" {candidate_run_root} {target_port} {target_category} {repo_root / 'configs/runtime_bfcl_structured.yaml'} {candidate_dir} {candidate_trace_dir} {candidate_dir} {baseline_root / 'artifacts/metrics.json'}",
+        "holdout_run": f"cd {repo_root} && bash scripts/run_bfcl_v4_patch.sh \"$GRC_BFCL_MODEL\" {holdout_run_root} {holdout_port} {holdout_category} {repo_root / 'configs/runtime_bfcl_structured.yaml'} {candidate_dir} {holdout_trace_dir} {holdout_artifact_dir} {holdout_baseline_metrics}",
+        "rerun": f"cd {repo_root} && bash scripts/run_bfcl_v4_patch.sh \"$GRC_BFCL_MODEL\" {rerun_root} {rerun_port} {target_category} {repo_root / 'configs/runtime_bfcl_structured.yaml'} {candidate_dir} {rerun_trace_dir} {rerun_artifact_dir} {baseline_root / 'artifacts/metrics.json'}",
         "paired_rerun": f"cd {repo_root} && PYTHONPATH=src python scripts/assess_paired_rerun.py --baseline {baseline_root / 'artifacts/metrics.json'} --primary {candidate_metrics} --rerun {rerun_artifact_dir / 'metrics.json'} --out {candidate_dir / 'paired_rerun.json'}",
-        "select": f"cd {repo_root} && PYTHONPATH=src python -m grc.cli select --baseline-metrics {baseline_root / 'artifacts/metrics.json'} --candidate-metrics {candidate_metrics} --candidate-dir {candidate_dir} --rule-path {candidate_rule_path} --accepted-dir {repo_root / 'rules/accepted'} --rejected-dir {repo_root / 'rules/rejected'} --active-dir {repo_root / 'rules/active'} --out {candidate_dir / 'accept.json'}",
+        "select": f"cd {repo_root} && PYTHONPATH=src python -m grc.cli select --baseline-metrics {baseline_root / 'artifacts/metrics.json'} --candidate-metrics {candidate_metrics} --candidate-dir {candidate_dir} --rule-path {candidate_rule_path} --accepted-dir {selection_root / 'accepted'} --rejected-dir {selection_root / 'rejected'} --active-dir {selection_root / 'active'} --out {candidate_dir / 'accept.json'}",
     }
     return commands
 
@@ -200,6 +212,16 @@ def _failure_rate_by_label(taxonomy_report: dict[str, Any], *, run_label: str) -
                 if isinstance(row, dict)
             }
     return {}
+
+
+def _candidate_decision_rank(result: dict[str, Any]) -> tuple[int, int, float, float]:
+    decision_code = str(result.get("decision_code") or "")
+    return (
+        1 if decision_code == "accepted" else 0,
+        1 if decision_code == "retained" else 0,
+        float(result.get("target_delta") or 0.0),
+        float(result.get("holdout_delta") or 0.0),
+    )
 
 
 def main() -> None:
@@ -293,41 +315,80 @@ def main() -> None:
     for key in ("taxonomy", "mine", "propose"):
         _run_logged_command(planned_command_map[key], step_name=key, out_root=out_root)
 
-    try:
-        candidate_dir = _select_candidate_dir(proposal_summary_path, args.max_candidates)
-    except SystemExit as exc:
+    candidate_dirs = _candidate_dirs(proposal_summary_path, args.max_candidates, runnable_only=True)
+    if not candidate_dirs:
         _write_failure_state(
             out_root,
             step_name="select_candidate",
-            reason=str(exc),
+            reason="no executable candidate proposals found within the allowed proposal set",
             proposal_summary_path=str(proposal_summary_path),
             max_candidates=args.max_candidates,
         )
-        raise
-    execute_command_map = _build_command_plan(
-        repo_root=repo_root,
-        baseline_root=baseline_root,
-        target_root=target_root,
-        holdout_root=holdout_root,
-        out_root=out_root,
-        history=args.history,
-        target_category=args.target_category,
-        holdout_category=args.holdout_category,
-        candidate_dir=candidate_dir,
-    )
-    for key in ("target_run", "holdout_run", "rerun", "paired_rerun", "select"):
-        _run_logged_command(execute_command_map[key], step_name=key, out_root=out_root)
+        raise SystemExit("no executable candidate proposals found within the allowed proposal set")
+
+    candidate_results: list[dict[str, Any]] = []
+    execute_command_map = planned_command_map
+    for candidate_index, candidate_dir in enumerate(candidate_dirs):
+        candidate_name = candidate_dir.name
+        candidate_run_root = out_root / "candidate_runs" / candidate_name / "target"
+        holdout_candidate_root = out_root / "candidate_runs" / candidate_name / "holdout"
+        rerun_candidate_root = out_root / "candidate_runs" / candidate_name / "rerun"
+        execute_command_map = _build_command_plan(
+            repo_root=repo_root,
+            baseline_root=baseline_root,
+            target_root=target_root,
+            holdout_root=holdout_root,
+            out_root=out_root,
+            history=args.history,
+            target_category=args.target_category,
+            holdout_category=args.holdout_category,
+            candidate_dir=candidate_dir,
+            candidate_run_root=candidate_run_root,
+            holdout_run_root_override=holdout_candidate_root,
+            rerun_root_override=rerun_candidate_root,
+            target_port=8022 + candidate_index * 10,
+            holdout_port=8012 + candidate_index * 10,
+            rerun_port=8013 + candidate_index * 10,
+            selection_root=out_root / "selection" / candidate_name,
+        )
+        for key in ("target_run", "holdout_run", "rerun", "paired_rerun", "select"):
+            _run_logged_command(
+                execute_command_map[key],
+                step_name=f"{candidate_name}_{key}",
+                out_root=out_root,
+            )
+
+        decision = _load_json(candidate_dir / "accept.json")
+        holdout_metrics = _load_json(holdout_candidate_root / "artifacts" / "metrics.json")
+        holdout_baseline_metrics = _load_json((holdout_root / "artifacts" / "metrics.json") if holdout_root else None)
+        holdout_target = _target_metric(holdout_metrics)
+        holdout_baseline_target = _target_metric(holdout_baseline_metrics)
+        holdout_delta = None
+        if holdout_target is not None and holdout_baseline_target is not None:
+            holdout_delta = holdout_target - holdout_baseline_target
+        candidate_result = {
+            "candidate_dir": str(candidate_dir),
+            "proposal_mode": _proposal_metadata(candidate_dir).get("proposal_mode")
+            or _proposal_metadata(candidate_dir).get("proposal_kind"),
+            "decision_code": decision.get("decision_code"),
+            "accept": decision.get("accept"),
+            "target_delta": decision.get("target_delta"),
+            "selection_score": decision.get("selection_score"),
+            "holdout_delta": holdout_delta,
+            "clean_slice_regression": max(0.0, -(holdout_delta or 0.0)),
+            "commands": execute_command_map,
+        }
+        _json_dump(candidate_dir / "candidate_result.json", candidate_result)
+        candidate_results.append(candidate_result)
+
+    selected_result = sorted(candidate_results, key=_candidate_decision_rank, reverse=True)[0]
+    candidate_dir = Path(str(selected_result["candidate_dir"]))
+    execute_command_map = dict(selected_result.get("commands") or execute_command_map)
 
     taxonomy_report = _load_json(out_root / "taxonomy_report.json")
     proposal_summary = _proposal_summary(proposal_summary_path)
     decision = _load_json(candidate_dir / "accept.json")
-    holdout_metrics = _load_json(out_root / "holdout_run" / "artifacts" / "metrics.json")
-    holdout_baseline_metrics = _load_json((holdout_root / "artifacts" / "metrics.json") if holdout_root else None)
-    holdout_target = _target_metric(holdout_metrics)
-    holdout_baseline_target = _target_metric(holdout_baseline_metrics)
-    holdout_delta = None
-    if holdout_target is not None and holdout_baseline_target is not None:
-        holdout_delta = holdout_target - holdout_baseline_target
+    holdout_delta = selected_result.get("holdout_delta")
 
     proposal_count_by_mode = _proposal_count_by_mode(proposal_summary)
     selected_metadata = _proposal_metadata(candidate_dir)
@@ -336,7 +397,11 @@ def main() -> None:
         {
             "planned_commands": list(execute_command_map.values()),
             "selected_candidate_dir": str(candidate_dir),
-            "selected_proposal_mode": selected_metadata.get("proposal_mode") or selected_metadata.get("proposal_kind"),
+            "selected_proposal_mode": selected_result.get("proposal_mode")
+            or selected_metadata.get("proposal_mode")
+            or selected_metadata.get("proposal_kind"),
+            "evaluated_candidate_count": len(candidate_results),
+            "candidate_results": candidate_results,
             "failure_rate_by_label": _failure_rate_by_label(taxonomy_report, run_label="primary_v4"),
             "top_failure_signatures": proposal_summary.get("top_failure_signatures") or [],
             "proposal_count_by_mode": proposal_count_by_mode,

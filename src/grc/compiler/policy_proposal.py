@@ -6,7 +6,7 @@ import types
 from pathlib import Path
 from typing import Any
 
-from grc.compiler.failure_signature import top_k_signatures
+from grc.compiler.failure_signature import signature_from_failure, top_k_signatures
 from grc.selector.history import retrieve
 
 try:
@@ -40,10 +40,18 @@ def _write_yaml_like(path: Path, payload: dict[str, Any]) -> None:
 
 
 def _signature_matches(failure: dict[str, Any], signature: dict[str, Any]) -> bool:
-    return (
-        str(failure.get("stage")) == str(signature.get("stage"))
-        and str(failure.get("failure_type") or failure.get("error_type")) == str(signature.get("type"))
-    )
+    if str(failure.get("stage")) != str(signature.get("stage")):
+        return False
+    if str(failure.get("failure_type") or failure.get("error_type")) != str(signature.get("type")):
+        return False
+    failure_signature = signature_from_failure(type("Failure", (), failure)())
+    wanted_hash = str(signature.get("tool_schema_hash") or "*")
+    if wanted_hash != "*" and failure_signature.tool_schema_hash != wanted_hash:
+        return False
+    wanted_literals = signature.get("literals_pattern")
+    if wanted_literals and failure_signature.literals_pattern != wanted_literals:
+        return False
+    return True
 
 
 def _subset_failures(failures: list[dict[str, Any]], signature: dict[str, Any]) -> list[dict[str, Any]]:
@@ -51,6 +59,9 @@ def _subset_failures(failures: list[dict[str, Any]], signature: dict[str, Any]) 
 
 
 def _policy_units_from_record(record: dict[str, Any]) -> list[dict[str, Any]]:
+    units = record.get("policy_units")
+    if isinstance(units, list) and units:
+        return [unit for unit in units if isinstance(unit, dict)]
     payload = {
         "policy_units": [
             {
@@ -101,15 +112,37 @@ def _history_failure_records(
     *,
     request_predicates: list[str] | None = None,
 ) -> list[dict[str, Any]]:
+    policy_units = _policy_units_from_record(record)
+    policy_unit = policy_units[0] if policy_units else {}
+    policy_trigger = policy_unit.get("trigger") if isinstance(policy_unit.get("trigger"), dict) else {}
+    policy_signature = (
+        policy_unit.get("source_failure_signature")
+        if isinstance(policy_unit.get("source_failure_signature"), dict)
+        else {}
+    )
     error_families = [
         str(item).strip()
-        for item in (record.get("error_families") or [])
+        for item in (record.get("error_families") or policy_trigger.get("error_types") or [])
         if isinstance(item, str) and str(item).strip()
     ]
     error_type = error_families[0] if error_families else str(signature.get("type") or "validation_issue").lower()
     stage = str(signature.get("stage") or "PRE_TOOL")
     failure_type = str(signature.get("type") or error_type.upper())
     predicates = list(request_predicates or record.get("request_predicates") or [])
+    recommended_tools = [
+        str(item)
+        for item in (
+            policy_unit.get("recommended_tools")
+            or record.get("recommended_tools")
+            or []
+        )
+        if isinstance(item, str) and item.strip()
+    ]
+    tool_schema_hash = str(
+        signature.get("tool_schema_hash")
+        or policy_signature.get("tool_schema_hash")
+        or "*"
+    )
     return [
         {
             "trace_id": f"history_{record.get('patch_id') or 'unknown'}_{error_type}",
@@ -120,6 +153,9 @@ def _history_failure_records(
             "failure_type": failure_type,
             "failure_label": f"({stage},{failure_type})",
             "request_predicates": predicates,
+            "predicate_evidence": {predicate: True for predicate in predicates},
+            "recommended_tools": recommended_tools,
+            "tool_schema_hash": tool_schema_hash,
         }
     ]
 
@@ -186,6 +222,7 @@ def generate_proposals(
             "holdout_category": holdout_category,
             "iteration_id": iteration_id,
             "compile_status": compile_status.get("status"),
+            "runnable": compile_status.get("status") == "actionable_patch",
         }
         _write_json(fresh_dir / "proposal_metadata.json", metadata)
         created.append({"candidate_dir": str(fresh_dir), **metadata})
@@ -199,6 +236,10 @@ def generate_proposals(
                 patch_id=reuse_dir.name,
                 request_predicates=list(signature.get("request_predicates") or reused.get("request_predicates") or []),
             )
+            _write_yaml_like(
+                reuse_dir / "source_policy_unit.yaml",
+                {"policy_units": _policy_units_from_record(reused)},
+            )
             reuse_meta = {
                 "proposal_mode": "reuse",
                 "proposal_kind": "reuse",
@@ -209,6 +250,7 @@ def generate_proposals(
                 "holdout_category": holdout_category,
                 "iteration_id": iteration_id,
                 "compile_status": reuse_compile_status.get("status"),
+                "runnable": reuse_compile_status.get("status") == "actionable_patch",
             }
             _write_json(reuse_dir / "proposal_metadata.json", reuse_meta)
             created.append({"candidate_dir": str(reuse_dir), **reuse_meta})
@@ -222,6 +264,10 @@ def generate_proposals(
                     patch_id=specialize_dir.name,
                     request_predicates=list(signature.get("request_predicates") or []),
                 )
+                _write_yaml_like(
+                    specialize_dir / "source_policy_unit.yaml",
+                    {"policy_units": _policy_units_from_record(reused)},
+                )
                 specialize_meta = {
                     "proposal_mode": "specialize",
                     "proposal_kind": "specialize",
@@ -232,6 +278,7 @@ def generate_proposals(
                     "holdout_category": holdout_category,
                     "iteration_id": iteration_id,
                     "compile_status": specialize_compile_status.get("status"),
+                    "runnable": specialize_compile_status.get("status") == "actionable_patch",
                 }
                 _write_json(specialize_dir / "proposal_metadata.json", specialize_meta)
                 created.append({"candidate_dir": str(specialize_dir), **specialize_meta})

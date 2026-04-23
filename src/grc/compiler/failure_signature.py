@@ -45,12 +45,17 @@ def literals_pattern(failure_case: Any) -> str:
 def signature_from_failure(failure_case: Any, trace_payload: dict[str, Any] | None = None) -> FailureSignature:
     trace_payload = trace_payload or {}
     schema_snapshot = trace_payload.get("tool_schema_snapshot")
+    explicit_hash = (
+        getattr(failure_case, "tool_schema_hash", None)
+        or trace_payload.get("tool_schema_hash")
+        or trace_payload.get("tool_schema_fingerprint")
+    )
     stage = getattr(failure_case, "stage", None) or "UNKNOWN"
     failure_type = getattr(failure_case, "failure_type", None) or getattr(failure_case, "error_type", "UNKNOWN")
     return FailureSignature(
         stage=str(stage),
         type=str(failure_type),
-        tool_schema_hash=tool_schema_hash(schema_snapshot),
+        tool_schema_hash=str(explicit_hash) if explicit_hash else tool_schema_hash(schema_snapshot),
         literals_pattern=literals_pattern(failure_case),
     )
 

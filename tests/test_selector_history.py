@@ -21,10 +21,11 @@ policy_units:
     trigger:
       error_types: [actionable_no_tool_decision]
       request_predicates: [tools_available]
+    recommended_tools: [lookup_file]
     source_failure_signature:
       stage: PRE_TOOL
       type: ACTIONABLE_NO_TOOL_DECISION
-      tool_schema_hash: "*"
+      tool_schema_hash: "schema123"
       literals_pattern: explicit_context_literals
 """,
                 encoding="utf-8",
@@ -41,7 +42,7 @@ policy_units:
                 {
                     "stage": "PRE_TOOL",
                     "type": "ACTIONABLE_NO_TOOL_DECISION",
-                    "tool_schema_hash": "*",
+                    "tool_schema_hash": "schema123",
                     "literals_pattern": "explicit_context_literals",
                     "request_predicates": ["tools_available"],
                 },
@@ -50,6 +51,8 @@ policy_units:
 
         self.assertEqual(record["decision_code"], "retained")
         self.assertEqual(record["error_families"], ["actionable_no_tool_decision"])
+        self.assertEqual(record["recommended_tools"], ["lookup_file"])
+        self.assertEqual(record["failure_signatures"][0]["tool_schema_hash"], "schema123")
         self.assertEqual(len(matches), 1)
         self.assertGreaterEqual(matches[0]["match_score"], 10)
         self.assertEqual(json.loads(history_text)["decision_code"], "retained")

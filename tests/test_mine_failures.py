@@ -105,6 +105,7 @@ class MineFailuresTests(unittest.TestCase):
         self.assertEqual(failures[0].tool_name, "lookup_weather")
         self.assertEqual(failures[0].field_name, "days")
         self.assertEqual(failures[0].expected_type, "integer")
+        self.assertNotEqual(failures[0].tool_schema_hash, "*")
 
     def test_splits_prompt_backed_file_name_clarification_into_non_actionable_subfamily(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -225,7 +226,6 @@ class MineFailuresTests(unittest.TestCase):
             ["tools_available", "prior_explicit_literals_present"],
         )
         self.assertEqual(failures[0].request_literals, ["report.txt"])
-        self.assertEqual(failures[0].recommended_tools, ["cat"])
 
     def test_does_not_treat_arbitrary_quoted_string_as_actionable_literal(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

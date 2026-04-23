@@ -10,6 +10,7 @@ from grc.compiler.failure_taxonomy import (
     classify_error_type,
     classify_no_tool_failure,
 )
+from grc.compiler.failure_signature import tool_schema_hash
 from grc.types import FailureCase
 from grc.utils.jsonfix import parse_loose_json
 from grc.utils.text_tool_calls import (
@@ -388,6 +389,7 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
         raw = data.get("raw_response", {})
         validation = data.get("validation", {})
         tool_map = _tool_schema_map(data)
+        schema_hash = tool_schema_hash(tool_map)
         explicit_literals = _explicit_context_literals(data)
         seen_failure_keys: set[tuple[str, int, str, str, str | None]] = set()
         inferred_no_tool_call_kind: str | None = None
@@ -405,20 +407,25 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
             if key in seen_failure_keys:
                 return
             seen_failure_keys.add(key)
+            updates: dict[str, Any] = {}
+            if not case.tool_schema_hash or case.tool_schema_hash == "*":
+                updates["tool_schema_hash"] = schema_hash
             if not case.stage or not case.failure_type or not case.failure_label:
                 classification = classify_error_type(
                     case.error_type,
                     request_predicates=case.request_predicates,
                     has_prior_tool_output=_has_prior_tool_outputs(data),
                 )
-                case = case.model_copy(
-                    update={
+                updates.update(
+                    {
                         "stage": case.stage or classification.stage.value,
                         "failure_type": case.failure_type or classification.failure_type.value,
                         "failure_label": case.failure_label or classification.label,
                         "predicate_evidence": case.predicate_evidence or classification.predicate_evidence,
                     }
                 )
+            if updates:
+                case = case.model_copy(update=updates)
             failures.append(case)
 
         for choice in raw.get("choices", []):

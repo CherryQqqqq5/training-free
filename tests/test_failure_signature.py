@@ -24,11 +24,25 @@ class FailureSignatureTests(unittest.TestCase):
         signature = signature_from_failure(failure)
         self.assertEqual(signature.literals_pattern, "explicit_context_literals")
 
+    def test_signature_prefers_failure_schema_hash(self) -> None:
+        failure = FailureCase(
+            trace_id="t1",
+            turn_index=0,
+            tool_name="__none__",
+            error_type="actionable_no_tool_decision",
+            stage="PRE_TOOL",
+            failure_type="ACTIONABLE_NO_TOOL_DECISION",
+            tool_schema_hash="abc123",
+        )
+        signature = signature_from_failure(failure, trace_payload={"tool_schema_snapshot": {"other": True}})
+        self.assertEqual(signature.tool_schema_hash, "abc123")
+
     def test_top_k_signatures_aggregates(self) -> None:
         failures = [
-            FailureCase(trace_id="t1", turn_index=0, tool_name="__none__", error_type="x", stage="PRE_TOOL", failure_type="ACTIONABLE_NO_TOOL_DECISION", failure_label="(PRE_TOOL,ACTIONABLE_NO_TOOL_DECISION)"),
-            FailureCase(trace_id="t2", turn_index=0, tool_name="__none__", error_type="x", stage="PRE_TOOL", failure_type="ACTIONABLE_NO_TOOL_DECISION", failure_label="(PRE_TOOL,ACTIONABLE_NO_TOOL_DECISION)"),
+            FailureCase(trace_id="t1", turn_index=0, tool_name="__none__", error_type="x", stage="PRE_TOOL", failure_type="ACTIONABLE_NO_TOOL_DECISION", failure_label="(PRE_TOOL,ACTIONABLE_NO_TOOL_DECISION)", tool_schema_hash="hash_a"),
+            FailureCase(trace_id="t2", turn_index=0, tool_name="__none__", error_type="x", stage="PRE_TOOL", failure_type="ACTIONABLE_NO_TOOL_DECISION", failure_label="(PRE_TOOL,ACTIONABLE_NO_TOOL_DECISION)", tool_schema_hash="hash_a"),
         ]
         summaries = top_k_signatures(failures, k=1)
         self.assertEqual(summaries[0].count, 2)
         self.assertEqual(summaries[0].failure_labels, ["(PRE_TOOL,ACTIONABLE_NO_TOOL_DECISION)"])
+        self.assertEqual(summaries[0].signature.tool_schema_hash, "hash_a")

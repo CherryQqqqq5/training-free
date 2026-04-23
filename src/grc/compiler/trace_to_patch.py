@@ -111,6 +111,17 @@ def _recommended_tools_from_failures(failures: List[FailureCase]) -> List[str]:
     return recommended[:3]
 
 
+def _tool_schema_hash_from_failures(failures: List[FailureCase]) -> str:
+    counts = Counter(
+        case.tool_schema_hash
+        for case in failures
+        if isinstance(case.tool_schema_hash, str) and case.tool_schema_hash and case.tool_schema_hash != "*"
+    )
+    if not counts:
+        return "*"
+    return counts.most_common(1)[0][0]
+
+
 def _build_failure_ir(grouped: DefaultDict[str, List[FailureCase]]) -> List[FailureIR]:
     failure_irs: List[FailureIR] = []
     for tool_name, failures in grouped.items():
@@ -149,6 +160,7 @@ def _build_failure_ir(grouped: DefaultDict[str, List[FailureCase]]) -> List[Fail
                         )[:8],
                         predicate_evidence=taxonomy["predicate_evidence"],
                         recommended_tools=_recommended_tools_from_failures(scoped_failures),
+                        tool_schema_hash=_tool_schema_hash_from_failures(scoped_failures),
                     )
                 )
             continue
@@ -188,6 +200,7 @@ def _build_failure_ir(grouped: DefaultDict[str, List[FailureCase]]) -> List[Fail
                 )[:8],
                 predicate_evidence=taxonomy["predicate_evidence"],
                 recommended_tools=_recommended_tools_from_failures(failures),
+                tool_schema_hash=_tool_schema_hash_from_failures(failures),
             )
         )
 
@@ -223,6 +236,7 @@ def _failure_summary(
                 "failure_labels": item.failure_labels,
                 "field_names": item.field_names,
                 "recommended_tools": item.recommended_tools,
+                "tool_schema_hash": item.tool_schema_hash,
             }
             for item in failure_irs
         ],
@@ -265,7 +279,7 @@ def _policy_units_from_rules(rules: List[Rule], failure_irs: List[FailureIR]) ->
                 "source_failure_signature": {
                     "stage": (source_ir.stages[0] if source_ir and source_ir.stages else "*"),
                     "type": (source_ir.failure_types[0] if source_ir and source_ir.failure_types else error_type),
-                    "tool_schema_hash": "*",
+                    "tool_schema_hash": (source_ir.tool_schema_hash if source_ir else "*"),
                     "literals_pattern": (
                         "explicit_context_literals"
                         if source_ir and source_ir.request_literals
@@ -538,6 +552,7 @@ def _build_global_guard_rules(grouped: DefaultDict[str, List[FailureCase]]) -> L
                 }
             )[:8],
             recommended_tools=_recommended_tools_from_failures(scoped_failures),
+            tool_schema_hash=_tool_schema_hash_from_failures(scoped_failures),
         )
         if error_type == "actionable_no_tool_decision":
             prompt_fragments = _actionable_no_tool_prompt_fragments(failure_ir)

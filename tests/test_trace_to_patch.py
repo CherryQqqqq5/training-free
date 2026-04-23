@@ -53,6 +53,7 @@ class TraceToPatchTests(unittest.TestCase):
                         "request_predicates": ["tools_available", "prior_explicit_literals_present"],
                         "request_literals": ["report.txt"],
                         "recommended_tools": ["move_file"],
+                        "tool_schema_hash": "schema123",
                     }
                 )
                 + "\n",
@@ -98,6 +99,10 @@ class TraceToPatchTests(unittest.TestCase):
         self.assertEqual(
             policy_units["policy_units"][0]["source_failure_signature"]["type"],
             "ACTIONABLE_NO_TOOL_DECISION",
+        )
+        self.assertEqual(
+            policy_units["policy_units"][0]["source_failure_signature"]["tool_schema_hash"],
+            "schema123",
         )
         self.assertEqual(policy_units["policy_units"][0]["recommended_tools"], ["move_file"])
 

@@ -79,6 +79,10 @@ def _load_policy_units_without_yaml(path: Path) -> list[dict[str, Any]]:
             current["trigger"][key] = parse_inline_list(value)
         elif in_signature:
             current["source_failure_signature"][key] = value.strip("'\"")
+        elif key in {"recommended_tools", "forbidden_terminations", "evidence_requirements"}:
+            current[key] = parse_inline_list(value)
+        elif key in {"continue_condition", "stop_condition"}:
+            current[key] = value.strip("'\"")
     if current:
         units.append(current)
     return units
@@ -178,7 +182,16 @@ def history_record_from_selection(decision: dict[str, Any], candidate_dir: str |
                 if isinstance(predicate, str)
             }
         ),
+        "recommended_tools": sorted(
+            {
+                tool
+                for unit in units
+                for tool in (unit.get("recommended_tools") or [])
+                if isinstance(tool, str)
+            }
+        ),
         "policy_fingerprints": [policy_fingerprint(unit) for unit in units],
+        "policy_units": units,
         "reusable_for_search": decision_code in {"accepted", "retained"}
         and decision.get("candidate_valid") is not False
         and decision.get("manifest_valid") is not False
