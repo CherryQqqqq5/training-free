@@ -111,18 +111,25 @@ class FailureCase(BaseModel):
     turn_index: int
     tool_name: str
     error_type: str
+    stage: Optional[str] = None
+    failure_type: Optional[str] = None
+    failure_label: Optional[str] = None
     field_name: Optional[str] = None
     expected_type: Optional[str] = None
     observed_value: Any = None
     category: Optional[str] = None
     request_predicates: List[str] = Field(default_factory=list)
     request_literals: List[str] = Field(default_factory=list)
+    predicate_evidence: Dict[str, bool] = Field(default_factory=dict)
 
 
 class FailureIR(BaseModel):
     failure_id: str
     tool_name: str
     error_types: List[str] = Field(default_factory=list)
+    stages: List[str] = Field(default_factory=list)
+    failure_types: List[str] = Field(default_factory=list)
+    failure_labels: List[str] = Field(default_factory=list)
     field_names: List[str] = Field(default_factory=list)
     expected_types: Dict[str, str] = Field(default_factory=dict)
     categories: List[str] = Field(default_factory=list)
@@ -130,6 +137,7 @@ class FailureIR(BaseModel):
     trace_ids: List[str] = Field(default_factory=list)
     request_predicates: List[str] = Field(default_factory=list)
     request_literals: List[str] = Field(default_factory=list)
+    predicate_evidence: Dict[str, int] = Field(default_factory=dict)
 
 
 class ValidationIssue(BaseModel):
@@ -146,6 +154,8 @@ class ValidationRecord(BaseModel):
     rule_hits: List[str] = Field(default_factory=list)
     issues: List[ValidationIssue] = Field(default_factory=list)
     repairs: List[Dict[str, Any]] = Field(default_factory=list)
+    repair_kinds: List[str] = Field(default_factory=list)
+    failure_labels: List[str] = Field(default_factory=list)
     fallback_applied: bool = False
     request_patches: List[str] = Field(default_factory=list)
 

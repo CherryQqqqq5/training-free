@@ -5,7 +5,7 @@ import shutil
 from pathlib import Path
 from typing import Any, Dict
 
-from grc.selector.history import append_history, build_history_record
+from grc.selector.history import append_history_record
 
 try:
     import yaml
@@ -26,6 +26,8 @@ TARGET_UPLIFT_TAU = 0.5
 COST_BUDGET_RATIO = 0.10
 LATENCY_BUDGET_RATIO = 0.10
 SUBSET_REGRESSION_CAP = 0.5
+LATENCY_SCORE_WEIGHT = 0.001
+REGRESSION_SCORE_WEIGHT = 1.0
 
 
 def _metric_value(metrics: Dict[str, object], key: str, default: float = 0.0) -> float:
@@ -50,6 +52,14 @@ def _target_metric(metrics: Dict[str, Any]) -> float:
     if test_category and isinstance(subsets, dict) and test_category in subsets:
         return _metric_value(subsets, test_category)
     return _metric_value(metrics, "acc")
+
+
+def _selection_score(metrics: Dict[str, Any]) -> float:
+    return (
+        _target_metric(metrics)
+        - LATENCY_SCORE_WEIGHT * _metric_value(metrics, "latency")
+        - REGRESSION_SCORE_WEIGHT * _metric_value(metrics, "regression")
+    )
 
 
 def _within_budget(candidate: Dict[str, Any], baseline: Dict[str, Any]) -> tuple[bool, list[str]]:
@@ -288,6 +298,7 @@ def select_patch(baseline_path: str, candidate_path: str) -> Dict[str, object]:
         "reason": reason,
         "subset_regressions": subset_regressions,
         "target_delta": (_target_metric(candidate) - _target_metric(baseline)) if baseline and candidate else 0.0,
+        "selection_score": _selection_score(candidate) if candidate else 0.0,
     }
 
 
@@ -319,21 +330,11 @@ def write_selection_outputs(
         candidate_file = candidate_path / "accept.json"
         candidate_file.parent.mkdir(parents=True, exist_ok=True)
         candidate_file.write_text(json.dumps(decision, ensure_ascii=False, indent=2), encoding="utf-8")
+        append_history_record(candidate_path.parent / "history.jsonl", decision, candidate_dir)
         patch_id = candidate_path.name
 
     if not source or not source.exists():
         return
-
-    history_root = None
-    for candidate in (accepted_dir, rejected_dir, active_dir):
-        if candidate:
-            history_root = Path(candidate).parent
-            break
-    if history_root is not None:
-        append_history(
-            history_root / "history.jsonl",
-            build_history_record(decision, rule_path=str(source)),
-        )
 
     if patch_id is None:
         patch_id = source.stem

@@ -17,10 +17,14 @@ from grc.compiler.ir import (
     ValidationRecord,
     VerificationContract,
 )
+from grc.compiler.failure_taxonomy import FailureStage, FailureType, FailureClassification
 
 __all__ = [
     "FailureCase",
+    "FailureClassification",
     "FailureIR",
+    "FailureStage",
+    "FailureType",
     "DecisionPolicySpec",
     "FieldConstraint",
     "FallbackRoutingSpec",
