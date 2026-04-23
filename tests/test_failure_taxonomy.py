@@ -56,3 +56,13 @@ class FailureTaxonomyTests(unittest.TestCase):
         self.assertEqual(classify_error_type("missing_required").failure_type, FailureType.ARG_UNDERSPECIFIED)
         self.assertEqual(classify_error_type("type_mismatch").failure_type, FailureType.MALFORMED_CALL)
         self.assertEqual(classify_error_type("type_mismatch").stage, FailureStage.MID_TOOL)
+
+    def test_maps_empty_completion_to_empty_tool_family_with_post_tool_stage(self) -> None:
+        classification = classify_error_type(
+            "empty_completion",
+            request_predicates=["tools_available", "prior_tool_outputs_present"],
+        )
+
+        self.assertEqual(classification.failure_type, FailureType.EMPTY_TOOL_CALL)
+        self.assertEqual(classification.stage, FailureStage.POST_TOOL)
+        self.assertEqual(classification.label, "(POST_TOOL,EMPTY_TOOL_CALL)")

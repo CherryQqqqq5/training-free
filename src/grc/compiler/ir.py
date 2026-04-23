@@ -156,6 +156,9 @@ class ValidationRecord(BaseModel):
     repairs: List[Dict[str, Any]] = Field(default_factory=list)
     repair_kinds: List[str] = Field(default_factory=list)
     failure_labels: List[str] = Field(default_factory=list)
+    request_predicates: List[str] = Field(default_factory=list)
+    response_shapes: List[str] = Field(default_factory=list)
+    last_observed_role: Optional[str] = None
     fallback_applied: bool = False
     request_patches: List[str] = Field(default_factory=list)
 

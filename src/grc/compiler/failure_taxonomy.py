@@ -232,7 +232,7 @@ def classify_error_type(
     if normalized == "actionable_no_tool_decision":
         no_tool_stage = FailureStage.POST_TOOL if "prior_tool_outputs_present" in predicate_set or has_prior_tool_output else FailureStage.PRE_TOOL
         return FailureClassification(stage=no_tool_stage, failure_type=FailureType.ACTIONABLE_NO_TOOL_DECISION, error_type=normalized, request_predicates=predicates)
-    if normalized in {"empty_tool_call", "hallucinated_completion", "natural_language_termination", "malformed_output"}:
+    if normalized in {"empty_tool_call", "empty_completion", "hallucinated_completion", "natural_language_termination", "malformed_output"}:
         no_tool_stage = FailureStage.POST_TOOL if "prior_tool_outputs_present" in predicate_set or has_prior_tool_output else FailureStage.PRE_TOOL
         return FailureClassification(stage=no_tool_stage, failure_type=FailureType.EMPTY_TOOL_CALL, error_type=normalized, request_predicates=predicates)
     if normalized in {"clarification_request", "clarification_no_tool", "redundant_clarification_request"}:

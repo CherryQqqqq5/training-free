@@ -62,8 +62,10 @@ def classify_no_tool_policy_issue(
     tool_schema_map: Dict[str, Dict[str, object]],
     observed_predicates: List[str],
     last_observed_role: str | None,
+    *,
+    base_kind: str | None = None,
 ) -> str:
-    base_kind = classify_no_tool_call_content(content, tool_schema_map)
+    base_kind = base_kind or classify_no_tool_call_content(content, tool_schema_map)
     text = content.strip() if isinstance(content, str) else ""
     actionable_bases = {
         "empty_tool_call",
@@ -110,6 +112,7 @@ def evaluate_no_tool_policy(
         "hallucinated_completion": "assistant claimed progress or completion without emitting a tool call",
         "malformed_output": "assistant emitted malformed content instead of a tool call",
         "empty_tool_call": "no tool call emitted for tool-enabled request",
+        "empty_completion": "provider returned an empty assistant completion without tool calls for a tool-enabled request",
         "post_tool_prose_summary": "assistant emitted a prose-only summary immediately after a successful tool result instead of continuing structurally",
         "actionable_no_tool_decision": "assistant ended a tool-enabled turn with prose instead of the next locally grounded tool action",
     }

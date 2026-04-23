@@ -78,14 +78,10 @@ class RuleEngine:
 
         for path in sorted(self.rules_dir.glob("*.yaml")):
             data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
-            if not isinstance(data, dict) or not data:
-                continue
-            if "policy_units" in data and "rule_id" not in data and "rules" not in data:
-                continue
             if "rules" in data:
                 bundle = PatchBundle(**data)
                 rules.extend(bundle.rules)
-            else:
+            elif data:
                 rules.append(Rule(**data))
         return sorted((rule for rule in rules if rule.enabled), key=lambda item: item.priority, reverse=True)
 
@@ -334,6 +330,24 @@ class RuleEngine:
                 return "tool"
         return None
 
+    @staticmethod
+    def _detect_no_tool_response_shape(
+        message: Dict[str, Any],
+        choice: Dict[str, Any],
+        response_json: Dict[str, Any],
+    ) -> str | None:
+        if message.get("tool_calls"):
+            return None
+        content = message.get("content")
+        finish_reason = choice.get("finish_reason")
+        usage = response_json.get("usage", {})
+        completion_tokens = usage.get("completion_tokens") if isinstance(usage, dict) else None
+        if content is None and completion_tokens == 0 and finish_reason in {None, "stop"}:
+            return "empty_completion"
+        if isinstance(content, str) and not content.strip():
+            return "blank_no_tool_response"
+        return None
+
     def _structured_tool_guidance_fragments(self, request_json: Dict[str, Any]) -> List[str]:
         if not request_json.get("tools") or not self.inject_structured_tool_guidance:
             return []
@@ -505,14 +519,16 @@ class RuleEngine:
         if not issues:
             return False
 
-        issue_kinds = {issue.kind for issue in issues}
+        issue_kinds = {alias for issue in issues for alias in self._issue_kind_aliases(issue.kind)}
         for rule in rule_hits:
             trigger_error_types = set(rule.trigger.error_types)
             if trigger_error_types and not (trigger_error_types & issue_kinds):
                 continue
             strategy = rule.action.fallback_router.strategy
             scoped_issue_kinds = set(rule.action.fallback_router.on_issue_kinds)
-            if scoped_issue_kinds and not any(issue.kind in scoped_issue_kinds for issue in issues):
+            if scoped_issue_kinds and not any(
+                self._issue_kind_aliases(issue.kind) & scoped_issue_kinds for issue in issues
+            ):
                 continue
             if strategy == "drop_tool_call":
                 if 0 <= index < len(tool_calls):
@@ -530,15 +546,23 @@ class RuleEngine:
                 return True
         return False
 
+    @staticmethod
+    def _issue_kind_aliases(issue_kind: str) -> set[str]:
+        aliases = {issue_kind}
+        if issue_kind == "empty_completion":
+            aliases.add("empty_tool_call")
+        return aliases
+
     def _has_explicit_no_tool_recovery(self, issue_kind: str, rule_hits: List[Rule]) -> bool:
+        issue_aliases = self._issue_kind_aliases(issue_kind)
         for rule in rule_hits:
-            if rule.trigger.error_types and issue_kind not in rule.trigger.error_types:
+            if rule.trigger.error_types and not (issue_aliases & set(rule.trigger.error_types)):
                 continue
             strategy = rule.action.fallback_router.strategy
             if strategy == "record_only":
                 continue
             scoped_issue_kinds = set(rule.action.fallback_router.on_issue_kinds)
-            if scoped_issue_kinds and issue_kind not in scoped_issue_kinds:
+            if scoped_issue_kinds and not (issue_aliases & scoped_issue_kinds):
                 continue
             return True
         return False
@@ -576,13 +600,14 @@ class RuleEngine:
             "post_tool_prose_summary",
         }:
             return "record"
+        issue_aliases = self._issue_kind_aliases(issue_kind)
         for rule in rule_hits:
-            if rule.trigger.error_types and issue_kind not in rule.trigger.error_types:
+            if rule.trigger.error_types and not (issue_aliases & set(rule.trigger.error_types)):
                 continue
             guard = rule.action.tool_guard
             if not guard.enabled:
                 continue
-            if issue_kind == "empty_tool_call":
+            if issue_aliases & {"empty_tool_call"}:
                 return guard.on_empty_tool_call
             if issue_kind in {"tool_guard_violation", "wrong_tool_name"}:
                 return guard.on_unknown_tool
@@ -634,6 +659,8 @@ class RuleEngine:
         content: str,
         request_json: Dict[str, Any],
         tool_schema_map: Dict[str, Dict[str, Any]],
+        *,
+        base_issue_kind: str | None = None,
     ) -> tuple[str, List[str], List[ValidationIssue], List[Rule], List[Rule]]:
         observed_predicates = sorted(self._observable_request_predicates(request_json))
         issue_kind = classify_no_tool_policy_issue(
@@ -641,14 +668,25 @@ class RuleEngine:
             tool_schema_map,
             observed_predicates,
             self._last_observed_role(request_json),
+            base_kind=base_issue_kind,
         )
         policy_rule_hits = self._matched_policy_rules(issue_kind, request_json=request_json)
+        if issue_kind == "empty_completion" and not policy_rule_hits:
+            policy_rule_hits = self._matched_policy_rules(
+                "empty_tool_call",
+                request_json=request_json,
+            )
         if issue_kind == "post_tool_prose_summary" and not policy_rule_hits:
             policy_rule_hits = self._matched_policy_rules(
                 "actionable_no_tool_decision",
                 request_json=request_json,
             )
         compatibility_rule_hits = self._matched_compatibility_rules(issue_kind, request_json=request_json)
+        if issue_kind == "empty_completion" and not compatibility_rule_hits:
+            compatibility_rule_hits = self._matched_compatibility_rules(
+                "empty_tool_call",
+                request_json=request_json,
+            )
         if issue_kind == "post_tool_prose_summary" and not compatibility_rule_hits:
             compatibility_rule_hits = self._matched_compatibility_rules(
                 "actionable_no_tool_decision",
@@ -717,11 +755,18 @@ class RuleEngine:
             all_repairs.extend(narration_repairs)
             if request_json.get("tools") and not tool_calls:
                 content = msg.get("content", "")
+                no_tool_response_shape = self._detect_no_tool_response_shape(msg, choice, final_response)
+                if no_tool_response_shape:
+                    validation.response_shapes.append(no_tool_response_shape)
+                validation.request_predicates = sorted(self._observable_request_predicates(request_json))
+                validation.last_observed_role = self._last_observed_role(request_json)
                 issue_kind, observed_predicates, issues, policy_rule_hits, compatibility_rule_hits = self._evaluate_no_tool_policy(
                     content,
                     request_json,
                     tool_schema_map,
+                    base_issue_kind="empty_completion" if no_tool_response_shape == "empty_completion" else None,
                 )
+                validation.request_predicates = observed_predicates
                 effective_rule_hits = policy_rule_hits or compatibility_rule_hits
                 validation.issues.extend(issues)
                 validation.rule_hits.extend(rule.rule_id for rule in effective_rule_hits)
@@ -847,6 +892,7 @@ class RuleEngine:
             choice["message"] = msg
 
         validation.rule_hits = list(dict.fromkeys(validation.rule_hits))
+        validation.response_shapes = list(dict.fromkeys(validation.response_shapes))
         validation.repairs = all_repairs
         validation.repair_kinds = list(
             dict.fromkeys(
@@ -856,6 +902,13 @@ class RuleEngine:
             )
         )
         validation.failure_labels = list(
-            dict.fromkeys(classify_error_type(issue.kind).label for issue in validation.issues)
+            dict.fromkeys(
+                classify_error_type(
+                    issue.kind,
+                    request_predicates=validation.request_predicates,
+                    has_prior_tool_output="prior_tool_outputs_present" in set(validation.request_predicates),
+                ).label
+                for issue in validation.issues
+            )
         )
         return final_response, all_repairs, validation

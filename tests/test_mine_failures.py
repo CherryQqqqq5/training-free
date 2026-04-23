@@ -698,6 +698,75 @@ class MineFailuresTests(unittest.TestCase):
         self.assertEqual(failures[0].error_type, "empty_tool_call")
         self.assertEqual(failures[0].tool_name, "__none__")
 
+    def test_mines_empty_completion_with_post_tool_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            trace_path = root / "trace.json"
+            trace_path.write_text(
+                json.dumps(
+                    {
+                        "request": {
+                            "model": "demo-model",
+                            "messages": [
+                                {"role": "user", "content": "Create a ticket from plan.txt."},
+                                {"role": "assistant", "content": "", "tool_calls": [{"id": "c1"}]},
+                                {"role": "tool", "tool_call_id": "c1", "content": json.dumps({"file_content": "Initial project plan details."})},
+                            ],
+                            "tools": [
+                                {
+                                    "type": "function",
+                                    "function": {
+                                        "name": "create_ticket",
+                                        "parameters": {
+                                            "type": "object",
+                                            "properties": {"title": {"type": "string"}},
+                                            "required": ["title"],
+                                        },
+                                    },
+                                }
+                            ],
+                        },
+                        "request_original": {
+                            "model": "demo-model",
+                            "input": [
+                                {"role": "user", "content": "Create a ticket from plan.txt."},
+                                {"role": "assistant", "content": "", "tool_calls": [{"id": "c1"}]},
+                                {"role": "tool", "tool_call_id": "c1", "content": json.dumps({"file_content": "Initial project plan details."})},
+                            ],
+                        },
+                        "raw_response": {
+                            "choices": [
+                                {
+                                    "finish_reason": "stop",
+                                    "message": {
+                                        "role": "assistant",
+                                        "content": None,
+                                    }
+                                }
+                            ],
+                            "usage": {"completion_tokens": 0},
+                        },
+                        "validation": {
+                            "issues": [
+                                {
+                                    "kind": "empty_completion",
+                                    "tool_name": None,
+                                }
+                            ]
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            failures = mine_failures(str(root))
+
+        self.assertEqual(len(failures), 1)
+        self.assertEqual(failures[0].error_type, "empty_completion")
+        self.assertEqual(failures[0].stage, "POST_TOOL")
+        self.assertEqual(failures[0].failure_label, "(POST_TOOL,EMPTY_TOOL_CALL)")
+        self.assertEqual(failures[0].request_predicates, ["tools_available", "prior_explicit_literals_present", "prior_tool_outputs_present"])
+
     def test_mines_responses_prompt_backed_type_mismatch(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

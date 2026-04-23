@@ -366,6 +366,14 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
             msg = choice.get("message", {})
             tool_calls = msg.get("tool_calls", [])
             parsed = parse_text_tool_calls(msg.get("content", ""))
+            usage = raw.get("usage", {})
+            completion_tokens = usage.get("completion_tokens") if isinstance(usage, dict) else None
+            empty_completion = (
+                msg.get("content") is None
+                and not tool_calls
+                and completion_tokens == 0
+                and choice.get("finish_reason") in {None, "stop"}
+            )
             if parsed:
                 raw_implies_text_tool_call = True
             if tool_map and not tool_calls:
@@ -377,7 +385,11 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
                     tool_calls = parsed
 
             if not tool_calls and not parsed:
-                inferred_no_tool_call_kind = classify_no_tool_call_content(msg.get("content", ""), tool_map)
+                inferred_no_tool_call_kind = (
+                    "empty_completion"
+                    if empty_completion
+                    else classify_no_tool_call_content(msg.get("content", ""), tool_map)
+                )
                 if inferred_no_tool_call_kind == "clarification_request":
                     redundant_clarification_detected = _is_redundant_clarification_request(
                         data,
@@ -542,10 +554,10 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
                         )
                     )
                 continue
-            if issue_kind == "empty_tool_call":
+            if issue_kind in {"empty_tool_call", "empty_completion"}:
                 if raw_implies_text_tool_call:
                     continue
-                if inferred_no_tool_subfamily not in {None, "empty_tool_call", "actionable_no_tool_decision"}:
+                if inferred_no_tool_subfamily not in {None, "empty_tool_call", "empty_completion", "actionable_no_tool_decision"}:
                     continue
             record_failure(
                 FailureCase(
@@ -554,25 +566,25 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
                     tool_name=issue.get("tool_name") or "__none__",
                     error_type=(
                         inferred_no_tool_subfamily
-                        if issue_kind == "empty_tool_call" and inferred_no_tool_subfamily
+                        if issue_kind in {"empty_tool_call", "empty_completion"} and inferred_no_tool_subfamily
                         else issue_kind
                     ),
                     field_name=issue.get("field"),
                     category="verification_hook",
                     request_predicates=(
                         inferred_no_tool_predicates
-                        if issue_kind == "empty_tool_call" and inferred_no_tool_predicates
+                        if issue_kind in {"empty_tool_call", "empty_completion"} and inferred_no_tool_predicates
                         else []
                     ),
                     request_literals=(
                         list(explicit_literals)
-                        if issue_kind == "empty_tool_call"
+                        if issue_kind in {"empty_tool_call", "empty_completion"}
                         and inferred_no_tool_subfamily == "actionable_no_tool_decision"
                         else []
                     ),
                     predicate_evidence=(
                         inferred_no_tool_classification.predicate_evidence
-                        if issue_kind == "empty_tool_call" and inferred_no_tool_classification
+                        if issue_kind in {"empty_tool_call", "empty_completion"} and inferred_no_tool_classification
                         else {}
                     ),
                 )
