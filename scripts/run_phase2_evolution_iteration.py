@@ -30,6 +30,10 @@ def _parse_optional_run(value: str) -> tuple[str, Path]:
     return label.strip(), Path(raw)
 
 
+def _first_candidate_dir(proposal_root: Path) -> Path:
+    return proposal_root / "fresh_00"
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run or plan one minimal Phase-2 evolution iteration.")
     parser.add_argument("--repo-root", required=True)
@@ -77,15 +81,27 @@ def main() -> None:
     proposal_summary_path = proposal_root / "proposal_summary.json"
     taxonomy_json = out_root / "taxonomy_report.json"
     taxonomy_md = out_root / "taxonomy_report.md"
+    candidate_dir = _first_candidate_dir(proposal_root)
+    candidate_rule_path = candidate_dir / "rule.yaml"
+    candidate_metrics = candidate_dir / "metrics.json"
+    candidate_run_root = out_root / "candidate_run"
+    candidate_trace_dir = candidate_run_root / "traces"
+    holdout_run_root = out_root / "holdout_run"
+    holdout_trace_dir = holdout_run_root / "traces"
+    holdout_artifact_dir = holdout_run_root / "artifacts"
+    rerun_root = out_root / "candidate_run_rerun"
+    rerun_trace_dir = rerun_root / "traces"
+    rerun_artifact_dir = candidate_dir / "rerun"
 
     planned_commands = [
-        f"cd {repo_root} && PYTHONPATH=src python scripts/build_phase2_taxonomy_report.py --run baseline={baseline_root / 'traces'} --run primary_v4={target_root / 'traces'} --out-json {taxonomy_json} --out-md {taxonomy_md}",
+        f"cd {repo_root} && PYTHONPATH=src python scripts/build_phase2_taxonomy_report.py --run baseline={baseline_root / 'traces'} --run primary_v4={target_root / 'traces'} --metrics baseline={baseline_root / 'artifacts/metrics.json'} --metrics primary_v4={target_root / 'artifacts/metrics.json'} --out-json {taxonomy_json} --out-md {taxonomy_md}",
         f"cd {repo_root} && PYTHONPATH=src python -m grc.cli mine --trace-dir {target_root / 'traces'} --out {failures_path}",
         f"cd {repo_root} && PYTHONPATH=src python -m grc.cli propose --failures {failures_path} --history {args.history} --out-dir {proposal_root} --top-k-signatures 3 --target-category {args.target_category} --holdout-category {args.holdout_category}",
-        f"cd {repo_root} && bash scripts/run_bfcl_v4_patch.sh \"$GRC_BFCL_MODEL\" {out_root / 'candidate_run'} 8022 {args.target_category} {repo_root / 'configs/runtime_bfcl_structured.yaml'} {repo_root / 'outputs/phase2_targeted_v2'} {out_root / 'candidate_run/traces'} {out_root / 'candidate_run/artifacts'}",
-        f"cd {repo_root} && bash scripts/run_bfcl_v4_baseline.sh \"$GRC_BFCL_MODEL\" {out_root / 'holdout_run'} 8012 {args.holdout_category} {repo_root / 'configs/runtime_bfcl_structured.yaml'} {repo_root / 'outputs/phase2_targeted_v2'} {out_root / 'holdout_run/traces'} {out_root / 'holdout_run/artifacts'}",
-        f"cd {repo_root} && PYTHONPATH=src python scripts/assess_paired_rerun.py --baseline-metrics {baseline_root / 'artifacts/metrics.json'} --candidate-metrics {out_root / 'candidate_run/artifacts/metrics.json'} --out {out_root / 'candidate_run/artifacts/paired_rerun.json'}",
-        f"cd {repo_root} && PYTHONPATH=src python -m grc.cli select --baseline-metrics {baseline_root / 'artifacts/metrics.json'} --candidate-metrics {out_root / 'candidate_run/artifacts/metrics.json'} --candidate-dir {out_root / 'candidate_run/artifacts'} --out {out_root / 'candidate_run/artifacts/accept.json'}",
+        f"cd {repo_root} && bash scripts/run_bfcl_v4_patch.sh \"$GRC_BFCL_MODEL\" {candidate_run_root} 8022 {args.target_category} {repo_root / 'configs/runtime_bfcl_structured.yaml'} {candidate_dir} {candidate_trace_dir} {candidate_dir} {baseline_root / 'artifacts/metrics.json'}",
+        f"cd {repo_root} && bash scripts/run_bfcl_v4_baseline.sh \"$GRC_BFCL_MODEL\" {holdout_run_root} 8012 {args.holdout_category} {repo_root / 'configs/runtime_bfcl_structured.yaml'} {repo_root / 'outputs/phase2_targeted_v2'} {holdout_trace_dir} {holdout_artifact_dir}",
+        f"cd {repo_root} && bash scripts/run_bfcl_v4_patch.sh \"$GRC_BFCL_MODEL\" {rerun_root} 8013 {args.target_category} {repo_root / 'configs/runtime_bfcl_structured.yaml'} {candidate_dir} {rerun_trace_dir} {rerun_artifact_dir} {baseline_root / 'artifacts/metrics.json'}",
+        f"cd {repo_root} && PYTHONPATH=src python scripts/assess_paired_rerun.py --baseline {baseline_root / 'artifacts/metrics.json'} --primary {candidate_metrics} --rerun {rerun_artifact_dir / 'metrics.json'} --out {candidate_dir / 'paired_rerun.json'}",
+        f"cd {repo_root} && PYTHONPATH=src python -m grc.cli select --baseline-metrics {baseline_root / 'artifacts/metrics.json'} --candidate-metrics {candidate_metrics} --candidate-dir {candidate_dir} --rule-path {candidate_rule_path} --accepted-dir {repo_root / 'rules/accepted'} --rejected-dir {repo_root / 'rules/rejected'} --active-dir {repo_root / 'rules/active'} --out {candidate_dir / 'accept.json'}",
     ]
 
     summary = {
