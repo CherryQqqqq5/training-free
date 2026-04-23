@@ -85,6 +85,12 @@ class RepairAttributionTests(unittest.TestCase):
                         },
                         "validation": {
                             "issues": [{"kind": "actionable_no_tool_decision"}],
+                            "policy_hits": ["rule_next_tool_policy"],
+                            "recommended_tools": ["lookup_file"],
+                            "selected_next_tool": "lookup_file",
+                            "tool_choice_mode": "soft",
+                            "next_tool_emitted": True,
+                            "next_tool_matches_recommendation": True,
                         },
                     }
                 ),
@@ -102,3 +108,8 @@ class RepairAttributionTests(unittest.TestCase):
         self.assertEqual(summary["repairs"]["coerce_no_tool_text_to_empty"]["success"], 1.0)
         self.assertEqual(summary["repairs"]["coerce_no_tool_text_to_empty"]["attribution_gain"], 3.5)
         self.assertEqual(summary["repair_by_family"][0]["failure_label"], "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)")
+        self.assertEqual(records[0]["policy_hits"], ["rule_next_tool_policy"])
+        self.assertEqual(summary["policy_conversion_by_family"][0]["policy_hit_count"], 1)
+        self.assertEqual(summary["policy_conversion_by_family"][0]["next_tool_conversion"], 1.0)
+        self.assertEqual(summary["policy_conversion_by_family"][0]["recommended_tool_match"], 1.0)
+        self.assertEqual(summary["policy_conversion_by_family"][0]["scorer_success"], 1.0)

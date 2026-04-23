@@ -32,13 +32,16 @@ lightning_logs/
 .idea/
 Thumbs.db
 
-# Tracked output tree: ignore bulk outputs but keep small templates under outputs/artifacts/
-outputs/
-!outputs/
-!outputs/**/
-!outputs/**/.gitkeep
-!outputs/README.md
-!outputs/artifacts/
-!outputs/artifacts/**/
-!outputs/artifacts/**/*.md
-!outputs/artifacts/**/*.json
+# Tracked output tree: keep compact reports only.
+/outputs/*
+!/outputs/README.md
+!/outputs/artifacts/
+!/outputs/artifacts/**
+!/outputs/artifacts/**/*.md
+!/outputs/artifacts/**/*.json
+
+# Never commit raw benchmark traces or BFCL lock files; compact summaries belong under outputs/artifacts/.
+outputs/**/traces/*.json
+outputs/**/bfcl/.file_locks/**
+outputs/**/bfcl/result/**
+outputs/**/bfcl/score/**

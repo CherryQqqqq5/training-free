@@ -1,9 +1,10 @@
 {
   "final_outputs": {
-    "accept_json": false,
-    "evolution_iteration_summary_json": false,
-    "failure_state_json": false,
-    "paired_rerun_json": false
+    "evolution_iteration_summary_json": true,
+    "accept_json": true,
+    "paired_rerun_json": true,
+    "rerun_metrics_json": true,
+    "failure_state_json": false
   },
   "holdout": {
     "accuracy": 95.0,
@@ -46,8 +47,8 @@
     "target_category": "multi_turn_miss_param"
   },
   "rerun": {
-    "metrics_present": false,
-    "status": "running",
+    "metrics_present": true,
+    "status": "completed",
     "trace_summary": {
       "force_terminated_count": 0,
       "issues": {
@@ -67,11 +68,14 @@
         "200": 330
       },
       "trace_count": 330
-    }
+    },
+    "accuracy": 40.5,
+    "correct_count": 81.0,
+    "delta_vs_baseline_pp": 4.0
   },
   "run_id": "iter_004_execute",
   "selected_proposal": "fresh_02",
-  "status": "active_rerun_pending",
+  "status": "final_evidence_only_protocol_rejected",
   "target": {
     "accuracy": 42.0,
     "baseline_accuracy": 36.5,
@@ -103,5 +107,30 @@
       "trace_count": 2734
     }
   },
-  "updated_at_local": "2026-04-23"
+  "updated_at_local": "2026-04-23",
+  "claim_status": "Evidence Only",
+  "selector": {
+    "accept": false,
+    "decision_code": "candidate_invalid",
+    "reason": "selection blocked: manifest mismatch: upstream_model_route mismatch: baseline='x-ai/grok-3', candidate='x-ai/grok-3-beta'",
+    "manifest_consistency_issues": [
+      "upstream_model_route mismatch: baseline='x-ai/grok-3', candidate='x-ai/grok-3-beta'"
+    ]
+  },
+  "paired_rerun": {
+    "consistent": null,
+    "primary_accuracy": null,
+    "rerun_accuracy": null,
+    "accuracy_delta": null
+  },
+  "evolution_summary": {
+    "selected_candidate_dir": "/cephfs/qiuyn/training-free/outputs/phase2_evolution/iter_004_execute/proposals/fresh_02",
+    "selected_proposal_mode": "fresh",
+    "accepted_count": 0,
+    "retained_count": 0,
+    "rejected_count": 1,
+    "history_reuse_count": 0,
+    "new_policy_count": 3
+  },
+  "protocol_note": "Target and rerun improved over baseline with holdout unchanged, but selector rejected the candidate because baseline and candidate manifests used different upstream_model_route values. Do not claim this as accepted policy gain."
 }

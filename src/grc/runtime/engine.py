@@ -57,6 +57,10 @@ class RuleEngine:
         self.inject_context_literal_hints = bool(self.runtime_policy.get("inject_context_literal_hints", False))
         self.resolve_contextual_string_args = bool(self.runtime_policy.get("resolve_contextual_string_args", False))
         self.force_actionable_tool_choice = bool(self.runtime_policy.get("force_actionable_tool_choice", True))
+        self.enable_required_next_tool_choice = bool(
+            self.runtime_policy.get("enable_required_next_tool_choice", False)
+            or self.runtime_policy.get("required_next_tool_choice_enabled", False)
+        )
         self.rules: List[Rule] = self._load_rules()
 
     _QUOTED_LITERAL_RE = re.compile(
@@ -171,6 +175,8 @@ class RuleEngine:
                 bool(getattr(policy, "stop_condition", None)),
                 bool(getattr(policy, "forbidden_terminations", []) or []),
                 bool(getattr(policy, "evidence_requirements", []) or []),
+                bool(getattr(getattr(policy, "next_tool_policy", None), "recommended_tools", []) or []),
+                bool(getattr(getattr(policy, "next_tool_policy", None), "activation_predicates", []) or []),
             ]
         ):
             return policy
@@ -372,24 +378,77 @@ class RuleEngine:
                 )
         return fragments
 
-    def _recommended_policy_tools(self, request_json: Dict[str, Any]) -> List[str]:
+    def _policy_recommended_tools(self, policy: DecisionPolicySpec) -> List[str]:
+        recommended = list(getattr(policy, "recommended_tools", []) or [])
+        next_tool_policy = getattr(policy, "next_tool_policy", None)
+        for tool_name in getattr(next_tool_policy, "recommended_tools", []) or []:
+            if tool_name not in recommended:
+                recommended.append(tool_name)
+        return recommended
+
+    def _next_tool_activation_predicates(self, rule: Rule, policy: DecisionPolicySpec) -> List[str]:
+        next_tool_policy = getattr(policy, "next_tool_policy", None)
+        configured = list(getattr(next_tool_policy, "activation_predicates", []) or [])
+        if configured:
+            return configured
+        predicates = list(self._rule_request_predicates(rule))
+        error_types = set(rule.trigger.error_types or [])
+        if "actionable_no_tool_decision" in error_types and "prior_explicit_literals_present" not in predicates:
+            predicates.append("prior_explicit_literals_present")
+        if "post_tool_prose_summary" in error_types and "prior_tool_outputs_present" not in predicates:
+            predicates.append("prior_tool_outputs_present")
+        return predicates
+
+    def _next_tool_policy_plan(self, request_json: Dict[str, Any]) -> Dict[str, Any]:
         request_tool_names = set(self._tool_schema_map(request_json).keys())
+        observed_predicates = self._observable_request_predicates(request_json)
+        plan: Dict[str, Any] = {
+            "activated": False,
+            "recommended_tools": [],
+            "selected_tool": None,
+            "tool_choice_mode": "soft",
+            "policy_hits": [],
+            "activation_predicates": [],
+            "confidence": 0.0,
+        }
         if not request_tool_names:
-            return []
-        recommended: List[str] = []
+            return plan
         for rule in self.rules:
             patch_sites = set(rule.scope.patch_sites)
-            if patch_sites and not ({"prompt_injector", "policy_executor"} & patch_sites):
+            if patch_sites and "policy_executor" not in patch_sites and "prompt_injector" not in patch_sites:
                 continue
             policy = self._rule_decision_policy(rule)
             if policy is None:
                 continue
             if not self._request_predicates_met(self._rule_request_predicates(rule), request_json):
                 continue
-            for tool_name in policy.recommended_tools:
-                if tool_name in request_tool_names and tool_name not in recommended:
-                    recommended.append(tool_name)
-        return recommended[:3]
+            activation_predicates = self._next_tool_activation_predicates(rule, policy)
+            if not set(activation_predicates).issubset(observed_predicates):
+                continue
+            recommended = [
+                tool_name
+                for tool_name in self._policy_recommended_tools(policy)
+                if tool_name in request_tool_names
+            ]
+            if not recommended:
+                continue
+            next_tool_policy = getattr(policy, "next_tool_policy", None)
+            mode = str(getattr(next_tool_policy, "tool_choice_mode", None) or "soft")
+            confidence = float(getattr(next_tool_policy, "confidence", 0.0) or 0.0)
+            plan["activated"] = True
+            plan["selected_tool"] = plan["selected_tool"] or recommended[0]
+            plan["tool_choice_mode"] = "required" if mode == "required" else "soft"
+            plan["confidence"] = max(float(plan["confidence"]), confidence)
+            plan["activation_predicates"] = list(dict.fromkeys(plan["activation_predicates"] + activation_predicates))
+            plan["policy_hits"].append(rule.rule_id)
+            for tool_name in recommended:
+                if tool_name not in plan["recommended_tools"]:
+                    plan["recommended_tools"].append(tool_name)
+        plan["recommended_tools"] = plan["recommended_tools"][:3]
+        return plan
+
+    def _recommended_policy_tools(self, request_json: Dict[str, Any]) -> List[str]:
+        return list(self._next_tool_policy_plan(request_json).get("recommended_tools") or [])
 
     def _recommended_policy_tool_fragments(self, request_json: Dict[str, Any]) -> List[str]:
         recommended = self._recommended_policy_tools(request_json)
@@ -536,8 +595,27 @@ class RuleEngine:
 
     def apply_request(self, request_json: Dict[str, Any]) -> Tuple[Dict[str, Any], List[str]]:
         patched = copy.deepcopy(request_json)
+        next_tool_plan = self._next_tool_policy_plan(patched)
         fragments = self._collect_prompt_fragments(patched)
         request_patches: List[str] = []
+        policy_request_patches: List[str] = []
+
+        if next_tool_plan.get("activated"):
+            selected_tool = next_tool_plan.get("selected_tool")
+            recommended_tools = list(next_tool_plan.get("recommended_tools") or [])
+            policy_request_patches.append("policy_next_tool:activated")
+            if selected_tool:
+                policy_request_patches.append(f"policy_next_tool:selected={selected_tool}")
+            if recommended_tools:
+                policy_request_patches.append("policy_next_tool:recommended=" + ",".join(recommended_tools))
+            policy_request_patches.extend(f"policy_hit:{rule_id}" for rule_id in next_tool_plan.get("policy_hits") or [])
+            if (
+                self.enable_required_next_tool_choice
+                and next_tool_plan.get("tool_choice_mode") == "required"
+                and "tool_choice" not in patched
+            ):
+                patched["tool_choice"] = "required"
+                policy_request_patches.append("tool_choice:required(policy_next_tool)")
 
         if fragments:
             system_text = "[Golden Rule Compiler]\n" + "\n".join(f"- {fragment}" for fragment in fragments)
@@ -551,6 +629,7 @@ class RuleEngine:
             patched["messages"] = messages
             request_patches.extend(f"prompt_injector:{fragment}" for fragment in fragments)
 
+        request_patches.extend(policy_request_patches)
         return patched, request_patches
 
     def _apply_fallback(self, message: Dict[str, Any], tool_calls: List[Dict[str, Any]], index: int, issues: List[ValidationIssue], rule_hits: List[Rule]) -> bool:
@@ -771,6 +850,19 @@ class RuleEngine:
         all_repairs: List[Dict[str, Any]] = []
         validation = ValidationRecord()
         validation.request_patches = list(request_patches or [])
+        for patch in validation.request_patches:
+            if patch.startswith("policy_hit:"):
+                validation.policy_hits.append(patch.split(":", 1)[1])
+            elif patch.startswith("policy_next_tool:selected="):
+                validation.selected_next_tool = patch.split("=", 1)[1]
+            elif patch.startswith("policy_next_tool:recommended="):
+                validation.recommended_tools = [
+                    item for item in patch.split("=", 1)[1].split(",") if item
+                ]
+            elif patch == "tool_choice:required(policy_next_tool)":
+                validation.tool_choice_mode = "required"
+        if validation.selected_next_tool and validation.tool_choice_mode is None:
+            validation.tool_choice_mode = "soft"
 
         for choice in final_response.get("choices", []):
             msg = choice.get("message", {})
@@ -926,10 +1018,22 @@ class RuleEngine:
                 validation.rule_hits.extend(rule.rule_id for rule in effective_rule_hits)
                 applied = self._apply_fallback(msg, tool_calls, index, issues, effective_rule_hits)
                 validation.fallback_applied = validation.fallback_applied or applied
+            if validation.selected_next_tool is not None:
+                emitted_names = [
+                    call.get("function", {}).get("name")
+                    for call in tool_calls
+                    if isinstance(call, dict)
+                ]
+                if validation.next_tool_emitted is not True:
+                    validation.next_tool_emitted = any(bool(name) for name in emitted_names)
+                if validation.next_tool_matches_recommendation is not True:
+                    validation.next_tool_matches_recommendation = validation.selected_next_tool in emitted_names
             msg["tool_calls"] = tool_calls
             choice["message"] = msg
 
         validation.rule_hits = list(dict.fromkeys(validation.rule_hits))
+        validation.policy_hits = list(dict.fromkeys(validation.policy_hits))
+        validation.recommended_tools = list(dict.fromkeys(validation.recommended_tools))
         validation.response_shapes = list(dict.fromkeys(validation.response_shapes))
         validation.repairs = all_repairs
         validation.repair_kinds = list(

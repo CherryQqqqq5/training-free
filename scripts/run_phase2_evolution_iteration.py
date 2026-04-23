@@ -46,6 +46,31 @@ def _first_candidate_dir(proposal_root: Path) -> Path:
     return proposal_root / "fresh_00"
 
 
+def _run_manifest(run_root: Path | None) -> dict[str, Any]:
+    if run_root is None:
+        return {}
+    return _load_json(run_root / "artifacts" / "run_manifest.json") or _load_json(run_root / "run_manifest.json")
+
+
+def _upstream_model_route(run_root: Path | None) -> str | None:
+    manifest = _run_manifest(run_root)
+    if not manifest:
+        return None
+    value = manifest.get("upstream_model_route")
+    if value is None and isinstance(manifest.get("upstream"), dict):
+        value = manifest["upstream"].get("upstream_model_route") or manifest["upstream"].get("model")
+    return str(value) if value else None
+
+
+def _assert_reference_routes_compatible(reference_roots: dict[str, Path | None]) -> None:
+    routes = {label: _upstream_model_route(root) for label, root in reference_roots.items() if root is not None}
+    known = {label: route for label, route in routes.items() if route}
+    if len(set(known.values())) <= 1:
+        return
+    details = ", ".join(f"{label}={route}" for label, route in sorted(known.items()))
+    raise SystemExit(f"upstream_model_route mismatch before Phase-2 execution: {details}")
+
+
 def _target_metric(metrics: dict[str, Any]) -> float | None:
     subsets = metrics.get("subsets")
     category = str(metrics.get("test_category") or "").strip()
@@ -258,6 +283,14 @@ def main() -> None:
         raise SystemExit("executable mode currently requires simple_python as the clean holdout")
     if args.execute and not (1 <= args.max_candidates <= 3):
         raise SystemExit("executable mode currently supports 1 to 3 bounded candidate proposals")
+    if args.execute:
+        _assert_reference_routes_compatible(
+            {
+                "baseline": baseline_root,
+                "target_source": target_root,
+                "holdout_baseline": holdout_root,
+            }
+        )
 
     skipped_optional: list[dict[str, Any]] = []
     for label, path in args.optional_rerun_root:

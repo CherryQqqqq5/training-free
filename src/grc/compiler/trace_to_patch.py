@@ -247,6 +247,7 @@ def _policy_units_from_rules(rules: List[Rule], failure_irs: List[FailureIR]) ->
     units: list[Dict[str, object]] = []
     for rule in rules:
         policy = rule.action.decision_policy
+        next_tool_policy = getattr(policy, "next_tool_policy", None)
         has_policy = any(
             [
                 policy.request_predicates,
@@ -255,6 +256,8 @@ def _policy_units_from_rules(rules: List[Rule], failure_irs: List[FailureIR]) ->
                 policy.stop_condition,
                 policy.forbidden_terminations,
                 policy.evidence_requirements,
+                getattr(next_tool_policy, "recommended_tools", []),
+                getattr(next_tool_policy, "activation_predicates", []),
             ]
         )
         if not has_policy:
@@ -271,6 +274,12 @@ def _policy_units_from_rules(rules: List[Rule], failure_irs: List[FailureIR]) ->
                     "category_patterns": list(rule.trigger.category_patterns),
                 },
                 "recommended_tools": list(policy.recommended_tools),
+                "next_tool_policy": {
+                    "activation_predicates": list(getattr(next_tool_policy, "activation_predicates", []) or []),
+                    "recommended_tools": list(getattr(next_tool_policy, "recommended_tools", []) or []),
+                    "tool_choice_mode": getattr(next_tool_policy, "tool_choice_mode", "soft"),
+                    "confidence": getattr(next_tool_policy, "confidence", 0.0),
+                },
                 "continue_condition": policy.continue_condition,
                 "stop_condition": policy.stop_condition,
                 "forbidden_terminations": list(policy.forbidden_terminations),
@@ -460,17 +469,27 @@ def _global_decision_policy_for_failure_ir(failure_ir: FailureIR) -> DecisionPol
     )
 
     if "actionable_no_tool_decision" in error_types:
+        activation_predicates = list(dict.fromkeys(predicates + ["tools_available", "prior_explicit_literals_present"]))
         policy.forbidden_terminations = ["prose_only_no_tool_termination"]
-        policy.evidence_requirements = list(predicates)
+        policy.evidence_requirements = activation_predicates
         policy.continue_condition = "tools remain available and locally grounded evidence supports another tool action"
         policy.stop_condition = "do not stop with prose-only narration while the matched local continuation evidence still holds"
+        policy.next_tool_policy.activation_predicates = activation_predicates
+        policy.next_tool_policy.recommended_tools = list(failure_ir.recommended_tools)
+        policy.next_tool_policy.tool_choice_mode = "required"
+        policy.next_tool_policy.confidence = 0.8
         return policy
 
     if "post_tool_prose_summary" in error_types:
+        activation_predicates = sorted(set(predicates) | {"tools_available", "prior_tool_outputs_present"})
         policy.forbidden_terminations = ["prose_only_no_tool_termination"]
-        policy.evidence_requirements = sorted(set(predicates) | {"prior_tool_outputs_present"})
+        policy.evidence_requirements = activation_predicates
         policy.continue_condition = "prior tool outputs already provide enough local evidence for the next grounded tool action"
         policy.stop_condition = "do not stop with a prose summary immediately after a sufficient tool result while another grounded action remains"
+        policy.next_tool_policy.activation_predicates = activation_predicates
+        policy.next_tool_policy.recommended_tools = list(failure_ir.recommended_tools)
+        policy.next_tool_policy.tool_choice_mode = "required"
+        policy.next_tool_policy.confidence = 0.75
         return policy
 
     if "empty_tool_call" in error_types:

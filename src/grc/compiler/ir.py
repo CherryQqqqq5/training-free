@@ -40,6 +40,13 @@ class PromptInjectionSpec(BaseModel):
     position: str = "prepend_system"
 
 
+class NextToolPolicySpec(BaseModel):
+    activation_predicates: List[str] = Field(default_factory=list)
+    recommended_tools: List[str] = Field(default_factory=list)
+    tool_choice_mode: str = "soft"
+    confidence: float = 0.0
+
+
 class DecisionPolicySpec(BaseModel):
     request_predicates: List[str] = Field(default_factory=list)
     recommended_tools: List[str] = Field(default_factory=list)
@@ -47,6 +54,7 @@ class DecisionPolicySpec(BaseModel):
     stop_condition: Optional[str] = None
     forbidden_terminations: List[str] = Field(default_factory=list)
     evidence_requirements: List[str] = Field(default_factory=list)
+    next_tool_policy: NextToolPolicySpec = Field(default_factory=NextToolPolicySpec)
 
 
 class ToolGuardSpec(BaseModel):
@@ -165,6 +173,12 @@ class ValidationRecord(BaseModel):
     last_observed_role: Optional[str] = None
     fallback_applied: bool = False
     request_patches: List[str] = Field(default_factory=list)
+    policy_hits: List[str] = Field(default_factory=list)
+    recommended_tools: List[str] = Field(default_factory=list)
+    selected_next_tool: Optional[str] = None
+    tool_choice_mode: Optional[str] = None
+    next_tool_emitted: Optional[bool] = None
+    next_tool_matches_recommendation: Optional[bool] = None
 
 
 class PatchBundle(BaseModel):

@@ -199,6 +199,27 @@ def _repair_kinds(payload: dict[str, Any]) -> list[str]:
     return kinds
 
 
+def _validation_policy_fields(payload: dict[str, Any]) -> dict[str, Any]:
+    validation = payload.get("validation") or {}
+    if not isinstance(validation, dict):
+        return {
+            "policy_hits": [],
+            "recommended_tools": [],
+            "selected_next_tool": None,
+            "tool_choice_mode": None,
+            "next_tool_emitted": None,
+            "next_tool_matches_recommendation": None,
+        }
+    return {
+        "policy_hits": [str(item) for item in validation.get("policy_hits") or [] if str(item).strip()],
+        "recommended_tools": [str(item) for item in validation.get("recommended_tools") or [] if str(item).strip()],
+        "selected_next_tool": validation.get("selected_next_tool"),
+        "tool_choice_mode": validation.get("tool_choice_mode"),
+        "next_tool_emitted": validation.get("next_tool_emitted"),
+        "next_tool_matches_recommendation": validation.get("next_tool_matches_recommendation"),
+    }
+
+
 def _has_prior_tool_output(payload: dict[str, Any]) -> bool:
     def visit(item: Any) -> bool:
         if isinstance(item, list):
@@ -243,6 +264,7 @@ def repair_records(trace_dir: Path, *, run_id: str, success_map: dict[str, Any] 
         trace_id = str(payload.get("trace_id") or path.stem)
         case_id = _case_id(payload, trace_id)
         repairs = _repair_kinds(payload)
+        policy_fields = _validation_policy_fields(payload)
         validation = payload.get("validation") or {}
         issues = validation.get("issues") if isinstance(validation, dict) else []
         if not isinstance(issues, list):
@@ -270,6 +292,12 @@ def repair_records(trace_dir: Path, *, run_id: str, success_map: dict[str, Any] 
                     "legacy_error_type": str(issue.get("kind") or "validation_issue"),
                     "request_predicates": request_predicates,
                     "repairs_applied": repairs,
+                    "policy_hits": policy_fields["policy_hits"],
+                    "recommended_tools": policy_fields["recommended_tools"],
+                    "selected_next_tool": policy_fields["selected_next_tool"],
+                    "tool_choice_mode": policy_fields["tool_choice_mode"],
+                    "next_tool_emitted": policy_fields["next_tool_emitted"],
+                    "next_tool_matches_recommendation": policy_fields["next_tool_matches_recommendation"],
                     "final_success": success_map.get(case_id),
                 }
             )
@@ -286,7 +314,24 @@ def summarize_repairs(records: list[dict[str, Any]], ablation_acc: dict[str, flo
     family_known_success: dict[tuple[str, str], int] = defaultdict(int)
     family_success_counts: dict[tuple[str, str], int] = defaultdict(int)
 
+    policy_family_total: Counter[str] = Counter()
+    policy_family_next_tool: Counter[str] = Counter()
+    policy_family_match: Counter[str] = Counter()
+    policy_family_known_success: Counter[str] = Counter()
+    policy_family_success: Counter[str] = Counter()
+
     for record in records:
+        if record.get("policy_hits"):
+            label = record["failure_label"]
+            policy_family_total[label] += 1
+            if record.get("next_tool_emitted") is True:
+                policy_family_next_tool[label] += 1
+            if record.get("next_tool_matches_recommendation") is True:
+                policy_family_match[label] += 1
+            if record.get("final_success") is not None:
+                policy_family_known_success[label] += 1
+                if bool(record.get("final_success")):
+                    policy_family_success[label] += 1
         for repair in record.get("repairs_applied") or []:
             repair_failure_counts[repair][record["failure_label"]] += 1
             family_applied_counts[(record["failure_label"], repair)] += 1
@@ -349,12 +394,28 @@ def summarize_repairs(records: list[dict[str, Any]], ablation_acc: dict[str, flo
         key = f"{repair_class}_repair_coverage"
         family_summary[key] += row["coverage"]
 
+    policy_conversion_by_family: list[dict[str, Any]] = []
+    for failure_label, policy_hits in sorted(policy_family_total.items()):
+        known_success = policy_family_known_success[failure_label]
+        policy_conversion_by_family.append(
+            {
+                "failure_label": failure_label,
+                "policy_hit_count": policy_hits,
+                "policy_coverage": policy_hits / failure_totals[failure_label] if failure_totals[failure_label] else 0.0,
+                "next_tool_conversion": policy_family_next_tool[failure_label] / policy_hits if policy_hits else 0.0,
+                "recommended_tool_match": policy_family_match[failure_label] / policy_hits if policy_hits else 0.0,
+                "scorer_success": policy_family_success[failure_label] / known_success if known_success else None,
+                "known_success_count": known_success,
+            }
+        )
+
     return {
         "record_count": len(records),
         "failure_totals": dict(sorted(failure_totals.items())),
         "repairs": repair_stats,
         "repair_by_family": repair_by_family,
         "family_summary": list(family_summary_index.values()),
+        "policy_conversion_by_family": policy_conversion_by_family,
     }
 
 
@@ -409,6 +470,12 @@ def main() -> None:
         for row in summary["family_summary"]:
             lines.append(
                 f"| {row['failure_label']} | {row['total_failures']} | {row['compatibility_repair_coverage']:.4f} | {row['decision_adjacent_repair_coverage']:.4f} | {row['unknown_repair_coverage']:.4f} |"
+            )
+        lines.extend(["", "## Policy Conversion By Family", "", "| Failure Label | Policy Hits | Policy Coverage | Next-Tool Conversion | Recommended-Tool Match | Scorer Success |", "| --- | ---: | ---: | ---: | ---: | ---: |"])
+        for row in summary["policy_conversion_by_family"]:
+            scorer_success = "-" if row["scorer_success"] is None else f"{row['scorer_success']:.4f}"
+            lines.append(
+                f"| {row['failure_label']} | {row['policy_hit_count']} | {row['policy_coverage']:.4f} | {row['next_tool_conversion']:.4f} | {row['recommended_tool_match']:.4f} | {scorer_success} |"
             )
         md_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
     if not args.summary_out:

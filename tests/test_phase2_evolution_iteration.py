@@ -284,6 +284,44 @@ class Phase2EvolutionIterationTests(unittest.TestCase):
         self.assertEqual(failure["step"], "target_run")
         self.assertIn("before-fail", log_text)
 
+    def test_execute_fails_fast_on_reference_route_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            baseline = root / "baseline"
+            target = root / "target"
+            holdout = root / "holdout"
+            history = root / "history.jsonl"
+            out = root / "out"
+            for run_root, route in ((baseline, "x-ai/grok-3"), (target, "x-ai/grok-3-beta"), (holdout, "x-ai/grok-3")):
+                (run_root / "traces").mkdir(parents=True)
+                (run_root / "artifacts").mkdir(parents=True)
+                (run_root / "artifacts" / "run_manifest.json").write_text(
+                    json.dumps({"upstream_model_route": route}),
+                    encoding="utf-8",
+                )
+            history.write_text("", encoding="utf-8")
+            argv = [
+                "run_phase2_evolution_iteration.py",
+                "--repo-root",
+                str(root),
+                "--baseline-run-root",
+                str(baseline),
+                "--target-run-root",
+                str(target),
+                "--holdout-run-root",
+                str(holdout),
+                "--history",
+                str(history),
+                "--out-root",
+                str(out),
+                "--execute",
+            ]
+            with patch.object(sys, "argv", argv):
+                with self.assertRaises(SystemExit) as raised:
+                    runner.main()
+
+        self.assertIn("upstream_model_route mismatch", str(raised.exception))
+
     def test_candidate_selection_failure_writes_failure_state(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

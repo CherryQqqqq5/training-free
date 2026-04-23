@@ -1614,6 +1614,82 @@ action:
             "Could you please provide the city before I look up the weather?",
         )
 
+    def test_required_next_tool_choice_is_config_gated(self) -> None:
+        rule = Rule(
+            rule_id="rule_next_tool_policy",
+            trigger=MatchSpec(
+                error_types=["actionable_no_tool_decision"],
+                request_predicates=["tools_available", "prior_explicit_literals_present"],
+            ),
+            scope=PatchScope(patch_sites=["prompt_injector", "policy_executor"]),
+            action=RuleAction(
+                decision_policy={
+                    "request_predicates": ["tools_available", "prior_explicit_literals_present"],
+                    "recommended_tools": ["move_file"],
+                    "next_tool_policy": {
+                        "activation_predicates": ["tools_available", "prior_explicit_literals_present"],
+                        "recommended_tools": ["move_file"],
+                        "tool_choice_mode": "required",
+                        "confidence": 0.8,
+                    },
+                }
+            ),
+        )
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir)
+            engine.rules = [rule]
+            patched, request_patches = engine.apply_request(self._make_move_file_request())
+
+        self.assertNotIn("tool_choice", patched)
+        self.assertIn("policy_next_tool:selected=move_file", request_patches)
+        self.assertIn("policy_hit:rule_next_tool_policy", request_patches)
+
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir, runtime_policy={"enable_required_next_tool_choice": True})
+            engine.rules = [rule]
+            patched, request_patches = engine.apply_request(self._make_move_file_request())
+
+        self.assertEqual(patched["tool_choice"], "required")
+        self.assertIn("tool_choice:required(policy_next_tool)", request_patches)
+
+    def test_next_tool_conversion_fields_are_recorded(self) -> None:
+        request = self._make_move_file_request()
+        response = {
+            "choices": [
+                {
+                    "message": {
+                        "role": "assistant",
+                        "content": None,
+                        "tool_calls": [
+                            {
+                                "id": "c1",
+                                "type": "function",
+                                "function": {"name": "move_file", "arguments": "{\"file_name\":\"report.txt\"}"},
+                            }
+                        ],
+                    }
+                }
+            ]
+        }
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir)
+            _, _, validation = engine.apply_response(
+                request,
+                response,
+                request_patches=[
+                    "policy_next_tool:activated",
+                    "policy_next_tool:selected=move_file",
+                    "policy_next_tool:recommended=move_file",
+                    "policy_hit:rule_next_tool_policy",
+                ],
+            )
+
+        self.assertEqual(validation.policy_hits, ["rule_next_tool_policy"])
+        self.assertEqual(validation.recommended_tools, ["move_file"])
+        self.assertEqual(validation.selected_next_tool, "move_file")
+        self.assertTrue(validation.next_tool_emitted)
+        self.assertTrue(validation.next_tool_matches_recommendation)
+
     def test_true_empty_tool_call_still_records_failure(self) -> None:
         with tempfile.TemporaryDirectory() as rules_dir:
             engine = RuleEngine(rules_dir)

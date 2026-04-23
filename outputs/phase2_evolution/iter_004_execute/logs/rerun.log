@@ -1,196 +1,0 @@
-$ cd /cephfs/qiuyn/training-free && bash scripts/run_bfcl_v4_patch.sh "$GRC_BFCL_MODEL" /cephfs/qiuyn/training-free/outputs/phase2_evolution/iter_004_execute/candidate_run_rerun 8013 multi_turn_miss_param /cephfs/qiuyn/training-free/configs/runtime_bfcl_structured.yaml /cephfs/qiuyn/training-free/outputs/phase2_evolution/iter_004_execute/proposals/fresh_02 /cephfs/qiuyn/training-free/outputs/phase2_evolution/iter_004_execute/candidate_run_rerun/traces /cephfs/qiuyn/training-free/outputs/phase2_evolution/iter_004_execute/proposals/fresh_02/rerun /cephfs/qiuyn/training-free/outputs/phase1_checks/multi_turn_miss_param/artifacts/metrics.json
-
-{
-  "base_url": "http://127.0.0.1:8013",
-  "config_path": "/cephfs/qiuyn/training-free/configs/runtime_bfcl_structured.yaml",
-  "trace_dir": "/cephfs/qiuyn/training-free/outputs/phase2_evolution/iter_004_execute/candidate_run_rerun/traces",
-  "expected_api_key_env": "OPENROUTER_API_KEY",
-  "environment_check": {
-    "expected_api_key_env": "OPENROUTER_API_KEY",
-    "is_set": true,
-    "reason": "ok"
-  },
-  "checks": [
-    {
-      "name": "chat_tool_call",
-      "request_path": "/v1/chat/completions",
-      "http_status": 200,
-      "passed": true,
-      "reason": "ok",
-      "response": {
-        "id": "gen-1776946754-eSHC6O3BoLPtoUSpB6yP",
-        "object": "chat.completion",
-        "created": 1776946754,
-        "model": "x-ai/grok-3",
-        "provider": "xAI",
-        "system_fingerprint": null,
-        "service_tier": "default",
-        "choices": [
-          {
-            "index": 0,
-            "logprobs": null,
-            "finish_reason": "tool_calls",
-            "native_finish_reason": "completed",
-            "message": {
-              "role": "assistant",
-              "content": null,
-              "refusal": null,
-              "reasoning": null,
-              "tool_calls": [
-                {
-                  "type": "function",
-                  "index": 0,
-                  "id": "call_26080100",
-                  "function": {
-                    "name": "echo",
-                    "arguments": "{\"text\":\"ping\"}"
-                  }
-                }
-              ]
-            }
-          }
-        ],
-        "usage": {
-          "prompt_tokens": 384,
-          "completion_tokens": 25,
-          "total_tokens": 409,
-          "cost": 0.0012689325,
-          "is_byok": false,
-          "prompt_tokens_details": {
-            "cached_tokens": 109,
-            "cache_write_tokens": 0,
-            "audio_tokens": 0,
-            "video_tokens": 0
-          },
-          "cost_details": {
-            "upstream_inference_cost": 0.00128175,
-            "upstream_inference_prompt_cost": 0.00090675,
-            "upstream_inference_completions_cost": 0.000375
-          },
-          "completion_tokens_details": {
-            "reasoning_tokens": 0,
-            "image_tokens": 0,
-            "audio_tokens": 0
-          }
-        }
-      }
-    },
-    {
-      "name": "responses_tool_call",
-      "request_path": "/v1/responses",
-      "http_status": 200,
-      "passed": true,
-      "reason": "ok",
-      "response": {
-        "id": "gen-1776946755-mE47T7odIUOujIWDirtz",
-        "object": "response",
-        "created_at": 1776946756,
-        "model": "x-ai/grok-3",
-        "output": [
-          {
-            "type": "function_call",
-            "id": "call_38061770",
-            "call_id": "call_38061770",
-            "name": "echo",
-            "arguments": "{\"text\":\"ping\"}"
-          }
-        ],
-        "usage": {
-          "prompt_tokens": 384,
-          "completion_tokens": 25,
-          "total_tokens": 409,
-          "cost": 0.0006585975,
-          "is_byok": false,
-          "prompt_tokens_details": {
-            "cached_tokens": 383,
-            "cache_write_tokens": 0,
-            "audio_tokens": 0,
-            "video_tokens": 0
-          },
-          "cost_details": {
-            "upstream_inference_cost": 0.00066525,
-            "upstream_inference_prompt_cost": 0.00029025,
-            "upstream_inference_completions_cost": 0.000375
-          },
-          "completion_tokens_details": {
-            "reasoning_tokens": 0,
-            "image_tokens": 0,
-            "audio_tokens": 0
-          }
-        }
-      }
-    },
-    {
-      "name": "chat_text_response",
-      "request_path": "/v1/chat/completions",
-      "http_status": 200,
-      "passed": true,
-      "reason": "ok",
-      "response": {
-        "id": "gen-1776946757-p2VzzRQl6aNKyuskdIkO",
-        "object": "chat.completion",
-        "created": 1776946757,
-        "model": "x-ai/grok-3",
-        "provider": "xAI",
-        "system_fingerprint": null,
-        "service_tier": "default",
-        "choices": [
-          {
-            "index": 0,
-            "logprobs": null,
-            "finish_reason": "stop",
-            "native_finish_reason": "completed",
-            "message": {
-              "role": "assistant",
-              "content": "PONG",
-              "refusal": null,
-              "reasoning": null,
-              "tool_calls": []
-            }
-          }
-        ],
-        "usage": {
-          "prompt_tokens": 14,
-          "completion_tokens": 2,
-          "total_tokens": 16,
-          "cost": 6.6825e-05,
-          "is_byok": false,
-          "prompt_tokens_details": {
-            "cached_tokens": 2,
-            "cache_write_tokens": 0,
-            "audio_tokens": 0,
-            "video_tokens": 0
-          },
-          "cost_details": {
-            "upstream_inference_cost": 6.75e-05,
-            "upstream_inference_prompt_cost": 3.75e-05,
-            "upstream_inference_completions_cost": 3e-05
-          },
-          "completion_tokens_details": {
-            "reasoning_tokens": 0,
-            "image_tokens": 0,
-            "audio_tokens": 0
-          }
-        }
-      }
-    },
-    {
-      "name": "trace_emission",
-      "request_path": null,
-      "http_status": null,
-      "passed": true,
-      "reason": "ok",
-      "response": {
-        "new_traces": [
-          "0edcb791-a324-4aa1-b352-dea2df8a64d8.json",
-          "2705352c-0568-4c11-acb4-0d1421a26362.json",
-          "fdf97b66-bd28-4aa2-9f7e-ac92549ada1d.json"
-        ]
-      }
-    }
-  ],
-  "passed": true
-}
-Generating results for ['gpt-4o-mini-2024-07-18-FC']
-Running full test cases for categories: ['multi_turn_miss_param'].
-Generating results for gpt-4o-mini-2024-07-18-FC:   0%|          | 0/200 [00:00<?, ?it/s]Generating results for gpt-4o-mini-2024-07-18-FC:   0%|          | 1/200 [01:16<4:14:12, 76.65s/it]Generating results for gpt-4o-mini-2024-07-18-FC:   1%|          | 2/200 [01:50<2:58:20, 54.04s/it]Generating results for gpt-4o-mini-2024-07-18-FC:   2%|▏         | 3/200 [02:52<3:07:49, 57.20s/it]Generating results for gpt-4o-mini-2024-07-18-FC:   2%|▏         | 4/200 [04:15<3:30:44, 64.51s/it]Generating results for gpt-4o-mini-2024-07-18-FC:   2%|▎         | 5/200 [04:44<3:01:35, 55.87s/it]Generating results for gpt-4o-mini-2024-07-18-FC:   3%|▎         | 6/200 [05:25<2:50:25, 52.71s/it]Generating results for gpt-4o-mini-2024-07-18-FC:   4%|▎         | 7/200 [06:29<2:56:19, 54.82s/it]Generating results for gpt-4o-mini-2024-07-18-FC:   4%|▍         | 8/200 [06:53<2:38:00, 49.38s/it]Generating results for gpt-4o-mini-2024-07-18-FC:   4%|▍         | 9/200 [07:29<2:30:34, 47.30s/it]Generating results for gpt-4o-mini-2024-07-18-FC:   5%|▌         | 10/200 [07:59<2:21:16, 44.61s/it]Generating results for gpt-4o-mini-2024-07-18-FC:   6%|▌         | 11/200 [08:28<2:13:25, 42.36s/it]Generating results for gpt-4o-mini-2024-07-18-FC:   6%|▌         | 12/200 [08:50<2:03:47, 39.51s/it]Generating results for gpt-4o-mini-2024-07-18-FC:   6%|▋         | 13/200 [09:14<1:56:27, 37.37s/it]Generating results for gpt-4o-mini-2024-07-18-FC:   7%|▋         | 14/200 [09:34<1:49:11, 35.22s/it]Generating results for gpt-4o-mini-2024-07-18-FC:   8%|▊         | 15/200 [10:11<1:49:01, 35.36s/it]Generating results for gpt-4o-mini-2024-07-18-FC:   8%|▊         | 16/200 [10:45<1:48:09, 35.27s/it]Generating results for gpt-4o-mini-2024-07-18-FC:   8%|▊         | 17/200 [11:49<1:58:01, 38.70s/it]Generating results for gpt-4o-mini-2024-07-18-FC:   9%|▉         | 18/200 [12:16<1:53:18, 37.36s/it]Generating results for gpt-4o-mini-2024-07-18-FC:  10%|▉         | 19/200 [13:08<1:57:42, 39.02s/it]Generating results for gpt-4o-mini-2024-07-18-FC:  10%|█         | 20/200 [13:24<1:49:07, 36.38s/it]Generating results for gpt-4o-mini-2024-07-18-FC:  10%|█         | 21/200 [13:47<1:44:00, 34.86s/it]Generating results for gpt-4o-mini-2024-07-18-FC:  11%|█         | 22/200 [14:08<1:38:59, 33.37s/it]Generating results for gpt-4o-mini-2024-07-18-FC:  12%|█▏        | 23/200 [14:46<1:39:55, 33.88s/it]Generating results for gpt-4o-mini-2024-07-18-FC:  12%|█▏        | 24/200 [15:05<1:34:41, 32.28s/it]Generating results for gpt-4o-mini-2024-07-18-FC:  12%|█▎        | 25/200 [15:35<1:33:13, 31.96s/it]Generating results for gpt-4o-mini-2024-07-18-FC:  13%|█▎        | 26/200 [16:00<1:30:31, 31.22s/it]Generating results for gpt-4o-mini-2024-07-18-FC:  14%|█▎        | 27/200 [16:21<1:26:58, 30.17s/it]Generating results for gpt-4o-mini-2024-07-18-FC:  14%|█▍        | 28/200 [16:55<1:27:37, 30.57s/it]Generating results for gpt-4o-mini-2024-07-18-FC:  14%|█▍        | 29/200 [18:04<1:38:43, 34.64s/it]Generating results for gpt-4o-mini-2024-07-18-FC:  15%|█▌        | 30/200 [18:26<1:34:08, 33.23s/it]Generating results for gpt-4o-mini-2024-07-18-FC:  16%|█▌        | 31/200 [18:58<1:33:16, 33.12s/it]Generating results for gpt-4o-mini-2024-07-18-FC:  16%|█▌        | 32/200 [19:28<1:31:47, 32.78s/it]Generating results for gpt-4o-mini-2024-07-18-FC:  16%|█▋        | 33/200 [19:51<1:28:31, 31.80s/it]Generating results for gpt-4o-mini-2024-07-18-FC:  17%|█▋        | 34/200 [20:19<1:26:52, 31.40s/it]Generating results for gpt-4o-mini-2024-07-18-FC:  18%|█▊        | 35/200 [20:40<1:23:32, 30.38s/it]Generating results for gpt-4o-mini-2024-07-18-FC:  18%|█▊        | 36/200 [21:21<1:26:03, 31.49s/it]Generating results for gpt-4o-mini-2024-07-18-FC:  18%|█▊        | 37/200 [22:16<1:31:56, 33.84s/it]Generating results for gpt-4o-mini-2024-07-18-FC:  19%|█▉        | 38/200 [23:02<1:34:37, 35.05s/it]Generating results for gpt-4o-mini-2024-07-18-FC:  20%|█▉        | 39/200 [23:38<1:34:15, 35.13s/it]Generating results for gpt-4o-mini-2024-07-18-FC:  20%|██        | 40/200 [24:18<1:35:08, 35.68s/it]Generating results for gpt-4o-mini-2024-07-18-FC:  20%|██        | 41/200 [24:48<1:32:58, 35.08s/it]Generating results for gpt-4o-mini-2024-07-18-FC:  21%|██        | 42/200 [25:43<1:37:39, 37.08s/it]Generating results for gpt-4o-mini-2024-07-18-FC:  22%|██▏       | 43/200 [26:04<1:32:55, 35.51s/it]Generating results for gpt-4o-mini-2024-07-18-FC:  22%|██▏       | 44/200 [26:46<1:34:05, 36.19s/it]

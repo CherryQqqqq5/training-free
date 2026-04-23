@@ -19,6 +19,8 @@ def rule_decision_policy(rule: Rule) -> DecisionPolicySpec | None:
             bool(getattr(policy, "stop_condition", None)),
             bool(getattr(policy, "forbidden_terminations", []) or []),
             bool(getattr(policy, "evidence_requirements", []) or []),
+            bool(getattr(getattr(policy, "next_tool_policy", None), "recommended_tools", []) or []),
+            bool(getattr(getattr(policy, "next_tool_policy", None), "activation_predicates", []) or []),
         ]
     ):
         return policy
