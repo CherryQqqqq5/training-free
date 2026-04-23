@@ -49,3 +49,13 @@ class PolicyProposalTests(unittest.TestCase):
             self.assertGreaterEqual(summary["proposal_count"], 2)
             self.assertTrue((out_dir / "fresh_00" / "proposal_metadata.json").exists())
             self.assertTrue((out_dir / "reuse_00_patch_old" / "proposal_metadata.json").exists())
+            self.assertTrue((out_dir / "reuse_00_patch_old" / "rule.yaml").exists())
+            self.assertEqual(
+                json.loads((out_dir / "reuse_00_patch_old" / "compile_status.json").read_text(encoding="utf-8"))["status"],
+                "actionable_patch",
+            )
+            self.assertTrue((out_dir / "specialize_00_patch_old" / "rule.yaml").exists())
+            self.assertEqual(
+                json.loads((out_dir / "specialize_00_patch_old" / "compile_status.json").read_text(encoding="utf-8"))["status"],
+                "actionable_patch",
+            )

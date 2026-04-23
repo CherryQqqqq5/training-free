@@ -78,10 +78,14 @@ class RuleEngine:
 
         for path in sorted(self.rules_dir.glob("*.yaml")):
             data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+            if not isinstance(data, dict) or not data:
+                continue
+            if "policy_units" in data and "rule_id" not in data and "rules" not in data:
+                continue
             if "rules" in data:
                 bundle = PatchBundle(**data)
                 rules.extend(bundle.rules)
-            elif data:
+            else:
                 rules.append(Rule(**data))
         return sorted((rule for rule in rules if rule.enabled), key=lambda item: item.priority, reverse=True)
 

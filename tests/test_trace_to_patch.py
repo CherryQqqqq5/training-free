@@ -97,6 +97,65 @@ class TraceToPatchTests(unittest.TestCase):
             "ACTIONABLE_NO_TOOL_DECISION",
         )
 
+    def test_compile_patch_emits_post_tool_policy_first_rule(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            failure_path = root / "failures.jsonl"
+            out_path = root / "rule.yaml"
+            candidate_dir = root / "candidate"
+            failure_path.write_text(
+                json.dumps(
+                    {
+                        "trace_id": "trace_1",
+                        "turn_index": 0,
+                        "tool_name": "__none__",
+                        "error_type": "post_tool_prose_summary",
+                        "stage": "POST_TOOL",
+                        "failure_type": "POST_TOOL_PROSE_SUMMARY",
+                        "failure_label": "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+                        "request_predicates": ["tools_available", "prior_tool_outputs_present"],
+                    }
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+
+            compile_status = compile_patch(
+                str(failure_path),
+                str(out_path),
+                patch_id="patch_post_tool_prose_v1",
+                candidate_dir=str(candidate_dir),
+            )
+            bundle = _load_bundle(out_path)
+            policy_units = _load_bundle(candidate_dir / "policy_unit.yaml")
+
+        self.assertEqual(compile_status["status"], "actionable_patch")
+        self.assertEqual(len(bundle["rules"]), 1)
+        rule = bundle["rules"][0]
+        self.assertEqual(
+            rule["rule_id"],
+            "rule_global_no_tool_post_tool_prose_summary_prior_tool_outputs_present_tools_available_v1",
+        )
+        self.assertEqual(rule["trigger"]["request_predicates"], ["prior_tool_outputs_present", "tools_available"])
+        self.assertEqual(rule["scope"]["patch_sites"], ["prompt_injector", "policy_executor"])
+        self.assertEqual(
+            rule["action"]["decision_policy"]["forbidden_terminations"],
+            ["prose_only_no_tool_termination"],
+        )
+        self.assertEqual(
+            rule["action"]["decision_policy"]["evidence_requirements"],
+            ["prior_tool_outputs_present", "tools_available"],
+        )
+        self.assertIn(
+            "prior tool outputs already provide enough local evidence",
+            rule["action"]["decision_policy"]["continue_condition"],
+        )
+        self.assertTrue(rule["action"]["prompt_injection"]["fragments"])
+        self.assertEqual(
+            policy_units["policy_units"][0]["source_failure_signature"]["type"],
+            "POST_TOOL_PROSE_SUMMARY",
+        )
+
     def test_compile_patch_emits_split_global_hallucinated_completion_rule(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

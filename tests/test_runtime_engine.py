@@ -5,6 +5,7 @@ import sys
 import tempfile
 import types
 import unittest
+from pathlib import Path
 
 _INJECTED_YAML_STUB = False
 try:
@@ -101,6 +102,29 @@ class RuntimeEngineTests(unittest.TestCase):
                 response or self._make_text_response("I'll move report.txt into the archive now."),
             )
         return final_response, repairs, validation
+
+    def test_load_rules_ignores_policy_unit_metadata_files(self) -> None:
+        with tempfile.TemporaryDirectory() as rules_dir:
+            policy_path = Path(rules_dir) / "policy_unit.yaml"
+            policy_path.write_text(
+                json.dumps(
+                    {
+                        "policy_units": [
+                            {
+                                "name": "policy_rule_global_no_tool_actionable_v1",
+                                "trigger": {
+                                    "error_types": ["actionable_no_tool_decision"],
+                                    "request_predicates": ["tools_available"],
+                                },
+                            }
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
+            engine = RuleEngine(rules_dir)
+
+        self.assertEqual(engine.rules, [])
 
     def _make_actionable_policy_rule(
         self,

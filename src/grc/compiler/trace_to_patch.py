@@ -396,6 +396,23 @@ def _actionable_no_tool_prompt_fragments(failure_ir: FailureIR) -> List[str]:
     return fragments
 
 
+def _post_tool_prose_prompt_fragments(failure_ir: FailureIR) -> List[str]:
+    fragments = [
+        "After a tool returns enough local evidence to continue, emit the next grounded tool action instead of wrapping the result in prose-only narration.",
+        "Do not convert a sufficient tool result into a free-form summary when another grounded tool step is still required.",
+    ]
+    predicates = set(failure_ir.request_predicates)
+    if "prior_tool_outputs_present" in predicates:
+        fragments.append(
+            "Treat the latest tool output as usable state for the next action rather than as a cue to stop with a textual summary."
+        )
+    if "prior_explicit_literals_present" in predicates:
+        fragments.append(
+            "Carry forward explicit literals from the request context when turning the tool result into the next action."
+        )
+    return fragments
+
+
 def _global_decision_policy_for_failure_ir(failure_ir: FailureIR) -> DecisionPolicySpec:
     error_types = set(failure_ir.error_types)
     predicates = list(failure_ir.request_predicates)
@@ -406,6 +423,13 @@ def _global_decision_policy_for_failure_ir(failure_ir: FailureIR) -> DecisionPol
         policy.evidence_requirements = list(predicates)
         policy.continue_condition = "tools remain available and locally grounded evidence supports another tool action"
         policy.stop_condition = "do not stop with prose-only narration while the matched local continuation evidence still holds"
+        return policy
+
+    if "post_tool_prose_summary" in error_types:
+        policy.forbidden_terminations = ["prose_only_no_tool_termination"]
+        policy.evidence_requirements = sorted(set(predicates) | {"prior_tool_outputs_present"})
+        policy.continue_condition = "prior tool outputs already provide enough local evidence for the next grounded tool action"
+        policy.stop_condition = "do not stop with a prose summary immediately after a sufficient tool result while another grounded action remains"
         return policy
 
     if "empty_tool_call" in error_types:
@@ -457,8 +481,9 @@ def _build_global_guard_rules(grouped: DefaultDict[str, List[FailureCase]]) -> L
 
     rules: List[Rule] = []
     groups: DefaultDict[tuple[str, tuple[str, ...]], List[FailureCase]] = defaultdict(list)
+    policy_first_error_types = {"actionable_no_tool_decision", "post_tool_prose_summary"}
     for case in global_failures:
-        predicates = tuple(sorted(case.request_predicates)) if case.error_type == "actionable_no_tool_decision" else ()
+        predicates = tuple(sorted(case.request_predicates)) if case.error_type in policy_first_error_types else ()
         groups[(case.error_type, predicates)].append(case)
 
     for (error_type, request_predicates), scoped_failures in sorted(groups.items()):
@@ -486,16 +511,17 @@ def _build_global_guard_rules(grouped: DefaultDict[str, List[FailureCase]]) -> L
                 }
             )[:8],
         )
-        prompt_fragments = (
-            _actionable_no_tool_prompt_fragments(failure_ir)
-            if error_type == "actionable_no_tool_decision"
-            else _global_prompt_fragments(failure_ir)
-        )
+        if error_type == "actionable_no_tool_decision":
+            prompt_fragments = _actionable_no_tool_prompt_fragments(failure_ir)
+        elif error_type == "post_tool_prose_summary":
+            prompt_fragments = _post_tool_prose_prompt_fragments(failure_ir)
+        else:
+            prompt_fragments = _global_prompt_fragments(failure_ir)
         decision_policy = _global_decision_policy_for_failure_ir(failure_ir)
         verification = _no_tool_verification_contract()
         validation_contract = verification
         patch_sites = ["tool_guard", "verification_hook", "fallback_router"]
-        if error_type == "actionable_no_tool_decision":
+        if error_type in policy_first_error_types:
             patch_sites = ["prompt_injector", "policy_executor"]
             verification.forbidden_terminations = list(decision_policy.forbidden_terminations)
             verification.evidence_requirements = list(decision_policy.evidence_requirements)
@@ -522,7 +548,7 @@ def _build_global_guard_rules(grouped: DefaultDict[str, List[FailureCase]]) -> L
                 action=RuleAction(
                     prompt_fragments=prompt_fragments,
                     prompt_injection=PromptInjectionSpec(
-                        fragments=prompt_fragments if error_type == "actionable_no_tool_decision" else []
+                        fragments=prompt_fragments if error_type in policy_first_error_types else []
                     ),
                     decision_policy=decision_policy,
                     tool_guard=ToolGuardSpec(
