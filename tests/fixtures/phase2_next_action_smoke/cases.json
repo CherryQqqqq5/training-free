@@ -1,0 +1,204 @@
+{
+  "cases": [
+    {
+      "id": "find_cat_01",
+      "family": "find_to_cat",
+      "should_activate": true,
+      "expected_plan": {"blocked_reason": "activated", "selected_next_tool": "cat"},
+      "expected_request_patch": ["policy_next_tool:activated", "policy_next_tool:selected=cat", "tool_choice:required(policy_next_tool)"],
+      "request": {"model": "demo-model", "messages": [{"role": "user", "content": "Find notes and read the first matching file."}, {"role": "tool", "name": "find", "content": "{\"matches\":[\"/workspace/notes.txt\"]}"}], "tools": [{"type": "function", "function": {"name": "find", "parameters": {"type": "object", "properties": {"pattern": {"type": "string"}}, "required": ["pattern"]}}}, {"type": "function", "function": {"name": "cat", "parameters": {"type": "object", "properties": {"file_name": {"type": "string"}}, "required": ["file_name"]}}}]},
+      "rules": [{"rule_id": "rule_find_cat_01", "trigger": {"error_types": ["actionable_no_tool_decision"], "request_predicates": ["tools_available", "prior_tool_outputs_present"]}, "scope": {"patch_sites": ["prompt_injector", "policy_executor"]}, "action": {"decision_policy": {"request_predicates": ["tools_available", "prior_tool_outputs_present"], "recommended_tools": ["cat"], "next_tool_policy": {"activation_predicates": ["tools_available", "prior_tool_outputs_present"], "recommended_tools": ["cat"], "tool_choice_mode": "required", "confidence": 0.8}}}}],
+      "mock_response": {"choices": [{"message": {"role": "assistant", "content": null, "tool_calls": [{"id": "c1", "type": "function", "function": {"name": "cat", "arguments": "{\"file_name\":\"notes.txt\"}"}}]}}]}
+    },
+    {
+      "id": "find_cat_02",
+      "family": "find_to_cat",
+      "should_activate": true,
+      "expected_plan": {"blocked_reason": "activated", "selected_next_tool": "cat"},
+      "expected_request_patch": ["policy_next_tool:activated", "policy_next_tool:selected=cat", "tool_choice:required(policy_next_tool)"],
+      "request": {"model": "demo-model", "messages": [{"role": "user", "content": "Open the first report returned by search."}, {"role": "tool", "name": "find", "content": "{\"matches\":[\"./reports/q1.txt\",\"./reports/q2.txt\"]}"}], "tools": [{"type": "function", "function": {"name": "find", "parameters": {"type": "object", "properties": {"pattern": {"type": "string"}}, "required": ["pattern"]}}}, {"type": "function", "function": {"name": "cat", "parameters": {"type": "object", "properties": {"file_name": {"type": "string"}}, "required": ["file_name"]}}}]},
+      "rules": [{"rule_id": "rule_find_cat_02", "trigger": {"error_types": ["post_tool_prose_summary"], "request_predicates": ["tools_available", "prior_tool_outputs_present"]}, "scope": {"patch_sites": ["prompt_injector", "policy_executor"]}, "action": {"decision_policy": {"request_predicates": ["tools_available", "prior_tool_outputs_present"], "recommended_tools": ["cat"], "next_tool_policy": {"activation_predicates": ["tools_available", "prior_tool_outputs_present"], "recommended_tools": ["cat"], "tool_choice_mode": "required", "confidence": 0.8}}}}],
+      "mock_response": {"choices": [{"message": {"role": "assistant", "content": null, "tool_calls": [{"id": "c1", "type": "function", "function": {"name": "cat", "arguments": "{\"file_name\":\"q1.txt\"}"}}]}}]}
+    },
+    {
+      "id": "find_cat_03",
+      "family": "find_to_cat",
+      "should_activate": true,
+      "expected_plan": {"blocked_reason": "activated", "selected_next_tool": "cat"},
+      "expected_request_patch": ["policy_next_tool:activated", "policy_next_tool:selected=cat", "tool_choice:required(policy_next_tool)"],
+      "request": {"model": "demo-model", "messages": [{"role": "user", "content": "Show me the complete content of the matching config file."}, {"role": "tool", "name": "find", "content": "{\"matches\":[\"/repo/config.yaml\"]}"}], "tools": [{"type": "function", "function": {"name": "find", "parameters": {"type": "object", "properties": {"pattern": {"type": "string"}}, "required": ["pattern"]}}}, {"type": "function", "function": {"name": "cat", "parameters": {"type": "object", "properties": {"file_name": {"type": "string"}}, "required": ["file_name"]}}}]},
+      "rules": [{"rule_id": "rule_find_cat_03", "trigger": {"error_types": ["actionable_no_tool_decision"], "request_predicates": ["tools_available", "prior_tool_outputs_present"]}, "scope": {"patch_sites": ["prompt_injector", "policy_executor"]}, "action": {"decision_policy": {"request_predicates": ["tools_available", "prior_tool_outputs_present"], "recommended_tools": ["cat"], "next_tool_policy": {"activation_predicates": ["tools_available", "prior_tool_outputs_present"], "recommended_tools": ["cat"], "tool_choice_mode": "required", "confidence": 0.8}}}}],
+      "mock_response": {"choices": [{"message": {"role": "assistant", "content": null, "tool_calls": [{"id": "c1", "type": "function", "function": {"name": "cat", "arguments": "{\"file_name\":\"config.yaml\"}"}}]}}]}
+    },
+    {
+      "id": "find_cat_04",
+      "family": "find_to_cat",
+      "should_activate": true,
+      "expected_plan": {"blocked_reason": "activated", "selected_next_tool": "cat"},
+      "expected_request_patch": ["policy_next_tool:activated", "policy_next_tool:selected=cat", "tool_choice:required(policy_next_tool)"],
+      "request": {"model": "demo-model", "messages": [{"role": "user", "content": "Read the first matching todo file."}, {"role": "tool", "name": "find", "content": "{\"matches\":[\"tasks/todo.md\"]}"}], "tools": [{"type": "function", "function": {"name": "find", "parameters": {"type": "object", "properties": {"pattern": {"type": "string"}}, "required": ["pattern"]}}}, {"type": "function", "function": {"name": "cat", "parameters": {"type": "object", "properties": {"file_name": {"type": "string"}}, "required": ["file_name"]}}}]},
+      "rules": [{"rule_id": "rule_find_cat_04", "trigger": {"error_types": ["post_tool_prose_summary"], "request_predicates": ["tools_available", "prior_tool_outputs_present"]}, "scope": {"patch_sites": ["prompt_injector", "policy_executor"]}, "action": {"decision_policy": {"request_predicates": ["tools_available", "prior_tool_outputs_present"], "recommended_tools": ["cat"], "next_tool_policy": {"activation_predicates": ["tools_available", "prior_tool_outputs_present"], "recommended_tools": ["cat"], "tool_choice_mode": "required", "confidence": 0.8}}}}],
+      "mock_response": {"choices": [{"message": {"role": "assistant", "content": null, "tool_calls": [{"id": "c1", "type": "function", "function": {"name": "cat", "arguments": "{\"file_name\":\"todo.md\"}"}}]}}]}
+    },
+    {
+      "id": "find_cat_05",
+      "family": "find_to_cat",
+      "should_activate": true,
+      "expected_plan": {"blocked_reason": "activated", "selected_next_tool": "cat"},
+      "expected_request_patch": ["policy_next_tool:activated", "policy_next_tool:selected=cat", "tool_choice:required(policy_next_tool)"],
+      "request": {"model": "demo-model", "messages": [{"role": "user", "content": "Output the contents of the discovered goal file."}, {"role": "tool", "name": "find", "content": "{\"matches\":[\"./goal.txt\"]}"}], "tools": [{"type": "function", "function": {"name": "find", "parameters": {"type": "object", "properties": {"pattern": {"type": "string"}}, "required": ["pattern"]}}}, {"type": "function", "function": {"name": "cat", "parameters": {"type": "object", "properties": {"file_name": {"type": "string"}}, "required": ["file_name"]}}}]},
+      "rules": [{"rule_id": "rule_find_cat_05", "trigger": {"error_types": ["actionable_no_tool_decision"], "request_predicates": ["tools_available", "prior_tool_outputs_present"]}, "scope": {"patch_sites": ["prompt_injector", "policy_executor"]}, "action": {"decision_policy": {"request_predicates": ["tools_available", "prior_tool_outputs_present"], "recommended_tools": ["cat"], "next_tool_policy": {"activation_predicates": ["tools_available", "prior_tool_outputs_present"], "recommended_tools": ["cat"], "tool_choice_mode": "required", "confidence": 0.8}}}}],
+      "mock_response": {"choices": [{"message": {"role": "assistant", "content": null, "tool_calls": [{"id": "c1", "type": "function", "function": {"name": "cat", "arguments": "{\"file_name\":\"goal.txt\"}"}}]}}]}
+    },
+    {
+      "id": "path_action_01",
+      "family": "path_sensitive_action",
+      "should_activate": true,
+      "expected_plan": {"blocked_reason": "activated", "selected_next_tool": "mkdir"},
+      "expected_request_patch": ["policy_next_tool:activated", "policy_next_tool:selected=mkdir", "tool_choice:required(policy_next_tool)"],
+      "request": {"model": "demo-model", "messages": [{"role": "user", "content": "Create an archive directory in the current folder."}, {"role": "tool", "name": "pwd", "content": "{\"cwd\":\"/workspace/project\"}"}], "tools": [{"type": "function", "function": {"name": "pwd", "parameters": {"type": "object", "properties": {}}}}, {"type": "function", "function": {"name": "mkdir", "parameters": {"type": "object", "properties": {"dir_name": {"type": "string"}}, "required": ["dir_name"]}}}]},
+      "rules": [{"rule_id": "rule_path_action_01", "trigger": {"error_types": ["actionable_no_tool_decision"], "request_predicates": ["tools_available", "prior_tool_outputs_present"]}, "scope": {"patch_sites": ["prompt_injector", "policy_executor"]}, "action": {"decision_policy": {"request_predicates": ["tools_available", "prior_tool_outputs_present"], "recommended_tools": ["mkdir"], "next_tool_policy": {"activation_predicates": ["tools_available", "prior_tool_outputs_present"], "recommended_tools": ["mkdir"], "tool_choice_mode": "required", "confidence": 0.8}}}}],
+      "mock_response": {"choices": [{"message": {"role": "assistant", "content": null, "tool_calls": [{"id": "c1", "type": "function", "function": {"name": "mkdir", "arguments": "{\"dir_name\":\"archive\"}"}}]}}]}
+    },
+    {
+      "id": "path_action_02",
+      "family": "path_sensitive_action",
+      "should_activate": true,
+      "expected_plan": {"blocked_reason": "activated", "selected_next_tool": "touch"},
+      "expected_request_patch": ["policy_next_tool:activated", "policy_next_tool:selected=touch", "tool_choice:required(policy_next_tool)"],
+      "request": {"model": "demo-model", "messages": [{"role": "user", "content": "Create a marker file in the listed directory."}, {"role": "tool", "name": "ls", "content": "{\"entries\":[\"src\",\"docs\"],\"cwd\":\"/workspace/project\"}"}], "tools": [{"type": "function", "function": {"name": "ls", "parameters": {"type": "object", "properties": {"path": {"type": "string"}}}}}, {"type": "function", "function": {"name": "touch", "parameters": {"type": "object", "properties": {"file_name": {"type": "string"}}, "required": ["file_name"]}}}]},
+      "rules": [{"rule_id": "rule_path_action_02", "trigger": {"error_types": ["actionable_no_tool_decision"], "request_predicates": ["tools_available", "prior_tool_outputs_present"]}, "scope": {"patch_sites": ["prompt_injector", "policy_executor"]}, "action": {"decision_policy": {"request_predicates": ["tools_available", "prior_tool_outputs_present"], "recommended_tools": ["touch"], "next_tool_policy": {"activation_predicates": ["tools_available", "prior_tool_outputs_present"], "recommended_tools": ["touch"], "tool_choice_mode": "required", "confidence": 0.8}}}}],
+      "mock_response": {"choices": [{"message": {"role": "assistant", "content": null, "tool_calls": [{"id": "c1", "type": "function", "function": {"name": "touch", "arguments": "{\"file_name\":\"marker.txt\"}"}}]}}]}
+    },
+    {
+      "id": "path_action_03",
+      "family": "path_sensitive_action",
+      "should_activate": true,
+      "expected_plan": {"blocked_reason": "activated", "selected_next_tool": "cat"},
+      "expected_request_patch": ["policy_next_tool:activated", "policy_next_tool:selected=cat", "tool_choice:required(policy_next_tool)"],
+      "request": {"model": "demo-model", "messages": [{"role": "user", "content": "Read README from the current directory listing."}, {"role": "tool", "name": "ls", "content": "{\"entries\":[\"README.md\",\"src\"],\"cwd\":\"/repo\"}"}], "tools": [{"type": "function", "function": {"name": "ls", "parameters": {"type": "object", "properties": {"path": {"type": "string"}}}}}, {"type": "function", "function": {"name": "cat", "parameters": {"type": "object", "properties": {"file_name": {"type": "string"}}, "required": ["file_name"]}}}]},
+      "rules": [{"rule_id": "rule_path_action_03", "trigger": {"error_types": ["post_tool_prose_summary"], "request_predicates": ["tools_available", "prior_tool_outputs_present"]}, "scope": {"patch_sites": ["prompt_injector", "policy_executor"]}, "action": {"decision_policy": {"request_predicates": ["tools_available", "prior_tool_outputs_present"], "recommended_tools": ["cat"], "next_tool_policy": {"activation_predicates": ["tools_available", "prior_tool_outputs_present"], "recommended_tools": ["cat"], "tool_choice_mode": "required", "confidence": 0.8}}}}],
+      "mock_response": {"choices": [{"message": {"role": "assistant", "content": null, "tool_calls": [{"id": "c1", "type": "function", "function": {"name": "cat", "arguments": "{\"file_name\":\"README.md\"}"}}]}}]}
+    },
+    {
+      "id": "path_action_04",
+      "family": "path_sensitive_action",
+      "should_activate": true,
+      "expected_plan": {"blocked_reason": "activated", "selected_next_tool": "mkdir"},
+      "expected_request_patch": ["policy_next_tool:activated", "policy_next_tool:selected=mkdir", "tool_choice:required(policy_next_tool)"],
+      "request": {"model": "demo-model", "messages": [{"role": "user", "content": "Make a logs folder next to the listed files."}, {"role": "tool", "name": "ls", "content": "{\"entries\":[\"app.py\",\"data\"],\"cwd\":\"/workspace\"}"}], "tools": [{"type": "function", "function": {"name": "ls", "parameters": {"type": "object", "properties": {"path": {"type": "string"}}}}}, {"type": "function", "function": {"name": "mkdir", "parameters": {"type": "object", "properties": {"dir_name": {"type": "string"}}, "required": ["dir_name"]}}}]},
+      "rules": [{"rule_id": "rule_path_action_04", "trigger": {"error_types": ["actionable_no_tool_decision"], "request_predicates": ["tools_available", "prior_tool_outputs_present"]}, "scope": {"patch_sites": ["prompt_injector", "policy_executor"]}, "action": {"decision_policy": {"request_predicates": ["tools_available", "prior_tool_outputs_present"], "recommended_tools": ["mkdir"], "next_tool_policy": {"activation_predicates": ["tools_available", "prior_tool_outputs_present"], "recommended_tools": ["mkdir"], "tool_choice_mode": "required", "confidence": 0.8}}}}],
+      "mock_response": {"choices": [{"message": {"role": "assistant", "content": null, "tool_calls": [{"id": "c1", "type": "function", "function": {"name": "mkdir", "arguments": "{\"dir_name\":\"logs\"}"}}]}}]}
+    },
+    {
+      "id": "path_action_05",
+      "family": "path_sensitive_action",
+      "should_activate": true,
+      "expected_plan": {"blocked_reason": "activated", "selected_next_tool": "touch"},
+      "expected_request_patch": ["policy_next_tool:activated", "policy_next_tool:selected=touch", "tool_choice:required(policy_next_tool)"],
+      "request": {"model": "demo-model", "messages": [{"role": "user", "content": "Add an empty TODO file in this directory."}, {"role": "tool", "name": "pwd", "content": "{\"cwd\":\"/workspace/docs\"}"}], "tools": [{"type": "function", "function": {"name": "pwd", "parameters": {"type": "object", "properties": {}}}}, {"type": "function", "function": {"name": "touch", "parameters": {"type": "object", "properties": {"file_name": {"type": "string"}}, "required": ["file_name"]}}}]},
+      "rules": [{"rule_id": "rule_path_action_05", "trigger": {"error_types": ["actionable_no_tool_decision"], "request_predicates": ["tools_available", "prior_tool_outputs_present"]}, "scope": {"patch_sites": ["prompt_injector", "policy_executor"]}, "action": {"decision_policy": {"request_predicates": ["tools_available", "prior_tool_outputs_present"], "recommended_tools": ["touch"], "next_tool_policy": {"activation_predicates": ["tools_available", "prior_tool_outputs_present"], "recommended_tools": ["touch"], "tool_choice_mode": "required", "confidence": 0.8}}}}],
+      "mock_response": {"choices": [{"message": {"role": "assistant", "content": null, "tool_calls": [{"id": "c1", "type": "function", "function": {"name": "touch", "arguments": "{\"file_name\":\"TODO.md\"}"}}]}}]}
+    },
+    {
+      "id": "literal_arg_01",
+      "family": "explicit_literal_arg",
+      "should_activate": true,
+      "expected_plan": {"blocked_reason": "activated", "selected_next_tool": "cat"},
+      "expected_request_patch": ["policy_next_tool:activated", "policy_next_tool:selected=cat", "tool_choice:required(policy_next_tool)"],
+      "request": {"model": "demo-model", "messages": [{"role": "user", "content": "Read 'invoice_2024.txt'."}], "tools": [{"type": "function", "function": {"name": "cat", "parameters": {"type": "object", "properties": {"file_name": {"type": "string"}}, "required": ["file_name"]}}}]},
+      "rules": [{"rule_id": "rule_literal_arg_01", "trigger": {"error_types": ["actionable_no_tool_decision"], "request_predicates": ["tools_available", "prior_explicit_literals_present"]}, "scope": {"patch_sites": ["prompt_injector", "policy_executor"]}, "action": {"decision_policy": {"request_predicates": ["tools_available", "prior_explicit_literals_present"], "recommended_tools": ["cat"], "next_tool_policy": {"activation_predicates": ["tools_available", "prior_explicit_literals_present"], "recommended_tools": ["cat"], "tool_choice_mode": "required", "confidence": 0.8}}}}],
+      "mock_response": {"choices": [{"message": {"role": "assistant", "content": null, "tool_calls": [{"id": "c1", "type": "function", "function": {"name": "cat", "arguments": "{\"file_name\":\"invoice_2024.txt\"}"}}]}}]}
+    },
+    {
+      "id": "literal_arg_02",
+      "family": "explicit_literal_arg",
+      "should_activate": true,
+      "expected_plan": {"blocked_reason": "activated", "selected_next_tool": "delete_file"},
+      "expected_request_patch": ["policy_next_tool:activated", "policy_next_tool:selected=delete_file", "tool_choice:required(policy_next_tool)"],
+      "request": {"model": "demo-model", "messages": [{"role": "user", "content": "Delete 'tmp.log'."}], "tools": [{"type": "function", "function": {"name": "delete_file", "parameters": {"type": "object", "properties": {"file_name": {"type": "string"}}, "required": ["file_name"]}}}]},
+      "rules": [{"rule_id": "rule_literal_arg_02", "trigger": {"error_types": ["actionable_no_tool_decision"], "request_predicates": ["tools_available", "prior_explicit_literals_present"]}, "scope": {"patch_sites": ["prompt_injector", "policy_executor"]}, "action": {"decision_policy": {"request_predicates": ["tools_available", "prior_explicit_literals_present"], "recommended_tools": ["delete_file"], "next_tool_policy": {"activation_predicates": ["tools_available", "prior_explicit_literals_present"], "recommended_tools": ["delete_file"], "tool_choice_mode": "required", "confidence": 0.8}}}}],
+      "mock_response": {"choices": [{"message": {"role": "assistant", "content": null, "tool_calls": [{"id": "c1", "type": "function", "function": {"name": "delete_file", "arguments": "{\"file_name\":\"tmp.log\"}"}}]}}]}
+    },
+    {
+      "id": "literal_arg_03",
+      "family": "explicit_literal_arg",
+      "should_activate": true,
+      "expected_plan": {"blocked_reason": "activated", "selected_next_tool": "lookup_id"},
+      "expected_request_patch": ["policy_next_tool:activated", "policy_next_tool:selected=lookup_id", "tool_choice:required(policy_next_tool)"],
+      "request": {"model": "demo-model", "messages": [{"role": "user", "content": "Lookup id 'A-1042'."}], "tools": [{"type": "function", "function": {"name": "lookup_id", "parameters": {"type": "object", "properties": {"item_id": {"type": "string"}}, "required": ["item_id"]}}}]},
+      "rules": [{"rule_id": "rule_literal_arg_03", "trigger": {"error_types": ["actionable_no_tool_decision"], "request_predicates": ["tools_available", "prior_explicit_literals_present"]}, "scope": {"patch_sites": ["prompt_injector", "policy_executor"]}, "action": {"decision_policy": {"request_predicates": ["tools_available", "prior_explicit_literals_present"], "recommended_tools": ["lookup_id"], "next_tool_policy": {"activation_predicates": ["tools_available", "prior_explicit_literals_present"], "recommended_tools": ["lookup_id"], "tool_choice_mode": "required", "confidence": 0.8}}}}],
+      "mock_response": {"choices": [{"message": {"role": "assistant", "content": null, "tool_calls": [{"id": "c1", "type": "function", "function": {"name": "lookup_id", "arguments": "{\"item_id\":\"A-1042\"}"}}]}}]}
+    },
+    {
+      "id": "literal_arg_04",
+      "family": "explicit_literal_arg",
+      "should_activate": true,
+      "expected_plan": {"blocked_reason": "activated", "selected_next_tool": "mkdir"},
+      "expected_request_patch": ["policy_next_tool:activated", "policy_next_tool:selected=mkdir", "tool_choice:required(policy_next_tool)"],
+      "request": {"model": "demo-model", "messages": [{"role": "user", "content": "Create directory 'exports'."}], "tools": [{"type": "function", "function": {"name": "mkdir", "parameters": {"type": "object", "properties": {"dir_name": {"type": "string"}}, "required": ["dir_name"]}}}]},
+      "rules": [{"rule_id": "rule_literal_arg_04", "trigger": {"error_types": ["actionable_no_tool_decision"], "request_predicates": ["tools_available", "prior_explicit_literals_present"]}, "scope": {"patch_sites": ["prompt_injector", "policy_executor"]}, "action": {"decision_policy": {"request_predicates": ["tools_available", "prior_explicit_literals_present"], "recommended_tools": ["mkdir"], "next_tool_policy": {"activation_predicates": ["tools_available", "prior_explicit_literals_present"], "recommended_tools": ["mkdir"], "tool_choice_mode": "required", "confidence": 0.8}}}}],
+      "mock_response": {"choices": [{"message": {"role": "assistant", "content": null, "tool_calls": [{"id": "c1", "type": "function", "function": {"name": "mkdir", "arguments": "{\"dir_name\":\"exports\"}"}}]}}]}
+    },
+    {
+      "id": "literal_arg_05",
+      "family": "explicit_literal_arg",
+      "should_activate": true,
+      "expected_plan": {"blocked_reason": "activated", "selected_next_tool": "touch"},
+      "expected_request_patch": ["policy_next_tool:activated", "policy_next_tool:selected=touch", "tool_choice:required(policy_next_tool)"],
+      "request": {"model": "demo-model", "messages": [{"role": "user", "content": "Create file 'draft.md'."}], "tools": [{"type": "function", "function": {"name": "touch", "parameters": {"type": "object", "properties": {"file_name": {"type": "string"}}, "required": ["file_name"]}}}]},
+      "rules": [{"rule_id": "rule_literal_arg_05", "trigger": {"error_types": ["actionable_no_tool_decision"], "request_predicates": ["tools_available", "prior_explicit_literals_present"]}, "scope": {"patch_sites": ["prompt_injector", "policy_executor"]}, "action": {"decision_policy": {"request_predicates": ["tools_available", "prior_explicit_literals_present"], "recommended_tools": ["touch"], "next_tool_policy": {"activation_predicates": ["tools_available", "prior_explicit_literals_present"], "recommended_tools": ["touch"], "tool_choice_mode": "required", "confidence": 0.8}}}}],
+      "mock_response": {"choices": [{"message": {"role": "assistant", "content": null, "tool_calls": [{"id": "c1", "type": "function", "function": {"name": "touch", "arguments": "{\"file_name\":\"draft.md\"}"}}]}}]}
+    },
+    {
+      "id": "stop_allowed_01",
+      "family": "stop_allowed",
+      "should_activate": false,
+      "expected_plan": {"blocked_reason": "no_policy_candidate"},
+      "expected_request_patch": [],
+      "request": {"model": "demo-model", "messages": [{"role": "user", "content": "What is the file content?"}, {"role": "tool", "name": "cat", "content": "hello world"}], "tools": [{"type": "function", "function": {"name": "cat", "parameters": {"type": "object", "properties": {"file_name": {"type": "string"}}, "required": ["file_name"]}}}]},
+      "rules": [],
+      "mock_response": {"choices": [{"message": {"role": "assistant", "content": "hello world"}}]}
+    },
+    {
+      "id": "stop_allowed_02",
+      "family": "stop_allowed",
+      "should_activate": false,
+      "expected_plan": {"blocked_reason": "no_policy_candidate"},
+      "expected_request_patch": [],
+      "request": {"model": "demo-model", "messages": [{"role": "user", "content": "Summarize the result."}, {"role": "tool", "name": "cat", "content": "The document says the release is approved."}], "tools": [{"type": "function", "function": {"name": "cat", "parameters": {"type": "object", "properties": {"file_name": {"type": "string"}}, "required": ["file_name"]}}}]},
+      "rules": [],
+      "mock_response": {"choices": [{"message": {"role": "assistant", "content": "The release is approved."}}]}
+    },
+    {
+      "id": "stop_allowed_03",
+      "family": "stop_allowed",
+      "should_activate": false,
+      "expected_plan": {"blocked_reason": "no_policy_candidate"},
+      "expected_request_patch": [],
+      "request": {"model": "demo-model", "messages": [{"role": "user", "content": "Report whether the directory exists."}, {"role": "tool", "name": "ls", "content": "{\"entries\":[\"src\",\"tests\"]}"}], "tools": [{"type": "function", "function": {"name": "ls", "parameters": {"type": "object", "properties": {"path": {"type": "string"}}}}}]},
+      "rules": [],
+      "mock_response": {"choices": [{"message": {"role": "assistant", "content": "The directory exists and contains src and tests."}}]}
+    },
+    {
+      "id": "stop_allowed_04",
+      "family": "stop_allowed",
+      "should_activate": false,
+      "expected_plan": {"blocked_reason": "no_policy_candidate"},
+      "expected_request_patch": [],
+      "request": {"model": "demo-model", "messages": [{"role": "user", "content": "Give me the lookup result."}, {"role": "tool", "name": "lookup_id", "content": "{\"name\":\"sample\",\"status\":\"ready\"}"}], "tools": [{"type": "function", "function": {"name": "lookup_id", "parameters": {"type": "object", "properties": {"item_id": {"type": "string"}}, "required": ["item_id"]}}}]},
+      "rules": [],
+      "mock_response": {"choices": [{"message": {"role": "assistant", "content": "The item sample is ready."}}]}
+    },
+    {
+      "id": "stop_allowed_05",
+      "family": "stop_allowed",
+      "should_activate": false,
+      "expected_plan": {"blocked_reason": "no_policy_candidate"},
+      "expected_request_patch": [],
+      "request": {"model": "demo-model", "messages": [{"role": "user", "content": "Confirm the command result."}, {"role": "tool", "name": "mkdir", "content": "{\"created\":\"archive\"}"}], "tools": [{"type": "function", "function": {"name": "mkdir", "parameters": {"type": "object", "properties": {"dir_name": {"type": "string"}}, "required": ["dir_name"]}}}]},
+      "rules": [],
+      "mock_response": {"choices": [{"message": {"role": "assistant", "content": "The archive directory was created."}}]}
+    }
+  ]
+}
