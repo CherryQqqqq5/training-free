@@ -1865,7 +1865,9 @@ action:
         self.assertEqual(validation.selected_action_candidate["tool"], "move_file")
         self.assertTrue(validation.next_tool_args_emitted)
         self.assertTrue(validation.next_tool_args_match_binding)
+        self.assertTrue(validation.next_tool_args_match_binding_normalized)
         self.assertTrue(validation.next_tool_final_args_match_binding)
+        self.assertTrue(validation.next_tool_final_args_match_binding_normalized)
         self.assertEqual(
             validation.arg_binding_validation["file_name"],
             {
@@ -1952,11 +1954,15 @@ action:
         self.assertIn("/workspace/notes.txt", final_response["choices"][0]["message"]["tool_calls"][0]["function"]["arguments"])
         self.assertTrue(validation.next_tool_args_emitted)
         self.assertTrue(validation.next_tool_args_match_binding)
+        self.assertTrue(validation.next_tool_args_match_binding_normalized)
         self.assertFalse(validation.next_tool_final_args_match_binding)
+        self.assertTrue(validation.next_tool_final_args_match_binding_normalized)
         self.assertEqual(validation.arg_binding_validation["file_name"]["observed"], "notes.txt")
         self.assertTrue(validation.arg_binding_validation["file_name"]["match"])
         self.assertEqual(validation.final_arg_binding_validation["file_name"]["observed"], "/workspace/notes.txt")
         self.assertFalse(validation.final_arg_binding_validation["file_name"]["match"])
+        self.assertTrue(validation.final_normalized_arg_binding_validation["file_name"]["match"])
+        self.assertEqual(validation.final_normalized_arg_binding_validation["file_name"]["normalization"], "path_basename")
 
     def test_next_tool_arg_binding_validation_records_mismatch(self) -> None:
         action_candidate = {
@@ -1997,8 +2003,42 @@ action:
 
         self.assertTrue(validation.next_tool_args_emitted)
         self.assertFalse(validation.next_tool_args_match_binding)
+        self.assertFalse(validation.next_tool_args_match_binding_normalized)
         self.assertEqual(validation.arg_binding_validation["file_name"]["observed"], "wrong.txt")
         self.assertFalse(validation.arg_binding_validation["file_name"]["match"])
+
+    def test_next_tool_arg_binding_normalizes_path_equivalent_values(self) -> None:
+        cases = [
+            ("notes.txt", "/workspace/notes.txt", "file_name"),
+            ("q1.txt", "./reports/q1.txt", "file_name"),
+            ("goal.txt", "./goal.txt", "path"),
+            ("archive", "/workspace/project/archive", "dir_name"),
+        ]
+        for expected, observed, field in cases:
+            with self.subTest(expected=expected, observed=observed, field=field):
+                rows = RuleEngine._validate_action_candidate_args_normalized(
+                    {
+                        "args": {field: expected},
+                        "arg_bindings": {field: {"source": "fixture", "value": expected}},
+                    },
+                    {field: observed},
+                )
+
+                self.assertTrue(rows[field]["match"])
+                self.assertFalse(rows[field]["strict_match"])
+                self.assertEqual(rows[field]["normalization"], "path_basename")
+
+    def test_next_tool_arg_binding_normalization_does_not_fuzz_non_path_fields(self) -> None:
+        rows = RuleEngine._validate_action_candidate_args_normalized(
+            {
+                "args": {"id": "123"},
+                "arg_bindings": {"id": {"source": "explicit_literal", "value": "123"}},
+            },
+            {"id": "abc/123"},
+        )
+
+        self.assertFalse(rows["id"]["match"])
+        self.assertEqual(rows["id"]["normalization"], "unsupported_field")
 
 
     def test_true_empty_tool_call_still_records_failure(self) -> None:

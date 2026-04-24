@@ -58,6 +58,9 @@ class NextActionLiveSmokeTests(unittest.TestCase):
                     "next_tool_matches_recommendation": index < 8,
                     "next_tool_args_emitted": index < 7,
                     "next_tool_args_match_binding": index < 6,
+                    "next_tool_args_match_binding_normalized": index < 10,
+                    "next_tool_final_args_match_binding": index < 5,
+                    "next_tool_final_args_match_binding_normalized": index < 9,
                     "stop_allowed_false_positive": False,
                 }
             )
@@ -73,6 +76,9 @@ class NextActionLiveSmokeTests(unittest.TestCase):
                     "next_tool_matches_recommendation": None,
                     "next_tool_args_emitted": None,
                     "next_tool_args_match_binding": None,
+                    "next_tool_args_match_binding_normalized": None,
+                    "next_tool_final_args_match_binding": None,
+                    "next_tool_final_args_match_binding_normalized": None,
                     "stop_allowed_false_positive": False,
                 }
             )
@@ -85,6 +91,9 @@ class NextActionLiveSmokeTests(unittest.TestCase):
         self.assertEqual(summary["recommended_tool_match_count"], 8)
         self.assertEqual(summary["arg_emitted_count"], 7)
         self.assertEqual(summary["arg_binding_match_count"], 6)
+        self.assertEqual(summary["normalized_arg_binding_match_count"], 10)
+        self.assertEqual(summary["final_arg_binding_match_count"], 5)
+        self.assertEqual(summary["final_normalized_arg_binding_match_count"], 9)
         self.assertEqual(summary["stop_allowed_false_positive_count"], 0)
         self.assertTrue(summary["accepted"])
         self.assertEqual(summary["family_summary"]["stop_allowed"]["stop_allowed_false_positive"], 0)
@@ -137,7 +146,9 @@ class NextActionLiveSmokeTests(unittest.TestCase):
         self.assertEqual(saved_summary["next_tool_emitted_count"], 15)
         self.assertEqual(saved_summary["recommended_tool_match_count"], 15)
         self.assertEqual(saved_summary["arg_binding_match_count"], 15)
+        self.assertEqual(saved_summary["normalized_arg_binding_match_count"], 15)
         self.assertEqual(saved_summary["final_arg_binding_match_count"], 10)
+        self.assertEqual(saved_summary["final_normalized_arg_binding_match_count"], 15)
         self.assertEqual(saved_summary["stop_allowed_false_positive_count"], 0)
         self.assertEqual(len(traces), 20)
 

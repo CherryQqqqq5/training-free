@@ -142,8 +142,14 @@ def _case_result_from_trace(trace: dict[str, Any]) -> dict[str, Any]:
         "next_tool_args_emitted": validation.get("next_tool_args_emitted"),
         "next_tool_args_match_binding": validation.get("next_tool_args_match_binding"),
         "arg_binding_validation": validation.get("arg_binding_validation") or {},
+        "next_tool_args_match_binding_normalized": validation.get("next_tool_args_match_binding_normalized"),
+        "normalized_arg_binding_validation": validation.get("normalized_arg_binding_validation") or {},
         "next_tool_final_args_match_binding": validation.get("next_tool_final_args_match_binding"),
         "final_arg_binding_validation": validation.get("final_arg_binding_validation") or {},
+        "next_tool_final_args_match_binding_normalized": validation.get(
+            "next_tool_final_args_match_binding_normalized"
+        ),
+        "final_normalized_arg_binding_validation": validation.get("final_normalized_arg_binding_validation") or {},
         "status_code": trace.get("status_code"),
         "latency_ms": trace.get("latency_ms"),
         "upstream_model": trace.get("upstream_model"),
@@ -163,7 +169,9 @@ def summarize_results(results: list[dict[str, Any]]) -> dict[str, Any]:
             "recommended_tool_match": 0,
             "arg_emitted": 0,
             "arg_binding_match": 0,
+            "normalized_arg_binding_match": 0,
             "final_arg_binding_match": 0,
+            "final_normalized_arg_binding_match": 0,
             "stop_allowed_false_positive": 0,
         }
     )
@@ -176,7 +184,13 @@ def summarize_results(results: list[dict[str, Any]]) -> dict[str, Any]:
         family["recommended_tool_match"] += int(item.get("next_tool_matches_recommendation") is True)
         family["arg_emitted"] += int(item.get("next_tool_args_emitted") is True)
         family["arg_binding_match"] += int(item.get("next_tool_args_match_binding") is True)
+        family["normalized_arg_binding_match"] += int(
+            item.get("next_tool_args_match_binding_normalized") is True
+        )
         family["final_arg_binding_match"] += int(item.get("next_tool_final_args_match_binding") is True)
+        family["final_normalized_arg_binding_match"] += int(
+            item.get("next_tool_final_args_match_binding_normalized") is True
+        )
         family["stop_allowed_false_positive"] += int(bool(item.get("stop_allowed_false_positive")))
 
     summary = {
@@ -186,8 +200,14 @@ def summarize_results(results: list[dict[str, Any]]) -> dict[str, Any]:
         "recommended_tool_match_count": sum(int(item.get("next_tool_matches_recommendation") is True) for item in results),
         "arg_emitted_count": sum(int(item.get("next_tool_args_emitted") is True) for item in results),
         "arg_binding_match_count": sum(int(item.get("next_tool_args_match_binding") is True) for item in results),
+        "normalized_arg_binding_match_count": sum(
+            int(item.get("next_tool_args_match_binding_normalized") is True) for item in results
+        ),
         "final_arg_binding_match_count": sum(
             int(item.get("next_tool_final_args_match_binding") is True) for item in results
+        ),
+        "final_normalized_arg_binding_match_count": sum(
+            int(item.get("next_tool_final_args_match_binding_normalized") is True) for item in results
         ),
         "stop_allowed_false_positive_count": sum(int(bool(item.get("stop_allowed_false_positive"))) for item in results),
         "blocked_reason_distribution": dict(sorted(blocked_reasons.items())),
@@ -215,7 +235,9 @@ def render_markdown(summary: dict[str, Any]) -> str:
         f"- Recommended tool match: `{summary['recommended_tool_match_count']}`",
         f"- Args emitted: `{summary['arg_emitted_count']}`",
         f"- Arg binding match: `{summary['arg_binding_match_count']}`",
+        f"- Normalized arg binding match: `{summary['normalized_arg_binding_match_count']}`",
         f"- Final arg binding match: `{summary['final_arg_binding_match_count']}`",
+        f"- Final normalized arg binding match: `{summary['final_normalized_arg_binding_match_count']}`",
         f"- Stop-allowed false positives: `{summary['stop_allowed_false_positive_count']}`",
         f"- Accepted: `{summary['accepted']}`",
         "",
@@ -226,23 +248,28 @@ def render_markdown(summary: dict[str, Any]) -> str:
     ]
     for metric, passed in summary["acceptance"].items():
         lines.append(f"| {metric} | {int(bool(passed))} |")
-    lines.extend(["", "## Family Summary", "", "| Family | Total | Expected Activate | Activated | Emitted | Tool Match | Arg Emitted | Raw Arg Match | Final Arg Match | Stop FP |", "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"])
+    lines.extend(["", "## Family Summary", "", "| Family | Total | Expected Activate | Activated | Emitted | Tool Match | Arg Emitted | Raw Strict Arg Match | Raw Normalized Arg Match | Final Strict Arg Match | Final Normalized Arg Match | Stop FP |", "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"])
     for family, row in summary["family_summary"].items():
         lines.append(
             f"| {family} | {row['total']} | {row['expected_activate']} | {row['policy_plan_activated']} | "
             f"{row['next_tool_emitted']} | {row['recommended_tool_match']} | {row['arg_emitted']} | "
-            f"{row['arg_binding_match']} | {row['final_arg_binding_match']} | {row['stop_allowed_false_positive']} |"
+            f"{row['arg_binding_match']} | {row['normalized_arg_binding_match']} | "
+            f"{row['final_arg_binding_match']} | {row['final_normalized_arg_binding_match']} | "
+            f"{row['stop_allowed_false_positive']} |"
         )
     lines.extend(["", "## Blocked Reasons", "", "| Reason | Count |", "| --- | ---: |"])
     for reason, count in summary["blocked_reason_distribution"].items():
         lines.append(f"| {reason} | {count} |")
-    lines.extend(["", "## Cases", "", "| Case | Family | Activated | Emitted | Tool Match | Raw Arg Match | Final Arg Match | Status |", "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |"])
+    lines.extend(["", "## Cases", "", "| Case | Family | Activated | Emitted | Tool Match | Raw Strict Arg Match | Raw Normalized Arg Match | Final Strict Arg Match | Final Normalized Arg Match | Status |", "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"])
     for result in summary["results"]:
         lines.append(
             f"| {result['case_id']} | {result['family']} | {int(result['next_tool_plan_activated'])} | "
             f"{int(result.get('next_tool_emitted') is True)} | {int(result.get('next_tool_matches_recommendation') is True)} | "
             f"{int(result.get('next_tool_args_match_binding') is True)} | "
-            f"{int(result.get('next_tool_final_args_match_binding') is True)} | {result.get('status_code') or '-'} |"
+            f"{int(result.get('next_tool_args_match_binding_normalized') is True)} | "
+            f"{int(result.get('next_tool_final_args_match_binding') is True)} | "
+            f"{int(result.get('next_tool_final_args_match_binding_normalized') is True)} | "
+            f"{result.get('status_code') or '-'} |"
         )
     return "\n".join(lines) + "\n"
 
@@ -425,7 +452,9 @@ def main() -> None:
         "recommended_tool_match_count",
         "arg_emitted_count",
         "arg_binding_match_count",
+        "normalized_arg_binding_match_count",
         "final_arg_binding_match_count",
+        "final_normalized_arg_binding_match_count",
         "stop_allowed_false_positive_count",
         "accepted",
     ]}, ensure_ascii=False, indent=2))

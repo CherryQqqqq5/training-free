@@ -800,6 +800,48 @@ class RuleEngine:
         return validation
 
     @staticmethod
+    def _pathish_basename(value: Any) -> str | None:
+        if not isinstance(value, str):
+            return None
+        stripped = value.strip()
+        if not stripped:
+            return ""
+        return stripped.replace("\\", "/").rstrip("/").split("/")[-1]
+
+    @classmethod
+    def _normalized_arg_binding_match(cls, field: str, expected: Any, observed: Any) -> tuple[bool, str]:
+        if observed == expected:
+            return True, "exact"
+        if not isinstance(expected, str) or not isinstance(observed, str):
+            return False, "unsupported_non_string"
+        field_name = str(field).lower()
+        if not any(token in field_name for token in ("file", "path", "dir", "name")):
+            return False, "unsupported_field"
+        expected_base = cls._pathish_basename(expected)
+        observed_base = cls._pathish_basename(observed)
+        if expected_base is not None and observed_base is not None and expected_base == observed_base:
+            return True, "path_basename"
+        return False, "path_basename_mismatch"
+
+    @classmethod
+    def _validate_action_candidate_args_normalized(
+        cls,
+        candidate: Dict[str, Any],
+        observed_args: Dict[str, Any],
+    ) -> Dict[str, Dict[str, Any]]:
+        strict = cls._validate_action_candidate_args(candidate, observed_args)
+        normalized: Dict[str, Dict[str, Any]] = {}
+        for field, row in strict.items():
+            match, reason = cls._normalized_arg_binding_match(field, row.get("expected"), row.get("observed"))
+            normalized[field] = {
+                **row,
+                "match": match,
+                "strict_match": bool(row.get("match")),
+                "normalization": reason,
+            }
+        return normalized
+
+    @staticmethod
     def _selected_tool_call_args(tool_calls: List[Dict[str, Any]], selected_tool: str) -> Dict[str, Any] | None:
         for call in tool_calls:
             if not isinstance(call, dict):
@@ -1198,8 +1240,17 @@ class RuleEngine:
                             validation.next_tool_args_match_binding = all(
                                 bool(row.get("match")) for row in validation.arg_binding_validation.values()
                             )
+                        validation.normalized_arg_binding_validation = self._validate_action_candidate_args_normalized(
+                            validation.selected_action_candidate,
+                            raw_selected_args,
+                        )
+                        if validation.normalized_arg_binding_validation:
+                            validation.next_tool_args_match_binding_normalized = all(
+                                bool(row.get("match")) for row in validation.normalized_arg_binding_validation.values()
+                            )
                     if final_selected_args is None:
                         validation.next_tool_final_args_match_binding = False
+                        validation.next_tool_final_args_match_binding_normalized = False
                     if final_selected_args is not None:
                         validation.final_arg_binding_validation = self._validate_action_candidate_args(
                             validation.selected_action_candidate,
@@ -1208,6 +1259,15 @@ class RuleEngine:
                         if validation.final_arg_binding_validation:
                             validation.next_tool_final_args_match_binding = all(
                                 bool(row.get("match")) for row in validation.final_arg_binding_validation.values()
+                            )
+                        validation.final_normalized_arg_binding_validation = self._validate_action_candidate_args_normalized(
+                            validation.selected_action_candidate,
+                            final_selected_args,
+                        )
+                        if validation.final_normalized_arg_binding_validation:
+                            validation.next_tool_final_args_match_binding_normalized = all(
+                                bool(row.get("match"))
+                                for row in validation.final_normalized_arg_binding_validation.values()
                             )
             msg["tool_calls"] = tool_calls
             choice["message"] = msg
