@@ -48,6 +48,22 @@ def _metric_source_priority(path: Path) -> tuple[int, str]:
     return (3, path_str)
 
 
+def _is_bfcl_result_source(path: Path, data: Any) -> bool:
+    lowered = str(path).lower()
+    if "result" not in lowered or path.suffix.lower() != ".json":
+        return False
+    objects = data if isinstance(data, list) else [data]
+    return any(isinstance(obj, dict) and isinstance(obj.get("id"), str) and "result" in obj for obj in objects)
+
+
+def _is_bfcl_score_source(path: Path, data: Any) -> bool:
+    lowered = str(path).lower()
+    if "score" not in lowered or path.suffix.lower() != ".json":
+        return False
+    objects = data if isinstance(data, list) else [data]
+    return any(isinstance(obj, dict) and (("accuracy" in obj) or (isinstance(obj.get("id"), str) and "valid" in obj)) for obj in objects)
+
+
 def load_json(path: Path) -> Any:
     text = path.read_text(encoding="utf-8")
     try:
@@ -278,6 +294,8 @@ def discover_bfcl_metrics(root: Path) -> Tuple[Dict[str, float], Dict[str, float
                 for key, value in discovered_overall.items():
                     overall.setdefault(key, value)
                 subsets.update(discovered_subsets)
+            if hits == 0 and (_is_bfcl_result_source(path, data) or _is_bfcl_score_source(path, data)):
+                hits = 1
 
         if hits:
             sources.append(str(path))

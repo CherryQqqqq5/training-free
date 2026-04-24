@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shutil
 import subprocess
 import sys
 from collections import Counter
@@ -18,6 +19,21 @@ TARGET_LABELS = {
     "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
 }
 KEYWORDS = ("file", "path", "matches", "cat", "touch", "mkdir", "find", "folder", "directory")
+TARGET_ACTION_TOOLS = {
+    "cat",
+    "cd",
+    "cp",
+    "diff",
+    "echo",
+    "find",
+    "grep",
+    "ls",
+    "mkdir",
+    "mv",
+    "sort",
+    "tail",
+    "touch",
+}
 
 
 def _utc_timestamp() -> str:
@@ -35,14 +51,18 @@ def _read_jsonl(path: Path) -> list[dict[str, Any]]:
 
 
 def _score_json_path(run_root: Path, category: str) -> Path | None:
-    score_root = run_root / "bfcl" / "score"
-    candidates = sorted(score_root.glob(f"*/multi_turn/BFCL_v4_{category}_score.json"))
+    bfcl_root = run_root / "bfcl"
+    candidates = sorted(bfcl_root.glob(f"**/score/**/multi_turn/BFCL_v4_{category}_score.json"))
+    if not candidates:
+        candidates = sorted((bfcl_root / "score").glob(f"*/multi_turn/BFCL_v4_{category}_score.json"))
     return candidates[0] if candidates else None
 
 
 def _result_json_path(run_root: Path, category: str) -> Path | None:
-    result_root = run_root / "bfcl" / "result"
-    candidates = sorted(result_root.glob(f"*/multi_turn/BFCL_v4_{category}_result.json"))
+    bfcl_root = run_root / "bfcl"
+    candidates = sorted(bfcl_root.glob(f"**/result/**/multi_turn/BFCL_v4_{category}_result.json"))
+    if not candidates:
+        candidates = sorted((bfcl_root / "result").glob(f"*/multi_turn/BFCL_v4_{category}_result.json"))
     return candidates[0] if candidates else None
 
 
@@ -130,6 +150,16 @@ def _run(command: list[str], *, cwd: Path, env: dict[str, str], log_path: Path) 
         raise RuntimeError(f"command failed ({process.returncode}): {' '.join(command)}; see {log_path}")
 
 
+def _execution_env(repo_root: Path) -> dict[str, str]:
+    env = dict(os.environ)
+    venv_bin = repo_root / ".venv" / "bin"
+    env["PATH"] = f"{venv_bin}{os.pathsep}{env.get('PATH', '')}"
+    env["GRC_BFCL_USE_RUN_IDS"] = "1"
+    env["GRC_BFCL_PARTIAL_EVAL"] = "1"
+    env.setdefault("GRC_BFCL_NUM_THREADS", "1")
+    return env
+
+
 def _compile_subset_rules(repo_root: Path, source_trace_dir: Path, rules_dir: Path, log_dir: Path) -> dict[str, Any]:
     failures = rules_dir / "failures.jsonl"
     rules_dir.mkdir(parents=True, exist_ok=True)
@@ -160,7 +190,64 @@ def _compile_subset_rules(repo_root: Path, source_trace_dir: Path, rules_dir: Pa
         env=env,
         log_path=log_dir / "compile.log",
     )
-    return json.loads((rules_dir / "compile_status.json").read_text(encoding="utf-8"))
+    prune_result = prune_rule_policy_tools(rules_dir / "rule.yaml", allowed_tools=TARGET_ACTION_TOOLS)
+    status = json.loads((rules_dir / "compile_status.json").read_text(encoding="utf-8"))
+    status["policy_tool_prune"] = prune_result
+    (rules_dir / "compile_status.json").write_text(json.dumps(status, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return status
+
+
+def prune_rule_policy_tools(rule_path: Path, *, allowed_tools: set[str]) -> dict[str, Any]:
+    if not rule_path.exists():
+        return {"kept_tools": [], "removed_tools": [], "kept_action_candidate_count": 0}
+    payload = yaml.safe_load(rule_path.read_text(encoding="utf-8")) or {}
+    kept: Counter[str] = Counter()
+    removed: Counter[str] = Counter()
+    kept_candidate_count = 0
+
+    def filter_tools(values: Any) -> list[str]:
+        out: list[str] = []
+        for value in values or []:
+            if not isinstance(value, str) or not value:
+                continue
+            if value in allowed_tools:
+                out.append(value)
+                kept[value] += 1
+            else:
+                removed[value] += 1
+        return list(dict.fromkeys(out))
+
+    for rule in payload.get("rules") or []:
+        policy = (((rule or {}).get("action") or {}).get("decision_policy") or {})
+        policy["recommended_tools"] = filter_tools(policy.get("recommended_tools") or [])
+        next_policy = policy.get("next_tool_policy") or {}
+        next_policy["recommended_tools"] = filter_tools(next_policy.get("recommended_tools") or [])
+        if next_policy:
+            policy["next_tool_policy"] = next_policy
+        candidates: list[dict[str, Any]] = []
+        for candidate in policy.get("action_candidates") or []:
+            if not isinstance(candidate, dict):
+                continue
+            tool = candidate.get("tool")
+            recs = filter_tools(candidate.get("recommended_tools") or ([tool] if isinstance(tool, str) else []))
+            if not isinstance(tool, str) or tool not in allowed_tools or not recs:
+                if isinstance(tool, str) and tool:
+                    removed[tool] += 1
+                continue
+            candidate = dict(candidate)
+            candidate["recommended_tools"] = recs
+            candidates.append(candidate)
+            kept[tool] += 1
+            kept_candidate_count += 1
+        policy["action_candidates"] = candidates
+
+    rule_path.write_text(yaml.safe_dump(payload, sort_keys=False, allow_unicode=True), encoding="utf-8")
+    return {
+        "allowed_tools": sorted(allowed_tools),
+        "kept_tools": dict(sorted(kept.items())),
+        "removed_tools": dict(sorted(removed.items())),
+        "kept_action_candidate_count": kept_candidate_count,
+    }
 
 
 def rules_have_ctspc_actions(rule_path: Path) -> bool:
@@ -169,10 +256,10 @@ def rules_have_ctspc_actions(rule_path: Path) -> bool:
     payload = yaml.safe_load(rule_path.read_text(encoding="utf-8")) or {}
     for rule in payload.get("rules") or []:
         policy = (((rule or {}).get("action") or {}).get("decision_policy") or {})
-        if policy.get("recommended_tools") or policy.get("action_candidates"):
+        if policy.get("action_candidates"):
             return True
         next_policy = policy.get("next_tool_policy") or {}
-        if next_policy.get("recommended_tools"):
+        if any(tool in TARGET_ACTION_TOOLS for tool in next_policy.get("recommended_tools") or []):
             return True
     return False
 
@@ -196,15 +283,9 @@ def _result_step_counts(run_root: Path, category: str, selected_ids: list[str]) 
 
 
 def _trace_groups_by_case(trace_dir: Path, counts: dict[str, int]) -> dict[str, list[dict[str, Any]]]:
-    traces = sorted(trace_dir.glob("*.json"), key=lambda path: path.stat().st_mtime)
-    total = sum(counts.values())
-    if total and len(traces) >= total:
-        traces = traces[-total:]
+    trace_groups = _trace_paths_by_case(trace_dir, counts)
     groups: dict[str, list[dict[str, Any]]] = {}
-    offset = 0
-    for case_id, count in counts.items():
-        case_paths = traces[offset : offset + count]
-        offset += count
+    for case_id, case_paths in trace_groups.items():
         groups[case_id] = []
         for path in case_paths:
             try:
@@ -212,6 +293,55 @@ def _trace_groups_by_case(trace_dir: Path, counts: dict[str, int]) -> dict[str, 
             except Exception:
                 pass
     return groups
+
+
+def _trace_paths_by_case(trace_dir: Path, counts: dict[str, int]) -> dict[str, list[Path]]:
+    traces = sorted(trace_dir.glob("*.json"), key=lambda path: path.stat().st_mtime)
+    total = sum(counts.values())
+    if total and len(traces) >= total:
+        traces = traces[-total:]
+    groups: dict[str, list[Path]] = {}
+    offset = 0
+    for case_id, count in counts.items():
+        groups[case_id] = traces[offset : offset + count]
+        offset += count
+    return groups
+
+
+def materialize_selected_traces(
+    *,
+    source_run_root: Path,
+    category: str,
+    selected_ids: list[str],
+    out_dir: Path,
+) -> dict[str, Any]:
+    counts = _result_step_counts(source_run_root, category, selected_ids)
+    expected_trace_count = sum(counts.values())
+    if expected_trace_count <= 0:
+        raise RuntimeError("selected trace materialization failed: no result steps found for selected cases")
+    trace_groups = _trace_paths_by_case(source_run_root / "traces", counts)
+    actual_trace_count = sum(len(paths) for paths in trace_groups.values())
+    if actual_trace_count < expected_trace_count:
+        raise RuntimeError(
+            "selected trace materialization failed: "
+            f"expected {expected_trace_count} traces from result steps, found {actual_trace_count}"
+        )
+
+    if out_dir.exists():
+        shutil.rmtree(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    copied = 0
+    for case_id in selected_ids:
+        for index, path in enumerate(trace_groups.get(case_id, [])):
+            target = out_dir / f"{case_id}__{index:03d}__{path.name}"
+            shutil.copy2(path, target)
+            copied += 1
+    return {
+        "expected_trace_count": expected_trace_count,
+        "selected_trace_count": copied,
+        "selected_case_with_trace_count": sum(1 for paths in trace_groups.values() if paths),
+        "source_trace_count": len(list((source_run_root / "traces").glob("*.json"))),
+    }
 
 
 def _aggregate_validation(traces: list[dict[str, Any]]) -> dict[str, Any]:
@@ -267,6 +397,7 @@ def build_case_report(
 def summarize_case_report(rows: list[dict[str, Any]], *, baseline_acc: float | None = None, candidate_acc: float | None = None) -> dict[str, Any]:
     activated = [row for row in rows if row.get("policy_plan_activated")]
     denom = len(activated) or 1
+    blocked = Counter(row.get("blocked_reason") or "unknown" for row in rows)
     summary = {
         "selected_case_count": len(rows),
         "runnable_ctspc_case_count": len(activated),
@@ -280,7 +411,8 @@ def summarize_case_report(rows: list[dict[str, Any]], *, baseline_acc: float | N
         "case_fixed_count": sum(row.get("case_fixed") is True for row in rows),
         "case_regressed_count": sum(row.get("case_regressed") is True for row in rows),
         "stop_allowed_false_positive_count": 0,
-        "blocked_reason_distribution": dict(Counter(row.get("blocked_reason") or "unknown" for row in rows)),
+        "blocked_reason_distribution": dict(blocked),
+        "recommended_tools_not_in_schema_count": blocked.get("recommended_tools_not_in_schema", 0),
     }
     summary["net_case_gain"] = summary["case_fixed_count"] - summary["case_regressed_count"]
     summary["accepted"] = (
@@ -291,6 +423,32 @@ def summarize_case_report(rows: list[dict[str, Any]], *, baseline_acc: float | N
         and summary["case_fixed_count"] > summary["case_regressed_count"]
     )
     return summary
+
+
+def candidate_policy_tool_distribution(rule_path: Path) -> dict[str, int]:
+    if not rule_path.exists():
+        return {}
+    payload = yaml.safe_load(rule_path.read_text(encoding="utf-8")) or {}
+    counts: Counter[str] = Counter()
+    for rule in payload.get("rules") or []:
+        policy = (((rule or {}).get("action") or {}).get("decision_policy") or {})
+        for tool in policy.get("recommended_tools") or []:
+            if isinstance(tool, str) and tool:
+                counts[tool] += 1
+        next_policy = policy.get("next_tool_policy") or {}
+        for tool in next_policy.get("recommended_tools") or []:
+            if isinstance(tool, str) and tool:
+                counts[tool] += 1
+        for candidate in policy.get("action_candidates") or []:
+            if not isinstance(candidate, dict):
+                continue
+            tool = candidate.get("tool")
+            if isinstance(tool, str) and tool:
+                counts[tool] += 1
+            for rec in candidate.get("recommended_tools") or []:
+                if isinstance(rec, str) and rec:
+                    counts[rec] += 1
+    return dict(sorted(counts.items(), key=lambda item: (-item[1], item[0])))
 
 
 def _metric_acc(run_root: Path, category: str) -> float | None:
@@ -361,11 +519,17 @@ def main() -> None:
     logs_dir = out_root / "logs"
     compile_status: dict[str, Any] = {"status": "dry_run"}
     has_ctspc_actions = False
+    selected_trace_dir = out_root / "source_selected_traces"
+    selected_trace_manifest: dict[str, Any] = {}
     if not args.dry_run:
-        compile_status = _compile_subset_rules(repo, source_run_root / "traces", rules_dir, logs_dir)
+        selected_trace_manifest = materialize_selected_traces(
+            source_run_root=source_run_root,
+            category=args.category,
+            selected_ids=selected_ids,
+            out_dir=selected_trace_dir,
+        )
+        compile_status = _compile_subset_rules(repo, selected_trace_dir, rules_dir, logs_dir)
         has_ctspc_actions = rules_have_ctspc_actions(rules_dir / "rule.yaml")
-        if not has_ctspc_actions:
-            raise RuntimeError("compiled candidate rules contain no recommended_tools/action_candidates")
     else:
         has_ctspc_actions = False
 
@@ -402,11 +566,61 @@ def main() -> None:
         "candidate_rules_dir": str(rules_dir),
         "compile_status": compile_status,
         "has_ctspc_actions": has_ctspc_actions,
+        "compile_trace_scope": "selected_cases" if not args.dry_run else "dry_run",
+        "selected_trace_manifest": selected_trace_manifest,
         "trace_case_mapping": "mtime_by_result_step_count",
         "planned_commands": [" ".join(baseline_cmd), " ".join(candidate_cmd)],
         "dry_run": args.dry_run,
     }
     (out_root / "subset_manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    if not args.dry_run and not has_ctspc_actions:
+        summary = {
+            "selected_case_count": len(selected_ids),
+            "runnable_ctspc_case_count": 0,
+            "baseline_accuracy": None,
+            "candidate_accuracy": None,
+            "policy_plan_activated_count": 0,
+            "recommended_tool_match_rate_among_activated": 0.0,
+            "raw_normalized_arg_match_rate_among_activated": 0.0,
+            "raw_strict_arg_match_rate_among_activated": 0.0,
+            "final_normalized_arg_match_rate_among_activated": 0.0,
+            "case_fixed_count": 0,
+            "case_regressed_count": 0,
+            "stop_allowed_false_positive_count": 0,
+            "blocked_reason_distribution": {"no_schema_local_ctspc_actions": len(selected_ids)},
+            "recommended_tools_not_in_schema_count": 0,
+            "net_case_gain": 0,
+            "accepted": False,
+            "failure_reason": "compiled candidate rules contain no schema-local CTSPC action candidates after pruning",
+            "candidate_policy_tool_distribution": candidate_policy_tool_distribution(rules_dir / "rule.yaml"),
+            "manifest": manifest,
+        }
+        rows = [
+            {
+                "case_id": case_id,
+                "baseline_success": None,
+                "candidate_success": None,
+                "policy_plan_activated": False,
+                "selected_next_tool": None,
+                "next_tool_emitted": None,
+                "recommended_tool_match": None,
+                "raw_strict_arg_match": None,
+                "raw_normalized_arg_match": None,
+                "final_strict_arg_match": None,
+                "final_normalized_arg_match": None,
+                "case_fixed": False,
+                "case_regressed": False,
+                "blocked_reason": "no_schema_local_ctspc_actions",
+                "repair_kinds": [],
+            }
+            for case_id in selected_ids
+        ]
+        with (out_root / "subset_case_report.jsonl").open("w", encoding="utf-8") as handle:
+            for row in rows:
+                handle.write(json.dumps(row, ensure_ascii=False) + "\n")
+        (out_root / "subset_summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        (out_root / "subset_summary.md").write_text(_render_summary(summary, rows), encoding="utf-8")
+        raise RuntimeError("compiled candidate rules contain no schema-local CTSPC action candidates after pruning")
     if args.dry_run:
         rows = [
             {
@@ -429,9 +643,7 @@ def main() -> None:
             for case_id in selected_ids
         ]
     else:
-        env = dict(os.environ)
-        env["GRC_BFCL_USE_RUN_IDS"] = "1"
-        env.setdefault("GRC_BFCL_NUM_THREADS", "1")
+        env = _execution_env(repo)
         _run(baseline_cmd, cwd=repo, env=env, log_path=logs_dir / "baseline.log")
         _run(candidate_cmd, cwd=repo, env=env, log_path=logs_dir / "candidate.log")
         rows = build_case_report(
@@ -448,6 +660,7 @@ def main() -> None:
         baseline_acc=_metric_acc(baseline_run, args.category),
         candidate_acc=_metric_acc(candidate_run, args.category),
     )
+    summary["candidate_policy_tool_distribution"] = candidate_policy_tool_distribution(rules_dir / "rule.yaml")
     summary["manifest"] = manifest
     (out_root / "subset_summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     (out_root / "subset_summary.md").write_text(_render_summary(summary, rows), encoding="utf-8")
