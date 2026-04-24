@@ -347,6 +347,74 @@ rules:
         self.assertEqual(manifest["selected_trace_count"], 1)
         self.assertEqual(len(copied), 1)
         self.assertIn("multi_turn_miss_param_2", copied[0].name)
+        self.assertEqual(manifest["trace_case_mapping"], "mtime_by_result_step_count")
+
+    def test_materialize_selected_traces_prefers_prompt_prefix_mapping_over_mtime(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_raw:
+            root = Path(tmp_raw)
+            source = root / "source"
+            score = source / "bfcl" / "score" / "model" / "multi_turn" / "BFCL_v4_multi_turn_miss_param_score.json"
+            result = source / "bfcl" / "result" / "model" / "multi_turn" / "BFCL_v4_multi_turn_miss_param_result.json"
+            score.parent.mkdir(parents=True)
+            result.parent.mkdir(parents=True)
+            score.write_text(
+                "\n".join(
+                    [
+                        json.dumps({"accuracy": 0.0}),
+                        json.dumps(
+                            {
+                                "id": "multi_turn_miss_param_1",
+                                "valid": False,
+                                "prompt": {"question": [[{"role": "user", "content": "case one request"}]]},
+                            }
+                        ),
+                        json.dumps(
+                            {
+                                "id": "multi_turn_miss_param_2",
+                                "valid": False,
+                                "prompt": {"question": [[{"role": "user", "content": "case two request"}]]},
+                            }
+                        ),
+                    ]
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            result.write_text(
+                "\n".join(
+                    [
+                        json.dumps({"id": "multi_turn_miss_param_1", "result": [[[{"cat": "{}"}]]]}),
+                        json.dumps({"id": "multi_turn_miss_param_2", "result": [[[{"cat": "{}"}]]]}),
+                    ]
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            trace_dir = source / "traces"
+            trace_dir.mkdir(parents=True)
+            case_two = trace_dir / "trace_case_two.json"
+            case_one = trace_dir / "trace_case_one_newer.json"
+            case_two.write_text(
+                json.dumps({"request_original": {"input": [{"role": "user", "content": "case two request"}]}}),
+                encoding="utf-8",
+            )
+            case_one.write_text(
+                json.dumps({"request_original": {"input": [{"role": "user", "content": "case one request"}]}}),
+                encoding="utf-8",
+            )
+
+            manifest = materialize_selected_traces(
+                source_run_root=source,
+                category="multi_turn_miss_param",
+                selected_ids=["multi_turn_miss_param_2"],
+                out_dir=root / "selected",
+            )
+            copied = sorted((root / "selected").glob("*.json"))
+            copied_payload = json.loads(copied[0].read_text(encoding="utf-8"))
+
+        self.assertEqual(manifest["trace_case_mapping"], "prompt_user_prefix")
+        self.assertEqual(len(copied), 1)
+        self.assertEqual(copied_payload["request_original"]["input"][0]["content"], "case two request")
 
     def test_candidate_policy_tool_distribution_counts_policy_tools(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_raw:

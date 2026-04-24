@@ -599,6 +599,82 @@ def _trace_paths_by_case(trace_dir: Path, counts: dict[str, int]) -> dict[str, l
     return groups
 
 
+def _user_texts_from_score_row(row: dict[str, Any]) -> list[str]:
+    prompt = row.get("prompt") if isinstance(row.get("prompt"), dict) else {}
+    question = prompt.get("question") if isinstance(prompt, dict) else []
+    texts: list[str] = []
+    if not isinstance(question, list):
+        return texts
+    for turn in question:
+        if not isinstance(turn, list):
+            continue
+        for message in turn:
+            if isinstance(message, dict) and message.get("role") == "user":
+                content = message.get("content")
+                if isinstance(content, str):
+                    texts.append(content)
+    return texts
+
+
+def _user_texts_from_trace_payload(trace: dict[str, Any]) -> list[str]:
+    request_original = trace.get("request_original") if isinstance(trace.get("request_original"), dict) else {}
+    input_items = request_original.get("input") if isinstance(request_original, dict) else []
+    texts: list[str] = []
+    if not isinstance(input_items, list):
+        return texts
+    for item in input_items:
+        if isinstance(item, dict) and item.get("role") == "user":
+            content = item.get("content")
+            if isinstance(content, str):
+                texts.append(content)
+    return texts
+
+
+def _score_user_texts_by_case(run_root: Path, category: str, selected_ids: list[str]) -> dict[str, list[str]]:
+    path = _score_json_path(run_root, category)
+    if not path:
+        return {}
+    selected = set(selected_ids)
+    out: dict[str, list[str]] = {}
+    for row in _read_jsonl(path):
+        case_id = row.get("id")
+        if isinstance(case_id, str) and case_id in selected:
+            out[case_id] = _user_texts_from_score_row(row)
+    return out
+
+
+def _trace_paths_by_case_from_prompt_prefix(
+    *,
+    source_run_root: Path,
+    category: str,
+    selected_ids: list[str],
+) -> dict[str, list[Path]]:
+    case_users = _score_user_texts_by_case(source_run_root, category, selected_ids)
+    if not case_users:
+        return {}
+    groups: dict[str, list[Path]] = {case_id: [] for case_id in selected_ids}
+    for path in sorted((source_run_root / "traces").glob("*.json"), key=lambda item: (item.stat().st_mtime, item.name)):
+        try:
+            trace = json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        trace_users = _user_texts_from_trace_payload(trace)
+        if not trace_users:
+            continue
+        matches = [
+            case_id
+            for case_id, user_texts in case_users.items()
+            if len(trace_users) <= len(user_texts) and user_texts[: len(trace_users)] == trace_users
+        ]
+        if not matches:
+            continue
+        # Ambiguity can occur when two BFCL cases share an early user prefix. Use the longest prompt
+        # sequence as a stable tie-breaker and then case id for determinism.
+        matches.sort(key=lambda case_id: (-len(case_users.get(case_id) or []), _case_number(case_id), case_id))
+        groups.setdefault(matches[0], []).append(path)
+    return groups
+
+
 def materialize_selected_traces(
     *,
     source_run_root: Path,
@@ -610,7 +686,19 @@ def materialize_selected_traces(
     expected_trace_count = sum(counts.values())
     if expected_trace_count <= 0:
         raise RuntimeError("selected trace materialization failed: no result steps found for selected cases")
-    trace_groups = _trace_paths_by_case(source_run_root / "traces", counts)
+    trace_groups = _trace_paths_by_case_from_prompt_prefix(
+        source_run_root=source_run_root,
+        category=category,
+        selected_ids=selected_ids,
+    )
+    mapping_method = "prompt_user_prefix"
+    if (
+        not trace_groups
+        or any(not trace_groups.get(case_id) for case_id in selected_ids)
+        or sum(len(paths) for paths in trace_groups.values()) != expected_trace_count
+    ):
+        trace_groups = _trace_paths_by_case(source_run_root / "traces", counts)
+        mapping_method = "mtime_by_result_step_count"
     actual_trace_count = sum(len(paths) for paths in trace_groups.values())
     if actual_trace_count < expected_trace_count:
         raise RuntimeError(
@@ -632,6 +720,7 @@ def materialize_selected_traces(
         "selected_trace_count": copied,
         "selected_case_with_trace_count": sum(1 for paths in trace_groups.values() if paths),
         "source_trace_count": len(list((source_run_root / "traces").glob("*.json"))),
+        "trace_case_mapping": mapping_method,
     }
 
 
@@ -890,7 +979,7 @@ def main() -> None:
         "has_ctspc_actions": has_ctspc_actions,
         "compile_trace_scope": compile_scope,
         "selected_trace_manifest": selected_trace_manifest,
-        "trace_case_mapping": "mtime_by_result_step_count",
+        "trace_case_mapping": selected_trace_manifest.get("trace_case_mapping") or "not_materialized",
         "planned_commands": [" ".join(baseline_cmd), " ".join(candidate_cmd)] if baseline_cmd and candidate_cmd else [],
         "dry_run": args.dry_run,
         "gap_report_only": args.gap_report_only,
