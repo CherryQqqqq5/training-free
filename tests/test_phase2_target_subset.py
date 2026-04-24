@@ -13,6 +13,7 @@ from scripts.run_phase2_target_subset import (
     _result_json_path,
     _score_json_path,
     _tool_names_from_trace,
+    _tool_names_from_prompt_path,
     build_gap_report_rows,
     candidate_case_infos,
     candidate_policy_tool_distribution,
@@ -20,6 +21,7 @@ from scripts.run_phase2_target_subset import (
     prune_rule_policy_tools,
     rules_have_ctspc_actions,
     select_case_ids,
+    summarize_schema_scan,
     summarize_gap_report,
     summarize_case_report,
     write_test_case_ids,
@@ -65,7 +67,7 @@ class Phase2TargetSubsetTests(unittest.TestCase):
 
             selected = select_case_ids(root, "multi_turn_miss_param", 2, schema_local=False)
 
-        self.assertEqual(selected, ["multi_turn_miss_param_1", "multi_turn_miss_param_2"])
+        self.assertEqual(selected, ["multi_turn_miss_param_1", "multi_turn_miss_param_3"])
 
     def test_tool_names_from_trace_supports_snapshot_dict_list_and_request_fallback(self) -> None:
         trace = {
@@ -90,6 +92,10 @@ class Phase2TargetSubsetTests(unittest.TestCase):
         }
         self.assertEqual(_tool_names_from_trace(list_trace), {"grep", "ls"})
 
+    def test_tool_names_from_prompt_path_extracts_leaf_function_names(self) -> None:
+        row = {"prompt": {"path": ["GorillaFileSystem.find", "GorillaFileSystem.mv", "TwitterAPI.post_tweet"]}}
+        self.assertEqual(_tool_names_from_prompt_path(row), {"find", "mv", "post_tweet"})
+
     def test_schema_local_selection_filters_keyword_cases_without_target_tool_schema(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_raw:
             root = Path(tmp_raw)
@@ -105,14 +111,30 @@ class Phase2TargetSubsetTests(unittest.TestCase):
                             {
                                 "id": "multi_turn_miss_param_1",
                                 "valid": False,
-                                "prompt": {"question": [[{"role": "user", "content": "find file path"}]]},
+                                "prompt": {
+                                    "path": ["TravelAPI.book_flight"],
+                                    "question": [[{"role": "user", "content": "find file path"}]],
+                                },
                             }
                         ),
                         json.dumps(
                             {
                                 "id": "multi_turn_miss_param_2",
                                 "valid": False,
-                                "prompt": {"question": [[{"role": "user", "content": "find file path"}]]},
+                                "prompt": {
+                                    "path": ["GorillaFileSystem.cat"],
+                                    "question": [[{"role": "user", "content": "find file path"}]],
+                                },
+                            }
+                        ),
+                        json.dumps(
+                            {
+                                "id": "multi_turn_miss_param_3",
+                                "valid": False,
+                                "prompt": {
+                                    "path": ["GorillaFileSystem.touch"],
+                                    "question": [[{"role": "user", "content": "say hello"}]],
+                                },
                             }
                         ),
                     ]
@@ -125,6 +147,7 @@ class Phase2TargetSubsetTests(unittest.TestCase):
                     [
                         json.dumps({"id": "multi_turn_miss_param_1", "result": [[[{"book_flight": "{}"}]]]}),
                         json.dumps({"id": "multi_turn_miss_param_2", "result": [[[{"cat": "{}"}]]]}),
+                        json.dumps({"id": "multi_turn_miss_param_3", "result": [[[{"book_flight": "{}"}]]]}),
                     ]
                 )
                 + "\n",
@@ -134,14 +157,20 @@ class Phase2TargetSubsetTests(unittest.TestCase):
             trace_dir.mkdir()
             (trace_dir / "trace_1.json").write_text(json.dumps({"tool_schema_snapshot": {"book_flight": {}}}), encoding="utf-8")
             (trace_dir / "trace_2.json").write_text(json.dumps({"tool_schema_snapshot": {"cat": {}}}), encoding="utf-8")
+            (trace_dir / "trace_3.json").write_text(json.dumps({"tool_schema_snapshot": {"book_flight": {}}}), encoding="utf-8")
 
             infos = candidate_case_infos(root, "multi_turn_miss_param")
             selected = select_case_ids(root, "multi_turn_miss_param", 10)
+            scan = summarize_schema_scan(infos)
 
-        self.assertEqual(len(infos), 2)
-        self.assertEqual(selected, ["multi_turn_miss_param_2"])
+        self.assertEqual(len(infos), 3)
+        self.assertEqual(selected, ["multi_turn_miss_param_2", "multi_turn_miss_param_3"])
         self.assertEqual(infos[0]["target_action_tools_present"], [])
         self.assertEqual(infos[1]["target_action_tools_present"], ["cat"])
+        self.assertEqual(infos[2]["target_action_tools_present"], ["touch"])
+        self.assertEqual(infos[0]["schema_source"], "prompt_path")
+        self.assertEqual(scan["cases_with_TARGET_ACTION_TOOLS"], 2)
+        self.assertEqual(scan["schema_source_distribution"], {"prompt_path": 3})
 
     def test_write_test_case_ids_uses_category_key(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_raw:
@@ -464,7 +493,10 @@ rules:
                     {
                         "id": "multi_turn_miss_param_1",
                         "valid": False,
-                        "prompt": {"question": [[{"role": "user", "content": "find file path"}]]},
+                        "prompt": {
+                            "path": ["TravelAPI.book_flight"],
+                            "question": [[{"role": "user", "content": "find file path"}]],
+                        },
                     }
                 )
                 + "\n",
@@ -493,11 +525,61 @@ rules:
             )
             manifest = json.loads((out / "subset_manifest.json").read_text(encoding="utf-8"))
             gap_summary = json.loads((out / "gap_summary.json").read_text(encoding="utf-8"))
+            schema_scan_summary = json.loads((out / "schema_scan_summary.json").read_text(encoding="utf-8"))
 
         self.assertEqual(manifest["selected_case_ids"], [])
         self.assertEqual(manifest["planned_commands"], [])
         self.assertEqual(gap_summary["schema_filtered_out_count"], 1)
         self.assertEqual(gap_summary["why_no_schema_local_candidate_distribution"], {"non_target_schema": 1})
+        self.assertEqual(schema_scan_summary["cases_with_TARGET_ACTION_TOOLS"], 0)
+
+    def test_dry_run_with_enough_schema_local_cases_writes_planned_commands_without_execution(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_raw:
+            root = Path(tmp_raw)
+            source = root / "source"
+            out = root / "out"
+            score = source / "bfcl" / "score" / "model" / "multi_turn" / "BFCL_v4_multi_turn_miss_param_score.json"
+            score.parent.mkdir(parents=True)
+            lines = [json.dumps({"accuracy": 0.0})]
+            for index in range(2):
+                lines.append(
+                    json.dumps(
+                        {
+                            "id": f"multi_turn_miss_param_{index}",
+                            "valid": False,
+                            "prompt": {
+                                "path": ["GorillaFileSystem.cat"],
+                                "question": [[{"role": "user", "content": "hello"}]],
+                            },
+                        }
+                    )
+                )
+            score.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+            subprocess.run(
+                [
+                    sys.executable,
+                    "scripts/run_phase2_target_subset.py",
+                    "--source-run-root",
+                    str(source),
+                    "--out-root",
+                    str(out),
+                    "--dry-run",
+                    "--min-schema-local-cases",
+                    "2",
+                ],
+                check=True,
+                cwd=Path.cwd(),
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
+            manifest = json.loads((out / "subset_manifest.json").read_text(encoding="utf-8"))
+            schema_scan_summary = json.loads((out / "schema_scan_summary.json").read_text(encoding="utf-8"))
+
+        self.assertEqual(manifest["selected_case_ids"], ["multi_turn_miss_param_0", "multi_turn_miss_param_1"])
+        self.assertEqual(len(manifest["planned_commands"]), 2)
+        self.assertEqual(schema_scan_summary["cases_with_TARGET_ACTION_TOOLS"], 2)
 
 
 if __name__ == "__main__":

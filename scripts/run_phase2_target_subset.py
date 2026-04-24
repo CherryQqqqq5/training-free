@@ -85,6 +85,16 @@ def _prompt_text(row: dict[str, Any]) -> str:
     return json.dumps(question, ensure_ascii=False).lower()
 
 
+def _tool_names_from_prompt_path(row: dict[str, Any]) -> set[str]:
+    prompt = row.get("prompt") if isinstance(row.get("prompt"), dict) else {}
+    tools: set[str] = set()
+    for item in prompt.get("path") or []:
+        if not isinstance(item, str) or not item:
+            continue
+        tools.add(item.rsplit(".", 1)[-1])
+    return tools
+
+
 def _family_records(run_root: Path) -> dict[str, set[str]]:
     records = _read_jsonl(run_root / "artifacts" / "repair_records.jsonl")
     if not records:
@@ -135,6 +145,15 @@ def _case_tools_from_trace_groups(trace_groups: dict[str, list[dict[str, Any]]])
     return out
 
 
+def _schema_tools_for_case(row: dict[str, Any], trace_tools: set[str]) -> tuple[set[str], str]:
+    prompt_tools = _tool_names_from_prompt_path(row)
+    if prompt_tools:
+        return prompt_tools, "prompt_path"
+    if trace_tools:
+        return trace_tools, "trace_schema"
+    return set(), "empty"
+
+
 def candidate_case_infos(source_run_root: Path, category: str) -> list[dict[str, Any]]:
     score_path = _score_json_path(source_run_root, category)
     rows = _read_jsonl(score_path) if score_path else []
@@ -148,22 +167,18 @@ def candidate_case_infos(source_run_root: Path, category: str) -> list[dict[str,
         case_id = row.get("id")
         if not isinstance(case_id, str) or "valid" not in row:
             continue
-        labels = families.get(case_id)
-        if labels and not labels.intersection(TARGET_LABELS):
-            continue
         text = _prompt_text(row)
         keyword_score = sum(1 for keyword in KEYWORDS if keyword in text)
-        if keyword_score <= 0:
-            continue
         failure_bonus = 1 if row.get("valid") is False else 0
-        available_tools = tools_by_case.get(case_id, set())
+        available_tools, schema_source = _schema_tools_for_case(row, tools_by_case.get(case_id, set()))
         target_tools = available_tools.intersection(TARGET_ACTION_TOOLS)
         candidates.append(
             {
                 "case_id": case_id,
-                "failure_labels": sorted(labels or []),
+                "failure_labels": sorted(families.get(case_id) or []),
                 "failure_bonus": failure_bonus,
                 "keyword_score": keyword_score,
+                "schema_source": schema_source,
                 "available_tools_in_case_schema": sorted(available_tools),
                 "target_action_tools_present": sorted(target_tools),
             }
@@ -411,6 +426,77 @@ def summarize_gap_report(rows: list[dict[str, Any]], *, selected_ids: list[str],
         "target_action_tool_distribution": dict(sorted(target_tools.items())),
         "why_no_schema_local_candidate_distribution": dict(sorted(reasons.items())),
     }
+
+
+def summarize_schema_scan(candidate_infos: list[dict[str, Any]]) -> dict[str, Any]:
+    target_tools: Counter[str] = Counter()
+    family_counts: Counter[str] = Counter()
+    source_counts: Counter[str] = Counter()
+    overlap_counts: Counter[str] = Counter()
+    cases_with_target = 0
+    for row in candidate_infos:
+        source_counts[str(row.get("schema_source") or "unknown")] += 1
+        target_present = row.get("target_action_tools_present") or []
+        if target_present:
+            cases_with_target += 1
+            target_tools.update(str(tool) for tool in target_present)
+            for label in row.get("failure_labels") or []:
+                family_counts[str(label)] += 1
+            for label in TARGET_LABELS:
+                if label in set(row.get("failure_labels") or []):
+                    overlap_counts[label] += 1
+    return {
+        "total_cases": len(candidate_infos),
+        "cases_with_TARGET_ACTION_TOOLS": cases_with_target,
+        "cases_by_target_tool": dict(sorted(target_tools.items())),
+        "cases_by_failure_family": dict(sorted(family_counts.items())),
+        "overlap_with_ACTIONABLE_NO_TOOL_DECISION": overlap_counts.get("(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)", 0),
+        "overlap_with_POST_TOOL_PROSE_SUMMARY": overlap_counts.get("(POST_TOOL,POST_TOOL_PROSE_SUMMARY)", 0),
+        "schema_source_distribution": dict(sorted(source_counts.items())),
+    }
+
+
+def render_schema_scan_summary(summary: dict[str, Any], rows: list[dict[str, Any]]) -> str:
+    lines = [
+        "# Phase-2 Schema Scan Summary",
+        "",
+        f"- Total cases: `{summary['total_cases']}`",
+        f"- Cases with TARGET_ACTION_TOOLS: `{summary['cases_with_TARGET_ACTION_TOOLS']}`",
+        f"- ACTIONABLE_NO_TOOL_DECISION overlap: `{summary['overlap_with_ACTIONABLE_NO_TOOL_DECISION']}`",
+        f"- POST_TOOL_PROSE_SUMMARY overlap: `{summary['overlap_with_POST_TOOL_PROSE_SUMMARY']}`",
+        "",
+        "## Target Tool Distribution",
+        "",
+    ]
+    for tool, count in (summary.get("cases_by_target_tool") or {}).items():
+        lines.append(f"- `{tool}`: `{count}`")
+    lines.extend(["", "## Schema Sources", ""])
+    for source, count in (summary.get("schema_source_distribution") or {}).items():
+        lines.append(f"- `{source}`: `{count}`")
+    lines.extend(
+        [
+            "",
+            "## Cases",
+            "",
+            "| Case | Schema Source | Target Tools | Failure Labels | Keyword Score |",
+            "| --- | --- | --- | --- | ---: |",
+        ]
+    )
+    for row in rows:
+        lines.append(
+            f"| {row['case_id']} | {row.get('schema_source') or '-'} | "
+            f"{', '.join(row.get('target_action_tools_present') or []) or '-'} | "
+            f"{', '.join(row.get('failure_labels') or []) or '-'} | {row.get('keyword_score', 0)} |"
+        )
+    return "\n".join(lines) + "\n"
+
+
+def write_schema_scan_artifacts(out_root: Path, rows: list[dict[str, Any]], summary: dict[str, Any]) -> None:
+    with (out_root / "schema_scan_report.jsonl").open("w", encoding="utf-8") as handle:
+        for row in rows:
+            handle.write(json.dumps(row, ensure_ascii=False) + "\n")
+    (out_root / "schema_scan_summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    (out_root / "schema_scan_summary.md").write_text(render_schema_scan_summary(summary, rows), encoding="utf-8")
 
 
 def render_gap_summary(summary: dict[str, Any], rows: list[dict[str, Any]]) -> str:
@@ -707,6 +793,7 @@ def main() -> None:
     parser.add_argument("--candidate-port", type=int, default=8061)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--gap-report-only", action="store_true")
+    parser.add_argument("--schema-scan-only", action="store_true")
     parser.add_argument("--min-schema-local-cases", type=int, default=MIN_SCHEMA_LOCAL_CASES)
     args = parser.parse_args()
 
@@ -717,6 +804,8 @@ def main() -> None:
     out_root = args.out_root or repo / "outputs" / "phase2_subset" / f"ctspc_v0_{_utc_timestamp()}"
     out_root.mkdir(parents=True, exist_ok=True)
     candidate_infos = candidate_case_infos(source_run_root, args.category)
+    schema_scan_summary = summarize_schema_scan(candidate_infos)
+    write_schema_scan_artifacts(out_root, candidate_infos, schema_scan_summary)
     schema_local_infos = [row for row in candidate_infos if row.get("target_action_tools_present")]
     selected_ids = [str(row["case_id"]) for row in schema_local_infos[: args.max_cases]]
     schema_local_ready = len(schema_local_infos) >= args.min_schema_local_cases
@@ -735,7 +824,7 @@ def main() -> None:
     compile_scope = "dry_run"
     gap_rows = build_gap_report_rows(candidate_infos)
     gap_summary = summarize_gap_report(gap_rows, selected_ids=selected_ids, min_schema_local_cases=args.min_schema_local_cases)
-    if not args.dry_run and (schema_local_ready or args.gap_report_only):
+    if not args.dry_run and (schema_local_ready or args.gap_report_only) and not args.schema_scan_only:
         trace_ids_for_compile = selected_ids if schema_local_ready and not args.gap_report_only else [str(row["case_id"]) for row in candidate_infos]
         selected_trace_manifest = materialize_selected_traces(
             source_run_root=source_run_root,
@@ -805,12 +894,16 @@ def main() -> None:
         "planned_commands": [" ".join(baseline_cmd), " ".join(candidate_cmd)] if baseline_cmd and candidate_cmd else [],
         "dry_run": args.dry_run,
         "gap_report_only": args.gap_report_only,
+        "schema_scan_only": args.schema_scan_only,
+        "schema_scan_summary": schema_scan_summary,
     }
     (out_root / "subset_manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    if args.gap_report_only or not schema_local_ready:
+    if args.schema_scan_only or args.gap_report_only or not schema_local_ready:
         failure_reason = (
             "schema-local eligible cases below execution threshold"
             if not schema_local_ready
+            else "schema scan only"
+            if args.schema_scan_only
             else "gap report only"
         )
         summary = {
@@ -833,6 +926,7 @@ def main() -> None:
             "failure_reason": failure_reason,
             "candidate_policy_tool_distribution": candidate_policy_tool_distribution(rules_dir / "rule.yaml"),
             "gap_summary": gap_summary,
+            "schema_scan_summary": schema_scan_summary,
             "manifest": manifest,
         }
         rows = [
@@ -861,7 +955,7 @@ def main() -> None:
         (out_root / "subset_summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         (out_root / "subset_summary.md").write_text(_render_summary(summary, rows), encoding="utf-8")
         print(json.dumps({"selected_case_count": len(selected_ids), **gap_summary, "accepted": False}, indent=2))
-        if not args.gap_report_only and not args.dry_run:
+        if not args.gap_report_only and not args.schema_scan_only and not args.dry_run:
             raise RuntimeError(f"{failure_reason}: {len(schema_local_infos)} < {args.min_schema_local_cases}")
         return
     if not args.dry_run and not has_ctspc_actions:
