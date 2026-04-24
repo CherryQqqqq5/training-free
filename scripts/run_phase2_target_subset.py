@@ -575,6 +575,10 @@ def _result_step_counts(run_root: Path, category: str, selected_ids: list[str]) 
 
 def _trace_groups_by_case(trace_dir: Path, counts: dict[str, int]) -> dict[str, list[dict[str, Any]]]:
     trace_groups = _trace_paths_by_case(trace_dir, counts)
+    return _read_trace_groups(trace_groups)
+
+
+def _read_trace_groups(trace_groups: dict[str, list[Path]]) -> dict[str, list[dict[str, Any]]]:
     groups: dict[str, list[dict[str, Any]]] = {}
     for case_id, case_paths in trace_groups.items():
         groups[case_id] = []
@@ -724,6 +728,36 @@ def materialize_selected_traces(
     }
 
 
+def _completed_run_trace_groups_by_case(
+    *,
+    run_root: Path,
+    category: str,
+    selected_ids: list[str],
+) -> tuple[dict[str, list[dict[str, Any]]], str]:
+    counts = _result_step_counts(run_root, category, selected_ids)
+    expected_trace_count = sum(counts.values())
+    trace_paths = _trace_paths_by_case_from_prompt_prefix(
+        source_run_root=run_root,
+        category=category,
+        selected_ids=selected_ids,
+    )
+    mapping_method = "prompt_user_prefix"
+    if (
+        not trace_paths
+        or any(not trace_paths.get(case_id) for case_id in selected_ids)
+        or sum(len(paths) for paths in trace_paths.values()) != expected_trace_count
+    ):
+        trace_paths = _trace_paths_by_case(run_root / "traces", counts)
+        mapping_method = "mtime_by_result_step_count"
+    return _read_trace_groups(trace_paths), mapping_method
+
+
+class CaseReportRows(list[dict[str, Any]]):
+    def __init__(self, rows: list[dict[str, Any]], *, trace_mapping_method: str) -> None:
+        super().__init__(rows)
+        self.trace_mapping_method = trace_mapping_method
+
+
 def _aggregate_validation(traces: list[dict[str, Any]]) -> dict[str, Any]:
     validations = [trace.get("validation") or {} for trace in traces if isinstance(trace.get("validation"), dict)]
     activated = [v for v in validations if v.get("next_tool_plan_activated") is True]
@@ -754,8 +788,11 @@ def build_case_report(
 ) -> list[dict[str, Any]]:
     baseline_success = _load_success_map(baseline_run, category)
     candidate_success = _load_success_map(candidate_run, category)
-    counts = _result_step_counts(candidate_run, category, selected_ids)
-    trace_groups = _trace_groups_by_case(candidate_run / "traces", counts)
+    trace_groups, trace_mapping_method = _completed_run_trace_groups_by_case(
+        run_root=candidate_run,
+        category=category,
+        selected_ids=selected_ids,
+    )
     rows: list[dict[str, Any]] = []
     for case_id in selected_ids:
         validation = _aggregate_validation(trace_groups.get(case_id, []))
@@ -771,7 +808,7 @@ def build_case_report(
                 "case_regressed": base is True and cand is False,
             }
         )
-    return rows
+    return CaseReportRows(rows, trace_mapping_method=trace_mapping_method)
 
 
 def summarize_case_report(rows: list[dict[str, Any]], *, baseline_acc: float | None = None, candidate_acc: float | None = None) -> dict[str, Any]:
@@ -793,6 +830,7 @@ def summarize_case_report(rows: list[dict[str, Any]], *, baseline_acc: float | N
         "stop_allowed_false_positive_count": 0,
         "blocked_reason_distribution": dict(blocked),
         "recommended_tools_not_in_schema_count": blocked.get("recommended_tools_not_in_schema", 0),
+        "case_report_trace_mapping": getattr(rows, "trace_mapping_method", "unknown"),
     }
     summary["net_case_gain"] = summary["case_fixed_count"] - summary["case_regressed_count"]
     summary["accepted"] = (

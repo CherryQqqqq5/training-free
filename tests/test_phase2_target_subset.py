@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -262,6 +263,104 @@ rules:
         self.assertEqual(rows[0]["repair_kinds"], ["coerce_no_tool_text_to_empty"])
         self.assertEqual(summary["case_fixed_count"], 1)
         self.assertTrue(summary["accepted"])
+
+    def test_build_case_report_prefers_prompt_prefix_when_trace_mtimes_are_reversed(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_raw:
+            root = Path(tmp_raw)
+            baseline = root / "baseline"
+            candidate = root / "candidate"
+            category = "multi_turn_miss_param"
+            selected_ids = ["multi_turn_miss_param_1", "multi_turn_miss_param_2"]
+
+            for run, valids in ((baseline, [False, False]), (candidate, [True, False])):
+                score = run / "bfcl" / "score" / "model" / "multi_turn" / f"BFCL_v4_{category}_score.json"
+                score.parent.mkdir(parents=True)
+                score.write_text(
+                    "\n".join(
+                        [
+                            json.dumps({"accuracy": 0.0}),
+                            json.dumps(
+                                {
+                                    "id": "multi_turn_miss_param_1",
+                                    "valid": valids[0],
+                                    "prompt": {"question": [[{"role": "user", "content": "case one request"}]]},
+                                }
+                            ),
+                            json.dumps(
+                                {
+                                    "id": "multi_turn_miss_param_2",
+                                    "valid": valids[1],
+                                    "prompt": {"question": [[{"role": "user", "content": "case two request"}]]},
+                                }
+                            ),
+                        ]
+                    )
+                    + "\n",
+                    encoding="utf-8",
+                )
+
+            result = candidate / "bfcl" / "result" / "model" / "multi_turn" / f"BFCL_v4_{category}_result.json"
+            result.parent.mkdir(parents=True)
+            result.write_text(
+                "\n".join(
+                    [
+                        json.dumps({"id": "multi_turn_miss_param_1", "result": [[[{"cat": "{}"}]]]}),
+                        json.dumps({"id": "multi_turn_miss_param_2", "result": [[[{"touch": "{}"}]]]}),
+                    ]
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+
+            trace_dir = candidate / "traces"
+            trace_dir.mkdir(parents=True)
+            case_two_trace = trace_dir / "trace_case_two_older.json"
+            case_one_trace = trace_dir / "trace_case_one_newer.json"
+            case_two_trace.write_text(
+                json.dumps(
+                    {
+                        "request_original": {"input": [{"role": "user", "content": "case two request"}]},
+                        "validation": {
+                            "next_tool_plan_activated": True,
+                            "selected_next_tool": "touch",
+                            "next_tool_matches_recommendation": True,
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+            case_one_trace.write_text(
+                json.dumps(
+                    {
+                        "request_original": {"input": [{"role": "user", "content": "case one request"}]},
+                        "validation": {
+                            "next_tool_plan_activated": True,
+                            "selected_next_tool": "cat",
+                            "next_tool_matches_recommendation": True,
+                            "next_tool_args_match_binding_normalized": True,
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+            os.utime(case_two_trace, (1000, 1000))
+            os.utime(case_one_trace, (2000, 2000))
+
+            rows = build_case_report(
+                baseline_run=baseline,
+                candidate_run=candidate,
+                category=category,
+                selected_ids=selected_ids,
+            )
+            summary = summarize_case_report(rows)
+
+        by_case = {row["case_id"]: row for row in rows}
+        self.assertTrue(by_case["multi_turn_miss_param_1"]["policy_plan_activated"])
+        self.assertEqual(by_case["multi_turn_miss_param_1"]["selected_next_tool"], "cat")
+        self.assertTrue(by_case["multi_turn_miss_param_1"]["case_fixed"])
+        self.assertEqual(by_case["multi_turn_miss_param_2"]["selected_next_tool"], "touch")
+        self.assertFalse(by_case["multi_turn_miss_param_2"]["case_fixed"])
+        self.assertEqual(summary["case_report_trace_mapping"], "prompt_user_prefix")
 
     def test_nested_partial_eval_score_and_result_paths_are_supported(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_raw:
