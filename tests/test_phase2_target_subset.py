@@ -10,6 +10,7 @@ from pathlib import Path
 
 from scripts.run_phase2_target_subset import (
     build_case_report,
+    _dataset_user_texts_by_case,
     _execution_env,
     _result_json_path,
     _score_json_path,
@@ -361,6 +362,113 @@ rules:
         self.assertEqual(by_case["multi_turn_miss_param_2"]["selected_next_tool"], "touch")
         self.assertFalse(by_case["multi_turn_miss_param_2"]["case_fixed"])
         self.assertEqual(summary["case_report_trace_mapping"], "prompt_user_prefix")
+
+    def test_build_case_report_treats_missing_score_rows_as_success_when_score_is_failure_only(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_raw:
+            root = Path(tmp_raw)
+            baseline = root / "baseline"
+            candidate = root / "candidate"
+            category = "multi_turn_miss_param"
+            selected_ids = ["multi_turn_miss_param_0", "multi_turn_miss_param_1"]
+
+            for run in (baseline, candidate):
+                result = run / "bfcl" / "result" / "model" / "multi_turn" / f"BFCL_v4_{category}_result.json"
+                result.parent.mkdir(parents=True)
+                result.write_text(
+                    "\n".join(
+                        [
+                            json.dumps({"id": selected_ids[0], "result": [[[{"cat": "{}"}]]]}),
+                            json.dumps({"id": selected_ids[1], "result": [[[{"touch": "{}"}]]]}),
+                        ]
+                    )
+                    + "\n",
+                    encoding="utf-8",
+                )
+
+            baseline_score = baseline / "bfcl" / "score" / "model" / "multi_turn" / f"BFCL_v4_{category}_score.json"
+            candidate_score = candidate / "bfcl" / "score" / "model" / "multi_turn" / f"BFCL_v4_{category}_score.json"
+            baseline_score.parent.mkdir(parents=True)
+            candidate_score.parent.mkdir(parents=True)
+            baseline_score.write_text(
+                json.dumps({"accuracy": 0.5, "correct_count": 1, "total_count": 2})
+                + "\n"
+                + json.dumps({"id": selected_ids[0], "valid": False})
+                + "\n",
+                encoding="utf-8",
+            )
+            candidate_score.write_text(
+                json.dumps({"accuracy": 1.0, "correct_count": 2, "total_count": 2}) + "\n",
+                encoding="utf-8",
+            )
+
+            trace_dir = candidate / "traces"
+            trace_dir.mkdir(parents=True)
+            prompt_users = _dataset_user_texts_by_case(category, selected_ids)
+            for index, case_id in enumerate(selected_ids):
+                (trace_dir / f"trace_{index}.json").write_text(
+                    json.dumps(
+                        {
+                            "request_original": {"input": [{"role": "user", "content": prompt_users[case_id][0]}]},
+                            "validation": {
+                                "next_tool_plan_activated": True,
+                                "selected_next_tool": "cat" if index == 0 else "touch",
+                                "next_tool_matches_recommendation": True,
+                                "next_tool_args_match_binding_normalized": True,
+                            },
+                        }
+                    ),
+                    encoding="utf-8",
+                )
+
+            rows = build_case_report(
+                baseline_run=baseline,
+                candidate_run=candidate,
+                category=category,
+                selected_ids=selected_ids,
+            )
+
+        by_case = {row["case_id"]: row for row in rows}
+        self.assertFalse(by_case[selected_ids[0]]["baseline_success"])
+        self.assertTrue(by_case[selected_ids[0]]["candidate_success"])
+        self.assertTrue(by_case[selected_ids[0]]["case_fixed"])
+        self.assertTrue(by_case[selected_ids[1]]["baseline_success"])
+        self.assertTrue(by_case[selected_ids[1]]["candidate_success"])
+        self.assertEqual(rows.trace_mapping_method, "prompt_user_prefix")
+
+    def test_build_case_report_marks_exception_result_rows_failed(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_raw:
+            root = Path(tmp_raw)
+            run = root / "run"
+            category = "multi_turn_miss_param"
+            selected_ids = ["multi_turn_miss_param_0"]
+            score = run / "bfcl" / "score" / "model" / "multi_turn" / f"BFCL_v4_{category}_score.json"
+            result = run / "bfcl" / "result" / "model" / "multi_turn" / f"BFCL_v4_{category}_result.json"
+            score.parent.mkdir(parents=True)
+            result.parent.mkdir(parents=True)
+            score.write_text(json.dumps({"accuracy": 0.0, "correct_count": 0, "total_count": 1}) + "\n", encoding="utf-8")
+            result.write_text(
+                json.dumps({"id": selected_ids[0], "result": "Error during inference: boom", "traceback": "boom"}) + "\n",
+                encoding="utf-8",
+            )
+
+            trace_dir = run / "traces"
+            trace_dir.mkdir(parents=True)
+            prompt_users = _dataset_user_texts_by_case(category, selected_ids)
+            (trace_dir / "trace.json").write_text(
+                json.dumps({"request_original": {"input": [{"role": "user", "content": prompt_users[selected_ids[0]][0]}]}}),
+                encoding="utf-8",
+            )
+
+            rows = build_case_report(
+                baseline_run=run,
+                candidate_run=run,
+                category=category,
+                selected_ids=selected_ids,
+            )
+
+        self.assertFalse(rows[0]["baseline_success"])
+        self.assertFalse(rows[0]["candidate_success"])
+        self.assertEqual(rows[0]["candidate_failure_reason"], "generation_exception")
 
     def test_nested_partial_eval_score_and_result_paths_are_supported(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_raw:

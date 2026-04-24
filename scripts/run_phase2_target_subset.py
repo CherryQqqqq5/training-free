@@ -67,15 +67,77 @@ def _result_json_path(run_root: Path, category: str) -> Path | None:
     return candidates[0] if candidates else None
 
 
-def _load_success_map(run_root: Path, category: str) -> dict[str, bool]:
+def _score_header(run_root: Path, category: str) -> dict[str, Any]:
     path = _score_json_path(run_root, category)
     if not path:
         return {}
-    success: dict[str, bool] = {}
+    for row in _read_jsonl(path):
+        if not isinstance(row.get("id"), str):
+            return row
+    return {}
+
+
+def _result_rows_by_case(run_root: Path, category: str) -> dict[str, dict[str, Any]]:
+    path = _result_json_path(run_root, category)
+    if not path:
+        return {}
+    rows: dict[str, dict[str, Any]] = {}
+    for row in _read_jsonl(path):
+        case_id = row.get("id")
+        if isinstance(case_id, str):
+            rows[case_id] = row
+    return rows
+
+
+def _result_failure_reason(row: dict[str, Any]) -> str | None:
+    if row.get("traceback"):
+        return "generation_exception"
+    result = row.get("result")
+    if isinstance(result, str):
+        return result[:500]
+    return None
+
+
+def _result_failure_reasons(run_root: Path, category: str) -> dict[str, str]:
+    reasons: dict[str, str] = {}
+    for case_id, row in _result_rows_by_case(run_root, category).items():
+        reason = _result_failure_reason(row)
+        if reason:
+            reasons[case_id] = reason
+    return reasons
+
+
+def _score_rows_by_case(run_root: Path, category: str) -> dict[str, dict[str, Any]]:
+    path = _score_json_path(run_root, category)
+    if not path:
+        return {}
+    rows: dict[str, dict[str, Any]] = {}
     for row in _read_jsonl(path):
         case_id = row.get("id")
         if isinstance(case_id, str) and "valid" in row:
-            success[case_id] = bool(row.get("valid"))
+            rows[case_id] = row
+    return rows
+
+
+def _load_success_map(run_root: Path, category: str, selected_ids: list[str] | None = None) -> dict[str, bool]:
+    score_rows = _score_rows_by_case(run_root, category)
+    result_rows = _result_rows_by_case(run_root, category)
+    header = _score_header(run_root, category)
+    success: dict[str, bool] = {}
+
+    for case_id, row in score_rows.items():
+        success[case_id] = bool(row.get("valid"))
+    for case_id, row in result_rows.items():
+        if _result_failure_reason(row):
+            success[case_id] = False
+
+    selected = list(selected_ids or result_rows.keys())
+    total_count = header.get("total_count")
+    if isinstance(total_count, (int, float)) and result_rows and int(total_count) <= len(result_rows):
+        for case_id in selected:
+            if case_id in result_rows and case_id not in success:
+                # BFCL score JSON stores the header plus failed rows; correct rows are omitted.
+                success[case_id] = True
     return success
 
 
@@ -603,9 +665,7 @@ def _trace_paths_by_case(trace_dir: Path, counts: dict[str, int]) -> dict[str, l
     return groups
 
 
-def _user_texts_from_score_row(row: dict[str, Any]) -> list[str]:
-    prompt = row.get("prompt") if isinstance(row.get("prompt"), dict) else {}
-    question = prompt.get("question") if isinstance(prompt, dict) else []
+def _user_texts_from_question(question: Any) -> list[str]:
     texts: list[str] = []
     if not isinstance(question, list):
         return texts
@@ -618,6 +678,30 @@ def _user_texts_from_score_row(row: dict[str, Any]) -> list[str]:
                 if isinstance(content, str):
                     texts.append(content)
     return texts
+
+
+def _user_texts_from_score_row(row: dict[str, Any]) -> list[str]:
+    prompt = row.get("prompt") if isinstance(row.get("prompt"), dict) else {}
+    question = prompt.get("question") if isinstance(prompt, dict) else []
+    return _user_texts_from_question(question)
+
+
+def _dataset_user_texts_by_case(category: str, selected_ids: list[str]) -> dict[str, list[str]]:
+    try:
+        from bfcl_eval.utils import load_dataset_entry
+    except Exception:
+        return {}
+    selected = set(selected_ids)
+    out: dict[str, list[str]] = {}
+    try:
+        dataset_rows = load_dataset_entry(category)
+    except Exception:
+        return {}
+    for row in dataset_rows:
+        case_id = row.get("id") if isinstance(row, dict) else None
+        if isinstance(case_id, str) and case_id in selected:
+            out[case_id] = _user_texts_from_question(row.get("question"))
+    return out
 
 
 def _user_texts_from_trace_payload(trace: dict[str, Any]) -> list[str]:
@@ -643,8 +727,18 @@ def _score_user_texts_by_case(run_root: Path, category: str, selected_ids: list[
     for row in _read_jsonl(path):
         case_id = row.get("id")
         if isinstance(case_id, str) and case_id in selected:
-            out[case_id] = _user_texts_from_score_row(row)
+            texts = _user_texts_from_score_row(row)
+            if texts:
+                out[case_id] = texts
     return out
+
+
+def _prompt_user_texts_by_case(run_root: Path, category: str, selected_ids: list[str]) -> dict[str, list[str]]:
+    case_users = _dataset_user_texts_by_case(category, selected_ids)
+    # Score rows can carry synthetic test prompts in unit tests and failure prompts in real BFCL.
+    # Let them override dataset rows when present, but do not require every selected case to have one.
+    case_users.update(_score_user_texts_by_case(run_root, category, selected_ids))
+    return case_users
 
 
 def _trace_paths_by_case_from_prompt_prefix(
@@ -653,7 +747,7 @@ def _trace_paths_by_case_from_prompt_prefix(
     category: str,
     selected_ids: list[str],
 ) -> dict[str, list[Path]]:
-    case_users = _score_user_texts_by_case(source_run_root, category, selected_ids)
+    case_users = _prompt_user_texts_by_case(source_run_root, category, selected_ids)
     if not case_users:
         return {}
     groups: dict[str, list[Path]] = {case_id: [] for case_id in selected_ids}
@@ -735,18 +829,13 @@ def _completed_run_trace_groups_by_case(
     selected_ids: list[str],
 ) -> tuple[dict[str, list[dict[str, Any]]], str]:
     counts = _result_step_counts(run_root, category, selected_ids)
-    expected_trace_count = sum(counts.values())
     trace_paths = _trace_paths_by_case_from_prompt_prefix(
         source_run_root=run_root,
         category=category,
         selected_ids=selected_ids,
     )
     mapping_method = "prompt_user_prefix"
-    if (
-        not trace_paths
-        or any(not trace_paths.get(case_id) for case_id in selected_ids)
-        or sum(len(paths) for paths in trace_paths.values()) != expected_trace_count
-    ):
+    if not trace_paths or any(not trace_paths.get(case_id) for case_id in selected_ids):
         trace_paths = _trace_paths_by_case(run_root / "traces", counts)
         mapping_method = "mtime_by_result_step_count"
     return _read_trace_groups(trace_paths), mapping_method
@@ -786,8 +875,10 @@ def build_case_report(
     category: str,
     selected_ids: list[str],
 ) -> list[dict[str, Any]]:
-    baseline_success = _load_success_map(baseline_run, category)
-    candidate_success = _load_success_map(candidate_run, category)
+    baseline_success = _load_success_map(baseline_run, category, selected_ids)
+    candidate_success = _load_success_map(candidate_run, category, selected_ids)
+    baseline_failure_reasons = _result_failure_reasons(baseline_run, category)
+    candidate_failure_reasons = _result_failure_reasons(candidate_run, category)
     trace_groups, trace_mapping_method = _completed_run_trace_groups_by_case(
         run_root=candidate_run,
         category=category,
@@ -803,6 +894,8 @@ def build_case_report(
                 "case_id": case_id,
                 "baseline_success": base,
                 "candidate_success": cand,
+                "baseline_failure_reason": baseline_failure_reasons.get(case_id),
+                "candidate_failure_reason": candidate_failure_reasons.get(case_id),
                 **validation,
                 "case_fixed": base is False and cand is True,
                 "case_regressed": base is True and cand is False,

@@ -2041,6 +2041,44 @@ action:
         self.assertEqual(rows["id"]["normalization"], "unsupported_field")
 
 
+    def test_next_tool_plan_ranks_action_candidates_by_request_literals(self) -> None:
+        rule = self._next_tool_rule(
+            recommended_tools=["mkdir", "cat"],
+            request_predicates=["tools_available", "prior_explicit_literals_present"],
+            activation_predicates=["tools_available", "prior_explicit_literals_present"],
+            action_candidates=[
+                {"tool": "mkdir", "args": {"dir_name": "archive"}, "recommended_tools": ["mkdir"]},
+                {"tool": "cat", "args": {"file_name": "report.txt"}, "recommended_tools": ["cat"]},
+            ],
+        )
+        request = {
+            "model": "demo-model",
+            "messages": [{"role": "user", "content": "Please read 'report.txt' and show me the contents."}],
+            "tools": [
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "mkdir",
+                        "parameters": {"type": "object", "properties": {"dir_name": {"type": "string"}}},
+                    },
+                },
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "cat",
+                        "parameters": {"type": "object", "properties": {"file_name": {"type": "string"}}},
+                    },
+                },
+            ],
+        }
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir)
+            engine.rules = [rule]
+            _, request_patches = engine.apply_request(request)
+
+        self.assertIn("policy_next_tool:selected=cat", request_patches)
+        self.assertIn("policy_next_tool:recommended=mkdir,cat", request_patches)
+
     def test_true_empty_tool_call_still_records_failure(self) -> None:
         with tempfile.TemporaryDirectory() as rules_dir:
             engine = RuleEngine(rules_dir)

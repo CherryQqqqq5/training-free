@@ -417,6 +417,105 @@ class RuleEngine:
             candidates.append(candidate)
         return candidates
 
+    @staticmethod
+    def _candidate_string_values(value: Any) -> List[str]:
+        values: List[str] = []
+        if isinstance(value, dict):
+            for item in value.values():
+                values.extend(RuleEngine._candidate_string_values(item))
+        elif isinstance(value, list):
+            for item in value:
+                values.extend(RuleEngine._candidate_string_values(item))
+        elif isinstance(value, str) and value.strip():
+            values.append(value.strip())
+        return values
+
+    def _request_text_for_ranking(self, request_json: Dict[str, Any]) -> str:
+        items = self._conversation_items(request_json)
+        return json.dumps(items[-12:], ensure_ascii=False).lower()
+
+    def _tool_intent_score(self, tool_name: str, request_text: str) -> int:
+        aliases = {
+            "cat": ("read", "show", "display", "content", "open"),
+            "grep": ("search", "find", "match", "matches", "contains"),
+            "find": ("find", "locate", "search"),
+            "mkdir": ("make directory", "create directory", "new folder", "make folder", "directory", "folder"),
+            "touch": ("create file", "new file", "touch", "empty file"),
+            "mv": ("move", "rename"),
+            "cp": ("copy", "duplicate"),
+            "diff": ("compare", "identical", "difference", "diff"),
+            "echo": ("write", "put", "append", "replace"),
+            "ls": ("list", "show files"),
+            "tail": ("last lines", "tail"),
+            "sort": ("sort", "ordered"),
+        }
+        return sum(1 for alias in aliases.get(tool_name, ()) if alias in request_text)
+
+    def _action_candidate_rank(
+        self,
+        candidate: Dict[str, Any],
+        *,
+        request_json: Dict[str, Any],
+        request_tool_name_set: set[str],
+        recommended: List[str],
+        confidence: float,
+        index: int,
+    ) -> tuple[int, int, float, int, int]:
+        tool_name = str(candidate.get("tool") or "").strip()
+        if tool_name not in request_tool_name_set:
+            return (-1000, -1000, confidence, -999, -index)
+        request_text = self._request_text_for_ranking(request_json)
+        context_literals = [item.lower() for item in self._collect_context_literals(request_json)]
+        values = self._candidate_string_values(candidate.get("args") or {})
+        bindings = candidate.get("arg_bindings") or {}
+        if isinstance(bindings, dict):
+            values.extend(self._candidate_string_values(bindings))
+        literal_score = 0
+        for value in values:
+            lowered = value.lower().strip()
+            if not lowered:
+                continue
+            basename = lowered.rsplit("/", 1)[-1]
+            if lowered in request_text:
+                literal_score += 6
+            elif basename and basename in request_text:
+                literal_score += 5
+            elif lowered in context_literals or basename in context_literals:
+                literal_score += 4
+            else:
+                tokens = set(self._normalize_literal_tokens(lowered))
+                if tokens and tokens.issubset(set(self._normalize_literal_tokens(request_text))):
+                    literal_score += 2
+        intent_score = self._tool_intent_score(tool_name, request_text)
+        recommended_rank = recommended.index(tool_name) if tool_name in recommended else 999
+        return (literal_score, intent_score, confidence, -recommended_rank, -index)
+
+    def _rank_action_candidates(
+        self,
+        candidates: List[Dict[str, Any]],
+        *,
+        request_json: Dict[str, Any],
+        request_tool_name_set: set[str],
+        recommended: List[str],
+        confidence: float,
+    ) -> List[tuple[tuple[int, int, float, int, int], Dict[str, Any]]]:
+        ranked = [
+            (
+                self._action_candidate_rank(
+                    candidate,
+                    request_json=request_json,
+                    request_tool_name_set=request_tool_name_set,
+                    recommended=recommended,
+                    confidence=confidence,
+                    index=index,
+                ),
+                candidate,
+            )
+            for index, candidate in enumerate(candidates)
+        ]
+        return sorted(ranked, key=lambda item: item[0], reverse=True)
+
+
     def _next_tool_activation_predicates(self, rule: Rule, policy: DecisionPolicySpec) -> List[str]:
         next_tool_policy = getattr(policy, "next_tool_policy", None)
         configured = list(getattr(next_tool_policy, "activation_predicates", []) or [])
@@ -461,6 +560,8 @@ class RuleEngine:
         }
         blocked_reason = "no_policy_candidate"
         blocked_rank = blocked_priority[blocked_reason]
+        best_selection: tuple[tuple[int, int, float, int, int], Dict[str, Any]] | None = None
+        fallback_selected_tool: str | None = None
 
         def mark_blocked(reason: str) -> None:
             nonlocal blocked_reason, blocked_rank
@@ -512,20 +613,30 @@ class RuleEngine:
             confidence = float(getattr(next_tool_policy, "confidence", 0.0) or 0.0)
             plan["activated"] = True
             plan["blocked_reason"] = "activated"
-            plan["selected_tool"] = plan["selected_tool"] or recommended[0]
+            fallback_selected_tool = fallback_selected_tool or recommended[0]
             plan["tool_choice_mode"] = "required" if mode == "required" else "soft"
             plan["confidence"] = max(float(plan["confidence"]), confidence)
             plan["activation_predicates"] = list(dict.fromkeys(plan["activation_predicates"] + activation_predicates))
             plan["policy_hits"].append(rule.rule_id)
             add_unique("matched_recommended_tools", recommended)
             add_unique("recommended_tools", recommended)
-            for candidate in self._policy_action_candidates(policy):
+            ranked_candidates = self._rank_action_candidates(
+                self._policy_action_candidates(policy),
+                request_json=request_json,
+                request_tool_name_set=request_tool_name_set,
+                recommended=recommended,
+                confidence=confidence,
+            )
+            for _, candidate in ranked_candidates:
                 if candidate not in plan["action_candidates"]:
                     plan["action_candidates"].append(candidate)
-            if plan["selected_action_candidate"] is None:
-                selected_candidates = self._policy_action_candidates(policy, recommended[0])
-                if selected_candidates:
-                    plan["selected_action_candidate"] = selected_candidates[0]
+            if ranked_candidates and (best_selection is None or ranked_candidates[0][0] > best_selection[0]):
+                best_selection = ranked_candidates[0]
+        if best_selection is not None:
+            plan["selected_action_candidate"] = best_selection[1]
+            plan["selected_tool"] = str(best_selection[1].get("tool") or "") or fallback_selected_tool
+        elif fallback_selected_tool:
+            plan["selected_tool"] = fallback_selected_tool
         plan["recommended_tools"] = plan["recommended_tools"][:3]
         plan["matched_recommended_tools"] = plan["matched_recommended_tools"][:3]
         plan["candidate_recommended_tools"] = plan["candidate_recommended_tools"][:5]
