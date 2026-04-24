@@ -1865,6 +1865,7 @@ action:
         self.assertEqual(validation.selected_action_candidate["tool"], "move_file")
         self.assertTrue(validation.next_tool_args_emitted)
         self.assertTrue(validation.next_tool_args_match_binding)
+        self.assertTrue(validation.next_tool_final_args_match_binding)
         self.assertEqual(
             validation.arg_binding_validation["file_name"],
             {
@@ -1874,6 +1875,88 @@ action:
                 "match": True,
             },
         )
+        self.assertEqual(validation.final_arg_binding_validation, validation.arg_binding_validation)
+
+    def test_next_tool_arg_binding_keeps_raw_match_when_contextual_repair_changes_final_arg(self) -> None:
+        action_candidate = {
+            "tool": "cat",
+            "args": {"file_name": "notes.txt"},
+            "arg_bindings": {
+                "file_name": {
+                    "source": "prior_tool_output.matches[0]|basename",
+                    "value": "notes.txt",
+                }
+            },
+            "recommended_tools": ["cat"],
+        }
+        rule = self._next_tool_rule(
+            recommended_tools=["cat"],
+            request_predicates=["tools_available", "prior_tool_outputs_present"],
+            activation_predicates=["tools_available", "prior_tool_outputs_present"],
+            action_candidates=[action_candidate],
+        )
+        request = {
+            "model": "demo-model",
+            "messages": [
+                {"role": "user", "content": "Read the first matching file."},
+                {"role": "tool", "name": "find", "content": "{\"matches\":[\"/workspace/notes.txt\"]}"},
+            ],
+            "tools": [
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "cat",
+                        "parameters": {
+                            "type": "object",
+                            "properties": {"file_name": {"type": "string"}},
+                            "required": ["file_name"],
+                        },
+                    },
+                }
+            ],
+        }
+        response = {
+            "choices": [
+                {
+                    "message": {
+                        "role": "assistant",
+                        "content": None,
+                        "tool_calls": [
+                            {
+                                "id": "c1",
+                                "type": "function",
+                                "function": {"name": "cat", "arguments": "{\"file_name\":\"notes.txt\"}"},
+                            }
+                        ],
+                    }
+                }
+            ]
+        }
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(
+                rules_dir,
+                runtime_policy={
+                    "enable_required_next_tool_choice": True,
+                    "resolve_contextual_string_args": True,
+                },
+            )
+            engine.rules = [rule]
+            patched, request_patches = engine.apply_request(request)
+            final_response, repairs, validation = engine.apply_response(
+                patched,
+                response,
+                request_patches=request_patches,
+            )
+
+        self.assertEqual(repairs[0]["kind"], "resolve_contextual_string_arg")
+        self.assertIn("/workspace/notes.txt", final_response["choices"][0]["message"]["tool_calls"][0]["function"]["arguments"])
+        self.assertTrue(validation.next_tool_args_emitted)
+        self.assertTrue(validation.next_tool_args_match_binding)
+        self.assertFalse(validation.next_tool_final_args_match_binding)
+        self.assertEqual(validation.arg_binding_validation["file_name"]["observed"], "notes.txt")
+        self.assertTrue(validation.arg_binding_validation["file_name"]["match"])
+        self.assertEqual(validation.final_arg_binding_validation["file_name"]["observed"], "/workspace/notes.txt")
+        self.assertFalse(validation.final_arg_binding_validation["file_name"]["match"])
 
     def test_next_tool_arg_binding_validation_records_mismatch(self) -> None:
         action_candidate = {

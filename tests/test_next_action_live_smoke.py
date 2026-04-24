@@ -83,6 +83,7 @@ class NextActionLiveSmokeTests(unittest.TestCase):
                         "runtime_policy": {
                             "inject_structured_tool_guidance": True,
                             "inject_context_literal_hints": True,
+                            "resolve_contextual_string_args": True,
                         },
                         "upstream": {
                             "active_profile": "local",
@@ -119,6 +120,7 @@ class NextActionLiveSmokeTests(unittest.TestCase):
         self.assertEqual(saved_summary["next_tool_emitted_count"], 15)
         self.assertEqual(saved_summary["recommended_tool_match_count"], 15)
         self.assertEqual(saved_summary["arg_binding_match_count"], 15)
+        self.assertEqual(saved_summary["final_arg_binding_match_count"], 10)
         self.assertEqual(saved_summary["stop_allowed_false_positive_count"], 0)
         self.assertEqual(len(traces), 20)
 

@@ -1031,6 +1031,7 @@ class RuleEngine:
                             fn["arguments"] = json.dumps(fn["arguments"], ensure_ascii=False)
                     tool_calls = text_calls
                     msg["tool_calls"] = tool_calls
+            raw_tool_calls = copy.deepcopy(tool_calls)
             narration_repairs = self._strip_assistant_narration_with_tool_calls(
                 msg,
                 tool_calls,
@@ -1183,18 +1184,30 @@ class RuleEngine:
                 if validation.next_tool_matches_recommendation is not True:
                     validation.next_tool_matches_recommendation = validation.selected_next_tool in emitted_names
                 if validation.selected_action_candidate:
-                    selected_args = self._selected_tool_call_args(tool_calls, validation.selected_next_tool)
-                    validation.next_tool_args_emitted = selected_args is not None
-                    if selected_args is None:
+                    raw_selected_args = self._selected_tool_call_args(raw_tool_calls, validation.selected_next_tool)
+                    final_selected_args = self._selected_tool_call_args(tool_calls, validation.selected_next_tool)
+                    validation.next_tool_args_emitted = raw_selected_args is not None
+                    if raw_selected_args is None:
                         validation.next_tool_args_match_binding = False
-                    if selected_args is not None:
+                    if raw_selected_args is not None:
                         validation.arg_binding_validation = self._validate_action_candidate_args(
                             validation.selected_action_candidate,
-                            selected_args,
+                            raw_selected_args,
                         )
                         if validation.arg_binding_validation:
                             validation.next_tool_args_match_binding = all(
                                 bool(row.get("match")) for row in validation.arg_binding_validation.values()
+                            )
+                    if final_selected_args is None:
+                        validation.next_tool_final_args_match_binding = False
+                    if final_selected_args is not None:
+                        validation.final_arg_binding_validation = self._validate_action_candidate_args(
+                            validation.selected_action_candidate,
+                            final_selected_args,
+                        )
+                        if validation.final_arg_binding_validation:
+                            validation.next_tool_final_args_match_binding = all(
+                                bool(row.get("match")) for row in validation.final_arg_binding_validation.values()
                             )
             msg["tool_calls"] = tool_calls
             choice["message"] = msg
