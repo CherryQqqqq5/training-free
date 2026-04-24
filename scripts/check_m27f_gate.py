@@ -1,0 +1,126 @@
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+from typing import Any
+
+
+DEFAULT_SUMMARY_PATH = Path("outputs/artifacts/bfcl_ctspc_subset30_v1/subset_summary.json")
+
+
+def _number(value: Any) -> float | None:
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, (int, float)):
+        return float(value)
+    return None
+
+
+def _criterion(*, passed: bool, actual: Any, expected: str) -> dict[str, Any]:
+    return {"passed": passed, "actual": actual, "expected": expected}
+
+
+def evaluate_m27f_gate(summary: dict[str, Any], *, summary_path: str | None = None) -> dict[str, Any]:
+    baseline_accuracy = _number(summary.get("baseline_accuracy"))
+    candidate_accuracy = _number(summary.get("candidate_accuracy"))
+    case_fixed_count = _number(summary.get("case_fixed_count"))
+    case_regressed_count = _number(summary.get("case_regressed_count"))
+    net_case_gain = _number(summary.get("net_case_gain"))
+    policy_plan_activated_count = _number(summary.get("policy_plan_activated_count"))
+    recommended_tool_match_rate = _number(summary.get("recommended_tool_match_rate_among_activated"))
+    raw_normalized_arg_match_rate = _number(summary.get("raw_normalized_arg_match_rate_among_activated"))
+    stop_allowed_false_positive_count = _number(summary.get("stop_allowed_false_positive_count"))
+
+    criteria = {
+        "case_report_trace_mapping": _criterion(
+            passed=summary.get("case_report_trace_mapping") == "prompt_user_prefix",
+            actual=summary.get("case_report_trace_mapping"),
+            expected="prompt_user_prefix",
+        ),
+        "candidate_accuracy_gt_baseline_accuracy": _criterion(
+            passed=(candidate_accuracy is not None and baseline_accuracy is not None and candidate_accuracy > baseline_accuracy),
+            actual={"candidate_accuracy": summary.get("candidate_accuracy"), "baseline_accuracy": summary.get("baseline_accuracy")},
+            expected="candidate_accuracy > baseline_accuracy",
+        ),
+        "case_fixed_count_gt_case_regressed_count": _criterion(
+            passed=(case_fixed_count is not None and case_regressed_count is not None and case_fixed_count > case_regressed_count),
+            actual={"case_fixed_count": summary.get("case_fixed_count"), "case_regressed_count": summary.get("case_regressed_count")},
+            expected="case_fixed_count > case_regressed_count",
+        ),
+        "net_case_gain_min_2": _criterion(
+            passed=(net_case_gain is not None and net_case_gain >= 2),
+            actual=summary.get("net_case_gain"),
+            expected=">= 2",
+        ),
+        "policy_plan_activated_count_positive": _criterion(
+            passed=(policy_plan_activated_count is not None and policy_plan_activated_count > 0),
+            actual=summary.get("policy_plan_activated_count"),
+            expected="> 0",
+        ),
+        "recommended_tool_match_rate_among_activated_min_0_6": _criterion(
+            passed=(recommended_tool_match_rate is not None and recommended_tool_match_rate >= 0.6),
+            actual=summary.get("recommended_tool_match_rate_among_activated"),
+            expected=">= 0.6",
+        ),
+        "raw_normalized_arg_match_rate_among_activated_min_0_6": _criterion(
+            passed=(raw_normalized_arg_match_rate is not None and raw_normalized_arg_match_rate >= 0.6),
+            actual=summary.get("raw_normalized_arg_match_rate_among_activated"),
+            expected=">= 0.6",
+        ),
+        "stop_allowed_false_positive_count_zero": _criterion(
+            passed=(stop_allowed_false_positive_count is not None and stop_allowed_false_positive_count == 0),
+            actual=summary.get("stop_allowed_false_positive_count"),
+            expected="== 0",
+        ),
+    }
+    failed = [name for name, item in criteria.items() if not item["passed"]]
+    gate_passed = not failed
+    mapping_stable = criteria["case_report_trace_mapping"]["passed"]
+    return {
+        "summary_path": summary_path,
+        "m2_7f_gate_passed": gate_passed,
+        "summary_accepted_ignored": summary.get("accepted"),
+        "criteria": criteria,
+        "diagnostic": {
+            "case_level_evidence": "durable" if mapping_stable else "diagnostic_only",
+            "first_failed_criterion": failed[0] if failed else None,
+            "failed_criteria": failed,
+            "do_not_expand_to_100_case_m28_or_full_bfcl": not gate_passed,
+            "recommended_next_focus": _recommended_next_focus(summary, criteria),
+        },
+    }
+
+
+def _recommended_next_focus(summary: dict[str, Any], criteria: dict[str, dict[str, Any]]) -> str:
+    if not criteria["case_report_trace_mapping"]["passed"]:
+        return "prompt_prefix_fallback"
+    baseline_accuracy = _number(summary.get("baseline_accuracy"))
+    candidate_accuracy = _number(summary.get("candidate_accuracy"))
+    if candidate_accuracy is not None and baseline_accuracy is not None and candidate_accuracy <= baseline_accuracy:
+        return "over_actuation_or_repair_interaction"
+    if _number(summary.get("policy_plan_activated_count")) == 0:
+        return "predicates_or_rule_scope"
+    if not criteria["recommended_tool_match_rate_among_activated_min_0_6"]["passed"]:
+        return "actuation_or_prompt_guidance"
+    if not criteria["raw_normalized_arg_match_rate_among_activated_min_0_6"]["passed"]:
+        return "arg_binding"
+    if not criteria["net_case_gain_min_2"]["passed"]:
+        return "trajectory_continuation_or_final_answer"
+    return "none"
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Check the explicit M2.7f BFCL phase gate from subset_summary.json.")
+    parser.add_argument("--summary", type=Path, default=DEFAULT_SUMMARY_PATH)
+    parser.add_argument("--compact", action="store_true", help="Print compact JSON instead of indented JSON.")
+    args = parser.parse_args()
+
+    summary = json.loads(args.summary.read_text(encoding="utf-8"))
+    report = evaluate_m27f_gate(summary, summary_path=str(args.summary))
+    print(json.dumps(report, ensure_ascii=False, indent=None if args.compact else 2))
+    return 0 if report["m2_7f_gate_passed"] else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
