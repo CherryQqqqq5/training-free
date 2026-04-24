@@ -1,0 +1,43 @@
+protocol_id: bfcl_v4_performance_proof
+bfcl:
+  evaluator_package: bfcl-eval==2025.12.17
+  checkout: f7cf735
+  version: v4
+  data_version: pinned_by_evaluator_checkout
+comparison:
+  primary_objective: same_base_model_improvement
+  target_absolute_pp: 3.0
+  challenge_objective: leaderboard_sota_snapshot
+model:
+  bfcl_model_alias: gpt-4o-mini-2024-07-18-FC
+  upstream_profile: openrouter
+  upstream_model_route: x-ai/grok-3-beta
+runtime:
+  config: configs/runtime_bfcl_structured.yaml
+  baseline_rules_dir: rules/baseline_empty
+  candidate_mode: ctspc
+categories:
+  baseline_freeze:
+    - simple
+    - multiple
+    - parallel
+    - parallel_multiple
+    - multi_turn_base
+    - multi_turn_miss_func
+    - multi_turn_miss_param
+    - multi_turn_long_context
+metrics:
+  primary: accuracy
+  paired_subset:
+    min_selected_cases: 30
+    min_candidate_generatable_cases: 20
+    min_net_case_gain: 2
+    min_tool_match_rate_among_activated: 0.6
+    min_raw_normalized_arg_match_rate_among_activated: 0.6
+    max_stop_allowed_false_positive_count: 0
+artifact_policy:
+  commit_compact_artifacts: true
+  commit_raw_traces: false
+  commit_bfcl_result_trees: false
+  commit_logs: false
+  commit_repair_records_jsonl: false
