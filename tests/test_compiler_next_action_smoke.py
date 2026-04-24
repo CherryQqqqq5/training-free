@@ -130,6 +130,7 @@ class CompilerNextActionSmokeTests(unittest.TestCase):
         compiler_generated_policy_count = 0
         recommended_tools_non_empty_count = 0
         argument_binding_present_count = 0
+        runtime_arg_binding_match_count = 0
         runtime_activated_count = 0
         stop_allowed_actual_activate = 0
         blocked_reasons: dict[str, int] = {}
@@ -145,6 +146,10 @@ class CompilerNextActionSmokeTests(unittest.TestCase):
                     argument_binding_present_count += int(
                         any(candidate.get("arg_bindings") for candidate in action_candidates if isinstance(candidate, dict))
                     )
+                for rule in rules:
+                    policy = (rule.get("action") or {}).get("decision_policy") or {}
+                    if policy.get("action_candidates"):
+                        self.assertTrue(policy["action_candidates"][0].get("arg_bindings"))
                 engine = RuleEngine(tmp, runtime_policy={"enable_required_next_tool_choice": True})
                 engine.rules = [Rule(**rule) for rule in rules]
                 patched, request_patches = engine.apply_request(case["request"])
@@ -155,6 +160,7 @@ class CompilerNextActionSmokeTests(unittest.TestCase):
                 )
 
             runtime_activated_count += int(validation.next_tool_plan_activated)
+            runtime_arg_binding_match_count += int(validation.next_tool_args_match_binding is True)
             if case["family"] == "stop_allowed":
                 stop_allowed_actual_activate += int(validation.next_tool_plan_activated)
             reason = validation.next_tool_plan_blocked_reason or "unknown"
@@ -164,6 +170,7 @@ class CompilerNextActionSmokeTests(unittest.TestCase):
         self.assertGreaterEqual(recommended_tools_non_empty_count, 15)
         self.assertGreaterEqual(argument_binding_present_count, 10)
         self.assertEqual(runtime_activated_count, 15)
+        self.assertGreaterEqual(runtime_arg_binding_match_count, 15)
         self.assertEqual(stop_allowed_actual_activate, 0)
         self.assertLess(blocked_reasons.get("recommended_tools_empty", 0), blocked_reasons.get("activated", 0))
 

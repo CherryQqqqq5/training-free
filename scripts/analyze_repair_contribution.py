@@ -213,9 +213,13 @@ def _validation_policy_fields(payload: dict[str, Any]) -> dict[str, Any]:
             "matched_recommended_tools": [],
             "activation_predicate_status": {},
             "selected_next_tool": None,
+            "selected_action_candidate": None,
             "tool_choice_mode": None,
             "next_tool_emitted": None,
             "next_tool_matches_recommendation": None,
+            "next_tool_args_emitted": None,
+            "next_tool_args_match_binding": None,
+            "arg_binding_validation": {},
         }
     return {
         "policy_hits": [str(item) for item in validation.get("policy_hits") or [] if str(item).strip()],
@@ -232,9 +236,13 @@ def _validation_policy_fields(payload: dict[str, Any]) -> dict[str, Any]:
         ],
         "activation_predicate_status": dict(validation.get("activation_predicate_status") or {}),
         "selected_next_tool": validation.get("selected_next_tool"),
+        "selected_action_candidate": validation.get("selected_action_candidate"),
         "tool_choice_mode": validation.get("tool_choice_mode"),
         "next_tool_emitted": validation.get("next_tool_emitted"),
         "next_tool_matches_recommendation": validation.get("next_tool_matches_recommendation"),
+        "next_tool_args_emitted": validation.get("next_tool_args_emitted"),
+        "next_tool_args_match_binding": validation.get("next_tool_args_match_binding"),
+        "arg_binding_validation": dict(validation.get("arg_binding_validation") or {}),
     }
 
 
@@ -320,9 +328,13 @@ def repair_records(trace_dir: Path, *, run_id: str, success_map: dict[str, Any] 
                     "matched_recommended_tools": policy_fields["matched_recommended_tools"],
                     "activation_predicate_status": policy_fields["activation_predicate_status"],
                     "selected_next_tool": policy_fields["selected_next_tool"],
+                    "selected_action_candidate": policy_fields["selected_action_candidate"],
                     "tool_choice_mode": policy_fields["tool_choice_mode"],
                     "next_tool_emitted": policy_fields["next_tool_emitted"],
                     "next_tool_matches_recommendation": policy_fields["next_tool_matches_recommendation"],
+                    "next_tool_args_emitted": policy_fields["next_tool_args_emitted"],
+                    "next_tool_args_match_binding": policy_fields["next_tool_args_match_binding"],
+                    "arg_binding_validation": policy_fields["arg_binding_validation"],
                     "final_success": success_map.get(case_id),
                 }
             )
@@ -342,6 +354,8 @@ def summarize_repairs(records: list[dict[str, Any]], ablation_acc: dict[str, flo
     policy_family_total: Counter[str] = Counter()
     policy_family_next_tool: Counter[str] = Counter()
     policy_family_match: Counter[str] = Counter()
+    policy_family_arg_emitted: Counter[str] = Counter()
+    policy_family_arg_match: Counter[str] = Counter()
     policy_family_known_success: Counter[str] = Counter()
     policy_family_success: Counter[str] = Counter()
     next_tool_plan_blocked_reasons = Counter(
@@ -358,6 +372,10 @@ def summarize_repairs(records: list[dict[str, Any]], ablation_acc: dict[str, flo
                 policy_family_next_tool[label] += 1
             if record.get("next_tool_matches_recommendation") is True:
                 policy_family_match[label] += 1
+            if record.get("next_tool_args_emitted") is True:
+                policy_family_arg_emitted[label] += 1
+            if record.get("next_tool_args_match_binding") is True:
+                policy_family_arg_match[label] += 1
             if record.get("final_success") is not None:
                 policy_family_known_success[label] += 1
                 if bool(record.get("final_success")):
@@ -434,6 +452,8 @@ def summarize_repairs(records: list[dict[str, Any]], ablation_acc: dict[str, flo
                 "policy_coverage": policy_hits / failure_totals[failure_label] if failure_totals[failure_label] else 0.0,
                 "next_tool_conversion": policy_family_next_tool[failure_label] / policy_hits if policy_hits else 0.0,
                 "recommended_tool_match": policy_family_match[failure_label] / policy_hits if policy_hits else 0.0,
+                "arg_emitted": policy_family_arg_emitted[failure_label] / policy_hits if policy_hits else 0.0,
+                "arg_binding_match": policy_family_arg_match[failure_label] / policy_hits if policy_hits else 0.0,
                 "scorer_success": policy_family_success[failure_label] / known_success if known_success else None,
                 "known_success_count": known_success,
             }
@@ -502,11 +522,11 @@ def main() -> None:
             lines.append(
                 f"| {row['failure_label']} | {row['total_failures']} | {row['compatibility_repair_coverage']:.4f} | {row['decision_adjacent_repair_coverage']:.4f} | {row['unknown_repair_coverage']:.4f} |"
             )
-        lines.extend(["", "## Policy Conversion By Family", "", "| Failure Label | Policy Hits | Policy Coverage | Next-Tool Conversion | Recommended-Tool Match | Scorer Success |", "| --- | ---: | ---: | ---: | ---: | ---: |"])
+        lines.extend(["", "## Policy Conversion By Family", "", "| Failure Label | Policy Hits | Policy Coverage | Next-Tool Conversion | Recommended-Tool Match | Arg Emitted | Arg Binding Match | Scorer Success |", "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"])
         for row in summary["policy_conversion_by_family"]:
             scorer_success = "-" if row["scorer_success"] is None else f"{row['scorer_success']:.4f}"
             lines.append(
-                f"| {row['failure_label']} | {row['policy_hit_count']} | {row['policy_coverage']:.4f} | {row['next_tool_conversion']:.4f} | {row['recommended_tool_match']:.4f} | {scorer_success} |"
+                f"| {row['failure_label']} | {row['policy_hit_count']} | {row['policy_coverage']:.4f} | {row['next_tool_conversion']:.4f} | {row['recommended_tool_match']:.4f} | {row['arg_emitted']:.4f} | {row['arg_binding_match']:.4f} | {scorer_success} |"
             )
         lines.extend(["", "## Next-Tool Plan Diagnostics", "", "| Blocked Reason | Count |", "| --- | ---: |"])
         for reason, count in summary["next_tool_plan_blocked_reason_distribution"].items():

@@ -485,6 +485,7 @@ def _global_decision_policy_for_failure_ir(failure_ir: FailureIR) -> DecisionPol
     policy = DecisionPolicySpec(
         request_predicates=predicates,
         recommended_tools=list(failure_ir.recommended_tools),
+        action_candidates=list(failure_ir.action_candidates),
     )
 
     if "actionable_no_tool_decision" in error_types:
@@ -590,6 +591,7 @@ def _build_global_guard_rules(grouped: DefaultDict[str, List[FailureCase]]) -> L
                 }
             )[:8],
             recommended_tools=_recommended_tools_from_failures(scoped_failures),
+            action_candidates=_action_candidates_from_failures(scoped_failures),
             tool_schema_hash=_tool_schema_hash_from_failures(scoped_failures),
         )
         if error_type == "actionable_no_tool_decision":

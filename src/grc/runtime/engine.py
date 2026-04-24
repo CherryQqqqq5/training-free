@@ -181,6 +181,7 @@ class RuleEngine:
                 bool(getattr(policy, "stop_condition", None)),
                 bool(getattr(policy, "forbidden_terminations", []) or []),
                 bool(getattr(policy, "evidence_requirements", []) or []),
+                bool(getattr(policy, "action_candidates", []) or []),
                 bool(getattr(getattr(policy, "next_tool_policy", None), "recommended_tools", []) or []),
                 bool(getattr(getattr(policy, "next_tool_policy", None), "activation_predicates", []) or []),
             ]
@@ -386,11 +387,35 @@ class RuleEngine:
 
     def _policy_recommended_tools(self, policy: DecisionPolicySpec) -> List[str]:
         recommended = list(getattr(policy, "recommended_tools", []) or [])
+        for candidate in getattr(policy, "action_candidates", []) or []:
+            if not isinstance(candidate, dict):
+                continue
+            for tool_name in candidate.get("recommended_tools") or [candidate.get("tool")]:
+                if tool_name and tool_name not in recommended:
+                    recommended.append(str(tool_name))
         next_tool_policy = getattr(policy, "next_tool_policy", None)
         for tool_name in getattr(next_tool_policy, "recommended_tools", []) or []:
             if tool_name not in recommended:
                 recommended.append(tool_name)
         return recommended
+
+    @staticmethod
+    def _policy_action_candidates(policy: DecisionPolicySpec, selected_tool: str | None = None) -> List[Dict[str, Any]]:
+        candidates: List[Dict[str, Any]] = []
+        for raw in getattr(policy, "action_candidates", []) or []:
+            if not isinstance(raw, dict):
+                continue
+            tool_name = str(raw.get("tool") or "").strip()
+            if not tool_name:
+                recommended = raw.get("recommended_tools") or []
+                tool_name = str(recommended[0]).strip() if recommended else ""
+            if selected_tool and tool_name != selected_tool:
+                continue
+            candidate = dict(raw)
+            if tool_name:
+                candidate["tool"] = tool_name
+            candidates.append(candidate)
+        return candidates
 
     def _next_tool_activation_predicates(self, rule: Rule, policy: DecisionPolicySpec) -> List[str]:
         next_tool_policy = getattr(policy, "next_tool_policy", None)
@@ -422,6 +447,8 @@ class RuleEngine:
             "policy_hits": [],
             "activation_predicates": [],
             "activation_predicate_status": {},
+            "action_candidates": [],
+            "selected_action_candidate": None,
             "confidence": 0.0,
         }
         blocked_priority = {
@@ -492,9 +519,17 @@ class RuleEngine:
             plan["policy_hits"].append(rule.rule_id)
             add_unique("matched_recommended_tools", recommended)
             add_unique("recommended_tools", recommended)
+            for candidate in self._policy_action_candidates(policy):
+                if candidate not in plan["action_candidates"]:
+                    plan["action_candidates"].append(candidate)
+            if plan["selected_action_candidate"] is None:
+                selected_candidates = self._policy_action_candidates(policy, recommended[0])
+                if selected_candidates:
+                    plan["selected_action_candidate"] = selected_candidates[0]
         plan["recommended_tools"] = plan["recommended_tools"][:3]
         plan["matched_recommended_tools"] = plan["matched_recommended_tools"][:3]
         plan["candidate_recommended_tools"] = plan["candidate_recommended_tools"][:5]
+        plan["action_candidates"] = plan["action_candidates"][:5]
         if not plan["activated"]:
             plan["blocked_reason"] = blocked_reason
         return plan
@@ -746,6 +781,40 @@ class RuleEngine:
             return False
         return not self._has_explicit_no_tool_recovery(issue_kind, rule_hits)
 
+    @staticmethod
+    def _validate_action_candidate_args(candidate: Dict[str, Any], observed_args: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
+        bindings = candidate.get("arg_bindings") if isinstance(candidate.get("arg_bindings"), dict) else {}
+        expected_args = candidate.get("args") if isinstance(candidate.get("args"), dict) else {}
+        fields = list(dict.fromkeys(list(expected_args.keys()) + list(bindings.keys())))
+        validation: Dict[str, Dict[str, Any]] = {}
+        for field in fields:
+            binding = bindings.get(field) if isinstance(bindings.get(field), dict) else {}
+            expected = binding.get("value", expected_args.get(field))
+            observed = observed_args.get(field)
+            validation[str(field)] = {
+                "expected": expected,
+                "observed": observed,
+                "source": binding.get("source") or candidate.get("binding_source") or "action_candidate.args",
+                "match": observed == expected,
+            }
+        return validation
+
+    @staticmethod
+    def _selected_tool_call_args(tool_calls: List[Dict[str, Any]], selected_tool: str) -> Dict[str, Any] | None:
+        for call in tool_calls:
+            if not isinstance(call, dict):
+                continue
+            function = call.get("function", {})
+            if not isinstance(function, dict) or function.get("name") != selected_tool:
+                continue
+            raw_args = function.get("arguments", "{}")
+            try:
+                parsed = parse_loose_json(raw_args) if isinstance(raw_args, str) else raw_args
+            except Exception:
+                return None
+            return parsed if isinstance(parsed, dict) else None
+        return None
+
     def _coerce_no_tool_text_to_empty(self, message: Dict[str, Any], issue_kind: str) -> List[Dict[str, Any]]:
         content = message.get("content")
         if not isinstance(content, str) or not content.strip():
@@ -928,6 +997,9 @@ class RuleEngine:
             selected_tool = plan.get("selected_tool")
             if selected_tool:
                 validation.selected_next_tool = str(selected_tool)
+            selected_action_candidate = plan.get("selected_action_candidate")
+            if isinstance(selected_action_candidate, dict):
+                validation.selected_action_candidate = dict(selected_action_candidate)
             mode = str(plan.get("tool_choice_mode") or "").strip()
             if validation.selected_next_tool and mode:
                 validation.tool_choice_mode = mode
@@ -1110,6 +1182,20 @@ class RuleEngine:
                     validation.next_tool_emitted = any(bool(name) for name in emitted_names)
                 if validation.next_tool_matches_recommendation is not True:
                     validation.next_tool_matches_recommendation = validation.selected_next_tool in emitted_names
+                if validation.selected_action_candidate:
+                    selected_args = self._selected_tool_call_args(tool_calls, validation.selected_next_tool)
+                    validation.next_tool_args_emitted = selected_args is not None
+                    if selected_args is None:
+                        validation.next_tool_args_match_binding = False
+                    if selected_args is not None:
+                        validation.arg_binding_validation = self._validate_action_candidate_args(
+                            validation.selected_action_candidate,
+                            selected_args,
+                        )
+                        if validation.arg_binding_validation:
+                            validation.next_tool_args_match_binding = all(
+                                bool(row.get("match")) for row in validation.arg_binding_validation.values()
+                            )
             msg["tool_calls"] = tool_calls
             choice["message"] = msg
 

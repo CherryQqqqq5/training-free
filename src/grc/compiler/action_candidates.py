@@ -61,6 +61,40 @@ def _literal_for_tool(state: ToolState, tool_name: str) -> str | None:
     return state.explicit_literals[0]
 
 
+def _read_file_value(state: ToolState) -> tuple[str | None, str, dict[str, Any]]:
+    match_value = first_match_basename(state)
+    if match_value:
+        return (
+            match_value,
+            "prior_tool_output.matches[0]|basename",
+            {"last_tool": state.last_tool, "prior_output_keys": state.prior_output_keys},
+        )
+    file_literals = [item for item in state.explicit_literals if "." in item]
+    if file_literals:
+        return (
+            file_literals[0],
+            "explicit_literal",
+            {"explicit_literals": state.explicit_literals, "intent": state.user_intent_family},
+        )
+    lowered = state.latest_user_text.lower()
+    for output in state.prior_tool_outputs:
+        entries = output.content.get("entries") if isinstance(output.content, dict) else None
+        if not isinstance(entries, list):
+            continue
+        for entry in entries:
+            if not isinstance(entry, str) or "." not in entry:
+                continue
+            basename = entry.rstrip("/").split("/")[-1]
+            stem = basename.rsplit(".", 1)[0].lower()
+            if basename.lower() in lowered or stem in lowered:
+                return (
+                    basename,
+                    "prior_tool_output.entries|basename",
+                    {"last_tool": state.last_tool, "prior_output_keys": state.prior_output_keys},
+                )
+    return None, "", {}
+
+
 def _candidate(tool: str, arg_name: str | None, value: str | None, *, reason: str, evidence: dict[str, Any], source: str) -> ActionCandidate:
     args = {arg_name: value} if arg_name and value is not None else {}
     bindings = (
@@ -93,7 +127,7 @@ def generate_action_candidates(state: ToolState, tool_schemas: dict[str, dict[st
 
     candidates: list[ActionCandidate] = []
     if state.user_intent_family == "read_file_content" and _has_tool(state, "cat"):
-        file_name = first_match_basename(state)
+        file_name, source, evidence = _read_file_value(state)
         if file_name:
             arg_name = _first_required_arg(schemas["cat"], ["file_name", "filename", "path"])
             candidates.append(
@@ -102,8 +136,8 @@ def generate_action_candidates(state: ToolState, tool_schemas: dict[str, dict[st
                     arg_name,
                     file_name,
                     reason="prior find/list output has a concrete match and the user asks to read content",
-                    evidence={"last_tool": state.last_tool, "prior_output_keys": state.prior_output_keys},
-                    source="prior_tool_output.matches[0]|basename",
+                    evidence=evidence,
+                    source=source,
                 )
             )
             return candidates

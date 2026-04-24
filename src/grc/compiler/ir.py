@@ -50,6 +50,7 @@ class NextToolPolicySpec(BaseModel):
 class DecisionPolicySpec(BaseModel):
     request_predicates: List[str] = Field(default_factory=list)
     recommended_tools: List[str] = Field(default_factory=list)
+    action_candidates: List[Dict[str, Any]] = Field(default_factory=list)
     continue_condition: Optional[str] = None
     stop_condition: Optional[str] = None
     forbidden_terminations: List[str] = Field(default_factory=list)
@@ -185,9 +186,13 @@ class ValidationRecord(BaseModel):
     matched_recommended_tools: List[str] = Field(default_factory=list)
     activation_predicate_status: Dict[str, bool] = Field(default_factory=dict)
     selected_next_tool: Optional[str] = None
+    selected_action_candidate: Optional[Dict[str, Any]] = None
     tool_choice_mode: Optional[str] = None
     next_tool_emitted: Optional[bool] = None
     next_tool_matches_recommendation: Optional[bool] = None
+    next_tool_args_emitted: Optional[bool] = None
+    next_tool_args_match_binding: Optional[bool] = None
+    arg_binding_validation: Dict[str, Dict[str, Any]] = Field(default_factory=dict)
 
 
 class PatchBundle(BaseModel):

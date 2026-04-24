@@ -11,7 +11,10 @@ _INJECTED_YAML_STUB = False
 try:
     import yaml as _yaml  # noqa: F401
 except ModuleNotFoundError:
-    sys.modules["yaml"] = types.SimpleNamespace(safe_load=lambda _: {})
+    sys.modules["yaml"] = types.SimpleNamespace(
+        safe_dump=lambda data, **_: json.dumps(data, ensure_ascii=False, indent=2),
+        safe_load=json.loads,
+    )
     _INJECTED_YAML_STUB = True
 
 from scripts.build_next_action_smoke_report import evaluate_cases, load_cases, render_markdown
@@ -30,6 +33,8 @@ class NextActionSmokeTests(unittest.TestCase):
         self.assertEqual(summary["case_count"], 20)
         self.assertEqual(summary["passed_count"], 20)
         self.assertGreaterEqual(summary["expected_activation_rate"], 0.8)
+        self.assertEqual(summary["selected_tool_match_count"], 15)
+        self.assertEqual(summary["stop_allowed_false_positive_count"], 0)
         self.assertEqual(summary["family_summary"]["stop_allowed"]["actual_activate"], 0)
         for family in ["find_to_cat", "path_sensitive_action", "explicit_literal_arg"]:
             self.assertEqual(summary["family_summary"][family]["actual_activate"], 5)
@@ -48,9 +53,23 @@ class NextActionSmokeTests(unittest.TestCase):
             markdown = md_path.read_text(encoding="utf-8")
 
         self.assertEqual(loaded["blocked_reason_distribution"], {"activated": 15, "no_policy_candidate": 5})
+        self.assertIn("arg_binding_match_count", loaded)
         self.assertIn("## Family Summary", markdown)
         self.assertIn("## Blocked Reasons", markdown)
         self.assertIn("| stop_allowed | 5 | 5 | 0 | 0 |", markdown)
+        self.assertIn("Arg binding matches", markdown)
+
+    def test_compiler_generated_report_counts_arg_binding_matches(self) -> None:
+        summary = evaluate_cases(load_cases(FIXTURES_DIR), compiler_generated=True)
+
+        self.assertEqual(summary["mode"], "compiler_generated")
+        self.assertEqual(summary["case_count"], 20)
+        self.assertEqual(summary["passed_count"], 20)
+        self.assertEqual(summary["action_candidate_count"], 15)
+        self.assertGreaterEqual(summary["arg_binding_present_count"], 15)
+        self.assertEqual(summary["selected_tool_match_count"], 15)
+        self.assertGreaterEqual(summary["arg_binding_match_count"], 15)
+        self.assertEqual(summary["stop_allowed_false_positive_count"], 0)
 
 
 if __name__ == "__main__":

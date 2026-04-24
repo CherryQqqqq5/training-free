@@ -85,6 +85,7 @@ action:
         recommended_tools=None,
         request_predicates=None,
         activation_predicates=None,
+        action_candidates=None,
     ) -> Rule:
         recommended_tools = list(recommended_tools or [])
         request_predicates = list(request_predicates or ["tools_available", "prior_explicit_literals_present"])
@@ -100,6 +101,7 @@ action:
                 decision_policy={
                     "request_predicates": request_predicates,
                     "recommended_tools": recommended_tools,
+                    "action_candidates": list(action_candidates or []),
                     "next_tool_policy": {
                         "activation_predicates": activation_predicates,
                         "recommended_tools": recommended_tools,
@@ -1821,6 +1823,99 @@ action:
         self.assertEqual(validation.tool_choice_mode, "required")
         self.assertTrue(validation.next_tool_emitted)
         self.assertTrue(validation.next_tool_matches_recommendation)
+
+    def test_next_tool_arg_binding_validation_records_match(self) -> None:
+        action_candidate = {
+            "tool": "move_file",
+            "args": {"file_name": "report.txt"},
+            "arg_bindings": {
+                "file_name": {
+                    "source": "explicit_literal",
+                    "value": "report.txt",
+                }
+            },
+            "recommended_tools": ["move_file"],
+        }
+        rule = self._next_tool_rule(recommended_tools=["move_file"], action_candidates=[action_candidate])
+        request = self._make_move_file_request()
+        response = {
+            "choices": [
+                {
+                    "message": {
+                        "role": "assistant",
+                        "content": None,
+                        "tool_calls": [
+                            {
+                                "id": "c1",
+                                "type": "function",
+                                "function": {"name": "move_file", "arguments": "{\"file_name\":\"report.txt\"}"},
+                            }
+                        ],
+                    }
+                }
+            ]
+        }
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir, runtime_policy={"enable_required_next_tool_choice": True})
+            engine.rules = [rule]
+            patched, request_patches = engine.apply_request(request)
+            _, _, validation = engine.apply_response(patched, response, request_patches=request_patches)
+
+        self.assertTrue(validation.next_tool_plan_activated)
+        self.assertEqual(validation.selected_action_candidate["tool"], "move_file")
+        self.assertTrue(validation.next_tool_args_emitted)
+        self.assertTrue(validation.next_tool_args_match_binding)
+        self.assertEqual(
+            validation.arg_binding_validation["file_name"],
+            {
+                "expected": "report.txt",
+                "observed": "report.txt",
+                "source": "explicit_literal",
+                "match": True,
+            },
+        )
+
+    def test_next_tool_arg_binding_validation_records_mismatch(self) -> None:
+        action_candidate = {
+            "tool": "move_file",
+            "args": {"file_name": "report.txt"},
+            "arg_bindings": {
+                "file_name": {
+                    "source": "explicit_literal",
+                    "value": "report.txt",
+                }
+            },
+            "recommended_tools": ["move_file"],
+        }
+        rule = self._next_tool_rule(recommended_tools=["move_file"], action_candidates=[action_candidate])
+        request = self._make_move_file_request()
+        response = {
+            "choices": [
+                {
+                    "message": {
+                        "role": "assistant",
+                        "content": None,
+                        "tool_calls": [
+                            {
+                                "id": "c1",
+                                "type": "function",
+                                "function": {"name": "move_file", "arguments": "{\"file_name\":\"wrong.txt\"}"},
+                            }
+                        ],
+                    }
+                }
+            ]
+        }
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir, runtime_policy={"enable_required_next_tool_choice": True})
+            engine.rules = [rule]
+            patched, request_patches = engine.apply_request(request)
+            _, _, validation = engine.apply_response(patched, response, request_patches=request_patches)
+
+        self.assertTrue(validation.next_tool_args_emitted)
+        self.assertFalse(validation.next_tool_args_match_binding)
+        self.assertEqual(validation.arg_binding_validation["file_name"]["observed"], "wrong.txt")
+        self.assertFalse(validation.arg_binding_validation["file_name"]["match"])
 
 
     def test_true_empty_tool_call_still_records_failure(self) -> None:
