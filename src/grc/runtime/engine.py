@@ -31,6 +31,12 @@ from grc.utils.text_tool_calls import parse_text_tool_calls
 from grc.utils.tool_schema import tool_map_from_tools_payload
 
 
+class RequestPatchList(list):
+    def __init__(self, values: List[str] | None = None, *, next_tool_plan: Dict[str, Any] | None = None):
+        super().__init__(values or [])
+        self.next_tool_plan = next_tool_plan or {}
+
+
 class RuleEngine:
     def __init__(self, rules_dir: str, runtime_policy: Dict[str, Any] | None = None):
         self.rules_dir = Path(rules_dir)
@@ -400,18 +406,53 @@ class RuleEngine:
         return predicates
 
     def _next_tool_policy_plan(self, request_json: Dict[str, Any]) -> Dict[str, Any]:
-        request_tool_names = set(self._tool_schema_map(request_json).keys())
+        request_tool_names = sorted(self._tool_schema_map(request_json).keys())
+        request_tool_name_set = set(request_tool_names)
         observed_predicates = self._observable_request_predicates(request_json)
         plan: Dict[str, Any] = {
+            "attempted": True,
             "activated": False,
+            "blocked_reason": None,
+            "available_tools": request_tool_names,
+            "candidate_recommended_tools": [],
+            "matched_recommended_tools": [],
             "recommended_tools": [],
             "selected_tool": None,
             "tool_choice_mode": "soft",
             "policy_hits": [],
             "activation_predicates": [],
+            "activation_predicate_status": {},
             "confidence": 0.0,
         }
+        blocked_priority = {
+            "no_policy_candidate": 1,
+            "request_predicates_unmet": 2,
+            "activation_predicates_unmet": 3,
+            "recommended_tools_empty": 4,
+            "recommended_tools_not_in_schema": 5,
+            "activated": 99,
+        }
+        blocked_reason = "no_policy_candidate"
+        blocked_rank = blocked_priority[blocked_reason]
+
+        def mark_blocked(reason: str) -> None:
+            nonlocal blocked_reason, blocked_rank
+            rank = blocked_priority.get(reason, 0)
+            if rank >= blocked_rank:
+                blocked_reason = reason
+                blocked_rank = rank
+
+        def record_predicates(predicates: List[str]) -> None:
+            for predicate in predicates:
+                plan["activation_predicate_status"][predicate] = predicate in observed_predicates
+
+        def add_unique(field: str, values: List[str]) -> None:
+            for value in values:
+                if value and value not in plan[field]:
+                    plan[field].append(value)
+
         if not request_tool_names:
+            plan["blocked_reason"] = "no_tools_available"
             return plan
         for rule in self.rules:
             patch_sites = set(rule.scope.patch_sites)
@@ -420,31 +461,42 @@ class RuleEngine:
             policy = self._rule_decision_policy(rule)
             if policy is None:
                 continue
-            if not self._request_predicates_met(self._rule_request_predicates(rule), request_json):
+            raw_recommended = self._policy_recommended_tools(policy)
+            add_unique("candidate_recommended_tools", raw_recommended)
+            rule_predicates = self._rule_request_predicates(rule)
+            record_predicates(rule_predicates)
+            if not set(rule_predicates).issubset(observed_predicates):
+                mark_blocked("request_predicates_unmet")
                 continue
             activation_predicates = self._next_tool_activation_predicates(rule, policy)
+            record_predicates(activation_predicates)
             if not set(activation_predicates).issubset(observed_predicates):
+                mark_blocked("activation_predicates_unmet")
                 continue
-            recommended = [
-                tool_name
-                for tool_name in self._policy_recommended_tools(policy)
-                if tool_name in request_tool_names
-            ]
+            if not raw_recommended:
+                mark_blocked("recommended_tools_empty")
+                continue
+            recommended = [tool_name for tool_name in raw_recommended if tool_name in request_tool_name_set]
             if not recommended:
+                mark_blocked("recommended_tools_not_in_schema")
                 continue
             next_tool_policy = getattr(policy, "next_tool_policy", None)
             mode = str(getattr(next_tool_policy, "tool_choice_mode", None) or "soft")
             confidence = float(getattr(next_tool_policy, "confidence", 0.0) or 0.0)
             plan["activated"] = True
+            plan["blocked_reason"] = "activated"
             plan["selected_tool"] = plan["selected_tool"] or recommended[0]
             plan["tool_choice_mode"] = "required" if mode == "required" else "soft"
             plan["confidence"] = max(float(plan["confidence"]), confidence)
             plan["activation_predicates"] = list(dict.fromkeys(plan["activation_predicates"] + activation_predicates))
             plan["policy_hits"].append(rule.rule_id)
-            for tool_name in recommended:
-                if tool_name not in plan["recommended_tools"]:
-                    plan["recommended_tools"].append(tool_name)
+            add_unique("matched_recommended_tools", recommended)
+            add_unique("recommended_tools", recommended)
         plan["recommended_tools"] = plan["recommended_tools"][:3]
+        plan["matched_recommended_tools"] = plan["matched_recommended_tools"][:3]
+        plan["candidate_recommended_tools"] = plan["candidate_recommended_tools"][:5]
+        if not plan["activated"]:
+            plan["blocked_reason"] = blocked_reason
         return plan
 
     def _recommended_policy_tools(self, request_json: Dict[str, Any]) -> List[str]:
@@ -597,7 +649,7 @@ class RuleEngine:
         patched = copy.deepcopy(request_json)
         next_tool_plan = self._next_tool_policy_plan(patched)
         fragments = self._collect_prompt_fragments(patched)
-        request_patches: List[str] = []
+        request_patches = RequestPatchList(next_tool_plan=next_tool_plan)
         policy_request_patches: List[str] = []
 
         if next_tool_plan.get("activated"):
@@ -844,11 +896,41 @@ class RuleEngine:
         request_json: Dict[str, Any],
         response_json: Dict[str, Any],
         request_patches: List[str] | None = None,
+        next_tool_plan: Dict[str, Any] | None = None,
     ) -> Tuple[Dict[str, Any], List[Dict[str, Any]], ValidationRecord]:
         final_response = copy.deepcopy(response_json)
         tool_schema_map = self._tool_schema_map(request_json)
         all_repairs: List[Dict[str, Any]] = []
         validation = ValidationRecord()
+        plan = next_tool_plan
+        if plan is None and request_patches is not None:
+            plan = getattr(request_patches, "next_tool_plan", None)
+        if isinstance(plan, dict) and plan:
+            validation.next_tool_plan_attempted = bool(plan.get("attempted", True))
+            validation.next_tool_plan_activated = bool(plan.get("activated", False))
+            validation.next_tool_plan_blocked_reason = str(plan.get("blocked_reason") or "").strip() or None
+            validation.available_tools = [str(item) for item in plan.get("available_tools") or [] if str(item).strip()]
+            validation.candidate_recommended_tools = [
+                str(item) for item in plan.get("candidate_recommended_tools") or [] if str(item).strip()
+            ]
+            validation.matched_recommended_tools = [
+                str(item) for item in plan.get("matched_recommended_tools") or [] if str(item).strip()
+            ]
+            predicate_status = plan.get("activation_predicate_status") or {}
+            if isinstance(predicate_status, dict):
+                validation.activation_predicate_status = {
+                    str(key): bool(value) for key, value in predicate_status.items() if str(key).strip()
+                }
+            validation.policy_hits.extend(str(item) for item in plan.get("policy_hits") or [] if str(item).strip())
+            validation.recommended_tools.extend(
+                str(item) for item in plan.get("recommended_tools") or [] if str(item).strip()
+            )
+            selected_tool = plan.get("selected_tool")
+            if selected_tool:
+                validation.selected_next_tool = str(selected_tool)
+            mode = str(plan.get("tool_choice_mode") or "").strip()
+            if validation.selected_next_tool and mode:
+                validation.tool_choice_mode = mode
         validation.request_patches = list(request_patches or [])
         for patch in validation.request_patches:
             if patch.startswith("policy_hit:"):

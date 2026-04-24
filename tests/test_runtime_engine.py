@@ -79,6 +79,37 @@ action:
             ],
         }
 
+    def _next_tool_rule(
+        self,
+        *,
+        recommended_tools=None,
+        request_predicates=None,
+        activation_predicates=None,
+    ) -> Rule:
+        recommended_tools = list(recommended_tools or [])
+        request_predicates = list(request_predicates or ["tools_available", "prior_explicit_literals_present"])
+        activation_predicates = list(activation_predicates or request_predicates)
+        return Rule(
+            rule_id="rule_next_tool_policy",
+            trigger=MatchSpec(
+                error_types=["actionable_no_tool_decision"],
+                request_predicates=request_predicates,
+            ),
+            scope=PatchScope(patch_sites=["prompt_injector", "policy_executor"]),
+            action=RuleAction(
+                decision_policy={
+                    "request_predicates": request_predicates,
+                    "recommended_tools": recommended_tools,
+                    "next_tool_policy": {
+                        "activation_predicates": activation_predicates,
+                        "recommended_tools": recommended_tools,
+                        "tool_choice_mode": "required",
+                        "confidence": 0.8,
+                    },
+                }
+            ),
+        )
+
     def _make_text_response(self, content: str | None) -> dict:
         return {
             "choices": [
@@ -1615,26 +1646,7 @@ action:
         )
 
     def test_required_next_tool_choice_is_config_gated(self) -> None:
-        rule = Rule(
-            rule_id="rule_next_tool_policy",
-            trigger=MatchSpec(
-                error_types=["actionable_no_tool_decision"],
-                request_predicates=["tools_available", "prior_explicit_literals_present"],
-            ),
-            scope=PatchScope(patch_sites=["prompt_injector", "policy_executor"]),
-            action=RuleAction(
-                decision_policy={
-                    "request_predicates": ["tools_available", "prior_explicit_literals_present"],
-                    "recommended_tools": ["move_file"],
-                    "next_tool_policy": {
-                        "activation_predicates": ["tools_available", "prior_explicit_literals_present"],
-                        "recommended_tools": ["move_file"],
-                        "tool_choice_mode": "required",
-                        "confidence": 0.8,
-                    },
-                }
-            ),
-        )
+        rule = self._next_tool_rule(recommended_tools=["move_file"])
         with tempfile.TemporaryDirectory() as rules_dir:
             engine = RuleEngine(rules_dir)
             engine.rules = [rule]
@@ -1651,6 +1663,88 @@ action:
 
         self.assertEqual(patched["tool_choice"], "required")
         self.assertIn("tool_choice:required(policy_next_tool)", request_patches)
+
+    def test_next_tool_plan_records_no_tools_available(self) -> None:
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir)
+            request = {"model": "demo-model", "messages": [{"role": "user", "content": "hello"}]}
+            response = {"choices": [{"message": {"role": "assistant", "content": "hello"}}]}
+            patched, request_patches = engine.apply_request(request)
+            _, _, validation = engine.apply_response(patched, response, request_patches=request_patches)
+
+        self.assertTrue(validation.next_tool_plan_attempted)
+        self.assertFalse(validation.next_tool_plan_activated)
+        self.assertEqual(validation.next_tool_plan_blocked_reason, "no_tools_available")
+        self.assertEqual(validation.available_tools, [])
+
+    def test_next_tool_plan_records_request_predicates_unmet(self) -> None:
+        rule = self._next_tool_rule(recommended_tools=["move_file"])
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir)
+            engine.rules = [rule]
+            request = self._make_move_file_request(messages=[{"role": "user", "content": "Move it."}])
+            response = {"choices": [{"message": {"role": "assistant", "content": "Done"}}]}
+            patched, request_patches = engine.apply_request(request)
+            _, _, validation = engine.apply_response(patched, response, request_patches=request_patches)
+
+        self.assertTrue(validation.next_tool_plan_attempted)
+        self.assertFalse(validation.next_tool_plan_activated)
+        self.assertEqual(validation.next_tool_plan_blocked_reason, "request_predicates_unmet")
+        self.assertEqual(validation.candidate_recommended_tools, ["move_file"])
+        self.assertFalse(validation.activation_predicate_status["prior_explicit_literals_present"])
+
+    def test_next_tool_plan_records_activation_predicates_unmet(self) -> None:
+        rule = self._next_tool_rule(
+            recommended_tools=["move_file"],
+            request_predicates=["tools_available"],
+            activation_predicates=["tools_available", "prior_tool_outputs_present"],
+        )
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir)
+            engine.rules = [rule]
+            response = {"choices": [{"message": {"role": "assistant", "content": "Done"}}]}
+            patched, request_patches = engine.apply_request(self._make_move_file_request())
+            _, _, validation = engine.apply_response(patched, response, request_patches=request_patches)
+
+        self.assertFalse(validation.next_tool_plan_activated)
+        self.assertEqual(validation.next_tool_plan_blocked_reason, "activation_predicates_unmet")
+        self.assertTrue(validation.activation_predicate_status["tools_available"])
+        self.assertFalse(validation.activation_predicate_status["prior_tool_outputs_present"])
+
+    def test_next_tool_plan_records_empty_recommended_tools(self) -> None:
+        rule = self._next_tool_rule(
+            recommended_tools=[],
+            request_predicates=["tools_available"],
+            activation_predicates=["tools_available"],
+        )
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir)
+            engine.rules = [rule]
+            response = {"choices": [{"message": {"role": "assistant", "content": "Done"}}]}
+            patched, request_patches = engine.apply_request(self._make_move_file_request())
+            _, _, validation = engine.apply_response(patched, response, request_patches=request_patches)
+
+        self.assertFalse(validation.next_tool_plan_activated)
+        self.assertEqual(validation.next_tool_plan_blocked_reason, "recommended_tools_empty")
+        self.assertEqual(validation.candidate_recommended_tools, [])
+
+    def test_next_tool_plan_records_recommended_tools_not_in_schema(self) -> None:
+        rule = self._next_tool_rule(
+            recommended_tools=["copy_file"],
+            request_predicates=["tools_available"],
+            activation_predicates=["tools_available"],
+        )
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir)
+            engine.rules = [rule]
+            response = {"choices": [{"message": {"role": "assistant", "content": "Done"}}]}
+            patched, request_patches = engine.apply_request(self._make_move_file_request())
+            _, _, validation = engine.apply_response(patched, response, request_patches=request_patches)
+
+        self.assertFalse(validation.next_tool_plan_activated)
+        self.assertEqual(validation.next_tool_plan_blocked_reason, "recommended_tools_not_in_schema")
+        self.assertEqual(validation.candidate_recommended_tools, ["copy_file"])
+        self.assertEqual(validation.matched_recommended_tools, [])
 
     def test_next_tool_conversion_fields_are_recorded(self) -> None:
         request = self._make_move_file_request()
@@ -1689,6 +1783,45 @@ action:
         self.assertEqual(validation.selected_next_tool, "move_file")
         self.assertTrue(validation.next_tool_emitted)
         self.assertTrue(validation.next_tool_matches_recommendation)
+
+    def test_next_tool_plan_activation_diagnostics_are_recorded(self) -> None:
+        rule = self._next_tool_rule(recommended_tools=["move_file"])
+        request = self._make_move_file_request()
+        response = {
+            "choices": [
+                {
+                    "message": {
+                        "role": "assistant",
+                        "content": None,
+                        "tool_calls": [
+                            {
+                                "id": "c1",
+                                "type": "function",
+                                "function": {"name": "move_file", "arguments": "{\"file_name\":\"report.txt\"}"},
+                            }
+                        ],
+                    }
+                }
+            ]
+        }
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir, runtime_policy={"enable_required_next_tool_choice": True})
+            engine.rules = [rule]
+            patched, request_patches = engine.apply_request(request)
+            _, _, validation = engine.apply_response(patched, response, request_patches=request_patches)
+
+        self.assertEqual(patched["tool_choice"], "required")
+        self.assertTrue(validation.next_tool_plan_attempted)
+        self.assertTrue(validation.next_tool_plan_activated)
+        self.assertEqual(validation.next_tool_plan_blocked_reason, "activated")
+        self.assertEqual(validation.available_tools, ["move_file"])
+        self.assertEqual(validation.candidate_recommended_tools, ["move_file"])
+        self.assertEqual(validation.matched_recommended_tools, ["move_file"])
+        self.assertEqual(validation.selected_next_tool, "move_file")
+        self.assertEqual(validation.tool_choice_mode, "required")
+        self.assertTrue(validation.next_tool_emitted)
+        self.assertTrue(validation.next_tool_matches_recommendation)
+
 
     def test_true_empty_tool_call_still_records_failure(self) -> None:
         with tempfile.TemporaryDirectory() as rules_dir:

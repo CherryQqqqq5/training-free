@@ -87,6 +87,13 @@ class RepairAttributionTests(unittest.TestCase):
                             "issues": [{"kind": "actionable_no_tool_decision"}],
                             "policy_hits": ["rule_next_tool_policy"],
                             "recommended_tools": ["lookup_file"],
+                            "next_tool_plan_attempted": True,
+                            "next_tool_plan_activated": True,
+                            "next_tool_plan_blocked_reason": "activated",
+                            "available_tools": ["lookup_file"],
+                            "candidate_recommended_tools": ["lookup_file"],
+                            "matched_recommended_tools": ["lookup_file"],
+                            "activation_predicate_status": {"tools_available": True},
                             "selected_next_tool": "lookup_file",
                             "tool_choice_mode": "soft",
                             "next_tool_emitted": True,
@@ -113,3 +120,35 @@ class RepairAttributionTests(unittest.TestCase):
         self.assertEqual(summary["policy_conversion_by_family"][0]["next_tool_conversion"], 1.0)
         self.assertEqual(summary["policy_conversion_by_family"][0]["recommended_tool_match"], 1.0)
         self.assertEqual(summary["policy_conversion_by_family"][0]["scorer_success"], 1.0)
+        self.assertEqual(records[0]["next_tool_plan_blocked_reason"], "activated")
+        self.assertEqual(summary["next_tool_plan_blocked_reason_distribution"], {"activated": 1})
+
+    def test_summarizes_next_tool_blocked_reasons_without_policy_hits(self) -> None:
+        records = [
+            {
+                "failure_label": "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+                "repairs_applied": [],
+                "final_success": None,
+                "policy_hits": [],
+                "next_tool_plan_attempted": True,
+                "next_tool_plan_activated": False,
+                "next_tool_plan_blocked_reason": "recommended_tools_empty",
+            },
+            {
+                "failure_label": "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+                "repairs_applied": [],
+                "final_success": None,
+                "policy_hits": [],
+                "next_tool_plan_attempted": True,
+                "next_tool_plan_activated": False,
+                "next_tool_plan_blocked_reason": "activation_predicates_unmet",
+            },
+        ]
+
+        summary = summarize_repairs(records)
+
+        self.assertEqual(summary["policy_conversion_by_family"], [])
+        self.assertEqual(
+            summary["next_tool_plan_blocked_reason_distribution"],
+            {"activation_predicates_unmet": 1, "recommended_tools_empty": 1},
+        )

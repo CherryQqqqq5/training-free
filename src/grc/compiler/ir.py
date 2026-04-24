@@ -175,6 +175,13 @@ class ValidationRecord(BaseModel):
     request_patches: List[str] = Field(default_factory=list)
     policy_hits: List[str] = Field(default_factory=list)
     recommended_tools: List[str] = Field(default_factory=list)
+    next_tool_plan_attempted: bool = False
+    next_tool_plan_activated: bool = False
+    next_tool_plan_blocked_reason: Optional[str] = None
+    available_tools: List[str] = Field(default_factory=list)
+    candidate_recommended_tools: List[str] = Field(default_factory=list)
+    matched_recommended_tools: List[str] = Field(default_factory=list)
+    activation_predicate_status: Dict[str, bool] = Field(default_factory=dict)
     selected_next_tool: Optional[str] = None
     tool_choice_mode: Optional[str] = None
     next_tool_emitted: Optional[bool] = None
