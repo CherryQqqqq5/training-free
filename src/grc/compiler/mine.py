@@ -10,7 +10,9 @@ from grc.compiler.failure_taxonomy import (
     classify_error_type,
     classify_no_tool_failure,
 )
+from grc.compiler.action_candidates import generate_action_candidates
 from grc.compiler.failure_signature import tool_schema_hash
+from grc.compiler.tool_state import extract_tool_state
 from grc.types import FailureCase
 from grc.utils.jsonfix import parse_loose_json
 from grc.utils.text_tool_calls import (
@@ -391,6 +393,16 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
         tool_map = _tool_schema_map(data)
         schema_hash = tool_schema_hash(tool_map)
         explicit_literals = _explicit_context_literals(data)
+        tool_state = extract_tool_state(data)
+        if not explicit_literals and tool_state.explicit_literals:
+            explicit_literals = list(tool_state.explicit_literals)
+        action_candidates = [candidate.to_dict() for candidate in generate_action_candidates(tool_state, tool_map)]
+        candidate_recommended_tools = [
+            tool
+            for candidate in action_candidates
+            for tool in candidate.get("recommended_tools", [])
+            if isinstance(tool, str) and tool.strip()
+        ]
         seen_failure_keys: set[tuple[str, int, str, str, str | None]] = set()
         inferred_no_tool_call_kind: str | None = None
         inferred_no_tool_subfamily: str | None = None
@@ -398,7 +410,9 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
         inferred_no_tool_predicates: list[str] = []
         redundant_clarification_detected = False
         raw_implies_text_tool_call = False
-        recommended_tools = _rank_recommended_tools(data, tool_map, explicit_literals)
+        recommended_tools = list(dict.fromkeys(candidate_recommended_tools)) or (
+            [] if tool_state.stop_allowed else _rank_recommended_tools(data, tool_map, explicit_literals)
+        )
 
         def record_failure(case: FailureCase) -> None:
             # Validation issues can mirror failures already inferable from the raw response.
@@ -424,6 +438,10 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
                         "predicate_evidence": case.predicate_evidence or classification.predicate_evidence,
                     }
                 )
+            if not case.recommended_tools and recommended_tools:
+                updates["recommended_tools"] = recommended_tools
+            if not case.action_candidates and action_candidates:
+                updates["action_candidates"] = action_candidates
             if updates:
                 case = case.model_copy(update=updates)
             failures.append(case)
@@ -472,6 +490,18 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
                     explicit_literals=explicit_literals,
                     redundant_clarification_detected=redundant_clarification_detected,
                 )
+                if action_candidates and inferred_no_tool_subfamily in {"empty_tool_call", "empty_completion"}:
+                    inferred_no_tool_subfamily = "actionable_no_tool_decision"
+                    inferred_no_tool_predicates = ["tools_available"]
+                    if tool_state.explicit_literals:
+                        inferred_no_tool_predicates.append("prior_explicit_literals_present")
+                    if tool_state.prior_tool_outputs:
+                        inferred_no_tool_predicates.append("prior_tool_outputs_present")
+                    inferred_no_tool_classification = classify_error_type(
+                        "actionable_no_tool_decision",
+                        request_predicates=inferred_no_tool_predicates,
+                        has_prior_tool_output=bool(tool_state.prior_tool_outputs),
+                    )
 
             if tool_map and not tool_calls:
                 if inferred_no_tool_subfamily:
@@ -498,7 +528,7 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
                             ),
                             request_predicates=inferred_no_tool_predicates,
                             request_literals=(
-                                list(explicit_literals)
+                                list(explicit_literals or tool_state.explicit_literals)
                                 if inferred_no_tool_subfamily == "actionable_no_tool_decision"
                                 else []
                             ),
@@ -508,6 +538,7 @@ def mine_failures(trace_dir: str) -> List[FailureCase]:
                                 else {}
                             ),
                             recommended_tools=recommended_tools,
+                            action_candidates=action_candidates,
                         )
                     )
 

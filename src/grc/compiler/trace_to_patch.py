@@ -111,6 +111,21 @@ def _recommended_tools_from_failures(failures: List[FailureCase]) -> List[str]:
     return recommended[:3]
 
 
+def _action_candidates_from_failures(failures: List[FailureCase]) -> List[dict]:
+    candidates: List[dict] = []
+    seen: set[str] = set()
+    for case in failures:
+        for candidate in case.action_candidates:
+            if not isinstance(candidate, dict):
+                continue
+            key = json.dumps(candidate, sort_keys=True, ensure_ascii=False)
+            if key in seen:
+                continue
+            seen.add(key)
+            candidates.append(candidate)
+    return candidates[:5]
+
+
 def _tool_schema_hash_from_failures(failures: List[FailureCase]) -> str:
     counts = Counter(
         case.tool_schema_hash
@@ -160,6 +175,7 @@ def _build_failure_ir(grouped: DefaultDict[str, List[FailureCase]]) -> List[Fail
                         )[:8],
                         predicate_evidence=taxonomy["predicate_evidence"],
                         recommended_tools=_recommended_tools_from_failures(scoped_failures),
+                        action_candidates=_action_candidates_from_failures(scoped_failures),
                         tool_schema_hash=_tool_schema_hash_from_failures(scoped_failures),
                     )
                 )
@@ -200,6 +216,7 @@ def _build_failure_ir(grouped: DefaultDict[str, List[FailureCase]]) -> List[Fail
                 )[:8],
                 predicate_evidence=taxonomy["predicate_evidence"],
                 recommended_tools=_recommended_tools_from_failures(failures),
+                action_candidates=_action_candidates_from_failures(failures),
                 tool_schema_hash=_tool_schema_hash_from_failures(failures),
             )
         )
@@ -236,6 +253,7 @@ def _failure_summary(
                 "failure_labels": item.failure_labels,
                 "field_names": item.field_names,
                 "recommended_tools": item.recommended_tools,
+                "action_candidates": item.action_candidates,
                 "tool_schema_hash": item.tool_schema_hash,
             }
             for item in failure_irs
@@ -274,6 +292,7 @@ def _policy_units_from_rules(rules: List[Rule], failure_irs: List[FailureIR]) ->
                     "category_patterns": list(rule.trigger.category_patterns),
                 },
                 "recommended_tools": list(policy.recommended_tools),
+                "action_candidates": list(source_ir.action_candidates if source_ir else []),
                 "next_tool_policy": {
                     "activation_predicates": list(getattr(next_tool_policy, "activation_predicates", []) or []),
                     "recommended_tools": list(getattr(next_tool_policy, "recommended_tools", []) or []),
