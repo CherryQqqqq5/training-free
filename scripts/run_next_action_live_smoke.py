@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import os
 import subprocess
@@ -251,6 +252,39 @@ def _write_json(path: Path, payload: dict[str, Any]) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def _request_for_upstream(request_json: dict[str, Any]) -> dict[str, Any]:
+    """Convert fixture-only orphan tool outputs into provider-valid context.
+
+    Smoke fixtures model prior tool state directly with role=tool messages. That
+    is valid for the runtime state extractor, but OpenAI-compatible providers
+    require tool messages to be linked to a prior assistant tool_call_id. For
+    live smoke, preserve the information while sending a valid chat payload.
+    """
+    converted = copy.deepcopy(request_json)
+    messages = converted.get("messages")
+    if not isinstance(messages, list):
+        return converted
+
+    normalized: list[dict[str, Any]] = []
+    for message in messages:
+        if not isinstance(message, dict):
+            normalized.append(message)
+            continue
+        if message.get("role") != "tool" or message.get("tool_call_id"):
+            normalized.append(message)
+            continue
+        name = message.get("name") or "tool"
+        content = message.get("content")
+        normalized.append(
+            {
+                "role": "user",
+                "content": f"Prior tool output from {name}: {content}",
+            }
+        )
+    converted["messages"] = normalized
+    return converted
+
+
 def _evaluate_case(
     *,
     case: dict[str, Any],
@@ -269,8 +303,9 @@ def _evaluate_case(
         engine.rules = [Rule(**rule) for rule in rules]
         patched, request_patches = engine.apply_request(case["request"])
 
+        upstream_request = _request_for_upstream(patched)
         if upstream.get("model"):
-            patched["model"] = upstream["model"]
+            upstream_request["model"] = upstream["model"]
 
         status_code = None
         latency_ms = None
@@ -280,7 +315,7 @@ def _evaluate_case(
         else:
             status_code, raw_response, latency_ms = _call_chat_completions(
                 upstream=upstream,
-                request_json=patched,
+                request_json=upstream_request,
                 timeout_sec=int(cfg.get("timeout_sec", 120)),
             )
 
@@ -296,7 +331,8 @@ def _evaluate_case(
         "should_activate": bool(case.get("should_activate")),
         "dry_run": dry_run,
         "request_original": case["request"],
-        "request": patched,
+        "request": upstream_request,
+        "runtime_request": patched,
         "tool_schema_snapshot": tool_map_from_tools_payload(patched.get("tools", [])),
         "raw_response": raw_response,
         "final_response": final_response,

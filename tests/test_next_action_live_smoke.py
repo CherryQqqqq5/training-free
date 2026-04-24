@@ -17,7 +17,7 @@ except ModuleNotFoundError:
     )
     _INJECTED_YAML_STUB = True
 
-from scripts.run_next_action_live_smoke import run_live_smoke, summarize_results
+from scripts.run_next_action_live_smoke import _request_for_upstream, run_live_smoke, summarize_results
 
 if _INJECTED_YAML_STUB:
     sys.modules.pop("yaml", None)
@@ -27,6 +27,23 @@ FIXTURES_DIR = Path(__file__).parent / "fixtures" / "phase2_next_action_smoke"
 
 
 class NextActionLiveSmokeTests(unittest.TestCase):
+    def test_request_for_upstream_converts_orphan_tool_messages(self) -> None:
+        request = {
+            "messages": [
+                {"role": "user", "content": "Read the first match."},
+                {"role": "tool", "name": "find", "content": "{\"matches\":[\"notes.txt\"]}"},
+                {"role": "tool", "tool_call_id": "call_1", "name": "cat", "content": "ok"},
+            ],
+            "tools": [],
+        }
+
+        converted = _request_for_upstream(request)
+
+        self.assertEqual(converted["messages"][1]["role"], "user")
+        self.assertIn("Prior tool output from find", converted["messages"][1]["content"])
+        self.assertEqual(converted["messages"][2]["role"], "tool")
+        self.assertEqual(request["messages"][1]["role"], "tool")
+
     def test_summarize_results_counts_conversion_metrics(self) -> None:
         results = []
         for index in range(15):
