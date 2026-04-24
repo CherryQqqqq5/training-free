@@ -22,7 +22,7 @@ from scripts.run_phase2_target_subset import (
 
 
 def _candidate_generatable(row: dict[str, Any]) -> bool:
-    return bool(row.get("target_action_tools_present"))
+    return bool(row.get("compiler_candidate_generatable"))
 
 
 def scan_opportunities(source_run_root: Path, category: str) -> list[dict[str, Any]]:
@@ -39,6 +39,9 @@ def scan_opportunities(source_run_root: Path, category: str) -> list[dict[str, A
             "available_tools_in_case_schema": item.get("available_tools_in_case_schema") or [],
             "target_action_tools_present": sorted(target_tools),
             "schema_local": bool(target_tools),
+            "schema_tool_present": bool(target_tools),
+            "compiler_candidate_generatable": False,
+            "candidate_rule_generatable": False,
             "candidate_generatable": _candidate_generatable(item),
             "failure_labels": sorted(labels),
             "failure_family_overlap": sorted(labels.intersection(TARGET_LABELS)),
@@ -48,7 +51,7 @@ def scan_opportunities(source_run_root: Path, category: str) -> list[dict[str, A
     rows.sort(
         key=lambda row: (
             not row["baseline_wrong"],
-            not row["candidate_generatable"],
+            not row["schema_local"],
             -int(row["keyword_score"]),
             _case_number(str(row["case_id"])),
         )
@@ -61,7 +64,7 @@ def select_opportunities(rows: list[dict[str, Any]], *, max_cases: int, require_
     for row in rows:
         if require_baseline_wrong and not row.get("baseline_wrong"):
             continue
-        if not row.get("schema_local") or not row.get("candidate_generatable"):
+        if not row.get("schema_local"):
             continue
         selected.append(row)
         if len(selected) >= max_cases:
@@ -83,6 +86,9 @@ def summarize_opportunities(rows: list[dict[str, Any]], selected: list[dict[str,
         "total_cases": len(rows),
         "baseline_wrong_count": sum(row.get("baseline_wrong") is True for row in rows),
         "schema_local_case_count": sum(row.get("schema_local") is True for row in rows),
+        "schema_tool_present_count": sum(row.get("schema_tool_present") is True for row in rows),
+        "compiler_candidate_generatable_count": sum(row.get("compiler_candidate_generatable") is True for row in rows),
+        "candidate_rule_generatable_count": sum(row.get("candidate_rule_generatable") is True for row in rows),
         "candidate_generatable_count": sum(row.get("candidate_generatable") is True for row in rows),
         "selected_case_count": len(selected),
         "selected_case_ids": [row["case_id"] for row in selected],
@@ -95,7 +101,9 @@ def summarize_opportunities(rows: list[dict[str, Any]], selected: list[dict[str,
             "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)" in set(row.get("failure_labels") or []) for row in rows
         ),
         "schema_source_distribution": dict(sorted(schema_sources.items())),
-        "selection_ready": len(selected) >= 30 and sum(row.get("candidate_generatable") is True for row in selected) >= 20,
+        "schema_selection_ready": len(selected) >= 30,
+        "selection_ready": len(selected) >= 30,
+        "paired_execution_ready": False,
     }
 
 
@@ -106,7 +114,9 @@ def render_summary(summary: dict[str, Any]) -> str:
         f"- Total cases: `{summary['total_cases']}`",
         f"- Baseline wrong: `{summary['baseline_wrong_count']}`",
         f"- Schema-local cases: `{summary['schema_local_case_count']}`",
-        f"- Candidate-generatable cases: `{summary['candidate_generatable_count']}`",
+        f"- Schema tool present cases: `{summary['schema_tool_present_count']}`",
+        f"- Compiler candidate-generatable cases: `{summary['compiler_candidate_generatable_count']}`",
+        f"- Candidate rule-generatable cases: `{summary['candidate_rule_generatable_count']}`",
         f"- Selected cases: `{summary['selected_case_count']}`",
         f"- Selection ready: `{summary['selection_ready']}`",
         "",

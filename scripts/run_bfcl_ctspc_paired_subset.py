@@ -12,7 +12,29 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from scripts.run_phase2_target_subset import write_test_case_ids
+from scripts.run_phase2_target_subset import (
+    TARGET_ACTION_TOOLS,
+    candidate_policy_tool_distribution,
+    rules_have_ctspc_actions,
+)
 from scripts.scan_bfcl_ctspc_opportunities import scan_opportunities, select_opportunities, summarize_opportunities
+
+
+def _selected_schema_tools(selected: list[dict[str, Any]]) -> set[str]:
+    tools: set[str] = set()
+    for row in selected:
+        for tool in row.get("target_action_tools_present") or []:
+            if isinstance(tool, str) and tool:
+                tools.add(tool)
+    return tools
+
+
+def _rules_schema_local(rule_path: Path, selected_tools: set[str]) -> bool:
+    distribution = candidate_policy_tool_distribution(rule_path)
+    if not distribution:
+        return False
+    rule_tools = set(distribution)
+    return rule_tools.issubset(TARGET_ACTION_TOOLS) and rule_tools.issubset(selected_tools)
 
 
 def build_planned_commands(
@@ -84,12 +106,22 @@ def main() -> None:
     for run_name in ("baseline", "candidate"):
         write_test_case_ids(out_root / run_name / "bfcl" / "test_case_ids_to_generate.json", args.category, selected_ids)
 
+    selected_schema_tools = _selected_schema_tools(selected)
     selection_gate_passed = (
         len(selected_ids) >= args.min_selected_cases
-        and sum(row.get("candidate_generatable") is True for row in selected) >= args.min_candidate_generatable_cases
+        and len([row for row in selected if row.get("schema_local")]) >= args.min_candidate_generatable_cases
     )
-    candidate_rules_available = args.candidate_rules_dir.exists() and (args.candidate_rules_dir / "rule.yaml").exists()
-    gate_passed = selection_gate_passed and candidate_rules_available
+    rule_path = args.candidate_rules_dir / "rule.yaml"
+    candidate_rules_available = args.candidate_rules_dir.exists() and rule_path.exists()
+    candidate_rules_have_ctspc_actions = candidate_rules_available and rules_have_ctspc_actions(rule_path)
+    candidate_policy_distribution = candidate_policy_tool_distribution(rule_path)
+    candidate_rules_schema_local = candidate_rules_available and _rules_schema_local(rule_path, selected_schema_tools)
+    gate_passed = (
+        selection_gate_passed
+        and candidate_rules_available
+        and candidate_rules_have_ctspc_actions
+        and candidate_rules_schema_local
+    )
     commands = []
     if gate_passed:
         commands = build_planned_commands(
@@ -113,10 +145,16 @@ def main() -> None:
         "gate_passed": gate_passed,
         "selection_gate_passed": selection_gate_passed,
         "candidate_rules_available": candidate_rules_available,
+        "candidate_rules_have_ctspc_actions": candidate_rules_have_ctspc_actions,
+        "candidate_rules_schema_local": candidate_rules_schema_local,
+        "candidate_policy_tool_distribution": candidate_policy_distribution,
+        "selected_schema_tools": sorted(selected_schema_tools),
         "gate_requirements": {
             "min_selected_cases": args.min_selected_cases,
-            "min_candidate_generatable_cases": args.min_candidate_generatable_cases,
+            "min_schema_local_cases": args.min_candidate_generatable_cases,
             "candidate_rules_must_exist": True,
+            "candidate_rules_must_have_ctspc_actions": True,
+            "candidate_rules_must_be_schema_local": True,
         },
         "opportunity_summary": summary,
         "planned_commands": commands,
