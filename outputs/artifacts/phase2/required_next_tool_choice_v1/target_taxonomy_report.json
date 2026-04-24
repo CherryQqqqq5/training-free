@@ -1,0 +1,588 @@
+{
+  "runs": [
+    {
+      "run": "baseline",
+      "trace_dir": "/cephfs/qiuyn/training-free/outputs/phase2_validation/required_next_tool_choice_v1/baseline_target/traces",
+      "failure_count": 1217,
+      "accuracy": 37.0,
+      "accuracy_source": "subsets.multi_turn_miss_param",
+      "correct_count": 74.0,
+      "taxonomy_distribution": [
+        {
+          "run": "baseline",
+          "failure_label": "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+          "count": 372,
+          "share": 0.3056696795398521,
+          "failure_group": "decision_layer_target",
+          "accuracy": 37.0,
+          "correct_count": 74.0
+        },
+        {
+          "run": "baseline",
+          "failure_label": "(POST_TOOL,CLARIFICATION_REQUEST)",
+          "count": 92,
+          "share": 0.07559572719802794,
+          "failure_group": "boundary_misuse",
+          "accuracy": 37.0,
+          "correct_count": 74.0
+        },
+        {
+          "run": "baseline",
+          "failure_label": "(POST_TOOL,EMPTY_TOOL_CALL)",
+          "count": 463,
+          "share": 0.38044371405094496,
+          "failure_group": "compatibility_heavy",
+          "accuracy": 37.0,
+          "correct_count": 74.0
+        },
+        {
+          "run": "baseline",
+          "failure_label": "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+          "count": 288,
+          "share": 0.23664749383730485,
+          "failure_group": "decision_layer_target",
+          "accuracy": 37.0,
+          "correct_count": 74.0
+        },
+        {
+          "run": "baseline",
+          "failure_label": "(POST_TOOL,UNSUPPORTED_REQUEST)",
+          "count": 2,
+          "share": 0.0016433853738701725,
+          "failure_group": "allowed_boundary",
+          "accuracy": 37.0,
+          "correct_count": 74.0
+        }
+      ],
+      "top_failure_families": [
+        {
+          "failure_label": "(POST_TOOL,EMPTY_TOOL_CALL)",
+          "count": 463,
+          "share": 0.38044371405094496,
+          "failure_group": "compatibility_heavy"
+        },
+        {
+          "failure_label": "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+          "count": 372,
+          "share": 0.3056696795398521,
+          "failure_group": "decision_layer_target"
+        },
+        {
+          "failure_label": "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+          "count": 288,
+          "share": 0.23664749383730485,
+          "failure_group": "decision_layer_target"
+        }
+      ],
+      "group_totals": {
+        "allowed_boundary": 30,
+        "boundary_misuse": 64,
+        "compatibility_heavy": 463,
+        "decision_layer_target": 660
+      },
+      "top_failure_signatures": [
+        {
+          "signature": {
+            "stage": "POST_TOOL",
+            "type": "EMPTY_TOOL_CALL",
+            "tool_schema_hash": "4c9bb41436ee2d15",
+            "literals_pattern": "prior_tool_outputs"
+          },
+          "count": 57,
+          "share": 0.04683648315529992,
+          "failure_labels": [
+            "(POST_TOOL,EMPTY_TOOL_CALL)"
+          ]
+        },
+        {
+          "signature": {
+            "stage": "POST_TOOL",
+            "type": "EMPTY_TOOL_CALL",
+            "tool_schema_hash": "d2d724f11ceff920",
+            "literals_pattern": "prior_tool_outputs"
+          },
+          "count": 46,
+          "share": 0.03779786359901397,
+          "failure_labels": [
+            "(POST_TOOL,EMPTY_TOOL_CALL)"
+          ]
+        },
+        {
+          "signature": {
+            "stage": "POST_TOOL",
+            "type": "EMPTY_TOOL_CALL",
+            "tool_schema_hash": "c044d07c9a54b9ac",
+            "literals_pattern": "prior_tool_outputs"
+          },
+          "count": 40,
+          "share": 0.03286770747740345,
+          "failure_labels": [
+            "(POST_TOOL,EMPTY_TOOL_CALL)"
+          ]
+        },
+        {
+          "signature": {
+            "stage": "POST_TOOL",
+            "type": "EMPTY_TOOL_CALL",
+            "tool_schema_hash": "5febe4383d5d27c0",
+            "literals_pattern": "prior_tool_outputs"
+          },
+          "count": 34,
+          "share": 0.027937551355792935,
+          "failure_labels": [
+            "(POST_TOOL,EMPTY_TOOL_CALL)"
+          ]
+        },
+        {
+          "signature": {
+            "stage": "POST_TOOL",
+            "type": "EMPTY_TOOL_CALL",
+            "tool_schema_hash": "d2a6c21ced089a3d",
+            "literals_pattern": "prior_tool_outputs"
+          },
+          "count": 32,
+          "share": 0.02629416598192276,
+          "failure_labels": [
+            "(POST_TOOL,EMPTY_TOOL_CALL)"
+          ]
+        }
+      ]
+    },
+    {
+      "run": "primary_v4",
+      "trace_dir": "/cephfs/qiuyn/training-free/outputs/phase2_validation/required_next_tool_choice_v1/soft_target/traces",
+      "failure_count": 1566,
+      "accuracy": 39.5,
+      "accuracy_source": "subsets.multi_turn_miss_param",
+      "correct_count": 79.0,
+      "taxonomy_distribution": [
+        {
+          "run": "primary_v4",
+          "failure_label": "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+          "count": 353,
+          "share": 0.22541507024265645,
+          "failure_group": "decision_layer_target",
+          "accuracy": 39.5,
+          "correct_count": 79.0
+        },
+        {
+          "run": "primary_v4",
+          "failure_label": "(POST_TOOL,CLARIFICATION_REQUEST)",
+          "count": 88,
+          "share": 0.0561941251596424,
+          "failure_group": "allowed_boundary",
+          "accuracy": 39.5,
+          "correct_count": 79.0
+        },
+        {
+          "run": "primary_v4",
+          "failure_label": "(POST_TOOL,EMPTY_TOOL_CALL)",
+          "count": 483,
+          "share": 0.30842911877394635,
+          "failure_group": "compatibility_heavy",
+          "accuracy": 39.5,
+          "correct_count": 79.0
+        },
+        {
+          "run": "primary_v4",
+          "failure_label": "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+          "count": 287,
+          "share": 0.18326947637292465,
+          "failure_group": "decision_layer_target",
+          "accuracy": 39.5,
+          "correct_count": 79.0
+        },
+        {
+          "run": "primary_v4",
+          "failure_label": "(POST_TOOL,TERMINATION_INADMISSIBLE)",
+          "count": 353,
+          "share": 0.22541507024265645,
+          "failure_group": "decision_layer_target",
+          "accuracy": 39.5,
+          "correct_count": 79.0
+        },
+        {
+          "run": "primary_v4",
+          "failure_label": "(POST_TOOL,UNSUPPORTED_REQUEST)",
+          "count": 2,
+          "share": 0.001277139208173691,
+          "failure_group": "allowed_boundary",
+          "accuracy": 39.5,
+          "correct_count": 79.0
+        }
+      ],
+      "top_failure_families": [
+        {
+          "failure_label": "(POST_TOOL,EMPTY_TOOL_CALL)",
+          "count": 483,
+          "share": 0.30842911877394635,
+          "failure_group": "compatibility_heavy"
+        },
+        {
+          "failure_label": "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+          "count": 353,
+          "share": 0.22541507024265645,
+          "failure_group": "decision_layer_target"
+        },
+        {
+          "failure_label": "(POST_TOOL,TERMINATION_INADMISSIBLE)",
+          "count": 353,
+          "share": 0.22541507024265645,
+          "failure_group": "decision_layer_target"
+        }
+      ],
+      "group_totals": {
+        "allowed_boundary": 34,
+        "boundary_misuse": 56,
+        "compatibility_heavy": 483,
+        "decision_layer_target": 993
+      },
+      "top_failure_signatures": [
+        {
+          "signature": {
+            "stage": "POST_TOOL",
+            "type": "EMPTY_TOOL_CALL",
+            "tool_schema_hash": "4c9bb41436ee2d15",
+            "literals_pattern": "prior_tool_outputs"
+          },
+          "count": 61,
+          "share": 0.038952745849297574,
+          "failure_labels": [
+            "(POST_TOOL,EMPTY_TOOL_CALL)"
+          ]
+        },
+        {
+          "signature": {
+            "stage": "POST_TOOL",
+            "type": "EMPTY_TOOL_CALL",
+            "tool_schema_hash": "d2d724f11ceff920",
+            "literals_pattern": "prior_tool_outputs"
+          },
+          "count": 46,
+          "share": 0.02937420178799489,
+          "failure_labels": [
+            "(POST_TOOL,EMPTY_TOOL_CALL)"
+          ]
+        },
+        {
+          "signature": {
+            "stage": "POST_TOOL",
+            "type": "EMPTY_TOOL_CALL",
+            "tool_schema_hash": "c044d07c9a54b9ac",
+            "literals_pattern": "prior_tool_outputs"
+          },
+          "count": 39,
+          "share": 0.02490421455938697,
+          "failure_labels": [
+            "(POST_TOOL,EMPTY_TOOL_CALL)"
+          ]
+        },
+        {
+          "signature": {
+            "stage": "POST_TOOL",
+            "type": "TERMINATION_INADMISSIBLE",
+            "tool_schema_hash": "5febe4383d5d27c0",
+            "literals_pattern": "no_explicit_literals"
+          },
+          "count": 33,
+          "share": 0.0210727969348659,
+          "failure_labels": [
+            "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+          ]
+        },
+        {
+          "signature": {
+            "stage": "POST_TOOL",
+            "type": "EMPTY_TOOL_CALL",
+            "tool_schema_hash": "5febe4383d5d27c0",
+            "literals_pattern": "prior_tool_outputs"
+          },
+          "count": 33,
+          "share": 0.0210727969348659,
+          "failure_labels": [
+            "(POST_TOOL,EMPTY_TOOL_CALL)"
+          ]
+        }
+      ]
+    },
+    {
+      "run": "required",
+      "trace_dir": "/cephfs/qiuyn/training-free/outputs/phase2_validation/required_next_tool_choice_v1/required_target/traces",
+      "failure_count": 1534,
+      "accuracy": 38.0,
+      "accuracy_source": "subsets.multi_turn_miss_param",
+      "correct_count": 76.0,
+      "taxonomy_distribution": [
+        {
+          "run": "required",
+          "failure_label": "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+          "count": 344,
+          "share": 0.2242503259452412,
+          "failure_group": "decision_layer_target",
+          "accuracy": 38.0,
+          "correct_count": 76.0
+        },
+        {
+          "run": "required",
+          "failure_label": "(POST_TOOL,CLARIFICATION_REQUEST)",
+          "count": 90,
+          "share": 0.05867014341590613,
+          "failure_group": "boundary_misuse",
+          "accuracy": 38.0,
+          "correct_count": 76.0
+        },
+        {
+          "run": "required",
+          "failure_label": "(POST_TOOL,EMPTY_TOOL_CALL)",
+          "count": 484,
+          "share": 0.3155149934810952,
+          "failure_group": "compatibility_heavy",
+          "accuracy": 38.0,
+          "correct_count": 76.0
+        },
+        {
+          "run": "required",
+          "failure_label": "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+          "count": 272,
+          "share": 0.1773142112125163,
+          "failure_group": "decision_layer_target",
+          "accuracy": 38.0,
+          "correct_count": 76.0
+        },
+        {
+          "run": "required",
+          "failure_label": "(POST_TOOL,TERMINATION_INADMISSIBLE)",
+          "count": 344,
+          "share": 0.2242503259452412,
+          "failure_group": "decision_layer_target",
+          "accuracy": 38.0,
+          "correct_count": 76.0
+        }
+      ],
+      "top_failure_families": [
+        {
+          "failure_label": "(POST_TOOL,EMPTY_TOOL_CALL)",
+          "count": 484,
+          "share": 0.3155149934810952,
+          "failure_group": "compatibility_heavy"
+        },
+        {
+          "failure_label": "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+          "count": 344,
+          "share": 0.2242503259452412,
+          "failure_group": "decision_layer_target"
+        },
+        {
+          "failure_label": "(POST_TOOL,TERMINATION_INADMISSIBLE)",
+          "count": 344,
+          "share": 0.2242503259452412,
+          "failure_group": "decision_layer_target"
+        }
+      ],
+      "group_totals": {
+        "allowed_boundary": 28,
+        "boundary_misuse": 62,
+        "compatibility_heavy": 484,
+        "decision_layer_target": 960
+      },
+      "top_failure_signatures": [
+        {
+          "signature": {
+            "stage": "POST_TOOL",
+            "type": "EMPTY_TOOL_CALL",
+            "tool_schema_hash": "4c9bb41436ee2d15",
+            "literals_pattern": "prior_tool_outputs"
+          },
+          "count": 58,
+          "share": 0.03780964797913951,
+          "failure_labels": [
+            "(POST_TOOL,EMPTY_TOOL_CALL)"
+          ]
+        },
+        {
+          "signature": {
+            "stage": "POST_TOOL",
+            "type": "EMPTY_TOOL_CALL",
+            "tool_schema_hash": "d2d724f11ceff920",
+            "literals_pattern": "prior_tool_outputs"
+          },
+          "count": 46,
+          "share": 0.02998696219035202,
+          "failure_labels": [
+            "(POST_TOOL,EMPTY_TOOL_CALL)"
+          ]
+        },
+        {
+          "signature": {
+            "stage": "POST_TOOL",
+            "type": "EMPTY_TOOL_CALL",
+            "tool_schema_hash": "c044d07c9a54b9ac",
+            "literals_pattern": "prior_tool_outputs"
+          },
+          "count": 42,
+          "share": 0.027379400260756193,
+          "failure_labels": [
+            "(POST_TOOL,EMPTY_TOOL_CALL)"
+          ]
+        },
+        {
+          "signature": {
+            "stage": "POST_TOOL",
+            "type": "TERMINATION_INADMISSIBLE",
+            "tool_schema_hash": "5febe4383d5d27c0",
+            "literals_pattern": "no_explicit_literals"
+          },
+          "count": 37,
+          "share": 0.024119947848761408,
+          "failure_labels": [
+            "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+          ]
+        },
+        {
+          "signature": {
+            "stage": "POST_TOOL",
+            "type": "ACTIONABLE_NO_TOOL_DECISION",
+            "tool_schema_hash": "5febe4383d5d27c0",
+            "literals_pattern": "explicit_context_literals"
+          },
+          "count": 34,
+          "share": 0.02216427640156454,
+          "failure_labels": [
+            "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)"
+          ]
+        }
+      ]
+    }
+  ],
+  "skipped_optional_runs": [],
+  "merged_comparison": [
+    {
+      "failure_label": "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+      "baseline_count": 372,
+      "baseline_share": 0.3056696795398521,
+      "primary_v4_count": 353,
+      "primary_v4_share": 0.22541507024265645,
+      "required_count": 344,
+      "required_share": 0.2242503259452412
+    },
+    {
+      "failure_label": "(POST_TOOL,CLARIFICATION_REQUEST)",
+      "baseline_count": 92,
+      "baseline_share": 0.07559572719802794,
+      "primary_v4_count": 88,
+      "primary_v4_share": 0.0561941251596424,
+      "required_count": 90,
+      "required_share": 0.05867014341590613
+    },
+    {
+      "failure_label": "(POST_TOOL,EMPTY_TOOL_CALL)",
+      "baseline_count": 463,
+      "baseline_share": 0.38044371405094496,
+      "primary_v4_count": 483,
+      "primary_v4_share": 0.30842911877394635,
+      "required_count": 484,
+      "required_share": 0.3155149934810952
+    },
+    {
+      "failure_label": "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+      "baseline_count": 288,
+      "baseline_share": 0.23664749383730485,
+      "primary_v4_count": 287,
+      "primary_v4_share": 0.18326947637292465,
+      "required_count": 272,
+      "required_share": 0.1773142112125163
+    },
+    {
+      "failure_label": "(POST_TOOL,TERMINATION_INADMISSIBLE)",
+      "baseline_count": 0,
+      "baseline_share": 0.0,
+      "primary_v4_count": 353,
+      "primary_v4_share": 0.22541507024265645,
+      "required_count": 344,
+      "required_share": 0.2242503259452412
+    },
+    {
+      "failure_label": "(POST_TOOL,UNSUPPORTED_REQUEST)",
+      "baseline_count": 2,
+      "baseline_share": 0.0016433853738701725,
+      "primary_v4_count": 2,
+      "primary_v4_share": 0.001277139208173691,
+      "required_count": 0,
+      "required_share": 0.0
+    }
+  ],
+  "delta_vs_baseline": [
+    {
+      "run": "primary_v4",
+      "failure_label": "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+      "count_delta_vs_baseline": -19,
+      "share_delta_vs_baseline": -0.08025460929719563
+    },
+    {
+      "run": "required",
+      "failure_label": "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+      "count_delta_vs_baseline": -28,
+      "share_delta_vs_baseline": -0.08141935359461089
+    },
+    {
+      "run": "primary_v4",
+      "failure_label": "(POST_TOOL,CLARIFICATION_REQUEST)",
+      "count_delta_vs_baseline": -4,
+      "share_delta_vs_baseline": -0.01940160203838554
+    },
+    {
+      "run": "required",
+      "failure_label": "(POST_TOOL,CLARIFICATION_REQUEST)",
+      "count_delta_vs_baseline": -2,
+      "share_delta_vs_baseline": -0.016925583782121813
+    },
+    {
+      "run": "primary_v4",
+      "failure_label": "(POST_TOOL,EMPTY_TOOL_CALL)",
+      "count_delta_vs_baseline": 20,
+      "share_delta_vs_baseline": -0.0720145952769986
+    },
+    {
+      "run": "required",
+      "failure_label": "(POST_TOOL,EMPTY_TOOL_CALL)",
+      "count_delta_vs_baseline": 21,
+      "share_delta_vs_baseline": -0.06492872056984977
+    },
+    {
+      "run": "primary_v4",
+      "failure_label": "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+      "count_delta_vs_baseline": -1,
+      "share_delta_vs_baseline": -0.0533780174643802
+    },
+    {
+      "run": "required",
+      "failure_label": "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+      "count_delta_vs_baseline": -16,
+      "share_delta_vs_baseline": -0.05933328262478854
+    },
+    {
+      "run": "primary_v4",
+      "failure_label": "(POST_TOOL,TERMINATION_INADMISSIBLE)",
+      "count_delta_vs_baseline": 353,
+      "share_delta_vs_baseline": 0.22541507024265645
+    },
+    {
+      "run": "required",
+      "failure_label": "(POST_TOOL,TERMINATION_INADMISSIBLE)",
+      "count_delta_vs_baseline": 344,
+      "share_delta_vs_baseline": 0.2242503259452412
+    },
+    {
+      "run": "primary_v4",
+      "failure_label": "(POST_TOOL,UNSUPPORTED_REQUEST)",
+      "count_delta_vs_baseline": 0,
+      "share_delta_vs_baseline": -0.00036624616569648147
+    },
+    {
+      "run": "required",
+      "failure_label": "(POST_TOOL,UNSUPPORTED_REQUEST)",
+      "count_delta_vs_baseline": -2,
+      "share_delta_vs_baseline": -0.0016433853738701725
+    }
+  ]
+}

@@ -9,41 +9,56 @@ This table summarizes the currently available `multi_turn_miss_param` Phase-2 ru
 | `primary_v2` | `multi_turn_miss_param` | 0.0% | 0 / 200 | Run failed behaviorally; no useful tool-use recovery | Rejected |
 | `primary_v3` | `multi_turn_miss_param` | 35.0% | 70 / 200 | No-tool / premature-stop failures remained dominant | Evidence Only |
 | `baseline` | `multi_turn_miss_param` | 36.5% | 73 / 200 | `(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)` dominated taxonomy report | Baseline |
-| `primary_v4` | `multi_turn_miss_param` | 40.0% | 80 / 200 | `ACTIONABLE_NO_TOOL_DECISION` decreased, but `EMPTY_TOOL_CALL`, `POST_TOOL_PROSE_SUMMARY`, and `TERMINATION_INADMISSIBLE` increased as residual buckets | Evidence Only |
+| `primary_v4` | `multi_turn_miss_param` | 40.0% | 80 / 200 | `ACTIONABLE_NO_TOOL_DECISION` decreased, but `EMPTY_TOOL_CALL`, `POST_TOOL_PROSE_SUMMARY`, and `TERMINATION_INADMISSIBLE` remained residual buckets | Evidence Only |
 | `rerun_v4` | `multi_turn_miss_param` | 43.5% | 87 / 200 | Historical console result; run artifacts not present on current server | Claimable historical evidence |
 | `iter_003_execute` | `multi_turn_miss_param` + `simple_python` holdout | Incomplete | N/A | Driver/process ended without final outputs; archived as incomplete | Rejected for formal claim |
-| `iter_004_execute` / `fresh_02` target | `multi_turn_miss_param` | 42.0% | 84 / 200 | Fresh policy proposal for `(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)` with explicit-context literals | Evidence Only until rerun + selector finalization |
-| `iter_004_execute` / `fresh_02` holdout | `simple_python` | 95.0% | 380 / 400 | No validation issues; only 5 contextual string repairs | Safety holdout passes so far |
-| `iter_004_execute` / `fresh_02` paired rerun | `multi_turn_miss_param` | Pending | Pending | Rerun active; final metrics, paired-rerun report, accept decision not emitted yet | Pending |
-| `required_next_tool_choice_v1` | `multi_turn_miss_param` + `simple_python` holdout | In Progress | N/A | Soft vs required next-tool validation launched on clean `main` with fixed `fresh_02` ruleset | Pending |
-
-## Current `iter_004_execute` Status
-
-- Selected proposal: `fresh_02`.
-- Proposal mode: `fresh`.
-- Failure signature: `(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)`, `literals_pattern=explicit_context_literals`, predicates `prior_explicit_literals_present`, `prior_tool_outputs_present`, `tools_available`.
-- Target result: `42.0%` (`84 / 200`), which is `+5.5 pp` over the `36.5%` baseline and `+2.0 pp` over `primary_v4=40.0%`, but still `-1.5 pp` below the historical `rerun_v4=43.5%`.
-- Holdout result: `simple_python=95.0%` (`380 / 400`), matching the baseline holdout and showing no measured holdout regression so far.
-- Paired rerun is still active. Do not treat `iter_004_execute` as a final claim until `paired_rerun.json`, `accept.json`, and `evolution_iteration_summary.json` exist.
-
-## Artifact Locations
-
-- Current execute root: `/cephfs/qiuyn/training-free/outputs/phase2_evolution/iter_004_execute`
-- Current proposal metrics: `/cephfs/qiuyn/training-free/outputs/phase2_evolution/iter_004_execute/proposals/fresh_02/metrics.json`
-- Current holdout metrics: `/cephfs/qiuyn/training-free/outputs/phase2_evolution/iter_004_execute/holdout_run/artifacts/metrics.json`
-- Git-tracked compact summary: `outputs/artifacts/phase2/iter_004_execute_current/status_summary.json`
-- Git-tracked taxonomy snapshot: `outputs/artifacts/phase2/iter_004_execute_current/taxonomy_report.md`
-- Full traces and logs remain on the server and are intentionally not committed.
-
-## Notes
-
-- `primary_v2`, `primary_v3`, and `primary_v4` are useful for trend discussion, but only `primary_v4` and `iter_004_execute` currently have directly inspected server-side artifacts in this pass.
-- `rerun_v4=43.5%` remains the strongest historical top-line evidence, but its artifacts were not found under the current new-server output tree.
-- `iter_004_execute` is the first current-server evolution execute run with completed target and clean holdout metrics, but it is still pending paired rerun and selector acceptance.
+| `iter_004_execute` / `fresh_02` target | `multi_turn_miss_param` | 42.0% | 84 / 200 | Fresh policy proposal for `(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)` with explicit-context literals | Evidence Only |
+| `iter_004_execute` / `fresh_02` holdout | `simple_python` | 95.0% | 380 / 400 | No validation issues; only 5 contextual string repairs | Safety holdout passes |
+| `iter_004_execute` / `fresh_02` paired rerun | `multi_turn_miss_param` | 40.5% | 81 / 200 | Directionally consistent with primary target run, but selector rejected because baseline/candidate routes differed | Evidence Only / Protocol Rejected |
+| `required_next_tool_choice_v1` soft target | `multi_turn_miss_param` | 39.5% | 79 / 200 | Soft prompt-biased policy using fixed `fresh_02` ruleset | Evidence Only |
+| `required_next_tool_choice_v1` required target | `multi_turn_miss_param` | 38.0% | 76 / 200 | Required mode did not produce measurable next-tool policy conversion | Neutral / Not Claimable |
+| `required_next_tool_choice_v1` soft holdout | `simple_python` | 94.25% | 377 / 400 | No validation issues; benign holdout behavior | Holdout OK |
+| `required_next_tool_choice_v1` required holdout | `simple_python` | 94.50% | 378 / 400 | No validation issues; benign holdout behavior | Holdout OK |
 
 ## Required Next-Tool Validation
 
-- Launch snapshot: `docs/required_next_tool_choice_validation_2026-04-23.md`
-- Validation root: `/cephfs/qiuyn/training-free/outputs/phase2_validation/required_next_tool_choice_v1`
-- Compact artifacts will land under: `outputs/artifacts/phase2/required_next_tool_choice_v1`
-- This run is protocol-first and should remain `Pending` until `validation_summary.json` exists.
+The required next-tool validation completed under `/cephfs/qiuyn/training-free/outputs/phase2_validation/required_next_tool_choice_v1`.
+
+All six jobs used the same upstream route, `x-ai/grok-3-beta`, so the comparison passed the route-consistency guard. The final verdict is `neutral`: required mode did not beat soft mode on the target slice, while holdout stayed effectively flat.
+
+Key readout:
+
+- Baseline target: `37.0%` (`74 / 200`)
+- Soft target: `39.5%` (`79 / 200`)
+- Required target: `38.0%` (`76 / 200`)
+- Baseline holdout: `95.25%` (`381 / 400`)
+- Soft holdout: `94.25%` (`377 / 400`)
+- Required holdout: `94.50%` (`378 / 400`)
+
+The most important diagnostic is that traces showed no measurable policy actuation:
+
+- `policy_validation` records: `0` across soft/required target and holdout runs
+- `tool_choice_mode="required"` records: `0`
+- `selected_next_tool` records: `0`
+- `next_tool_emitted` records: `0`
+
+The fixed `fresh_02` ruleset has `decision_policy.recommended_tools: []`, so enabling `runtime_policy.enable_required_next_tool_choice` did not give the runtime a concrete next-tool candidate to harden. The result should therefore be read as evidence that the current policy artifact is still constraint-heavy rather than action-policy-heavy.
+
+Compact result package:
+
+- `outputs/artifacts/phase2/required_next_tool_choice_v1/run_matrix.json`
+- `outputs/artifacts/phase2/required_next_tool_choice_v1/validation_summary.json`
+- `outputs/artifacts/phase2/required_next_tool_choice_v1/target_taxonomy_report.md`
+- `outputs/artifacts/phase2/required_next_tool_choice_v1/*_repair_report.md`
+
+## Artifact Locations
+
+- Current validation root: `/cephfs/qiuyn/training-free/outputs/phase2_validation/required_next_tool_choice_v1`
+- Current compact artifacts: `outputs/artifacts/phase2/required_next_tool_choice_v1`
+- Full traces and BFCL result trees remain on the server and are intentionally not committed.
+
+## Notes
+
+- `rerun_v4=43.5%` remains the strongest historical top-line evidence, but its full artifacts were not found under the current new-server output tree.
+- `iter_004_execute` is useful evidence because target and paired rerun were directionally consistent, but it is not an accepted claim because selector validation found an upstream route mismatch.
+- The required next-tool validation shows that the next engineering step is not another full run. The next step is to make compiler output non-empty `recommended_tools` and make runtime trace policy conversion fields observable before rerunning required mode.
