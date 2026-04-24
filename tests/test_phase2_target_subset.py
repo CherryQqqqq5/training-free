@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -10,11 +12,15 @@ from scripts.run_phase2_target_subset import (
     _execution_env,
     _result_json_path,
     _score_json_path,
+    _tool_names_from_trace,
+    build_gap_report_rows,
+    candidate_case_infos,
     candidate_policy_tool_distribution,
     materialize_selected_traces,
     prune_rule_policy_tools,
     rules_have_ctspc_actions,
     select_case_ids,
+    summarize_gap_report,
     summarize_case_report,
     write_test_case_ids,
 )
@@ -57,9 +63,85 @@ class Phase2TargetSubsetTests(unittest.TestCase):
                 encoding="utf-8",
             )
 
-            selected = select_case_ids(root, "multi_turn_miss_param", 2)
+            selected = select_case_ids(root, "multi_turn_miss_param", 2, schema_local=False)
 
         self.assertEqual(selected, ["multi_turn_miss_param_1", "multi_turn_miss_param_2"])
+
+    def test_tool_names_from_trace_supports_snapshot_dict_list_and_request_fallback(self) -> None:
+        trace = {
+            "tool_schema_snapshot": {
+                "cat": {"type": "object"},
+                "find": {"type": "object"},
+            },
+            "request": {
+                "tools": [
+                    {"type": "function", "function": {"name": "touch"}},
+                    {"name": "mkdir"},
+                ]
+            },
+        }
+        self.assertEqual(_tool_names_from_trace(trace), {"cat", "find", "touch", "mkdir"})
+
+        list_trace = {
+            "tool_schema_snapshot": [
+                {"type": "function", "function": {"name": "grep"}},
+                {"name": "ls"},
+            ]
+        }
+        self.assertEqual(_tool_names_from_trace(list_trace), {"grep", "ls"})
+
+    def test_schema_local_selection_filters_keyword_cases_without_target_tool_schema(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_raw:
+            root = Path(tmp_raw)
+            score = root / "bfcl" / "score" / "model" / "multi_turn" / "BFCL_v4_multi_turn_miss_param_score.json"
+            result = root / "bfcl" / "result" / "model" / "multi_turn" / "BFCL_v4_multi_turn_miss_param_result.json"
+            score.parent.mkdir(parents=True)
+            result.parent.mkdir(parents=True)
+            score.write_text(
+                "\n".join(
+                    [
+                        json.dumps({"accuracy": 0.0}),
+                        json.dumps(
+                            {
+                                "id": "multi_turn_miss_param_1",
+                                "valid": False,
+                                "prompt": {"question": [[{"role": "user", "content": "find file path"}]]},
+                            }
+                        ),
+                        json.dumps(
+                            {
+                                "id": "multi_turn_miss_param_2",
+                                "valid": False,
+                                "prompt": {"question": [[{"role": "user", "content": "find file path"}]]},
+                            }
+                        ),
+                    ]
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            result.write_text(
+                "\n".join(
+                    [
+                        json.dumps({"id": "multi_turn_miss_param_1", "result": [[[{"book_flight": "{}"}]]]}),
+                        json.dumps({"id": "multi_turn_miss_param_2", "result": [[[{"cat": "{}"}]]]}),
+                    ]
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            trace_dir = root / "traces"
+            trace_dir.mkdir()
+            (trace_dir / "trace_1.json").write_text(json.dumps({"tool_schema_snapshot": {"book_flight": {}}}), encoding="utf-8")
+            (trace_dir / "trace_2.json").write_text(json.dumps({"tool_schema_snapshot": {"cat": {}}}), encoding="utf-8")
+
+            infos = candidate_case_infos(root, "multi_turn_miss_param")
+            selected = select_case_ids(root, "multi_turn_miss_param", 10)
+
+        self.assertEqual(len(infos), 2)
+        self.assertEqual(selected, ["multi_turn_miss_param_2"])
+        self.assertEqual(infos[0]["target_action_tools_present"], [])
+        self.assertEqual(infos[1]["target_action_tools_present"], ["cat"])
 
     def test_write_test_case_ids_uses_category_key(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_raw:
@@ -294,6 +376,128 @@ rules:
         self.assertIn("book_flight", result["removed_tools"])
         self.assertEqual(distribution, {"cat": 3, "touch": 1})
         self.assertTrue(has_ctspc_actions)
+
+    def test_gap_report_classifies_non_target_schema_insufficient_evidence_and_generator_gap(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_raw:
+            root = Path(tmp_raw)
+            failures = root / "failures.jsonl"
+            failures.write_text(
+                "\n".join(
+                    [
+                        json.dumps(
+                            {
+                                "trace_id": "case_generator_gap__000__trace",
+                                "failure_label": "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+                                "recommended_tools": ["book_flight"],
+                                "action_candidates": [{"tool": "book_flight", "recommended_tools": ["book_flight"]}],
+                            }
+                        ),
+                        json.dumps(
+                            {
+                                "trace_id": "case_schema_local__000__trace",
+                                "failure_label": "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+                                "recommended_tools": ["cat"],
+                                "action_candidates": [{"tool": "cat", "recommended_tools": ["cat"]}],
+                            }
+                        ),
+                    ]
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            candidates = [
+                {
+                    "case_id": "case_non_target",
+                    "failure_labels": ["(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)"],
+                    "available_tools_in_case_schema": ["book_flight"],
+                    "target_action_tools_present": [],
+                },
+                {
+                    "case_id": "case_insufficient",
+                    "failure_labels": ["(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)"],
+                    "available_tools_in_case_schema": ["cat"],
+                    "target_action_tools_present": ["cat"],
+                },
+                {
+                    "case_id": "case_generator_gap",
+                    "failure_labels": ["(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)"],
+                    "available_tools_in_case_schema": ["cat"],
+                    "target_action_tools_present": ["cat"],
+                },
+                {
+                    "case_id": "case_schema_local",
+                    "failure_labels": ["(POST_TOOL,POST_TOOL_PROSE_SUMMARY)"],
+                    "available_tools_in_case_schema": ["cat"],
+                    "target_action_tools_present": ["cat"],
+                },
+            ]
+
+            rows = build_gap_report_rows(
+                candidates,
+                failures_path=failures,
+                prune_result={"kept_tools": {"cat": 1}, "removed_tools": {"book_flight": 1}},
+            )
+            summary = summarize_gap_report(rows, selected_ids=["case_schema_local"], min_schema_local_cases=20)
+
+        reasons = {row["case_id"]: row["why_no_schema_local_candidate"] for row in rows}
+        self.assertEqual(reasons["case_non_target"], "non_target_schema")
+        self.assertEqual(reasons["case_insufficient"], "insufficient_local_evidence")
+        self.assertEqual(reasons["case_generator_gap"], "generator_gap")
+        self.assertEqual(reasons["case_schema_local"], "schema_local_candidate")
+        self.assertEqual(summary["schema_local_candidate_count"], 3)
+        self.assertEqual(summary["schema_filtered_out_count"], 1)
+        self.assertFalse(summary["eligible_for_execution"])
+
+    def test_dry_run_with_too_few_schema_local_cases_writes_gap_artifacts_without_bfcl_commands(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_raw:
+            root = Path(tmp_raw)
+            source = root / "source"
+            out = root / "out"
+            score = source / "bfcl" / "score" / "model" / "multi_turn" / "BFCL_v4_multi_turn_miss_param_score.json"
+            result = source / "bfcl" / "result" / "model" / "multi_turn" / "BFCL_v4_multi_turn_miss_param_result.json"
+            score.parent.mkdir(parents=True)
+            result.parent.mkdir(parents=True)
+            score.write_text(
+                json.dumps({"accuracy": 0.0})
+                + "\n"
+                + json.dumps(
+                    {
+                        "id": "multi_turn_miss_param_1",
+                        "valid": False,
+                        "prompt": {"question": [[{"role": "user", "content": "find file path"}]]},
+                    }
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            result.write_text(json.dumps({"id": "multi_turn_miss_param_1", "result": [[[{"book_flight": "{}"}]]]}) + "\n", encoding="utf-8")
+            trace_dir = source / "traces"
+            trace_dir.mkdir(parents=True)
+            (trace_dir / "trace.json").write_text(json.dumps({"tool_schema_snapshot": {"book_flight": {}}}), encoding="utf-8")
+
+            subprocess.run(
+                [
+                    sys.executable,
+                    "scripts/run_phase2_target_subset.py",
+                    "--source-run-root",
+                    str(source),
+                    "--out-root",
+                    str(out),
+                    "--dry-run",
+                ],
+                check=True,
+                cwd=Path.cwd(),
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
+            manifest = json.loads((out / "subset_manifest.json").read_text(encoding="utf-8"))
+            gap_summary = json.loads((out / "gap_summary.json").read_text(encoding="utf-8"))
+
+        self.assertEqual(manifest["selected_case_ids"], [])
+        self.assertEqual(manifest["planned_commands"], [])
+        self.assertEqual(gap_summary["schema_filtered_out_count"], 1)
+        self.assertEqual(gap_summary["why_no_schema_local_candidate_distribution"], {"non_target_schema": 1})
 
 
 if __name__ == "__main__":

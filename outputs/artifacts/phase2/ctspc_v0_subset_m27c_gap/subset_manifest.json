@@ -1,0 +1,78 @@
+{
+  "created_at": "20260424T071449Z",
+  "source_run_root": "/cephfs/qiuyn/training-free/outputs/phase2_validation/required_next_tool_choice_v1/soft_target",
+  "category": "multi_turn_miss_param",
+  "selected_case_ids": [],
+  "prompt_family_candidate_count": 62,
+  "schema_local_candidate_count": 0,
+  "schema_filtered_out_count": 62,
+  "selection_schema_filter": true,
+  "min_schema_local_cases": 20,
+  "max_cases": 50,
+  "runtime_config": "configs/runtime_bfcl_structured.yaml",
+  "candidate_rules_dir": "outputs/phase2_subset/ctspc_v0_m27c_gap/candidate_rules",
+  "compile_status": {
+    "status": "actionable_patch",
+    "patch_id": "m27_subset_ctspc",
+    "source_failure_count": 626,
+    "failure_ir_count": 9,
+    "rule_count": 9,
+    "actionable_rule_count": 5,
+    "high_value_error_types": [
+      "actionable_no_tool_decision",
+      "clarification_no_tool",
+      "empty_completion",
+      "post_tool_prose_summary",
+      "redundant_clarification_request",
+      "termination_inadmissible",
+      "unsupported_no_tool",
+      "unsupported_request"
+    ],
+    "reason": "compiler synthesized a non-empty actionable patch",
+    "policy_tool_prune": {
+      "allowed_tools": [
+        "cat",
+        "cd",
+        "cp",
+        "diff",
+        "echo",
+        "find",
+        "grep",
+        "ls",
+        "mkdir",
+        "mv",
+        "sort",
+        "tail",
+        "touch"
+      ],
+      "kept_tools": {},
+      "removed_tools": {
+        "add_to_watchlist": 1,
+        "book_flight": 4,
+        "cancel_order": 1,
+        "filter_stocks_by_price": 2,
+        "get_available_stocks": 2,
+        "logarithm": 5,
+        "notify_price_change": 2,
+        "place_order": 6,
+        "purchase_insurance": 4,
+        "register_credit_card": 2,
+        "set_budget_limit": 2,
+        "square_root": 5
+      },
+      "kept_action_candidate_count": 0
+    }
+  },
+  "has_ctspc_actions": false,
+  "compile_trace_scope": "prompt_family_candidates",
+  "selected_trace_manifest": {
+    "expected_trace_count": 946,
+    "selected_trace_count": 946,
+    "selected_case_with_trace_count": 62,
+    "source_trace_count": 2746
+  },
+  "trace_case_mapping": "mtime_by_result_step_count",
+  "planned_commands": [],
+  "dry_run": false,
+  "gap_report_only": true
+}

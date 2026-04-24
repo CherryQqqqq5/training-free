@@ -34,6 +34,7 @@ TARGET_ACTION_TOOLS = {
     "tail",
     "touch",
 }
+MIN_SCHEMA_LOCAL_CASES = 20
 
 
 def _utc_timestamp() -> str:
@@ -97,11 +98,52 @@ def _family_records(run_root: Path) -> dict[str, set[str]]:
     return out
 
 
-def select_case_ids(source_run_root: Path, category: str, max_cases: int) -> list[str]:
+def _tool_names_from_trace(trace: dict[str, Any]) -> set[str]:
+    names: set[str] = set()
+    snapshot = trace.get("tool_schema_snapshot") or {}
+    if isinstance(snapshot, dict):
+        names.update(str(key) for key in snapshot if str(key))
+    elif isinstance(snapshot, list):
+        for item in snapshot:
+            if not isinstance(item, dict):
+                continue
+            function = item.get("function") if isinstance(item.get("function"), dict) else {}
+            name = function.get("name") or item.get("name")
+            if isinstance(name, str) and name:
+                names.add(name)
+
+    request = trace.get("request") if isinstance(trace.get("request"), dict) else {}
+    tools = request.get("tools") if isinstance(request, dict) else []
+    if isinstance(tools, list):
+        for item in tools:
+            if not isinstance(item, dict):
+                continue
+            function = item.get("function") if isinstance(item.get("function"), dict) else {}
+            name = function.get("name") or item.get("name")
+            if isinstance(name, str) and name:
+                names.add(name)
+    return names
+
+
+def _case_tools_from_trace_groups(trace_groups: dict[str, list[dict[str, Any]]]) -> dict[str, set[str]]:
+    out: dict[str, set[str]] = {}
+    for case_id, traces in trace_groups.items():
+        tools: set[str] = set()
+        for trace in traces:
+            tools.update(_tool_names_from_trace(trace))
+        out[case_id] = tools
+    return out
+
+
+def candidate_case_infos(source_run_root: Path, category: str) -> list[dict[str, Any]]:
     score_path = _score_json_path(source_run_root, category)
     rows = _read_jsonl(score_path) if score_path else []
     families = _family_records(source_run_root)
-    candidates: list[tuple[int, int, str]] = []
+    score_case_ids = [row.get("id") for row in rows if isinstance(row.get("id"), str) and "valid" in row]
+    counts = _result_step_counts(source_run_root, category, score_case_ids)
+    trace_groups = _trace_groups_by_case(source_run_root / "traces", counts)
+    tools_by_case = _case_tools_from_trace_groups(trace_groups)
+    candidates: list[dict[str, Any]] = []
     for index, row in enumerate(rows):
         case_id = row.get("id")
         if not isinstance(case_id, str) or "valid" not in row:
@@ -114,9 +156,27 @@ def select_case_ids(source_run_root: Path, category: str, max_cases: int) -> lis
         if keyword_score <= 0:
             continue
         failure_bonus = 1 if row.get("valid") is False else 0
-        candidates.append((failure_bonus, keyword_score, case_id))
-    candidates.sort(key=lambda item: (-item[0], -item[1], _case_number(item[2])))
-    return [case_id for _, _, case_id in candidates[:max_cases]]
+        available_tools = tools_by_case.get(case_id, set())
+        target_tools = available_tools.intersection(TARGET_ACTION_TOOLS)
+        candidates.append(
+            {
+                "case_id": case_id,
+                "failure_labels": sorted(labels or []),
+                "failure_bonus": failure_bonus,
+                "keyword_score": keyword_score,
+                "available_tools_in_case_schema": sorted(available_tools),
+                "target_action_tools_present": sorted(target_tools),
+            }
+        )
+    candidates.sort(key=lambda item: (-int(item["failure_bonus"]), -int(item["keyword_score"]), _case_number(str(item["case_id"]))))
+    return candidates
+
+
+def select_case_ids(source_run_root: Path, category: str, max_cases: int, *, schema_local: bool = True) -> list[str]:
+    candidates = candidate_case_infos(source_run_root, category)
+    if schema_local:
+        candidates = [row for row in candidates if row.get("target_action_tools_present")]
+    return [str(row["case_id"]) for row in candidates[:max_cases]]
 
 
 def _case_number(case_id: str) -> int:
@@ -248,6 +308,151 @@ def prune_rule_policy_tools(rule_path: Path, *, allowed_tools: set[str]) -> dict
         "removed_tools": dict(sorted(removed.items())),
         "kept_action_candidate_count": kept_candidate_count,
     }
+
+
+def _case_id_from_trace_id(trace_id: str) -> str:
+    return trace_id.split("__", 1)[0]
+
+
+def _mined_policy_signals_by_case(failures_path: Path) -> dict[str, dict[str, Any]]:
+    signals: dict[str, dict[str, Any]] = {}
+    if not failures_path.exists():
+        return signals
+    for row in _read_jsonl(failures_path):
+        trace_id = row.get("trace_id")
+        if not isinstance(trace_id, str) or not trace_id:
+            continue
+        case_id = _case_id_from_trace_id(trace_id)
+        entry = signals.setdefault(
+            case_id,
+            {
+                "failure_labels": set(),
+                "mined_recommended_tools_before_prune": set(),
+                "mined_action_candidates_before_prune": set(),
+            },
+        )
+        label = row.get("failure_label")
+        if isinstance(label, str) and label:
+            entry["failure_labels"].add(label)
+        for tool in row.get("recommended_tools") or []:
+            if isinstance(tool, str) and tool:
+                entry["mined_recommended_tools_before_prune"].add(tool)
+        for candidate in row.get("action_candidates") or []:
+            if not isinstance(candidate, dict):
+                continue
+            tool = candidate.get("tool")
+            if isinstance(tool, str) and tool:
+                entry["mined_action_candidates_before_prune"].add(tool)
+            for tool in candidate.get("recommended_tools") or []:
+                if isinstance(tool, str) and tool:
+                    entry["mined_action_candidates_before_prune"].add(tool)
+    return signals
+
+
+def build_gap_report_rows(
+    candidate_infos: list[dict[str, Any]],
+    *,
+    failures_path: Path | None = None,
+    prune_result: dict[str, Any] | None = None,
+) -> list[dict[str, Any]]:
+    mined = _mined_policy_signals_by_case(failures_path) if failures_path else {}
+    removed_counts = (prune_result or {}).get("removed_tools") or {}
+    kept_counts = (prune_result or {}).get("kept_tools") or {}
+    rows: list[dict[str, Any]] = []
+    for info in candidate_infos:
+        case_id = str(info["case_id"])
+        mined_entry = mined.get(case_id, {})
+        recommended = sorted(mined_entry.get("mined_recommended_tools_before_prune") or [])
+        action_candidates = sorted(mined_entry.get("mined_action_candidates_before_prune") or [])
+        available = set(info.get("available_tools_in_case_schema") or [])
+        target_present = sorted(available.intersection(TARGET_ACTION_TOOLS))
+        mined_tools = set(recommended).union(action_candidates)
+        removed = sorted(tool for tool in mined_tools.union(available) if tool in removed_counts or (tool and tool not in TARGET_ACTION_TOOLS))
+        kept = sorted(tool for tool in mined_tools if tool in kept_counts or tool in TARGET_ACTION_TOOLS)
+        if not target_present:
+            reason = "non_target_schema"
+        elif not recommended and not action_candidates:
+            reason = "insufficient_local_evidence"
+        elif not kept:
+            reason = "generator_gap"
+        else:
+            reason = "schema_local_candidate"
+        labels = sorted(set(info.get("failure_labels") or []).union(mined_entry.get("failure_labels") or []))
+        rows.append(
+            {
+                "case_id": case_id,
+                "failure_labels": labels,
+                "available_tools_in_case_schema": sorted(available),
+                "target_action_tools_present": target_present,
+                "mined_recommended_tools_before_prune": recommended,
+                "mined_action_candidates_before_prune": action_candidates,
+                "removed_tools": removed,
+                "kept_tools": kept,
+                "why_no_schema_local_candidate": reason,
+            }
+        )
+    return rows
+
+
+def summarize_gap_report(rows: list[dict[str, Any]], *, selected_ids: list[str], min_schema_local_cases: int) -> dict[str, Any]:
+    reasons = Counter(str(row.get("why_no_schema_local_candidate") or "unknown") for row in rows)
+    target_tools: Counter[str] = Counter()
+    for row in rows:
+        target_tools.update(str(tool) for tool in row.get("target_action_tools_present") or [])
+    schema_local_count = sum(bool(row.get("target_action_tools_present")) for row in rows)
+    return {
+        "prompt_family_candidate_count": len(rows),
+        "schema_local_candidate_count": schema_local_count,
+        "schema_filtered_out_count": len(rows) - schema_local_count,
+        "selected_case_count": len(selected_ids),
+        "selection_schema_filter": True,
+        "min_schema_local_cases": min_schema_local_cases,
+        "eligible_for_execution": schema_local_count >= min_schema_local_cases,
+        "target_action_tool_distribution": dict(sorted(target_tools.items())),
+        "why_no_schema_local_candidate_distribution": dict(sorted(reasons.items())),
+    }
+
+
+def render_gap_summary(summary: dict[str, Any], rows: list[dict[str, Any]]) -> str:
+    lines = [
+        "# Phase-2 Target Subset Gap Report",
+        "",
+        f"- Prompt/family candidates: `{summary['prompt_family_candidate_count']}`",
+        f"- Schema-local candidates: `{summary['schema_local_candidate_count']}`",
+        f"- Schema-filtered out: `{summary['schema_filtered_out_count']}`",
+        f"- Selected cases: `{summary['selected_case_count']}`",
+        f"- Eligible for execution: `{summary['eligible_for_execution']}`",
+        "",
+        "## Reason Distribution",
+        "",
+    ]
+    for reason, count in (summary.get("why_no_schema_local_candidate_distribution") or {}).items():
+        lines.append(f"- `{reason}`: `{count}`")
+    lines.extend(
+        [
+            "",
+            "## Cases",
+            "",
+            "| Case | Target Tools | Mined Recommended | Mined Candidates | Reason |",
+            "| --- | --- | --- | --- | --- |",
+        ]
+    )
+    for row in rows:
+        lines.append(
+            f"| {row['case_id']} | {', '.join(row.get('target_action_tools_present') or []) or '-'} | "
+            f"{', '.join(row.get('mined_recommended_tools_before_prune') or []) or '-'} | "
+            f"{', '.join(row.get('mined_action_candidates_before_prune') or []) or '-'} | "
+            f"{row.get('why_no_schema_local_candidate') or '-'} |"
+        )
+    return "\n".join(lines) + "\n"
+
+
+def write_gap_artifacts(out_root: Path, rows: list[dict[str, Any]], summary: dict[str, Any]) -> None:
+    with (out_root / "gap_report.jsonl").open("w", encoding="utf-8") as handle:
+        for row in rows:
+            handle.write(json.dumps(row, ensure_ascii=False) + "\n")
+    (out_root / "gap_summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    (out_root / "gap_summary.md").write_text(render_gap_summary(summary, rows), encoding="utf-8")
 
 
 def rules_have_ctspc_actions(rule_path: Path) -> bool:
@@ -501,6 +706,8 @@ def main() -> None:
     parser.add_argument("--baseline-port", type=int, default=8060)
     parser.add_argument("--candidate-port", type=int, default=8061)
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--gap-report-only", action="store_true")
+    parser.add_argument("--min-schema-local-cases", type=int, default=MIN_SCHEMA_LOCAL_CASES)
     args = parser.parse_args()
 
     repo = args.repo_root.resolve()
@@ -509,11 +716,15 @@ def main() -> None:
         source_run_root = (repo / source_run_root).resolve()
     out_root = args.out_root or repo / "outputs" / "phase2_subset" / f"ctspc_v0_{_utc_timestamp()}"
     out_root.mkdir(parents=True, exist_ok=True)
-    selected_ids = select_case_ids(source_run_root, args.category, args.max_cases)
+    candidate_infos = candidate_case_infos(source_run_root, args.category)
+    schema_local_infos = [row for row in candidate_infos if row.get("target_action_tools_present")]
+    selected_ids = [str(row["case_id"]) for row in schema_local_infos[: args.max_cases]]
+    schema_local_ready = len(schema_local_infos) >= args.min_schema_local_cases
     baseline_run = out_root / "baseline"
     candidate_run = out_root / "candidate"
-    for run in (baseline_run, candidate_run):
-        write_test_case_ids(run / "bfcl" / "test_case_ids_to_generate.json", args.category, selected_ids)
+    if schema_local_ready and not args.gap_report_only:
+        for run in (baseline_run, candidate_run):
+            write_test_case_ids(run / "bfcl" / "test_case_ids_to_generate.json", args.category, selected_ids)
 
     rules_dir = out_root / "candidate_rules"
     logs_dir = out_root / "logs"
@@ -521,58 +732,138 @@ def main() -> None:
     has_ctspc_actions = False
     selected_trace_dir = out_root / "source_selected_traces"
     selected_trace_manifest: dict[str, Any] = {}
-    if not args.dry_run:
+    compile_scope = "dry_run"
+    gap_rows = build_gap_report_rows(candidate_infos)
+    gap_summary = summarize_gap_report(gap_rows, selected_ids=selected_ids, min_schema_local_cases=args.min_schema_local_cases)
+    if not args.dry_run and (schema_local_ready or args.gap_report_only):
+        trace_ids_for_compile = selected_ids if schema_local_ready and not args.gap_report_only else [str(row["case_id"]) for row in candidate_infos]
         selected_trace_manifest = materialize_selected_traces(
             source_run_root=source_run_root,
             category=args.category,
-            selected_ids=selected_ids,
+            selected_ids=trace_ids_for_compile,
             out_dir=selected_trace_dir,
         )
+        compile_scope = "selected_cases" if trace_ids_for_compile == selected_ids else "prompt_family_candidates"
         compile_status = _compile_subset_rules(repo, selected_trace_dir, rules_dir, logs_dir)
         has_ctspc_actions = rules_have_ctspc_actions(rules_dir / "rule.yaml")
-    else:
+        gap_rows = build_gap_report_rows(
+            candidate_infos,
+            failures_path=rules_dir / "failures.jsonl",
+            prune_result=compile_status.get("policy_tool_prune") if isinstance(compile_status.get("policy_tool_prune"), dict) else None,
+        )
+        gap_summary = summarize_gap_report(gap_rows, selected_ids=selected_ids, min_schema_local_cases=args.min_schema_local_cases)
+    write_gap_artifacts(out_root, gap_rows, gap_summary)
+    if args.dry_run:
         has_ctspc_actions = False
+    else:
+        compile_scope = compile_scope
 
     model_alias = os.environ.get("GRC_BFCL_MODEL", "gpt-4o-mini-2024-07-18-FC")
-    baseline_cmd = [
-        "bash",
-        str(repo / "scripts/run_bfcl_v4_baseline.sh"),
-        model_alias,
-        str(baseline_run),
-        str(args.baseline_port),
-        args.category,
-        str(repo / args.runtime_config if not args.runtime_config.is_absolute() else args.runtime_config),
-    ]
-    candidate_cmd = [
-        "bash",
-        str(repo / "scripts/run_bfcl_v4_patch.sh"),
-        model_alias,
-        str(candidate_run),
-        str(args.candidate_port),
-        args.category,
-        str(repo / args.runtime_config if not args.runtime_config.is_absolute() else args.runtime_config),
-        str(rules_dir),
-        str(candidate_run / "traces"),
-        str(candidate_run / "artifacts"),
-        str(baseline_run / "artifacts" / "metrics.json"),
-    ]
+    baseline_cmd: list[str] = []
+    candidate_cmd: list[str] = []
+    if schema_local_ready and not args.gap_report_only:
+        baseline_cmd = [
+            "bash",
+            str(repo / "scripts/run_bfcl_v4_baseline.sh"),
+            model_alias,
+            str(baseline_run),
+            str(args.baseline_port),
+            args.category,
+            str(repo / args.runtime_config if not args.runtime_config.is_absolute() else args.runtime_config),
+        ]
+        candidate_cmd = [
+            "bash",
+            str(repo / "scripts/run_bfcl_v4_patch.sh"),
+            model_alias,
+            str(candidate_run),
+            str(args.candidate_port),
+            args.category,
+            str(repo / args.runtime_config if not args.runtime_config.is_absolute() else args.runtime_config),
+            str(rules_dir),
+            str(candidate_run / "traces"),
+            str(candidate_run / "artifacts"),
+            str(baseline_run / "artifacts" / "metrics.json"),
+        ]
     manifest = {
         "created_at": _utc_timestamp(),
         "source_run_root": str(source_run_root),
         "category": args.category,
         "selected_case_ids": selected_ids,
+        "prompt_family_candidate_count": len(candidate_infos),
+        "schema_local_candidate_count": len(schema_local_infos),
+        "schema_filtered_out_count": len(candidate_infos) - len(schema_local_infos),
+        "selection_schema_filter": True,
+        "min_schema_local_cases": args.min_schema_local_cases,
         "max_cases": args.max_cases,
         "runtime_config": str(args.runtime_config),
         "candidate_rules_dir": str(rules_dir),
         "compile_status": compile_status,
         "has_ctspc_actions": has_ctspc_actions,
-        "compile_trace_scope": "selected_cases" if not args.dry_run else "dry_run",
+        "compile_trace_scope": compile_scope,
         "selected_trace_manifest": selected_trace_manifest,
         "trace_case_mapping": "mtime_by_result_step_count",
-        "planned_commands": [" ".join(baseline_cmd), " ".join(candidate_cmd)],
+        "planned_commands": [" ".join(baseline_cmd), " ".join(candidate_cmd)] if baseline_cmd and candidate_cmd else [],
         "dry_run": args.dry_run,
+        "gap_report_only": args.gap_report_only,
     }
     (out_root / "subset_manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    if args.gap_report_only or not schema_local_ready:
+        failure_reason = (
+            "schema-local eligible cases below execution threshold"
+            if not schema_local_ready
+            else "gap report only"
+        )
+        summary = {
+            "selected_case_count": len(selected_ids),
+            "runnable_ctspc_case_count": 0,
+            "baseline_accuracy": None,
+            "candidate_accuracy": None,
+            "policy_plan_activated_count": 0,
+            "recommended_tool_match_rate_among_activated": 0.0,
+            "raw_normalized_arg_match_rate_among_activated": 0.0,
+            "raw_strict_arg_match_rate_among_activated": 0.0,
+            "final_normalized_arg_match_rate_among_activated": 0.0,
+            "case_fixed_count": 0,
+            "case_regressed_count": 0,
+            "stop_allowed_false_positive_count": 0,
+            "blocked_reason_distribution": {failure_reason: len(candidate_infos)},
+            "recommended_tools_not_in_schema_count": 0,
+            "net_case_gain": 0,
+            "accepted": False,
+            "failure_reason": failure_reason,
+            "candidate_policy_tool_distribution": candidate_policy_tool_distribution(rules_dir / "rule.yaml"),
+            "gap_summary": gap_summary,
+            "manifest": manifest,
+        }
+        rows = [
+            {
+                "case_id": str(row["case_id"]),
+                "baseline_success": None,
+                "candidate_success": None,
+                "policy_plan_activated": False,
+                "selected_next_tool": None,
+                "next_tool_emitted": None,
+                "recommended_tool_match": None,
+                "raw_strict_arg_match": None,
+                "raw_normalized_arg_match": None,
+                "final_strict_arg_match": None,
+                "final_normalized_arg_match": None,
+                "case_fixed": False,
+                "case_regressed": False,
+                "blocked_reason": row.get("why_no_schema_local_candidate") or failure_reason,
+                "repair_kinds": [],
+            }
+            for row in gap_rows
+        ]
+        with (out_root / "subset_case_report.jsonl").open("w", encoding="utf-8") as handle:
+            for row in rows:
+                handle.write(json.dumps(row, ensure_ascii=False) + "\n")
+        (out_root / "subset_summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        (out_root / "subset_summary.md").write_text(_render_summary(summary, rows), encoding="utf-8")
+        print(json.dumps({"selected_case_count": len(selected_ids), **gap_summary, "accepted": False}, indent=2))
+        if not args.gap_report_only and not args.dry_run:
+            raise RuntimeError(f"{failure_reason}: {len(schema_local_infos)} < {args.min_schema_local_cases}")
+        return
     if not args.dry_run and not has_ctspc_actions:
         summary = {
             "selected_case_count": len(selected_ids),
