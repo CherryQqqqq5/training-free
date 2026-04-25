@@ -1,27 +1,30 @@
 {
-  "title": "M2.7f Failure Diagnostic",
+  "title": "M2.7f-lite Failure Diagnostic",
   "m2_7f_gate_passed": false,
   "case_level_evidence": "durable",
-  "first_failed_criterion": "candidate_accuracy_gt_baseline_accuracy",
+  "first_failed_criterion": "recommended_tool_match_rate_among_activated_min_0_6",
   "failed_criteria": [
-    "candidate_accuracy_gt_baseline_accuracy",
-    "case_fixed_count_gt_case_regressed_count",
-    "net_case_gain_min_2",
     "recommended_tool_match_rate_among_activated_min_0_6",
     "raw_normalized_arg_match_rate_among_activated_min_0_6"
   ],
-  "recommended_next_focus": "over_actuation_or_repair_interaction",
+  "recommended_next_focus": "actuation_or_prompt_guidance",
   "do_not_expand_to_100_case_m28_or_full_bfcl": true,
+  "auxiliary_engineering_value_signal": {
+    "candidate_accuracy_gte_baseline_accuracy": true,
+    "case_regressed_count_lte_1": true,
+    "net_case_gain_gte_0": true,
+    "policy_plan_activated_count_gte_10": true
+  },
   "acceptance_values": {
     "case_report_trace_mapping": "prompt_user_prefix",
-    "baseline_accuracy": 13.33,
-    "candidate_accuracy": 10.0,
-    "case_fixed_count": 2,
-    "case_regressed_count": 3,
-    "net_case_gain": -1,
-    "policy_plan_activated_count": 30,
-    "recommended_tool_match_rate_among_activated": 0.36666666666666664,
-    "raw_normalized_arg_match_rate_among_activated": 0.03333333333333333,
+    "baseline_accuracy": 6.67,
+    "candidate_accuracy": 16.67,
+    "case_fixed_count": 4,
+    "case_regressed_count": 1,
+    "net_case_gain": 3,
+    "policy_plan_activated_count": 14,
+    "recommended_tool_match_rate_among_activated": 0.42857142857142855,
+    "raw_normalized_arg_match_rate_among_activated": 0.14285714285714285,
     "stop_allowed_false_positive_count": 0,
     "accepted": false
   },
@@ -29,29 +32,44 @@
   "candidate_action_diversity": {
     "passed": true,
     "selected_next_tool_distribution": {
-      "cat": 17,
-      "touch": 8,
-      "mkdir": 5
+      "cat": 9,
+      "touch": 5
     },
-    "dominant_selected_next_tool_rate": 0.5666666666666667
+    "dominant_selected_next_tool_rate": 0.6428571428571429
   },
   "layer_diagnostic": {
-    "no_activation_cases": [],
+    "no_activation_cases": [
+      "multi_turn_miss_param_19",
+      "multi_turn_miss_param_38",
+      "multi_turn_miss_param_3",
+      "multi_turn_miss_param_16",
+      "multi_turn_miss_param_6",
+      "multi_turn_miss_param_9",
+      "multi_turn_miss_param_18",
+      "multi_turn_miss_param_21",
+      "multi_turn_miss_param_36",
+      "multi_turn_miss_param_43",
+      "multi_turn_miss_param_45",
+      "multi_turn_miss_param_0",
+      "multi_turn_miss_param_4",
+      "multi_turn_miss_param_8",
+      "multi_turn_miss_param_25",
+      "multi_turn_miss_param_29"
+    ],
     "selected_next_tool_distribution": {
-      "cat": 17,
-      "touch": 8,
-      "mkdir": 5
+      "cat": 9,
+      "touch": 5
     },
-    "recommended_tool_matches": "11/30",
-    "raw_normalized_arg_matches": "1/30",
+    "recommended_tool_matches": "6/14",
+    "raw_normalized_arg_matches": "2/14",
     "case_fixed": [
       "multi_turn_miss_param_31",
+      "multi_turn_miss_param_22",
+      "multi_turn_miss_param_25",
       "multi_turn_miss_param_39"
     ],
     "case_regressed": [
-      "multi_turn_miss_param_9",
-      "multi_turn_miss_param_21",
-      "multi_turn_miss_param_36"
+      "multi_turn_miss_param_35"
     ]
   },
   "gate_report": {
@@ -65,39 +83,39 @@
         "expected": "prompt_user_prefix"
       },
       "candidate_accuracy_gt_baseline_accuracy": {
-        "passed": false,
+        "passed": true,
         "actual": {
-          "candidate_accuracy": 10.0,
-          "baseline_accuracy": 13.33
+          "candidate_accuracy": 16.67,
+          "baseline_accuracy": 6.67
         },
         "expected": "candidate_accuracy > baseline_accuracy"
       },
       "case_fixed_count_gt_case_regressed_count": {
-        "passed": false,
+        "passed": true,
         "actual": {
-          "case_fixed_count": 2,
-          "case_regressed_count": 3
+          "case_fixed_count": 4,
+          "case_regressed_count": 1
         },
         "expected": "case_fixed_count > case_regressed_count"
       },
       "net_case_gain_min_2": {
-        "passed": false,
-        "actual": -1,
+        "passed": true,
+        "actual": 3,
         "expected": ">= 2"
       },
       "policy_plan_activated_count_positive": {
         "passed": true,
-        "actual": 30,
+        "actual": 14,
         "expected": "> 0"
       },
       "recommended_tool_match_rate_among_activated_min_0_6": {
         "passed": false,
-        "actual": 0.36666666666666664,
+        "actual": 0.42857142857142855,
         "expected": ">= 0.6"
       },
       "raw_normalized_arg_match_rate_among_activated_min_0_6": {
         "passed": false,
-        "actual": 0.03333333333333333,
+        "actual": 0.14285714285714285,
         "expected": ">= 0.6"
       },
       "stop_allowed_false_positive_count_zero": {
@@ -108,16 +126,13 @@
     },
     "diagnostic": {
       "case_level_evidence": "durable",
-      "first_failed_criterion": "candidate_accuracy_gt_baseline_accuracy",
+      "first_failed_criterion": "recommended_tool_match_rate_among_activated_min_0_6",
       "failed_criteria": [
-        "candidate_accuracy_gt_baseline_accuracy",
-        "case_fixed_count_gt_case_regressed_count",
-        "net_case_gain_min_2",
         "recommended_tool_match_rate_among_activated_min_0_6",
         "raw_normalized_arg_match_rate_among_activated_min_0_6"
       ],
       "do_not_expand_to_100_case_m28_or_full_bfcl": true,
-      "recommended_next_focus": "over_actuation_or_repair_interaction"
+      "recommended_next_focus": "actuation_or_prompt_guidance"
     }
   }
 }
