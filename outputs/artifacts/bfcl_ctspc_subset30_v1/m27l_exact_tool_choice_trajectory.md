@@ -1,12 +1,12 @@
 # M2.7l Exact Tool-Choice Trajectory Diagnostic
 
-- Case-level evidence: `diagnostic_only`
+- Case-level evidence: `durable`
 - Activated cases: `13`
-- Exact tool-choice applied: `12`
-- Action-specific guidance applied: `12`
-- Failure layers: `{'selected_action_not_expected_trajectory': 17, 'local_tool_arg_match_but_trajectory_fail': 7, 'exact_tool_choice_overconstraint': 3, 'tool_arg_mismatch': 2, 'trace_mapping_incomplete': 1}`
-- Missing candidate prompt-prefix traces: `['multi_turn_miss_param_43']`
-- First failed criterion: `trace_mapping_incomplete`
+- Exact tool-choice applied: `13`
+- Action-specific guidance applied: `13`
+- Failure layers: `{'selected_action_not_expected_trajectory': 17, 'local_tool_arg_match_but_trajectory_fail': 8, 'exact_tool_choice_overconstraint': 3, 'tool_arg_mismatch': 2}`
+- Missing candidate prompt-prefix traces: `[]`
+- First failed criterion: `exact_tool_choice_overconstraint`
 
 | Case | Baseline | Candidate | Selected | Emitted | Exact | Tool+Arg | Layer |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -29,7 +29,7 @@
 | multi_turn_miss_param_35 | True | False | cat | find | True | True | exact_tool_choice_overconstraint |
 | multi_turn_miss_param_36 | False | False | None | touch | False | False | selected_action_not_expected_trajectory |
 | multi_turn_miss_param_40 | False | False | touch | ls | True | True | local_tool_arg_match_but_trajectory_fail |
-| multi_turn_miss_param_43 | False | False | touch | None | False | True | trace_mapping_incomplete |
+| multi_turn_miss_param_43 | False | False | touch | ls | True | True | local_tool_arg_match_but_trajectory_fail |
 | multi_turn_miss_param_45 | False | False | None | find | False | False | selected_action_not_expected_trajectory |
 | multi_turn_miss_param_0 | False | False | None | mkdir | False | False | selected_action_not_expected_trajectory |
 | multi_turn_miss_param_4 | False | False | None | ls | False | False | selected_action_not_expected_trajectory |
