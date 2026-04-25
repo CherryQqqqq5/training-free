@@ -9,6 +9,7 @@ import yaml
 
 from scripts.check_m27f_artifact_completeness import evaluate_artifact_completeness
 from scripts.check_m27f_candidate_action_diversity import evaluate_candidate_action_diversity
+from scripts.check_m27f_candidate_plan_diversity import evaluate_candidate_plan_diversity
 from scripts.run_phase2_target_subset import _dataset_user_texts_by_case
 
 
@@ -176,6 +177,171 @@ class M27fPreflightTests(unittest.TestCase):
 
         self.assertTrue(report["m2_7f_candidate_action_diversity_passed"])
         self.assertEqual(report["dominant_selected_next_tool_rate"], 0.7)
+
+
+def _bfcl_tool(name: str) -> dict:
+    return {
+        "name": name,
+        "description": f"{name} tool",
+        "parameters": {"type": "object", "properties": {"target": {"type": "string"}}},
+    }
+
+
+def _plan_dataset_rows() -> list[dict]:
+    return [
+        {
+            "id": SELECTED[0],
+            "question": [[{"role": "user", "content": "Please read 'alpha.txt' and show me the content."}]],
+            "function": [_bfcl_tool("cat"), _bfcl_tool("mkdir")],
+        },
+        {
+            "id": SELECTED[1],
+            "question": [[{"role": "user", "content": "Please create a directory named 'archive'."}]],
+            "function": [_bfcl_tool("cat"), _bfcl_tool("mkdir")],
+        },
+    ]
+
+
+def _write_plan_rule(
+    path: Path,
+    *,
+    recommended_tools: list[str],
+    action_candidates: list[dict],
+    request_predicates: list[str] | None = None,
+    activation_predicates: list[str] | None = None,
+) -> None:
+    request_predicates = list(request_predicates or ["tools_available"])
+    activation_predicates = list(activation_predicates or request_predicates)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        yaml.safe_dump(
+            {
+                "patch_id": "test_plan_diversity",
+                "rules": [
+                    {
+                        "rule_id": "rule_plan_diversity",
+                        "priority": 100,
+                        "enabled": True,
+                        "trigger": {
+                            "tool_names": [],
+                            "error_types": ["actionable_no_tool_decision"],
+                            "category_patterns": [],
+                            "request_predicates": request_predicates,
+                        },
+                        "scope": {"tool_names": [], "patch_sites": ["policy_executor", "prompt_injector"]},
+                        "action": {
+                            "decision_policy": {
+                                "request_predicates": request_predicates,
+                                "recommended_tools": recommended_tools,
+                                "action_candidates": action_candidates,
+                                "next_tool_policy": {
+                                    "activation_predicates": activation_predicates,
+                                    "recommended_tools": recommended_tools,
+                                    "tool_choice_mode": "required",
+                                    "confidence": 0.8,
+                                },
+                            }
+                        },
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+
+class M27fPlanOnlyPreflightTests(unittest.TestCase):
+    def test_plan_diversity_fails_single_mkdir_collapse(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_raw:
+            root = Path(tmp_raw)
+            _write_manifest(root)
+            rules_dir = root / "rules"
+            _write_plan_rule(
+                rules_dir / "rule.yaml",
+                recommended_tools=["mkdir"],
+                action_candidates=[{"tool": "mkdir", "args": {"target": "archive"}, "recommended_tools": ["mkdir"]}],
+            )
+
+            report = evaluate_candidate_plan_diversity(
+                root / "paired_subset_manifest.json",
+                rules_dir=rules_dir,
+                runtime_config=root / "runtime.yaml",
+                dataset_rows=_plan_dataset_rows(),
+            )
+
+        self.assertFalse(report["m2_7f_candidate_plan_diversity_passed"])
+        self.assertEqual(report["selected_next_tool_distribution"], {"mkdir": 2})
+        self.assertEqual(report["diagnostic"]["first_failed_criterion"], "selected_next_tool_single_mkdir_collapse")
+
+    def test_plan_diversity_accepts_request_local_multi_tool_selection(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_raw:
+            root = Path(tmp_raw)
+            _write_manifest(root)
+            rules_dir = root / "rules"
+            _write_plan_rule(
+                rules_dir / "rule.yaml",
+                recommended_tools=["mkdir", "cat"],
+                action_candidates=[
+                    {"tool": "mkdir", "args": {"target": "archive"}, "recommended_tools": ["mkdir"]},
+                    {"tool": "cat", "args": {"target": "alpha.txt"}, "recommended_tools": ["cat"]},
+                ],
+            )
+
+            report = evaluate_candidate_plan_diversity(
+                root / "paired_subset_manifest.json",
+                rules_dir=rules_dir,
+                runtime_config=root / "runtime.yaml",
+                dataset_rows=_plan_dataset_rows(),
+            )
+
+        self.assertTrue(report["m2_7f_candidate_plan_diversity_passed"])
+        self.assertEqual(report["selected_next_tool_distribution"], {"cat": 1, "mkdir": 1})
+        self.assertEqual(report["per_case_selected_tool"][SELECTED[0]], "cat")
+        self.assertEqual(report["per_case_selected_tool"][SELECTED[1]], "mkdir")
+
+    def test_plan_diversity_fails_when_no_plan_activates(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_raw:
+            root = Path(tmp_raw)
+            _write_manifest(root)
+            rules_dir = root / "rules"
+            _write_plan_rule(
+                rules_dir / "rule.yaml",
+                recommended_tools=["cat", "mkdir"],
+                action_candidates=[{"tool": "cat", "args": {"target": "alpha.txt"}, "recommended_tools": ["cat"]}],
+                request_predicates=["prior_tool_outputs_present", "tools_available"],
+            )
+
+            report = evaluate_candidate_plan_diversity(
+                root / "paired_subset_manifest.json",
+                rules_dir=rules_dir,
+                runtime_config=root / "runtime.yaml",
+                dataset_rows=_plan_dataset_rows(),
+            )
+
+        self.assertFalse(report["m2_7f_candidate_plan_diversity_passed"])
+        self.assertEqual(report["plan_activated_count"], 0)
+        self.assertEqual(report["diagnostic"]["first_failed_criterion"], "no_activation")
+
+    def test_plan_diversity_fails_when_policy_tools_are_not_schema_local(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_raw:
+            root = Path(tmp_raw)
+            _write_manifest(root)
+            rules_dir = root / "rules"
+            _write_plan_rule(
+                rules_dir / "rule.yaml",
+                recommended_tools=["cat", "rm"],
+                action_candidates=[{"tool": "cat", "args": {"target": "alpha.txt"}, "recommended_tools": ["cat"]}],
+            )
+
+            report = evaluate_candidate_plan_diversity(
+                root / "paired_subset_manifest.json",
+                rules_dir=rules_dir,
+                runtime_config=root / "runtime.yaml",
+                dataset_rows=_plan_dataset_rows(),
+            )
+
+        self.assertFalse(report["m2_7f_candidate_plan_diversity_passed"])
+        self.assertFalse(report["candidate_rules_schema_local"])
 
 
 if __name__ == "__main__":
