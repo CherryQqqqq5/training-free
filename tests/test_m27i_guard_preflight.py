@@ -22,6 +22,7 @@ def _plan(
         "blocked_reason": blocked_reason or ("activated" if activated else "action_candidate_guard_rejected"),
         "selected_tool": tool if activated else None,
         "selected_action_candidate": {"tool": tool, "args": {"path": f"{tool}.txt"}} if activated and candidate and tool else None,
+        "action_candidate_guard": {"accepted": True, "reason": "strong_explicit_literal_binding", "risk_flags": []} if activated and candidate and tool else None,
         "rejected_action_candidates": [],
     }
     if rejected_reason:
@@ -91,8 +92,15 @@ class M27iGuardPreflightTests(unittest.TestCase):
         self.assertEqual(report["regressed_cases_guard_status"][REGRESSED[0]], "guard_rejected")
         self.assertEqual(report["fixed_cases_guard_status"][FIXED[0]], "guard_kept")
         self.assertIn("weak_arg_binding_evidence", report["guard_reason_distribution"])
-        self.assertIn("prior_output_state_unavailable", report["guard_reason_distribution"])
-        self.assertIn("weak_cwd_or_listing_binding", report["guard_reason_distribution"])
+        self.assertIn("prior_output_state_unavailable", report["all_candidate_rejection_reason_distribution"])
+        self.assertIn("weak_cwd_or_listing_binding", report["top_candidate_rejection_reason_distribution"])
+        self.assertIn("strong_explicit_literal_binding", report["case_final_guard_reason_distribution"])
+        self.assertEqual(report["selected_next_tool_count_after_guard"], 3)
+        rejected = next(case for case in report["cases"] if case["case_id"] == REGRESSED[0])
+        self.assertEqual(rejected["top_candidate_rejection_reason"], "weak_arg_binding_evidence")
+        self.assertEqual(rejected["case_final_guard_reason"], "weak_arg_binding_evidence")
+        kept = next(case for case in report["cases"] if case["case_id"] == FIXED[0])
+        self.assertEqual(kept["case_final_guard_reason"], "strong_explicit_literal_binding")
         self.assertIn("M2.7i Guard Preflight", render_markdown(report))
 
     def test_fails_when_too_few_regressed_cases_are_rejected(self) -> None:

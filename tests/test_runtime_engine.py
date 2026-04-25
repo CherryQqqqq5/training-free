@@ -2028,6 +2028,162 @@ action:
         guard = request_patches.next_tool_plan["rejected_action_candidates"][0]["guard"]
         self.assertIn("repeat_same_tool_without_new_evidence", guard["risk_flags"])
 
+    def test_next_tool_guard_allows_prior_match_binding_without_request_literal(self) -> None:
+        action_candidate = {
+            "tool": "cat",
+            "args": {"file_name": "notes.txt"},
+            "binding_source": "prior_tool_output.matches[0]|basename",
+            "arg_bindings": {"file_name": {"source": "prior_tool_output.matches[0]|basename", "value": "notes.txt"}},
+            "recommended_tools": ["cat"],
+        }
+        rule = self._next_tool_rule(
+            recommended_tools=["cat"],
+            request_predicates=["tools_available", "prior_tool_outputs_present"],
+            activation_predicates=["tools_available", "prior_tool_outputs_present"],
+            action_candidates=[action_candidate],
+        )
+        request = {
+            "model": "demo-model",
+            "messages": [
+                {"role": "user", "content": "Read the matching file."},
+                {"role": "tool", "name": "find", "content": json.dumps({"matches": ["/workspace/other.txt"]})},
+            ],
+            "tools": [
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "cat",
+                        "parameters": {"type": "object", "properties": {"file_name": {"type": "string"}}},
+                    },
+                }
+            ],
+        }
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir, runtime_policy={"enable_required_next_tool_choice": True})
+            engine.rules = [rule]
+            patched, request_patches = engine.apply_request(request)
+
+        self.assertEqual(patched["tool_choice"], "required")
+        self.assertEqual(request_patches.next_tool_plan["action_candidate_guard"]["reason"], "strong_prior_output_match_binding")
+
+    def test_next_tool_guard_allows_clean_cwd_listing_binding(self) -> None:
+        action_candidate = {
+            "tool": "touch",
+            "args": {"file_name": "marker.txt"},
+            "binding_source": "prior_tool_output.cwd_or_listing",
+            "arg_bindings": {"file_name": {"source": "prior_tool_output.cwd_or_listing", "value": "marker.txt"}},
+            "recommended_tools": ["touch"],
+        }
+        rule = self._next_tool_rule(
+            recommended_tools=["touch"],
+            request_predicates=["tools_available", "prior_tool_outputs_present"],
+            activation_predicates=["tools_available", "prior_tool_outputs_present"],
+            action_candidates=[action_candidate],
+        )
+        request = {
+            "model": "demo-model",
+            "messages": [
+                {"role": "user", "content": "Continue from the clean directory listing."},
+                {"role": "tool", "name": "ls", "content": json.dumps({"current_directory_content": ["new_folder"]})},
+            ],
+            "tools": [
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "touch",
+                        "parameters": {"type": "object", "properties": {"file_name": {"type": "string"}}},
+                    },
+                }
+            ],
+        }
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir, runtime_policy={"enable_required_next_tool_choice": True})
+            engine.rules = [rule]
+            patched, request_patches = engine.apply_request(request)
+
+        self.assertEqual(patched["tool_choice"], "required")
+        self.assertEqual(request_patches.next_tool_plan["action_candidate_guard"]["reason"], "clean_cwd_listing_binding")
+
+    def test_next_tool_guard_blocks_repeated_prior_match_binding(self) -> None:
+        action_candidate = {
+            "tool": "cat",
+            "args": {"file_name": "notes.txt"},
+            "binding_source": "prior_tool_output.matches[0]|basename",
+            "arg_bindings": {"file_name": {"source": "prior_tool_output.matches[0]|basename", "value": "notes.txt"}},
+            "recommended_tools": ["cat"],
+        }
+        rule = self._next_tool_rule(
+            recommended_tools=["cat"],
+            request_predicates=["tools_available", "prior_tool_outputs_present"],
+            activation_predicates=["tools_available", "prior_tool_outputs_present"],
+            action_candidates=[action_candidate],
+        )
+        request = {
+            "model": "demo-model",
+            "messages": [
+                {"role": "user", "content": "Read the matching file."},
+                {"role": "assistant", "content": "", "tool_calls": [{"id": "c1", "type": "function", "function": {"name": "cat", "arguments": "{\"file_name\":\"old.txt\"}"}}]},
+                {"role": "tool", "tool_call_id": "c1", "content": json.dumps({"matches": ["/workspace/other.txt"]})},
+            ],
+            "tools": [
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "cat",
+                        "parameters": {"type": "object", "properties": {"file_name": {"type": "string"}}},
+                    },
+                }
+            ],
+        }
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir, runtime_policy={"enable_required_next_tool_choice": True})
+            engine.rules = [rule]
+            patched, request_patches = engine.apply_request(request)
+
+        self.assertNotIn("tool_choice", patched)
+        guard = request_patches.next_tool_plan["rejected_action_candidates"][0]["guard"]
+        self.assertIn("repeat_same_tool_without_new_evidence", guard["risk_flags"])
+
+    def test_next_tool_guard_blocks_post_search_literal_cat_intervention(self) -> None:
+        action_candidate = {
+            "tool": "cat",
+            "args": {"file_name": "summary_2024.txt"},
+            "binding_source": "explicit_literal",
+            "arg_bindings": {"file_name": {"source": "explicit_literal", "value": "summary_2024.txt"}},
+            "recommended_tools": ["cat"],
+        }
+        rule = self._next_tool_rule(
+            recommended_tools=["cat"],
+            request_predicates=["tools_available", "prior_explicit_literals_present", "prior_tool_outputs_present"],
+            activation_predicates=["tools_available", "prior_explicit_literals_present", "prior_tool_outputs_present"],
+            action_candidates=[action_candidate],
+        )
+        request = {
+            "model": "demo-model",
+            "messages": [
+                {"role": "user", "content": "Search summary_2024.txt for the specific term."},
+                {"role": "assistant", "content": "", "tool_calls": [{"id": "c1", "type": "function", "function": {"name": "grep", "arguments": "{\"file_name\":\"summary_2024.txt\",\"pattern\":\"term\"}"}}]},
+                {"role": "tool", "tool_call_id": "c1", "content": json.dumps({"matching_lines": []})},
+            ],
+            "tools": [
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "cat",
+                        "parameters": {"type": "object", "properties": {"file_name": {"type": "string"}}},
+                    },
+                }
+            ],
+        }
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir, runtime_policy={"enable_required_next_tool_choice": True})
+            engine.rules = [rule]
+            patched, request_patches = engine.apply_request(request)
+
+        self.assertNotIn("tool_choice", patched)
+        guard = request_patches.next_tool_plan["rejected_action_candidates"][0]["guard"]
+        self.assertIn("post_search_literal_cat_intervention", guard["risk_flags"])
+
     def test_next_tool_arg_binding_validation_records_match(self) -> None:
         action_candidate = {
             "tool": "move_file",

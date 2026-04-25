@@ -741,6 +741,9 @@ class RuleEngine:
         literal_score = int(components.get("literal_score") or 0)
         state_score = int(components.get("state_compatibility_score") or 0)
         intent_score = int(components.get("intent_score") or 0)
+        observed_prior_keys = set(components.get("prior_output_keys_observed") or [])
+        context_literals = self._collect_context_literals(request_json)
+        has_context_file_literal = any(self._looks_like_file_literal(str(item)) for item in context_literals)
         risk_flags: List[str] = []
         if not components.get("schema_available"):
             return {"accepted": False, "reason": "schema_unavailable", "risk_flags": ["schema_unavailable"]}
@@ -752,23 +755,47 @@ class RuleEngine:
             risk_flags.append("prior_output_state_unavailable")
         if "prior_tool_output.cwd_or_listing" in binding_sources and literal_score <= 0:
             risk_flags.append("weak_cwd_or_listing_binding")
-        if tool_name == "cat" and intent_score < 0:
+        if tool_name == "cat" and (intent_score < 0 or (intent_score <= 0 and "explicit_literal" in binding_sources)):
             risk_flags.append("cat_competing_intent")
         write_path_tools = {"mkdir", "touch"}
         if tool_name in write_path_tools and "explicit_literal" in binding_sources and intent_score <= 0:
             risk_flags.append("write_intent_unconfirmed")
         last_prior_tool = self._last_prior_tool_name(request_json)
-        if tool_name in generic_tools and last_prior_tool == tool_name and "explicit_literal" in binding_sources:
+        if tool_name in generic_tools and last_prior_tool == tool_name and binding_sources:
             risk_flags.append("repeat_same_tool_without_new_evidence")
-        if tool_name in generic_tools and last_prior_tool in {"echo", "touch", "mkdir", "mv", "cp"} and "explicit_literal" in binding_sources:
+        if tool_name in generic_tools and last_prior_tool in {"echo", "touch", "mkdir", "mv", "cp", "rm"} and "explicit_literal" in binding_sources:
             risk_flags.append("post_write_tool_intervention")
+        if tool_name == "cat" and last_prior_tool in {"grep", "find"} and "explicit_literal" in binding_sources:
+            risk_flags.append("post_search_literal_cat_intervention")
+        match_keys = {"matches", "file_content"}
+        strong_prior_match = (
+            tool_name == "cat"
+            and "prior_tool_output.matches[0]|basename" in binding_sources
+            and state_score >= 9
+            and arg_score >= 6
+            and intent_score >= -1
+            and bool(observed_prior_keys & match_keys)
+        )
+        clean_cwd_listing = (
+            tool_name in {"touch", "mkdir"}
+            and "prior_tool_output.cwd_or_listing" in binding_sources
+            and state_score >= 9
+            and arg_score >= 6
+            and "current_directory_content" in observed_prior_keys
+            and observed_prior_keys.issubset({"current_directory_content", "current_working_directory"})
+            and not (tool_name == "touch" and has_context_file_literal)
+        )
         strong_explicit = "explicit_literal" in binding_sources and arg_score >= 12 and literal_score > 0
         strong_prior = needs_prior_output and state_score >= 8 and arg_score >= 8 and literal_score > 0
         strong_literal_arg = not binding_sources and arg_score >= 8 and literal_score > 0
-        if strong_explicit and not (tool_name == "cat" and "cat_competing_intent" in risk_flags) and "write_intent_unconfirmed" not in risk_flags and "repeat_same_tool_without_new_evidence" not in risk_flags and "post_write_tool_intervention" not in risk_flags:
+        if strong_explicit and not (tool_name == "cat" and "cat_competing_intent" in risk_flags) and "write_intent_unconfirmed" not in risk_flags and "repeat_same_tool_without_new_evidence" not in risk_flags and "post_write_tool_intervention" not in risk_flags and "post_search_literal_cat_intervention" not in risk_flags:
             return {"accepted": True, "reason": "strong_explicit_literal_binding", "risk_flags": risk_flags}
         if strong_prior and "weak_cwd_or_listing_binding" not in risk_flags:
             return {"accepted": True, "reason": "strong_prior_output_binding", "risk_flags": risk_flags}
+        if strong_prior_match and "cat_competing_intent" not in risk_flags and "repeat_same_tool_without_new_evidence" not in risk_flags:
+            return {"accepted": True, "reason": "strong_prior_output_match_binding", "risk_flags": risk_flags}
+        if clean_cwd_listing:
+            return {"accepted": True, "reason": "clean_cwd_listing_binding", "risk_flags": risk_flags}
         if strong_literal_arg and not (tool_name == "cat" and "cat_competing_intent" in risk_flags) and "write_intent_unconfirmed" not in risk_flags and "repeat_same_tool_without_new_evidence" not in risk_flags and "post_write_tool_intervention" not in risk_flags:
             return {"accepted": True, "reason": "literal_arg_match", "risk_flags": risk_flags}
         if risk_flags:

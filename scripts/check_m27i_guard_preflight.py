@@ -87,6 +87,27 @@ def _candidate_guard_reasons(plan: dict[str, Any]) -> list[str]:
     return reasons
 
 
+def _accepted_guard_reason(plan: dict[str, Any]) -> str | None:
+    guard = plan.get("action_candidate_guard") if isinstance(plan.get("action_candidate_guard"), dict) else {}
+    reason = guard.get("reason")
+    return str(reason) if reason else None
+
+
+def _top_candidate_rejection_reason(plan: dict[str, Any]) -> str | None:
+    rejected = plan.get("rejected_action_candidates") or []
+    if not rejected or not isinstance(rejected[0], dict):
+        return None
+    guard = rejected[0].get("guard") if isinstance(rejected[0].get("guard"), dict) else {}
+    reason = guard.get("reason")
+    return str(reason) if reason else None
+
+
+def _case_final_guard_reason(after_plan: dict[str, Any]) -> str | None:
+    if after_plan.get("activated"):
+        return _accepted_guard_reason(after_plan)
+    return _top_candidate_rejection_reason(after_plan) or str(after_plan.get("blocked_reason") or "unknown")
+
+
 def _case_status(before_plan: dict[str, Any], after_plan: dict[str, Any]) -> str:
     before_candidate = before_plan.get("selected_action_candidate") if isinstance(before_plan.get("selected_action_candidate"), dict) else None
     after_candidate = after_plan.get("selected_action_candidate") if isinstance(after_plan.get("selected_action_candidate"), dict) else None
@@ -153,6 +174,8 @@ def summarize_guard_preflight(
     distribution = _tool_distribution(after_plans)
     dominant_tool, dominant_rate = _dominant_tool_rate(distribution, activated_after)
     guard_reason_distribution: Counter[str] = Counter()
+    top_candidate_reason_distribution: Counter[str] = Counter()
+    case_final_reason_distribution: Counter[str] = Counter()
     guard_rejected_count = 0
     status_by_case: dict[str, str] = {}
     enriched_cases: list[dict[str, Any]] = []
@@ -165,10 +188,19 @@ def summarize_guard_preflight(
         if status == "guard_rejected":
             guard_rejected_count += 1
         reasons = _candidate_guard_reasons(after_plan)
+        top_reason = _top_candidate_rejection_reason(after_plan)
+        final_reason = _case_final_guard_reason(after_plan)
         guard_reason_distribution.update(reasons)
+        if top_reason:
+            top_candidate_reason_distribution[top_reason] += 1
+        if final_reason:
+            case_final_reason_distribution[final_reason] += 1
         enriched = dict(row)
         enriched["guard_status"] = status
         enriched["guard_rejection_reasons"] = reasons
+        enriched["all_candidate_rejection_reasons"] = reasons
+        enriched["top_candidate_rejection_reason"] = top_reason
+        enriched["case_final_guard_reason"] = final_reason
         enriched_cases.append(enriched)
 
     regressed_status = {case_id: status_by_case.get(case_id, "missing") for case_id in regressed_cases}
@@ -193,7 +225,11 @@ def summarize_guard_preflight(
         "plan_activated_count_after_guard": activated_after,
         "guard_rejected_count": guard_rejected_count,
         "guard_reason_distribution": dict(sorted(guard_reason_distribution.items(), key=lambda item: (-item[1], item[0]))),
+        "all_candidate_rejection_reason_distribution": dict(sorted(guard_reason_distribution.items(), key=lambda item: (-item[1], item[0]))),
+        "top_candidate_rejection_reason_distribution": dict(sorted(top_candidate_reason_distribution.items(), key=lambda item: (-item[1], item[0]))),
+        "case_final_guard_reason_distribution": dict(sorted(case_final_reason_distribution.items(), key=lambda item: (-item[1], item[0]))),
         "selected_next_tool_distribution_after_guard": dict(sorted(distribution.items(), key=lambda item: (-item[1], item[0]))),
+        "selected_next_tool_count_after_guard": len(distribution),
         "dominant_selected_next_tool_after_guard": dominant_tool,
         "dominant_selected_next_tool_rate_after_guard": dominant_rate,
         "candidate_rules_schema_local": schema_local,
