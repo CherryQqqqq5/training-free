@@ -67,6 +67,32 @@ class M27fGateTests(unittest.TestCase):
         self.assertEqual(report["diagnostic"]["case_level_evidence"], "durable")
         self.assertFalse(report["diagnostic"]["do_not_expand_to_100_case_m28_or_full_bfcl"])
 
+
+    def test_case_level_gate_disallowed_fails_even_when_mapping_and_metrics_pass(self) -> None:
+        summary = passing_summary()
+        summary["case_level_gate_allowed"] = False
+
+        report = evaluate_m27f_gate(summary)
+
+        self.assertFalse(report["m2_7f_gate_passed"])
+        self.assertFalse(report["criteria"]["case_level_gate_allowed"]["passed"])
+        self.assertEqual(report["diagnostic"]["case_level_evidence"], "diagnostic_only")
+        self.assertEqual(report["diagnostic"]["first_failed_criterion"], "case_level_gate_allowed")
+        self.assertEqual(report["diagnostic"]["recommended_next_focus"], "trace_completeness_or_prompt_prefix_fallback")
+
+    def test_mtime_mapping_with_good_metrics_remains_diagnostic_only(self) -> None:
+        summary = passing_summary()
+        summary["case_report_trace_mapping"] = "mtime_by_result_step_count"
+        summary["case_level_gate_allowed"] = False
+        summary["accepted"] = True
+
+        report = evaluate_m27f_gate(summary)
+
+        self.assertFalse(report["m2_7f_gate_passed"])
+        self.assertEqual(report["diagnostic"]["case_level_evidence"], "diagnostic_only")
+        self.assertIn("case_level_gate_allowed", report["diagnostic"]["failed_criteria"])
+        self.assertIn("case_report_trace_mapping", report["diagnostic"]["failed_criteria"])
+
     def test_cli_exit_code_reflects_explicit_gate_not_accepted_field(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_raw:
             summary_path = Path(tmp_raw) / "subset_summary.json"

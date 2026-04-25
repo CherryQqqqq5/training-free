@@ -926,6 +926,8 @@ def summarize_case_report(rows: list[dict[str, Any]], *, baseline_acc: float | N
         "case_report_trace_mapping": getattr(rows, "trace_mapping_method", "unknown"),
     }
     summary["net_case_gain"] = summary["case_fixed_count"] - summary["case_regressed_count"]
+    summary["case_level_gate_allowed"] = summary["case_report_trace_mapping"] == "prompt_user_prefix"
+    summary["case_level_evidence"] = "durable" if summary["case_level_gate_allowed"] else "diagnostic_only"
     summary["accepted"] = (
         summary["policy_plan_activated_count"] > 0
         and summary["recommended_tool_match_rate_among_activated"] >= 0.6

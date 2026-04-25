@@ -32,7 +32,13 @@ def evaluate_m27f_gate(summary: dict[str, Any], *, summary_path: str | None = No
     raw_normalized_arg_match_rate = _number(summary.get("raw_normalized_arg_match_rate_among_activated"))
     stop_allowed_false_positive_count = _number(summary.get("stop_allowed_false_positive_count"))
 
+    case_level_gate_allowed = summary.get("case_level_gate_allowed")
     criteria = {
+        "case_level_gate_allowed": _criterion(
+            passed=case_level_gate_allowed is not False,
+            actual=case_level_gate_allowed,
+            expected="not false; case-level gate must be explicitly allowed when present",
+        ),
         "case_report_trace_mapping": _criterion(
             passed=summary.get("case_report_trace_mapping") == "prompt_user_prefix",
             actual=summary.get("case_report_trace_mapping"),
@@ -76,7 +82,7 @@ def evaluate_m27f_gate(summary: dict[str, Any], *, summary_path: str | None = No
     }
     failed = [name for name, item in criteria.items() if not item["passed"]]
     gate_passed = not failed
-    mapping_stable = criteria["case_report_trace_mapping"]["passed"]
+    mapping_stable = criteria["case_report_trace_mapping"]["passed"] and criteria["case_level_gate_allowed"]["passed"]
     return {
         "summary_path": summary_path,
         "m2_7f_gate_passed": gate_passed,
@@ -93,6 +99,8 @@ def evaluate_m27f_gate(summary: dict[str, Any], *, summary_path: str | None = No
 
 
 def _recommended_next_focus(summary: dict[str, Any], criteria: dict[str, dict[str, Any]]) -> str:
+    if not criteria["case_level_gate_allowed"]["passed"]:
+        return "trace_completeness_or_prompt_prefix_fallback"
     if not criteria["case_report_trace_mapping"]["passed"]:
         return "prompt_prefix_fallback"
     baseline_accuracy = _number(summary.get("baseline_accuracy"))
