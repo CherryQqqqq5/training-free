@@ -544,13 +544,21 @@ class RuleEngine:
         ]
         return json.dumps(items[-12:], ensure_ascii=False).lower()
 
+    def _request_intent_text_for_ranking(self, request_json: Dict[str, Any]) -> str:
+        items = [
+            item
+            for item in self._conversation_items(request_json)
+            if item.get("role") == "user"
+        ]
+        return json.dumps(items[-4:], ensure_ascii=False).lower()
+
     @staticmethod
     def _request_intent_hits(request_text: str) -> Dict[str, int]:
         aliases = {
             "cat": ("read", "show", "display", "open", "view", "print contents", "show contents"),
             "grep": ("grep", "search", "match", "matches", "contains", "matching lines"),
             "find": ("find", "locate", "search for", "look for"),
-            "mkdir": ("make directory", "create directory", "new folder", "make folder", "create folder"),
+            "mkdir": ("make directory", "make a directory", "create directory", "create a directory", "new directory", "new folder", "make folder", "create folder"),
             "touch": ("create file", "new file", "touch", "empty file"),
             "mv": ("move", "rename"),
             "cp": ("copy", "duplicate"),
@@ -612,13 +620,13 @@ class RuleEngine:
             if not lowered:
                 continue
             basename = lowered.rsplit("/", 1)[-1]
-            if lowered in request_text:
+            if self._literal_present_in_text(lowered, request_text):
                 literal_score += 10
-            elif basename and basename in request_text:
+            elif basename and self._literal_present_in_text(basename, request_text):
                 literal_score += 8
             elif lowered in context_literals or basename in context_literals:
                 literal_score += 6
-            else:
+            elif not self._looks_like_file_literal(lowered):
                 tokens = set(self._normalize_literal_tokens(lowered))
                 if tokens and tokens.issubset(set(self._normalize_literal_tokens(request_text))):
                     literal_score += 3
@@ -644,7 +652,8 @@ class RuleEngine:
         elif not binding_sources and literal_score > 0:
             components["arg_binding_score"] = 8
 
-        components["intent_score"] = self._tool_intent_score(tool_name, request_text)
+        intent_text = self._request_intent_text_for_ranking(request_json)
+        components["intent_score"] = self._tool_intent_score(tool_name, intent_text)
         components["score"] = (
             int(components["arg_binding_score"])
             + int(components["state_compatibility_score"])
@@ -745,14 +754,22 @@ class RuleEngine:
             risk_flags.append("weak_cwd_or_listing_binding")
         if tool_name == "cat" and intent_score < 0:
             risk_flags.append("cat_competing_intent")
+        write_path_tools = {"mkdir", "touch"}
+        if tool_name in write_path_tools and "explicit_literal" in binding_sources and intent_score <= 0:
+            risk_flags.append("write_intent_unconfirmed")
+        last_prior_tool = self._last_prior_tool_name(request_json)
+        if tool_name in generic_tools and last_prior_tool == tool_name and "explicit_literal" in binding_sources:
+            risk_flags.append("repeat_same_tool_without_new_evidence")
+        if tool_name in generic_tools and last_prior_tool in {"echo", "touch", "mkdir", "mv", "cp"} and "explicit_literal" in binding_sources:
+            risk_flags.append("post_write_tool_intervention")
         strong_explicit = "explicit_literal" in binding_sources and arg_score >= 12 and literal_score > 0
         strong_prior = needs_prior_output and state_score >= 8 and arg_score >= 8 and literal_score > 0
         strong_literal_arg = not binding_sources and arg_score >= 8 and literal_score > 0
-        if strong_explicit and not (tool_name == "cat" and "cat_competing_intent" in risk_flags):
+        if strong_explicit and not (tool_name == "cat" and "cat_competing_intent" in risk_flags) and "write_intent_unconfirmed" not in risk_flags and "repeat_same_tool_without_new_evidence" not in risk_flags and "post_write_tool_intervention" not in risk_flags:
             return {"accepted": True, "reason": "strong_explicit_literal_binding", "risk_flags": risk_flags}
         if strong_prior and "weak_cwd_or_listing_binding" not in risk_flags:
             return {"accepted": True, "reason": "strong_prior_output_binding", "risk_flags": risk_flags}
-        if strong_literal_arg and not (tool_name == "cat" and "cat_competing_intent" in risk_flags):
+        if strong_literal_arg and not (tool_name == "cat" and "cat_competing_intent" in risk_flags) and "write_intent_unconfirmed" not in risk_flags and "repeat_same_tool_without_new_evidence" not in risk_flags and "post_write_tool_intervention" not in risk_flags:
             return {"accepted": True, "reason": "literal_arg_match", "risk_flags": risk_flags}
         if risk_flags:
             return {"accepted": False, "reason": risk_flags[0], "risk_flags": risk_flags}
@@ -1005,6 +1022,13 @@ class RuleEngine:
     @staticmethod
     def _looks_like_file_literal(value: str) -> bool:
         return bool(re.search(r"\.[A-Za-z0-9]{1,8}$", value.strip()))
+
+    @staticmethod
+    def _literal_present_in_text(literal: str, text: str) -> bool:
+        if not literal:
+            return False
+        pattern = r"(?<![a-z0-9_.-])" + re.escape(literal.lower()) + r"(?![a-z0-9_.-])"
+        return re.search(pattern, text.lower()) is not None
 
     @staticmethod
     def _normalize_literal_tokens(value: str) -> List[str]:

@@ -1923,6 +1923,111 @@ action:
         guard = request_patches.next_tool_plan["rejected_action_candidates"][0]["guard"]
         self.assertIn("cat_competing_intent", guard["risk_flags"])
 
+    def test_action_candidate_literal_score_does_not_match_filename_substrings(self) -> None:
+        engine = RuleEngine("/tmp/nonexistent-rules")
+        request = {
+            "model": "demo-model",
+            "messages": [{"role": "user", "content": "Create project_summary.txt in the current directory."}],
+            "tools": [
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "touch",
+                        "parameters": {"type": "object", "properties": {"file_name": {"type": "string"}}},
+                    },
+                }
+            ],
+        }
+        components = engine._action_candidate_score_components(
+            {
+                "tool": "touch",
+                "args": {"file_name": "summary.txt"},
+                "binding_source": "explicit_literal",
+                "arg_bindings": {"file_name": {"source": "explicit_literal", "value": "summary.txt"}},
+            },
+            request_json=request,
+            request_tool_name_set={"touch"},
+            recommended=["touch"],
+            confidence=0.8,
+            index=0,
+        )
+
+        self.assertEqual(components["literal_score"], 0)
+        self.assertEqual(components["arg_binding_score"], 0)
+
+    def test_next_tool_guard_blocks_touch_literal_without_create_intent(self) -> None:
+        action_candidate = {
+            "tool": "touch",
+            "args": {"file_name": "summary.txt"},
+            "binding_source": "explicit_literal",
+            "arg_bindings": {"file_name": {"source": "explicit_literal", "value": "summary.txt"}},
+            "recommended_tools": ["touch"],
+        }
+        rule = self._next_tool_rule(recommended_tools=["touch"], action_candidates=[action_candidate])
+        request = {
+            "model": "demo-model",
+            "messages": [{"role": "user", "content": "Inspect summary.txt and report what it says."}],
+            "tools": [
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "touch",
+                        "parameters": {"type": "object", "properties": {"file_name": {"type": "string"}}},
+                    },
+                }
+            ],
+        }
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir, runtime_policy={"enable_required_next_tool_choice": True})
+            engine.rules = [rule]
+            patched, request_patches = engine.apply_request(request)
+
+        self.assertNotIn("tool_choice", patched)
+        self.assertFalse(request_patches.next_tool_plan["activated"])
+        guard = request_patches.next_tool_plan["rejected_action_candidates"][0]["guard"]
+        self.assertIn("write_intent_unconfirmed", guard["risk_flags"])
+
+    def test_next_tool_guard_blocks_repeated_generic_tool_without_new_evidence(self) -> None:
+        action_candidate = {
+            "tool": "touch",
+            "args": {"file_name": "project_summary.txt"},
+            "binding_source": "explicit_literal",
+            "arg_bindings": {"file_name": {"source": "explicit_literal", "value": "project_summary.txt"}},
+            "recommended_tools": ["touch"],
+        }
+        rule = self._next_tool_rule(
+            recommended_tools=["touch"],
+            request_predicates=["tools_available", "prior_explicit_literals_present", "prior_tool_outputs_present"],
+            activation_predicates=["tools_available", "prior_explicit_literals_present", "prior_tool_outputs_present"],
+            action_candidates=[action_candidate],
+        )
+        request = {
+            "model": "demo-model",
+            "messages": [
+                {"role": "user", "content": "Create an empty file named 'project_summary.txt'."},
+                {"role": "assistant", "content": "", "tool_calls": [{"id": "c1", "type": "function", "function": {"name": "touch", "arguments": "{\"file_name\":\"project_summary.txt\"}"}}]},
+                {"role": "tool", "tool_call_id": "c1", "content": "None"},
+            ],
+            "tools": [
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "touch",
+                        "parameters": {"type": "object", "properties": {"file_name": {"type": "string"}}},
+                    },
+                }
+            ],
+        }
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir, runtime_policy={"enable_required_next_tool_choice": True})
+            engine.rules = [rule]
+            patched, request_patches = engine.apply_request(request)
+
+        self.assertNotIn("tool_choice", patched)
+        self.assertFalse(request_patches.next_tool_plan["activated"])
+        guard = request_patches.next_tool_plan["rejected_action_candidates"][0]["guard"]
+        self.assertIn("repeat_same_tool_without_new_evidence", guard["risk_flags"])
+
     def test_next_tool_arg_binding_validation_records_match(self) -> None:
         action_candidate = {
             "tool": "move_file",
