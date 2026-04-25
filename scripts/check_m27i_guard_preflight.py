@@ -474,6 +474,8 @@ def evaluate_guard_preflight(
             "source_traces": str(source_traces),
             "regression_audit_path": str(regression_audit_path),
             "category": category,
+            "exact_next_tool_choice_mode": engine.exact_next_tool_choice_mode,
+            "exact_tool_choice_trajectory_sensitive_tools": sorted(engine.exact_tool_choice_trajectory_sensitive_tools),
             "request_state_source": primary_source,
             "per_state_summary_after_guard": per_state_summary,
         },

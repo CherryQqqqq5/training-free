@@ -38,6 +38,25 @@ class RequestPatchList(list):
 
 
 class RuleEngine:
+    _EXACT_NEXT_TOOL_CHOICE_MODES = {"off", "guidance_only", "exact_tool_when_single_step_confident"}
+    _DEFAULT_EXACT_TOOL_CHOICE_TRAJECTORY_SENSITIVE_TOOLS = {"cat", "touch", "mkdir"}
+    _DEFAULT_EXACT_TOOL_CHOICE_ALLOWED_GUARD_REASONS = {
+        "strong_explicit_literal_binding",
+        "strong_prior_output_binding",
+        "strong_prior_output_match_binding",
+        "literal_arg_match",
+    }
+    _DEFAULT_EXACT_TOOL_CHOICE_UNSAFE_RISK_FLAGS = {
+        "weak_arg_binding_evidence",
+        "prior_output_state_unavailable",
+        "weak_cwd_or_listing_binding",
+        "cat_competing_intent",
+        "write_intent_unconfirmed",
+        "repeat_same_tool_without_new_evidence",
+        "post_write_tool_intervention",
+        "post_search_literal_cat_intervention",
+    }
+
     def __init__(self, rules_dir: str, runtime_policy: Dict[str, Any] | None = None):
         self.rules_dir = Path(rules_dir)
         self.runtime_policy = dict(runtime_policy or {})
@@ -67,10 +86,13 @@ class RuleEngine:
             self.runtime_policy.get("enable_required_next_tool_choice", False)
             or self.runtime_policy.get("required_next_tool_choice_enabled", False)
         )
-        self.enable_exact_next_tool_choice = bool(
-            self.runtime_policy.get("enable_exact_next_tool_choice", False)
-            or self.runtime_policy.get("exact_next_tool_choice_enabled", False)
-        )
+        self.exact_next_tool_choice_mode = self._configured_exact_next_tool_choice_mode()
+        self.enable_exact_next_tool_choice = self.exact_next_tool_choice_mode == "exact_tool_when_single_step_confident"
+        configured_sensitive = self.runtime_policy.get("exact_tool_choice_trajectory_sensitive_tools")
+        if isinstance(configured_sensitive, list):
+            self.exact_tool_choice_trajectory_sensitive_tools = {str(item) for item in configured_sensitive if str(item).strip()}
+        else:
+            self.exact_tool_choice_trajectory_sensitive_tools = set(self._DEFAULT_EXACT_TOOL_CHOICE_TRAJECTORY_SENSITIVE_TOOLS)
         self.rules: List[Rule] = self._load_rules()
 
     _QUOTED_LITERAL_RE = re.compile(
@@ -102,6 +124,64 @@ class RuleEngine:
             elif data:
                 rules.append(Rule(**data))
         return sorted((rule for rule in rules if rule.enabled), key=lambda item: item.priority, reverse=True)
+
+    def _configured_exact_next_tool_choice_mode(self) -> str:
+        raw_mode = self.runtime_policy.get("exact_next_tool_choice_mode")
+        if isinstance(raw_mode, str) and raw_mode.strip():
+            mode = raw_mode.strip()
+            if mode not in self._EXACT_NEXT_TOOL_CHOICE_MODES:
+                raise ValueError(
+                    "exact_next_tool_choice_mode must be one of "
+                    + ", ".join(sorted(self._EXACT_NEXT_TOOL_CHOICE_MODES))
+                )
+            return mode
+        legacy_enabled = bool(
+            self.runtime_policy.get("enable_exact_next_tool_choice", False)
+            or self.runtime_policy.get("exact_next_tool_choice_enabled", False)
+        )
+        if legacy_enabled:
+            return "exact_tool_when_single_step_confident"
+        return "guidance_only"
+
+    def _action_specific_guidance_enabled(self) -> bool:
+        return self.exact_next_tool_choice_mode in {"guidance_only", "exact_tool_when_single_step_confident"}
+
+    def _exact_next_tool_choice_allowed(
+        self,
+        *,
+        selected_tool: str | None,
+        selected_action_candidate: Dict[str, Any] | None,
+        next_tool_plan: Dict[str, Any],
+    ) -> bool:
+        if self.exact_next_tool_choice_mode != "exact_tool_when_single_step_confident":
+            return False
+        if not selected_tool or not isinstance(selected_action_candidate, dict):
+            return False
+        if str(selected_action_candidate.get("tool") or "").strip() != selected_tool:
+            return False
+        if selected_tool in self.exact_tool_choice_trajectory_sensitive_tools:
+            return False
+        guard = next_tool_plan.get("action_candidate_guard") if isinstance(next_tool_plan.get("action_candidate_guard"), dict) else {}
+        reason = str(guard.get("reason") or "")
+        configured_reasons = self.runtime_policy.get("exact_tool_choice_allowed_guard_reasons")
+        if isinstance(configured_reasons, list) and configured_reasons:
+            allowed_reasons = {str(item) for item in configured_reasons if str(item).strip()}
+        else:
+            allowed_reasons = set(self._DEFAULT_EXACT_TOOL_CHOICE_ALLOWED_GUARD_REASONS)
+        if reason not in allowed_reasons:
+            return False
+        risk_flags = {str(item) for item in guard.get("risk_flags") or []}
+        unsafe_flags = set(self._DEFAULT_EXACT_TOOL_CHOICE_UNSAFE_RISK_FLAGS)
+        configured_unsafe = self.runtime_policy.get("exact_tool_choice_unsafe_risk_flags")
+        if isinstance(configured_unsafe, list) and configured_unsafe:
+            unsafe_flags = {str(item) for item in configured_unsafe if str(item).strip()}
+        if risk_flags & unsafe_flags:
+            return False
+        try:
+            json.dumps(selected_action_candidate.get("args") or {}, ensure_ascii=False, sort_keys=True)
+        except TypeError:
+            return False
+        return True
 
     def _tool_schema_map(self, request_json: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
         return tool_map_from_tools_payload(request_json.get("tools", []))
@@ -863,6 +943,7 @@ class RuleEngine:
         observed_predicates = self._observable_request_predicates(request_json)
         plan: Dict[str, Any] = {
             "attempted": True,
+            "exact_next_tool_choice_mode": self.exact_next_tool_choice_mode,
             "activated": False,
             "blocked_reason": None,
             "available_tools": request_tool_names,
@@ -1017,7 +1098,13 @@ class RuleEngine:
         fragments: List[str] = []
         selected_tool = str(plan.get("selected_tool") or "").strip()
         candidate = plan.get("selected_action_candidate") if isinstance(plan.get("selected_action_candidate"), dict) else None
-        if plan.get("activated") and selected_tool and candidate and str(candidate.get("tool") or "").strip() == selected_tool:
+        if (
+            self._action_specific_guidance_enabled()
+            and plan.get("activated")
+            and selected_tool
+            and candidate
+            and str(candidate.get("tool") or "").strip() == selected_tool
+        ):
             args = candidate.get("args") if isinstance(candidate.get("args"), dict) else {}
             args_text = json.dumps(args, ensure_ascii=False, sort_keys=True)
             sources = self._action_candidate_guidance_sources(candidate)
@@ -1194,13 +1281,22 @@ class RuleEngine:
             policy_request_patches.extend(f"policy_hit:{rule_id}" for rule_id in next_tool_plan.get("policy_hits") or [])
             selected_action_candidate = next_tool_plan.get("selected_action_candidate")
             if (
-                self.enable_exact_next_tool_choice
-                and selected_tool
-                and isinstance(selected_action_candidate, dict)
+                self._exact_next_tool_choice_allowed(
+                    selected_tool=str(selected_tool) if selected_tool else None,
+                    selected_action_candidate=selected_action_candidate if isinstance(selected_action_candidate, dict) else None,
+                    next_tool_plan=next_tool_plan,
+                )
                 and "tool_choice" not in patched
             ):
                 patched["tool_choice"] = {"type": "function", "function": {"name": str(selected_tool)}}
                 policy_request_patches.append(f"tool_choice:function(policy_next_tool)={selected_tool}")
+            elif (
+                self.exact_next_tool_choice_mode == "exact_tool_when_single_step_confident"
+                and selected_tool
+                and isinstance(selected_action_candidate, dict)
+                and "tool_choice" not in patched
+            ):
+                policy_request_patches.append(f"tool_choice:function(policy_next_tool):skipped={selected_tool}")
             elif (
                 self.enable_required_next_tool_choice
                 and next_tool_plan.get("tool_choice_mode") == "required"

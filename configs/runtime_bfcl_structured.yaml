@@ -34,10 +34,15 @@ runtime_policy:
   # already present in the conversation/tool state.
   resolve_contextual_string_args: true
 
-  # M2.7k: BFCL-lite policy interventions are only emitted after the
-  # conservative guard accepts an action candidate. In that narrow case, force
-  # the exact selected function name rather than merely requiring any tool.
-  enable_exact_next_tool_choice: true
+  # M2.7l: keep BFCL-lite interventions as action-specific guidance by default.
+  # Exact function forcing is available only through the conditional mode and is
+  # disabled for trajectory-sensitive generic filesystem tools unless explicitly
+  # reconfigured.
+  exact_next_tool_choice_mode: guidance_only
+  exact_tool_choice_trajectory_sensitive_tools:
+    - cat
+    - touch
+    - mkdir
 
 upstream:
   active_profile: "openrouter"

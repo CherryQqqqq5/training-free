@@ -162,7 +162,7 @@ class M27kToolArgAlignmentTests(unittest.TestCase):
         self.assertEqual(arg_case["repair_kinds"], ["resolve_contextual_string_arg"])
         self.assertIn("M2.7k", render_markdown(report))
 
-    def test_preflight_fails_without_action_specific_guidance_or_exact_tool_choice(self) -> None:
+    def test_preflight_fails_without_action_specific_guidance_but_not_without_exact_tool_choice(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_raw:
             root = Path(tmp_raw)
             selected = ["case_tool_mismatch", "case_arg_mismatch", "case_continuation", "case_fixed", "case_inactive"]
@@ -173,8 +173,8 @@ class M27kToolArgAlignmentTests(unittest.TestCase):
 
         self.assertFalse(report["m2_7k_tool_arg_alignment_passed"])
         self.assertEqual(report["diagnostic"]["first_failed_criterion"], "action_specific_guidance_coverage")
-        self.assertFalse(exact_report["m2_7k_tool_arg_alignment_passed"])
-        self.assertEqual(exact_report["diagnostic"]["first_failed_criterion"], "exact_tool_choice_coverage")
+        self.assertTrue(exact_report["m2_7k_tool_arg_alignment_passed"])
+        self.assertEqual(exact_report["exact_tool_choice_coverage"], 0.0)
 
 
 if __name__ == "__main__":

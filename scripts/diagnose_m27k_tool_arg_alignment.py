@@ -158,8 +158,6 @@ def _first_failed_criterion(report: dict[str, Any]) -> str | None:
         return "all_activated_cases_classified"
     if report.get("action_specific_guidance_coverage") != 1.0:
         return "action_specific_guidance_coverage"
-    if report.get("exact_tool_choice_coverage") != 1.0:
-        return "exact_tool_choice_coverage"
     if report.get("candidate_args_serializable_rate") != 1.0:
         return "candidate_args_serializable_rate"
     if not report.get("candidate_rules_schema_local"):
@@ -234,6 +232,8 @@ def evaluate_tool_arg_alignment(
         "classification_counts": dict(sorted(classification_counts.items(), key=lambda item: (-item[1], item[0]))),
         "cases": cases,
         "candidate_rules_schema_local": preflight_report.get("candidate_rules_schema_local"),
+        "exact_next_tool_choice_mode": preflight_report.get("exact_next_tool_choice_mode"),
+        "exact_tool_choice_trajectory_sensitive_tools": preflight_report.get("exact_tool_choice_trajectory_sensitive_tools") or [],
         "plan_activated_count_after_guard": preflight_report.get("plan_activated_count_after_guard"),
         "dominant_selected_next_tool_rate_after_guard": preflight_report.get("dominant_selected_next_tool_rate_after_guard"),
         "fixed_cases_guard_status": preflight_report.get("fixed_cases_guard_status") or {},
@@ -260,6 +260,7 @@ def render_markdown(report: dict[str, Any]) -> str:
         "- Classification counts: `{}`".format(report.get("classification_counts")),
         "- Action-specific guidance coverage: `{}`".format(report.get("action_specific_guidance_coverage")),
         "- Exact tool-choice coverage: `{}`".format(report.get("exact_tool_choice_coverage")),
+        "- Exact tool-choice mode: `{}`".format(report.get("exact_next_tool_choice_mode")),
         "- First failed criterion: `{}`".format((report.get("diagnostic") or {}).get("first_failed_criterion")),
         "",
         "| Case | Kind | Classification | Selected Tool | Tool Match | Raw Arg Match |",
@@ -301,6 +302,7 @@ def main() -> None:
             "classification_counts",
             "action_specific_guidance_coverage",
             "exact_tool_choice_coverage",
+            "exact_next_tool_choice_mode",
             "candidate_args_serializable_rate",
             "plan_activated_count_after_guard",
             "dominant_selected_next_tool_rate_after_guard",
