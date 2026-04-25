@@ -1,0 +1,1163 @@
+{
+  "title": "M2.7k Tool/Arg Alignment Diagnostic",
+  "selected_case_count": 30,
+  "activated_case_count": 14,
+  "classified_activated_case_count": 14,
+  "all_activated_cases_classified": true,
+  "classification_counts": {
+    "not_activated_context": 16,
+    "actuation_or_prompt_guidance": 8,
+    "argument_realization": 4,
+    "aligned_or_fixed": 1,
+    "trajectory_continuation_or_final_answer": 1
+  },
+  "cases": [
+    {
+      "case_id": "multi_turn_miss_param_17",
+      "case_kind": "stable_failure",
+      "classification": "argument_realization",
+      "baseline_success": false,
+      "candidate_success": false,
+      "policy_plan_activated": true,
+      "selected_next_tool": "touch",
+      "next_tool_emitted": true,
+      "recommended_tool_match": true,
+      "raw_normalized_arg_match": false,
+      "final_normalized_arg_match": false,
+      "selected_action_candidate": {
+        "tool": "touch",
+        "args": {
+          "file_name": "marker.txt"
+        },
+        "arg_bindings": {
+          "file_name": {
+            "source": "prior_tool_output.cwd_or_listing",
+            "value": "marker.txt",
+            "evidence": {
+              "last_tool": null,
+              "prior_output_keys": [
+                "current_working_directory",
+                "disk_usage"
+              ]
+            }
+          }
+        },
+        "recommended_tools": [
+          "touch"
+        ],
+        "reason": "prior cwd/listing output grounds a path-sensitive next action",
+        "evidence": {
+          "last_tool": null,
+          "prior_output_keys": [
+            "current_working_directory",
+            "disk_usage"
+          ]
+        },
+        "binding_source": "prior_tool_output.cwd_or_listing"
+      },
+      "binding_sources": [
+        "prior_tool_output.cwd_or_listing"
+      ],
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ]
+    },
+    {
+      "case_id": "multi_turn_miss_param_19",
+      "case_kind": "stable_failure",
+      "classification": "not_activated_context",
+      "baseline_success": false,
+      "candidate_success": false,
+      "policy_plan_activated": false,
+      "selected_next_tool": null,
+      "next_tool_emitted": false,
+      "recommended_tool_match": false,
+      "raw_normalized_arg_match": false,
+      "final_normalized_arg_match": false,
+      "selected_action_candidate": {},
+      "binding_sources": [],
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "resolve_contextual_string_arg",
+        "strip_assistant_content_with_tool_calls"
+      ]
+    },
+    {
+      "case_id": "multi_turn_miss_param_31",
+      "case_kind": "fixed",
+      "classification": "aligned_or_fixed",
+      "baseline_success": false,
+      "candidate_success": true,
+      "policy_plan_activated": true,
+      "selected_next_tool": "cat",
+      "next_tool_emitted": true,
+      "recommended_tool_match": true,
+      "raw_normalized_arg_match": true,
+      "final_normalized_arg_match": true,
+      "selected_action_candidate": {
+        "tool": "cat",
+        "args": {
+          "file_name": "data.txt"
+        },
+        "arg_bindings": {
+          "file_name": {
+            "source": "prior_tool_output.matches[0]|basename",
+            "value": "data.txt",
+            "evidence": {
+              "last_tool": null,
+              "prior_output_keys": [
+                "matches",
+                "result",
+                "file_content",
+                "matching_lines",
+                "error",
+                "count",
+                "type"
+              ]
+            }
+          }
+        },
+        "recommended_tools": [
+          "cat"
+        ],
+        "reason": "prior find/list output has a concrete match and the user asks to read content",
+        "evidence": {
+          "last_tool": null,
+          "prior_output_keys": [
+            "matches",
+            "result",
+            "file_content",
+            "matching_lines",
+            "error",
+            "count",
+            "type"
+          ]
+        },
+        "binding_source": "prior_tool_output.matches[0]|basename"
+      },
+      "binding_sources": [
+        "prior_tool_output.matches[0]|basename"
+      ],
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "resolve_contextual_string_arg"
+      ]
+    },
+    {
+      "case_id": "multi_turn_miss_param_38",
+      "case_kind": "stable_failure",
+      "classification": "not_activated_context",
+      "baseline_success": false,
+      "candidate_success": false,
+      "policy_plan_activated": false,
+      "selected_next_tool": null,
+      "next_tool_emitted": false,
+      "recommended_tool_match": false,
+      "raw_normalized_arg_match": false,
+      "final_normalized_arg_match": false,
+      "selected_action_candidate": {},
+      "binding_sources": [],
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ]
+    },
+    {
+      "case_id": "multi_turn_miss_param_3",
+      "case_kind": "stable_failure",
+      "classification": "not_activated_context",
+      "baseline_success": false,
+      "candidate_success": false,
+      "policy_plan_activated": false,
+      "selected_next_tool": null,
+      "next_tool_emitted": false,
+      "recommended_tool_match": false,
+      "raw_normalized_arg_match": false,
+      "final_normalized_arg_match": false,
+      "selected_action_candidate": {},
+      "binding_sources": [],
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "resolve_contextual_string_arg",
+        "strip_assistant_content_with_tool_calls"
+      ]
+    },
+    {
+      "case_id": "multi_turn_miss_param_5",
+      "case_kind": "stable_failure",
+      "classification": "argument_realization",
+      "baseline_success": false,
+      "candidate_success": false,
+      "policy_plan_activated": true,
+      "selected_next_tool": "cat",
+      "next_tool_emitted": true,
+      "recommended_tool_match": true,
+      "raw_normalized_arg_match": false,
+      "final_normalized_arg_match": false,
+      "selected_action_candidate": {
+        "tool": "cat",
+        "args": {
+          "file_name": "test_results.json"
+        },
+        "arg_bindings": {
+          "file_name": {
+            "source": "prior_tool_output.matches[0]|basename",
+            "value": "test_results.json",
+            "evidence": {
+              "last_tool": null,
+              "prior_output_keys": [
+                "matches",
+                "error",
+                "current_working_directory",
+                "file_content",
+                "id",
+                "username",
+                "content",
+                "tags",
+                "mentions"
+              ]
+            }
+          }
+        },
+        "recommended_tools": [
+          "cat"
+        ],
+        "reason": "prior find/list output has a concrete match and the user asks to read content",
+        "evidence": {
+          "last_tool": null,
+          "prior_output_keys": [
+            "matches",
+            "error",
+            "current_working_directory",
+            "file_content",
+            "id",
+            "username",
+            "content",
+            "tags",
+            "mentions"
+          ]
+        },
+        "binding_source": "prior_tool_output.matches[0]|basename"
+      },
+      "binding_sources": [
+        "prior_tool_output.matches[0]|basename"
+      ],
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ]
+    },
+    {
+      "case_id": "multi_turn_miss_param_7",
+      "case_kind": "stable_failure",
+      "classification": "actuation_or_prompt_guidance",
+      "baseline_success": false,
+      "candidate_success": false,
+      "policy_plan_activated": true,
+      "selected_next_tool": "cat",
+      "next_tool_emitted": true,
+      "recommended_tool_match": false,
+      "raw_normalized_arg_match": false,
+      "final_normalized_arg_match": false,
+      "selected_action_candidate": {
+        "tool": "cat",
+        "args": {
+          "file_name": "test_results.json"
+        },
+        "arg_bindings": {
+          "file_name": {
+            "source": "prior_tool_output.matches[0]|basename",
+            "value": "test_results.json",
+            "evidence": {
+              "last_tool": null,
+              "prior_output_keys": [
+                "matches",
+                "error",
+                "current_working_directory",
+                "file_content",
+                "id",
+                "username",
+                "content",
+                "tags",
+                "mentions"
+              ]
+            }
+          }
+        },
+        "recommended_tools": [
+          "cat"
+        ],
+        "reason": "prior find/list output has a concrete match and the user asks to read content",
+        "evidence": {
+          "last_tool": null,
+          "prior_output_keys": [
+            "matches",
+            "error",
+            "current_working_directory",
+            "file_content",
+            "id",
+            "username",
+            "content",
+            "tags",
+            "mentions"
+          ]
+        },
+        "binding_source": "prior_tool_output.matches[0]|basename"
+      },
+      "binding_sources": [
+        "prior_tool_output.matches[0]|basename"
+      ],
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ]
+    },
+    {
+      "case_id": "multi_turn_miss_param_16",
+      "case_kind": "stable_failure",
+      "classification": "not_activated_context",
+      "baseline_success": false,
+      "candidate_success": false,
+      "policy_plan_activated": false,
+      "selected_next_tool": null,
+      "next_tool_emitted": false,
+      "recommended_tool_match": false,
+      "raw_normalized_arg_match": false,
+      "final_normalized_arg_match": false,
+      "selected_action_candidate": {},
+      "binding_sources": [],
+      "repair_kinds": []
+    },
+    {
+      "case_id": "multi_turn_miss_param_22",
+      "case_kind": "fixed",
+      "classification": "actuation_or_prompt_guidance",
+      "baseline_success": false,
+      "candidate_success": true,
+      "policy_plan_activated": true,
+      "selected_next_tool": "touch",
+      "next_tool_emitted": true,
+      "recommended_tool_match": false,
+      "raw_normalized_arg_match": false,
+      "final_normalized_arg_match": false,
+      "selected_action_candidate": {
+        "tool": "touch",
+        "args": {
+          "file_name": "marker.txt"
+        },
+        "arg_bindings": {
+          "file_name": {
+            "source": "prior_tool_output.cwd_or_listing",
+            "value": "marker.txt",
+            "evidence": {
+              "last_tool": null,
+              "prior_output_keys": [
+                "current_working_directory",
+                "disk_usage"
+              ]
+            }
+          }
+        },
+        "recommended_tools": [
+          "touch"
+        ],
+        "reason": "prior cwd/listing output grounds a path-sensitive next action",
+        "evidence": {
+          "last_tool": null,
+          "prior_output_keys": [
+            "current_working_directory",
+            "disk_usage"
+          ]
+        },
+        "binding_source": "prior_tool_output.cwd_or_listing"
+      },
+      "binding_sources": [
+        "prior_tool_output.cwd_or_listing"
+      ],
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ]
+    },
+    {
+      "case_id": "multi_turn_miss_param_2",
+      "case_kind": "stable_failure",
+      "classification": "argument_realization",
+      "baseline_success": false,
+      "candidate_success": false,
+      "policy_plan_activated": true,
+      "selected_next_tool": "cat",
+      "next_tool_emitted": true,
+      "recommended_tool_match": true,
+      "raw_normalized_arg_match": false,
+      "final_normalized_arg_match": false,
+      "selected_action_candidate": {
+        "tool": "cat",
+        "args": {
+          "file_name": "test_results.json"
+        },
+        "arg_bindings": {
+          "file_name": {
+            "source": "prior_tool_output.matches[0]|basename",
+            "value": "test_results.json",
+            "evidence": {
+              "last_tool": null,
+              "prior_output_keys": [
+                "matches",
+                "error",
+                "current_working_directory",
+                "file_content",
+                "id",
+                "username",
+                "content",
+                "tags",
+                "mentions"
+              ]
+            }
+          }
+        },
+        "recommended_tools": [
+          "cat"
+        ],
+        "reason": "prior find/list output has a concrete match and the user asks to read content",
+        "evidence": {
+          "last_tool": null,
+          "prior_output_keys": [
+            "matches",
+            "error",
+            "current_working_directory",
+            "file_content",
+            "id",
+            "username",
+            "content",
+            "tags",
+            "mentions"
+          ]
+        },
+        "binding_source": "prior_tool_output.matches[0]|basename"
+      },
+      "binding_sources": [
+        "prior_tool_output.matches[0]|basename"
+      ],
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ]
+    },
+    {
+      "case_id": "multi_turn_miss_param_6",
+      "case_kind": "stable_failure",
+      "classification": "not_activated_context",
+      "baseline_success": false,
+      "candidate_success": false,
+      "policy_plan_activated": false,
+      "selected_next_tool": null,
+      "next_tool_emitted": false,
+      "recommended_tool_match": false,
+      "raw_normalized_arg_match": false,
+      "final_normalized_arg_match": false,
+      "selected_action_candidate": {},
+      "binding_sources": [],
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ]
+    },
+    {
+      "case_id": "multi_turn_miss_param_9",
+      "case_kind": "stable_failure",
+      "classification": "not_activated_context",
+      "baseline_success": false,
+      "candidate_success": false,
+      "policy_plan_activated": false,
+      "selected_next_tool": null,
+      "next_tool_emitted": false,
+      "recommended_tool_match": false,
+      "raw_normalized_arg_match": false,
+      "final_normalized_arg_match": false,
+      "selected_action_candidate": {},
+      "binding_sources": [],
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "resolve_contextual_string_arg"
+      ]
+    },
+    {
+      "case_id": "multi_turn_miss_param_10",
+      "case_kind": "stable_failure",
+      "classification": "actuation_or_prompt_guidance",
+      "baseline_success": false,
+      "candidate_success": false,
+      "policy_plan_activated": true,
+      "selected_next_tool": "touch",
+      "next_tool_emitted": true,
+      "recommended_tool_match": false,
+      "raw_normalized_arg_match": false,
+      "final_normalized_arg_match": false,
+      "selected_action_candidate": {
+        "tool": "touch",
+        "args": {
+          "file_name": "summary.txt"
+        },
+        "arg_bindings": {
+          "file_name": {
+            "source": "explicit_literal",
+            "value": "summary.txt",
+            "evidence": {
+              "explicit_literals": [
+                "summary.txt",
+                "Hello",
+                "notes.md"
+              ],
+              "intent": "explicit_literal_action"
+            }
+          }
+        },
+        "recommended_tools": [
+          "touch"
+        ],
+        "reason": "explicit literal in user request grounds the next tool argument",
+        "evidence": {
+          "explicit_literals": [
+            "summary.txt",
+            "Hello",
+            "notes.md"
+          ],
+          "intent": "explicit_literal_action"
+        },
+        "binding_source": "explicit_literal"
+      },
+      "binding_sources": [
+        "explicit_literal"
+      ],
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "resolve_contextual_string_arg"
+      ]
+    },
+    {
+      "case_id": "multi_turn_miss_param_18",
+      "case_kind": "stable_failure",
+      "classification": "not_activated_context",
+      "baseline_success": false,
+      "candidate_success": false,
+      "policy_plan_activated": false,
+      "selected_next_tool": null,
+      "next_tool_emitted": false,
+      "recommended_tool_match": false,
+      "raw_normalized_arg_match": false,
+      "final_normalized_arg_match": false,
+      "selected_action_candidate": {},
+      "binding_sources": [],
+      "repair_kinds": [
+        "resolve_contextual_string_arg"
+      ]
+    },
+    {
+      "case_id": "multi_turn_miss_param_21",
+      "case_kind": "stable_success",
+      "classification": "not_activated_context",
+      "baseline_success": true,
+      "candidate_success": true,
+      "policy_plan_activated": false,
+      "selected_next_tool": null,
+      "next_tool_emitted": false,
+      "recommended_tool_match": false,
+      "raw_normalized_arg_match": false,
+      "final_normalized_arg_match": false,
+      "selected_action_candidate": {},
+      "binding_sources": [],
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ]
+    },
+    {
+      "case_id": "multi_turn_miss_param_28",
+      "case_kind": "stable_failure",
+      "classification": "actuation_or_prompt_guidance",
+      "baseline_success": false,
+      "candidate_success": false,
+      "policy_plan_activated": true,
+      "selected_next_tool": "cat",
+      "next_tool_emitted": true,
+      "recommended_tool_match": false,
+      "raw_normalized_arg_match": false,
+      "final_normalized_arg_match": false,
+      "selected_action_candidate": {
+        "tool": "cat",
+        "args": {
+          "file_name": "test_results.json"
+        },
+        "arg_bindings": {
+          "file_name": {
+            "source": "prior_tool_output.matches[0]|basename",
+            "value": "test_results.json",
+            "evidence": {
+              "last_tool": null,
+              "prior_output_keys": [
+                "matches",
+                "error",
+                "current_working_directory",
+                "file_content",
+                "id",
+                "username",
+                "content",
+                "tags",
+                "mentions"
+              ]
+            }
+          }
+        },
+        "recommended_tools": [
+          "cat"
+        ],
+        "reason": "prior find/list output has a concrete match and the user asks to read content",
+        "evidence": {
+          "last_tool": null,
+          "prior_output_keys": [
+            "matches",
+            "error",
+            "current_working_directory",
+            "file_content",
+            "id",
+            "username",
+            "content",
+            "tags",
+            "mentions"
+          ]
+        },
+        "binding_source": "prior_tool_output.matches[0]|basename"
+      },
+      "binding_sources": [
+        "prior_tool_output.matches[0]|basename"
+      ],
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "resolve_contextual_string_arg",
+        "strip_assistant_content_with_tool_calls"
+      ]
+    },
+    {
+      "case_id": "multi_turn_miss_param_35",
+      "case_kind": "regressed",
+      "classification": "argument_realization",
+      "baseline_success": true,
+      "candidate_success": false,
+      "policy_plan_activated": true,
+      "selected_next_tool": "cat",
+      "next_tool_emitted": true,
+      "recommended_tool_match": true,
+      "raw_normalized_arg_match": false,
+      "final_normalized_arg_match": false,
+      "selected_action_candidate": {
+        "tool": "cat",
+        "args": {
+          "file_name": "config.py"
+        },
+        "arg_bindings": {
+          "file_name": {
+            "source": "prior_tool_output.matches[0]|basename",
+            "value": "config.py",
+            "evidence": {
+              "last_tool": null,
+              "prior_output_keys": [
+                "matches",
+                "error",
+                "current_working_directory",
+                "last_lines",
+                "file_content"
+              ]
+            }
+          }
+        },
+        "recommended_tools": [
+          "cat"
+        ],
+        "reason": "prior find/list output has a concrete match and the user asks to read content",
+        "evidence": {
+          "last_tool": null,
+          "prior_output_keys": [
+            "matches",
+            "error",
+            "current_working_directory",
+            "last_lines",
+            "file_content"
+          ]
+        },
+        "binding_source": "prior_tool_output.matches[0]|basename"
+      },
+      "binding_sources": [
+        "prior_tool_output.matches[0]|basename"
+      ],
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "resolve_contextual_string_arg"
+      ]
+    },
+    {
+      "case_id": "multi_turn_miss_param_36",
+      "case_kind": "stable_failure",
+      "classification": "not_activated_context",
+      "baseline_success": false,
+      "candidate_success": false,
+      "policy_plan_activated": false,
+      "selected_next_tool": null,
+      "next_tool_emitted": false,
+      "recommended_tool_match": false,
+      "raw_normalized_arg_match": false,
+      "final_normalized_arg_match": false,
+      "selected_action_candidate": {},
+      "binding_sources": [],
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "strip_assistant_content_with_tool_calls"
+      ]
+    },
+    {
+      "case_id": "multi_turn_miss_param_40",
+      "case_kind": "stable_failure",
+      "classification": "actuation_or_prompt_guidance",
+      "baseline_success": false,
+      "candidate_success": false,
+      "policy_plan_activated": true,
+      "selected_next_tool": "touch",
+      "next_tool_emitted": true,
+      "recommended_tool_match": false,
+      "raw_normalized_arg_match": false,
+      "final_normalized_arg_match": false,
+      "selected_action_candidate": {
+        "tool": "touch",
+        "args": {
+          "file_name": "marker.txt"
+        },
+        "arg_bindings": {
+          "file_name": {
+            "source": "prior_tool_output.cwd_or_listing",
+            "value": "marker.txt",
+            "evidence": {
+              "last_tool": null,
+              "prior_output_keys": [
+                "current_working_directory",
+                "disk_usage"
+              ]
+            }
+          }
+        },
+        "recommended_tools": [
+          "touch"
+        ],
+        "reason": "prior cwd/listing output grounds a path-sensitive next action",
+        "evidence": {
+          "last_tool": null,
+          "prior_output_keys": [
+            "current_working_directory",
+            "disk_usage"
+          ]
+        },
+        "binding_source": "prior_tool_output.cwd_or_listing"
+      },
+      "binding_sources": [
+        "prior_tool_output.cwd_or_listing"
+      ],
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ]
+    },
+    {
+      "case_id": "multi_turn_miss_param_43",
+      "case_kind": "stable_failure",
+      "classification": "not_activated_context",
+      "baseline_success": false,
+      "candidate_success": false,
+      "policy_plan_activated": false,
+      "selected_next_tool": null,
+      "next_tool_emitted": false,
+      "recommended_tool_match": false,
+      "raw_normalized_arg_match": false,
+      "final_normalized_arg_match": false,
+      "selected_action_candidate": {},
+      "binding_sources": [],
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "resolve_contextual_string_arg"
+      ]
+    },
+    {
+      "case_id": "multi_turn_miss_param_45",
+      "case_kind": "stable_failure",
+      "classification": "not_activated_context",
+      "baseline_success": false,
+      "candidate_success": false,
+      "policy_plan_activated": false,
+      "selected_next_tool": null,
+      "next_tool_emitted": false,
+      "recommended_tool_match": false,
+      "raw_normalized_arg_match": false,
+      "final_normalized_arg_match": false,
+      "selected_action_candidate": {},
+      "binding_sources": [],
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "resolve_contextual_string_arg"
+      ]
+    },
+    {
+      "case_id": "multi_turn_miss_param_0",
+      "case_kind": "stable_failure",
+      "classification": "not_activated_context",
+      "baseline_success": false,
+      "candidate_success": false,
+      "policy_plan_activated": false,
+      "selected_next_tool": null,
+      "next_tool_emitted": false,
+      "recommended_tool_match": false,
+      "raw_normalized_arg_match": false,
+      "final_normalized_arg_match": false,
+      "selected_action_candidate": {},
+      "binding_sources": [],
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "strip_assistant_content_with_tool_calls"
+      ]
+    },
+    {
+      "case_id": "multi_turn_miss_param_4",
+      "case_kind": "stable_failure",
+      "classification": "not_activated_context",
+      "baseline_success": false,
+      "candidate_success": false,
+      "policy_plan_activated": false,
+      "selected_next_tool": null,
+      "next_tool_emitted": false,
+      "recommended_tool_match": false,
+      "raw_normalized_arg_match": false,
+      "final_normalized_arg_match": false,
+      "selected_action_candidate": {},
+      "binding_sources": [],
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ]
+    },
+    {
+      "case_id": "multi_turn_miss_param_8",
+      "case_kind": "stable_failure",
+      "classification": "not_activated_context",
+      "baseline_success": false,
+      "candidate_success": false,
+      "policy_plan_activated": false,
+      "selected_next_tool": null,
+      "next_tool_emitted": false,
+      "recommended_tool_match": false,
+      "raw_normalized_arg_match": false,
+      "final_normalized_arg_match": false,
+      "selected_action_candidate": {},
+      "binding_sources": [],
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ]
+    },
+    {
+      "case_id": "multi_turn_miss_param_25",
+      "case_kind": "fixed",
+      "classification": "not_activated_context",
+      "baseline_success": false,
+      "candidate_success": true,
+      "policy_plan_activated": false,
+      "selected_next_tool": null,
+      "next_tool_emitted": false,
+      "recommended_tool_match": false,
+      "raw_normalized_arg_match": false,
+      "final_normalized_arg_match": false,
+      "selected_action_candidate": {},
+      "binding_sources": [],
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ]
+    },
+    {
+      "case_id": "multi_turn_miss_param_27",
+      "case_kind": "stable_failure",
+      "classification": "actuation_or_prompt_guidance",
+      "baseline_success": false,
+      "candidate_success": false,
+      "policy_plan_activated": true,
+      "selected_next_tool": "cat",
+      "next_tool_emitted": true,
+      "recommended_tool_match": false,
+      "raw_normalized_arg_match": false,
+      "final_normalized_arg_match": false,
+      "selected_action_candidate": {
+        "tool": "cat",
+        "args": {
+          "file_name": "test_results.json"
+        },
+        "arg_bindings": {
+          "file_name": {
+            "source": "prior_tool_output.matches[0]|basename",
+            "value": "test_results.json",
+            "evidence": {
+              "last_tool": null,
+              "prior_output_keys": [
+                "matches",
+                "error",
+                "current_working_directory",
+                "file_content",
+                "id",
+                "username",
+                "content",
+                "tags",
+                "mentions"
+              ]
+            }
+          }
+        },
+        "recommended_tools": [
+          "cat"
+        ],
+        "reason": "prior find/list output has a concrete match and the user asks to read content",
+        "evidence": {
+          "last_tool": null,
+          "prior_output_keys": [
+            "matches",
+            "error",
+            "current_working_directory",
+            "file_content",
+            "id",
+            "username",
+            "content",
+            "tags",
+            "mentions"
+          ]
+        },
+        "binding_source": "prior_tool_output.matches[0]|basename"
+      },
+      "binding_sources": [
+        "prior_tool_output.matches[0]|basename"
+      ],
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "strip_assistant_content_with_tool_calls"
+      ]
+    },
+    {
+      "case_id": "multi_turn_miss_param_29",
+      "case_kind": "stable_failure",
+      "classification": "not_activated_context",
+      "baseline_success": false,
+      "candidate_success": false,
+      "policy_plan_activated": false,
+      "selected_next_tool": null,
+      "next_tool_emitted": false,
+      "recommended_tool_match": false,
+      "raw_normalized_arg_match": false,
+      "final_normalized_arg_match": false,
+      "selected_action_candidate": {},
+      "binding_sources": [],
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "resolve_contextual_string_arg"
+      ]
+    },
+    {
+      "case_id": "multi_turn_miss_param_30",
+      "case_kind": "stable_failure",
+      "classification": "trajectory_continuation_or_final_answer",
+      "baseline_success": false,
+      "candidate_success": false,
+      "policy_plan_activated": true,
+      "selected_next_tool": "cat",
+      "next_tool_emitted": true,
+      "recommended_tool_match": true,
+      "raw_normalized_arg_match": true,
+      "final_normalized_arg_match": true,
+      "selected_action_candidate": {
+        "tool": "cat",
+        "args": {
+          "file_name": "test_results.json"
+        },
+        "arg_bindings": {
+          "file_name": {
+            "source": "prior_tool_output.matches[0]|basename",
+            "value": "test_results.json",
+            "evidence": {
+              "last_tool": null,
+              "prior_output_keys": [
+                "matches",
+                "error",
+                "current_working_directory",
+                "file_content",
+                "id",
+                "username",
+                "content",
+                "tags",
+                "mentions"
+              ]
+            }
+          }
+        },
+        "recommended_tools": [
+          "cat"
+        ],
+        "reason": "prior find/list output has a concrete match and the user asks to read content",
+        "evidence": {
+          "last_tool": null,
+          "prior_output_keys": [
+            "matches",
+            "error",
+            "current_working_directory",
+            "file_content",
+            "id",
+            "username",
+            "content",
+            "tags",
+            "mentions"
+          ]
+        },
+        "binding_source": "prior_tool_output.matches[0]|basename"
+      },
+      "binding_sources": [
+        "prior_tool_output.matches[0]|basename"
+      ],
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "resolve_contextual_string_arg",
+        "strip_assistant_content_with_tool_calls"
+      ]
+    },
+    {
+      "case_id": "multi_turn_miss_param_37",
+      "case_kind": "stable_failure",
+      "classification": "actuation_or_prompt_guidance",
+      "baseline_success": false,
+      "candidate_success": false,
+      "policy_plan_activated": true,
+      "selected_next_tool": "cat",
+      "next_tool_emitted": false,
+      "recommended_tool_match": false,
+      "raw_normalized_arg_match": false,
+      "final_normalized_arg_match": false,
+      "selected_action_candidate": {
+        "tool": "cat",
+        "args": {
+          "file_name": "test_results.json"
+        },
+        "arg_bindings": {
+          "file_name": {
+            "source": "prior_tool_output.matches[0]|basename",
+            "value": "test_results.json",
+            "evidence": {
+              "last_tool": null,
+              "prior_output_keys": [
+                "matches",
+                "error",
+                "current_working_directory",
+                "file_content",
+                "id",
+                "username",
+                "content",
+                "tags",
+                "mentions"
+              ]
+            }
+          }
+        },
+        "recommended_tools": [
+          "cat"
+        ],
+        "reason": "prior find/list output has a concrete match and the user asks to read content",
+        "evidence": {
+          "last_tool": null,
+          "prior_output_keys": [
+            "matches",
+            "error",
+            "current_working_directory",
+            "file_content",
+            "id",
+            "username",
+            "content",
+            "tags",
+            "mentions"
+          ]
+        },
+        "binding_source": "prior_tool_output.matches[0]|basename"
+      },
+      "binding_sources": [
+        "prior_tool_output.matches[0]|basename"
+      ],
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "strip_assistant_content_with_tool_calls"
+      ]
+    },
+    {
+      "case_id": "multi_turn_miss_param_39",
+      "case_kind": "fixed",
+      "classification": "actuation_or_prompt_guidance",
+      "baseline_success": false,
+      "candidate_success": true,
+      "policy_plan_activated": true,
+      "selected_next_tool": "touch",
+      "next_tool_emitted": true,
+      "recommended_tool_match": false,
+      "raw_normalized_arg_match": false,
+      "final_normalized_arg_match": false,
+      "selected_action_candidate": {
+        "tool": "touch",
+        "args": {
+          "file_name": "marker.txt"
+        },
+        "arg_bindings": {
+          "file_name": {
+            "source": "prior_tool_output.cwd_or_listing",
+            "value": "marker.txt",
+            "evidence": {
+              "last_tool": null,
+              "prior_output_keys": [
+                "current_working_directory",
+                "disk_usage"
+              ]
+            }
+          }
+        },
+        "recommended_tools": [
+          "touch"
+        ],
+        "reason": "prior cwd/listing output grounds a path-sensitive next action",
+        "evidence": {
+          "last_tool": null,
+          "prior_output_keys": [
+            "current_working_directory",
+            "disk_usage"
+          ]
+        },
+        "binding_source": "prior_tool_output.cwd_or_listing"
+      },
+      "binding_sources": [
+        "prior_tool_output.cwd_or_listing"
+      ],
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ]
+    }
+  ],
+  "candidate_rules_schema_local": true,
+  "plan_activated_count_after_guard": 13,
+  "dominant_selected_next_tool_rate_after_guard": 0.6153846153846154,
+  "fixed_cases_guard_status": {
+    "multi_turn_miss_param_31": "guard_kept",
+    "multi_turn_miss_param_39": "guard_kept"
+  },
+  "regressed_cases_guard_status": {
+    "multi_turn_miss_param_9": "guard_rejected",
+    "multi_turn_miss_param_21": "guard_rejected",
+    "multi_turn_miss_param_36": "guard_rejected"
+  },
+  "accepted_activated_candidate_count": 13,
+  "action_specific_guidance_count": 13,
+  "exact_tool_choice_count": 13,
+  "candidate_args_serializable_count": 13,
+  "action_specific_guidance_coverage": 1.0,
+  "exact_tool_choice_coverage": 1.0,
+  "candidate_args_serializable_rate": 1.0,
+  "m2_7k_tool_arg_alignment_passed": true,
+  "diagnostic": {
+    "checker_scope": "m2_7k_offline_tool_arg_alignment_no_upstream_model_call",
+    "first_failed_criterion": null,
+    "do_not_rerun_m2_7f_until_passed": false,
+    "recommended_next_focus": "m2_7f_lite_rerun_candidate"
+  }
+}
