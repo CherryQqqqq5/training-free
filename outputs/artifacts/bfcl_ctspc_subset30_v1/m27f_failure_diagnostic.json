@@ -1,158 +1,123 @@
 {
-  "status": "failed",
-  "reason": "M2.7f acceptance criteria not met; case report trace mapping fell back, and candidate causal metrics underperformed.",
+  "title": "M2.7f Failure Diagnostic",
+  "m2_7f_gate_passed": false,
+  "case_level_evidence": "durable",
+  "first_failed_criterion": "candidate_accuracy_gt_baseline_accuracy",
+  "failed_criteria": [
+    "candidate_accuracy_gt_baseline_accuracy",
+    "case_fixed_count_gt_case_regressed_count",
+    "net_case_gain_min_2",
+    "recommended_tool_match_rate_among_activated_min_0_6",
+    "raw_normalized_arg_match_rate_among_activated_min_0_6"
+  ],
+  "recommended_next_focus": "over_actuation_or_repair_interaction",
+  "do_not_expand_to_100_case_m28_or_full_bfcl": true,
   "acceptance_values": {
-    "case_report_trace_mapping": "mtime_by_result_step_count",
-    "baseline_accuracy": 10.0,
-    "candidate_accuracy": 13.33,
-    "case_fixed_count": 0,
-    "case_regressed_count": 0,
-    "net_case_gain": 0,
-    "policy_plan_activated_count": 29,
-    "recommended_tool_match_rate_among_activated": 0.27586206896551724,
-    "raw_normalized_arg_match_rate_among_activated": 0.0,
+    "case_report_trace_mapping": "prompt_user_prefix",
+    "baseline_accuracy": 13.33,
+    "candidate_accuracy": 10.0,
+    "case_fixed_count": 2,
+    "case_regressed_count": 3,
+    "net_case_gain": -1,
+    "policy_plan_activated_count": 30,
+    "recommended_tool_match_rate_among_activated": 0.36666666666666664,
+    "raw_normalized_arg_match_rate_among_activated": 0.03333333333333333,
     "stop_allowed_false_positive_count": 0,
     "accepted": false
   },
-  "trace_mapping_diagnostic": {
-    "baseline": {
-      "score_rows": 27,
-      "expected_trace_count_from_result_steps": 465,
-      "prompt_prefix_mapped_trace_count": 431,
-      "source_trace_count": 468,
-      "missing_score_rows": [
-        "multi_turn_miss_param_21",
-        "multi_turn_miss_param_22",
-        "multi_turn_miss_param_25"
-      ],
-      "prompt_count_mismatches": [
-        {
-          "case_id": "multi_turn_miss_param_22",
-          "result_steps": 14,
-          "prompt_mapped_traces": 0
-        },
-        {
-          "case_id": "multi_turn_miss_param_21",
-          "result_steps": 8,
-          "prompt_mapped_traces": 0
-        },
-        {
-          "case_id": "multi_turn_miss_param_40",
-          "result_steps": 16,
-          "prompt_mapped_traces": 19
-        },
-        {
-          "case_id": "multi_turn_miss_param_43",
-          "result_steps": 30,
-          "prompt_mapped_traces": 27
-        },
-        {
-          "case_id": "multi_turn_miss_param_25",
-          "result_steps": 12,
-          "prompt_mapped_traces": 0
-        }
-      ]
+  "artifact_completeness_passed": true,
+  "candidate_action_diversity": {
+    "passed": true,
+    "selected_next_tool_distribution": {
+      "cat": 17,
+      "touch": 8,
+      "mkdir": 5
     },
-    "candidate": {
-      "score_rows": 26,
-      "expected_trace_count_from_result_steps": 482,
-      "prompt_prefix_mapped_trace_count": 421,
-      "source_trace_count": 494,
-      "missing_score_rows": [
-        "multi_turn_miss_param_9",
-        "multi_turn_miss_param_25",
-        "multi_turn_miss_param_35",
-        "multi_turn_miss_param_39"
-      ],
-      "prompt_count_mismatches": [
-        {
-          "case_id": "multi_turn_miss_param_9",
-          "result_steps": 22,
-          "prompt_mapped_traces": 0
-        },
-        {
-          "case_id": "multi_turn_miss_param_35",
-          "result_steps": 18,
-          "prompt_mapped_traces": 0
-        },
-        {
-          "case_id": "multi_turn_miss_param_40",
-          "result_steps": 12,
-          "prompt_mapped_traces": 15
-        },
-        {
-          "case_id": "multi_turn_miss_param_43",
-          "result_steps": 16,
-          "prompt_mapped_traces": 13
-        },
-        {
-          "case_id": "multi_turn_miss_param_25",
-          "result_steps": 12,
-          "prompt_mapped_traces": 0
-        },
-        {
-          "case_id": "multi_turn_miss_param_37",
-          "result_steps": 0,
-          "prompt_mapped_traces": 9
-        },
-        {
-          "case_id": "multi_turn_miss_param_39",
-          "result_steps": 18,
-          "prompt_mapped_traces": 0
-        }
-      ]
-    }
+    "dominant_selected_next_tool_rate": 0.5666666666666667
   },
   "layer_diagnostic": {
-    "no_activation_cases": [
-      "multi_turn_miss_param_37"
-    ],
+    "no_activation_cases": [],
     "selected_next_tool_distribution": {
-      "mkdir": 29
+      "cat": 17,
+      "touch": 8,
+      "mkdir": 5
     },
-    "wrong_selected_tool_cases": [
-      "multi_turn_miss_param_19",
+    "recommended_tool_matches": "11/30",
+    "raw_normalized_arg_matches": "1/30",
+    "case_fixed": [
       "multi_turn_miss_param_31",
-      "multi_turn_miss_param_38",
-      "multi_turn_miss_param_5",
-      "multi_turn_miss_param_7",
-      "multi_turn_miss_param_16",
-      "multi_turn_miss_param_22",
-      "multi_turn_miss_param_6",
-      "multi_turn_miss_param_9",
-      "multi_turn_miss_param_21",
-      "multi_turn_miss_param_28",
-      "multi_turn_miss_param_35",
-      "multi_turn_miss_param_40",
-      "multi_turn_miss_param_43",
-      "multi_turn_miss_param_45",
-      "multi_turn_miss_param_8",
-      "multi_turn_miss_param_25",
-      "multi_turn_miss_param_27",
-      "multi_turn_miss_param_29",
-      "multi_turn_miss_param_30",
       "multi_turn_miss_param_39"
     ],
-    "recommended_tool_match_count": 8,
-    "activated_count": 29,
-    "raw_normalized_arg_match_count": 0,
-    "arg_binding_fail_after_tool_match_cases": [
-      "multi_turn_miss_param_17",
-      "multi_turn_miss_param_3",
-      "multi_turn_miss_param_2",
-      "multi_turn_miss_param_10",
-      "multi_turn_miss_param_18",
-      "multi_turn_miss_param_36",
-      "multi_turn_miss_param_0",
-      "multi_turn_miss_param_4"
-    ],
-    "case_fixed": [],
-    "case_regressed": [],
-    "repair_kinds": {
-      "resolve_contextual_string_arg": 13,
-      "coerce_no_tool_text_to_empty": 27,
-      "strip_assistant_content_with_tool_calls": 8
-    }
+    "case_regressed": [
+      "multi_turn_miss_param_9",
+      "multi_turn_miss_param_21",
+      "multi_turn_miss_param_36"
+    ]
   },
-  "next_step_guardrail": "Do not expand to 100-case, M2.8, or full BFCL from this run; treat case-level attribution as diagnostic only because mapping fell back."
+  "gate_report": {
+    "summary_path": "outputs/artifacts/bfcl_ctspc_subset30_v1/subset_summary.json",
+    "m2_7f_gate_passed": false,
+    "summary_accepted_ignored": false,
+    "criteria": {
+      "case_report_trace_mapping": {
+        "passed": true,
+        "actual": "prompt_user_prefix",
+        "expected": "prompt_user_prefix"
+      },
+      "candidate_accuracy_gt_baseline_accuracy": {
+        "passed": false,
+        "actual": {
+          "candidate_accuracy": 10.0,
+          "baseline_accuracy": 13.33
+        },
+        "expected": "candidate_accuracy > baseline_accuracy"
+      },
+      "case_fixed_count_gt_case_regressed_count": {
+        "passed": false,
+        "actual": {
+          "case_fixed_count": 2,
+          "case_regressed_count": 3
+        },
+        "expected": "case_fixed_count > case_regressed_count"
+      },
+      "net_case_gain_min_2": {
+        "passed": false,
+        "actual": -1,
+        "expected": ">= 2"
+      },
+      "policy_plan_activated_count_positive": {
+        "passed": true,
+        "actual": 30,
+        "expected": "> 0"
+      },
+      "recommended_tool_match_rate_among_activated_min_0_6": {
+        "passed": false,
+        "actual": 0.36666666666666664,
+        "expected": ">= 0.6"
+      },
+      "raw_normalized_arg_match_rate_among_activated_min_0_6": {
+        "passed": false,
+        "actual": 0.03333333333333333,
+        "expected": ">= 0.6"
+      },
+      "stop_allowed_false_positive_count_zero": {
+        "passed": true,
+        "actual": 0,
+        "expected": "== 0"
+      }
+    },
+    "diagnostic": {
+      "case_level_evidence": "durable",
+      "first_failed_criterion": "candidate_accuracy_gt_baseline_accuracy",
+      "failed_criteria": [
+        "candidate_accuracy_gt_baseline_accuracy",
+        "case_fixed_count_gt_case_regressed_count",
+        "net_case_gain_min_2",
+        "recommended_tool_match_rate_among_activated_min_0_6",
+        "raw_normalized_arg_match_rate_among_activated_min_0_6"
+      ],
+      "do_not_expand_to_100_case_m28_or_full_bfcl": true,
+      "recommended_next_focus": "over_actuation_or_repair_interaction"
+    }
+  }
 }
