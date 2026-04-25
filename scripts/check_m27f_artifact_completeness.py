@@ -13,7 +13,7 @@ from scripts.run_phase2_target_subset import (
     _score_header,
     _score_json_path,
     _score_rows_by_case,
-    _trace_paths_by_case_from_prompt_prefix,
+    _trace_paths_by_case_from_prompt_prefix_with_diagnostics,
 )
 
 
@@ -47,7 +47,7 @@ def _run_report(run_root: Path, category: str, selected_ids: list[str], *, requi
     score_ids = _score_case_ids(run_root, category)
     result_rows = _result_rows_by_case(run_root, category)
     result_ids = list(result_rows)
-    trace_groups = _trace_paths_by_case_from_prompt_prefix(
+    trace_groups, trace_mapping_diagnostic = _trace_paths_by_case_from_prompt_prefix_with_diagnostics(
         source_run_root=run_root,
         category=category,
         selected_ids=selected_ids,
@@ -57,7 +57,15 @@ def _run_report(run_root: Path, category: str, selected_ids: list[str], *, requi
     missing_result_ids = _ordered_missing(selected_ids, set(result_ids))
     missing_trace_ids = _ordered_missing(selected_ids, set(trace_ids))
     missing_effective_score_ids = _ordered_missing(selected_ids, set(effective_score_ids))
-    gate_passed = not missing_result_ids and not missing_effective_score_ids and (not require_prompt_traces or not missing_trace_ids)
+    prompt_prefix_ambiguity_unresolved = bool(trace_mapping_diagnostic.get("unresolved_ambiguity"))
+    prompt_prefix_count_mismatch = list(trace_mapping_diagnostic.get("count_mismatch") or [])
+    gate_passed = (
+        not missing_result_ids
+        and not missing_effective_score_ids
+        and (not require_prompt_traces or not missing_trace_ids)
+        and (not require_prompt_traces or not prompt_prefix_ambiguity_unresolved)
+        and (not require_prompt_traces or not prompt_prefix_count_mismatch)
+    )
     return {
         "run_root": str(run_root),
         "score_path": str(_score_json_path(run_root, category)) if _score_json_path(run_root, category) else None,
@@ -71,6 +79,9 @@ def _run_report(run_root: Path, category: str, selected_ids: list[str], *, requi
         "missing_result_ids": missing_result_ids,
         "missing_trace_ids": missing_trace_ids,
         "missing_effective_score_ids": missing_effective_score_ids,
+        "prompt_prefix_ambiguity_unresolved": prompt_prefix_ambiguity_unresolved,
+        "prompt_prefix_count_mismatch": prompt_prefix_count_mismatch,
+        "prompt_prefix_mapping_diagnostic": trace_mapping_diagnostic,
         "result_exception_ids": [case_id for case_id in selected_ids if case_id in _result_failure_reasons(run_root, category)],
         "prompt_prefix_traces_required": require_prompt_traces,
         "scorer_coverage_explained_by_failure_only_rows": scorer_coverage_explained,
