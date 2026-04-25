@@ -878,6 +878,8 @@ class RuleEngine:
             risk_flags.append(f"intervention_mode_{intervention_mode}")
         generic_tools = {"cat", "touch", "mkdir"}
         needs_prior_output = any(source.startswith("prior_tool_output") for source in binding_sources) or bool(components.get("prior_output_keys_required"))
+        if any(source.startswith("explicit_literal") for source in binding_sources) and literal_score <= 0:
+            risk_flags.append("explicit_literal_not_in_current_state")
         if tool_name in generic_tools and arg_score < 8:
             risk_flags.append("weak_arg_binding_evidence")
         if needs_prior_output and state_score <= 0:
@@ -901,6 +903,7 @@ class RuleEngine:
             "high_trajectory_risk",
             "intervention_mode_record_only",
             "intervention_mode_weak_guidance",
+            "explicit_literal_not_in_current_state",
         }
         if any(flag in risk_flags for flag in blocking_trajectory_flags):
             return {

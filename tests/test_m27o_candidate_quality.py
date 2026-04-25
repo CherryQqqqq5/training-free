@@ -65,12 +65,26 @@ class M27OCandidateQualityTests(unittest.TestCase):
             "trajectory_risk_flags": ["trajectory_sensitive_tool"],
             "binding_type": "file",
             "intervention_mode": "guidance",
+            "pending_goal_family": "read_content",
+        }
+
+
+    def _good_touch_candidate(self) -> dict:
+        return {
+            "tool": "touch",
+            "args": {"file_name": "todo.txt"},
+            "postcondition": {"kind": "file_exists", "expected_state_key": "current_directory_content", "target_arg": "file_name", "confidence": 0.75},
+            "trajectory_risk_score": 2,
+            "trajectory_risk_flags": ["trajectory_sensitive_tool"],
+            "binding_type": "file",
+            "intervention_mode": "guidance",
+            "pending_goal_family": "create_file",
         }
 
     def test_quality_gate_passes_for_typed_low_risk_candidates(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            rule_path, config_path = self._write_fixture(root, candidates=[self._good_candidate()])
+            rule_path, config_path = self._write_fixture(root, candidates=[self._good_candidate(), self._good_touch_candidate()])
             report = evaluate_candidate_quality(root, rule_path=rule_path, runtime_config=config_path)
 
         self.assertTrue(report["candidate_quality_gate_passed"])

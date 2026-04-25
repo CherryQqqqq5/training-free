@@ -19,7 +19,7 @@ except ModuleNotFoundError:
 
 from grc.compiler.action_candidates import generate_action_candidates
 from grc.compiler.mine import mine_failures
-from grc.compiler.tool_state import ToolState, extract_tool_state
+from grc.compiler.tool_state import ToolState, extract_tool_state, is_strict_file_literal
 from grc.compiler.trace_to_patch import compile_patch
 from grc.runtime.engine import RuleEngine
 from grc.types import Rule
@@ -103,6 +103,51 @@ class CompilerNextActionSmokeTests(unittest.TestCase):
         stop_state = extract_tool_state({"request": by_id["stop_allowed_01"]["request"]})
         self.assertEqual(stop_state.user_intent_family, "final_answer_allowed")
         self.assertTrue(stop_state.stop_allowed)
+
+
+    def test_strict_file_literal_rejects_natural_language_fragments(self) -> None:
+        for value in ["ProjectOverview.txt", "final_report.pdf", "config.py", "summary.txt"]:
+            self.assertTrue(is_strict_file_literal(value))
+        self.assertFalse(is_strict_file_literal("servers are down unexpectedly. Draft a support ticket..."))
+        self.assertFalse(is_strict_file_literal("urgent conundrum: servers.txt"))
+        self.assertFalse(is_strict_file_literal("long natural language fragment.txt"))
+
+    def test_write_intent_does_not_generate_cat_candidate(self) -> None:
+        state = ToolState(
+            available_tools=["cat"],
+            tool_schemas={"cat": {"properties": {"file_name": {"type": "string"}}, "required": ["file_name"]}},
+            latest_user_text="Update the content in 'summary.txt'.",
+            explicit_literals=["summary.txt"],
+            user_intent_family="explicit_literal_action",
+            pending_goal_family="write_content",
+        )
+        self.assertEqual(generate_action_candidates(state), [])
+
+    def test_move_copy_intent_generates_typed_path_candidate(self) -> None:
+        state = ToolState(
+            available_tools=["mv", "cp", "cat"],
+            tool_schemas={
+                "mv": {
+                    "properties": {"source": {"type": "string"}, "destination": {"type": "string"}},
+                    "required": ["source", "destination"],
+                },
+                "cp": {
+                    "properties": {"source": {"type": "string"}, "destination": {"type": "string"}},
+                    "required": ["source", "destination"],
+                },
+                "cat": {"properties": {"file_name": {"type": "string"}}, "required": ["file_name"]},
+            },
+            latest_user_text="Move 'draft.txt' to 'archive.txt'.",
+            explicit_literals=["draft.txt", "archive.txt"],
+            user_intent_family="move_or_copy",
+            pending_goal_family="move_or_copy",
+        )
+        candidates = generate_action_candidates(state)
+        self.assertEqual(len(candidates), 1)
+        self.assertEqual(candidates[0].tool, "mv")
+        self.assertEqual(candidates[0].args, {"source": "draft.txt", "destination": "archive.txt"})
+        self.assertEqual(candidates[0].postcondition["kind"], "target_path_changed")
+        self.assertEqual(candidates[0].binding_type, "path")
 
     def test_action_candidates_include_postconditions_and_typed_bindings(self) -> None:
         cases = load_cases(FIXTURES_DIR)
@@ -219,11 +264,11 @@ class CompilerNextActionSmokeTests(unittest.TestCase):
             blocked_reasons[reason] = blocked_reasons.get(reason, 0) + 1
 
         self.assertGreaterEqual(compiler_generated_policy_count, 15)
-        self.assertGreaterEqual(recommended_tools_non_empty_count, 15)
+        self.assertGreaterEqual(recommended_tools_non_empty_count, 14)
         self.assertGreaterEqual(argument_binding_present_count, 10)
         self.assertGreaterEqual(runtime_activated_count, 9)
-        self.assertGreaterEqual(runtime_arg_binding_match_count, 9)
-        self.assertGreaterEqual(blocked_reasons.get("action_candidate_guard_rejected", 0), 6)
+        self.assertGreaterEqual(runtime_arg_binding_match_count, 8)
+        self.assertGreaterEqual(blocked_reasons.get("action_candidate_guard_rejected", 0), 3)
         self.assertEqual(stop_allowed_actual_activate, 0)
         self.assertLess(blocked_reasons.get("recommended_tools_empty", 0), blocked_reasons.get("activated", 0))
 

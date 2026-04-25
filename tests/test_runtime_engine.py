@@ -1874,6 +1874,25 @@ action:
         self.assertTrue(request_patches.next_tool_plan["action_candidate_guard"]["accepted"])
         self.assertEqual(request_patches.next_tool_plan["action_candidate_guard"]["reason"], "strong_explicit_literal_binding")
 
+    def test_next_tool_guard_blocks_stale_explicit_literal_candidate(self) -> None:
+        action_candidate = {
+            "tool": "move_file",
+            "args": {"file_name": "stale.txt"},
+            "binding_source": "explicit_literal",
+            "arg_bindings": {"file_name": {"source": "explicit_literal", "value": "stale.txt"}},
+            "recommended_tools": ["move_file"],
+        }
+        rule = self._next_tool_rule(recommended_tools=["move_file"], action_candidates=[action_candidate])
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir, runtime_policy={"enable_required_next_tool_choice": True})
+            engine.rules = [rule]
+            _, request_patches = engine.apply_request(self._make_move_file_request())
+
+        self.assertEqual(request_patches.next_tool_plan["blocked_reason"], "action_candidate_guard_rejected")
+        guard = request_patches.next_tool_plan["rejected_action_candidates"][0]["guard"]
+        self.assertFalse(guard["accepted"])
+        self.assertEqual(guard["reason"], "explicit_literal_not_in_current_state")
+
     def test_next_tool_guard_blocks_legacy_candidate_missing_postcondition(self) -> None:
         action_candidate = {
             "tool": "move_file",
