@@ -202,6 +202,49 @@ def _plan_dataset_rows() -> list[dict]:
     ]
 
 
+
+def _trajectory_candidate(candidate: dict) -> dict:
+    tool = str(candidate.get("tool") or (candidate.get("recommended_tools") or [""])[0])
+    args = candidate.get("args") if isinstance(candidate.get("args"), dict) else {}
+    target_arg = next(iter(args), "target")
+    kind_by_tool = {
+        "cat": "file_content",
+        "touch": "file_exists",
+        "mkdir": "directory_exists",
+        "grep": "matches",
+        "find": "matches",
+        "mv": "target_path_changed",
+        "cp": "target_path_changed",
+        "move_file": "target_path_changed",
+        "copy_file": "target_path_changed",
+    }
+    kind = kind_by_tool.get(tool, "target_path_changed")
+    expected_state_key = (
+        "file_content"
+        if kind == "file_content"
+        else "matches"
+        if kind == "matches"
+        else "current_directory_content"
+    )
+    enriched = dict(candidate)
+    enriched.setdefault(
+        "postcondition",
+        {
+            "kind": kind,
+            "expected_state_key": expected_state_key,
+            "target_arg": target_arg,
+            "confidence": 0.8,
+        },
+    )
+    enriched.setdefault("trajectory_risk_score", 2 if tool in {"cat", "touch", "mkdir"} else 0)
+    enriched.setdefault(
+        "trajectory_risk_flags",
+        ["trajectory_sensitive_tool"] if tool in {"cat", "touch", "mkdir"} else [],
+    )
+    enriched.setdefault("binding_type", "directory" if tool == "mkdir" else "file" if tool in {"cat", "touch"} else "path")
+    enriched.setdefault("intervention_mode", "guidance")
+    return enriched
+
 def _write_plan_rule(
     path: Path,
     *,
@@ -233,7 +276,7 @@ def _write_plan_rule(
                             "decision_policy": {
                                 "request_predicates": request_predicates,
                                 "recommended_tools": recommended_tools,
-                                "action_candidates": action_candidates,
+                                "action_candidates": [_trajectory_candidate(candidate) for candidate in action_candidates],
                                 "next_tool_policy": {
                                     "activation_predicates": activation_predicates,
                                     "recommended_tools": recommended_tools,

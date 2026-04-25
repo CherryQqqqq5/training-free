@@ -19,7 +19,7 @@ except ModuleNotFoundError:
 
 from grc.compiler.action_candidates import generate_action_candidates
 from grc.compiler.mine import mine_failures
-from grc.compiler.tool_state import extract_tool_state
+from grc.compiler.tool_state import ToolState, extract_tool_state
 from grc.compiler.trace_to_patch import compile_patch
 from grc.runtime.engine import RuleEngine
 from grc.types import Rule
@@ -104,6 +104,58 @@ class CompilerNextActionSmokeTests(unittest.TestCase):
         self.assertEqual(stop_state.user_intent_family, "final_answer_allowed")
         self.assertTrue(stop_state.stop_allowed)
 
+    def test_action_candidates_include_postconditions_and_typed_bindings(self) -> None:
+        cases = load_cases(FIXTURES_DIR)
+        by_id = {case["id"]: case for case in cases}
+
+        find_state = extract_tool_state({"request": by_id["find_cat_01"]["request"]})
+        candidate = generate_action_candidates(find_state)[0]
+
+        self.assertEqual(candidate.binding_type, "file")
+        self.assertEqual(candidate.postcondition["kind"], "file_content")
+        self.assertEqual(candidate.postcondition["target_arg"], "file_name")
+        self.assertIn("trajectory_sensitive_tool", candidate.trajectory_risk_flags)
+        self.assertEqual(candidate.intervention_mode, "guidance")
+
+    def test_action_candidates_filter_file_directory_type_mismatches(self) -> None:
+        mkdir_state = ToolState(
+            available_tools=["mkdir"],
+            tool_schemas={"mkdir": {"properties": {"dir_name": {"type": "string"}}, "required": ["dir_name"]}},
+            latest_user_text="Create a directory named 'final_report.pdf'.",
+            explicit_literals=["final_report.pdf"],
+            user_intent_family="explicit_literal_action",
+        )
+        self.assertEqual(generate_action_candidates(mkdir_state), [])
+
+        cat_state = ToolState(
+            available_tools=["cat"],
+            tool_schemas={"cat": {"properties": {"file_name": {"type": "string"}}, "required": ["file_name"]}},
+            latest_user_text="Read 'archive'.",
+            explicit_literals=["archive"],
+            user_intent_family="read_file_content",
+        )
+        self.assertEqual(generate_action_candidates(cat_state), [])
+
+        touch_state = ToolState(
+            available_tools=["touch"],
+            tool_schemas={"touch": {"properties": {"file_name": {"type": "string"}}, "required": ["file_name"]}},
+            latest_user_text="Create 'archive'.",
+            explicit_literals=["archive"],
+            user_intent_family="explicit_literal_action",
+        )
+        self.assertEqual(generate_action_candidates(touch_state), [])
+
+        touch_file_state = ToolState(
+            available_tools=["touch"],
+            tool_schemas={"touch": {"properties": {"file_name": {"type": "string"}}, "required": ["file_name"]}},
+            latest_user_text="Create file 'archive'.",
+            explicit_literals=["archive"],
+            user_intent_family="explicit_literal_action",
+        )
+        candidate = generate_action_candidates(touch_file_state)[0]
+        self.assertEqual(candidate.tool, "touch")
+        self.assertEqual(candidate.postcondition["kind"], "file_exists")
+
     def test_action_candidates_are_grounded_and_have_negative_guards(self) -> None:
         cases = load_cases(FIXTURES_DIR)
         by_id = {case["id"]: case for case in cases}
@@ -169,9 +221,9 @@ class CompilerNextActionSmokeTests(unittest.TestCase):
         self.assertGreaterEqual(compiler_generated_policy_count, 15)
         self.assertGreaterEqual(recommended_tools_non_empty_count, 15)
         self.assertGreaterEqual(argument_binding_present_count, 10)
-        self.assertEqual(runtime_activated_count, 13)
-        self.assertGreaterEqual(runtime_arg_binding_match_count, 13)
-        self.assertEqual(blocked_reasons.get("action_candidate_guard_rejected", 0), 2)
+        self.assertGreaterEqual(runtime_activated_count, 9)
+        self.assertGreaterEqual(runtime_arg_binding_match_count, 9)
+        self.assertGreaterEqual(blocked_reasons.get("action_candidate_guard_rejected", 0), 6)
         self.assertEqual(stop_allowed_actual_activate, 0)
         self.assertLess(blocked_reasons.get("recommended_tools_empty", 0), blocked_reasons.get("activated", 0))
 

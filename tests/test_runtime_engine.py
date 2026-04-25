@@ -79,6 +79,36 @@ action:
             ],
         }
 
+    def _trajectory_candidate(self, candidate: dict, *, postcondition_kind: str | None = None) -> dict:
+        enriched = dict(candidate)
+        tool = str(enriched.get("tool") or (enriched.get("recommended_tools") or [""])[0])
+        args = enriched.get("args") if isinstance(enriched.get("args"), dict) else {}
+        target_arg = next(iter(args), "path")
+        kind_by_tool = {
+            "cat": "file_content",
+            "touch": "file_exists",
+            "mkdir": "directory_exists",
+            "move_file": "target_path_changed",
+            "copy_file": "target_path_changed",
+            "mv": "target_path_changed",
+            "cp": "target_path_changed",
+            "grep": "matches",
+            "find": "matches",
+        }
+        kind = postcondition_kind or kind_by_tool.get(tool, "target_path_changed")
+        expected_state_key = "file_content" if kind == "file_content" else "current_directory_content"
+        if kind == "matches":
+            expected_state_key = "matches"
+        enriched.setdefault(
+            "postcondition",
+            {"kind": kind, "expected_state_key": expected_state_key, "target_arg": target_arg, "confidence": 0.8},
+        )
+        enriched.setdefault("trajectory_risk_score", 2 if tool in {"cat", "touch", "mkdir"} else 0)
+        enriched.setdefault("trajectory_risk_flags", ["trajectory_sensitive_tool"] if tool in {"cat", "touch", "mkdir"} else [])
+        enriched.setdefault("binding_type", "file" if tool in {"cat", "touch"} else "path")
+        enriched.setdefault("intervention_mode", "guidance")
+        return enriched
+
     def _next_tool_rule(
         self,
         *,
@@ -90,6 +120,7 @@ action:
         recommended_tools = list(recommended_tools or [])
         request_predicates = list(request_predicates or ["tools_available", "prior_explicit_literals_present"])
         activation_predicates = list(activation_predicates or request_predicates)
+        action_candidates = [self._trajectory_candidate(candidate) for candidate in list(action_candidates or [])]
         return Rule(
             rule_id="rule_next_tool_policy",
             trigger=MatchSpec(
@@ -1842,6 +1873,29 @@ action:
         self.assertIn("policy_next_tool:selected=move_file", request_patches)
         self.assertTrue(request_patches.next_tool_plan["action_candidate_guard"]["accepted"])
         self.assertEqual(request_patches.next_tool_plan["action_candidate_guard"]["reason"], "strong_explicit_literal_binding")
+
+    def test_next_tool_guard_blocks_legacy_candidate_missing_postcondition(self) -> None:
+        action_candidate = {
+            "tool": "move_file",
+            "args": {"file_name": "report.txt"},
+            "binding_source": "explicit_literal",
+            "arg_bindings": {"file_name": {"source": "explicit_literal", "value": "report.txt"}},
+            "recommended_tools": ["move_file"],
+        }
+        rule = self._next_tool_rule(recommended_tools=["move_file"], action_candidates=[])
+        rule.action.decision_policy.action_candidates = [action_candidate]
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir, runtime_policy={"enable_required_next_tool_choice": True})
+            engine.rules = [rule]
+            patched, request_patches = engine.apply_request(self._make_move_file_request())
+
+        self.assertNotIn("tool_choice", patched)
+        self.assertFalse(request_patches.next_tool_plan["activated"])
+        self.assertEqual(request_patches.next_tool_plan["blocked_reason"], "action_candidate_guard_rejected")
+        guard = request_patches.next_tool_plan["rejected_action_candidates"][0]["guard"]
+        self.assertFalse(guard["accepted"])
+        self.assertEqual(guard["reason"], "postcondition_missing")
+        self.assertIn("high_trajectory_risk", guard["risk_flags"])
 
     def test_next_tool_guard_blocks_weak_generic_prior_output_candidate(self) -> None:
         action_candidate = {

@@ -15,6 +15,11 @@ class ActionCandidate:
     reason: str = ""
     evidence: dict[str, Any] = field(default_factory=dict)
     binding_source: str = ""
+    postcondition: dict[str, Any] = field(default_factory=dict)
+    trajectory_risk_score: int = 0
+    trajectory_risk_flags: list[str] = field(default_factory=list)
+    binding_type: str = "unknown"
+    intervention_mode: str = "guidance"
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -25,6 +30,11 @@ class ActionCandidate:
             "reason": self.reason,
             "evidence": self.evidence,
             "binding_source": self.binding_source,
+            "postcondition": self.postcondition,
+            "trajectory_risk_score": self.trajectory_risk_score,
+            "trajectory_risk_flags": self.trajectory_risk_flags,
+            "binding_type": self.binding_type,
+            "intervention_mode": self.intervention_mode,
         }
 
 
@@ -95,7 +105,91 @@ def _read_file_value(state: ToolState) -> tuple[str | None, str, dict[str, Any]]
     return None, "", {}
 
 
-def _candidate(tool: str, arg_name: str | None, value: str | None, *, reason: str, evidence: dict[str, Any], source: str) -> ActionCandidate:
+def _looks_like_file(value: str | None) -> bool:
+    if not value:
+        return False
+    basename = value.rstrip("/").split("/")[-1]
+    if basename in {"", ".", ".."}:
+        return False
+    return "." in basename and not value.endswith("/")
+
+
+def _looks_like_directory(value: str | None) -> bool:
+    if not value:
+        return False
+    if value.endswith("/"):
+        return True
+    return not _looks_like_file(value)
+
+
+def _binding_type(tool: str, value: str | None) -> str:
+    if tool == "lookup_id":
+        return "id"
+    if tool in {"touch", "delete_file"}:
+        return "file" if value else "unknown"
+    if tool == "cat":
+        return "file" if _looks_like_file(value) else "unknown"
+    if tool == "mkdir":
+        return "directory" if _looks_like_directory(value) else "unknown"
+    if tool in {"grep", "find"}:
+        return "content"
+    if tool in {"cp", "mv", "move_file", "copy_file"}:
+        return "path"
+    return "unknown"
+
+
+def _postcondition(tool: str, arg_name: str | None, *, binding_type: str) -> dict[str, Any]:
+    target_arg = arg_name or ""
+    if tool == "cat" and binding_type == "file":
+        return {"kind": "file_content", "expected_state_key": "file_content", "target_arg": target_arg, "confidence": 0.8}
+    if tool == "touch" and binding_type == "file":
+        return {"kind": "file_exists", "expected_state_key": "current_directory_content", "target_arg": target_arg, "confidence": 0.75}
+    if tool == "mkdir" and binding_type == "directory":
+        return {"kind": "directory_exists", "expected_state_key": "current_directory_content", "target_arg": target_arg, "confidence": 0.75}
+    if tool in {"grep", "find"}:
+        return {"kind": "matches", "expected_state_key": "matches", "target_arg": target_arg, "confidence": 0.7}
+    if tool in {"cp", "mv", "move_file", "copy_file"}:
+        return {"kind": "target_path_changed", "expected_state_key": "current_directory_content", "target_arg": target_arg, "confidence": 0.7}
+    return {}
+
+
+def _candidate_risk(tool: str, *, source: str, postcondition: dict[str, Any]) -> tuple[int, list[str]]:
+    flags: list[str] = []
+    score = 0
+    if tool in {"cat", "touch", "mkdir"}:
+        flags.append("trajectory_sensitive_tool")
+        score += 2
+    if not postcondition:
+        flags.append("postcondition_missing")
+        score += 8
+    if source == "prior_tool_output.cwd_or_listing":
+        flags.append("weak_cwd_or_listing_binding")
+        score += 5
+    elif source.startswith("prior_tool_output"):
+        score += 2
+    return score, flags
+
+
+def _intervention_mode(risk_score: int) -> str:
+    if risk_score >= 8:
+        return "record_only"
+    if risk_score >= 5:
+        return "weak_guidance"
+    return "guidance"
+
+
+def _candidate(
+    tool: str,
+    arg_name: str | None,
+    value: str | None,
+    *,
+    reason: str,
+    evidence: dict[str, Any],
+    source: str,
+) -> ActionCandidate:
+    binding_type = _binding_type(tool, value)
+    postcondition = _postcondition(tool, arg_name, binding_type=binding_type)
+    risk_score, risk_flags = _candidate_risk(tool, source=source, postcondition=postcondition)
     args = {arg_name: value} if arg_name and value is not None else {}
     bindings = (
         {
@@ -116,7 +210,24 @@ def _candidate(tool: str, arg_name: str | None, value: str | None, *, reason: st
         reason=reason,
         evidence=evidence,
         binding_source=source,
+        postcondition=postcondition,
+        trajectory_risk_score=risk_score,
+        trajectory_risk_flags=risk_flags,
+        binding_type=binding_type,
+        intervention_mode=_intervention_mode(risk_score),
     )
+
+
+def _candidate_allowed(tool: str, value: str | None, *, lowered_user_text: str) -> bool:
+    if not value:
+        return False
+    if tool == "mkdir" and _looks_like_file(value):
+        return False
+    if tool == "cat" and not _looks_like_file(value):
+        return False
+    if tool == "touch" and not _looks_like_file(value):
+        return any(token in lowered_user_text for token in ["file", "todo", "marker", "note"])
+    return True
 
 
 def generate_action_candidates(state: ToolState, tool_schemas: dict[str, dict[str, Any]] | None = None) -> list[ActionCandidate]:
@@ -168,7 +279,7 @@ def generate_action_candidates(state: ToolState, tool_schemas: dict[str, dict[st
             tool = ""
             arg_name = None
             value = None
-        if tool and value:
+        if tool and value and _candidate_allowed(tool, value, lowered_user_text=lowered):
             candidates.append(
                 _candidate(
                     tool,
@@ -198,7 +309,7 @@ def generate_action_candidates(state: ToolState, tool_schemas: dict[str, dict[st
             tool = ""
             arg_name = None
             value = None
-        if tool and value:
+        if tool and value and _candidate_allowed(tool, value, lowered_user_text=lowered):
             candidates.append(
                 _candidate(
                     tool,

@@ -55,7 +55,10 @@ class RuleEngine:
         "repeat_same_tool_without_new_evidence",
         "post_write_tool_intervention",
         "post_search_literal_cat_intervention",
+        "postcondition_missing",
+        "high_trajectory_risk",
     }
+    _DEFAULT_HIGH_TRAJECTORY_RISK_THRESHOLD = 5
 
     def __init__(self, rules_dir: str, runtime_policy: Dict[str, Any] | None = None):
         self.rules_dir = Path(rules_dir)
@@ -575,6 +578,33 @@ class RuleEngine:
         return sources
 
     @staticmethod
+    def _candidate_postcondition(candidate: Dict[str, Any]) -> Dict[str, Any]:
+        postcondition = candidate.get("postcondition")
+        return postcondition if isinstance(postcondition, dict) else {}
+
+    @staticmethod
+    def _candidate_declared_risk_flags(candidate: Dict[str, Any]) -> list[str]:
+        flags = candidate.get("trajectory_risk_flags")
+        if isinstance(flags, list):
+            return [str(item) for item in flags if str(item).strip()]
+        return []
+
+    def _candidate_trajectory_risk_score(self, candidate: Dict[str, Any]) -> int:
+        raw = candidate.get("trajectory_risk_score")
+        try:
+            score = int(raw)
+        except (TypeError, ValueError):
+            score = 0
+        if not self._candidate_postcondition(candidate):
+            score = max(score, 8)
+        return score
+
+    @staticmethod
+    def _candidate_intervention_mode(candidate: Dict[str, Any]) -> str:
+        mode = str(candidate.get("intervention_mode") or "").strip()
+        return mode if mode in {"record_only", "weak_guidance", "guidance"} else "record_only"
+
+    @staticmethod
     def _jsonlike_keys(value: Any) -> set[str]:
         keys: set[str] = set()
         if isinstance(value, dict):
@@ -690,6 +720,11 @@ class RuleEngine:
             "prior_output_keys_required": sorted(self._candidate_prior_output_keys(candidate)),
             "prior_output_keys_observed": sorted(self._prior_tool_output_keys(request_json)),
             "binding_sources": sorted(self._candidate_binding_sources(candidate)),
+            "postcondition": self._candidate_postcondition(candidate),
+            "trajectory_risk_score": self._candidate_trajectory_risk_score(candidate),
+            "trajectory_risk_flags": self._candidate_declared_risk_flags(candidate),
+            "binding_type": str(candidate.get("binding_type") or "unknown"),
+            "intervention_mode": self._candidate_intervention_mode(candidate),
             "score": -1000,
         }
         if tool_name not in request_tool_name_set:
@@ -828,9 +863,19 @@ class RuleEngine:
         observed_prior_keys = set(components.get("prior_output_keys_observed") or [])
         context_literals = self._collect_context_literals(request_json)
         has_context_file_literal = any(self._looks_like_file_literal(str(item)) for item in context_literals)
-        risk_flags: List[str] = []
+        risk_flags: List[str] = list(components.get("trajectory_risk_flags") or [])
+        trajectory_risk_score = int(components.get("trajectory_risk_score") or 0)
+        intervention_mode = str(components.get("intervention_mode") or "record_only")
+        postcondition = components.get("postcondition") if isinstance(components.get("postcondition"), dict) else {}
         if not components.get("schema_available"):
-            return {"accepted": False, "reason": "schema_unavailable", "risk_flags": ["schema_unavailable"]}
+            return {"accepted": False, "reason": "schema_unavailable", "risk_flags": ["schema_unavailable"], "trajectory_risk_score": trajectory_risk_score, "intervention_mode": intervention_mode}
+        if not postcondition:
+            risk_flags.append("postcondition_missing")
+            trajectory_risk_score = max(trajectory_risk_score, 8)
+        if trajectory_risk_score >= self._DEFAULT_HIGH_TRAJECTORY_RISK_THRESHOLD:
+            risk_flags.append("high_trajectory_risk")
+        if intervention_mode != "guidance":
+            risk_flags.append(f"intervention_mode_{intervention_mode}")
         generic_tools = {"cat", "touch", "mkdir"}
         needs_prior_output = any(source.startswith("prior_tool_output") for source in binding_sources) or bool(components.get("prior_output_keys_required"))
         if tool_name in generic_tools and arg_score < 8:
@@ -851,6 +896,20 @@ class RuleEngine:
             risk_flags.append("post_write_tool_intervention")
         if tool_name == "cat" and last_prior_tool in {"grep", "find"} and "explicit_literal" in binding_sources:
             risk_flags.append("post_search_literal_cat_intervention")
+        blocking_trajectory_flags = {
+            "postcondition_missing",
+            "high_trajectory_risk",
+            "intervention_mode_record_only",
+            "intervention_mode_weak_guidance",
+        }
+        if any(flag in risk_flags for flag in blocking_trajectory_flags):
+            return {
+                "accepted": False,
+                "reason": next(flag for flag in risk_flags if flag in blocking_trajectory_flags),
+                "risk_flags": risk_flags,
+                "trajectory_risk_score": trajectory_risk_score,
+                "intervention_mode": intervention_mode,
+            }
         match_keys = {"matches", "file_content"}
         strong_prior_match = (
             tool_name == "cat"
@@ -873,18 +932,18 @@ class RuleEngine:
         strong_prior = needs_prior_output and state_score >= 8 and arg_score >= 8 and literal_score > 0
         strong_literal_arg = not binding_sources and arg_score >= 8 and literal_score > 0
         if strong_explicit and not (tool_name == "cat" and "cat_competing_intent" in risk_flags) and "write_intent_unconfirmed" not in risk_flags and "repeat_same_tool_without_new_evidence" not in risk_flags and "post_write_tool_intervention" not in risk_flags and "post_search_literal_cat_intervention" not in risk_flags:
-            return {"accepted": True, "reason": "strong_explicit_literal_binding", "risk_flags": risk_flags}
+            return {"accepted": True, "reason": "strong_explicit_literal_binding", "risk_flags": risk_flags, "trajectory_risk_score": trajectory_risk_score, "intervention_mode": intervention_mode}
         if strong_prior and "weak_cwd_or_listing_binding" not in risk_flags:
-            return {"accepted": True, "reason": "strong_prior_output_binding", "risk_flags": risk_flags}
+            return {"accepted": True, "reason": "strong_prior_output_binding", "risk_flags": risk_flags, "trajectory_risk_score": trajectory_risk_score, "intervention_mode": intervention_mode}
         if strong_prior_match and "cat_competing_intent" not in risk_flags and "repeat_same_tool_without_new_evidence" not in risk_flags:
-            return {"accepted": True, "reason": "strong_prior_output_match_binding", "risk_flags": risk_flags}
+            return {"accepted": True, "reason": "strong_prior_output_match_binding", "risk_flags": risk_flags, "trajectory_risk_score": trajectory_risk_score, "intervention_mode": intervention_mode}
         if clean_cwd_listing:
-            return {"accepted": True, "reason": "clean_cwd_listing_binding", "risk_flags": risk_flags}
+            return {"accepted": True, "reason": "clean_cwd_listing_binding", "risk_flags": risk_flags, "trajectory_risk_score": trajectory_risk_score, "intervention_mode": intervention_mode}
         if strong_literal_arg and not (tool_name == "cat" and "cat_competing_intent" in risk_flags) and "write_intent_unconfirmed" not in risk_flags and "repeat_same_tool_without_new_evidence" not in risk_flags and "post_write_tool_intervention" not in risk_flags:
-            return {"accepted": True, "reason": "literal_arg_match", "risk_flags": risk_flags}
+            return {"accepted": True, "reason": "literal_arg_match", "risk_flags": risk_flags, "trajectory_risk_score": trajectory_risk_score, "intervention_mode": intervention_mode}
         if risk_flags:
-            return {"accepted": False, "reason": risk_flags[0], "risk_flags": risk_flags}
-        return {"accepted": True, "reason": "guard_passed", "risk_flags": risk_flags}
+            return {"accepted": False, "reason": risk_flags[0], "risk_flags": risk_flags, "trajectory_risk_score": trajectory_risk_score, "intervention_mode": intervention_mode}
+        return {"accepted": True, "reason": "guard_passed", "risk_flags": risk_flags, "trajectory_risk_score": trajectory_risk_score, "intervention_mode": intervention_mode}
 
     def _guarded_action_candidate_selection(
         self,
