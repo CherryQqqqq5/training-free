@@ -270,7 +270,7 @@ class M27fPlanOnlyPreflightTests(unittest.TestCase):
             )
 
         self.assertFalse(report["m2_7f_candidate_plan_diversity_passed"])
-        self.assertEqual(report["selected_next_tool_distribution"], {"mkdir": 2})
+        self.assertEqual(report["selected_next_tool_distribution"], {"mkdir": 1})
         self.assertEqual(report["diagnostic"]["first_failed_criterion"], "selected_next_tool_single_mkdir_collapse")
 
     def test_plan_diversity_accepts_request_local_multi_tool_selection(self) -> None:

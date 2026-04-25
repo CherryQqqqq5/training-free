@@ -464,6 +464,14 @@ class RuleEngine:
             for binding in bindings.values():
                 if isinstance(binding, dict):
                     visit(binding.get("evidence") or {})
+        for source in RuleEngine._candidate_binding_sources(candidate):
+            if source.startswith("prior_tool_output."):
+                suffix = source[len("prior_tool_output.") :]
+                key = suffix.split("[", 1)[0].split(".", 1)[0].split("|", 1)[0]
+                if key == "cwd_or_listing":
+                    keys.update({"current_working_directory", "current_directory_content"})
+                elif key:
+                    keys.add(key)
         return keys
 
     @staticmethod
@@ -547,7 +555,7 @@ class RuleEngine:
             "mv": ("move", "rename"),
             "cp": ("copy", "duplicate"),
             "diff": ("compare", "identical", "difference", "diff"),
-            "echo": ("write", "put", "append", "replace", "insert"),
+            "echo": ("write", "put", "putting", "append", "replace", "insert", "modify", "update", "change"),
             "ls": ("list", "show files"),
             "tail": ("last lines", "tail"),
             "sort": ("sort", "ordered"),
@@ -633,6 +641,8 @@ class RuleEngine:
             components["arg_binding_score"] = 12 if "explicit_literal" in binding_sources else 8
         elif binding_sources and needs_prior_output and components["state_compatibility_score"] > 0:
             components["arg_binding_score"] = 6
+        elif not binding_sources and literal_score > 0:
+            components["arg_binding_score"] = 8
 
         components["intent_score"] = self._tool_intent_score(tool_name, request_text)
         components["score"] = (
@@ -709,6 +719,82 @@ class RuleEngine:
         ]
         return sorted(ranked, key=lambda item: item[0], reverse=True)
 
+    def _action_candidate_guard_status(
+        self,
+        candidate: Dict[str, Any],
+        components: Dict[str, Any],
+        *,
+        request_json: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        tool_name = str(candidate.get("tool") or "").strip()
+        binding_sources = set(components.get("binding_sources") or [])
+        arg_score = int(components.get("arg_binding_score") or 0)
+        literal_score = int(components.get("literal_score") or 0)
+        state_score = int(components.get("state_compatibility_score") or 0)
+        intent_score = int(components.get("intent_score") or 0)
+        risk_flags: List[str] = []
+        if not components.get("schema_available"):
+            return {"accepted": False, "reason": "schema_unavailable", "risk_flags": ["schema_unavailable"]}
+        generic_tools = {"cat", "touch", "mkdir"}
+        needs_prior_output = any(source.startswith("prior_tool_output") for source in binding_sources) or bool(components.get("prior_output_keys_required"))
+        if tool_name in generic_tools and arg_score < 8:
+            risk_flags.append("weak_arg_binding_evidence")
+        if needs_prior_output and state_score <= 0:
+            risk_flags.append("prior_output_state_unavailable")
+        if "prior_tool_output.cwd_or_listing" in binding_sources and literal_score <= 0:
+            risk_flags.append("weak_cwd_or_listing_binding")
+        if tool_name == "cat" and intent_score < 0:
+            risk_flags.append("cat_competing_intent")
+        strong_explicit = "explicit_literal" in binding_sources and arg_score >= 12 and literal_score > 0
+        strong_prior = needs_prior_output and state_score >= 8 and arg_score >= 8 and literal_score > 0
+        strong_literal_arg = not binding_sources and arg_score >= 8 and literal_score > 0
+        if strong_explicit and not (tool_name == "cat" and "cat_competing_intent" in risk_flags):
+            return {"accepted": True, "reason": "strong_explicit_literal_binding", "risk_flags": risk_flags}
+        if strong_prior and "weak_cwd_or_listing_binding" not in risk_flags:
+            return {"accepted": True, "reason": "strong_prior_output_binding", "risk_flags": risk_flags}
+        if strong_literal_arg and not (tool_name == "cat" and "cat_competing_intent" in risk_flags):
+            return {"accepted": True, "reason": "literal_arg_match", "risk_flags": risk_flags}
+        if risk_flags:
+            return {"accepted": False, "reason": risk_flags[0], "risk_flags": risk_flags}
+        return {"accepted": True, "reason": "guard_passed", "risk_flags": risk_flags}
+
+    def _guarded_action_candidate_selection(
+        self,
+        candidates: List[Dict[str, Any]],
+        *,
+        request_json: Dict[str, Any],
+        request_tool_name_set: set[str],
+        recommended: List[str],
+        confidence: float,
+    ) -> tuple[tuple[tuple[int, int, int, int, float, int, int], Dict[str, Any], Dict[str, Any], Dict[str, Any]] | None, list[dict[str, Any]]]:
+        rows: list[tuple[tuple[int, int, int, int, float, int, int], Dict[str, Any], Dict[str, Any], Dict[str, Any]]] = []
+        rejected: list[dict[str, Any]] = []
+        for index, candidate in enumerate(candidates):
+            components = self._action_candidate_score_components(
+                candidate,
+                request_json=request_json,
+                request_tool_name_set=request_tool_name_set,
+                recommended=recommended,
+                confidence=confidence,
+                index=index,
+            )
+            rank = self._rank_tuple_from_components(components)
+            guard = self._action_candidate_guard_status(candidate, components, request_json=request_json)
+            rows.append((rank, candidate, components, guard))
+        rows.sort(key=lambda item: item[0], reverse=True)
+        for rank, candidate, components, guard in rows:
+            if guard.get("accepted"):
+                return (rank, candidate, components, guard), rejected
+            rejected.append(
+                {
+                    "tool": candidate.get("tool"),
+                    "args": candidate.get("args") or {},
+                    "rank_tuple": list(rank),
+                    "guard": guard,
+                    "candidate_rank_scores": components,
+                }
+            )
+        return None, rejected
 
     def _next_tool_activation_predicates(self, rule: Rule, policy: DecisionPolicySpec) -> List[str]:
         next_tool_policy = getattr(policy, "next_tool_policy", None)
@@ -742,6 +828,8 @@ class RuleEngine:
             "activation_predicate_status": {},
             "action_candidates": [],
             "selected_action_candidate": None,
+            "action_candidate_guard": None,
+            "rejected_action_candidates": [],
             "confidence": 0.0,
         }
         blocked_priority = {
@@ -750,11 +838,12 @@ class RuleEngine:
             "activation_predicates_unmet": 3,
             "recommended_tools_empty": 4,
             "recommended_tools_not_in_schema": 5,
+            "action_candidate_guard_rejected": 6,
             "activated": 99,
         }
         blocked_reason = "no_policy_candidate"
         blocked_rank = blocked_priority[blocked_reason]
-        best_selection: tuple[tuple[int, int, float, int, int], Dict[str, Any]] | None = None
+        best_selection: tuple[tuple[int, int, int, int, float, int, int], Dict[str, Any], Dict[str, Any], Dict[str, Any]] | None = None
         fallback_selected_tool: str | None = None
 
         def mark_blocked(reason: str) -> None:
@@ -805,6 +894,31 @@ class RuleEngine:
             next_tool_policy = getattr(policy, "next_tool_policy", None)
             mode = str(getattr(next_tool_policy, "tool_choice_mode", None) or "soft")
             confidence = float(getattr(next_tool_policy, "confidence", 0.0) or 0.0)
+            action_candidates = self._policy_action_candidates(policy)
+            ranked_candidates = self._rank_action_candidates(
+                action_candidates,
+                request_json=request_json,
+                request_tool_name_set=request_tool_name_set,
+                recommended=recommended,
+                confidence=confidence,
+            )
+            for _, candidate in ranked_candidates:
+                if candidate not in plan["action_candidates"]:
+                    plan["action_candidates"].append(candidate)
+            guarded_selection = None
+            rejected: list[dict[str, Any]] = []
+            if action_candidates:
+                guarded_selection, rejected = self._guarded_action_candidate_selection(
+                    action_candidates,
+                    request_json=request_json,
+                    request_tool_name_set=request_tool_name_set,
+                    recommended=recommended,
+                    confidence=confidence,
+                )
+                plan["rejected_action_candidates"].extend(rejected)
+                if guarded_selection is None:
+                    mark_blocked("action_candidate_guard_rejected")
+                    continue
             plan["activated"] = True
             plan["blocked_reason"] = "activated"
             fallback_selected_tool = fallback_selected_tool or recommended[0]
@@ -814,20 +928,11 @@ class RuleEngine:
             plan["policy_hits"].append(rule.rule_id)
             add_unique("matched_recommended_tools", recommended)
             add_unique("recommended_tools", recommended)
-            ranked_candidates = self._rank_action_candidates(
-                self._policy_action_candidates(policy),
-                request_json=request_json,
-                request_tool_name_set=request_tool_name_set,
-                recommended=recommended,
-                confidence=confidence,
-            )
-            for _, candidate in ranked_candidates:
-                if candidate not in plan["action_candidates"]:
-                    plan["action_candidates"].append(candidate)
-            if ranked_candidates and (best_selection is None or ranked_candidates[0][0] > best_selection[0]):
-                best_selection = ranked_candidates[0]
+            if guarded_selection is not None and (best_selection is None or guarded_selection[0] > best_selection[0]):
+                best_selection = guarded_selection
         if best_selection is not None:
             plan["selected_action_candidate"] = best_selection[1]
+            plan["action_candidate_guard"] = best_selection[3]
             plan["selected_tool"] = str(best_selection[1].get("tool") or "") or fallback_selected_tool
         elif fallback_selected_tool:
             plan["selected_tool"] = fallback_selected_tool

@@ -1824,6 +1824,105 @@ action:
         self.assertTrue(validation.next_tool_emitted)
         self.assertTrue(validation.next_tool_matches_recommendation)
 
+
+    def test_next_tool_guard_allows_high_confidence_explicit_binding(self) -> None:
+        action_candidate = {
+            "tool": "move_file",
+            "args": {"file_name": "report.txt"},
+            "arg_bindings": {"file_name": {"source": "explicit_literal", "value": "report.txt"}},
+            "recommended_tools": ["move_file"],
+        }
+        rule = self._next_tool_rule(recommended_tools=["move_file"], action_candidates=[action_candidate])
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir, runtime_policy={"enable_required_next_tool_choice": True})
+            engine.rules = [rule]
+            patched, request_patches = engine.apply_request(self._make_move_file_request())
+
+        self.assertEqual(patched["tool_choice"], "required")
+        self.assertIn("policy_next_tool:selected=move_file", request_patches)
+        self.assertTrue(request_patches.next_tool_plan["action_candidate_guard"]["accepted"])
+        self.assertEqual(request_patches.next_tool_plan["action_candidate_guard"]["reason"], "strong_explicit_literal_binding")
+
+    def test_next_tool_guard_blocks_weak_generic_prior_output_candidate(self) -> None:
+        action_candidate = {
+            "tool": "touch",
+            "args": {"file_name": "marker.txt"},
+            "binding_source": "prior_tool_output.cwd_or_listing",
+            "arg_bindings": {
+                "file_name": {
+                    "source": "prior_tool_output.cwd_or_listing",
+                    "value": "marker.txt",
+                    "evidence": {"prior_output_keys": ["current_working_directory", "disk_usage"]},
+                }
+            },
+            "recommended_tools": ["touch"],
+        }
+        rule = self._next_tool_rule(
+            recommended_tools=["touch"],
+            request_predicates=["tools_available", "prior_tool_outputs_present"],
+            activation_predicates=["tools_available", "prior_tool_outputs_present"],
+            action_candidates=[action_candidate],
+        )
+        request = {
+            "model": "demo-model",
+            "messages": [
+                {"role": "user", "content": "Continue from the current directory."},
+                {"role": "tool", "content": json.dumps({"current_working_directory": "/tmp", "disk_usage": "10B"})},
+            ],
+            "tools": [
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "touch",
+                        "parameters": {"type": "object", "properties": {"file_name": {"type": "string"}}},
+                    },
+                }
+            ],
+        }
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir, runtime_policy={"enable_required_next_tool_choice": True})
+            engine.rules = [rule]
+            patched, request_patches = engine.apply_request(request)
+
+        self.assertNotIn("tool_choice", patched)
+        self.assertFalse(request_patches.next_tool_plan["activated"])
+        self.assertEqual(request_patches.next_tool_plan["blocked_reason"], "action_candidate_guard_rejected")
+        guard = request_patches.next_tool_plan["rejected_action_candidates"][0]["guard"]
+        self.assertFalse(guard["accepted"])
+        self.assertIn("weak_cwd_or_listing_binding", guard["risk_flags"])
+
+    def test_next_tool_guard_blocks_cat_when_write_intent_is_stronger(self) -> None:
+        action_candidate = {
+            "tool": "cat",
+            "args": {"file_name": "ProjectOverview.txt"},
+            "binding_source": "explicit_literal",
+            "arg_bindings": {"file_name": {"source": "explicit_literal", "value": "ProjectOverview.txt"}},
+            "recommended_tools": ["cat"],
+        }
+        rule = self._next_tool_rule(recommended_tools=["cat"], action_candidates=[action_candidate])
+        request = {
+            "model": "demo-model",
+            "messages": [{"role": "user", "content": "Modify ProjectOverview.txt by putting Hello into it."}],
+            "tools": [
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "cat",
+                        "parameters": {"type": "object", "properties": {"file_name": {"type": "string"}}},
+                    },
+                }
+            ],
+        }
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir, runtime_policy={"enable_required_next_tool_choice": True})
+            engine.rules = [rule]
+            patched, request_patches = engine.apply_request(request)
+
+        self.assertNotIn("tool_choice", patched)
+        self.assertFalse(request_patches.next_tool_plan["activated"])
+        guard = request_patches.next_tool_plan["rejected_action_candidates"][0]["guard"]
+        self.assertIn("cat_competing_intent", guard["risk_flags"])
+
     def test_next_tool_arg_binding_validation_records_match(self) -> None:
         action_candidate = {
             "tool": "move_file",
