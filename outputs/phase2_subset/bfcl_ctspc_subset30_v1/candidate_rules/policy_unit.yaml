@@ -27,6 +27,7 @@ policy_units:
           - budget analysis
           - final_report.pdf
           intent: read_file_content
+          pending_goal_family: read_content
     recommended_tools:
     - cat
     reason: prior find/list output has a concrete match and the user asks to read
@@ -36,6 +37,7 @@ policy_units:
       - budget analysis
       - final_report.pdf
       intent: read_file_content
+      pending_goal_family: read_content
     binding_source: explicit_literal
     postcondition:
       kind: file_content
@@ -47,29 +49,28 @@ policy_units:
     - trajectory_sensitive_tool
     binding_type: file
     intervention_mode: guidance
+    pending_goal_family: read_content
   - &id002
     tool: touch
     args:
-      file_name: summary.txt
+      file_name: 2024_research_backup.txt
     arg_bindings:
       file_name:
         source: explicit_literal
-        value: summary.txt
+        value: 2024_research_backup.txt
         evidence:
           explicit_literals:
-          - summary.txt
-          - Hello
-          - notes.md
+          - 2024_research_backup.txt
           intent: explicit_literal_action
+          pending_goal_family: create_file
     recommended_tools:
     - touch
     reason: explicit literal in user request grounds the next tool argument
     evidence:
       explicit_literals:
-      - summary.txt
-      - Hello
-      - notes.md
+      - 2024_research_backup.txt
       intent: explicit_literal_action
+      pending_goal_family: create_file
     binding_source: explicit_literal
     postcondition:
       kind: file_exists
@@ -81,113 +82,139 @@ policy_units:
     - trajectory_sensitive_tool
     binding_type: file
     intervention_mode: guidance
+    pending_goal_family: create_file
   - &id003
-    tool: cat
+    tool: cp
     args:
-      file_name: 2024_research_backup.txt
+      source: test_document.txt
+      destination: final_document.txt
     arg_bindings:
-      file_name:
-        source: explicit_literal
-        value: 2024_research_backup.txt
+      source:
+        source: explicit_literal_pair
+        value: test_document.txt
         evidence:
           explicit_literals:
-          - 2024_research_backup.txt
-          intent: read_file_content
+          - test_document.txt
+          - final_document.txt
+          intent: explicit_literal_action
+          pending_goal_family: move_or_copy
+      destination:
+        source: explicit_literal_pair
+        value: final_document.txt
+        evidence:
+          explicit_literals:
+          - test_document.txt
+          - final_document.txt
+          intent: explicit_literal_action
+          pending_goal_family: move_or_copy
     recommended_tools:
-    - cat
-    reason: prior find/list output has a concrete match and the user asks to read
-      content
+    - cp
+    reason: explicit source and destination literals ground a move/copy next action
     evidence:
       explicit_literals:
-      - 2024_research_backup.txt
-      intent: read_file_content
-    binding_source: explicit_literal
+      - test_document.txt
+      - final_document.txt
+      intent: explicit_literal_action
+      pending_goal_family: move_or_copy
+    binding_source: explicit_literal_pair
     postcondition:
-      kind: file_content
-      expected_state_key: file_content
-      target_arg: file_name
-      confidence: 0.8
-    trajectory_risk_score: 2
-    trajectory_risk_flags:
-    - trajectory_sensitive_tool
-    binding_type: file
+      kind: target_path_changed
+      expected_state_key: current_directory_content
+      target_arg: destination
+      confidence: 0.7
+    trajectory_risk_score: 0
+    trajectory_risk_flags: []
+    binding_type: path
     intervention_mode: guidance
+    pending_goal_family: move_or_copy
   - &id004
-    tool: cat
+    tool: mv
     args:
-      file_name: ProjectOverview.txt
+      source: project_plan.md
+      destination: project_overview.md
     arg_bindings:
-      file_name:
-        source: explicit_literal
-        value: ProjectOverview.txt
+      source:
+        source: explicit_literal_pair
+        value: project_plan.md
         evidence:
           explicit_literals:
-          - 've just put together a file named '
-          - ' into my working directory where I'
-          - 'd like to modify the file content by putting '
-          - ProjectOverview.txt
-          intent: read_file_content
+          - project_plan.md
+          - project_overview.md
+          intent: explicit_literal_action
+          pending_goal_family: move_or_copy
+      destination:
+        source: explicit_literal_pair
+        value: project_overview.md
+        evidence:
+          explicit_literals:
+          - project_plan.md
+          - project_overview.md
+          intent: explicit_literal_action
+          pending_goal_family: move_or_copy
     recommended_tools:
-    - cat
-    reason: prior find/list output has a concrete match and the user asks to read
-      content
+    - mv
+    reason: explicit source and destination literals ground a move/copy next action
     evidence:
       explicit_literals:
-      - 've just put together a file named '
-      - ' into my working directory where I'
-      - 'd like to modify the file content by putting '
-      - ProjectOverview.txt
-      intent: read_file_content
-    binding_source: explicit_literal
+      - project_plan.md
+      - project_overview.md
+      intent: explicit_literal_action
+      pending_goal_family: move_or_copy
+    binding_source: explicit_literal_pair
     postcondition:
-      kind: file_content
-      expected_state_key: file_content
-      target_arg: file_name
-      confidence: 0.8
-    trajectory_risk_score: 2
-    trajectory_risk_flags:
-    - trajectory_sensitive_tool
-    binding_type: file
+      kind: target_path_changed
+      expected_state_key: current_directory_content
+      target_arg: destination
+      confidence: 0.7
+    trajectory_risk_score: 0
+    trajectory_risk_flags: []
+    binding_type: path
     intervention_mode: guidance
+    pending_goal_family: move_or_copy
   - &id005
     tool: cat
     args:
-      file_name: 've come across an urgent conundrum: servers are down unexpectedly.
-        Draft a support ticket, with description '
+      file_name: analysis_report.txt
     arg_bindings:
       file_name:
-        source: explicit_literal
-        value: 've come across an urgent conundrum: servers are down unexpectedly.
-          Draft a support ticket, with description '
+        source: prior_tool_output.matches[0]|basename
+        value: analysis_report.txt
         evidence:
-          explicit_literals:
-          - 've come across an urgent conundrum: servers are down unexpectedly. Draft
-            a support ticket, with description '
-          - ' highlighting this dilemma and assign it a priority level of 3 to hasten
-            the response rate. Title '
-          intent: read_file_content
+          last_tool: null
+          prior_output_keys:
+          - matches
+          - error
+          - current_working_directory
+          - current_directory_content
+          - matching_lines
+          - disk_usage
+          pending_goal_family: read_content
     recommended_tools:
     - cat
     reason: prior find/list output has a concrete match and the user asks to read
       content
     evidence:
-      explicit_literals:
-      - 've come across an urgent conundrum: servers are down unexpectedly. Draft
-        a support ticket, with description '
-      - ' highlighting this dilemma and assign it a priority level of 3 to hasten
-        the response rate. Title '
-      intent: read_file_content
-    binding_source: explicit_literal
+      last_tool: null
+      prior_output_keys:
+      - matches
+      - error
+      - current_working_directory
+      - current_directory_content
+      - matching_lines
+      - disk_usage
+      pending_goal_family: read_content
+    binding_source: prior_tool_output.matches[0]|basename
     postcondition:
       kind: file_content
       expected_state_key: file_content
       target_arg: file_name
       confidence: 0.8
-    trajectory_risk_score: 2
+    trajectory_risk_score: 4
     trajectory_risk_flags:
     - trajectory_sensitive_tool
     binding_type: file
     intervention_mode: guidance
+    pending_goal_family: read_content
   next_tool_policy:
     activation_predicates:
     - prior_explicit_literals_present
@@ -301,42 +328,49 @@ policy_units:
   - cd
   - echo
   action_candidates:
-  - tool: cat
+  - tool: mv
     args:
-      file_name: ProjectOverview.txt
+      source: project_plan.md
+      destination: project_overview.md
     arg_bindings:
-      file_name:
-        source: explicit_literal
-        value: ProjectOverview.txt
+      source:
+        source: explicit_literal_pair
+        value: project_plan.md
         evidence:
           explicit_literals:
-          - 've just put together a file named '
-          - ' into my working directory where I'
-          - 'd like to modify the file content by putting '
-          - ProjectOverview.txt
-          intent: read_file_content
+          - project_plan.md
+          - project_overview.md
+          intent: explicit_literal_action
+          pending_goal_family: move_or_copy
+      destination:
+        source: explicit_literal_pair
+        value: project_overview.md
+        evidence:
+          explicit_literals:
+          - project_plan.md
+          - project_overview.md
+          intent: explicit_literal_action
+          pending_goal_family: move_or_copy
     recommended_tools:
-    - cat
-    reason: prior find/list output has a concrete match and the user asks to read
-      content
+    - mv
+    reason: explicit source and destination literals ground a move/copy next action
     evidence:
       explicit_literals:
-      - 've just put together a file named '
-      - ' into my working directory where I'
-      - 'd like to modify the file content by putting '
-      - ProjectOverview.txt
-      intent: read_file_content
-    binding_source: explicit_literal
+      - project_plan.md
+      - project_overview.md
+      intent: explicit_literal_action
+      pending_goal_family: move_or_copy
+    binding_source: explicit_literal_pair
     postcondition:
-      kind: file_content
-      expected_state_key: file_content
-      target_arg: file_name
-      confidence: 0.8
-    trajectory_risk_score: 2
-    trajectory_risk_flags:
-    - trajectory_sensitive_tool
-    binding_type: file
+      kind: target_path_changed
+      expected_state_key: current_directory_content
+      target_arg: destination
+      confidence: 0.7
+    trajectory_risk_score: 0
+    trajectory_risk_flags: []
+    binding_type: path
     intervention_mode: guidance
+    pending_goal_family: move_or_copy
   - tool: cat
     args:
       file_name: data.txt
@@ -354,6 +388,7 @@ policy_units:
           - error
           - count
           - type
+          pending_goal_family: read_content
     recommended_tools:
     - cat
     reason: prior find/list output has a concrete match and the user asks to read
@@ -368,6 +403,7 @@ policy_units:
       - error
       - count
       - type
+      pending_goal_family: read_content
     binding_source: prior_tool_output.matches[0]|basename
     postcondition:
       kind: file_content
@@ -379,6 +415,46 @@ policy_units:
     - trajectory_sensitive_tool
     binding_type: file
     intervention_mode: guidance
+    pending_goal_family: read_content
+  - tool: cat
+    args:
+      file_name: config.py
+    arg_bindings:
+      file_name:
+        source: prior_tool_output.matches[0]|basename
+        value: config.py
+        evidence:
+          last_tool: null
+          prior_output_keys:
+          - matches
+          - error
+          - current_working_directory
+          - last_lines
+          pending_goal_family: read_content
+    recommended_tools:
+    - cat
+    reason: prior find/list output has a concrete match and the user asks to read
+      content
+    evidence:
+      last_tool: null
+      prior_output_keys:
+      - matches
+      - error
+      - current_working_directory
+      - last_lines
+      pending_goal_family: read_content
+    binding_source: prior_tool_output.matches[0]|basename
+    postcondition:
+      kind: file_content
+      expected_state_key: file_content
+      target_arg: file_name
+      confidence: 0.8
+    trajectory_risk_score: 4
+    trajectory_risk_flags:
+    - trajectory_sensitive_tool
+    binding_type: file
+    intervention_mode: guidance
+    pending_goal_family: read_content
   - tool: cat
     args:
       file_name: config.py
@@ -394,6 +470,7 @@ policy_units:
           - current_working_directory
           - last_lines
           - file_content
+          pending_goal_family: read_content
     recommended_tools:
     - cat
     reason: prior find/list output has a concrete match and the user asks to read
@@ -406,6 +483,7 @@ policy_units:
       - current_working_directory
       - last_lines
       - file_content
+      pending_goal_family: read_content
     binding_source: prior_tool_output.matches[0]|basename
     postcondition:
       kind: file_content
@@ -417,6 +495,7 @@ policy_units:
     - trajectory_sensitive_tool
     binding_type: file
     intervention_mode: guidance
+    pending_goal_family: read_content
   - tool: cat
     args:
       file_name: summary_2024.txt
@@ -428,6 +507,7 @@ policy_units:
           explicit_literals:
           - summary_2024.txt
           intent: read_file_content
+          pending_goal_family: read_content
     recommended_tools:
     - cat
     reason: prior find/list output has a concrete match and the user asks to read
@@ -436,6 +516,7 @@ policy_units:
       explicit_literals:
       - summary_2024.txt
       intent: read_file_content
+      pending_goal_family: read_content
     binding_source: explicit_literal
     postcondition:
       kind: file_content
@@ -447,46 +528,7 @@ policy_units:
     - trajectory_sensitive_tool
     binding_type: file
     intervention_mode: guidance
-  - tool: cat
-    args:
-      file_name: analysis_report.csv
-    arg_bindings:
-      file_name:
-        source: prior_tool_output.matches[0]|basename
-        value: analysis_report.csv
-        evidence:
-          last_tool: null
-          prior_output_keys:
-          - matches
-          - current_working_directory
-          - error
-          - result
-          - file_content
-          - sorted_content
-    recommended_tools:
-    - cat
-    reason: prior find/list output has a concrete match and the user asks to read
-      content
-    evidence:
-      last_tool: null
-      prior_output_keys:
-      - matches
-      - current_working_directory
-      - error
-      - result
-      - file_content
-      - sorted_content
-    binding_source: prior_tool_output.matches[0]|basename
-    postcondition:
-      kind: file_content
-      expected_state_key: file_content
-      target_arg: file_name
-      confidence: 0.8
-    trajectory_risk_score: 4
-    trajectory_risk_flags:
-    - trajectory_sensitive_tool
-    binding_type: file
-    intervention_mode: guidance
+    pending_goal_family: read_content
   next_tool_policy:
     activation_predicates:
     - prior_tool_outputs_present
@@ -524,38 +566,82 @@ policy_units:
   - cp
   - mkdir
   action_candidates:
-  - tool: cat
+  - tool: touch
     args:
-      file_name: test_document.txt
+      file_name: marker.txt
     arg_bindings:
       file_name:
-        source: prior_tool_output.matches[0]|basename
-        value: test_document.txt
+        source: prior_tool_output.cwd_or_listing
+        value: marker.txt
+        evidence:
+          last_tool: null
+          prior_output_keys:
+          - error
+          - diff_lines
+          pending_goal_family: create_file
+    recommended_tools:
+    - touch
+    reason: prior cwd/listing output grounds a path-sensitive next action
+    evidence:
+      last_tool: null
+      prior_output_keys:
+      - error
+      - diff_lines
+      pending_goal_family: create_file
+    binding_source: prior_tool_output.cwd_or_listing
+    postcondition:
+      kind: file_exists
+      expected_state_key: current_directory_content
+      target_arg: file_name
+      confidence: 0.75
+    trajectory_risk_score: 7
+    trajectory_risk_flags:
+    - trajectory_sensitive_tool
+    - weak_cwd_or_listing_binding
+    binding_type: file
+    intervention_mode: weak_guidance
+    pending_goal_family: create_file
+  - tool: touch
+    args:
+      file_name: marker.txt
+    arg_bindings:
+      file_name:
+        source: prior_tool_output.cwd_or_listing
+        value: marker.txt
         evidence:
           last_tool: null
           prior_output_keys:
           - matches
-          - result
+          - error
+          - current_working_directory
+          - last_lines
+          - file_content
+          pending_goal_family: create_file
     recommended_tools:
-    - cat
-    reason: prior find/list output has a concrete match and the user asks to read
-      content
+    - touch
+    reason: prior cwd/listing output grounds a path-sensitive next action
     evidence:
       last_tool: null
       prior_output_keys:
       - matches
-      - result
-    binding_source: prior_tool_output.matches[0]|basename
+      - error
+      - current_working_directory
+      - last_lines
+      - file_content
+      pending_goal_family: create_file
+    binding_source: prior_tool_output.cwd_or_listing
     postcondition:
-      kind: file_content
-      expected_state_key: file_content
+      kind: file_exists
+      expected_state_key: current_directory_content
       target_arg: file_name
-      confidence: 0.8
-    trajectory_risk_score: 4
+      confidence: 0.75
+    trajectory_risk_score: 7
     trajectory_risk_flags:
     - trajectory_sensitive_tool
+    - weak_cwd_or_listing_binding
     binding_type: file
-    intervention_mode: guidance
+    intervention_mode: weak_guidance
+    pending_goal_family: create_file
   - tool: cat
     args:
       file_name: project_summary.txt
@@ -567,6 +653,7 @@ policy_units:
           explicit_literals:
           - project_summary.txt
           intent: read_file_content
+          pending_goal_family: read_content
     recommended_tools:
     - cat
     reason: prior find/list output has a concrete match and the user asks to read
@@ -575,6 +662,7 @@ policy_units:
       explicit_literals:
       - project_summary.txt
       intent: read_file_content
+      pending_goal_family: read_content
     binding_source: explicit_literal
     postcondition:
       kind: file_content
@@ -586,6 +674,7 @@ policy_units:
     - trajectory_sensitive_tool
     binding_type: file
     intervention_mode: guidance
+    pending_goal_family: read_content
   next_tool_policy:
     activation_predicates: []
     recommended_tools: []
@@ -617,42 +706,49 @@ policy_units:
   - cp
   - echo
   action_candidates:
-  - tool: cat
+  - tool: mv
     args:
-      file_name: ProjectOverview.txt
+      source: project_plan.md
+      destination: project_overview.md
     arg_bindings:
-      file_name:
-        source: explicit_literal
-        value: ProjectOverview.txt
+      source:
+        source: explicit_literal_pair
+        value: project_plan.md
         evidence:
           explicit_literals:
-          - 've just put together a file named '
-          - ' into my working directory where I'
-          - 'd like to modify the file content by putting '
-          - ProjectOverview.txt
-          intent: read_file_content
+          - project_plan.md
+          - project_overview.md
+          intent: explicit_literal_action
+          pending_goal_family: move_or_copy
+      destination:
+        source: explicit_literal_pair
+        value: project_overview.md
+        evidence:
+          explicit_literals:
+          - project_plan.md
+          - project_overview.md
+          intent: explicit_literal_action
+          pending_goal_family: move_or_copy
     recommended_tools:
-    - cat
-    reason: prior find/list output has a concrete match and the user asks to read
-      content
+    - mv
+    reason: explicit source and destination literals ground a move/copy next action
     evidence:
       explicit_literals:
-      - 've just put together a file named '
-      - ' into my working directory where I'
-      - 'd like to modify the file content by putting '
-      - ProjectOverview.txt
-      intent: read_file_content
-    binding_source: explicit_literal
+      - project_plan.md
+      - project_overview.md
+      intent: explicit_literal_action
+      pending_goal_family: move_or_copy
+    binding_source: explicit_literal_pair
     postcondition:
-      kind: file_content
-      expected_state_key: file_content
-      target_arg: file_name
-      confidence: 0.8
-    trajectory_risk_score: 2
-    trajectory_risk_flags:
-    - trajectory_sensitive_tool
-    binding_type: file
+      kind: target_path_changed
+      expected_state_key: current_directory_content
+      target_arg: destination
+      confidence: 0.7
+    trajectory_risk_score: 0
+    trajectory_risk_flags: []
+    binding_type: path
     intervention_mode: guidance
+    pending_goal_family: move_or_copy
   - tool: cat
     args:
       file_name: data.txt
@@ -670,6 +766,7 @@ policy_units:
           - error
           - count
           - type
+          pending_goal_family: read_content
     recommended_tools:
     - cat
     reason: prior find/list output has a concrete match and the user asks to read
@@ -684,6 +781,7 @@ policy_units:
       - error
       - count
       - type
+      pending_goal_family: read_content
     binding_source: prior_tool_output.matches[0]|basename
     postcondition:
       kind: file_content
@@ -695,6 +793,46 @@ policy_units:
     - trajectory_sensitive_tool
     binding_type: file
     intervention_mode: guidance
+    pending_goal_family: read_content
+  - tool: cat
+    args:
+      file_name: config.py
+    arg_bindings:
+      file_name:
+        source: prior_tool_output.matches[0]|basename
+        value: config.py
+        evidence:
+          last_tool: null
+          prior_output_keys:
+          - matches
+          - error
+          - current_working_directory
+          - last_lines
+          pending_goal_family: read_content
+    recommended_tools:
+    - cat
+    reason: prior find/list output has a concrete match and the user asks to read
+      content
+    evidence:
+      last_tool: null
+      prior_output_keys:
+      - matches
+      - error
+      - current_working_directory
+      - last_lines
+      pending_goal_family: read_content
+    binding_source: prior_tool_output.matches[0]|basename
+    postcondition:
+      kind: file_content
+      expected_state_key: file_content
+      target_arg: file_name
+      confidence: 0.8
+    trajectory_risk_score: 4
+    trajectory_risk_flags:
+    - trajectory_sensitive_tool
+    binding_type: file
+    intervention_mode: guidance
+    pending_goal_family: read_content
   - tool: cat
     args:
       file_name: config.py
@@ -710,6 +848,7 @@ policy_units:
           - current_working_directory
           - last_lines
           - file_content
+          pending_goal_family: read_content
     recommended_tools:
     - cat
     reason: prior find/list output has a concrete match and the user asks to read
@@ -722,6 +861,7 @@ policy_units:
       - current_working_directory
       - last_lines
       - file_content
+      pending_goal_family: read_content
     binding_source: prior_tool_output.matches[0]|basename
     postcondition:
       kind: file_content
@@ -733,6 +873,7 @@ policy_units:
     - trajectory_sensitive_tool
     binding_type: file
     intervention_mode: guidance
+    pending_goal_family: read_content
   - tool: cat
     args:
       file_name: summary_2024.txt
@@ -744,6 +885,7 @@ policy_units:
           explicit_literals:
           - summary_2024.txt
           intent: read_file_content
+          pending_goal_family: read_content
     recommended_tools:
     - cat
     reason: prior find/list output has a concrete match and the user asks to read
@@ -752,6 +894,7 @@ policy_units:
       explicit_literals:
       - summary_2024.txt
       intent: read_file_content
+      pending_goal_family: read_content
     binding_source: explicit_literal
     postcondition:
       kind: file_content
@@ -763,46 +906,7 @@ policy_units:
     - trajectory_sensitive_tool
     binding_type: file
     intervention_mode: guidance
-  - tool: cat
-    args:
-      file_name: analysis_report.csv
-    arg_bindings:
-      file_name:
-        source: prior_tool_output.matches[0]|basename
-        value: analysis_report.csv
-        evidence:
-          last_tool: null
-          prior_output_keys:
-          - matches
-          - current_working_directory
-          - error
-          - result
-          - file_content
-          - sorted_content
-    recommended_tools:
-    - cat
-    reason: prior find/list output has a concrete match and the user asks to read
-      content
-    evidence:
-      last_tool: null
-      prior_output_keys:
-      - matches
-      - current_working_directory
-      - error
-      - result
-      - file_content
-      - sorted_content
-    binding_source: prior_tool_output.matches[0]|basename
-    postcondition:
-      kind: file_content
-      expected_state_key: file_content
-      target_arg: file_name
-      confidence: 0.8
-    trajectory_risk_score: 4
-    trajectory_risk_flags:
-    - trajectory_sensitive_tool
-    binding_type: file
-    intervention_mode: guidance
+    pending_goal_family: read_content
   next_tool_policy:
     activation_predicates: []
     recommended_tools: []

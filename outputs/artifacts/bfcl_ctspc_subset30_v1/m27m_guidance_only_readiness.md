@@ -1,15 +1,15 @@
 # M2.7m Guidance-Only Readiness
 
-- Combined preflight passed: `False`
+- Combined preflight passed: `True`
 - Trace completeness passed: `True`
-- Guidance-only readiness passed: `False`
+- Guidance-only readiness passed: `True`
 - Exact tool-choice mode: `guidance_only`
 - Action-specific guidance coverage: `1.0`
 - Exact tool-choice coverage: `0.0`
 - Trajectory-sensitive exact forcing count: `0`
-- After-guard activations: `11`
-- Dominant selected tool rate: `0.9090909090909091`
+- After-guard activations: `13`
+- Dominant selected tool rate: `0.6923076923076923`
 - Missing trace ids: `{'baseline': [], 'candidate': []}`
-- First failed criterion: `m2_7i_guard_preflight_passed`
+- First failed criterion: `None`
 
 This checker is offline only. It does not call BFCL or an upstream model.
