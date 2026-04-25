@@ -8,6 +8,9 @@
 - Case regressed: `4`
 - Net case gain: `-4`
 - Accepted: `False`
+- Case report trace mapping: `mtime_by_result_step_count`
+- Case-level gate allowed: `False`
+- Case-level evidence: `diagnostic_only`
 
 ## Cases
 
