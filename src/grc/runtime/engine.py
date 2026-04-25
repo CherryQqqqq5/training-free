@@ -430,26 +430,238 @@ class RuleEngine:
             values.append(value.strip())
         return values
 
+    @staticmethod
+    def _candidate_binding_values(candidate: Dict[str, Any]) -> List[str]:
+        values = RuleEngine._candidate_string_values(candidate.get("args") or {})
+        bindings = candidate.get("arg_bindings") or {}
+        if isinstance(bindings, dict):
+            for binding in bindings.values():
+                if not isinstance(binding, dict):
+                    continue
+                value = binding.get("value")
+                if isinstance(value, str) and value.strip():
+                    values.append(value.strip())
+        return values
+
+    @staticmethod
+    def _candidate_prior_output_keys(candidate: Dict[str, Any]) -> set[str]:
+        keys: set[str] = set()
+
+        def visit(value: Any) -> None:
+            if isinstance(value, dict):
+                prior_keys = value.get("prior_output_keys")
+                if isinstance(prior_keys, list):
+                    keys.update(str(item) for item in prior_keys if str(item).strip())
+                for item in value.values():
+                    visit(item)
+            elif isinstance(value, list):
+                for item in value:
+                    visit(item)
+
+        visit(candidate.get("evidence") or {})
+        bindings = candidate.get("arg_bindings") or {}
+        if isinstance(bindings, dict):
+            for binding in bindings.values():
+                if isinstance(binding, dict):
+                    visit(binding.get("evidence") or {})
+        return keys
+
+    @staticmethod
+    def _candidate_binding_sources(candidate: Dict[str, Any]) -> set[str]:
+        sources: set[str] = set()
+        binding_source = candidate.get("binding_source")
+        if isinstance(binding_source, str) and binding_source.strip():
+            sources.add(binding_source.strip())
+        bindings = candidate.get("arg_bindings") or {}
+        if isinstance(bindings, dict):
+            for binding in bindings.values():
+                if not isinstance(binding, dict):
+                    continue
+                source = binding.get("source")
+                if isinstance(source, str) and source.strip():
+                    sources.add(source.strip())
+        return sources
+
+    @staticmethod
+    def _jsonlike_keys(value: Any) -> set[str]:
+        keys: set[str] = set()
+        if isinstance(value, dict):
+            for key, item in value.items():
+                if isinstance(key, str) and key:
+                    keys.add(key)
+                keys.update(RuleEngine._jsonlike_keys(item))
+        elif isinstance(value, list):
+            for item in value:
+                keys.update(RuleEngine._jsonlike_keys(item))
+        elif isinstance(value, str):
+            try:
+                parsed = json.loads(value)
+            except Exception:
+                parsed = None
+            if parsed is not None:
+                keys.update(RuleEngine._jsonlike_keys(parsed))
+        return keys
+
+    def _prior_tool_output_keys(self, request_json: Dict[str, Any]) -> set[str]:
+        keys: set[str] = set()
+        for item in self._conversation_items(request_json):
+            if item.get("role") == "tool":
+                keys.update(self._jsonlike_keys(item.get("content")))
+            if item.get("type") == "function_call_output":
+                keys.update(self._jsonlike_keys(item.get("output")))
+        return keys
+
+    def _last_prior_tool_name(self, request_json: Dict[str, Any]) -> str | None:
+        for item in reversed(self._conversation_items(request_json)):
+            if item.get("type") == "function_call":
+                name = item.get("name")
+                if isinstance(name, str) and name:
+                    return name
+            tool_calls = item.get("tool_calls")
+            if isinstance(tool_calls, list) and tool_calls:
+                for call in reversed(tool_calls):
+                    if not isinstance(call, dict):
+                        continue
+                    fn = call.get("function") if isinstance(call.get("function"), dict) else {}
+                    name = fn.get("name")
+                    if isinstance(name, str) and name:
+                        return name
+        return None
+
     def _request_text_for_ranking(self, request_json: Dict[str, Any]) -> str:
-        items = self._conversation_items(request_json)
+        items = [
+            item
+            for item in self._conversation_items(request_json)
+            if item.get("role") not in {"system", "developer"}
+        ]
         return json.dumps(items[-12:], ensure_ascii=False).lower()
 
-    def _tool_intent_score(self, tool_name: str, request_text: str) -> int:
+    @staticmethod
+    def _request_intent_hits(request_text: str) -> Dict[str, int]:
         aliases = {
-            "cat": ("read", "show", "display", "content", "open"),
-            "grep": ("search", "find", "match", "matches", "contains"),
-            "find": ("find", "locate", "search"),
-            "mkdir": ("make directory", "create directory", "new folder", "make folder", "directory", "folder"),
+            "cat": ("read", "show", "display", "open", "view", "print contents", "show contents"),
+            "grep": ("grep", "search", "match", "matches", "contains", "matching lines"),
+            "find": ("find", "locate", "search for", "look for"),
+            "mkdir": ("make directory", "create directory", "new folder", "make folder", "create folder"),
             "touch": ("create file", "new file", "touch", "empty file"),
             "mv": ("move", "rename"),
             "cp": ("copy", "duplicate"),
             "diff": ("compare", "identical", "difference", "diff"),
-            "echo": ("write", "put", "append", "replace"),
+            "echo": ("write", "put", "append", "replace", "insert"),
             "ls": ("list", "show files"),
             "tail": ("last lines", "tail"),
             "sort": ("sort", "ordered"),
         }
-        return sum(1 for alias in aliases.get(tool_name, ()) if alias in request_text)
+        return {tool: sum(1 for alias in values if alias in request_text) for tool, values in aliases.items()}
+
+    def _tool_intent_score(self, tool_name: str, request_text: str) -> int:
+        hits = self._request_intent_hits(request_text)
+        score = hits.get(tool_name, 0)
+        if tool_name == "cat":
+            competing = sum(hits.get(tool, 0) for tool in ("mkdir", "touch", "mv", "cp", "grep", "find", "echo"))
+            if competing:
+                score -= min(4, competing)
+        elif score:
+            score += 2
+        return score
+
+    def _action_candidate_score_components(
+        self,
+        candidate: Dict[str, Any],
+        *,
+        request_json: Dict[str, Any],
+        request_tool_name_set: set[str],
+        recommended: List[str],
+        confidence: float,
+        index: int,
+    ) -> Dict[str, Any]:
+        tool_name = str(candidate.get("tool") or "").strip()
+        recommended_rank = recommended.index(tool_name) if tool_name in recommended else 999
+        components: Dict[str, Any] = {
+            "tool": tool_name,
+            "schema_available": tool_name in request_tool_name_set,
+            "literal_score": 0,
+            "arg_binding_score": 0,
+            "state_compatibility_score": 0,
+            "intent_score": 0,
+            "recommended_rank": recommended_rank,
+            "confidence": confidence,
+            "index": index,
+            "prior_output_keys_required": sorted(self._candidate_prior_output_keys(candidate)),
+            "prior_output_keys_observed": sorted(self._prior_tool_output_keys(request_json)),
+            "binding_sources": sorted(self._candidate_binding_sources(candidate)),
+            "score": -1000,
+        }
+        if tool_name not in request_tool_name_set:
+            return components
+
+        request_text = self._request_text_for_ranking(request_json)
+        context_literals = [item.lower() for item in self._collect_context_literals(request_json)]
+        values = self._candidate_binding_values(candidate)
+        literal_score = 0
+        for value in values:
+            lowered = value.lower().strip()
+            if not lowered:
+                continue
+            basename = lowered.rsplit("/", 1)[-1]
+            if lowered in request_text:
+                literal_score += 10
+            elif basename and basename in request_text:
+                literal_score += 8
+            elif lowered in context_literals or basename in context_literals:
+                literal_score += 6
+            else:
+                tokens = set(self._normalize_literal_tokens(lowered))
+                if tokens and tokens.issubset(set(self._normalize_literal_tokens(request_text))):
+                    literal_score += 3
+        components["literal_score"] = literal_score
+
+        observed_prior_keys = set(components["prior_output_keys_observed"])
+        required_prior_keys = set(components["prior_output_keys_required"])
+        binding_sources = set(components["binding_sources"])
+        needs_prior_output = bool(required_prior_keys) or any(source.startswith("prior_tool_output") for source in binding_sources)
+        if needs_prior_output:
+            overlap = required_prior_keys & observed_prior_keys
+            if overlap:
+                components["state_compatibility_score"] = 8 + min(6, len(overlap))
+            else:
+                components["state_compatibility_score"] = -18
+        elif "explicit_literal" in binding_sources and literal_score > 0:
+            components["state_compatibility_score"] = 8
+
+        if binding_sources and literal_score > 0:
+            components["arg_binding_score"] = 12 if "explicit_literal" in binding_sources else 8
+        elif binding_sources and needs_prior_output and components["state_compatibility_score"] > 0:
+            components["arg_binding_score"] = 6
+
+        components["intent_score"] = self._tool_intent_score(tool_name, request_text)
+        components["score"] = (
+            int(components["arg_binding_score"])
+            + int(components["state_compatibility_score"])
+            + int(components["literal_score"])
+            + int(components["intent_score"])
+        )
+        return components
+
+    @staticmethod
+    def _rank_tuple_from_components(components: Dict[str, Any]) -> tuple[int, int, int, int, float, int, int]:
+        if not components.get("schema_available"):
+            return (-1000, -1000, -1000, -1000, float(components.get("confidence") or 0.0), -999, -int(components.get("index") or 0))
+        recommended_rank = components.get("recommended_rank")
+        if recommended_rank is None:
+            recommended_rank = 999
+        index = components.get("index")
+        if index is None:
+            index = 0
+        return (
+            int(components.get("score") or 0),
+            int(components.get("arg_binding_score") or 0),
+            int(components.get("state_compatibility_score") or 0),
+            int(components.get("literal_score") or 0),
+            float(components.get("confidence") or 0.0),
+            -int(recommended_rank),
+            -int(index),
+        )
 
     def _action_candidate_rank(
         self,
@@ -460,35 +672,17 @@ class RuleEngine:
         recommended: List[str],
         confidence: float,
         index: int,
-    ) -> tuple[int, int, float, int, int]:
-        tool_name = str(candidate.get("tool") or "").strip()
-        if tool_name not in request_tool_name_set:
-            return (-1000, -1000, confidence, -999, -index)
-        request_text = self._request_text_for_ranking(request_json)
-        context_literals = [item.lower() for item in self._collect_context_literals(request_json)]
-        values = self._candidate_string_values(candidate.get("args") or {})
-        bindings = candidate.get("arg_bindings") or {}
-        if isinstance(bindings, dict):
-            values.extend(self._candidate_string_values(bindings))
-        literal_score = 0
-        for value in values:
-            lowered = value.lower().strip()
-            if not lowered:
-                continue
-            basename = lowered.rsplit("/", 1)[-1]
-            if lowered in request_text:
-                literal_score += 6
-            elif basename and basename in request_text:
-                literal_score += 5
-            elif lowered in context_literals or basename in context_literals:
-                literal_score += 4
-            else:
-                tokens = set(self._normalize_literal_tokens(lowered))
-                if tokens and tokens.issubset(set(self._normalize_literal_tokens(request_text))):
-                    literal_score += 2
-        intent_score = self._tool_intent_score(tool_name, request_text)
-        recommended_rank = recommended.index(tool_name) if tool_name in recommended else 999
-        return (literal_score, intent_score, confidence, -recommended_rank, -index)
+    ) -> tuple[int, int, int, int, float, int, int]:
+        return self._rank_tuple_from_components(
+            self._action_candidate_score_components(
+                candidate,
+                request_json=request_json,
+                request_tool_name_set=request_tool_name_set,
+                recommended=recommended,
+                confidence=confidence,
+                index=index,
+            )
+        )
 
     def _rank_action_candidates(
         self,
@@ -498,7 +692,7 @@ class RuleEngine:
         request_tool_name_set: set[str],
         recommended: List[str],
         confidence: float,
-    ) -> List[tuple[tuple[int, int, float, int, int], Dict[str, Any]]]:
+    ) -> List[tuple[tuple[int, int, int, int, float, int, int], Dict[str, Any]]]:
         ranked = [
             (
                 self._action_candidate_rank(

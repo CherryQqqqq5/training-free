@@ -2079,6 +2079,121 @@ action:
         self.assertIn("policy_next_tool:selected=cat", request_patches)
         self.assertIn("policy_next_tool:recommended=mkdir,cat", request_patches)
 
+
+    def test_next_tool_plan_prefers_exact_arg_binding_over_generic_cat_intent(self) -> None:
+        rule = self._next_tool_rule(
+            recommended_tools=["cat", "mkdir"],
+            request_predicates=["tools_available", "prior_explicit_literals_present"],
+            activation_predicates=["tools_available", "prior_explicit_literals_present"],
+            action_candidates=[
+                {
+                    "tool": "cat",
+                    "args": {"file_name": "notes.txt"},
+                    "arg_bindings": {"file_name": {"source": "explicit_literal", "value": "notes.txt"}},
+                    "recommended_tools": ["cat"],
+                },
+                {
+                    "tool": "mkdir",
+                    "args": {"dir_name": "archive"},
+                    "arg_bindings": {"dir_name": {"source": "explicit_literal", "value": "archive"}},
+                    "recommended_tools": ["mkdir"],
+                },
+            ],
+        )
+        request = {
+            "model": "demo-model",
+            "messages": [{"role": "user", "content": "Create a directory named 'archive' for the file content later."}],
+            "tools": [
+                {"type": "function", "function": {"name": "cat", "parameters": {"type": "object", "properties": {"file_name": {"type": "string"}}}}},
+                {"type": "function", "function": {"name": "mkdir", "parameters": {"type": "object", "properties": {"dir_name": {"type": "string"}}}}},
+            ],
+        }
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir)
+            engine.rules = [rule]
+            _, request_patches = engine.apply_request(request)
+
+        self.assertIn("policy_next_tool:selected=mkdir", request_patches)
+
+    def test_next_tool_plan_penalizes_prior_output_candidate_without_matching_state_keys(self) -> None:
+        rule = self._next_tool_rule(
+            recommended_tools=["cat", "mkdir"],
+            request_predicates=["tools_available", "prior_tool_outputs_present"],
+            activation_predicates=["tools_available", "prior_tool_outputs_present"],
+            action_candidates=[
+                {
+                    "tool": "cat",
+                    "args": {"file_name": "result.txt"},
+                    "arg_bindings": {
+                        "file_name": {
+                            "source": "prior_tool_output.matches[0]|basename",
+                            "value": "result.txt",
+                            "evidence": {"prior_output_keys": ["matches"]},
+                        }
+                    },
+                    "recommended_tools": ["cat"],
+                },
+                {
+                    "tool": "mkdir",
+                    "args": {"dir_name": "archive"},
+                    "arg_bindings": {"dir_name": {"source": "explicit_literal", "value": "archive"}},
+                    "recommended_tools": ["mkdir"],
+                },
+            ],
+        )
+        request = {
+            "model": "demo-model",
+            "messages": [
+                {"role": "user", "content": "Create folder 'archive'."},
+                {"role": "tool", "content": json.dumps({"current_working_directory": "/tmp"})},
+            ],
+            "tools": [
+                {"type": "function", "function": {"name": "cat", "parameters": {"type": "object", "properties": {"file_name": {"type": "string"}}}}},
+                {"type": "function", "function": {"name": "mkdir", "parameters": {"type": "object", "properties": {"dir_name": {"type": "string"}}}}},
+            ],
+        }
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir)
+            engine.rules = [rule]
+            _, request_patches = engine.apply_request(request)
+
+        self.assertIn("policy_next_tool:selected=mkdir", request_patches)
+
+    def test_next_tool_plan_source_trace_style_requests_select_multiple_tools(self) -> None:
+        rule = self._next_tool_rule(
+            recommended_tools=["cat", "mkdir", "touch"],
+            request_predicates=["tools_available", "prior_explicit_literals_present"],
+            activation_predicates=["tools_available", "prior_explicit_literals_present"],
+            action_candidates=[
+                {"tool": "cat", "args": {"file_name": "report.txt"}, "arg_bindings": {"file_name": {"source": "explicit_literal", "value": "report.txt"}}, "recommended_tools": ["cat"]},
+                {"tool": "mkdir", "args": {"dir_name": "archive"}, "arg_bindings": {"dir_name": {"source": "explicit_literal", "value": "archive"}}, "recommended_tools": ["mkdir"]},
+                {"tool": "touch", "args": {"file_name": "todo.txt"}, "arg_bindings": {"file_name": {"source": "explicit_literal", "value": "todo.txt"}}, "recommended_tools": ["touch"]},
+            ],
+        )
+        requests = [
+            "Read 'report.txt' and show me the content.",
+            "Create a directory named 'archive'.",
+            "Create an empty file named 'todo.txt'.",
+        ]
+        selected = []
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir)
+            engine.rules = [rule]
+            for content in requests:
+                request = {
+                    "model": "demo-model",
+                    "messages": [{"role": "user", "content": content}],
+                    "tools": [
+                        {"type": "function", "function": {"name": "cat", "parameters": {"type": "object", "properties": {"file_name": {"type": "string"}}}}},
+                        {"type": "function", "function": {"name": "mkdir", "parameters": {"type": "object", "properties": {"dir_name": {"type": "string"}}}}},
+                        {"type": "function", "function": {"name": "touch", "parameters": {"type": "object", "properties": {"file_name": {"type": "string"}}}}},
+                    ],
+                }
+                _, request_patches = engine.apply_request(request)
+                selected.append(next(item.split("=", 1)[1] for item in request_patches if item.startswith("policy_next_tool:selected=")))
+
+        self.assertEqual(set(selected), {"cat", "mkdir", "touch"})
+
     def test_true_empty_tool_call_still_records_failure(self) -> None:
         with tempfile.TemporaryDirectory() as rules_dir:
             engine = RuleEngine(rules_dir)
