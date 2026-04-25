@@ -372,9 +372,14 @@ def _before_guard_plan(engine: RuleEngine, request_json: dict[str, Any]) -> dict
 
 
 def _apply_after_guard(engine: RuleEngine, request_json: dict[str, Any]) -> dict[str, Any]:
-    _, patches = engine.apply_request(request_json)
+    patched, patches = engine.apply_request(request_json)
     plan = getattr(patches, "next_tool_plan", {}) or {}
-    return plan if isinstance(plan, dict) else {}
+    if not isinstance(plan, dict):
+        return {}
+    plan = dict(plan)
+    plan["request_patches"] = list(patches or [])
+    plan["patched_tool_choice"] = patched.get("tool_choice")
+    return plan
 
 
 def _compact_plan(plan: dict[str, Any]) -> dict[str, Any]:
@@ -389,6 +394,8 @@ def _compact_plan(plan: dict[str, Any]) -> dict[str, Any]:
         "recommended_tools": list(plan.get("recommended_tools") or []),
         "matched_recommended_tools": list(plan.get("matched_recommended_tools") or []),
         "policy_hits": list(plan.get("policy_hits") or []),
+        "request_patches": list(plan.get("request_patches") or []),
+        "patched_tool_choice": plan.get("patched_tool_choice"),
     }
 
 

@@ -2589,5 +2589,85 @@ action:
         self.assertEqual([issue.kind for issue in validation.issues], ["empty_tool_call"])
 
 
+
+    def test_exact_next_tool_choice_and_action_specific_guidance_are_config_gated(self) -> None:
+        action_candidate = {
+            "tool": "move_file",
+            "args": {"file_name": "report.txt"},
+            "binding_source": "explicit_literal",
+            "arg_bindings": {"file_name": {"source": "explicit_literal", "value": "report.txt"}},
+            "recommended_tools": ["move_file"],
+        }
+        rule = self._next_tool_rule(recommended_tools=["move_file"], action_candidates=[action_candidate])
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir, runtime_policy={"enable_exact_next_tool_choice": True})
+            engine.rules = [rule]
+            patched, request_patches = engine.apply_request(self._make_move_file_request())
+
+        self.assertEqual(patched["tool_choice"], {"type": "function", "function": {"name": "move_file"}})
+        self.assertIn("tool_choice:function(policy_next_tool)=move_file", request_patches)
+        system_text = patched["messages"][0]["content"]
+        self.assertIn("Policy selected next tool: call `move_file` next", system_text)
+        self.assertIn('"file_name": "report.txt"', system_text)
+        self.assertIn("binding sources: explicit_literal", system_text)
+        self.assertIn("preserve these exact path/file literal values", system_text)
+        self.assertTrue(any(str(patch).startswith("prompt_injector:Policy selected next tool:") for patch in request_patches))
+
+    def test_action_specific_guidance_is_not_added_for_guard_rejected_candidate(self) -> None:
+        action_candidate = {
+            "tool": "touch",
+            "args": {"file_name": "marker.txt"},
+            "binding_source": "prior_tool_output.cwd_or_listing",
+            "arg_bindings": {"file_name": {"source": "prior_tool_output.cwd_or_listing", "value": "marker.txt"}},
+            "recommended_tools": ["touch"],
+        }
+        rule = self._next_tool_rule(
+            recommended_tools=["touch"],
+            request_predicates=["tools_available"],
+            activation_predicates=["tools_available"],
+            action_candidates=[action_candidate],
+        )
+        request = {
+            "model": "demo-model",
+            "messages": [{"role": "user", "content": "Create a marker when appropriate."}],
+            "tools": [
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "touch",
+                        "parameters": {"type": "object", "properties": {"file_name": {"type": "string"}}},
+                    },
+                }
+            ],
+        }
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir, runtime_policy={"enable_exact_next_tool_choice": True})
+            engine.rules = [rule]
+            patched, request_patches = engine.apply_request(request)
+
+        self.assertNotIn("tool_choice", patched)
+        self.assertFalse(any(str(patch).startswith("prompt_injector:Policy selected next tool:") for patch in request_patches))
+        self.assertEqual(request_patches.next_tool_plan["blocked_reason"], "action_candidate_guard_rejected")
+
+    def test_exact_next_tool_choice_preserves_existing_tool_choice(self) -> None:
+        action_candidate = {
+            "tool": "move_file",
+            "args": {"file_name": "report.txt"},
+            "binding_source": "explicit_literal",
+            "arg_bindings": {"file_name": {"source": "explicit_literal", "value": "report.txt"}},
+            "recommended_tools": ["move_file"],
+        }
+        rule = self._next_tool_rule(recommended_tools=["move_file"], action_candidates=[action_candidate])
+        request = self._make_move_file_request()
+        request["tool_choice"] = "auto"
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir, runtime_policy={"enable_exact_next_tool_choice": True})
+            engine.rules = [rule]
+            patched, request_patches = engine.apply_request(request)
+
+        self.assertEqual(patched["tool_choice"], "auto")
+        self.assertNotIn("tool_choice:function(policy_next_tool)=move_file", request_patches)
+        self.assertTrue(any(str(patch).startswith("prompt_injector:Policy selected next tool:") for patch in request_patches))
+
 if __name__ == "__main__":
     unittest.main()

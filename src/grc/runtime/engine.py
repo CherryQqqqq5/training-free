@@ -67,6 +67,10 @@ class RuleEngine:
             self.runtime_policy.get("enable_required_next_tool_choice", False)
             or self.runtime_policy.get("required_next_tool_choice_enabled", False)
         )
+        self.enable_exact_next_tool_choice = bool(
+            self.runtime_policy.get("enable_exact_next_tool_choice", False)
+            or self.runtime_policy.get("exact_next_tool_choice_enabled", False)
+        )
         self.rules: List[Rule] = self._load_rules()
 
     _QUOTED_LITERAL_RE = re.compile(
@@ -991,23 +995,54 @@ class RuleEngine:
     def _recommended_policy_tools(self, request_json: Dict[str, Any]) -> List[str]:
         return list(self._next_tool_policy_plan(request_json).get("recommended_tools") or [])
 
-    def _recommended_policy_tool_fragments(self, request_json: Dict[str, Any]) -> List[str]:
-        recommended = self._recommended_policy_tools(request_json)
+    @staticmethod
+    def _action_candidate_guidance_sources(candidate: Dict[str, Any]) -> List[str]:
+        sources: set[str] = set()
+        source = candidate.get("binding_source")
+        if isinstance(source, str) and source.strip():
+            sources.add(source.strip())
+        bindings = candidate.get("arg_bindings") if isinstance(candidate.get("arg_bindings"), dict) else {}
+        for binding in bindings.values():
+            if isinstance(binding, dict) and isinstance(binding.get("source"), str) and binding.get("source", "").strip():
+                sources.add(str(binding["source"]).strip())
+        return sorted(sources)
+
+    def _recommended_policy_tool_fragments(
+        self,
+        request_json: Dict[str, Any],
+        next_tool_plan: Dict[str, Any] | None = None,
+    ) -> List[str]:
+        plan = next_tool_plan if isinstance(next_tool_plan, dict) else self._next_tool_policy_plan(request_json)
+        recommended = list(plan.get("recommended_tools") or [])
+        fragments: List[str] = []
+        selected_tool = str(plan.get("selected_tool") or "").strip()
+        candidate = plan.get("selected_action_candidate") if isinstance(plan.get("selected_action_candidate"), dict) else None
+        if plan.get("activated") and selected_tool and candidate and str(candidate.get("tool") or "").strip() == selected_tool:
+            args = candidate.get("args") if isinstance(candidate.get("args"), dict) else {}
+            args_text = json.dumps(args, ensure_ascii=False, sort_keys=True)
+            sources = self._action_candidate_guidance_sources(candidate)
+            source_text = ", ".join(sources) if sources else "action_candidate.args"
+            fragments.append(
+                f"Policy selected next tool: call `{selected_tool}` next with grounded arguments {args_text}; "
+                f"binding sources: {source_text}; preserve these exact path/file literal values unless the current user explicitly changes them."
+            )
         if not recommended:
-            return []
+            return fragments
         if len(recommended) == 1:
-            return [
+            fragments.append(
                 f"Policy next-tool recommendation: prefer `{recommended[0]}` as the next tool action when its required arguments are locally grounded; do not end this turn with prose-only narration while the policy predicates still hold."
-            ]
-        return [
+            )
+            return fragments
+        fragments.append(
             "Policy next-tool recommendations: prefer one of "
             + ", ".join(f"`{tool}`" for tool in recommended)
             + " as the next tool action when required arguments are locally grounded; do not end this turn with prose-only narration while the policy predicates still hold."
-        ]
+        )
+        return fragments
 
-    def _collect_prompt_fragments(self, request_json: Dict[str, Any]) -> List[str]:
+    def _collect_prompt_fragments(self, request_json: Dict[str, Any], next_tool_plan: Dict[str, Any] | None = None) -> List[str]:
         fragments: List[str] = self._structured_tool_guidance_fragments(request_json)
-        fragments.extend(self._recommended_policy_tool_fragments(request_json))
+        fragments.extend(self._recommended_policy_tool_fragments(request_json, next_tool_plan=next_tool_plan))
         request_tool_names = set(self._tool_schema_map(request_json).keys())
         allow_global_prompt_injection = bool(self.runtime_policy.get("allow_global_prompt_injection", False))
         for rule in self.rules:
@@ -1144,7 +1179,7 @@ class RuleEngine:
     def apply_request(self, request_json: Dict[str, Any]) -> Tuple[Dict[str, Any], List[str]]:
         patched = copy.deepcopy(request_json)
         next_tool_plan = self._next_tool_policy_plan(patched)
-        fragments = self._collect_prompt_fragments(patched)
+        fragments = self._collect_prompt_fragments(patched, next_tool_plan=next_tool_plan)
         request_patches = RequestPatchList(next_tool_plan=next_tool_plan)
         policy_request_patches: List[str] = []
 
@@ -1157,7 +1192,16 @@ class RuleEngine:
             if recommended_tools:
                 policy_request_patches.append("policy_next_tool:recommended=" + ",".join(recommended_tools))
             policy_request_patches.extend(f"policy_hit:{rule_id}" for rule_id in next_tool_plan.get("policy_hits") or [])
+            selected_action_candidate = next_tool_plan.get("selected_action_candidate")
             if (
+                self.enable_exact_next_tool_choice
+                and selected_tool
+                and isinstance(selected_action_candidate, dict)
+                and "tool_choice" not in patched
+            ):
+                patched["tool_choice"] = {"type": "function", "function": {"name": str(selected_tool)}}
+                policy_request_patches.append(f"tool_choice:function(policy_next_tool)={selected_tool}")
+            elif (
                 self.enable_required_next_tool_choice
                 and next_tool_plan.get("tool_choice_mode") == "required"
                 and "tool_choice" not in patched
@@ -1517,6 +1561,8 @@ class RuleEngine:
                     item for item in patch.split("=", 1)[1].split(",") if item
                 ]
             elif patch == "tool_choice:required(policy_next_tool)":
+                validation.tool_choice_mode = "required"
+            elif patch.startswith("tool_choice:function(policy_next_tool)="):
                 validation.tool_choice_mode = "required"
         if validation.selected_next_tool and validation.tool_choice_mode is None:
             validation.tool_choice_mode = "soft"

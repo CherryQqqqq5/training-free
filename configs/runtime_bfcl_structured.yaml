@@ -34,6 +34,11 @@ runtime_policy:
   # already present in the conversation/tool state.
   resolve_contextual_string_args: true
 
+  # M2.7k: BFCL-lite policy interventions are only emitted after the
+  # conservative guard accepts an action candidate. In that narrow case, force
+  # the exact selected function name rather than merely requiring any tool.
+  enable_exact_next_tool_choice: true
+
 upstream:
   active_profile: "openrouter"
   base_url: "https://YOUR_UPSTREAM_OPENAI_COMPATIBLE_ENDPOINT/v1"
