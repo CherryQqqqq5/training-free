@@ -72,18 +72,34 @@ def _run_report(run_root: Path, category: str, selected_ids: list[str], *, requi
         "missing_trace_ids": missing_trace_ids,
         "missing_effective_score_ids": missing_effective_score_ids,
         "result_exception_ids": [case_id for case_id in selected_ids if case_id in _result_failure_reasons(run_root, category)],
+        "prompt_prefix_traces_required": require_prompt_traces,
         "scorer_coverage_explained_by_failure_only_rows": scorer_coverage_explained,
         "gate_passed": gate_passed,
     }
 
 
-def evaluate_artifact_completeness(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
+def evaluate_artifact_completeness(
+    root: Path = DEFAULT_ROOT,
+    *,
+    require_baseline_prompt_traces: bool = False,
+    require_candidate_prompt_traces: bool = True,
+) -> dict[str, Any]:
     manifest = json.loads((root / "paired_subset_manifest.json").read_text(encoding="utf-8"))
     selected_ids = [str(case_id) for case_id in manifest.get("selected_case_ids") or []]
     category = str(manifest.get("category") or "multi_turn_miss_param")
     runs = {
-        "baseline": _run_report(root / "baseline", category, selected_ids, require_prompt_traces=False),
-        "candidate": _run_report(root / "candidate", category, selected_ids, require_prompt_traces=True),
+        "baseline": _run_report(
+            root / "baseline",
+            category,
+            selected_ids,
+            require_prompt_traces=require_baseline_prompt_traces,
+        ),
+        "candidate": _run_report(
+            root / "candidate",
+            category,
+            selected_ids,
+            require_prompt_traces=require_candidate_prompt_traces,
+        ),
     }
     gate_passed = bool(selected_ids) and all(run["gate_passed"] for run in runs.values())
     return {
@@ -92,6 +108,9 @@ def evaluate_artifact_completeness(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
         "selected_case_ids": selected_ids,
         "selected_case_count": len(selected_ids),
         "m2_7f_artifact_completeness_passed": gate_passed,
+        "require_baseline_prompt_traces": require_baseline_prompt_traces,
+        "require_candidate_prompt_traces": require_candidate_prompt_traces,
+        "case_level_gate_allowed": gate_passed,
         "runs": runs,
         "diagnostic": {
             "first_failed_run": next((name for name, run in runs.items() if not run["gate_passed"]), None),
@@ -103,9 +122,15 @@ def evaluate_artifact_completeness(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Check M2.7f selected-case artifact completeness before rerun.")
     parser.add_argument("--root", type=Path, default=DEFAULT_ROOT)
+    parser.add_argument("--require-baseline-prompt-traces", action="store_true")
+    parser.add_argument("--allow-missing-candidate-prompt-traces", action="store_true")
     parser.add_argument("--compact", action="store_true")
     args = parser.parse_args()
-    report = evaluate_artifact_completeness(args.root)
+    report = evaluate_artifact_completeness(
+        args.root,
+        require_baseline_prompt_traces=args.require_baseline_prompt_traces,
+        require_candidate_prompt_traces=not args.allow_missing_candidate_prompt_traces,
+    )
     print(json.dumps(report, ensure_ascii=False, indent=None if args.compact else 2))
     return 0 if report["m2_7f_artifact_completeness_passed"] else 1
 
