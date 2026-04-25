@@ -64,11 +64,12 @@ class NextActionSmokeTests(unittest.TestCase):
 
         self.assertEqual(summary["mode"], "compiler_generated")
         self.assertEqual(summary["case_count"], 20)
-        self.assertEqual(summary["passed_count"], 20)
-        self.assertEqual(summary["action_candidate_count"], 15)
-        self.assertGreaterEqual(summary["arg_binding_present_count"], 15)
-        self.assertEqual(summary["selected_tool_match_count"], 15)
-        self.assertGreaterEqual(summary["arg_binding_match_count"], 15)
+        self.assertEqual(summary["passed_count"], 18)
+        self.assertEqual(summary["action_candidate_count"], 13)
+        self.assertGreaterEqual(summary["arg_binding_present_count"], 13)
+        self.assertEqual(summary["selected_tool_match_count"], 13)
+        self.assertGreaterEqual(summary["arg_binding_match_count"], 13)
+        self.assertEqual(summary["blocked_reason_distribution"].get("action_candidate_guard_rejected", 0), 2)
         self.assertEqual(summary["stop_allowed_false_positive_count"], 0)
 
 

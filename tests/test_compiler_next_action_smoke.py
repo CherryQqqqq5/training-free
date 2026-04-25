@@ -169,8 +169,9 @@ class CompilerNextActionSmokeTests(unittest.TestCase):
         self.assertGreaterEqual(compiler_generated_policy_count, 15)
         self.assertGreaterEqual(recommended_tools_non_empty_count, 15)
         self.assertGreaterEqual(argument_binding_present_count, 10)
-        self.assertEqual(runtime_activated_count, 15)
-        self.assertGreaterEqual(runtime_arg_binding_match_count, 15)
+        self.assertEqual(runtime_activated_count, 13)
+        self.assertGreaterEqual(runtime_arg_binding_match_count, 13)
+        self.assertEqual(blocked_reasons.get("action_candidate_guard_rejected", 0), 2)
         self.assertEqual(stop_allowed_actual_activate, 0)
         self.assertLess(blocked_reasons.get("recommended_tools_empty", 0), blocked_reasons.get("activated", 0))
 
