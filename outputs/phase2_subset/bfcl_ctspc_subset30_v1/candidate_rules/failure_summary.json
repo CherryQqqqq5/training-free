@@ -1,0 +1,1108 @@
+{
+  "patch_id": "m27_subset_ctspc",
+  "source_failure_count": 226,
+  "failure_ir_count": 6,
+  "taxonomy_distribution": {
+    "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)": 68,
+    "(POST_TOOL,CLARIFICATION_REQUEST)": 11,
+    "(POST_TOOL,EMPTY_TOOL_CALL)": 45,
+    "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)": 47,
+    "(POST_TOOL,TERMINATION_INADMISSIBLE)": 55
+  },
+  "top_failure_families": [
+    {
+      "failure_label": "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+      "count": 68
+    },
+    {
+      "failure_label": "(POST_TOOL,TERMINATION_INADMISSIBLE)",
+      "count": 55
+    },
+    {
+      "failure_label": "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+      "count": 47
+    }
+  ],
+  "tools": [
+    {
+      "tool_name": "__none__",
+      "evidence_count": 62,
+      "error_types": [
+        "actionable_no_tool_decision"
+      ],
+      "stages": [
+        "POST_TOOL"
+      ],
+      "failure_types": [
+        "ACTIONABLE_NO_TOOL_DECISION"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)"
+      ],
+      "field_names": [],
+      "recommended_tools": [
+        "mv",
+        "cp",
+        "echo"
+      ],
+      "action_candidates": [
+        {
+          "tool": "cat",
+          "args": {
+            "file_name": "final_report.pdf"
+          },
+          "arg_bindings": {
+            "file_name": {
+              "source": "explicit_literal",
+              "value": "final_report.pdf",
+              "evidence": {
+                "explicit_literals": [
+                  "budget analysis",
+                  "final_report.pdf"
+                ],
+                "intent": "read_file_content"
+              }
+            }
+          },
+          "recommended_tools": [
+            "cat"
+          ],
+          "reason": "prior find/list output has a concrete match and the user asks to read content",
+          "evidence": {
+            "explicit_literals": [
+              "budget analysis",
+              "final_report.pdf"
+            ],
+            "intent": "read_file_content"
+          },
+          "binding_source": "explicit_literal",
+          "postcondition": {
+            "kind": "file_content",
+            "expected_state_key": "file_content",
+            "target_arg": "file_name",
+            "confidence": 0.8
+          },
+          "trajectory_risk_score": 2,
+          "trajectory_risk_flags": [
+            "trajectory_sensitive_tool"
+          ],
+          "binding_type": "file",
+          "intervention_mode": "guidance"
+        },
+        {
+          "tool": "touch",
+          "args": {
+            "file_name": "summary.txt"
+          },
+          "arg_bindings": {
+            "file_name": {
+              "source": "explicit_literal",
+              "value": "summary.txt",
+              "evidence": {
+                "explicit_literals": [
+                  "summary.txt",
+                  "Hello",
+                  "notes.md"
+                ],
+                "intent": "explicit_literal_action"
+              }
+            }
+          },
+          "recommended_tools": [
+            "touch"
+          ],
+          "reason": "explicit literal in user request grounds the next tool argument",
+          "evidence": {
+            "explicit_literals": [
+              "summary.txt",
+              "Hello",
+              "notes.md"
+            ],
+            "intent": "explicit_literal_action"
+          },
+          "binding_source": "explicit_literal",
+          "postcondition": {
+            "kind": "file_exists",
+            "expected_state_key": "current_directory_content",
+            "target_arg": "file_name",
+            "confidence": 0.75
+          },
+          "trajectory_risk_score": 2,
+          "trajectory_risk_flags": [
+            "trajectory_sensitive_tool"
+          ],
+          "binding_type": "file",
+          "intervention_mode": "guidance"
+        },
+        {
+          "tool": "cat",
+          "args": {
+            "file_name": "2024_research_backup.txt"
+          },
+          "arg_bindings": {
+            "file_name": {
+              "source": "explicit_literal",
+              "value": "2024_research_backup.txt",
+              "evidence": {
+                "explicit_literals": [
+                  "2024_research_backup.txt"
+                ],
+                "intent": "read_file_content"
+              }
+            }
+          },
+          "recommended_tools": [
+            "cat"
+          ],
+          "reason": "prior find/list output has a concrete match and the user asks to read content",
+          "evidence": {
+            "explicit_literals": [
+              "2024_research_backup.txt"
+            ],
+            "intent": "read_file_content"
+          },
+          "binding_source": "explicit_literal",
+          "postcondition": {
+            "kind": "file_content",
+            "expected_state_key": "file_content",
+            "target_arg": "file_name",
+            "confidence": 0.8
+          },
+          "trajectory_risk_score": 2,
+          "trajectory_risk_flags": [
+            "trajectory_sensitive_tool"
+          ],
+          "binding_type": "file",
+          "intervention_mode": "guidance"
+        },
+        {
+          "tool": "cat",
+          "args": {
+            "file_name": "ProjectOverview.txt"
+          },
+          "arg_bindings": {
+            "file_name": {
+              "source": "explicit_literal",
+              "value": "ProjectOverview.txt",
+              "evidence": {
+                "explicit_literals": [
+                  "ve just put together a file named ",
+                  " into my working directory where I",
+                  "d like to modify the file content by putting ",
+                  "ProjectOverview.txt"
+                ],
+                "intent": "read_file_content"
+              }
+            }
+          },
+          "recommended_tools": [
+            "cat"
+          ],
+          "reason": "prior find/list output has a concrete match and the user asks to read content",
+          "evidence": {
+            "explicit_literals": [
+              "ve just put together a file named ",
+              " into my working directory where I",
+              "d like to modify the file content by putting ",
+              "ProjectOverview.txt"
+            ],
+            "intent": "read_file_content"
+          },
+          "binding_source": "explicit_literal",
+          "postcondition": {
+            "kind": "file_content",
+            "expected_state_key": "file_content",
+            "target_arg": "file_name",
+            "confidence": 0.8
+          },
+          "trajectory_risk_score": 2,
+          "trajectory_risk_flags": [
+            "trajectory_sensitive_tool"
+          ],
+          "binding_type": "file",
+          "intervention_mode": "guidance"
+        },
+        {
+          "tool": "cat",
+          "args": {
+            "file_name": "ve come across an urgent conundrum: servers are down unexpectedly. Draft a support ticket, with description "
+          },
+          "arg_bindings": {
+            "file_name": {
+              "source": "explicit_literal",
+              "value": "ve come across an urgent conundrum: servers are down unexpectedly. Draft a support ticket, with description ",
+              "evidence": {
+                "explicit_literals": [
+                  "ve come across an urgent conundrum: servers are down unexpectedly. Draft a support ticket, with description ",
+                  " highlighting this dilemma and assign it a priority level of 3 to hasten the response rate. Title "
+                ],
+                "intent": "read_file_content"
+              }
+            }
+          },
+          "recommended_tools": [
+            "cat"
+          ],
+          "reason": "prior find/list output has a concrete match and the user asks to read content",
+          "evidence": {
+            "explicit_literals": [
+              "ve come across an urgent conundrum: servers are down unexpectedly. Draft a support ticket, with description ",
+              " highlighting this dilemma and assign it a priority level of 3 to hasten the response rate. Title "
+            ],
+            "intent": "read_file_content"
+          },
+          "binding_source": "explicit_literal",
+          "postcondition": {
+            "kind": "file_content",
+            "expected_state_key": "file_content",
+            "target_arg": "file_name",
+            "confidence": 0.8
+          },
+          "trajectory_risk_score": 2,
+          "trajectory_risk_flags": [
+            "trajectory_sensitive_tool"
+          ],
+          "binding_type": "file",
+          "intervention_mode": "guidance"
+        }
+      ],
+      "tool_schema_hash": "fa42f2679a942fc4"
+    },
+    {
+      "tool_name": "__none__",
+      "evidence_count": 6,
+      "error_types": [
+        "actionable_no_tool_decision"
+      ],
+      "stages": [
+        "POST_TOOL"
+      ],
+      "failure_types": [
+        "ACTIONABLE_NO_TOOL_DECISION"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)"
+      ],
+      "field_names": [],
+      "recommended_tools": [
+        "cd",
+        "find",
+        "grep"
+      ],
+      "action_candidates": [
+        {
+          "tool": "touch",
+          "args": {
+            "file_name": "marker.txt"
+          },
+          "arg_bindings": {
+            "file_name": {
+              "source": "prior_tool_output.cwd_or_listing",
+              "value": "marker.txt",
+              "evidence": {
+                "last_tool": null,
+                "prior_output_keys": [
+                  "current_working_directory",
+                  "disk_usage"
+                ]
+              }
+            }
+          },
+          "recommended_tools": [
+            "touch"
+          ],
+          "reason": "prior cwd/listing output grounds a path-sensitive next action",
+          "evidence": {
+            "last_tool": null,
+            "prior_output_keys": [
+              "current_working_directory",
+              "disk_usage"
+            ]
+          },
+          "binding_source": "prior_tool_output.cwd_or_listing",
+          "postcondition": {
+            "kind": "file_exists",
+            "expected_state_key": "current_directory_content",
+            "target_arg": "file_name",
+            "confidence": 0.75
+          },
+          "trajectory_risk_score": 7,
+          "trajectory_risk_flags": [
+            "trajectory_sensitive_tool",
+            "weak_cwd_or_listing_binding"
+          ],
+          "binding_type": "file",
+          "intervention_mode": "weak_guidance"
+        },
+        {
+          "tool": "cat",
+          "args": {
+            "file_name": "test_results.json"
+          },
+          "arg_bindings": {
+            "file_name": {
+              "source": "prior_tool_output.matches[0]|basename",
+              "value": "test_results.json",
+              "evidence": {
+                "last_tool": null,
+                "prior_output_keys": [
+                  "matches",
+                  "error",
+                  "current_working_directory",
+                  "file_content",
+                  "id",
+                  "username",
+                  "content",
+                  "tags",
+                  "mentions"
+                ]
+              }
+            }
+          },
+          "recommended_tools": [
+            "cat"
+          ],
+          "reason": "prior find/list output has a concrete match and the user asks to read content",
+          "evidence": {
+            "last_tool": null,
+            "prior_output_keys": [
+              "matches",
+              "error",
+              "current_working_directory",
+              "file_content",
+              "id",
+              "username",
+              "content",
+              "tags",
+              "mentions"
+            ]
+          },
+          "binding_source": "prior_tool_output.matches[0]|basename",
+          "postcondition": {
+            "kind": "file_content",
+            "expected_state_key": "file_content",
+            "target_arg": "file_name",
+            "confidence": 0.8
+          },
+          "trajectory_risk_score": 4,
+          "trajectory_risk_flags": [
+            "trajectory_sensitive_tool"
+          ],
+          "binding_type": "file",
+          "intervention_mode": "guidance"
+        },
+        {
+          "tool": "cat",
+          "args": {
+            "file_name": "goals.txt"
+          },
+          "arg_bindings": {
+            "file_name": {
+              "source": "prior_tool_output.matches[0]|basename",
+              "value": "goals.txt",
+              "evidence": {
+                "last_tool": null,
+                "prior_output_keys": [
+                  "current_directory_content",
+                  "matches",
+                  "file_content"
+                ]
+              }
+            }
+          },
+          "recommended_tools": [
+            "cat"
+          ],
+          "reason": "prior find/list output has a concrete match and the user asks to read content",
+          "evidence": {
+            "last_tool": null,
+            "prior_output_keys": [
+              "current_directory_content",
+              "matches",
+              "file_content"
+            ]
+          },
+          "binding_source": "prior_tool_output.matches[0]|basename",
+          "postcondition": {
+            "kind": "file_content",
+            "expected_state_key": "file_content",
+            "target_arg": "file_name",
+            "confidence": 0.8
+          },
+          "trajectory_risk_score": 4,
+          "trajectory_risk_flags": [
+            "trajectory_sensitive_tool"
+          ],
+          "binding_type": "file",
+          "intervention_mode": "guidance"
+        }
+      ],
+      "tool_schema_hash": "862e61f6127d544e"
+    },
+    {
+      "tool_name": "__none__",
+      "evidence_count": 45,
+      "error_types": [
+        "empty_completion"
+      ],
+      "stages": [
+        "POST_TOOL"
+      ],
+      "failure_types": [
+        "EMPTY_TOOL_CALL"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,EMPTY_TOOL_CALL)"
+      ],
+      "field_names": [],
+      "recommended_tools": [
+        "grep",
+        "mv",
+        "tail"
+      ],
+      "action_candidates": [],
+      "tool_schema_hash": "3d2ed0a3a57f9f00"
+    },
+    {
+      "tool_name": "__none__",
+      "evidence_count": 47,
+      "error_types": [
+        "post_tool_prose_summary"
+      ],
+      "stages": [
+        "POST_TOOL"
+      ],
+      "failure_types": [
+        "POST_TOOL_PROSE_SUMMARY"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)"
+      ],
+      "field_names": [],
+      "recommended_tools": [
+        "mkdir",
+        "cd",
+        "echo"
+      ],
+      "action_candidates": [
+        {
+          "tool": "cat",
+          "args": {
+            "file_name": "ProjectOverview.txt"
+          },
+          "arg_bindings": {
+            "file_name": {
+              "source": "explicit_literal",
+              "value": "ProjectOverview.txt",
+              "evidence": {
+                "explicit_literals": [
+                  "ve just put together a file named ",
+                  " into my working directory where I",
+                  "d like to modify the file content by putting ",
+                  "ProjectOverview.txt"
+                ],
+                "intent": "read_file_content"
+              }
+            }
+          },
+          "recommended_tools": [
+            "cat"
+          ],
+          "reason": "prior find/list output has a concrete match and the user asks to read content",
+          "evidence": {
+            "explicit_literals": [
+              "ve just put together a file named ",
+              " into my working directory where I",
+              "d like to modify the file content by putting ",
+              "ProjectOverview.txt"
+            ],
+            "intent": "read_file_content"
+          },
+          "binding_source": "explicit_literal",
+          "postcondition": {
+            "kind": "file_content",
+            "expected_state_key": "file_content",
+            "target_arg": "file_name",
+            "confidence": 0.8
+          },
+          "trajectory_risk_score": 2,
+          "trajectory_risk_flags": [
+            "trajectory_sensitive_tool"
+          ],
+          "binding_type": "file",
+          "intervention_mode": "guidance"
+        },
+        {
+          "tool": "cat",
+          "args": {
+            "file_name": "data.txt"
+          },
+          "arg_bindings": {
+            "file_name": {
+              "source": "prior_tool_output.matches[0]|basename",
+              "value": "data.txt",
+              "evidence": {
+                "last_tool": null,
+                "prior_output_keys": [
+                  "matches",
+                  "result",
+                  "file_content",
+                  "matching_lines",
+                  "error",
+                  "count",
+                  "type"
+                ]
+              }
+            }
+          },
+          "recommended_tools": [
+            "cat"
+          ],
+          "reason": "prior find/list output has a concrete match and the user asks to read content",
+          "evidence": {
+            "last_tool": null,
+            "prior_output_keys": [
+              "matches",
+              "result",
+              "file_content",
+              "matching_lines",
+              "error",
+              "count",
+              "type"
+            ]
+          },
+          "binding_source": "prior_tool_output.matches[0]|basename",
+          "postcondition": {
+            "kind": "file_content",
+            "expected_state_key": "file_content",
+            "target_arg": "file_name",
+            "confidence": 0.8
+          },
+          "trajectory_risk_score": 4,
+          "trajectory_risk_flags": [
+            "trajectory_sensitive_tool"
+          ],
+          "binding_type": "file",
+          "intervention_mode": "guidance"
+        },
+        {
+          "tool": "cat",
+          "args": {
+            "file_name": "config.py"
+          },
+          "arg_bindings": {
+            "file_name": {
+              "source": "prior_tool_output.matches[0]|basename",
+              "value": "config.py",
+              "evidence": {
+                "last_tool": null,
+                "prior_output_keys": [
+                  "matches",
+                  "error",
+                  "current_working_directory",
+                  "last_lines",
+                  "file_content"
+                ]
+              }
+            }
+          },
+          "recommended_tools": [
+            "cat"
+          ],
+          "reason": "prior find/list output has a concrete match and the user asks to read content",
+          "evidence": {
+            "last_tool": null,
+            "prior_output_keys": [
+              "matches",
+              "error",
+              "current_working_directory",
+              "last_lines",
+              "file_content"
+            ]
+          },
+          "binding_source": "prior_tool_output.matches[0]|basename",
+          "postcondition": {
+            "kind": "file_content",
+            "expected_state_key": "file_content",
+            "target_arg": "file_name",
+            "confidence": 0.8
+          },
+          "trajectory_risk_score": 4,
+          "trajectory_risk_flags": [
+            "trajectory_sensitive_tool"
+          ],
+          "binding_type": "file",
+          "intervention_mode": "guidance"
+        },
+        {
+          "tool": "cat",
+          "args": {
+            "file_name": "summary_2024.txt"
+          },
+          "arg_bindings": {
+            "file_name": {
+              "source": "explicit_literal",
+              "value": "summary_2024.txt",
+              "evidence": {
+                "explicit_literals": [
+                  "summary_2024.txt"
+                ],
+                "intent": "read_file_content"
+              }
+            }
+          },
+          "recommended_tools": [
+            "cat"
+          ],
+          "reason": "prior find/list output has a concrete match and the user asks to read content",
+          "evidence": {
+            "explicit_literals": [
+              "summary_2024.txt"
+            ],
+            "intent": "read_file_content"
+          },
+          "binding_source": "explicit_literal",
+          "postcondition": {
+            "kind": "file_content",
+            "expected_state_key": "file_content",
+            "target_arg": "file_name",
+            "confidence": 0.8
+          },
+          "trajectory_risk_score": 2,
+          "trajectory_risk_flags": [
+            "trajectory_sensitive_tool"
+          ],
+          "binding_type": "file",
+          "intervention_mode": "guidance"
+        },
+        {
+          "tool": "cat",
+          "args": {
+            "file_name": "analysis_report.csv"
+          },
+          "arg_bindings": {
+            "file_name": {
+              "source": "prior_tool_output.matches[0]|basename",
+              "value": "analysis_report.csv",
+              "evidence": {
+                "last_tool": null,
+                "prior_output_keys": [
+                  "matches",
+                  "current_working_directory",
+                  "error",
+                  "result",
+                  "file_content",
+                  "sorted_content"
+                ]
+              }
+            }
+          },
+          "recommended_tools": [
+            "cat"
+          ],
+          "reason": "prior find/list output has a concrete match and the user asks to read content",
+          "evidence": {
+            "last_tool": null,
+            "prior_output_keys": [
+              "matches",
+              "current_working_directory",
+              "error",
+              "result",
+              "file_content",
+              "sorted_content"
+            ]
+          },
+          "binding_source": "prior_tool_output.matches[0]|basename",
+          "postcondition": {
+            "kind": "file_content",
+            "expected_state_key": "file_content",
+            "target_arg": "file_name",
+            "confidence": 0.8
+          },
+          "trajectory_risk_score": 4,
+          "trajectory_risk_flags": [
+            "trajectory_sensitive_tool"
+          ],
+          "binding_type": "file",
+          "intervention_mode": "guidance"
+        }
+      ],
+      "tool_schema_hash": "fa42f2679a942fc4"
+    },
+    {
+      "tool_name": "__none__",
+      "evidence_count": 11,
+      "error_types": [
+        "redundant_clarification_request"
+      ],
+      "stages": [
+        "POST_TOOL"
+      ],
+      "failure_types": [
+        "CLARIFICATION_REQUEST"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,CLARIFICATION_REQUEST)"
+      ],
+      "field_names": [],
+      "recommended_tools": [
+        "mv",
+        "cp",
+        "mkdir"
+      ],
+      "action_candidates": [
+        {
+          "tool": "cat",
+          "args": {
+            "file_name": "test_document.txt"
+          },
+          "arg_bindings": {
+            "file_name": {
+              "source": "prior_tool_output.matches[0]|basename",
+              "value": "test_document.txt",
+              "evidence": {
+                "last_tool": null,
+                "prior_output_keys": [
+                  "matches",
+                  "result"
+                ]
+              }
+            }
+          },
+          "recommended_tools": [
+            "cat"
+          ],
+          "reason": "prior find/list output has a concrete match and the user asks to read content",
+          "evidence": {
+            "last_tool": null,
+            "prior_output_keys": [
+              "matches",
+              "result"
+            ]
+          },
+          "binding_source": "prior_tool_output.matches[0]|basename",
+          "postcondition": {
+            "kind": "file_content",
+            "expected_state_key": "file_content",
+            "target_arg": "file_name",
+            "confidence": 0.8
+          },
+          "trajectory_risk_score": 4,
+          "trajectory_risk_flags": [
+            "trajectory_sensitive_tool"
+          ],
+          "binding_type": "file",
+          "intervention_mode": "guidance"
+        },
+        {
+          "tool": "cat",
+          "args": {
+            "file_name": "project_summary.txt"
+          },
+          "arg_bindings": {
+            "file_name": {
+              "source": "explicit_literal",
+              "value": "project_summary.txt",
+              "evidence": {
+                "explicit_literals": [
+                  "project_summary.txt"
+                ],
+                "intent": "read_file_content"
+              }
+            }
+          },
+          "recommended_tools": [
+            "cat"
+          ],
+          "reason": "prior find/list output has a concrete match and the user asks to read content",
+          "evidence": {
+            "explicit_literals": [
+              "project_summary.txt"
+            ],
+            "intent": "read_file_content"
+          },
+          "binding_source": "explicit_literal",
+          "postcondition": {
+            "kind": "file_content",
+            "expected_state_key": "file_content",
+            "target_arg": "file_name",
+            "confidence": 0.8
+          },
+          "trajectory_risk_score": 2,
+          "trajectory_risk_flags": [
+            "trajectory_sensitive_tool"
+          ],
+          "binding_type": "file",
+          "intervention_mode": "guidance"
+        }
+      ],
+      "tool_schema_hash": "862e61f6127d544e"
+    },
+    {
+      "tool_name": "__none__",
+      "evidence_count": 55,
+      "error_types": [
+        "termination_inadmissible"
+      ],
+      "stages": [
+        "POST_TOOL"
+      ],
+      "failure_types": [
+        "TERMINATION_INADMISSIBLE"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "field_names": [],
+      "recommended_tools": [
+        "mv",
+        "cp",
+        "echo"
+      ],
+      "action_candidates": [
+        {
+          "tool": "cat",
+          "args": {
+            "file_name": "ProjectOverview.txt"
+          },
+          "arg_bindings": {
+            "file_name": {
+              "source": "explicit_literal",
+              "value": "ProjectOverview.txt",
+              "evidence": {
+                "explicit_literals": [
+                  "ve just put together a file named ",
+                  " into my working directory where I",
+                  "d like to modify the file content by putting ",
+                  "ProjectOverview.txt"
+                ],
+                "intent": "read_file_content"
+              }
+            }
+          },
+          "recommended_tools": [
+            "cat"
+          ],
+          "reason": "prior find/list output has a concrete match and the user asks to read content",
+          "evidence": {
+            "explicit_literals": [
+              "ve just put together a file named ",
+              " into my working directory where I",
+              "d like to modify the file content by putting ",
+              "ProjectOverview.txt"
+            ],
+            "intent": "read_file_content"
+          },
+          "binding_source": "explicit_literal",
+          "postcondition": {
+            "kind": "file_content",
+            "expected_state_key": "file_content",
+            "target_arg": "file_name",
+            "confidence": 0.8
+          },
+          "trajectory_risk_score": 2,
+          "trajectory_risk_flags": [
+            "trajectory_sensitive_tool"
+          ],
+          "binding_type": "file",
+          "intervention_mode": "guidance"
+        },
+        {
+          "tool": "cat",
+          "args": {
+            "file_name": "data.txt"
+          },
+          "arg_bindings": {
+            "file_name": {
+              "source": "prior_tool_output.matches[0]|basename",
+              "value": "data.txt",
+              "evidence": {
+                "last_tool": null,
+                "prior_output_keys": [
+                  "matches",
+                  "result",
+                  "file_content",
+                  "matching_lines",
+                  "error",
+                  "count",
+                  "type"
+                ]
+              }
+            }
+          },
+          "recommended_tools": [
+            "cat"
+          ],
+          "reason": "prior find/list output has a concrete match and the user asks to read content",
+          "evidence": {
+            "last_tool": null,
+            "prior_output_keys": [
+              "matches",
+              "result",
+              "file_content",
+              "matching_lines",
+              "error",
+              "count",
+              "type"
+            ]
+          },
+          "binding_source": "prior_tool_output.matches[0]|basename",
+          "postcondition": {
+            "kind": "file_content",
+            "expected_state_key": "file_content",
+            "target_arg": "file_name",
+            "confidence": 0.8
+          },
+          "trajectory_risk_score": 4,
+          "trajectory_risk_flags": [
+            "trajectory_sensitive_tool"
+          ],
+          "binding_type": "file",
+          "intervention_mode": "guidance"
+        },
+        {
+          "tool": "cat",
+          "args": {
+            "file_name": "config.py"
+          },
+          "arg_bindings": {
+            "file_name": {
+              "source": "prior_tool_output.matches[0]|basename",
+              "value": "config.py",
+              "evidence": {
+                "last_tool": null,
+                "prior_output_keys": [
+                  "matches",
+                  "error",
+                  "current_working_directory",
+                  "last_lines",
+                  "file_content"
+                ]
+              }
+            }
+          },
+          "recommended_tools": [
+            "cat"
+          ],
+          "reason": "prior find/list output has a concrete match and the user asks to read content",
+          "evidence": {
+            "last_tool": null,
+            "prior_output_keys": [
+              "matches",
+              "error",
+              "current_working_directory",
+              "last_lines",
+              "file_content"
+            ]
+          },
+          "binding_source": "prior_tool_output.matches[0]|basename",
+          "postcondition": {
+            "kind": "file_content",
+            "expected_state_key": "file_content",
+            "target_arg": "file_name",
+            "confidence": 0.8
+          },
+          "trajectory_risk_score": 4,
+          "trajectory_risk_flags": [
+            "trajectory_sensitive_tool"
+          ],
+          "binding_type": "file",
+          "intervention_mode": "guidance"
+        },
+        {
+          "tool": "cat",
+          "args": {
+            "file_name": "summary_2024.txt"
+          },
+          "arg_bindings": {
+            "file_name": {
+              "source": "explicit_literal",
+              "value": "summary_2024.txt",
+              "evidence": {
+                "explicit_literals": [
+                  "summary_2024.txt"
+                ],
+                "intent": "read_file_content"
+              }
+            }
+          },
+          "recommended_tools": [
+            "cat"
+          ],
+          "reason": "prior find/list output has a concrete match and the user asks to read content",
+          "evidence": {
+            "explicit_literals": [
+              "summary_2024.txt"
+            ],
+            "intent": "read_file_content"
+          },
+          "binding_source": "explicit_literal",
+          "postcondition": {
+            "kind": "file_content",
+            "expected_state_key": "file_content",
+            "target_arg": "file_name",
+            "confidence": 0.8
+          },
+          "trajectory_risk_score": 2,
+          "trajectory_risk_flags": [
+            "trajectory_sensitive_tool"
+          ],
+          "binding_type": "file",
+          "intervention_mode": "guidance"
+        },
+        {
+          "tool": "cat",
+          "args": {
+            "file_name": "analysis_report.csv"
+          },
+          "arg_bindings": {
+            "file_name": {
+              "source": "prior_tool_output.matches[0]|basename",
+              "value": "analysis_report.csv",
+              "evidence": {
+                "last_tool": null,
+                "prior_output_keys": [
+                  "matches",
+                  "current_working_directory",
+                  "error",
+                  "result",
+                  "file_content",
+                  "sorted_content"
+                ]
+              }
+            }
+          },
+          "recommended_tools": [
+            "cat"
+          ],
+          "reason": "prior find/list output has a concrete match and the user asks to read content",
+          "evidence": {
+            "last_tool": null,
+            "prior_output_keys": [
+              "matches",
+              "current_working_directory",
+              "error",
+              "result",
+              "file_content",
+              "sorted_content"
+            ]
+          },
+          "binding_source": "prior_tool_output.matches[0]|basename",
+          "postcondition": {
+            "kind": "file_content",
+            "expected_state_key": "file_content",
+            "target_arg": "file_name",
+            "confidence": 0.8
+          },
+          "trajectory_risk_score": 4,
+          "trajectory_risk_flags": [
+            "trajectory_sensitive_tool"
+          ],
+          "binding_type": "file",
+          "intervention_mode": "guidance"
+        }
+      ],
+      "tool_schema_hash": "fa42f2679a942fc4"
+    }
+  ]
+}

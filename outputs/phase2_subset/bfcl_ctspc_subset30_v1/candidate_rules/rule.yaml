@@ -1,0 +1,2377 @@
+patch_id: m27_subset_ctspc
+rules:
+- rule_id: rule_global_no_tool_actionable_no_tool_decision_prior_explicit_literals_present_prior_tool_outputs_present_tools_available_v1
+  priority: 100
+  enabled: true
+  trigger:
+    tool_names: []
+    error_types:
+    - actionable_no_tool_decision
+    category_patterns: []
+    request_predicates:
+    - prior_explicit_literals_present
+    - prior_tool_outputs_present
+    - tools_available
+  scope:
+    tool_names: []
+    patch_sites:
+    - prompt_injector
+    - policy_executor
+  action:
+    prompt_fragments:
+    - When tools are available and the current request already contains enough local
+      evidence to continue, emit the next tool call instead of ending the turn with
+      explanatory prose.
+    - Do not end a tool-enabled turn with prose-only status updates when the next
+      action can be grounded from the current request, prior explicit literals, or
+      prior tool outputs.
+    - Reuse explicit file names, paths, identifiers, or quoted literals already present
+      in the request context before asking for clarification or stopping.
+    - Use prior tool outputs as grounding for the next tool call instead of switching
+      into natural-language explanation.
+    - 'When these tools are present in the request, prefer the next locally grounded
+      tool from this policy recommendation set: `mv`, `cp`, `echo`'
+    prompt_injection:
+      fragments:
+      - When tools are available and the current request already contains enough local
+        evidence to continue, emit the next tool call instead of ending the turn with
+        explanatory prose.
+      - Do not end a tool-enabled turn with prose-only status updates when the next
+        action can be grounded from the current request, prior explicit literals,
+        or prior tool outputs.
+      - Reuse explicit file names, paths, identifiers, or quoted literals already
+        present in the request context before asking for clarification or stopping.
+      - Use prior tool outputs as grounding for the next tool call instead of switching
+        into natural-language explanation.
+      - 'When these tools are present in the request, prefer the next locally grounded
+        tool from this policy recommendation set: `mv`, `cp`, `echo`'
+      position: prepend_system
+    decision_policy:
+      request_predicates:
+      - prior_explicit_literals_present
+      - prior_tool_outputs_present
+      - tools_available
+      recommended_tools:
+      - mv
+      - cp
+      - echo
+      action_candidates:
+      - tool: cat
+        args:
+          file_name: final_report.pdf
+        arg_bindings:
+          file_name:
+            source: explicit_literal
+            value: final_report.pdf
+            evidence:
+              explicit_literals:
+              - budget analysis
+              - final_report.pdf
+              intent: read_file_content
+        recommended_tools:
+        - cat
+        reason: prior find/list output has a concrete match and the user asks to read
+          content
+        evidence:
+          explicit_literals:
+          - budget analysis
+          - final_report.pdf
+          intent: read_file_content
+        binding_source: explicit_literal
+        postcondition:
+          kind: file_content
+          expected_state_key: file_content
+          target_arg: file_name
+          confidence: 0.8
+        trajectory_risk_score: 2
+        trajectory_risk_flags:
+        - trajectory_sensitive_tool
+        binding_type: file
+        intervention_mode: guidance
+      - tool: touch
+        args:
+          file_name: summary.txt
+        arg_bindings:
+          file_name:
+            source: explicit_literal
+            value: summary.txt
+            evidence:
+              explicit_literals:
+              - summary.txt
+              - Hello
+              - notes.md
+              intent: explicit_literal_action
+        recommended_tools:
+        - touch
+        reason: explicit literal in user request grounds the next tool argument
+        evidence:
+          explicit_literals:
+          - summary.txt
+          - Hello
+          - notes.md
+          intent: explicit_literal_action
+        binding_source: explicit_literal
+        postcondition:
+          kind: file_exists
+          expected_state_key: current_directory_content
+          target_arg: file_name
+          confidence: 0.75
+        trajectory_risk_score: 2
+        trajectory_risk_flags:
+        - trajectory_sensitive_tool
+        binding_type: file
+        intervention_mode: guidance
+      - tool: cat
+        args:
+          file_name: 2024_research_backup.txt
+        arg_bindings:
+          file_name:
+            source: explicit_literal
+            value: 2024_research_backup.txt
+            evidence:
+              explicit_literals:
+              - 2024_research_backup.txt
+              intent: read_file_content
+        recommended_tools:
+        - cat
+        reason: prior find/list output has a concrete match and the user asks to read
+          content
+        evidence:
+          explicit_literals:
+          - 2024_research_backup.txt
+          intent: read_file_content
+        binding_source: explicit_literal
+        postcondition:
+          kind: file_content
+          expected_state_key: file_content
+          target_arg: file_name
+          confidence: 0.8
+        trajectory_risk_score: 2
+        trajectory_risk_flags:
+        - trajectory_sensitive_tool
+        binding_type: file
+        intervention_mode: guidance
+      - tool: cat
+        args:
+          file_name: ProjectOverview.txt
+        arg_bindings:
+          file_name:
+            source: explicit_literal
+            value: ProjectOverview.txt
+            evidence:
+              explicit_literals:
+              - 've just put together a file named '
+              - ' into my working directory where I'
+              - 'd like to modify the file content by putting '
+              - ProjectOverview.txt
+              intent: read_file_content
+        recommended_tools:
+        - cat
+        reason: prior find/list output has a concrete match and the user asks to read
+          content
+        evidence:
+          explicit_literals:
+          - 've just put together a file named '
+          - ' into my working directory where I'
+          - 'd like to modify the file content by putting '
+          - ProjectOverview.txt
+          intent: read_file_content
+        binding_source: explicit_literal
+        postcondition:
+          kind: file_content
+          expected_state_key: file_content
+          target_arg: file_name
+          confidence: 0.8
+        trajectory_risk_score: 2
+        trajectory_risk_flags:
+        - trajectory_sensitive_tool
+        binding_type: file
+        intervention_mode: guidance
+      - tool: cat
+        args:
+          file_name: 've come across an urgent conundrum: servers are down unexpectedly.
+            Draft a support ticket, with description '
+        arg_bindings:
+          file_name:
+            source: explicit_literal
+            value: 've come across an urgent conundrum: servers are down unexpectedly.
+              Draft a support ticket, with description '
+            evidence:
+              explicit_literals:
+              - 've come across an urgent conundrum: servers are down unexpectedly.
+                Draft a support ticket, with description '
+              - ' highlighting this dilemma and assign it a priority level of 3 to
+                hasten the response rate. Title '
+              intent: read_file_content
+        recommended_tools:
+        - cat
+        reason: prior find/list output has a concrete match and the user asks to read
+          content
+        evidence:
+          explicit_literals:
+          - 've come across an urgent conundrum: servers are down unexpectedly. Draft
+            a support ticket, with description '
+          - ' highlighting this dilemma and assign it a priority level of 3 to hasten
+            the response rate. Title '
+          intent: read_file_content
+        binding_source: explicit_literal
+        postcondition:
+          kind: file_content
+          expected_state_key: file_content
+          target_arg: file_name
+          confidence: 0.8
+        trajectory_risk_score: 2
+        trajectory_risk_flags:
+        - trajectory_sensitive_tool
+        binding_type: file
+        intervention_mode: guidance
+      continue_condition: tools remain available and locally grounded evidence supports
+        another tool action
+      stop_condition: do not stop with prose-only narration while the matched local
+        continuation evidence still holds
+      forbidden_terminations:
+      - prose_only_no_tool_termination
+      evidence_requirements:
+      - prior_explicit_literals_present
+      - prior_tool_outputs_present
+      - tools_available
+      next_tool_policy:
+        activation_predicates:
+        - prior_explicit_literals_present
+        - prior_tool_outputs_present
+        - tools_available
+        recommended_tools:
+        - mv
+        - cp
+        - echo
+        tool_choice_mode: required
+        confidence: 0.8
+    arg_sanitizer: {}
+    tool_guard:
+      enabled: true
+      on_violation: record
+      on_unknown_tool: record
+      on_empty_tool_call: record
+      assistant_message: null
+    verification:
+      require_known_tool: false
+      require_object_args: false
+      require_required_fields: false
+      require_known_fields: false
+      require_type_match: false
+      max_repairs: null
+      forbidden_terminations:
+      - prose_only_no_tool_termination
+      evidence_requirements:
+      - prior_explicit_literals_present
+      - prior_tool_outputs_present
+      - tools_available
+    fallback_router:
+      strategy: record_only
+      assistant_message: null
+      on_issue_kinds:
+      - actionable_no_tool_decision
+  validation_contract:
+    require_known_tool: true
+    require_object_args: true
+    require_required_fields: true
+    require_known_fields: true
+    require_type_match: true
+    max_repairs: null
+    forbidden_terminations: []
+    evidence_requirements: []
+  retention:
+    promote_to: rules/accepted
+    reject_to: rules/rejected
+    keep_in_candidates: true
+- rule_id: rule_global_no_tool_actionable_no_tool_decision_prior_tool_outputs_present_tools_available_v1
+  priority: 100
+  enabled: true
+  trigger:
+    tool_names: []
+    error_types:
+    - actionable_no_tool_decision
+    category_patterns: []
+    request_predicates:
+    - prior_tool_outputs_present
+    - tools_available
+  scope:
+    tool_names: []
+    patch_sites:
+    - prompt_injector
+    - policy_executor
+  action:
+    prompt_fragments:
+    - When tools are available and the current request already contains enough local
+      evidence to continue, emit the next tool call instead of ending the turn with
+      explanatory prose.
+    - Do not end a tool-enabled turn with prose-only status updates when the next
+      action can be grounded from the current request, prior explicit literals, or
+      prior tool outputs.
+    - Use prior tool outputs as grounding for the next tool call instead of switching
+      into natural-language explanation.
+    - 'When these tools are present in the request, prefer the next locally grounded
+      tool from this policy recommendation set: `cd`, `find`, `grep`'
+    prompt_injection:
+      fragments:
+      - When tools are available and the current request already contains enough local
+        evidence to continue, emit the next tool call instead of ending the turn with
+        explanatory prose.
+      - Do not end a tool-enabled turn with prose-only status updates when the next
+        action can be grounded from the current request, prior explicit literals,
+        or prior tool outputs.
+      - Use prior tool outputs as grounding for the next tool call instead of switching
+        into natural-language explanation.
+      - 'When these tools are present in the request, prefer the next locally grounded
+        tool from this policy recommendation set: `cd`, `find`, `grep`'
+      position: prepend_system
+    decision_policy:
+      request_predicates:
+      - prior_tool_outputs_present
+      - tools_available
+      recommended_tools:
+      - cd
+      - find
+      - grep
+      action_candidates:
+      - tool: touch
+        args:
+          file_name: marker.txt
+        arg_bindings:
+          file_name:
+            source: prior_tool_output.cwd_or_listing
+            value: marker.txt
+            evidence:
+              last_tool: null
+              prior_output_keys:
+              - current_working_directory
+              - disk_usage
+        recommended_tools:
+        - touch
+        reason: prior cwd/listing output grounds a path-sensitive next action
+        evidence:
+          last_tool: null
+          prior_output_keys:
+          - current_working_directory
+          - disk_usage
+        binding_source: prior_tool_output.cwd_or_listing
+        postcondition:
+          kind: file_exists
+          expected_state_key: current_directory_content
+          target_arg: file_name
+          confidence: 0.75
+        trajectory_risk_score: 7
+        trajectory_risk_flags:
+        - trajectory_sensitive_tool
+        - weak_cwd_or_listing_binding
+        binding_type: file
+        intervention_mode: weak_guidance
+      - tool: cat
+        args:
+          file_name: test_results.json
+        arg_bindings:
+          file_name:
+            source: prior_tool_output.matches[0]|basename
+            value: test_results.json
+            evidence:
+              last_tool: null
+              prior_output_keys:
+              - matches
+              - error
+              - current_working_directory
+              - file_content
+              - id
+              - username
+              - content
+              - tags
+              - mentions
+        recommended_tools:
+        - cat
+        reason: prior find/list output has a concrete match and the user asks to read
+          content
+        evidence:
+          last_tool: null
+          prior_output_keys:
+          - matches
+          - error
+          - current_working_directory
+          - file_content
+          - id
+          - username
+          - content
+          - tags
+          - mentions
+        binding_source: prior_tool_output.matches[0]|basename
+        postcondition:
+          kind: file_content
+          expected_state_key: file_content
+          target_arg: file_name
+          confidence: 0.8
+        trajectory_risk_score: 4
+        trajectory_risk_flags:
+        - trajectory_sensitive_tool
+        binding_type: file
+        intervention_mode: guidance
+      - tool: cat
+        args:
+          file_name: goals.txt
+        arg_bindings:
+          file_name:
+            source: prior_tool_output.matches[0]|basename
+            value: goals.txt
+            evidence:
+              last_tool: null
+              prior_output_keys:
+              - current_directory_content
+              - matches
+              - file_content
+        recommended_tools:
+        - cat
+        reason: prior find/list output has a concrete match and the user asks to read
+          content
+        evidence:
+          last_tool: null
+          prior_output_keys:
+          - current_directory_content
+          - matches
+          - file_content
+        binding_source: prior_tool_output.matches[0]|basename
+        postcondition:
+          kind: file_content
+          expected_state_key: file_content
+          target_arg: file_name
+          confidence: 0.8
+        trajectory_risk_score: 4
+        trajectory_risk_flags:
+        - trajectory_sensitive_tool
+        binding_type: file
+        intervention_mode: guidance
+      continue_condition: tools remain available and locally grounded evidence supports
+        another tool action
+      stop_condition: do not stop with prose-only narration while the matched local
+        continuation evidence still holds
+      forbidden_terminations:
+      - prose_only_no_tool_termination
+      evidence_requirements:
+      - prior_tool_outputs_present
+      - tools_available
+      - prior_explicit_literals_present
+      next_tool_policy:
+        activation_predicates:
+        - prior_tool_outputs_present
+        - tools_available
+        - prior_explicit_literals_present
+        recommended_tools:
+        - cd
+        - find
+        - grep
+        tool_choice_mode: required
+        confidence: 0.8
+    arg_sanitizer: {}
+    tool_guard:
+      enabled: true
+      on_violation: record
+      on_unknown_tool: record
+      on_empty_tool_call: record
+      assistant_message: null
+    verification:
+      require_known_tool: false
+      require_object_args: false
+      require_required_fields: false
+      require_known_fields: false
+      require_type_match: false
+      max_repairs: null
+      forbidden_terminations:
+      - prose_only_no_tool_termination
+      evidence_requirements:
+      - prior_tool_outputs_present
+      - tools_available
+      - prior_explicit_literals_present
+    fallback_router:
+      strategy: record_only
+      assistant_message: null
+      on_issue_kinds:
+      - actionable_no_tool_decision
+  validation_contract:
+    require_known_tool: true
+    require_object_args: true
+    require_required_fields: true
+    require_known_fields: true
+    require_type_match: true
+    max_repairs: null
+    forbidden_terminations: []
+    evidence_requirements: []
+  retention:
+    promote_to: rules/accepted
+    reject_to: rules/rejected
+    keep_in_candidates: true
+- rule_id: rule_global_no_tool_empty_completion_v1
+  priority: 100
+  enabled: true
+  trigger:
+    tool_names: []
+    error_types:
+    - empty_completion
+    category_patterns: []
+    request_predicates: []
+  scope:
+    tool_names: []
+    patch_sites:
+    - tool_guard
+    - verification_hook
+    - fallback_router
+  action:
+    prompt_fragments: []
+    prompt_injection:
+      fragments: []
+      position: prepend_system
+    decision_policy:
+      request_predicates: []
+      recommended_tools:
+      - grep
+      - mv
+      - tail
+      action_candidates: []
+      continue_condition: null
+      stop_condition: null
+      forbidden_terminations: []
+      evidence_requirements: []
+      next_tool_policy:
+        activation_predicates: []
+        recommended_tools: []
+        tool_choice_mode: soft
+        confidence: 0.0
+    arg_sanitizer: {}
+    tool_guard:
+      enabled: true
+      on_violation: record
+      on_unknown_tool: record
+      on_empty_tool_call: record
+      assistant_message: null
+    verification:
+      require_known_tool: false
+      require_object_args: false
+      require_required_fields: false
+      require_known_fields: false
+      require_type_match: false
+      max_repairs: null
+      forbidden_terminations: []
+      evidence_requirements: []
+    fallback_router:
+      strategy: record_only
+      assistant_message: null
+      on_issue_kinds:
+      - empty_completion
+  validation_contract:
+    require_known_tool: false
+    require_object_args: false
+    require_required_fields: false
+    require_known_fields: false
+    require_type_match: false
+    max_repairs: null
+    forbidden_terminations: []
+    evidence_requirements: []
+  retention:
+    promote_to: rules/accepted
+    reject_to: rules/rejected
+    keep_in_candidates: true
+- rule_id: rule_global_no_tool_post_tool_prose_summary_v1
+  priority: 100
+  enabled: true
+  trigger:
+    tool_names: []
+    error_types:
+    - post_tool_prose_summary
+    category_patterns:
+    - verification_hook
+    request_predicates: []
+  scope:
+    tool_names: []
+    patch_sites:
+    - prompt_injector
+    - policy_executor
+  action:
+    prompt_fragments:
+    - After a tool returns enough local evidence to continue, emit the next grounded
+      tool action instead of wrapping the result in prose-only narration.
+    - Do not convert a sufficient tool result into a free-form summary when another
+      grounded tool step is still required.
+    - 'After the tool result, prefer the next locally grounded tool from this policy
+      recommendation set when available: `mkdir`, `cd`, `echo`'
+    prompt_injection:
+      fragments:
+      - After a tool returns enough local evidence to continue, emit the next grounded
+        tool action instead of wrapping the result in prose-only narration.
+      - Do not convert a sufficient tool result into a free-form summary when another
+        grounded tool step is still required.
+      - 'After the tool result, prefer the next locally grounded tool from this policy
+        recommendation set when available: `mkdir`, `cd`, `echo`'
+      position: prepend_system
+    decision_policy:
+      request_predicates: []
+      recommended_tools:
+      - mkdir
+      - cd
+      - echo
+      action_candidates:
+      - tool: cat
+        args:
+          file_name: ProjectOverview.txt
+        arg_bindings:
+          file_name:
+            source: explicit_literal
+            value: ProjectOverview.txt
+            evidence:
+              explicit_literals:
+              - 've just put together a file named '
+              - ' into my working directory where I'
+              - 'd like to modify the file content by putting '
+              - ProjectOverview.txt
+              intent: read_file_content
+        recommended_tools:
+        - cat
+        reason: prior find/list output has a concrete match and the user asks to read
+          content
+        evidence:
+          explicit_literals:
+          - 've just put together a file named '
+          - ' into my working directory where I'
+          - 'd like to modify the file content by putting '
+          - ProjectOverview.txt
+          intent: read_file_content
+        binding_source: explicit_literal
+        postcondition:
+          kind: file_content
+          expected_state_key: file_content
+          target_arg: file_name
+          confidence: 0.8
+        trajectory_risk_score: 2
+        trajectory_risk_flags:
+        - trajectory_sensitive_tool
+        binding_type: file
+        intervention_mode: guidance
+      - tool: cat
+        args:
+          file_name: data.txt
+        arg_bindings:
+          file_name:
+            source: prior_tool_output.matches[0]|basename
+            value: data.txt
+            evidence:
+              last_tool: null
+              prior_output_keys:
+              - matches
+              - result
+              - file_content
+              - matching_lines
+              - error
+              - count
+              - type
+        recommended_tools:
+        - cat
+        reason: prior find/list output has a concrete match and the user asks to read
+          content
+        evidence:
+          last_tool: null
+          prior_output_keys:
+          - matches
+          - result
+          - file_content
+          - matching_lines
+          - error
+          - count
+          - type
+        binding_source: prior_tool_output.matches[0]|basename
+        postcondition:
+          kind: file_content
+          expected_state_key: file_content
+          target_arg: file_name
+          confidence: 0.8
+        trajectory_risk_score: 4
+        trajectory_risk_flags:
+        - trajectory_sensitive_tool
+        binding_type: file
+        intervention_mode: guidance
+      - tool: cat
+        args:
+          file_name: config.py
+        arg_bindings:
+          file_name:
+            source: prior_tool_output.matches[0]|basename
+            value: config.py
+            evidence:
+              last_tool: null
+              prior_output_keys:
+              - matches
+              - error
+              - current_working_directory
+              - last_lines
+              - file_content
+        recommended_tools:
+        - cat
+        reason: prior find/list output has a concrete match and the user asks to read
+          content
+        evidence:
+          last_tool: null
+          prior_output_keys:
+          - matches
+          - error
+          - current_working_directory
+          - last_lines
+          - file_content
+        binding_source: prior_tool_output.matches[0]|basename
+        postcondition:
+          kind: file_content
+          expected_state_key: file_content
+          target_arg: file_name
+          confidence: 0.8
+        trajectory_risk_score: 4
+        trajectory_risk_flags:
+        - trajectory_sensitive_tool
+        binding_type: file
+        intervention_mode: guidance
+      - tool: cat
+        args:
+          file_name: summary_2024.txt
+        arg_bindings:
+          file_name:
+            source: explicit_literal
+            value: summary_2024.txt
+            evidence:
+              explicit_literals:
+              - summary_2024.txt
+              intent: read_file_content
+        recommended_tools:
+        - cat
+        reason: prior find/list output has a concrete match and the user asks to read
+          content
+        evidence:
+          explicit_literals:
+          - summary_2024.txt
+          intent: read_file_content
+        binding_source: explicit_literal
+        postcondition:
+          kind: file_content
+          expected_state_key: file_content
+          target_arg: file_name
+          confidence: 0.8
+        trajectory_risk_score: 2
+        trajectory_risk_flags:
+        - trajectory_sensitive_tool
+        binding_type: file
+        intervention_mode: guidance
+      - tool: cat
+        args:
+          file_name: analysis_report.csv
+        arg_bindings:
+          file_name:
+            source: prior_tool_output.matches[0]|basename
+            value: analysis_report.csv
+            evidence:
+              last_tool: null
+              prior_output_keys:
+              - matches
+              - current_working_directory
+              - error
+              - result
+              - file_content
+              - sorted_content
+        recommended_tools:
+        - cat
+        reason: prior find/list output has a concrete match and the user asks to read
+          content
+        evidence:
+          last_tool: null
+          prior_output_keys:
+          - matches
+          - current_working_directory
+          - error
+          - result
+          - file_content
+          - sorted_content
+        binding_source: prior_tool_output.matches[0]|basename
+        postcondition:
+          kind: file_content
+          expected_state_key: file_content
+          target_arg: file_name
+          confidence: 0.8
+        trajectory_risk_score: 4
+        trajectory_risk_flags:
+        - trajectory_sensitive_tool
+        binding_type: file
+        intervention_mode: guidance
+      continue_condition: prior tool outputs already provide enough local evidence
+        for the next grounded tool action
+      stop_condition: do not stop with a prose summary immediately after a sufficient
+        tool result while another grounded action remains
+      forbidden_terminations:
+      - prose_only_no_tool_termination
+      evidence_requirements:
+      - prior_tool_outputs_present
+      - tools_available
+      next_tool_policy:
+        activation_predicates:
+        - prior_tool_outputs_present
+        - tools_available
+        recommended_tools:
+        - mkdir
+        - cd
+        - echo
+        tool_choice_mode: required
+        confidence: 0.75
+    arg_sanitizer: {}
+    tool_guard:
+      enabled: true
+      on_violation: record
+      on_unknown_tool: record
+      on_empty_tool_call: record
+      assistant_message: null
+    verification:
+      require_known_tool: false
+      require_object_args: false
+      require_required_fields: false
+      require_known_fields: false
+      require_type_match: false
+      max_repairs: null
+      forbidden_terminations:
+      - prose_only_no_tool_termination
+      evidence_requirements:
+      - prior_tool_outputs_present
+      - tools_available
+    fallback_router:
+      strategy: record_only
+      assistant_message: null
+      on_issue_kinds:
+      - post_tool_prose_summary
+  validation_contract:
+    require_known_tool: true
+    require_object_args: true
+    require_required_fields: true
+    require_known_fields: true
+    require_type_match: true
+    max_repairs: null
+    forbidden_terminations: []
+    evidence_requirements: []
+  retention:
+    promote_to: rules/accepted
+    reject_to: rules/rejected
+    keep_in_candidates: true
+- rule_id: rule_global_no_tool_redundant_clarification_request_v1
+  priority: 100
+  enabled: true
+  trigger:
+    tool_names: []
+    error_types:
+    - redundant_clarification_request
+    category_patterns: []
+    request_predicates: []
+  scope:
+    tool_names: []
+    patch_sites:
+    - tool_guard
+    - verification_hook
+    - fallback_router
+  action:
+    prompt_fragments:
+    - Before asking the user for missing details, inspect prior user turns, tool outputs,
+      and current state for explicit values that were already provided.
+    - If a file name, path, identifier, or previously confirmed target already appears
+      in the conversation or tool state, reuse it and emit the next tool call instead
+      of asking again.
+    prompt_injection:
+      fragments: []
+      position: prepend_system
+    decision_policy:
+      request_predicates: []
+      recommended_tools:
+      - mv
+      - cp
+      - mkdir
+      action_candidates:
+      - tool: cat
+        args:
+          file_name: test_document.txt
+        arg_bindings:
+          file_name:
+            source: prior_tool_output.matches[0]|basename
+            value: test_document.txt
+            evidence:
+              last_tool: null
+              prior_output_keys:
+              - matches
+              - result
+        recommended_tools:
+        - cat
+        reason: prior find/list output has a concrete match and the user asks to read
+          content
+        evidence:
+          last_tool: null
+          prior_output_keys:
+          - matches
+          - result
+        binding_source: prior_tool_output.matches[0]|basename
+        postcondition:
+          kind: file_content
+          expected_state_key: file_content
+          target_arg: file_name
+          confidence: 0.8
+        trajectory_risk_score: 4
+        trajectory_risk_flags:
+        - trajectory_sensitive_tool
+        binding_type: file
+        intervention_mode: guidance
+      - tool: cat
+        args:
+          file_name: project_summary.txt
+        arg_bindings:
+          file_name:
+            source: explicit_literal
+            value: project_summary.txt
+            evidence:
+              explicit_literals:
+              - project_summary.txt
+              intent: read_file_content
+        recommended_tools:
+        - cat
+        reason: prior find/list output has a concrete match and the user asks to read
+          content
+        evidence:
+          explicit_literals:
+          - project_summary.txt
+          intent: read_file_content
+        binding_source: explicit_literal
+        postcondition:
+          kind: file_content
+          expected_state_key: file_content
+          target_arg: file_name
+          confidence: 0.8
+        trajectory_risk_score: 2
+        trajectory_risk_flags:
+        - trajectory_sensitive_tool
+        binding_type: file
+        intervention_mode: guidance
+      continue_condition: reuse already available explicit literals before asking
+        the user to restate them
+      stop_condition: clarification is only admissible when the required explicit
+        literal is not already present in local context
+      forbidden_terminations: []
+      evidence_requirements:
+      - prior_explicit_literals_present
+      next_tool_policy:
+        activation_predicates: []
+        recommended_tools: []
+        tool_choice_mode: soft
+        confidence: 0.0
+    arg_sanitizer: {}
+    tool_guard:
+      enabled: true
+      on_violation: record
+      on_unknown_tool: record
+      on_empty_tool_call: record
+      assistant_message: null
+    verification:
+      require_known_tool: false
+      require_object_args: false
+      require_required_fields: false
+      require_known_fields: false
+      require_type_match: false
+      max_repairs: null
+      forbidden_terminations: []
+      evidence_requirements: []
+    fallback_router:
+      strategy: record_only
+      assistant_message: null
+      on_issue_kinds:
+      - redundant_clarification_request
+  validation_contract:
+    require_known_tool: false
+    require_object_args: false
+    require_required_fields: false
+    require_known_fields: false
+    require_type_match: false
+    max_repairs: null
+    forbidden_terminations: []
+    evidence_requirements: []
+  retention:
+    promote_to: rules/accepted
+    reject_to: rules/rejected
+    keep_in_candidates: true
+- rule_id: rule_global_no_tool_termination_inadmissible_v1
+  priority: 100
+  enabled: true
+  trigger:
+    tool_names: []
+    error_types:
+    - termination_inadmissible
+    category_patterns:
+    - verification_hook
+    request_predicates: []
+  scope:
+    tool_names: []
+    patch_sites:
+    - tool_guard
+    - verification_hook
+    - fallback_router
+  action:
+    prompt_fragments: []
+    prompt_injection:
+      fragments: []
+      position: prepend_system
+    decision_policy:
+      request_predicates: []
+      recommended_tools:
+      - mv
+      - cp
+      - echo
+      action_candidates:
+      - tool: cat
+        args:
+          file_name: ProjectOverview.txt
+        arg_bindings:
+          file_name:
+            source: explicit_literal
+            value: ProjectOverview.txt
+            evidence:
+              explicit_literals:
+              - 've just put together a file named '
+              - ' into my working directory where I'
+              - 'd like to modify the file content by putting '
+              - ProjectOverview.txt
+              intent: read_file_content
+        recommended_tools:
+        - cat
+        reason: prior find/list output has a concrete match and the user asks to read
+          content
+        evidence:
+          explicit_literals:
+          - 've just put together a file named '
+          - ' into my working directory where I'
+          - 'd like to modify the file content by putting '
+          - ProjectOverview.txt
+          intent: read_file_content
+        binding_source: explicit_literal
+        postcondition:
+          kind: file_content
+          expected_state_key: file_content
+          target_arg: file_name
+          confidence: 0.8
+        trajectory_risk_score: 2
+        trajectory_risk_flags:
+        - trajectory_sensitive_tool
+        binding_type: file
+        intervention_mode: guidance
+      - tool: cat
+        args:
+          file_name: data.txt
+        arg_bindings:
+          file_name:
+            source: prior_tool_output.matches[0]|basename
+            value: data.txt
+            evidence:
+              last_tool: null
+              prior_output_keys:
+              - matches
+              - result
+              - file_content
+              - matching_lines
+              - error
+              - count
+              - type
+        recommended_tools:
+        - cat
+        reason: prior find/list output has a concrete match and the user asks to read
+          content
+        evidence:
+          last_tool: null
+          prior_output_keys:
+          - matches
+          - result
+          - file_content
+          - matching_lines
+          - error
+          - count
+          - type
+        binding_source: prior_tool_output.matches[0]|basename
+        postcondition:
+          kind: file_content
+          expected_state_key: file_content
+          target_arg: file_name
+          confidence: 0.8
+        trajectory_risk_score: 4
+        trajectory_risk_flags:
+        - trajectory_sensitive_tool
+        binding_type: file
+        intervention_mode: guidance
+      - tool: cat
+        args:
+          file_name: config.py
+        arg_bindings:
+          file_name:
+            source: prior_tool_output.matches[0]|basename
+            value: config.py
+            evidence:
+              last_tool: null
+              prior_output_keys:
+              - matches
+              - error
+              - current_working_directory
+              - last_lines
+              - file_content
+        recommended_tools:
+        - cat
+        reason: prior find/list output has a concrete match and the user asks to read
+          content
+        evidence:
+          last_tool: null
+          prior_output_keys:
+          - matches
+          - error
+          - current_working_directory
+          - last_lines
+          - file_content
+        binding_source: prior_tool_output.matches[0]|basename
+        postcondition:
+          kind: file_content
+          expected_state_key: file_content
+          target_arg: file_name
+          confidence: 0.8
+        trajectory_risk_score: 4
+        trajectory_risk_flags:
+        - trajectory_sensitive_tool
+        binding_type: file
+        intervention_mode: guidance
+      - tool: cat
+        args:
+          file_name: summary_2024.txt
+        arg_bindings:
+          file_name:
+            source: explicit_literal
+            value: summary_2024.txt
+            evidence:
+              explicit_literals:
+              - summary_2024.txt
+              intent: read_file_content
+        recommended_tools:
+        - cat
+        reason: prior find/list output has a concrete match and the user asks to read
+          content
+        evidence:
+          explicit_literals:
+          - summary_2024.txt
+          intent: read_file_content
+        binding_source: explicit_literal
+        postcondition:
+          kind: file_content
+          expected_state_key: file_content
+          target_arg: file_name
+          confidence: 0.8
+        trajectory_risk_score: 2
+        trajectory_risk_flags:
+        - trajectory_sensitive_tool
+        binding_type: file
+        intervention_mode: guidance
+      - tool: cat
+        args:
+          file_name: analysis_report.csv
+        arg_bindings:
+          file_name:
+            source: prior_tool_output.matches[0]|basename
+            value: analysis_report.csv
+            evidence:
+              last_tool: null
+              prior_output_keys:
+              - matches
+              - current_working_directory
+              - error
+              - result
+              - file_content
+              - sorted_content
+        recommended_tools:
+        - cat
+        reason: prior find/list output has a concrete match and the user asks to read
+          content
+        evidence:
+          last_tool: null
+          prior_output_keys:
+          - matches
+          - current_working_directory
+          - error
+          - result
+          - file_content
+          - sorted_content
+        binding_source: prior_tool_output.matches[0]|basename
+        postcondition:
+          kind: file_content
+          expected_state_key: file_content
+          target_arg: file_name
+          confidence: 0.8
+        trajectory_risk_score: 4
+        trajectory_risk_flags:
+        - trajectory_sensitive_tool
+        binding_type: file
+        intervention_mode: guidance
+      continue_condition: null
+      stop_condition: null
+      forbidden_terminations: []
+      evidence_requirements: []
+      next_tool_policy:
+        activation_predicates: []
+        recommended_tools: []
+        tool_choice_mode: soft
+        confidence: 0.0
+    arg_sanitizer: {}
+    tool_guard:
+      enabled: true
+      on_violation: record
+      on_unknown_tool: record
+      on_empty_tool_call: record
+      assistant_message: null
+    verification:
+      require_known_tool: false
+      require_object_args: false
+      require_required_fields: false
+      require_known_fields: false
+      require_type_match: false
+      max_repairs: null
+      forbidden_terminations: []
+      evidence_requirements: []
+    fallback_router:
+      strategy: record_only
+      assistant_message: null
+      on_issue_kinds:
+      - termination_inadmissible
+  validation_contract:
+    require_known_tool: false
+    require_object_args: false
+    require_required_fields: false
+    require_known_fields: false
+    require_type_match: false
+    max_repairs: null
+    forbidden_terminations: []
+    evidence_requirements: []
+  retention:
+    promote_to: rules/accepted
+    reject_to: rules/rejected
+    keep_in_candidates: true
+failure_ir:
+- failure_id: failure_ir_global_actionable_no_tool_decision_prior_explicit_literals_present_prior_tool_outputs_present_tools_available
+  tool_name: __none__
+  error_types:
+  - actionable_no_tool_decision
+  stages:
+  - POST_TOOL
+  failure_types:
+  - ACTIONABLE_NO_TOOL_DECISION
+  failure_labels:
+  - (POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)
+  field_names: []
+  expected_types: {}
+  categories: []
+  evidence_count: 62
+  trace_ids:
+  - multi_turn_miss_param_0__002__6e73fab9-00ec-4ad9-8a84-427cd17b138d
+  - multi_turn_miss_param_0__015__614c3331-d8b4-425f-a8b9-537fc98853d6
+  - multi_turn_miss_param_0__017__d40b6224-29d9-432c-9cfe-d7359e521fa5
+  - multi_turn_miss_param_0__023__75f4a649-51ed-4623-a39a-b1798d10b6a1
+  - multi_turn_miss_param_10__001__56cc1a8d-17bb-4714-8f8a-37242711f956
+  - multi_turn_miss_param_10__010__7cb917ad-c14f-4461-8d39-6852218af078
+  - multi_turn_miss_param_16__007__a3b55abe-77e4-411c-a69c-784e5b5a906b
+  - multi_turn_miss_param_16__012__ba1a5290-5ca4-4ee0-8f20-ebc2d6aed580
+  - multi_turn_miss_param_16__014__21dd0461-5d50-4762-875b-44ea6ea1c363
+  - multi_turn_miss_param_16__016__89fa12b4-9fed-40b7-9aeb-5532e669d836
+  - multi_turn_miss_param_18__008__a7b8737d-f693-46ef-a456-691fb2420b26
+  - multi_turn_miss_param_18__012__69a7f72e-29f9-41d2-9169-cb3b8fc2684d
+  - multi_turn_miss_param_19__001__33a256cf-45c7-4cd3-b1ba-73dd031ef097
+  - multi_turn_miss_param_21__002__3aeaba09-67d0-4667-a4fd-1e0522944313
+  - multi_turn_miss_param_21__005__50461615-2bd4-4fc7-8e9c-83fbe9fc51b0
+  - multi_turn_miss_param_21__006__58f27b89-3392-4863-aec7-29cde7261d0f
+  - multi_turn_miss_param_22__004__f6489d65-68ed-46a7-8905-0c72959eca34
+  - multi_turn_miss_param_25__002__9e78de70-f638-48df-9838-d6113de2694a
+  - multi_turn_miss_param_27__005__65d3b4a8-1a83-480c-9852-7c6e29940103
+  - multi_turn_miss_param_27__009__47b1c4c3-9deb-4e07-bc97-be6f7d58d4ff
+  - multi_turn_miss_param_27__011__3319c389-eaf6-48a5-90ef-e41f89a6c01b
+  - multi_turn_miss_param_28__013__5b163ff0-cca6-4d90-8d2c-60191a2a8c6e
+  - multi_turn_miss_param_28__020__6ce586e4-d5e0-47d4-8bf7-510aa399109e
+  - multi_turn_miss_param_29__002__4f8ecdf5-972b-4cdc-af5a-9db37e8f33a8
+  - multi_turn_miss_param_2__005__9f16c409-f8bd-40a2-b2c8-4a9edf776c93
+  - multi_turn_miss_param_2__022__235b27fc-e67f-4093-96a5-6f89b7b01d05
+  - multi_turn_miss_param_2__029__3a2c2d43-2719-477d-bce2-85e46f08e849
+  - multi_turn_miss_param_2__031__49a269c9-2adb-48af-9a38-ea4586f03b96
+  - multi_turn_miss_param_30__008__c9fb73c6-d1a3-4c8a-9873-ac7ba83a9994
+  - multi_turn_miss_param_31__011__0b222296-a462-4034-a4d9-ca06bb083254
+  - multi_turn_miss_param_31__021__cd3958c9-b193-4c6c-a1d2-dfb87b05e3b0
+  - multi_turn_miss_param_35__005__ec5e401a-5649-4136-afcb-8b20926986f1
+  - multi_turn_miss_param_35__007__abb8dc28-3a27-4a3f-9021-5be64892f563
+  - multi_turn_miss_param_36__016__3ad53a14-0f37-4dbf-92fc-eabe22242a65
+  - multi_turn_miss_param_36__021__cb147d78-7e00-461a-903b-6c464edc3b79
+  - multi_turn_miss_param_37__004__fbb484e2-f517-45a6-b488-250b63208460
+  - multi_turn_miss_param_37__006__0d99c079-079e-4847-9470-18cc0713ecfb
+  - multi_turn_miss_param_37__007__75c219c5-156e-46c6-bb91-0cecd9b55454
+  - multi_turn_miss_param_38__013__96e78e07-83d8-4405-a329-04e66313be52
+  - multi_turn_miss_param_38__014__a35a29c9-b18b-4f96-9f00-429390b55fb7
+  - multi_turn_miss_param_38__016__581d3b43-1b49-4b57-a3c1-a3c6eb67ec0e
+  - multi_turn_miss_param_39__013__b415a5b9-44d7-42c3-84ca-cbf648645fc0
+  - multi_turn_miss_param_39__015__c6435f98-8a30-4829-b149-7b4e11cf7078
+  - multi_turn_miss_param_3__001__585749b3-8b84-4010-aa06-5e5cc4fd2e7c
+  - multi_turn_miss_param_3__013__f2cd74bd-5e1f-4720-9ea5-285ba589bcb2
+  - multi_turn_miss_param_3__016__e581280d-739c-45b7-984a-115584e170f9
+  - multi_turn_miss_param_40__004__6f704a51-cf14-4196-b935-11076735c206
+  - multi_turn_miss_param_40__005__d2b6e8e3-2ad8-41f7-a3de-72ce301ab0b1
+  - multi_turn_miss_param_43__015__d4be0cc9-43e3-438e-8900-794c26ca8553
+  - multi_turn_miss_param_45__005__c4a9d7b0-f7e4-44fd-b1b4-5e2a6122e4a8
+  - multi_turn_miss_param_4__002__e8eaadc3-c030-4275-ae13-73e86558f337
+  - multi_turn_miss_param_4__004__f71ee639-d173-4b29-8abe-3a20e7e6aba2
+  - multi_turn_miss_param_5__006__9a25cdb4-33ab-40ec-bd3d-9b6358cb43cb
+  - multi_turn_miss_param_5__009__e1c9d48d-e604-4987-9244-70a41375c74f
+  - multi_turn_miss_param_5__016__cb1f48a9-0c57-40ad-ace6-b10e82bc532e
+  - multi_turn_miss_param_6__002__6ee5216f-e0d1-4500-adb7-62c314407034
+  - multi_turn_miss_param_7__002__f557955f-b1b0-45cf-aef9-b71eb9df3a64
+  - multi_turn_miss_param_8__004__511aa8b0-dcda-46ae-8cbd-e4765072f223
+  - multi_turn_miss_param_8__006__6f015515-abdd-4f28-a6a3-b57b3ce9b427
+  - multi_turn_miss_param_9__003__3ad13b57-a6e6-4b60-9a01-9ad1167b55b4
+  - multi_turn_miss_param_9__018__950ac8c6-6e43-4c4f-9baf-367e38f80b13
+  - multi_turn_miss_param_9__035__566440f8-f3d9-4019-82e7-a6d6394a6ecf
+  request_predicates:
+  - prior_explicit_literals_present
+  - prior_tool_outputs_present
+  - tools_available
+  request_literals:
+  - 2024_research_backup.txt
+  - '37.0'
+  - '79.00'
+  - Annual_Report_2023.docx
+  - Archived/IdeasArchive.txt
+  - Archived/TeamNotes.txt
+  - ArchivedFinalReport2024.txt
+  - Archives/ArchivedFinalReport2024.txt
+  predicate_evidence:
+    has_sufficient_literals: 52
+    is_clarification: 1
+    tool_output_sufficient: 52
+  recommended_tools:
+  - mv
+  - cp
+  - echo
+  action_candidates:
+  - tool: cat
+    args:
+      file_name: final_report.pdf
+    arg_bindings:
+      file_name:
+        source: explicit_literal
+        value: final_report.pdf
+        evidence:
+          explicit_literals:
+          - budget analysis
+          - final_report.pdf
+          intent: read_file_content
+    recommended_tools:
+    - cat
+    reason: prior find/list output has a concrete match and the user asks to read
+      content
+    evidence:
+      explicit_literals:
+      - budget analysis
+      - final_report.pdf
+      intent: read_file_content
+    binding_source: explicit_literal
+    postcondition:
+      kind: file_content
+      expected_state_key: file_content
+      target_arg: file_name
+      confidence: 0.8
+    trajectory_risk_score: 2
+    trajectory_risk_flags:
+    - trajectory_sensitive_tool
+    binding_type: file
+    intervention_mode: guidance
+  - tool: touch
+    args:
+      file_name: summary.txt
+    arg_bindings:
+      file_name:
+        source: explicit_literal
+        value: summary.txt
+        evidence:
+          explicit_literals:
+          - summary.txt
+          - Hello
+          - notes.md
+          intent: explicit_literal_action
+    recommended_tools:
+    - touch
+    reason: explicit literal in user request grounds the next tool argument
+    evidence:
+      explicit_literals:
+      - summary.txt
+      - Hello
+      - notes.md
+      intent: explicit_literal_action
+    binding_source: explicit_literal
+    postcondition:
+      kind: file_exists
+      expected_state_key: current_directory_content
+      target_arg: file_name
+      confidence: 0.75
+    trajectory_risk_score: 2
+    trajectory_risk_flags:
+    - trajectory_sensitive_tool
+    binding_type: file
+    intervention_mode: guidance
+  - tool: cat
+    args:
+      file_name: 2024_research_backup.txt
+    arg_bindings:
+      file_name:
+        source: explicit_literal
+        value: 2024_research_backup.txt
+        evidence:
+          explicit_literals:
+          - 2024_research_backup.txt
+          intent: read_file_content
+    recommended_tools:
+    - cat
+    reason: prior find/list output has a concrete match and the user asks to read
+      content
+    evidence:
+      explicit_literals:
+      - 2024_research_backup.txt
+      intent: read_file_content
+    binding_source: explicit_literal
+    postcondition:
+      kind: file_content
+      expected_state_key: file_content
+      target_arg: file_name
+      confidence: 0.8
+    trajectory_risk_score: 2
+    trajectory_risk_flags:
+    - trajectory_sensitive_tool
+    binding_type: file
+    intervention_mode: guidance
+  - tool: cat
+    args:
+      file_name: ProjectOverview.txt
+    arg_bindings:
+      file_name:
+        source: explicit_literal
+        value: ProjectOverview.txt
+        evidence:
+          explicit_literals:
+          - 've just put together a file named '
+          - ' into my working directory where I'
+          - 'd like to modify the file content by putting '
+          - ProjectOverview.txt
+          intent: read_file_content
+    recommended_tools:
+    - cat
+    reason: prior find/list output has a concrete match and the user asks to read
+      content
+    evidence:
+      explicit_literals:
+      - 've just put together a file named '
+      - ' into my working directory where I'
+      - 'd like to modify the file content by putting '
+      - ProjectOverview.txt
+      intent: read_file_content
+    binding_source: explicit_literal
+    postcondition:
+      kind: file_content
+      expected_state_key: file_content
+      target_arg: file_name
+      confidence: 0.8
+    trajectory_risk_score: 2
+    trajectory_risk_flags:
+    - trajectory_sensitive_tool
+    binding_type: file
+    intervention_mode: guidance
+  - tool: cat
+    args:
+      file_name: 've come across an urgent conundrum: servers are down unexpectedly.
+        Draft a support ticket, with description '
+    arg_bindings:
+      file_name:
+        source: explicit_literal
+        value: 've come across an urgent conundrum: servers are down unexpectedly.
+          Draft a support ticket, with description '
+        evidence:
+          explicit_literals:
+          - 've come across an urgent conundrum: servers are down unexpectedly. Draft
+            a support ticket, with description '
+          - ' highlighting this dilemma and assign it a priority level of 3 to hasten
+            the response rate. Title '
+          intent: read_file_content
+    recommended_tools:
+    - cat
+    reason: prior find/list output has a concrete match and the user asks to read
+      content
+    evidence:
+      explicit_literals:
+      - 've come across an urgent conundrum: servers are down unexpectedly. Draft
+        a support ticket, with description '
+      - ' highlighting this dilemma and assign it a priority level of 3 to hasten
+        the response rate. Title '
+      intent: read_file_content
+    binding_source: explicit_literal
+    postcondition:
+      kind: file_content
+      expected_state_key: file_content
+      target_arg: file_name
+      confidence: 0.8
+    trajectory_risk_score: 2
+    trajectory_risk_flags:
+    - trajectory_sensitive_tool
+    binding_type: file
+    intervention_mode: guidance
+  tool_schema_hash: fa42f2679a942fc4
+- failure_id: failure_ir_global_actionable_no_tool_decision_prior_tool_outputs_present_tools_available
+  tool_name: __none__
+  error_types:
+  - actionable_no_tool_decision
+  stages:
+  - POST_TOOL
+  failure_types:
+  - ACTIONABLE_NO_TOOL_DECISION
+  failure_labels:
+  - (POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)
+  field_names: []
+  expected_types: {}
+  categories: []
+  evidence_count: 6
+  trace_ids:
+  - multi_turn_miss_param_17__002__cc338375-1319-4ae4-8cae-3792122a9526
+  - multi_turn_miss_param_29__004__5788e935-25f1-485c-b66d-8afa90912964
+  - multi_turn_miss_param_30__012__cd31ab5e-ffb2-45a1-98df-5604d69f76fd
+  - multi_turn_miss_param_39__002__af7625cf-361e-482d-a904-107ba42116f1
+  - multi_turn_miss_param_40__013__c5a2d5e0-3fef-47f6-8564-8eaafe4ca850
+  - multi_turn_miss_param_7__008__7b34067a-8798-4a7d-a270-dd9c4692fc86
+  request_predicates:
+  - prior_tool_outputs_present
+  - tools_available
+  request_literals:
+  - '79.00'
+  - academic_venture/goals.txt
+  - goals.txt
+  - newfile.txt
+  - project/test_results.json
+  - reference_goals.txt
+  - test_results.json
+  predicate_evidence:
+    tool_output_sufficient: 3
+  recommended_tools:
+  - cd
+  - find
+  - grep
+  action_candidates:
+  - tool: touch
+    args:
+      file_name: marker.txt
+    arg_bindings:
+      file_name:
+        source: prior_tool_output.cwd_or_listing
+        value: marker.txt
+        evidence:
+          last_tool: null
+          prior_output_keys:
+          - current_working_directory
+          - disk_usage
+    recommended_tools:
+    - touch
+    reason: prior cwd/listing output grounds a path-sensitive next action
+    evidence:
+      last_tool: null
+      prior_output_keys:
+      - current_working_directory
+      - disk_usage
+    binding_source: prior_tool_output.cwd_or_listing
+    postcondition:
+      kind: file_exists
+      expected_state_key: current_directory_content
+      target_arg: file_name
+      confidence: 0.75
+    trajectory_risk_score: 7
+    trajectory_risk_flags:
+    - trajectory_sensitive_tool
+    - weak_cwd_or_listing_binding
+    binding_type: file
+    intervention_mode: weak_guidance
+  - tool: cat
+    args:
+      file_name: test_results.json
+    arg_bindings:
+      file_name:
+        source: prior_tool_output.matches[0]|basename
+        value: test_results.json
+        evidence:
+          last_tool: null
+          prior_output_keys:
+          - matches
+          - error
+          - current_working_directory
+          - file_content
+          - id
+          - username
+          - content
+          - tags
+          - mentions
+    recommended_tools:
+    - cat
+    reason: prior find/list output has a concrete match and the user asks to read
+      content
+    evidence:
+      last_tool: null
+      prior_output_keys:
+      - matches
+      - error
+      - current_working_directory
+      - file_content
+      - id
+      - username
+      - content
+      - tags
+      - mentions
+    binding_source: prior_tool_output.matches[0]|basename
+    postcondition:
+      kind: file_content
+      expected_state_key: file_content
+      target_arg: file_name
+      confidence: 0.8
+    trajectory_risk_score: 4
+    trajectory_risk_flags:
+    - trajectory_sensitive_tool
+    binding_type: file
+    intervention_mode: guidance
+  - tool: cat
+    args:
+      file_name: goals.txt
+    arg_bindings:
+      file_name:
+        source: prior_tool_output.matches[0]|basename
+        value: goals.txt
+        evidence:
+          last_tool: null
+          prior_output_keys:
+          - current_directory_content
+          - matches
+          - file_content
+    recommended_tools:
+    - cat
+    reason: prior find/list output has a concrete match and the user asks to read
+      content
+    evidence:
+      last_tool: null
+      prior_output_keys:
+      - current_directory_content
+      - matches
+      - file_content
+    binding_source: prior_tool_output.matches[0]|basename
+    postcondition:
+      kind: file_content
+      expected_state_key: file_content
+      target_arg: file_name
+      confidence: 0.8
+    trajectory_risk_score: 4
+    trajectory_risk_flags:
+    - trajectory_sensitive_tool
+    binding_type: file
+    intervention_mode: guidance
+  tool_schema_hash: 862e61f6127d544e
+- failure_id: failure_ir_global_empty_completion
+  tool_name: __none__
+  error_types:
+  - empty_completion
+  stages:
+  - POST_TOOL
+  failure_types:
+  - EMPTY_TOOL_CALL
+  failure_labels:
+  - (POST_TOOL,EMPTY_TOOL_CALL)
+  field_names: []
+  expected_types: {}
+  categories: []
+  evidence_count: 45
+  trace_ids:
+  - multi_turn_miss_param_0__022__5067253c-6efa-4607-ab40-de28f53fe95f
+  - multi_turn_miss_param_10__005__cfe06584-9b1e-4cf7-95d4-d2b9a4a7c62d
+  - multi_turn_miss_param_10__013__2e02b217-59df-46c6-8c90-54bb0412a869
+  - multi_turn_miss_param_17__008__2223648f-7e2f-4bb0-b9ac-f28f6adc54dc
+  - multi_turn_miss_param_18__015__4ccf484a-2323-4456-8f67-ff5d04b57333
+  - multi_turn_miss_param_18__019__7cada602-5e49-4ad7-a078-a8752b00c816
+  - multi_turn_miss_param_19__003__7c0ab3cd-d2ca-4151-ad4c-e29123b01c29
+  - multi_turn_miss_param_19__006__16e93c0a-9197-410f-82f2-15ec5ec0c404
+  - multi_turn_miss_param_21__009__89949243-6d18-4eda-b932-3fd1012228eb
+  - multi_turn_miss_param_22__006__6f3f98d3-7ed7-4d92-ae92-f5c8b04a9b6c
+  - multi_turn_miss_param_22__008__79bf0b66-ad5d-4963-98f9-d667585f427f
+  - multi_turn_miss_param_22__010__009d6754-2ff5-4e9d-a31f-7aeddc72f3d3
+  - multi_turn_miss_param_22__013__31177c85-5e40-4eb8-b952-42044315c410
+  - multi_turn_miss_param_25__004__38e52110-18c4-4ead-9d59-5b6e1202895f
+  - multi_turn_miss_param_25__006__765d2a98-5180-4c22-b646-fd8c4f875bfb
+  - multi_turn_miss_param_25__008__9042722a-a2be-4e48-afbb-5f2307b01936
+  - multi_turn_miss_param_25__010__dec9fb53-723b-49d5-bc05-133c804c84d4
+  - multi_turn_miss_param_27__013__98e11a93-2294-4c78-b414-83976ea5d8b6
+  - multi_turn_miss_param_28__015__4004eee9-298a-49fe-a152-9b488f240170
+  - multi_turn_miss_param_29__006__6148dc30-6cc5-4397-b66e-e43e552a43fd
+  - multi_turn_miss_param_29__008__aaa427f1-c569-4716-8ef2-8fd6a7a846ad
+  - multi_turn_miss_param_2__007__07403de2-c653-44ee-afaf-87871835db10
+  - multi_turn_miss_param_2__009__4895ef21-c7c3-488a-8d09-dd62d7e8b59f
+  - multi_turn_miss_param_35__017__51504f15-2cea-41b3-bc48-80f80e2b292e
+  - multi_turn_miss_param_36__023__5df12069-a95f-41f2-8831-680177d99ce0
+  - multi_turn_miss_param_37__012__9b08246e-0605-477b-97c4-dc436bd5ff58
+  - multi_turn_miss_param_39__004__272533b4-2779-49ca-9396-1d32e2f9addb
+  - multi_turn_miss_param_39__017__f7eaf1aa-6598-4c10-90d7-5cc713a48b06
+  - multi_turn_miss_param_40__007__9be4fb91-4235-4c33-b6a6-50d11e720010
+  - multi_turn_miss_param_40__010__571dbf9f-39ba-455f-8dff-e08439e186d9
+  - multi_turn_miss_param_43__003__ed63b442-fe28-4f8f-8c35-6e2dd8c88ce0
+  - multi_turn_miss_param_43__009__25170660-1eb8-40ee-ab9c-262396dc126a
+  - multi_turn_miss_param_43__012__d1fe1e62-ee53-4b30-a0a7-e462ef550cb0
+  - multi_turn_miss_param_45__007__ed99dfa8-e50a-4121-b060-4c607275e767
+  - multi_turn_miss_param_45__010__a6a19e17-c564-4d50-a130-acbae9c8ce57
+  - multi_turn_miss_param_4__006__227630a4-b54d-4d5d-9b09-91118e84106d
+  - multi_turn_miss_param_4__008__10adb528-1571-45b4-98e1-5553d0221f83
+  - multi_turn_miss_param_5__012__4d7edb02-33f8-4576-ac10-2fd560292cc9
+  - multi_turn_miss_param_5__014__0496b9c7-ebd9-4cba-8e4a-c9eb72147164
+  - multi_turn_miss_param_7__004__82266354-2ac0-46d4-84b7-4035b0b74d23
+  - multi_turn_miss_param_7__006__add6a4c4-0240-4155-a1e6-beaaf0b4277d
+  - multi_turn_miss_param_8__009__3d35ae10-45ef-405a-b225-0203a9ff28eb
+  - multi_turn_miss_param_8__011__4d821013-3b80-4c04-b3f0-580a8dbd52af
+  - multi_turn_miss_param_8__013__70f79677-2ee2-406b-96b2-e30fa413f1a0
+  - multi_turn_miss_param_9__022__c3e7c56a-b1f9-4e36-b3a5-a55778a59023
+  request_predicates: []
+  request_literals: []
+  predicate_evidence:
+    has_sufficient_literals: 45
+    tool_output_sufficient: 45
+  recommended_tools:
+  - grep
+  - mv
+  - tail
+  action_candidates: []
+  tool_schema_hash: 3d2ed0a3a57f9f00
+- failure_id: failure_ir_global_post_tool_prose_summary
+  tool_name: __none__
+  error_types:
+  - post_tool_prose_summary
+  stages:
+  - POST_TOOL
+  failure_types:
+  - POST_TOOL_PROSE_SUMMARY
+  failure_labels:
+  - (POST_TOOL,POST_TOOL_PROSE_SUMMARY)
+  field_names: []
+  expected_types: {}
+  categories:
+  - verification_hook
+  evidence_count: 47
+  trace_ids:
+  - multi_turn_miss_param_10__001__56cc1a8d-17bb-4714-8f8a-37242711f956
+  - multi_turn_miss_param_16__007__a3b55abe-77e4-411c-a69c-784e5b5a906b
+  - multi_turn_miss_param_16__012__ba1a5290-5ca4-4ee0-8f20-ebc2d6aed580
+  - multi_turn_miss_param_16__016__89fa12b4-9fed-40b7-9aeb-5532e669d836
+  - multi_turn_miss_param_17__002__cc338375-1319-4ae4-8cae-3792122a9526
+  - multi_turn_miss_param_18__008__a7b8737d-f693-46ef-a456-691fb2420b26
+  - multi_turn_miss_param_18__012__69a7f72e-29f9-41d2-9169-cb3b8fc2684d
+  - multi_turn_miss_param_19__001__33a256cf-45c7-4cd3-b1ba-73dd031ef097
+  - multi_turn_miss_param_21__002__3aeaba09-67d0-4667-a4fd-1e0522944313
+  - multi_turn_miss_param_21__005__50461615-2bd4-4fc7-8e9c-83fbe9fc51b0
+  - multi_turn_miss_param_22__004__f6489d65-68ed-46a7-8905-0c72959eca34
+  - multi_turn_miss_param_25__002__9e78de70-f638-48df-9838-d6113de2694a
+  - multi_turn_miss_param_27__005__65d3b4a8-1a83-480c-9852-7c6e29940103
+  - multi_turn_miss_param_28__013__5b163ff0-cca6-4d90-8d2c-60191a2a8c6e
+  - multi_turn_miss_param_29__002__4f8ecdf5-972b-4cdc-af5a-9db37e8f33a8
+  - multi_turn_miss_param_2__005__9f16c409-f8bd-40a2-b2c8-4a9edf776c93
+  - multi_turn_miss_param_2__022__235b27fc-e67f-4093-96a5-6f89b7b01d05
+  - multi_turn_miss_param_30__008__c9fb73c6-d1a3-4c8a-9873-ac7ba83a9994
+  - multi_turn_miss_param_31__011__0b222296-a462-4034-a4d9-ca06bb083254
+  - multi_turn_miss_param_31__021__cd3958c9-b193-4c6c-a1d2-dfb87b05e3b0
+  - multi_turn_miss_param_35__005__ec5e401a-5649-4136-afcb-8b20926986f1
+  - multi_turn_miss_param_35__007__abb8dc28-3a27-4a3f-9021-5be64892f563
+  - multi_turn_miss_param_36__016__3ad53a14-0f37-4dbf-92fc-eabe22242a65
+  - multi_turn_miss_param_36__021__cb147d78-7e00-461a-903b-6c464edc3b79
+  - multi_turn_miss_param_37__004__fbb484e2-f517-45a6-b488-250b63208460
+  - multi_turn_miss_param_37__006__0d99c079-079e-4847-9470-18cc0713ecfb
+  - multi_turn_miss_param_38__013__96e78e07-83d8-4405-a329-04e66313be52
+  - multi_turn_miss_param_38__016__581d3b43-1b49-4b57-a3c1-a3c6eb67ec0e
+  - multi_turn_miss_param_39__002__af7625cf-361e-482d-a904-107ba42116f1
+  - multi_turn_miss_param_39__015__c6435f98-8a30-4829-b149-7b4e11cf7078
+  - multi_turn_miss_param_3__001__585749b3-8b84-4010-aa06-5e5cc4fd2e7c
+  - multi_turn_miss_param_3__013__f2cd74bd-5e1f-4720-9ea5-285ba589bcb2
+  - multi_turn_miss_param_3__016__e581280d-739c-45b7-984a-115584e170f9
+  - multi_turn_miss_param_40__004__6f704a51-cf14-4196-b935-11076735c206
+  - multi_turn_miss_param_40__013__c5a2d5e0-3fef-47f6-8564-8eaafe4ca850
+  - multi_turn_miss_param_43__015__d4be0cc9-43e3-438e-8900-794c26ca8553
+  - multi_turn_miss_param_45__005__c4a9d7b0-f7e4-44fd-b1b4-5e2a6122e4a8
+  - multi_turn_miss_param_4__002__e8eaadc3-c030-4275-ae13-73e86558f337
+  - multi_turn_miss_param_4__004__f71ee639-d173-4b29-8abe-3a20e7e6aba2
+  - multi_turn_miss_param_5__006__9a25cdb4-33ab-40ec-bd3d-9b6358cb43cb
+  - multi_turn_miss_param_5__009__e1c9d48d-e604-4987-9244-70a41375c74f
+  - multi_turn_miss_param_7__002__f557955f-b1b0-45cf-aef9-b71eb9df3a64
+  - multi_turn_miss_param_8__004__511aa8b0-dcda-46ae-8cbd-e4765072f223
+  - multi_turn_miss_param_8__006__6f015515-abdd-4f28-a6a3-b57b3ce9b427
+  - multi_turn_miss_param_9__003__3ad13b57-a6e6-4b60-9a01-9ad1167b55b4
+  - multi_turn_miss_param_9__018__950ac8c6-6e43-4c4f-9baf-367e38f80b13
+  - multi_turn_miss_param_9__035__566440f8-f3d9-4019-82e7-a6d6394a6ecf
+  request_predicates: []
+  request_literals: []
+  predicate_evidence: {}
+  recommended_tools:
+  - mkdir
+  - cd
+  - echo
+  action_candidates:
+  - tool: cat
+    args:
+      file_name: ProjectOverview.txt
+    arg_bindings:
+      file_name:
+        source: explicit_literal
+        value: ProjectOverview.txt
+        evidence:
+          explicit_literals:
+          - 've just put together a file named '
+          - ' into my working directory where I'
+          - 'd like to modify the file content by putting '
+          - ProjectOverview.txt
+          intent: read_file_content
+    recommended_tools:
+    - cat
+    reason: prior find/list output has a concrete match and the user asks to read
+      content
+    evidence:
+      explicit_literals:
+      - 've just put together a file named '
+      - ' into my working directory where I'
+      - 'd like to modify the file content by putting '
+      - ProjectOverview.txt
+      intent: read_file_content
+    binding_source: explicit_literal
+    postcondition:
+      kind: file_content
+      expected_state_key: file_content
+      target_arg: file_name
+      confidence: 0.8
+    trajectory_risk_score: 2
+    trajectory_risk_flags:
+    - trajectory_sensitive_tool
+    binding_type: file
+    intervention_mode: guidance
+  - tool: cat
+    args:
+      file_name: data.txt
+    arg_bindings:
+      file_name:
+        source: prior_tool_output.matches[0]|basename
+        value: data.txt
+        evidence:
+          last_tool: null
+          prior_output_keys:
+          - matches
+          - result
+          - file_content
+          - matching_lines
+          - error
+          - count
+          - type
+    recommended_tools:
+    - cat
+    reason: prior find/list output has a concrete match and the user asks to read
+      content
+    evidence:
+      last_tool: null
+      prior_output_keys:
+      - matches
+      - result
+      - file_content
+      - matching_lines
+      - error
+      - count
+      - type
+    binding_source: prior_tool_output.matches[0]|basename
+    postcondition:
+      kind: file_content
+      expected_state_key: file_content
+      target_arg: file_name
+      confidence: 0.8
+    trajectory_risk_score: 4
+    trajectory_risk_flags:
+    - trajectory_sensitive_tool
+    binding_type: file
+    intervention_mode: guidance
+  - tool: cat
+    args:
+      file_name: config.py
+    arg_bindings:
+      file_name:
+        source: prior_tool_output.matches[0]|basename
+        value: config.py
+        evidence:
+          last_tool: null
+          prior_output_keys:
+          - matches
+          - error
+          - current_working_directory
+          - last_lines
+          - file_content
+    recommended_tools:
+    - cat
+    reason: prior find/list output has a concrete match and the user asks to read
+      content
+    evidence:
+      last_tool: null
+      prior_output_keys:
+      - matches
+      - error
+      - current_working_directory
+      - last_lines
+      - file_content
+    binding_source: prior_tool_output.matches[0]|basename
+    postcondition:
+      kind: file_content
+      expected_state_key: file_content
+      target_arg: file_name
+      confidence: 0.8
+    trajectory_risk_score: 4
+    trajectory_risk_flags:
+    - trajectory_sensitive_tool
+    binding_type: file
+    intervention_mode: guidance
+  - tool: cat
+    args:
+      file_name: summary_2024.txt
+    arg_bindings:
+      file_name:
+        source: explicit_literal
+        value: summary_2024.txt
+        evidence:
+          explicit_literals:
+          - summary_2024.txt
+          intent: read_file_content
+    recommended_tools:
+    - cat
+    reason: prior find/list output has a concrete match and the user asks to read
+      content
+    evidence:
+      explicit_literals:
+      - summary_2024.txt
+      intent: read_file_content
+    binding_source: explicit_literal
+    postcondition:
+      kind: file_content
+      expected_state_key: file_content
+      target_arg: file_name
+      confidence: 0.8
+    trajectory_risk_score: 2
+    trajectory_risk_flags:
+    - trajectory_sensitive_tool
+    binding_type: file
+    intervention_mode: guidance
+  - tool: cat
+    args:
+      file_name: analysis_report.csv
+    arg_bindings:
+      file_name:
+        source: prior_tool_output.matches[0]|basename
+        value: analysis_report.csv
+        evidence:
+          last_tool: null
+          prior_output_keys:
+          - matches
+          - current_working_directory
+          - error
+          - result
+          - file_content
+          - sorted_content
+    recommended_tools:
+    - cat
+    reason: prior find/list output has a concrete match and the user asks to read
+      content
+    evidence:
+      last_tool: null
+      prior_output_keys:
+      - matches
+      - current_working_directory
+      - error
+      - result
+      - file_content
+      - sorted_content
+    binding_source: prior_tool_output.matches[0]|basename
+    postcondition:
+      kind: file_content
+      expected_state_key: file_content
+      target_arg: file_name
+      confidence: 0.8
+    trajectory_risk_score: 4
+    trajectory_risk_flags:
+    - trajectory_sensitive_tool
+    binding_type: file
+    intervention_mode: guidance
+  tool_schema_hash: fa42f2679a942fc4
+- failure_id: failure_ir_global_redundant_clarification_request
+  tool_name: __none__
+  error_types:
+  - redundant_clarification_request
+  stages:
+  - POST_TOOL
+  failure_types:
+  - CLARIFICATION_REQUEST
+  failure_labels:
+  - (POST_TOOL,CLARIFICATION_REQUEST)
+  field_names: []
+  expected_types: {}
+  categories: []
+  evidence_count: 11
+  trace_ids:
+  - multi_turn_miss_param_10__003__22b44f4f-c32c-4728-a663-f2b09d743786
+  - multi_turn_miss_param_10__011__d5672777-c4cd-4e28-a2b9-3838261a54c8
+  - multi_turn_miss_param_17__005__03b20419-c3a7-4590-852f-2bcecb146ff6
+  - multi_turn_miss_param_17__010__c49baacc-3c18-48dd-af5d-8604562985d5
+  - multi_turn_miss_param_19__004__6a344907-90ff-409d-ba84-70d3b12d5d44
+  - multi_turn_miss_param_28__005__a7c9024d-1fb2-4f7d-9e87-c2f918eae8b8
+  - multi_turn_miss_param_30__010__68ed6cbb-247d-4b61-94b6-8065886e295f
+  - multi_turn_miss_param_31__012__b6cb168a-5895-4042-b08a-5c1ceb6953bc
+  - multi_turn_miss_param_35__008__b81473ad-03d7-4acb-a3c7-60735ec7db37
+  - multi_turn_miss_param_36__002__a03c96a4-dcac-45ae-8dc5-5f9c553ee144
+  - multi_turn_miss_param_43__001__0525e0e8-dc35-48ba-8545-687bfb7ac8fe
+  request_predicates: []
+  request_literals: []
+  predicate_evidence:
+    has_sufficient_literals: 10
+    is_clarification: 8
+    tool_output_sufficient: 11
+  recommended_tools:
+  - mv
+  - cp
+  - mkdir
+  action_candidates:
+  - tool: cat
+    args:
+      file_name: test_document.txt
+    arg_bindings:
+      file_name:
+        source: prior_tool_output.matches[0]|basename
+        value: test_document.txt
+        evidence:
+          last_tool: null
+          prior_output_keys:
+          - matches
+          - result
+    recommended_tools:
+    - cat
+    reason: prior find/list output has a concrete match and the user asks to read
+      content
+    evidence:
+      last_tool: null
+      prior_output_keys:
+      - matches
+      - result
+    binding_source: prior_tool_output.matches[0]|basename
+    postcondition:
+      kind: file_content
+      expected_state_key: file_content
+      target_arg: file_name
+      confidence: 0.8
+    trajectory_risk_score: 4
+    trajectory_risk_flags:
+    - trajectory_sensitive_tool
+    binding_type: file
+    intervention_mode: guidance
+  - tool: cat
+    args:
+      file_name: project_summary.txt
+    arg_bindings:
+      file_name:
+        source: explicit_literal
+        value: project_summary.txt
+        evidence:
+          explicit_literals:
+          - project_summary.txt
+          intent: read_file_content
+    recommended_tools:
+    - cat
+    reason: prior find/list output has a concrete match and the user asks to read
+      content
+    evidence:
+      explicit_literals:
+      - project_summary.txt
+      intent: read_file_content
+    binding_source: explicit_literal
+    postcondition:
+      kind: file_content
+      expected_state_key: file_content
+      target_arg: file_name
+      confidence: 0.8
+    trajectory_risk_score: 2
+    trajectory_risk_flags:
+    - trajectory_sensitive_tool
+    binding_type: file
+    intervention_mode: guidance
+  tool_schema_hash: 862e61f6127d544e
+- failure_id: failure_ir_global_termination_inadmissible
+  tool_name: __none__
+  error_types:
+  - termination_inadmissible
+  stages:
+  - POST_TOOL
+  failure_types:
+  - TERMINATION_INADMISSIBLE
+  failure_labels:
+  - (POST_TOOL,TERMINATION_INADMISSIBLE)
+  field_names: []
+  expected_types: {}
+  categories:
+  - verification_hook
+  evidence_count: 55
+  trace_ids:
+  - multi_turn_miss_param_0__002__6e73fab9-00ec-4ad9-8a84-427cd17b138d
+  - multi_turn_miss_param_0__015__614c3331-d8b4-425f-a8b9-537fc98853d6
+  - multi_turn_miss_param_0__023__75f4a649-51ed-4623-a39a-b1798d10b6a1
+  - multi_turn_miss_param_10__001__56cc1a8d-17bb-4714-8f8a-37242711f956
+  - multi_turn_miss_param_16__007__a3b55abe-77e4-411c-a69c-784e5b5a906b
+  - multi_turn_miss_param_16__012__ba1a5290-5ca4-4ee0-8f20-ebc2d6aed580
+  - multi_turn_miss_param_16__016__89fa12b4-9fed-40b7-9aeb-5532e669d836
+  - multi_turn_miss_param_17__002__cc338375-1319-4ae4-8cae-3792122a9526
+  - multi_turn_miss_param_18__008__a7b8737d-f693-46ef-a456-691fb2420b26
+  - multi_turn_miss_param_18__012__69a7f72e-29f9-41d2-9169-cb3b8fc2684d
+  - multi_turn_miss_param_19__001__33a256cf-45c7-4cd3-b1ba-73dd031ef097
+  - multi_turn_miss_param_21__002__3aeaba09-67d0-4667-a4fd-1e0522944313
+  - multi_turn_miss_param_21__005__50461615-2bd4-4fc7-8e9c-83fbe9fc51b0
+  - multi_turn_miss_param_21__006__58f27b89-3392-4863-aec7-29cde7261d0f
+  - multi_turn_miss_param_22__004__f6489d65-68ed-46a7-8905-0c72959eca34
+  - multi_turn_miss_param_25__002__9e78de70-f638-48df-9838-d6113de2694a
+  - multi_turn_miss_param_27__005__65d3b4a8-1a83-480c-9852-7c6e29940103
+  - multi_turn_miss_param_28__013__5b163ff0-cca6-4d90-8d2c-60191a2a8c6e
+  - multi_turn_miss_param_29__002__4f8ecdf5-972b-4cdc-af5a-9db37e8f33a8
+  - multi_turn_miss_param_2__005__9f16c409-f8bd-40a2-b2c8-4a9edf776c93
+  - multi_turn_miss_param_2__022__235b27fc-e67f-4093-96a5-6f89b7b01d05
+  - multi_turn_miss_param_30__008__c9fb73c6-d1a3-4c8a-9873-ac7ba83a9994
+  - multi_turn_miss_param_31__011__0b222296-a462-4034-a4d9-ca06bb083254
+  - multi_turn_miss_param_31__021__cd3958c9-b193-4c6c-a1d2-dfb87b05e3b0
+  - multi_turn_miss_param_35__005__ec5e401a-5649-4136-afcb-8b20926986f1
+  - multi_turn_miss_param_35__007__abb8dc28-3a27-4a3f-9021-5be64892f563
+  - multi_turn_miss_param_36__016__3ad53a14-0f37-4dbf-92fc-eabe22242a65
+  - multi_turn_miss_param_36__021__cb147d78-7e00-461a-903b-6c464edc3b79
+  - multi_turn_miss_param_37__004__fbb484e2-f517-45a6-b488-250b63208460
+  - multi_turn_miss_param_37__006__0d99c079-079e-4847-9470-18cc0713ecfb
+  - multi_turn_miss_param_37__007__75c219c5-156e-46c6-bb91-0cecd9b55454
+  - multi_turn_miss_param_38__013__96e78e07-83d8-4405-a329-04e66313be52
+  - multi_turn_miss_param_38__014__a35a29c9-b18b-4f96-9f00-429390b55fb7
+  - multi_turn_miss_param_38__016__581d3b43-1b49-4b57-a3c1-a3c6eb67ec0e
+  - multi_turn_miss_param_39__002__af7625cf-361e-482d-a904-107ba42116f1
+  - multi_turn_miss_param_39__015__c6435f98-8a30-4829-b149-7b4e11cf7078
+  - multi_turn_miss_param_3__001__585749b3-8b84-4010-aa06-5e5cc4fd2e7c
+  - multi_turn_miss_param_3__013__f2cd74bd-5e1f-4720-9ea5-285ba589bcb2
+  - multi_turn_miss_param_3__016__e581280d-739c-45b7-984a-115584e170f9
+  - multi_turn_miss_param_40__004__6f704a51-cf14-4196-b935-11076735c206
+  - multi_turn_miss_param_40__005__d2b6e8e3-2ad8-41f7-a3de-72ce301ab0b1
+  - multi_turn_miss_param_40__013__c5a2d5e0-3fef-47f6-8564-8eaafe4ca850
+  - multi_turn_miss_param_43__015__d4be0cc9-43e3-438e-8900-794c26ca8553
+  - multi_turn_miss_param_45__005__c4a9d7b0-f7e4-44fd-b1b4-5e2a6122e4a8
+  - multi_turn_miss_param_4__002__e8eaadc3-c030-4275-ae13-73e86558f337
+  - multi_turn_miss_param_4__004__f71ee639-d173-4b29-8abe-3a20e7e6aba2
+  - multi_turn_miss_param_5__006__9a25cdb4-33ab-40ec-bd3d-9b6358cb43cb
+  - multi_turn_miss_param_5__009__e1c9d48d-e604-4987-9244-70a41375c74f
+  - multi_turn_miss_param_6__002__6ee5216f-e0d1-4500-adb7-62c314407034
+  - multi_turn_miss_param_7__002__f557955f-b1b0-45cf-aef9-b71eb9df3a64
+  - multi_turn_miss_param_8__004__511aa8b0-dcda-46ae-8cbd-e4765072f223
+  - multi_turn_miss_param_8__006__6f015515-abdd-4f28-a6a3-b57b3ce9b427
+  - multi_turn_miss_param_9__003__3ad13b57-a6e6-4b60-9a01-9ad1167b55b4
+  - multi_turn_miss_param_9__018__950ac8c6-6e43-4c4f-9baf-367e38f80b13
+  - multi_turn_miss_param_9__035__566440f8-f3d9-4019-82e7-a6d6394a6ecf
+  request_predicates: []
+  request_literals: []
+  predicate_evidence: {}
+  recommended_tools:
+  - mv
+  - cp
+  - echo
+  action_candidates:
+  - tool: cat
+    args:
+      file_name: ProjectOverview.txt
+    arg_bindings:
+      file_name:
+        source: explicit_literal
+        value: ProjectOverview.txt
+        evidence:
+          explicit_literals:
+          - 've just put together a file named '
+          - ' into my working directory where I'
+          - 'd like to modify the file content by putting '
+          - ProjectOverview.txt
+          intent: read_file_content
+    recommended_tools:
+    - cat
+    reason: prior find/list output has a concrete match and the user asks to read
+      content
+    evidence:
+      explicit_literals:
+      - 've just put together a file named '
+      - ' into my working directory where I'
+      - 'd like to modify the file content by putting '
+      - ProjectOverview.txt
+      intent: read_file_content
+    binding_source: explicit_literal
+    postcondition:
+      kind: file_content
+      expected_state_key: file_content
+      target_arg: file_name
+      confidence: 0.8
+    trajectory_risk_score: 2
+    trajectory_risk_flags:
+    - trajectory_sensitive_tool
+    binding_type: file
+    intervention_mode: guidance
+  - tool: cat
+    args:
+      file_name: data.txt
+    arg_bindings:
+      file_name:
+        source: prior_tool_output.matches[0]|basename
+        value: data.txt
+        evidence:
+          last_tool: null
+          prior_output_keys:
+          - matches
+          - result
+          - file_content
+          - matching_lines
+          - error
+          - count
+          - type
+    recommended_tools:
+    - cat
+    reason: prior find/list output has a concrete match and the user asks to read
+      content
+    evidence:
+      last_tool: null
+      prior_output_keys:
+      - matches
+      - result
+      - file_content
+      - matching_lines
+      - error
+      - count
+      - type
+    binding_source: prior_tool_output.matches[0]|basename
+    postcondition:
+      kind: file_content
+      expected_state_key: file_content
+      target_arg: file_name
+      confidence: 0.8
+    trajectory_risk_score: 4
+    trajectory_risk_flags:
+    - trajectory_sensitive_tool
+    binding_type: file
+    intervention_mode: guidance
+  - tool: cat
+    args:
+      file_name: config.py
+    arg_bindings:
+      file_name:
+        source: prior_tool_output.matches[0]|basename
+        value: config.py
+        evidence:
+          last_tool: null
+          prior_output_keys:
+          - matches
+          - error
+          - current_working_directory
+          - last_lines
+          - file_content
+    recommended_tools:
+    - cat
+    reason: prior find/list output has a concrete match and the user asks to read
+      content
+    evidence:
+      last_tool: null
+      prior_output_keys:
+      - matches
+      - error
+      - current_working_directory
+      - last_lines
+      - file_content
+    binding_source: prior_tool_output.matches[0]|basename
+    postcondition:
+      kind: file_content
+      expected_state_key: file_content
+      target_arg: file_name
+      confidence: 0.8
+    trajectory_risk_score: 4
+    trajectory_risk_flags:
+    - trajectory_sensitive_tool
+    binding_type: file
+    intervention_mode: guidance
+  - tool: cat
+    args:
+      file_name: summary_2024.txt
+    arg_bindings:
+      file_name:
+        source: explicit_literal
+        value: summary_2024.txt
+        evidence:
+          explicit_literals:
+          - summary_2024.txt
+          intent: read_file_content
+    recommended_tools:
+    - cat
+    reason: prior find/list output has a concrete match and the user asks to read
+      content
+    evidence:
+      explicit_literals:
+      - summary_2024.txt
+      intent: read_file_content
+    binding_source: explicit_literal
+    postcondition:
+      kind: file_content
+      expected_state_key: file_content
+      target_arg: file_name
+      confidence: 0.8
+    trajectory_risk_score: 2
+    trajectory_risk_flags:
+    - trajectory_sensitive_tool
+    binding_type: file
+    intervention_mode: guidance
+  - tool: cat
+    args:
+      file_name: analysis_report.csv
+    arg_bindings:
+      file_name:
+        source: prior_tool_output.matches[0]|basename
+        value: analysis_report.csv
+        evidence:
+          last_tool: null
+          prior_output_keys:
+          - matches
+          - current_working_directory
+          - error
+          - result
+          - file_content
+          - sorted_content
+    recommended_tools:
+    - cat
+    reason: prior find/list output has a concrete match and the user asks to read
+      content
+    evidence:
+      last_tool: null
+      prior_output_keys:
+      - matches
+      - current_working_directory
+      - error
+      - result
+      - file_content
+      - sorted_content
+    binding_source: prior_tool_output.matches[0]|basename
+    postcondition:
+      kind: file_content
+      expected_state_key: file_content
+      target_arg: file_name
+      confidence: 0.8
+    trajectory_risk_score: 4
+    trajectory_risk_flags:
+    - trajectory_sensitive_tool
+    binding_type: file
+    intervention_mode: guidance
+  tool_schema_hash: fa42f2679a942fc4
+source_failure_count: 226
+metadata:
+  compiler: trace_to_patch
+  failure_jsonl: /cephfs/qiuyn/training-free/outputs/phase2_subset/bfcl_ctspc_subset30_v1/candidate_rules/failures.jsonl
+  candidate_dir: /cephfs/qiuyn/training-free/outputs/phase2_subset/bfcl_ctspc_subset30_v1/candidate_rules
