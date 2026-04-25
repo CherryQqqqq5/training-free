@@ -741,16 +741,23 @@ def _prompt_user_texts_by_case(run_root: Path, category: str, selected_ids: list
     return case_users
 
 
-def _trace_paths_by_case_from_prompt_prefix(
+def _trace_paths_by_case_from_prompt_prefix_with_diagnostics(
     *,
     source_run_root: Path,
     category: str,
     selected_ids: list[str],
-) -> dict[str, list[Path]]:
+) -> tuple[dict[str, list[Path]], dict[str, Any]]:
     case_users = _prompt_user_texts_by_case(source_run_root, category, selected_ids)
     if not case_users:
-        return {}
+        return {}, {"mapping_method": "prompt_user_prefix", "unresolved_ambiguity": False, "reason": "no_case_prompts"}
+
+    selected_order = {case_id: index for index, case_id in enumerate(selected_ids)}
+    counts = _result_step_counts(source_run_root, category, selected_ids)
     groups: dict[str, list[Path]] = {case_id: [] for case_id in selected_ids}
+    ambiguous: dict[tuple[str, ...], list[Path]] = {}
+    ambiguous_records: list[dict[str, Any]] = []
+    unmatched_trace_count = 0
+
     for path in sorted((source_run_root / "traces").glob("*.json"), key=lambda item: (item.stat().st_mtime, item.name)):
         try:
             trace = json.loads(path.read_text(encoding="utf-8"))
@@ -765,11 +772,113 @@ def _trace_paths_by_case_from_prompt_prefix(
             if len(trace_users) <= len(user_texts) and user_texts[: len(trace_users)] == trace_users
         ]
         if not matches:
+            unmatched_trace_count += 1
             continue
-        # Ambiguity can occur when two BFCL cases share an early user prefix. Use the longest prompt
-        # sequence as a stable tie-breaker and then case id for determinism.
-        matches.sort(key=lambda case_id: (-len(case_users.get(case_id) or []), _case_number(case_id), case_id))
-        groups.setdefault(matches[0], []).append(path)
+        matches.sort(key=lambda case_id: selected_order.get(case_id, len(selected_ids)))
+        if len(matches) == 1:
+            groups.setdefault(matches[0], []).append(path)
+            continue
+        key = tuple(matches)
+        ambiguous.setdefault(key, []).append(path)
+        ambiguous_records.append(
+            {
+                "trace": path.name,
+                "matches": list(matches),
+                "trace_user_depth": len(trace_users),
+                "trace_request_user_prefix": trace_users[:3],
+            }
+        )
+
+    unresolved: list[dict[str, Any]] = []
+    resolved: list[dict[str, Any]] = []
+    for matches, paths in ambiguous.items():
+        residual_counts: dict[str, int] = {}
+        for case_id in matches:
+            expected = counts.get(case_id)
+            if expected is None:
+                residual_counts[case_id] = 0
+            else:
+                residual_counts[case_id] = max(int(expected) - len(groups.get(case_id, [])), 0)
+        expected_total = sum(residual_counts.values())
+        if expected_total <= 0:
+            unresolved.append(
+                {
+                    "matches": list(matches),
+                    "trace_count": len(paths),
+                    "expected_residual_count": expected_total,
+                    "reason": "no_expected_residual_count",
+                }
+            )
+            continue
+        if len(paths) < expected_total:
+            unresolved.append(
+                {
+                    "matches": list(matches),
+                    "trace_count": len(paths),
+                    "expected_residual_count": expected_total,
+                    "reason": "ambiguous_trace_count_below_expected",
+                }
+            )
+        offset = 0
+        assignment: dict[str, int] = {}
+        for case_id in matches:
+            take = residual_counts.get(case_id, 0)
+            if take <= 0:
+                continue
+            groups.setdefault(case_id, []).extend(paths[offset : offset + take])
+            assignment[case_id] = len(paths[offset : offset + take])
+            offset += take
+        if offset < len(paths):
+            unresolved.append(
+                {
+                    "matches": list(matches),
+                    "trace_count": len(paths),
+                    "assigned_trace_count": offset,
+                    "expected_residual_count": expected_total,
+                    "reason": "ambiguous_trace_count_above_expected",
+                }
+            )
+        resolved.append(
+            {
+                "matches": list(matches),
+                "trace_count": len(paths),
+                "expected_residual_count": expected_total,
+                "assigned_counts": assignment,
+            }
+        )
+
+    missing_trace_ids = [case_id for case_id in selected_ids if not groups.get(case_id)]
+    count_mismatch = []
+    for case_id in selected_ids:
+        expected = counts.get(case_id)
+        if expected is not None and int(expected) > 0 and groups.get(case_id) and len(groups.get(case_id, [])) != int(expected):
+            count_mismatch.append({"case_id": case_id, "expected": int(expected), "actual": len(groups.get(case_id, []))})
+    diagnostics = {
+        "mapping_method": "prompt_user_prefix",
+        "ambiguous_trace_count": len(ambiguous_records),
+        "ambiguous_match_sets": [list(key) for key in ambiguous],
+        "ambiguous_records_sample": ambiguous_records[:20],
+        "resolved_ambiguous_match_sets": resolved,
+        "unresolved_ambiguous_match_sets": unresolved,
+        "unresolved_ambiguity": bool(unresolved),
+        "missing_trace_ids": missing_trace_ids,
+        "count_mismatch": count_mismatch,
+        "unmatched_trace_count": unmatched_trace_count,
+    }
+    return groups, diagnostics
+
+
+def _trace_paths_by_case_from_prompt_prefix(
+    *,
+    source_run_root: Path,
+    category: str,
+    selected_ids: list[str],
+) -> dict[str, list[Path]]:
+    groups, _ = _trace_paths_by_case_from_prompt_prefix_with_diagnostics(
+        source_run_root=source_run_root,
+        category=category,
+        selected_ids=selected_ids,
+    )
     return groups
 
 
