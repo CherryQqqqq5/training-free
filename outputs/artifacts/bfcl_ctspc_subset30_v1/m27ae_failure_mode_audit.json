@@ -1,0 +1,314 @@
+{
+  "activated_failure_missing_divergence_case_ids": [],
+  "ambiguous_regression_count": 0,
+  "artifact_root": "outputs/artifacts/bfcl_ctspc_subset30_v1",
+  "baseline_accuracy": 20.0,
+  "candidate_accuracy": 10.0,
+  "case_fixed_count": 1,
+  "case_level_gate_allowed": true,
+  "case_regressed_count": 4,
+  "case_report_trace_mapping": "prompt_user_prefix",
+  "cases": [
+    {
+      "arg_match": true,
+      "baseline_success": false,
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_19",
+      "case_regressed": false,
+      "first_divergence_layer": "trajectory_continuation",
+      "policy_plan_activated": true,
+      "regression_source": "trajectory_continuation",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "scorer_proxy_gap_type": "proxy_ok_trajectory_failed",
+      "selected_tool": "cp",
+      "suggested_next_action": "redesign_trajectory_policy",
+      "tool_match": true
+    },
+    {
+      "arg_match": true,
+      "baseline_success": false,
+      "candidate_success": true,
+      "case_fixed": true,
+      "case_id": "multi_turn_miss_param_31",
+      "case_regressed": false,
+      "first_divergence_layer": "trajectory_continuation",
+      "policy_plan_activated": true,
+      "regression_source": "fixed_signal",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "scorer_proxy_gap_type": "no_proxy_gap",
+      "selected_tool": "cat",
+      "suggested_next_action": "preserve_as_diagnostic_only_signal",
+      "tool_match": true
+    },
+    {
+      "arg_match": false,
+      "baseline_success": true,
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_38",
+      "case_regressed": true,
+      "first_divergence_layer": "no_tool_repair",
+      "policy_plan_activated": false,
+      "regression_source": "no_tool_repair",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "scorer_proxy_gap_type": "no_proxy_gap",
+      "selected_tool": null,
+      "suggested_next_action": "split_repair_stack",
+      "tool_match": false
+    },
+    {
+      "arg_match": false,
+      "baseline_success": false,
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_5",
+      "case_regressed": false,
+      "first_divergence_layer": "action_selection",
+      "policy_plan_activated": true,
+      "regression_source": "action_policy",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "scorer_proxy_gap_type": "proxy_tool_ok_scorer_tool_wrong",
+      "selected_tool": "cat",
+      "suggested_next_action": "redesign_trajectory_policy",
+      "tool_match": false
+    },
+    {
+      "arg_match": false,
+      "baseline_success": true,
+      "candidate_success": true,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_22",
+      "case_regressed": false,
+      "first_divergence_layer": "argument_realization",
+      "policy_plan_activated": true,
+      "regression_source": "ambiguous",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "scorer_proxy_gap_type": "proxy_arg_ok_scorer_arg_wrong",
+      "selected_tool": "cat",
+      "suggested_next_action": "manual_trace_audit",
+      "tool_match": true
+    },
+    {
+      "arg_match": false,
+      "baseline_success": true,
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_35",
+      "case_regressed": true,
+      "first_divergence_layer": "no_tool_repair",
+      "policy_plan_activated": false,
+      "regression_source": "no_tool_repair",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "resolve_contextual_string_arg"
+      ],
+      "scorer_proxy_gap_type": "proxy_activated_but_scorer_not_activated",
+      "selected_tool": null,
+      "suggested_next_action": "split_repair_stack",
+      "tool_match": false
+    },
+    {
+      "arg_match": false,
+      "baseline_success": false,
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_4",
+      "case_regressed": false,
+      "first_divergence_layer": "action_selection",
+      "policy_plan_activated": true,
+      "regression_source": "action_policy",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "strip_assistant_content_with_tool_calls"
+      ],
+      "scorer_proxy_gap_type": "proxy_tool_ok_scorer_tool_wrong",
+      "selected_tool": "cat",
+      "suggested_next_action": "redesign_trajectory_policy",
+      "tool_match": false
+    },
+    {
+      "arg_match": true,
+      "baseline_success": true,
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_27",
+      "case_regressed": true,
+      "first_divergence_layer": "trajectory_continuation",
+      "policy_plan_activated": true,
+      "regression_source": "trajectory_continuation",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "strip_assistant_content_with_tool_calls"
+      ],
+      "scorer_proxy_gap_type": "proxy_ok_trajectory_failed",
+      "selected_tool": "mv",
+      "suggested_next_action": "redesign_trajectory_policy",
+      "tool_match": true
+    },
+    {
+      "arg_match": false,
+      "baseline_success": false,
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_29",
+      "case_regressed": false,
+      "first_divergence_layer": "action_selection",
+      "policy_plan_activated": true,
+      "regression_source": "action_policy",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "resolve_contextual_string_arg"
+      ],
+      "scorer_proxy_gap_type": "proxy_tool_ok_scorer_tool_wrong",
+      "selected_tool": "cat",
+      "suggested_next_action": "redesign_trajectory_policy",
+      "tool_match": false
+    },
+    {
+      "arg_match": false,
+      "baseline_success": true,
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_39",
+      "case_regressed": true,
+      "first_divergence_layer": "argument_realization",
+      "policy_plan_activated": true,
+      "regression_source": "action_policy",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "scorer_proxy_gap_type": "proxy_arg_ok_scorer_arg_wrong",
+      "selected_tool": "cat",
+      "suggested_next_action": "redesign_trajectory_policy",
+      "tool_match": true
+    }
+  ],
+  "diagnostic": {
+    "do_not_rerun_dev_or_holdout": true,
+    "no_bfcl_or_model_call": true,
+    "recommended_next_work": "split_repair_stack + pivot_to_lower_risk_slice"
+  },
+  "durable_evidence": true,
+  "first_divergence_layer_distribution": {
+    "argument_realization": 1,
+    "no_tool_repair": 2,
+    "trajectory_continuation": 1
+  },
+  "fixed_cases": [
+    {
+      "arg_match": true,
+      "baseline_success": false,
+      "candidate_success": true,
+      "case_fixed": true,
+      "case_id": "multi_turn_miss_param_31",
+      "case_regressed": false,
+      "first_divergence_layer": "trajectory_continuation",
+      "policy_plan_activated": true,
+      "regression_source": "fixed_signal",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "scorer_proxy_gap_type": "no_proxy_gap",
+      "selected_tool": "cat",
+      "suggested_next_action": "preserve_as_diagnostic_only_signal",
+      "tool_match": true
+    }
+  ],
+  "m27ae_failure_mode_audit_passed": true,
+  "m27ae_route_decision_ready": true,
+  "net_case_gain": -3,
+  "regression_cases": [
+    {
+      "arg_match": false,
+      "baseline_success": true,
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_38",
+      "case_regressed": true,
+      "first_divergence_layer": "no_tool_repair",
+      "policy_plan_activated": false,
+      "regression_source": "no_tool_repair",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "scorer_proxy_gap_type": "no_proxy_gap",
+      "selected_tool": null,
+      "suggested_next_action": "split_repair_stack",
+      "tool_match": false
+    },
+    {
+      "arg_match": false,
+      "baseline_success": true,
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_35",
+      "case_regressed": true,
+      "first_divergence_layer": "no_tool_repair",
+      "policy_plan_activated": false,
+      "regression_source": "no_tool_repair",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "resolve_contextual_string_arg"
+      ],
+      "scorer_proxy_gap_type": "proxy_activated_but_scorer_not_activated",
+      "selected_tool": null,
+      "suggested_next_action": "split_repair_stack",
+      "tool_match": false
+    },
+    {
+      "arg_match": true,
+      "baseline_success": true,
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_27",
+      "case_regressed": true,
+      "first_divergence_layer": "trajectory_continuation",
+      "policy_plan_activated": true,
+      "regression_source": "trajectory_continuation",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "strip_assistant_content_with_tool_calls"
+      ],
+      "scorer_proxy_gap_type": "proxy_ok_trajectory_failed",
+      "selected_tool": "mv",
+      "suggested_next_action": "redesign_trajectory_policy",
+      "tool_match": true
+    },
+    {
+      "arg_match": false,
+      "baseline_success": true,
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_39",
+      "case_regressed": true,
+      "first_divergence_layer": "argument_realization",
+      "policy_plan_activated": true,
+      "regression_source": "action_policy",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "scorer_proxy_gap_type": "proxy_arg_ok_scorer_arg_wrong",
+      "selected_tool": "cat",
+      "suggested_next_action": "redesign_trajectory_policy",
+      "tool_match": true
+    }
+  ],
+  "regression_source_distribution": {
+    "action_policy": 1,
+    "no_tool_repair": 2,
+    "trajectory_continuation": 1
+  },
+  "report_scope": "m2_7ae_failure_mode_audit",
+  "route_decision": "split_repair_stack + pivot_to_lower_risk_slice"
+}

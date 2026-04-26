@@ -1,0 +1,60 @@
+{
+  "ablation_variants": [
+    {
+      "ablation_id": "candidate_none",
+      "config_delta": {
+        "ctspc_policy": "off",
+        "repairs": "off"
+      },
+      "contains_executable_scorer_command": false,
+      "expected_diagnostic_question": "Measure baseline-like behavior without CTSPC intervention.",
+      "required_future_approval": true
+    },
+    {
+      "ablation_id": "compatibility_repairs_only",
+      "config_delta": {
+        "compatibility_repairs": "on",
+        "ctspc_policy": "off"
+      },
+      "contains_executable_scorer_command": false,
+      "expected_diagnostic_question": "Isolate repair stack contribution without action guidance.",
+      "required_future_approval": true
+    },
+    {
+      "ablation_id": "action_guidance_only",
+      "config_delta": {
+        "action_guidance": "on",
+        "compatibility_repairs": "off"
+      },
+      "contains_executable_scorer_command": false,
+      "expected_diagnostic_question": "Isolate action policy without repair stack side effects.",
+      "required_future_approval": true
+    },
+    {
+      "ablation_id": "repair_without_action",
+      "config_delta": {
+        "action_guidance": "off",
+        "repair_stack": "on"
+      },
+      "contains_executable_scorer_command": false,
+      "expected_diagnostic_question": "Check whether repair/no-tool coercion causes regressions.",
+      "required_future_approval": true
+    },
+    {
+      "ablation_id": "action_without_repair",
+      "config_delta": {
+        "action_guidance": "on",
+        "repair_stack": "off"
+      },
+      "contains_executable_scorer_command": false,
+      "expected_diagnostic_question": "Check whether local action guidance alone damages trajectory.",
+      "required_future_approval": true
+    }
+  ],
+  "artifact_root": "outputs/artifacts/bfcl_ctspc_subset30_v1",
+  "candidate_commands": [],
+  "no_bfcl_or_model_call": true,
+  "offline_plan_only": true,
+  "planned_commands": [],
+  "report_scope": "m2_7ae_ablation_matrix_manifest"
+}
