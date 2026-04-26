@@ -5,7 +5,7 @@
     "reject": 3,
     "retain": 0
   },
-  "dev_scorer_net_case_gain": -2,
+  "dev_scorer_net_case_gain": -3,
   "diagnostic": {
     "dev_only_cannot_promote_to_retained_memory": true,
     "m27ad_fallback_selection_used_for_retention_gate": true,
@@ -26,29 +26,15 @@
   "regression_cases": [
     {
       "candidate_policy_action": "reject_or_record_only_until_gap_fixed",
-      "case_id": "multi_turn_miss_param_22",
-      "emitted_tool": null,
-      "failure_mechanism": "regression",
-      "final_arg_match": false,
-      "policy_plan_activated": true,
-      "raw_arg_match": false,
-      "repair_kinds": [
-        "coerce_no_tool_text_to_empty"
-      ],
-      "rule_id": null,
-      "selected_action_candidate": {},
-      "selected_tool": "cat",
-      "tool_match": true
-    },
-    {
-      "candidate_policy_action": "reject_or_record_only_until_gap_fixed",
-      "case_id": "multi_turn_miss_param_21",
+      "case_id": "multi_turn_miss_param_38",
       "emitted_tool": null,
       "failure_mechanism": "regression",
       "final_arg_match": false,
       "policy_plan_activated": false,
       "raw_arg_match": false,
-      "repair_kinds": [],
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
       "rule_id": null,
       "selected_action_candidate": {},
       "selected_tool": null,
@@ -60,7 +46,7 @@
       "emitted_tool": null,
       "failure_mechanism": "regression",
       "final_arg_match": false,
-      "policy_plan_activated": true,
+      "policy_plan_activated": false,
       "raw_arg_match": false,
       "repair_kinds": [
         "coerce_no_tool_text_to_empty",
@@ -68,7 +54,24 @@
       ],
       "rule_id": null,
       "selected_action_candidate": {},
-      "selected_tool": "cat",
+      "selected_tool": null,
+      "tool_match": false
+    },
+    {
+      "candidate_policy_action": "reject_or_record_only_until_gap_fixed",
+      "case_id": "multi_turn_miss_param_27",
+      "emitted_tool": null,
+      "failure_mechanism": "regression",
+      "final_arg_match": true,
+      "policy_plan_activated": true,
+      "raw_arg_match": true,
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "strip_assistant_content_with_tool_calls"
+      ],
+      "rule_id": null,
+      "selected_action_candidate": {},
+      "selected_tool": "mv",
       "tool_match": true
     },
     {
@@ -76,15 +79,15 @@
       "case_id": "multi_turn_miss_param_39",
       "emitted_tool": null,
       "failure_mechanism": "regression",
-      "final_arg_match": true,
+      "final_arg_match": false,
       "policy_plan_activated": true,
-      "raw_arg_match": true,
+      "raw_arg_match": false,
       "repair_kinds": [
         "coerce_no_tool_text_to_empty"
       ],
       "rule_id": null,
       "selected_action_candidate": {},
-      "selected_tool": "touch",
+      "selected_tool": "cat",
       "tool_match": true
     }
   ],
@@ -120,7 +123,7 @@
         "retain_blocked_by": "missing_positive_dev_and_holdout_evidence"
       },
       "dev_only_signal": true,
-      "dev_scorer_net_case_gain": -2,
+      "dev_scorer_net_case_gain": -3,
       "fixed_count": 0,
       "holdout_manifest_ready": true,
       "holdout_required_for_retain": true,
@@ -160,7 +163,7 @@
         "retain_blocked_by": "missing_positive_dev_and_holdout_evidence"
       },
       "dev_only_signal": true,
-      "dev_scorer_net_case_gain": -2,
+      "dev_scorer_net_case_gain": -3,
       "fixed_count": 0,
       "holdout_manifest_ready": true,
       "holdout_required_for_retain": true,
@@ -201,7 +204,7 @@
         "retain_blocked_by": "missing_positive_dev_and_holdout_evidence"
       },
       "dev_only_signal": true,
-      "dev_scorer_net_case_gain": -2,
+      "dev_scorer_net_case_gain": -3,
       "fixed_count": 1,
       "holdout_manifest_ready": true,
       "holdout_required_for_retain": true,

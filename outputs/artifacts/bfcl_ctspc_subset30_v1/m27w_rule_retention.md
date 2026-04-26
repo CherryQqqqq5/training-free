@@ -3,7 +3,7 @@
 - Passed: `True`
 - Holdout manifest ready: `True`
 - Offline U/V readiness: `True`
-- Dev scorer net case gain: `-2`
+- Dev scorer net case gain: `-3`
 - Decisions: `{'retain': 0, 'demote': 0, 'reject': 3}`
 - Regression cases: `4`
 

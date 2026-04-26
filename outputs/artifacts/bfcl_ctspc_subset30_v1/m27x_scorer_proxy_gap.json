@@ -1,7 +1,7 @@
 {
   "artifact_root": "outputs/artifacts/bfcl_ctspc_subset30_v1",
   "baseline_accuracy": 20.0,
-  "candidate_accuracy": 13.33,
+  "candidate_accuracy": 10.0,
   "case_level_gate_allowed": true,
   "case_report_trace_mapping": "prompt_user_prefix",
   "cases": [
@@ -60,13 +60,13 @@
     },
     {
       "baseline_success": false,
-      "candidate_success": false,
-      "case_fixed": false,
+      "candidate_success": true,
+      "case_fixed": true,
       "case_id": "multi_turn_miss_param_31",
       "case_regressed": false,
       "emitted_args_available": false,
       "feedback_action": "diagnostic_only",
-      "gap_type": "proxy_ok_trajectory_failed",
+      "gap_type": "no_proxy_gap",
       "offline_arg_match_proxy": true,
       "offline_candidate_args": {
         "file_name": "data.txt"
@@ -85,11 +85,11 @@
       "scorer_selected_tool": "cat"
     },
     {
-      "baseline_success": false,
+      "baseline_success": true,
       "candidate_success": false,
       "case_fixed": false,
       "case_id": "multi_turn_miss_param_38",
-      "case_regressed": false,
+      "case_regressed": true,
       "emitted_args_available": false,
       "feedback_action": null,
       "gap_type": "no_proxy_gap",
@@ -126,8 +126,7 @@
       "real_tool_match": false,
       "repair_kinds": [
         "coerce_no_tool_text_to_empty",
-        "resolve_contextual_string_arg",
-        "strip_assistant_content_with_tool_calls"
+        "resolve_contextual_string_arg"
       ],
       "scorer_activated": false,
       "scorer_emitted_args": null,
@@ -278,7 +277,8 @@
       "real_raw_arg_match": false,
       "real_tool_match": false,
       "repair_kinds": [
-        "coerce_no_tool_text_to_empty"
+        "coerce_no_tool_text_to_empty",
+        "strip_assistant_content_with_tool_calls"
       ],
       "scorer_activated": false,
       "scorer_emitted_args": null,
@@ -286,11 +286,11 @@
       "scorer_selected_tool": null
     },
     {
-      "baseline_success": true,
+      "baseline_success": false,
       "candidate_success": false,
       "case_fixed": false,
       "case_id": "multi_turn_miss_param_9",
-      "case_regressed": true,
+      "case_regressed": false,
       "emitted_args_available": false,
       "feedback_action": "record_only",
       "gap_type": "no_proxy_gap",
@@ -360,8 +360,8 @@
       "scorer_selected_tool": null
     },
     {
-      "baseline_success": true,
-      "candidate_success": true,
+      "baseline_success": false,
+      "candidate_success": false,
       "case_fixed": false,
       "case_id": "multi_turn_miss_param_21",
       "case_regressed": false,
@@ -375,9 +375,7 @@
       "proxy_activated": false,
       "real_raw_arg_match": false,
       "real_tool_match": false,
-      "repair_kinds": [
-        "coerce_no_tool_text_to_empty"
-      ],
+      "repair_kinds": [],
       "scorer_activated": false,
       "scorer_emitted_args": null,
       "scorer_feedback_applied": false,
@@ -391,7 +389,7 @@
       "case_regressed": false,
       "emitted_args_available": false,
       "feedback_action": "diagnostic_only",
-      "gap_type": "proxy_tool_ok_scorer_tool_wrong",
+      "gap_type": "proxy_activated_but_scorer_not_activated",
       "offline_arg_match_proxy": true,
       "offline_candidate_args": {
         "file_name": "analysis_report.txt"
@@ -402,13 +400,12 @@
       "real_raw_arg_match": false,
       "real_tool_match": false,
       "repair_kinds": [
-        "coerce_no_tool_text_to_empty",
         "resolve_contextual_string_arg"
       ],
-      "scorer_activated": true,
+      "scorer_activated": false,
       "scorer_emitted_args": null,
       "scorer_feedback_applied": true,
-      "scorer_selected_tool": "cat"
+      "scorer_selected_tool": null
     },
     {
       "baseline_success": true,
@@ -505,7 +502,8 @@
       "real_tool_match": false,
       "repair_kinds": [
         "coerce_no_tool_text_to_empty",
-        "resolve_contextual_string_arg"
+        "resolve_contextual_string_arg",
+        "strip_assistant_content_with_tool_calls"
       ],
       "scorer_activated": false,
       "scorer_emitted_args": null,
@@ -554,6 +552,7 @@
       "real_tool_match": false,
       "repair_kinds": [
         "coerce_no_tool_text_to_empty",
+        "resolve_contextual_string_arg",
         "strip_assistant_content_with_tool_calls"
       ],
       "scorer_activated": false,
@@ -580,7 +579,8 @@
       "real_raw_arg_match": false,
       "real_tool_match": false,
       "repair_kinds": [
-        "coerce_no_tool_text_to_empty"
+        "coerce_no_tool_text_to_empty",
+        "strip_assistant_content_with_tool_calls"
       ],
       "scorer_activated": true,
       "scorer_emitted_args": null,
@@ -604,7 +604,8 @@
       "real_raw_arg_match": false,
       "real_tool_match": false,
       "repair_kinds": [
-        "coerce_no_tool_text_to_empty"
+        "coerce_no_tool_text_to_empty",
+        "resolve_contextual_string_arg"
       ],
       "scorer_activated": false,
       "scorer_emitted_args": null,
@@ -613,8 +614,8 @@
     },
     {
       "baseline_success": false,
-      "candidate_success": true,
-      "case_fixed": true,
+      "candidate_success": false,
+      "case_fixed": false,
       "case_id": "multi_turn_miss_param_25",
       "case_regressed": false,
       "emitted_args_available": false,
@@ -636,11 +637,11 @@
       "scorer_selected_tool": null
     },
     {
-      "baseline_success": false,
+      "baseline_success": true,
       "candidate_success": false,
       "case_fixed": false,
       "case_id": "multi_turn_miss_param_27",
-      "case_regressed": false,
+      "case_regressed": true,
       "emitted_args_available": false,
       "feedback_action": "diagnostic_only",
       "gap_type": "proxy_ok_trajectory_failed",
@@ -735,7 +736,8 @@
       "real_raw_arg_match": false,
       "real_tool_match": false,
       "repair_kinds": [
-        "coerce_no_tool_text_to_empty"
+        "coerce_no_tool_text_to_empty",
+        "strip_assistant_content_with_tool_calls"
       ],
       "scorer_activated": false,
       "scorer_emitted_args": null,
@@ -770,38 +772,38 @@
     }
   ],
   "diagnostic": {
-    "do_not_rerun_bfcl_until_gap_has_code_fix": false,
+    "do_not_rerun_bfcl_until_gap_has_code_fix": true,
     "emitted_args_unavailable_from_case_report": true,
     "offline_proxy_is_not_scorer_evidence": true,
     "postmortem_recommended_next_focus": "regression_and_rule_retention"
   },
-  "fixed_by_code_change": true,
-  "gap_case_count": 12,
+  "fixed_by_code_change": false,
+  "gap_case_count": 11,
   "gap_type_distribution": {
-    "no_proxy_gap": 18,
-    "proxy_activated_but_scorer_not_activated": 3,
+    "no_proxy_gap": 19,
+    "proxy_activated_but_scorer_not_activated": 4,
     "proxy_arg_ok_scorer_arg_wrong": 2,
-    "proxy_ok_trajectory_failed": 3,
-    "proxy_tool_ok_scorer_tool_wrong": 4
+    "proxy_ok_trajectory_failed": 2,
+    "proxy_tool_ok_scorer_tool_wrong": 3
   },
-  "last_scorer_raw_arg_match_rate": 0.3333333333333333,
-  "last_scorer_tool_match_rate": 0.5555555555555556,
+  "last_scorer_raw_arg_match_rate": 0.375,
+  "last_scorer_tool_match_rate": 0.625,
   "m27x_scorer_proxy_gap_explained": true,
-  "m27x_scorer_proxy_gap_passed": true,
+  "m27x_scorer_proxy_gap_passed": false,
   "m27y_scorer_feedback_ready": true,
-  "net_case_gain": -2,
+  "net_case_gain": -3,
   "offline_arg_match_proxy": 1.0,
   "offline_tool_match_proxy": 1.0,
-  "regressed_case_count": 3,
+  "regressed_case_count": 4,
   "regression_cases": [
     {
       "baseline_success": true,
       "candidate_success": false,
       "case_fixed": false,
-      "case_id": "multi_turn_miss_param_9",
+      "case_id": "multi_turn_miss_param_38",
       "case_regressed": true,
       "emitted_args_available": false,
-      "feedback_action": "record_only",
+      "feedback_action": null,
       "gap_type": "no_proxy_gap",
       "offline_arg_match_proxy": null,
       "offline_candidate_args": null,
@@ -811,12 +813,11 @@
       "real_raw_arg_match": false,
       "real_tool_match": false,
       "repair_kinds": [
-        "coerce_no_tool_text_to_empty",
-        "resolve_contextual_string_arg"
+        "coerce_no_tool_text_to_empty"
       ],
       "scorer_activated": false,
       "scorer_emitted_args": null,
-      "scorer_feedback_applied": true,
+      "scorer_feedback_applied": false,
       "scorer_selected_tool": null
     },
     {
@@ -850,6 +851,34 @@
       "baseline_success": true,
       "candidate_success": false,
       "case_fixed": false,
+      "case_id": "multi_turn_miss_param_27",
+      "case_regressed": true,
+      "emitted_args_available": false,
+      "feedback_action": "diagnostic_only",
+      "gap_type": "proxy_ok_trajectory_failed",
+      "offline_arg_match_proxy": true,
+      "offline_candidate_args": {
+        "destination": "project_overview.md",
+        "source": "project_plan.md"
+      },
+      "offline_selected_tool": "mv",
+      "offline_tool_match_proxy": true,
+      "proxy_activated": true,
+      "real_raw_arg_match": true,
+      "real_tool_match": true,
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "strip_assistant_content_with_tool_calls"
+      ],
+      "scorer_activated": true,
+      "scorer_emitted_args": null,
+      "scorer_feedback_applied": true,
+      "scorer_selected_tool": "mv"
+    },
+    {
+      "baseline_success": true,
+      "candidate_success": false,
+      "case_fixed": false,
       "case_id": "multi_turn_miss_param_39",
       "case_regressed": true,
       "emitted_args_available": false,
@@ -877,5 +906,5 @@
   "scorer_feedback_case_count": 13,
   "scorer_feedback_code_fix_id": "m27y_scorer_feedback_overlay_v1",
   "scorer_feedback_covers_gap_cases": true,
-  "scorer_feedback_covers_regression_cases": true
+  "scorer_feedback_covers_regression_cases": false
 }

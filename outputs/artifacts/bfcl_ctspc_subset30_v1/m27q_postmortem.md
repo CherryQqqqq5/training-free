@@ -5,10 +5,10 @@
 - Evidence status: `durable`
 - Trace mapping: `prompt_user_prefix`
 - Case-level gate allowed: `True`
-- Accuracy: baseline `13.33`, candidate `6.67`
-- Fixed/regressed/net: `2` / `4` / `-2`
-- Tool match rate: `0.6363636363636364`
-- Raw arg match rate: `0.45454545454545453`
+- Accuracy: baseline `20.0`, candidate `10.0`
+- Fixed/regressed/net: `1` / `4` / `-3`
+- Tool match rate: `0.625`
+- Raw arg match rate: `0.375`
 - Recommended next focus: `regression_and_rule_retention`
 
 ## Failed Gate Criteria
@@ -24,11 +24,11 @@
 | --- | ---: |
 | `aligned_success` | 1 |
 | `arg_match_low` | 2 |
-| `fixed` | 2 |
-| `not_activated` | 19 |
+| `fixed` | 1 |
+| `not_activated` | 22 |
 | `regression` | 4 |
-| `tool_match_low` | 4 |
-| `trajectory_continuation_or_postcondition` | 4 |
+| `tool_match_low` | 3 |
+| `trajectory_continuation_or_postcondition` | 2 |
 
 ## Rule Retention
 
