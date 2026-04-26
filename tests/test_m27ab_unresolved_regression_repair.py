@@ -60,6 +60,42 @@ def test_no_proxy_regression_enters_audit_and_can_be_effectively_absent(tmp_path
     assert report["cases"][0]["guard_outcome"] == "no_proxy_candidate_absent_or_guard_rejected"
 
 
+
+def test_post_feedback_fallback_candidate_is_classified(tmp_path: Path) -> None:
+    root = tmp_path / "subset"
+    original_key = '{"selected_tool_family":"create_file"}'
+    fallback_key = '{"selected_tool_family":"read_content"}'
+    _wj(root / "m27aa_regression_patterns.json", {
+        "old_regression_unresolved_case_ids": ["multi_turn_miss_param_39"],
+        "cases": [{"case_id": "multi_turn_miss_param_39", "regression_guard_key": original_key, "selected_tool": "touch", "binding_source": "prior_tool_output.cwd_or_listing", "repair_kinds": ["coerce_no_tool_text_to_empty"]}],
+    })
+    _wj(root / "m27i_guard_preflight.json", {"cases": [{"case_id": "multi_turn_miss_param_39", "after_guard_plan": {"activated": True, "selected_action_candidate": {"tool": "cat", "args": {"file_name": "analysis_report.txt"}, "matched_regression_guard_key": fallback_key, "scorer_feedback_pattern_matched": True, "scorer_feedback_pattern_action": "diagnostic_only"}, "rejected_action_candidates": [{"tool": "touch", "args": {"file_name": "marker.txt"}, "matched_regression_guard_key": original_key, "scorer_feedback_pattern_matched": True, "scorer_feedback_pattern_action": "record_only", "guard": {"reason": "intervention_mode_record_only", "intervention_mode": "record_only", "risk_flags": ["scorer_feedback_record_only"]}}]}}]})
+
+    report = evaluate(root)
+
+    assert report["m27ab_unresolved_regression_repair_passed"] is False
+    case = report["cases"][0]
+    assert case["regression_source_classification"] == "post_feedback_fallback_candidate"
+    assert case["guard_outcome"] == "post_feedback_fallback_candidate"
+
+
+def test_post_feedback_fallback_record_only_rejection_is_effective(tmp_path: Path) -> None:
+    root = tmp_path / "subset"
+    original_key = '{"selected_tool_family":"create_file"}'
+    fallback_key = '{"selected_tool_family":"read_content"}'
+    _wj(root / "m27aa_regression_patterns.json", {
+        "old_regression_unresolved_case_ids": ["multi_turn_miss_param_39"],
+        "cases": [{"case_id": "multi_turn_miss_param_39", "regression_guard_key": original_key, "selected_tool": "touch", "binding_source": "prior_tool_output.cwd_or_listing", "repair_kinds": ["coerce_no_tool_text_to_empty"]}],
+    })
+    _wj(root / "m27i_guard_preflight.json", {"cases": [{"case_id": "multi_turn_miss_param_39", "after_guard_plan": {"activated": False, "selected_action_candidate": None, "rejected_action_candidates": [{"tool": "cat", "args": {"file_name": "analysis_report.txt"}, "matched_regression_guard_key": fallback_key, "scorer_feedback_pattern_matched": True, "scorer_feedback_pattern_action": "diagnostic_only", "scorer_feedback_fallback_guard_matched": True, "matched_fallback_guard_key": original_key, "scorer_feedback_fallback_action": "record_only", "guard": {"reason": "intervention_mode_record_only", "intervention_mode": "record_only", "risk_flags": ["scorer_feedback_fallback_record_only"]}}]}}]})
+
+    report = evaluate(root)
+
+    assert report["m27ab_unresolved_regression_repair_passed"] is True
+    case = report["cases"][0]
+    assert case["guard_outcome"] == "post_feedback_fallback_record_only_rejection"
+    assert case["regression_source_classification"] == "post_feedback_fallback_candidate"
+
 def test_pattern_effective_coverage_required_for_tw_offline(tmp_path: Path) -> None:
     root = tmp_path / "subset"; hold = tmp_path / "hold"; source = tmp_path / "source"
     _wj(source / "source_collection_manifest.json", {"m27t_source_pool_ready": True})

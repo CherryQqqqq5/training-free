@@ -2944,6 +2944,58 @@ action:
         self.assertEqual(selected["matched_regression_guard_key"], "pattern-key")
         self.assertEqual(selected["scorer_feedback_pattern_action"], "diagnostic_only")
 
+
+    def test_scorer_feedback_fallback_context_blocks_diagnostic_pattern_candidate(self) -> None:
+        action_candidate = {
+            "tool": "cat",
+            "args": {"file_name": "analysis_report.txt"},
+            "binding_source": "prior_tool_output.matches[0]|basename",
+            "arg_bindings": {"file_name": {"source": "prior_tool_output.matches[0]|basename", "value": "analysis_report.txt"}},
+            "postcondition": {"kind": "file_content"},
+            "trajectory_risk_flags": ["trajectory_sensitive_tool"],
+            "recommended_tools": ["cat"],
+        }
+        rule = self._next_tool_rule(recommended_tools=["cat"], action_candidates=[action_candidate])
+        request = {
+            "model": "demo-model",
+            "messages": [{"role": "user", "content": "Read 'analysis_report.txt'."}],
+            "tools": [{"type": "function", "function": {"name": "cat", "parameters": {"type": "object", "properties": {"file_name": {"type": "string"}}, "required": ["file_name"]}}}],
+        }
+        fallback_key = '{"selected_tool_family":"read_content"}'
+        source_key = '{"selected_tool_family":"create_file"}'
+        feedback = {
+            "m27y_scorer_feedback_ready": True,
+            "blocked_regression_patterns": [
+                {
+                    "selected_tool_family": "read_content",
+                    "postcondition_family": "read_content",
+                    "binding_source": "prior_tool_output.matches[0]|basename",
+                    "trajectory_risk_flags": ["trajectory_sensitive_tool"],
+                    "action": "diagnostic_only",
+                    "regression_guard_key": fallback_key,
+                }
+            ],
+            "blocked_fallback_regression_contexts": [
+                {
+                    "source_regression_guard_key": source_key,
+                    "fallback_regression_guard_key": fallback_key,
+                    "fallback_signature": {"tool": "cat", "args": {"file_name": "analysis_report.txt"}},
+                    "action": "record_only",
+                }
+            ],
+        }
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir, runtime_policy={"exact_next_tool_choice_mode": "guidance_only", "scorer_feedback": feedback})
+            engine.rules = [rule]
+            _, request_patches = engine.apply_request(request)
+
+        self.assertFalse(request_patches.next_tool_plan["activated"])
+        rejected = request_patches.next_tool_plan["rejected_action_candidates"][0]
+        self.assertTrue(rejected["scorer_feedback_pattern_matched"])
+        self.assertTrue(rejected["scorer_feedback_fallback_guard_matched"])
+        self.assertEqual(rejected["matched_fallback_guard_key"], source_key)
+        self.assertEqual(rejected["scorer_feedback_fallback_action"], "record_only")
+
     def test_scorer_feedback_pattern_does_not_block_non_matching_candidate(self) -> None:
         action_candidate = {
             "tool": "cp",

@@ -98,6 +98,7 @@ class RuleEngine:
             self.exact_tool_choice_trajectory_sensitive_tools = set(self._DEFAULT_EXACT_TOOL_CHOICE_TRAJECTORY_SENSITIVE_TOOLS)
         self.scorer_feedback_blocked_signatures = self._load_scorer_feedback_blocked_signatures()
         self.scorer_feedback_blocked_patterns = self._load_scorer_feedback_blocked_patterns()
+        self.scorer_feedback_fallback_contexts = self._load_scorer_feedback_fallback_contexts()
         self.rules: List[Rule] = self._load_rules()
 
     _QUOTED_LITERAL_RE = re.compile(
@@ -181,6 +182,52 @@ class RuleEngine:
                 )
         return patterns
 
+
+    def _load_scorer_feedback_fallback_contexts(self) -> list[Dict[str, Any]]:
+        feedback = self._load_scorer_feedback_payload()
+        if not feedback.get("m27y_scorer_feedback_ready"):
+            return []
+        contexts: list[Dict[str, Any]] = []
+        for item in feedback.get("blocked_fallback_regression_contexts") or []:
+            if not isinstance(item, dict):
+                continue
+            fallback_key = str(item.get("fallback_regression_guard_key") or "").strip()
+            signature = item.get("fallback_signature") if isinstance(item.get("fallback_signature"), dict) else {}
+            tool_name = str(signature.get("tool") or item.get("fallback_tool") or "").strip()
+            args = signature.get("args") if isinstance(signature.get("args"), dict) else (item.get("fallback_args") if isinstance(item.get("fallback_args"), dict) else {})
+            if not fallback_key or not tool_name:
+                continue
+            contexts.append(
+                {
+                    "source_regression_guard_key": item.get("source_regression_guard_key"),
+                    "fallback_regression_guard_key": fallback_key,
+                    "fallback_signature": self._candidate_feedback_signature(tool_name, args),
+                    "match_mode": str(item.get("match_mode") or "signature"),
+                    "action": str(item.get("action") or "record_only"),
+                    "case_ids": sorted({str(case_id) for case_id in (item.get("case_ids") or []) if str(case_id).strip()}),
+                    "reason": str(item.get("reason") or "post_feedback_fallback_candidate"),
+                }
+            )
+        return contexts
+
+    def _candidate_feedback_fallback_match(self, candidate: Dict[str, Any], matched_pattern: Dict[str, Any] | None) -> Dict[str, Any] | None:
+        if not self.scorer_feedback_fallback_contexts or not matched_pattern:
+            return None
+        pattern_key = str(matched_pattern.get("regression_guard_key") or "").strip()
+        if not pattern_key:
+            return None
+        tool_name = str(candidate.get("tool") or "").strip()
+        args = candidate.get("args") if isinstance(candidate.get("args"), dict) else {}
+        signature = self._candidate_feedback_signature(tool_name, args)
+        for context in self.scorer_feedback_fallback_contexts:
+            if context.get("fallback_regression_guard_key") != pattern_key:
+                continue
+            if context.get("match_mode") == "pattern":
+                return context
+            if context.get("fallback_signature") == signature:
+                return context
+        return None
+
     def _candidate_feedback_pattern_match(self, candidate: Dict[str, Any]) -> Dict[str, Any] | None:
         if not self.scorer_feedback_blocked_patterns:
             return None
@@ -218,20 +265,28 @@ class RuleEngine:
         signature_blocked = bool(tool_name and self._candidate_feedback_signature(tool_name, args) in self.scorer_feedback_blocked_signatures)
         matched_pattern = self._candidate_feedback_pattern_match(candidate)
         pattern_blocked = matched_pattern is not None
-        if not signature_blocked and not pattern_blocked:
+        fallback_context = self._candidate_feedback_fallback_match(candidate, matched_pattern)
+        fallback_blocked = fallback_context is not None
+        if not signature_blocked and not pattern_blocked and not fallback_blocked:
             return candidate
         patched = dict(candidate)
         action = str((matched_pattern or {}).get("action") or "record_only") if pattern_blocked else "record_only"
+        fallback_action = str((fallback_context or {}).get("action") or "record_only") if fallback_blocked else None
         patched["scorer_feedback_pattern_matched"] = pattern_blocked
         patched["scorer_feedback_pattern_action"] = action if pattern_blocked else None
         patched["matched_regression_guard_key"] = (matched_pattern or {}).get("regression_guard_key")
-        patched["scorer_feedback_action"] = action
-        patched["scorer_feedback_reason"] = "m27aa_pattern_regression_guard" if pattern_blocked else "m27y_scorer_gap_or_regression"
-        if signature_blocked or action == "record_only":
+        patched["scorer_feedback_fallback_guard_matched"] = fallback_blocked
+        patched["matched_fallback_guard_key"] = (fallback_context or {}).get("source_regression_guard_key") if fallback_blocked else None
+        patched["scorer_feedback_fallback_action"] = fallback_action
+        patched["scorer_feedback_action"] = fallback_action or action
+        patched["scorer_feedback_reason"] = "m27ac_post_feedback_fallback_guard" if fallback_blocked else ("m27aa_pattern_regression_guard" if pattern_blocked else "m27y_scorer_gap_or_regression")
+        if signature_blocked or fallback_action == "record_only" or action == "record_only":
             patched["intervention_mode"] = "record_only"
             flags = list(patched.get("trajectory_risk_flags") or [])
             if "scorer_feedback_record_only" not in flags:
                 flags.append("scorer_feedback_record_only")
+            if fallback_blocked and "scorer_feedback_fallback_record_only" not in flags:
+                flags.append("scorer_feedback_fallback_record_only")
             patched["trajectory_risk_flags"] = flags
         return patched
 
@@ -1243,6 +1298,9 @@ class RuleEngine:
                     "scorer_feedback_pattern_action": candidate.get("scorer_feedback_pattern_action"),
                     "scorer_feedback_action": candidate.get("scorer_feedback_action"),
                     "scorer_feedback_reason": candidate.get("scorer_feedback_reason"),
+                    "scorer_feedback_fallback_guard_matched": bool(candidate.get("scorer_feedback_fallback_guard_matched")),
+                    "matched_fallback_guard_key": candidate.get("matched_fallback_guard_key"),
+                    "scorer_feedback_fallback_action": candidate.get("scorer_feedback_fallback_action"),
                 }
             )
         return None, rejected

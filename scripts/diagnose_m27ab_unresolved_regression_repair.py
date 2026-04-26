@@ -40,6 +40,9 @@ def _candidate_brief(candidate: Any) -> dict[str, Any] | None:
         "scorer_feedback_pattern_action": candidate.get("scorer_feedback_pattern_action"),
         "scorer_feedback_action": candidate.get("scorer_feedback_action"),
         "scorer_feedback_reason": candidate.get("scorer_feedback_reason"),
+        "scorer_feedback_fallback_guard_matched": bool(candidate.get("scorer_feedback_fallback_guard_matched")),
+        "matched_fallback_guard_key": candidate.get("matched_fallback_guard_key"),
+        "scorer_feedback_fallback_action": candidate.get("scorer_feedback_fallback_action"),
     }
 
 
@@ -62,7 +65,9 @@ def _is_record_only_rejection(item: dict[str, Any]) -> bool:
         guard.get("intervention_mode") == "record_only"
         or item.get("scorer_feedback_action") == "record_only"
         or item.get("scorer_feedback_pattern_action") == "record_only"
+        or item.get("scorer_feedback_fallback_action") == "record_only"
         or "scorer_feedback_record_only" in flags
+        or "scorer_feedback_fallback_record_only" in flags
     )
 
 
@@ -93,25 +98,46 @@ def evaluate(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
         rejected_hits = _rejected_feedback_hits(plan, guard_key)
         selected_key = selected.get("matched_regression_guard_key") if isinstance(selected, dict) else None
         selected_pattern_matched = bool(selected and selected.get("scorer_feedback_pattern_matched"))
+        selected_fallback_matched = bool(selected and selected.get("scorer_feedback_fallback_guard_matched"))
+        fallback_hits = [item for item in rejected_hits if item.get("scorer_feedback_fallback_guard_matched")]
         effective = False
         outcome = "pattern_not_observed_in_replay"
+        source_classification = "ambiguous_regression"
         reason = "No rejected current-replay candidate carried the regression pattern metadata."
-        if rejected_hits and any(_is_record_only_rejection(item) for item in rejected_hits):
+        if selected and selected_fallback_matched:
+            outcome = "post_feedback_fallback_candidate_still_selected"
+            source_classification = "post_feedback_fallback_candidate"
+            reason = "Fallback guard matched, but the candidate remained selected for hard guidance."
+        elif selected and selected_pattern_matched and guard_key and selected_key != guard_key:
+            outcome = "post_feedback_fallback_candidate"
+            source_classification = "post_feedback_fallback_candidate"
+            reason = "The original regression pattern was blocked or bypassed, but another scorer-feedback pattern candidate became hard guidance."
+        elif rejected_hits and any(_is_record_only_rejection(item) for item in rejected_hits):
             effective = True
-            outcome = "pattern_record_only_rejection"
-            reason = "Runtime pattern guard matched and downgraded the unsafe candidate before hard guidance."
+            if fallback_hits and any(_is_record_only_rejection(item) for item in fallback_hits):
+                outcome = "post_feedback_fallback_record_only_rejection"
+                source_classification = "post_feedback_fallback_candidate"
+                reason = "Runtime fallback guard downgraded the post-feedback unsafe candidate before hard guidance."
+            else:
+                outcome = "pattern_record_only_rejection"
+                source_classification = "action_pattern_effective"
+                reason = "Runtime pattern guard matched and downgraded the unsafe candidate before hard guidance."
         elif selected and (selected_pattern_matched or (guard_key and selected_key == guard_key)):
             outcome = "pattern_matched_but_still_selected"
+            source_classification = "action_pattern_not_effective"
             reason = "Regression pattern matched, but the candidate remained selected for hard guidance."
         elif selected is None and aa_case.get("selected_tool") in {None, "", "unknown"}:
             effective = True
             outcome = "no_proxy_candidate_absent_or_guard_rejected"
+            source_classification = "repair_policy_or_no_tool_coercion"
             reason = "The unresolved scorer regression had no offline unsafe action candidate, and current replay does not select one."
         elif selected is None:
             outcome = "guard_rejected_without_pattern_metadata"
+            source_classification = "ambiguous_regression"
             reason = "Current replay blocks the case, but not via an explicit scorer-feedback pattern match."
         elif selected:
             outcome = "unsafe_candidate_still_selected"
+            source_classification = "ambiguous_regression"
             reason = "Current replay still selects an action candidate for an old regression case without pattern feedback metadata."
 
         if effective:
@@ -134,10 +160,14 @@ def evaluate(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
                         "matched_regression_guard_key": item.get("matched_regression_guard_key"),
                         "scorer_feedback_pattern_action": item.get("scorer_feedback_pattern_action"),
                         "scorer_feedback_reason": item.get("scorer_feedback_reason"),
+                        "scorer_feedback_fallback_guard_matched": bool(item.get("scorer_feedback_fallback_guard_matched")),
+                        "matched_fallback_guard_key": item.get("matched_fallback_guard_key"),
+                        "scorer_feedback_fallback_action": item.get("scorer_feedback_fallback_action"),
                     }
                     for item in rejected_hits
                 ],
                 "guard_outcome": outcome,
+                "regression_source_classification": source_classification,
                 "repair_kinds": aa_case.get("repair_kinds") or [],
                 "binding_source": aa_case.get("binding_source"),
                 "selected_tool_family": aa_case.get("selected_tool"),

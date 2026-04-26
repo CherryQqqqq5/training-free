@@ -30,6 +30,24 @@
     "multi_turn_miss_param_5",
     "multi_turn_miss_param_9"
   ],
+  "blocked_fallback_regression_contexts": [
+    {
+      "action": "record_only",
+      "case_ids": [
+        "multi_turn_miss_param_39"
+      ],
+      "fallback_regression_guard_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"resolve_contextual_string_arg\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}",
+      "fallback_signature": {
+        "args": {
+          "file_name": "analysis_report.txt"
+        },
+        "tool": "cat"
+      },
+      "match_mode": "signature",
+      "reason": "post_feedback_fallback_candidate",
+      "source_regression_guard_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"prior_tool_output.cwd_or_listing\",\"postcondition_family\":\"create_file\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\"],\"selected_tool_family\":\"create_file\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\",\"weak_cwd_or_listing_binding\"]}"
+    }
+  ],
   "blocked_regression_patterns": [
     {
       "action": "diagnostic_only",

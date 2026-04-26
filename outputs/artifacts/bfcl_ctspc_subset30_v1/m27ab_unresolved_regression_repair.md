@@ -5,9 +5,9 @@
 - Unresolved after repair: `1`
 
 ## Cases
-- `multi_turn_miss_param_35`: effective=`True`, outcome=`pattern_record_only_rejection`, tool=`None`
-- `multi_turn_miss_param_39`: effective=`False`, outcome=`pattern_matched_but_still_selected`, tool=`cat`
-  - unresolved: Regression pattern matched, but the candidate remained selected for hard guidance.
-- `multi_turn_miss_param_9`: effective=`True`, outcome=`pattern_record_only_rejection`, tool=`None`
+- `multi_turn_miss_param_35`: effective=`True`, outcome=`post_feedback_fallback_record_only_rejection`, tool=`None`
+- `multi_turn_miss_param_39`: effective=`False`, outcome=`post_feedback_fallback_candidate`, tool=`cat`
+  - unresolved: The original regression pattern was blocked or bypassed, but another scorer-feedback pattern candidate became hard guidance.
+- `multi_turn_miss_param_9`: effective=`True`, outcome=`post_feedback_fallback_record_only_rejection`, tool=`None`
 
 This is an offline replay diagnostic only. It does not call BFCL or prove performance.

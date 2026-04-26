@@ -37,6 +37,8 @@ def build_feedback(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
     gap = _j(root / "m27x_scorer_proxy_gap.json", {}) or {}
     aa = _j(root / "m27aa_regression_patterns.json", {}) or {}
     ac = _j(root / "m27ac_pattern_guard_recall.json", {}) or {}
+    ab = _j(root / "m27ab_unresolved_regression_repair.json", {}) or {}
+    existing_feedback = _j(root / "m27y_scorer_feedback.json", {}) or {}
     summary = _j(root / "subset_summary.json", {}) or {}
     cases = gap.get("cases") if isinstance(gap.get("cases"), list) else []
     feedback_cases: list[dict[str, Any]] = []
@@ -95,6 +97,65 @@ def build_feedback(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
             item["action_source"] = "m27ac_pattern_guard_recall"
         blocked_patterns.append(item)
 
+    fallback_contexts: list[dict[str, Any]] = []
+    seen_fallback_contexts: set[str] = set()
+    seen_fallback_sources: set[str] = set()
+    for item in existing_feedback.get("blocked_fallback_regression_contexts") or []:
+        if not isinstance(item, dict):
+            continue
+        signature = json.dumps(
+            {
+                "source": item.get("source_regression_guard_key"),
+                "fallback": item.get("fallback_regression_guard_key"),
+                "signature": item.get("fallback_signature"),
+                "match_mode": item.get("match_mode") or "signature",
+            },
+            sort_keys=True,
+            ensure_ascii=False,
+        )
+        source_key = str(item.get("source_regression_guard_key") or "").strip()
+        if signature in seen_fallback_contexts or source_key in seen_fallback_sources:
+            continue
+        seen_fallback_contexts.add(signature)
+        if source_key:
+            seen_fallback_sources.add(source_key)
+        fallback_contexts.append(item)
+
+    for case in ab.get("cases") or []:
+        if not isinstance(case, dict):
+            continue
+        selected = case.get("selected_candidate") if isinstance(case.get("selected_candidate"), dict) else {}
+        fallback_key = str(selected.get("matched_regression_guard_key") or "").strip()
+        source_key = str(case.get("regression_guard_key") or "").strip()
+        tool_name = str(selected.get("tool") or "").strip()
+        args = selected.get("args") if isinstance(selected.get("args"), dict) else {}
+        if case.get("guard_outcome") not in {"pattern_matched_but_still_selected", "post_feedback_fallback_candidate", "post_feedback_fallback_candidate_still_selected"} or not fallback_key or not source_key or not tool_name:
+            continue
+        item = {
+            "case_ids": [str(case.get("case_id"))],
+            "source_regression_guard_key": source_key,
+            "fallback_regression_guard_key": fallback_key,
+            "fallback_signature": {"tool": tool_name, "args": args},
+            "match_mode": "signature",
+            "action": "record_only",
+            "reason": "post_feedback_fallback_candidate",
+        }
+        signature = json.dumps(
+            {
+                "source": item.get("source_regression_guard_key"),
+                "fallback": item.get("fallback_regression_guard_key"),
+                "signature": item.get("fallback_signature"),
+                "match_mode": item.get("match_mode") or "signature",
+            },
+            sort_keys=True,
+            ensure_ascii=False,
+        )
+        if signature not in seen_fallback_contexts and source_key not in seen_fallback_sources:
+            seen_fallback_contexts.add(signature)
+            if source_key:
+                seen_fallback_sources.add(source_key)
+            fallback_contexts.append(item)
+
     report = {
         "report_scope": "m2_7y_scorer_feedback",
         "artifact_root": str(root),
@@ -110,6 +171,7 @@ def build_feedback(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
         "feedback_cases": feedback_cases,
         "blocked_candidate_signatures": blocked_signatures,
         "blocked_regression_patterns": blocked_patterns,
+        "blocked_fallback_regression_contexts": fallback_contexts,
         "m27ac_pattern_guard_recall_passed": bool(ac.get("m27ac_pattern_guard_recall_passed")),
         "pattern_action_overrides": pattern_action_overrides,
         "scorer_feedback_covers_regression_patterns": bool(aa.get("scorer_feedback_covers_regression_patterns")),
@@ -137,6 +199,7 @@ def render_markdown(report: dict[str, Any]) -> str:
             f"- Ready: `{report['m27y_scorer_feedback_ready']}`",
             f"- Feedback cases: `{report['feedback_case_count']}`",
             f"- Runtime-blocked signatures: `{len(report.get('blocked_candidate_signatures') or [])}`",
+            f"- Fallback contexts: `{len(report.get('blocked_fallback_regression_contexts') or [])}`",
             f"- Regression cases covered: `{not report['missing_regression_coverage']}`",
             f"- Reason distribution: `{report['feedback_reason_distribution']}`",
             "",
