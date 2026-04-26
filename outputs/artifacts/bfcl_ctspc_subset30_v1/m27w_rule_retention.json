@@ -1,16 +1,20 @@
 {
   "artifact_root": "outputs/artifacts/bfcl_ctspc_subset30_v1",
   "decision_distribution": {
-    "demote": 0,
-    "reject": 3,
+    "demote": 1,
+    "reject": 2,
     "retain": 0
   },
   "diagnostic": {
-    "dev_only_cannot_promote_to_retained_memory": true
+    "dev_only_cannot_promote_to_retained_memory": true,
+    "offline_readiness_only": true,
+    "retain_requires_future_holdout_scorer_evidence": true
   },
-  "holdout_evidence_available": true,
+  "holdout_manifest_ready": true,
   "holdout_root": "outputs/artifacts/bfcl_ctspc_holdout30_v1",
-  "m27w_rule_retention_passed": false,
+  "holdout_scorer_evidence_available": false,
+  "m27w_rule_retention_passed": true,
+  "offline_u_v_readiness_passed": true,
   "report_scope": "m2_7w_rule_retention",
   "rule_count": 3,
   "rules": [
@@ -33,8 +37,19 @@
       "activation_count": 13,
       "arg_match_rate": 0.3076923076923077,
       "decision": "reject",
+      "decision_blocker": {
+        "blockers": [
+          "dev_tool_match_below_floor",
+          "dev_arg_match_below_floor",
+          "trajectory_fail_exceeds_fixed"
+        ],
+        "retain_blocked_by": "missing_positive_dev_and_holdout_evidence"
+      },
+      "dev_only_signal": true,
       "fixed_count": 0,
-      "holdout_evidence_available": true,
+      "holdout_manifest_ready": true,
+      "holdout_required_for_retain": true,
+      "holdout_scorer_evidence_available": false,
       "net_case_gain": 0,
       "not_activated_count": 17,
       "reason": "no_positive_retention_signal",
@@ -60,8 +75,19 @@
       "activation_count": 11,
       "arg_match_rate": 0.36363636363636365,
       "decision": "reject",
+      "decision_blocker": {
+        "blockers": [
+          "dev_tool_match_below_floor",
+          "dev_arg_match_below_floor",
+          "trajectory_fail_exceeds_fixed"
+        ],
+        "retain_blocked_by": "missing_positive_dev_and_holdout_evidence"
+      },
+      "dev_only_signal": true,
       "fixed_count": 0,
-      "holdout_evidence_available": true,
+      "holdout_manifest_ready": true,
+      "holdout_required_for_retain": true,
+      "holdout_scorer_evidence_available": false,
       "net_case_gain": 0,
       "not_activated_count": 19,
       "reason": "no_positive_retention_signal",
@@ -87,12 +113,23 @@
       ],
       "activation_count": 12,
       "arg_match_rate": 0.3333333333333333,
-      "decision": "reject",
+      "decision": "demote",
+      "decision_blocker": {
+        "blockers": [
+          "dev_tool_match_below_floor",
+          "dev_arg_match_below_floor",
+          "trajectory_fail_exceeds_fixed"
+        ],
+        "retain_blocked_by": "missing_holdout_scorer_evidence"
+      },
+      "dev_only_signal": true,
       "fixed_count": 1,
-      "holdout_evidence_available": true,
+      "holdout_manifest_ready": true,
+      "holdout_required_for_retain": true,
+      "holdout_scorer_evidence_available": false,
       "net_case_gain": 1,
       "not_activated_count": 18,
-      "reason": "no_positive_retention_signal",
+      "reason": "offline_ready_with_nonnegative_dev_signal_requires_scorer_validation",
       "regressed_count": 0,
       "rule_id": "rule_global_no_tool_post_tool_prose_summary_v1",
       "tool_match_rate": 0.5833333333333334,

@@ -4,274 +4,556 @@
   "canonical_arg_validation_coverage": 1.0,
   "cases": [
     {
-      "arg_binding_source": [],
-      "baseline_success": false,
-      "candidate_arg_validity": "missing_candidate",
-      "candidate_args": {},
-      "candidate_success": false,
-      "case_id": "multi_turn_miss_param_3",
-      "emitted_arg_match": false,
-      "emitted_args": null,
-      "failure_reason": "candidate_arg_wrong",
-      "normalization_result": {
-        "final_normalized_arg_match": false,
-        "final_strict_arg_match": false,
-        "raw_normalized_arg_match": false,
-        "raw_strict_arg_match": false
-      },
-      "repair_kinds": [
-        "coerce_no_tool_text_to_empty",
-        "resolve_contextual_string_arg"
-      ],
-      "schema_arg_names": [],
-      "selected_tool": "cp"
-    },
-    {
-      "arg_binding_source": [
-        "prior_tool_output.matches[0]|basename"
-      ],
-      "baseline_success": false,
-      "candidate_arg_validity": "plausible_candidate_args",
-      "candidate_args": {
-        "file_name": "test_results.json"
-      },
-      "candidate_success": false,
-      "case_id": "multi_turn_miss_param_5",
-      "emitted_arg_match": false,
-      "emitted_args": null,
-      "failure_reason": "emitted_arg_wrong_or_guidance_not_followed",
-      "normalization_result": {
-        "final_normalized_arg_match": false,
-        "final_strict_arg_match": false,
-        "raw_normalized_arg_match": false,
-        "raw_strict_arg_match": false
-      },
-      "repair_kinds": [
-        "coerce_no_tool_text_to_empty"
-      ],
-      "schema_arg_names": [
-        "file_name"
-      ],
-      "selected_tool": "cat"
-    },
-    {
-      "arg_binding_source": [
-        "prior_tool_output.matches[0]|basename"
-      ],
-      "baseline_success": false,
-      "candidate_arg_validity": "candidate_tool_mismatch_proxy",
-      "candidate_args": {
-        "file_name": "goals.txt"
-      },
-      "candidate_success": false,
-      "case_id": "multi_turn_miss_param_7",
-      "emitted_arg_match": false,
-      "emitted_args": null,
-      "failure_reason": "tool_mismatch_before_arg_realization",
-      "normalization_result": {
-        "final_normalized_arg_match": false,
-        "final_strict_arg_match": false,
-        "raw_normalized_arg_match": false,
-        "raw_strict_arg_match": false
-      },
-      "repair_kinds": [
-        "coerce_no_tool_text_to_empty"
-      ],
-      "schema_arg_names": [
-        "file_name"
-      ],
-      "selected_tool": "cat"
-    },
-    {
-      "arg_binding_source": [],
-      "baseline_success": false,
-      "candidate_arg_validity": "missing_candidate",
-      "candidate_args": {},
-      "candidate_success": false,
-      "case_id": "multi_turn_miss_param_16",
-      "emitted_arg_match": false,
-      "emitted_args": null,
-      "failure_reason": "tool_mismatch_before_arg_realization",
-      "normalization_result": {
-        "final_normalized_arg_match": false,
-        "final_strict_arg_match": false,
-        "raw_normalized_arg_match": false,
-        "raw_strict_arg_match": false
-      },
-      "repair_kinds": [
-        "coerce_no_tool_text_to_empty",
-        "resolve_contextual_string_arg"
-      ],
-      "schema_arg_names": [],
-      "selected_tool": "touch"
-    },
-    {
-      "arg_binding_source": [
-        "prior_tool_output.cwd_or_listing"
-      ],
-      "baseline_success": false,
-      "candidate_arg_validity": "candidate_tool_mismatch_proxy",
-      "candidate_args": {
+      "alias_match": false,
+      "arg_realization_proxy_ready": true,
+      "candidate_arg_json": {
         "file_name": "marker.txt"
       },
-      "candidate_success": false,
-      "case_id": "multi_turn_miss_param_22",
-      "emitted_arg_match": false,
-      "emitted_args": null,
-      "failure_reason": "tool_mismatch_before_arg_realization",
-      "normalization_result": {
-        "final_normalized_arg_match": false,
-        "final_strict_arg_match": false,
-        "raw_normalized_arg_match": false,
-        "raw_strict_arg_match": false
+      "candidate_args_serializable": true,
+      "canonical_arg_map": {
+        "file_name": {
+          "alias_group": "inferred",
+          "normalization_type": "path_basename",
+          "schema_arg_name": "file_name"
+        }
       },
-      "repair_kinds": [
-        "coerce_no_tool_text_to_empty"
-      ],
-      "schema_arg_names": [
-        "file_name"
-      ],
-      "selected_tool": "cat"
+      "canonical_arg_validation": {
+        "file_name": {
+          "alias_match": false,
+          "expected": "marker.txt",
+          "key_match": true,
+          "key_mismatch": false,
+          "match": true,
+          "normalization": "exact",
+          "observed": "marker.txt",
+          "observed_field": "file_name",
+          "path_normalized_match": false,
+          "required_pair_complete": true,
+          "source": "prior_tool_output.cwd_or_listing",
+          "strict_match": true,
+          "value_match": true,
+          "value_mismatch": false
+        }
+      },
+      "case_id": "multi_turn_miss_param_17",
+      "emitted_arg_json": null,
+      "failure_reason": null,
+      "key_mismatch": false,
+      "path_normalized_match": false,
+      "required_pair_complete": true,
+      "selected_tool": "touch",
+      "value_mismatch": false
     },
     {
-      "arg_binding_source": [
-        "prior_tool_output.matches[0]|basename"
-      ],
-      "baseline_success": false,
-      "candidate_arg_validity": "plausible_candidate_args",
-      "candidate_args": {
+      "alias_match": false,
+      "arg_realization_proxy_ready": true,
+      "candidate_arg_json": {
+        "destination": "final_document.txt",
+        "source": "test_document.txt"
+      },
+      "candidate_args_serializable": true,
+      "canonical_arg_map": {
+        "destination": {
+          "alias_group": "inferred",
+          "normalization_type": "path_basename",
+          "schema_arg_name": "destination"
+        },
+        "source": {
+          "alias_group": "inferred",
+          "normalization_type": "path_basename",
+          "schema_arg_name": "source"
+        }
+      },
+      "canonical_arg_validation": {
+        "destination": {
+          "alias_match": false,
+          "expected": "final_document.txt",
+          "key_match": true,
+          "key_mismatch": false,
+          "match": true,
+          "normalization": "exact",
+          "observed": "final_document.txt",
+          "observed_field": "destination",
+          "path_normalized_match": false,
+          "required_pair_complete": true,
+          "source": "explicit_literal_pair",
+          "strict_match": true,
+          "value_match": true,
+          "value_mismatch": false
+        },
+        "source": {
+          "alias_match": false,
+          "expected": "test_document.txt",
+          "key_match": true,
+          "key_mismatch": false,
+          "match": true,
+          "normalization": "exact",
+          "observed": "test_document.txt",
+          "observed_field": "source",
+          "path_normalized_match": false,
+          "required_pair_complete": true,
+          "source": "explicit_literal_pair",
+          "strict_match": true,
+          "value_match": true,
+          "value_mismatch": false
+        }
+      },
+      "case_id": "multi_turn_miss_param_19",
+      "emitted_arg_json": null,
+      "failure_reason": null,
+      "key_mismatch": false,
+      "path_normalized_match": false,
+      "required_pair_complete": true,
+      "selected_tool": "cp",
+      "value_mismatch": false
+    },
+    {
+      "alias_match": false,
+      "arg_realization_proxy_ready": true,
+      "candidate_arg_json": {
+        "file_name": "data.txt"
+      },
+      "candidate_args_serializable": true,
+      "canonical_arg_map": {
+        "file_name": {
+          "alias_group": "inferred",
+          "normalization_type": "path_basename",
+          "schema_arg_name": "file_name"
+        }
+      },
+      "canonical_arg_validation": {
+        "file_name": {
+          "alias_match": false,
+          "expected": "data.txt",
+          "key_match": true,
+          "key_mismatch": false,
+          "match": true,
+          "normalization": "exact",
+          "observed": "data.txt",
+          "observed_field": "file_name",
+          "path_normalized_match": false,
+          "required_pair_complete": true,
+          "source": "prior_tool_output.matches[0]|basename",
+          "strict_match": true,
+          "value_match": true,
+          "value_mismatch": false
+        }
+      },
+      "case_id": "multi_turn_miss_param_31",
+      "emitted_arg_json": null,
+      "failure_reason": null,
+      "key_mismatch": false,
+      "path_normalized_match": false,
+      "required_pair_complete": true,
+      "selected_tool": "cat",
+      "value_mismatch": false
+    },
+    {
+      "alias_match": false,
+      "arg_realization_proxy_ready": true,
+      "candidate_arg_json": {
         "file_name": "test_results.json"
       },
-      "candidate_success": false,
-      "case_id": "multi_turn_miss_param_2",
-      "emitted_arg_match": false,
-      "emitted_args": null,
-      "failure_reason": "emitted_arg_wrong_or_guidance_not_followed",
-      "normalization_result": {
-        "final_normalized_arg_match": false,
-        "final_strict_arg_match": false,
-        "raw_normalized_arg_match": false,
-        "raw_strict_arg_match": false
+      "candidate_args_serializable": true,
+      "canonical_arg_map": {
+        "file_name": {
+          "alias_group": "inferred",
+          "normalization_type": "path_basename",
+          "schema_arg_name": "file_name"
+        }
       },
-      "repair_kinds": [
-        "coerce_no_tool_text_to_empty",
-        "resolve_contextual_string_arg",
-        "strip_assistant_content_with_tool_calls"
-      ],
-      "schema_arg_names": [
-        "file_name"
-      ],
-      "selected_tool": "cat"
+      "canonical_arg_validation": {
+        "file_name": {
+          "alias_match": false,
+          "expected": "test_results.json",
+          "key_match": true,
+          "key_mismatch": false,
+          "match": true,
+          "normalization": "exact",
+          "observed": "test_results.json",
+          "observed_field": "file_name",
+          "path_normalized_match": false,
+          "required_pair_complete": true,
+          "source": "prior_tool_output.matches[0]|basename",
+          "strict_match": true,
+          "value_match": true,
+          "value_mismatch": false
+        }
+      },
+      "case_id": "multi_turn_miss_param_5",
+      "emitted_arg_json": null,
+      "failure_reason": null,
+      "key_mismatch": false,
+      "path_normalized_match": false,
+      "required_pair_complete": true,
+      "selected_tool": "cat",
+      "value_mismatch": false
     },
     {
-      "arg_binding_source": [
-        "prior_tool_output.matches[0]|basename"
-      ],
-      "baseline_success": false,
-      "candidate_arg_validity": "plausible_candidate_args",
-      "candidate_args": {
+      "alias_match": false,
+      "arg_realization_proxy_ready": true,
+      "candidate_arg_json": {
+        "file_name": "analysis_report.txt"
+      },
+      "candidate_args_serializable": true,
+      "canonical_arg_map": {
+        "file_name": {
+          "alias_group": "inferred",
+          "normalization_type": "path_basename",
+          "schema_arg_name": "file_name"
+        }
+      },
+      "canonical_arg_validation": {
+        "file_name": {
+          "alias_match": false,
+          "expected": "analysis_report.txt",
+          "key_match": true,
+          "key_mismatch": false,
+          "match": true,
+          "normalization": "exact",
+          "observed": "analysis_report.txt",
+          "observed_field": "file_name",
+          "path_normalized_match": false,
+          "required_pair_complete": true,
+          "source": "prior_tool_output.matches[0]|basename",
+          "strict_match": true,
+          "value_match": true,
+          "value_mismatch": false
+        }
+      },
+      "case_id": "multi_turn_miss_param_22",
+      "emitted_arg_json": null,
+      "failure_reason": null,
+      "key_mismatch": false,
+      "path_normalized_match": false,
+      "required_pair_complete": true,
+      "selected_tool": "cat",
+      "value_mismatch": false
+    },
+    {
+      "alias_match": false,
+      "arg_realization_proxy_ready": true,
+      "candidate_arg_json": {
+        "file_name": "analysis_report.txt"
+      },
+      "candidate_args_serializable": true,
+      "canonical_arg_map": {
+        "file_name": {
+          "alias_group": "inferred",
+          "normalization_type": "path_basename",
+          "schema_arg_name": "file_name"
+        }
+      },
+      "canonical_arg_validation": {
+        "file_name": {
+          "alias_match": false,
+          "expected": "analysis_report.txt",
+          "key_match": true,
+          "key_mismatch": false,
+          "match": true,
+          "normalization": "exact",
+          "observed": "analysis_report.txt",
+          "observed_field": "file_name",
+          "path_normalized_match": false,
+          "required_pair_complete": true,
+          "source": "prior_tool_output.matches[0]|basename",
+          "strict_match": true,
+          "value_match": true,
+          "value_mismatch": false
+        }
+      },
+      "case_id": "multi_turn_miss_param_28",
+      "emitted_arg_json": null,
+      "failure_reason": null,
+      "key_mismatch": false,
+      "path_normalized_match": false,
+      "required_pair_complete": true,
+      "selected_tool": "cat",
+      "value_mismatch": false
+    },
+    {
+      "alias_match": false,
+      "arg_realization_proxy_ready": true,
+      "candidate_arg_json": {
         "file_name": "config.py"
       },
-      "candidate_success": false,
-      "case_id": "multi_turn_miss_param_35",
-      "emitted_arg_match": false,
-      "emitted_args": null,
-      "failure_reason": "emitted_arg_wrong_or_guidance_not_followed",
-      "normalization_result": {
-        "final_normalized_arg_match": false,
-        "final_strict_arg_match": false,
-        "raw_normalized_arg_match": false,
-        "raw_strict_arg_match": false
+      "candidate_args_serializable": true,
+      "canonical_arg_map": {
+        "file_name": {
+          "alias_group": "inferred",
+          "normalization_type": "path_basename",
+          "schema_arg_name": "file_name"
+        }
       },
-      "repair_kinds": [
-        "coerce_no_tool_text_to_empty",
-        "resolve_contextual_string_arg"
-      ],
-      "schema_arg_names": [
-        "file_name"
-      ],
-      "selected_tool": "cat"
+      "canonical_arg_validation": {
+        "file_name": {
+          "alias_match": false,
+          "expected": "config.py",
+          "key_match": true,
+          "key_mismatch": false,
+          "match": true,
+          "normalization": "exact",
+          "observed": "config.py",
+          "observed_field": "file_name",
+          "path_normalized_match": false,
+          "required_pair_complete": true,
+          "source": "prior_tool_output.matches[0]|basename",
+          "strict_match": true,
+          "value_match": true,
+          "value_mismatch": false
+        }
+      },
+      "case_id": "multi_turn_miss_param_35",
+      "emitted_arg_json": null,
+      "failure_reason": null,
+      "key_mismatch": false,
+      "path_normalized_match": false,
+      "required_pair_complete": true,
+      "selected_tool": "cat",
+      "value_mismatch": false
     },
     {
-      "arg_binding_source": [
-        "prior_tool_output.cwd_or_listing"
-      ],
-      "baseline_success": false,
-      "candidate_arg_validity": "candidate_tool_mismatch_proxy",
-      "candidate_args": {
+      "alias_match": false,
+      "arg_realization_proxy_ready": true,
+      "candidate_arg_json": {
+        "file_name": "analysis_report.txt"
+      },
+      "candidate_args_serializable": true,
+      "canonical_arg_map": {
+        "file_name": {
+          "alias_group": "inferred",
+          "normalization_type": "path_basename",
+          "schema_arg_name": "file_name"
+        }
+      },
+      "canonical_arg_validation": {
+        "file_name": {
+          "alias_match": false,
+          "expected": "analysis_report.txt",
+          "key_match": true,
+          "key_mismatch": false,
+          "match": true,
+          "normalization": "exact",
+          "observed": "analysis_report.txt",
+          "observed_field": "file_name",
+          "path_normalized_match": false,
+          "required_pair_complete": true,
+          "source": "prior_tool_output.matches[0]|basename",
+          "strict_match": true,
+          "value_match": true,
+          "value_mismatch": false
+        }
+      },
+      "case_id": "multi_turn_miss_param_4",
+      "emitted_arg_json": null,
+      "failure_reason": null,
+      "key_mismatch": false,
+      "path_normalized_match": false,
+      "required_pair_complete": true,
+      "selected_tool": "cat",
+      "value_mismatch": false
+    },
+    {
+      "alias_match": false,
+      "arg_realization_proxy_ready": true,
+      "candidate_arg_json": {
+        "destination": "project_overview.md",
+        "source": "project_plan.md"
+      },
+      "candidate_args_serializable": true,
+      "canonical_arg_map": {
+        "destination": {
+          "alias_group": "inferred",
+          "normalization_type": "path_basename",
+          "schema_arg_name": "destination"
+        },
+        "source": {
+          "alias_group": "inferred",
+          "normalization_type": "path_basename",
+          "schema_arg_name": "source"
+        }
+      },
+      "canonical_arg_validation": {
+        "destination": {
+          "alias_match": false,
+          "expected": "project_overview.md",
+          "key_match": true,
+          "key_mismatch": false,
+          "match": true,
+          "normalization": "exact",
+          "observed": "project_overview.md",
+          "observed_field": "destination",
+          "path_normalized_match": false,
+          "required_pair_complete": true,
+          "source": "explicit_literal_pair",
+          "strict_match": true,
+          "value_match": true,
+          "value_mismatch": false
+        },
+        "source": {
+          "alias_match": false,
+          "expected": "project_plan.md",
+          "key_match": true,
+          "key_mismatch": false,
+          "match": true,
+          "normalization": "exact",
+          "observed": "project_plan.md",
+          "observed_field": "source",
+          "path_normalized_match": false,
+          "required_pair_complete": true,
+          "source": "explicit_literal_pair",
+          "strict_match": true,
+          "value_match": true,
+          "value_mismatch": false
+        }
+      },
+      "case_id": "multi_turn_miss_param_27",
+      "emitted_arg_json": null,
+      "failure_reason": null,
+      "key_mismatch": false,
+      "path_normalized_match": false,
+      "required_pair_complete": true,
+      "selected_tool": "mv",
+      "value_mismatch": false
+    },
+    {
+      "alias_match": false,
+      "arg_realization_proxy_ready": true,
+      "candidate_arg_json": {
+        "file_name": "analysis_report.txt"
+      },
+      "candidate_args_serializable": true,
+      "canonical_arg_map": {
+        "file_name": {
+          "alias_group": "inferred",
+          "normalization_type": "path_basename",
+          "schema_arg_name": "file_name"
+        }
+      },
+      "canonical_arg_validation": {
+        "file_name": {
+          "alias_match": false,
+          "expected": "analysis_report.txt",
+          "key_match": true,
+          "key_mismatch": false,
+          "match": true,
+          "normalization": "exact",
+          "observed": "analysis_report.txt",
+          "observed_field": "file_name",
+          "path_normalized_match": false,
+          "required_pair_complete": true,
+          "source": "prior_tool_output.matches[0]|basename",
+          "strict_match": true,
+          "value_match": true,
+          "value_mismatch": false
+        }
+      },
+      "case_id": "multi_turn_miss_param_29",
+      "emitted_arg_json": null,
+      "failure_reason": null,
+      "key_mismatch": false,
+      "path_normalized_match": false,
+      "required_pair_complete": true,
+      "selected_tool": "cat",
+      "value_mismatch": false
+    },
+    {
+      "alias_match": false,
+      "arg_realization_proxy_ready": true,
+      "candidate_arg_json": {
+        "file_name": "test_results.json"
+      },
+      "candidate_args_serializable": true,
+      "canonical_arg_map": {
+        "file_name": {
+          "alias_group": "inferred",
+          "normalization_type": "path_basename",
+          "schema_arg_name": "file_name"
+        }
+      },
+      "canonical_arg_validation": {
+        "file_name": {
+          "alias_match": false,
+          "expected": "test_results.json",
+          "key_match": true,
+          "key_mismatch": false,
+          "match": true,
+          "normalization": "exact",
+          "observed": "test_results.json",
+          "observed_field": "file_name",
+          "path_normalized_match": false,
+          "required_pair_complete": true,
+          "source": "prior_tool_output.matches[0]|basename",
+          "strict_match": true,
+          "value_match": true,
+          "value_mismatch": false
+        }
+      },
+      "case_id": "multi_turn_miss_param_30",
+      "emitted_arg_json": null,
+      "failure_reason": null,
+      "key_mismatch": false,
+      "path_normalized_match": false,
+      "required_pair_complete": true,
+      "selected_tool": "cat",
+      "value_mismatch": false
+    },
+    {
+      "alias_match": false,
+      "arg_realization_proxy_ready": true,
+      "candidate_arg_json": {
         "file_name": "marker.txt"
       },
-      "candidate_success": false,
-      "case_id": "multi_turn_miss_param_40",
-      "emitted_arg_match": false,
-      "emitted_args": null,
-      "failure_reason": "tool_mismatch_before_arg_realization",
-      "normalization_result": {
-        "final_normalized_arg_match": false,
-        "final_strict_arg_match": false,
-        "raw_normalized_arg_match": false,
-        "raw_strict_arg_match": false
+      "candidate_args_serializable": true,
+      "canonical_arg_map": {
+        "file_name": {
+          "alias_group": "inferred",
+          "normalization_type": "path_basename",
+          "schema_arg_name": "file_name"
+        }
       },
-      "repair_kinds": [
-        "coerce_no_tool_text_to_empty"
-      ],
-      "schema_arg_names": [
-        "file_name"
-      ],
-      "selected_tool": "cat"
-    },
-    {
-      "arg_binding_source": [],
-      "baseline_success": false,
-      "candidate_arg_validity": "missing_candidate",
-      "candidate_args": {},
-      "candidate_success": false,
-      "case_id": "multi_turn_miss_param_4",
-      "emitted_arg_match": false,
-      "emitted_args": null,
-      "failure_reason": "tool_mismatch_before_arg_realization",
-      "normalization_result": {
-        "final_normalized_arg_match": false,
-        "final_strict_arg_match": false,
-        "raw_normalized_arg_match": false,
-        "raw_strict_arg_match": false
+      "canonical_arg_validation": {
+        "file_name": {
+          "alias_match": false,
+          "expected": "marker.txt",
+          "key_match": true,
+          "key_mismatch": false,
+          "match": true,
+          "normalization": "exact",
+          "observed": "marker.txt",
+          "observed_field": "file_name",
+          "path_normalized_match": false,
+          "required_pair_complete": true,
+          "source": "prior_tool_output.cwd_or_listing",
+          "strict_match": true,
+          "value_match": true,
+          "value_mismatch": false
+        }
       },
-      "repair_kinds": [
-        "coerce_no_tool_text_to_empty"
-      ],
-      "schema_arg_names": [],
-      "selected_tool": "cat"
-    },
-    {
-      "arg_binding_source": [],
-      "baseline_success": false,
-      "candidate_arg_validity": "missing_candidate",
-      "candidate_args": {},
-      "candidate_success": false,
-      "case_id": "multi_turn_miss_param_37",
-      "emitted_arg_match": false,
-      "emitted_args": null,
-      "failure_reason": "tool_mismatch_before_arg_realization",
-      "normalization_result": {
-        "final_normalized_arg_match": false,
-        "final_strict_arg_match": false,
-        "raw_normalized_arg_match": false,
-        "raw_strict_arg_match": false
-      },
-      "repair_kinds": [
-        "coerce_no_tool_text_to_empty",
-        "strip_assistant_content_with_tool_calls"
-      ],
-      "schema_arg_names": [],
-      "selected_tool": "cat"
+      "case_id": "multi_turn_miss_param_39",
+      "emitted_arg_json": null,
+      "failure_reason": null,
+      "key_mismatch": false,
+      "path_normalized_match": false,
+      "required_pair_complete": true,
+      "selected_tool": "touch",
+      "value_mismatch": false
     }
   ],
   "diagnostic": {
     "guidance_only": true,
-    "offline_only": true
+    "last_scorer_metrics_retained_for_postmortem_only": true,
+    "offline_only": true,
+    "readiness_source": "source_trace_replay_current_rules"
   },
-  "emitted_arg_wrong_or_guidance_not_followed_count": 3,
-  "m27v_arg_realization_passed": false,
-  "raw_arg_match_rate_proxy": 0.375,
+  "emitted_arg_wrong_or_guidance_not_followed_count": 0,
+  "last_scorer_arg_failure_reason_distribution": {
+    "candidate_arg_wrong": 1,
+    "emitted_arg_wrong_or_guidance_not_followed": 3,
+    "tool_mismatch_before_arg_realization": 6
+  },
+  "last_scorer_raw_arg_match_rate": 0.375,
+  "m27v_arg_realization_passed": true,
+  "raw_arg_match_rate_proxy": 1.0,
   "report_scope": "m2_7v_arg_realization"
 }

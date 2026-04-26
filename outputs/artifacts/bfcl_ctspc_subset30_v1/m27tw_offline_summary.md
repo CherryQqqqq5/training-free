@@ -1,11 +1,13 @@
 # M2.7tw Offline Summary
 
-- Passed: `False`
+- Passed: `True`
 
 | Check | Passed |
 | --- | ---: |
 | `m27t_source_pool_ready` | `True` |
 | `m27tw_holdout_manifest_ready` | `True` |
-| `m27u_tool_ranking_passed` | `False` |
-| `m27v_arg_realization_passed` | `False` |
-| `m27w_rule_retention_passed` | `False` |
+| `m27u_tool_ranking_passed` | `True` |
+| `m27v_arg_realization_passed` | `True` |
+| `m27w_rule_retention_passed` | `True` |
+
+This summary is an offline readiness gate only. It does not authorize performance claims or 100-case/full BFCL.
