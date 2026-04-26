@@ -7,8 +7,8 @@
 - Action-specific guidance coverage: `1.0`
 - Exact tool-choice coverage: `0.0`
 - Trajectory-sensitive exact forcing count: `0`
-- After-guard activations: `13`
-- Dominant selected tool rate: `0.6923076923076923`
+- After-guard activations: `12`
+- Dominant selected tool rate: `0.6666666666666666`
 - Missing trace ids: `{'baseline': [], 'candidate': []}`
 - First failed criterion: `None`
 
