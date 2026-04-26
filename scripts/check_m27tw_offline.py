@@ -31,18 +31,41 @@ def _holdout_ready(manifest: dict[str, Any]) -> bool:
     return bool(manifest.get("m27tw_holdout_manifest_ready")) and int(manifest.get("selected_case_count") or 0) >= 20 and int(manifest.get("candidate_generatable_count") or 0) >= 15 and not (manifest.get("overlap_with_dev_case_ids") or [])
 
 
+def _proxy_calibration(root: Path, summary: dict[str, Any], x: dict[str, Any]) -> dict[str, Any]:
+    tool = summary.get("recommended_tool_match_rate_among_activated")
+    arg = summary.get("raw_normalized_arg_match_rate_among_activated")
+    tool_ok = isinstance(tool, (int, float)) and tool >= 0.6
+    arg_ok = isinstance(arg, (int, float)) and arg >= 0.6
+    scorer_floor_ok = tool_ok and arg_ok
+    gap_fixed = bool(x.get("m27x_scorer_proxy_gap_explained") and x.get("fixed_by_code_change"))
+    needs_gap_fix = not scorer_floor_ok
+    return {
+        "proxy_calibration_passed": (not needs_gap_fix) or gap_fixed,
+        "needs_gap_fix": needs_gap_fix,
+        "last_scorer_tool_match_rate": tool,
+        "last_scorer_raw_arg_match_rate": arg,
+        "m27x_scorer_proxy_gap_explained": bool(x.get("m27x_scorer_proxy_gap_explained")),
+        "fixed_by_code_change": bool(x.get("fixed_by_code_change")),
+        "gap_report_path": str(root / "m27x_scorer_proxy_gap.json") if (root / "m27x_scorer_proxy_gap.json").exists() else None,
+    }
+
+
 def evaluate(root: Path = ROOT, holdout: Path = HOLD, source: Path = SRC) -> dict[str, Any]:
     source_manifest = _j(source / "source_collection_manifest.json", {}) or {}
     holdout_manifest = _j(holdout / "holdout_manifest.json", {}) or {}
     u = _j(root / "m27u_tool_ranking.json", {}) or {}
     v = _j(root / "m27v_arg_realization.json", {}) or {}
     w = _j(root / "m27w_rule_retention.json", {}) or {}
+    summary = _j(root / "subset_summary.json", {}) or {}
+    x = _j(root / "m27x_scorer_proxy_gap.json", {}) or {}
+    calibration = _proxy_calibration(root, summary, x)
     checks = {
         "m27t_source_pool_ready": bool(source_manifest.get("m27t_source_pool_ready")),
         "m27tw_holdout_manifest_ready": _holdout_ready(holdout_manifest),
         "m27u_tool_ranking_passed": bool(u.get("m27u_tool_ranking_passed")),
         "m27v_arg_realization_passed": bool(v.get("m27v_arg_realization_passed")),
         "m27w_rule_retention_passed": bool(w.get("m27w_rule_retention_passed")),
+        "proxy_calibration_passed": bool(calibration.get("proxy_calibration_passed")),
     }
     return {
         "report_scope": "m2_7tw_offline_summary",
@@ -52,10 +75,12 @@ def evaluate(root: Path = ROOT, holdout: Path = HOLD, source: Path = SRC) -> dic
         "holdout": {key: holdout_manifest.get(key) for key in ["selected_case_count", "candidate_generatable_count", "overlap_with_dev_case_ids", "planned_commands"]},
         "tool_ranking": {key: u.get(key) for key in ["tool_mismatch_before_arg_realization_count", "offline_recommended_tool_match_proxy", "dominant_selected_next_tool_rate", "last_scorer_tool_match_rate"]},
         "arg_realization": {key: v.get(key) for key in ["raw_arg_match_rate_proxy", "emitted_arg_wrong_or_guidance_not_followed_count", "canonical_arg_validation_coverage", "last_scorer_raw_arg_match_rate"]},
-        "rule_retention": {key: w.get(key) for key in ["decision_distribution", "holdout_manifest_ready", "holdout_scorer_evidence_available", "offline_u_v_readiness_passed"]},
+        "rule_retention": {key: w.get(key) for key in ["decision_distribution", "holdout_manifest_ready", "holdout_scorer_evidence_available", "offline_u_v_readiness_passed", "scorer_override_applied"]},
+        "proxy_calibration": calibration,
         "diagnostic": {
             "offline_readiness_only": True,
             "last_scorer_metrics_retained_for_postmortem_only": True,
+            "offline_proxy_requires_scorer_gap_calibration": True,
             "no_bfcl_rerun": True,
             "no_100_case": True,
             "no_m2_8": True,
@@ -66,9 +91,9 @@ def evaluate(root: Path = ROOT, holdout: Path = HOLD, source: Path = SRC) -> dic
 
 def render_markdown(report: dict[str, Any]) -> str:
     lines = ["# M2.7tw Offline Summary", "", f"- Passed: `{report['m2_7tw_offline_passed']}`", "", "| Check | Passed |", "| --- | ---: |"]
-    for key in ["m27t_source_pool_ready", "m27tw_holdout_manifest_ready", "m27u_tool_ranking_passed", "m27v_arg_realization_passed", "m27w_rule_retention_passed"]:
+    for key in ["m27t_source_pool_ready", "m27tw_holdout_manifest_ready", "m27u_tool_ranking_passed", "m27v_arg_realization_passed", "m27w_rule_retention_passed", "proxy_calibration_passed"]:
         lines.append(f"| `{key}` | `{report[key]}` |")
-    lines.extend(["", "This summary is an offline readiness gate only. It does not authorize performance claims or 100-case/full BFCL.", ""])
+    lines.extend(["", "This summary is an offline readiness gate only. Proxy readiness is blocked when the latest scorer gap is unexplained or unfixed.", ""])
     return "\n".join(lines)
 
 
@@ -85,9 +110,10 @@ def main() -> int:
     _write_json(args.output, report)
     args.markdown_output.write_text(render_markdown(report), encoding="utf-8")
     if args.compact:
-        print(json.dumps({key: report.get(key) for key in ["m2_7tw_offline_passed", "m27t_source_pool_ready", "m27tw_holdout_manifest_ready", "m27u_tool_ranking_passed", "m27v_arg_realization_passed", "m27w_rule_retention_passed"]}, indent=2, sort_keys=True))
+        print(json.dumps({key: report.get(key) for key in ["m2_7tw_offline_passed", "m27t_source_pool_ready", "m27tw_holdout_manifest_ready", "m27u_tool_ranking_passed", "m27v_arg_realization_passed", "m27w_rule_retention_passed", "proxy_calibration_passed"]}, indent=2, sort_keys=True))
     return 0
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

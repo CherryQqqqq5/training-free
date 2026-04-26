@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -109,6 +110,56 @@ class M27fGateTests(unittest.TestCase):
         report = json.loads(completed.stdout)
         self.assertTrue(report["m2_7f_gate_passed"])
         self.assertFalse(report["summary_accepted_ignored"])
+
+
+    def test_stale_summary_fails_when_run_artifact_is_newer(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_raw:
+            root = Path(tmp_raw) / "subset"
+            root.mkdir()
+            summary_path = root / "subset_summary.json"
+            report_path = root / "subset_case_report.jsonl"
+            summary = passing_summary()
+            summary["manifest"] = {"category": "multi_turn_miss_param"}
+            summary["report_build_metadata"] = {
+                "baseline": {"run_id": "old-base"},
+                "candidate": {"run_id": "old-cand"},
+            }
+            summary_path.write_text(json.dumps(summary), encoding="utf-8")
+            report_path.write_text("{}\n", encoding="utf-8")
+            manifest = root / "candidate" / "artifacts" / "run_manifest.json"
+            manifest.parent.mkdir(parents=True)
+            manifest.write_text(json.dumps({"run_id": "old-cand"}), encoding="utf-8")
+            future = summary_path.stat().st_mtime + 10
+            os.utime(manifest, (future, future))
+
+            result = evaluate_m27f_gate(summary, summary_path=str(summary_path), artifact_root=root)
+
+        self.assertFalse(result["m2_7f_gate_passed"])
+        self.assertEqual(result["diagnostic"]["first_failed_criterion"], "stale_case_report_or_summary")
+        self.assertEqual(result["diagnostic"]["recommended_next_focus"], "rebuild_case_report_or_summary")
+
+    def test_run_id_mismatch_fails_freshness_gate(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_raw:
+            root = Path(tmp_raw) / "subset"
+            root.mkdir()
+            summary_path = root / "subset_summary.json"
+            report_path = root / "subset_case_report.jsonl"
+            manifest = root / "candidate" / "artifacts" / "run_manifest.json"
+            manifest.parent.mkdir(parents=True)
+            manifest.write_text(json.dumps({"run_id": "current"}), encoding="utf-8")
+            report_path.write_text("{}\n", encoding="utf-8")
+            summary = passing_summary()
+            summary["manifest"] = {"category": "multi_turn_miss_param"}
+            summary["report_build_metadata"] = {
+                "baseline": {"run_id": None},
+                "candidate": {"run_id": "stale"},
+            }
+            summary_path.write_text(json.dumps(summary), encoding="utf-8")
+
+            result = evaluate_m27f_gate(summary, summary_path=str(summary_path), artifact_root=root)
+
+        self.assertFalse(result["criteria"]["stale_case_report_or_summary"]["passed"])
+        self.assertEqual(result["criteria"]["stale_case_report_or_summary"]["actual"]["run_id_mismatches"]["candidate"]["current"], "current")
 
 
 if __name__ == "__main__":

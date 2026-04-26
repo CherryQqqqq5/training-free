@@ -22,6 +22,12 @@ def _j(path: Path, default: Any = None) -> Any:
         return default
 
 
+def _jl(path: Path) -> list[dict[str, Any]]:
+    if not path.exists():
+        return []
+    return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+
 def _write_json(path: Path, data: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -35,7 +41,7 @@ def _holdout_ready(holdout_root: Path) -> bool:
     return bool(holdout.get("m27tw_holdout_manifest_ready")) and selected >= 20 and generatable >= 15 and not overlap
 
 
-def decide(rule: dict[str, Any], holdout_ready: bool, offline_ready: bool = False) -> tuple[str, str, dict[str, Any]]:
+def decide(rule: dict[str, Any], holdout_ready: bool, offline_ready: bool = False, *, dev_scorer_net_case_gain: int | None = None) -> tuple[str, str, dict[str, Any]]:
     net = int(rule.get("net_case_gain") or 0)
     regressed = int(rule.get("regressed_count") or 0)
     fixed = int(rule.get("fixed_count") or 0)
@@ -57,25 +63,57 @@ def decide(rule: dict[str, Any], holdout_ready: bool, offline_ready: bool = Fals
         blockers.append("holdout_manifest_not_ready")
     if not offline_ready:
         blockers.append("offline_u_v_readiness_not_passed")
+    if dev_scorer_net_case_gain is not None and dev_scorer_net_case_gain < 0:
+        blockers.append("negative_overall_dev_scorer_net_gain")
 
-    if net > 0 and regressed == 0 and tool >= 0.6 and arg >= 0.6 and trajectory_fail <= fixed and holdout_ready:
-        # Holdout manifest readiness is not holdout scorer evidence; this remains retain-ready only.
-        return "demote", "dev_positive_holdout_scorer_required_before_retain", {"retain_blocked_by": "missing_holdout_scorer_evidence", "blockers": []}
-    if offline_ready and holdout_ready and net >= 0 and regressed == 0 and fixed > 0:
-        return "demote", "offline_ready_with_nonnegative_dev_signal_requires_scorer_validation", {"retain_blocked_by": "missing_holdout_scorer_evidence", "blockers": blockers}
+    positive_zero_regression = net > 0 and regressed == 0 and fixed > 0 and tool >= 0.6 and arg >= 0.6 and trajectory_fail <= fixed
+    if positive_zero_regression and holdout_ready and offline_ready:
+        return "demote", "dev_positive_holdout_scorer_required_before_retain", {"retain_blocked_by": "missing_holdout_scorer_evidence", "blockers": blockers}
     return "reject", "no_positive_retention_signal", {"retain_blocked_by": "missing_positive_dev_and_holdout_evidence", "blockers": blockers}
+
+
+def _regression_cases(root: Path) -> list[dict[str, Any]]:
+    postmortem = _j(root / "m27q_postmortem.json", {}) or {}
+    cases = postmortem.get("cases") if isinstance(postmortem.get("cases"), list) else []
+    if cases:
+        source = cases
+    else:
+        source = _jl(root / "subset_case_report.jsonl")
+    out = []
+    for row in source:
+        if not row.get("case_regressed"):
+            continue
+        out.append(
+            {
+                "case_id": row.get("case_id"),
+                "policy_plan_activated": row.get("policy_plan_activated"),
+                "selected_tool": row.get("selected_next_tool"),
+                "emitted_tool": row.get("emitted_tool"),
+                "tool_match": row.get("recommended_tool_match"),
+                "raw_arg_match": row.get("raw_normalized_arg_match"),
+                "final_arg_match": row.get("final_normalized_arg_match"),
+                "repair_kinds": row.get("repair_kinds") or [],
+                "rule_id": row.get("rule_id"),
+                "selected_action_candidate": row.get("selected_action_candidate") or {},
+                "failure_mechanism": row.get("primary_failure_layer") or "regression",
+                "candidate_policy_action": "reject_or_record_only_until_gap_fixed",
+            }
+        )
+    return out
 
 
 def evaluate(root: Path = DEFAULT_ROOT, holdout_root: Path = DEFAULT_HOLDOUT) -> dict[str, Any]:
     base = _j(root / "m27r_rule_retention.json", {}) or _j(root / "m27f_rule_level_report.json", {}) or {}
     u = _j(root / "m27u_tool_ranking.json", {}) or {}
     v = _j(root / "m27v_arg_realization.json", {}) or {}
+    summary = _j(root / "subset_summary.json", {}) or {}
     holdout_manifest_ready = _holdout_ready(holdout_root)
     offline_ready = bool(u.get("m27u_tool_ranking_passed") and v.get("m27v_arg_realization_passed"))
+    dev_scorer_net = summary.get("net_case_gain") if isinstance(summary.get("net_case_gain"), int) else None
     rules: list[dict[str, Any]] = []
     distribution: Counter[str] = Counter()
     for rule in base.get("rules") or []:
-        decision, reason, extra = decide(rule, holdout_manifest_ready, offline_ready)
+        decision, reason, extra = decide(rule, holdout_manifest_ready, offline_ready, dev_scorer_net_case_gain=dev_scorer_net)
         item = {
             **rule,
             "decision": decision,
@@ -84,11 +122,13 @@ def evaluate(root: Path = DEFAULT_ROOT, holdout_root: Path = DEFAULT_HOLDOUT) ->
             "holdout_manifest_ready": holdout_manifest_ready,
             "holdout_required_for_retain": True,
             "holdout_scorer_evidence_available": False,
+            "dev_scorer_net_case_gain": dev_scorer_net,
             "decision_blocker": extra,
         }
         rules.append(item)
         distribution[decision] += 1
     demote_or_retain = distribution.get("demote", 0) + distribution.get("retain", 0)
+    regressions = _regression_cases(root)
     report = {
         "report_scope": "m2_7w_rule_retention",
         "artifact_root": str(root),
@@ -96,13 +136,19 @@ def evaluate(root: Path = DEFAULT_ROOT, holdout_root: Path = DEFAULT_HOLDOUT) ->
         "holdout_manifest_ready": holdout_manifest_ready,
         "holdout_scorer_evidence_available": False,
         "offline_u_v_readiness_passed": offline_ready,
+        "dev_scorer_net_case_gain": dev_scorer_net,
+        "scorer_override_applied": dev_scorer_net is not None,
         "rule_count": len(rules),
         "rules": rules,
+        "regression_cases": regressions,
+        "regression_case_count": len(regressions),
         "decision_distribution": {key: distribution.get(key, 0) for key in ["retain", "demote", "reject"]},
         "m27w_rule_retention_passed": demote_or_retain >= 1 and holdout_manifest_ready and offline_ready,
         "diagnostic": {
             "dev_only_cannot_promote_to_retained_memory": True,
             "retain_requires_future_holdout_scorer_evidence": True,
+            "negative_dev_scorer_blocks_retain": bool(dev_scorer_net is not None and dev_scorer_net < 0),
+            "regression_candidates_rejected_or_record_only_until_gap_fixed": True,
             "offline_readiness_only": True,
         },
     }
@@ -117,9 +163,11 @@ def render_markdown(report: dict[str, Any]) -> str:
             f"- Passed: `{report['m27w_rule_retention_passed']}`",
             f"- Holdout manifest ready: `{report['holdout_manifest_ready']}`",
             f"- Offline U/V readiness: `{report['offline_u_v_readiness_passed']}`",
+            f"- Dev scorer net case gain: `{report['dev_scorer_net_case_gain']}`",
             f"- Decisions: `{report['decision_distribution']}`",
+            f"- Regression cases: `{report['regression_case_count']}`",
             "",
-            "Retain remains blocked until holdout scorer evidence exists; offline success can only mark rules as demote-ready.",
+            "Retain remains blocked until holdout scorer evidence exists; negative dev scorer evidence forces regression-causing candidates to reject or record-only.",
             "",
         ]
     )
@@ -137,9 +185,10 @@ def main() -> int:
     _write_json(args.output, report)
     args.markdown_output.write_text(render_markdown(report), encoding="utf-8")
     if args.compact:
-        print(json.dumps({k: report.get(k) for k in ["holdout_manifest_ready", "offline_u_v_readiness_passed", "decision_distribution", "m27w_rule_retention_passed"]}, indent=2, sort_keys=True))
+        print(json.dumps({k: report.get(k) for k in ["holdout_manifest_ready", "offline_u_v_readiness_passed", "dev_scorer_net_case_gain", "decision_distribution", "regression_case_count", "m27w_rule_retention_passed"]}, indent=2, sort_keys=True))
     return 0
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
