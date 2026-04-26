@@ -1,7 +1,7 @@
 {
   "artifact_root": "outputs/artifacts/bfcl_ctspc_subset30_v1",
-  "baseline_accuracy": 13.33,
-  "candidate_accuracy": 6.67,
+  "baseline_accuracy": 20.0,
+  "candidate_accuracy": 13.33,
   "case_level_gate_allowed": true,
   "case_report_trace_mapping": "prompt_user_prefix",
   "cases": [
@@ -13,7 +13,7 @@
       "case_regressed": false,
       "emitted_args_available": false,
       "feedback_action": "diagnostic_only",
-      "gap_type": "proxy_ok_trajectory_failed",
+      "gap_type": "proxy_activated_but_scorer_not_activated",
       "offline_arg_match_proxy": true,
       "offline_candidate_args": {
         "file_name": "marker.txt"
@@ -21,15 +21,15 @@
       "offline_selected_tool": "touch",
       "offline_tool_match_proxy": true,
       "proxy_activated": true,
-      "real_raw_arg_match": true,
-      "real_tool_match": true,
+      "real_raw_arg_match": false,
+      "real_tool_match": false,
       "repair_kinds": [
         "coerce_no_tool_text_to_empty"
       ],
-      "scorer_activated": true,
+      "scorer_activated": false,
       "scorer_emitted_args": null,
       "scorer_feedback_applied": true,
-      "scorer_selected_tool": "touch"
+      "scorer_selected_tool": null
     },
     {
       "baseline_success": false,
@@ -60,13 +60,13 @@
     },
     {
       "baseline_success": false,
-      "candidate_success": true,
-      "case_fixed": true,
+      "candidate_success": false,
+      "case_fixed": false,
       "case_id": "multi_turn_miss_param_31",
       "case_regressed": false,
       "emitted_args_available": false,
       "feedback_action": null,
-      "gap_type": "no_proxy_gap",
+      "gap_type": "proxy_ok_trajectory_failed",
       "offline_arg_match_proxy": true,
       "offline_candidate_args": {
         "file_name": "data.txt"
@@ -77,8 +77,7 @@
       "real_raw_arg_match": true,
       "real_tool_match": true,
       "repair_kinds": [
-        "coerce_no_tool_text_to_empty",
-        "strip_assistant_content_with_tool_calls"
+        "coerce_no_tool_text_to_empty"
       ],
       "scorer_activated": true,
       "scorer_emitted_args": null,
@@ -127,7 +126,8 @@
       "real_tool_match": false,
       "repair_kinds": [
         "coerce_no_tool_text_to_empty",
-        "resolve_contextual_string_arg"
+        "resolve_contextual_string_arg",
+        "strip_assistant_content_with_tool_calls"
       ],
       "scorer_activated": false,
       "scorer_emitted_args": null,
@@ -211,10 +211,10 @@
     },
     {
       "baseline_success": true,
-      "candidate_success": false,
+      "candidate_success": true,
       "case_fixed": false,
       "case_id": "multi_turn_miss_param_22",
-      "case_regressed": true,
+      "case_regressed": false,
       "emitted_args_available": false,
       "feedback_action": "record_only",
       "gap_type": "proxy_arg_ok_scorer_arg_wrong",
@@ -253,7 +253,8 @@
       "real_tool_match": false,
       "repair_kinds": [
         "coerce_no_tool_text_to_empty",
-        "resolve_contextual_string_arg"
+        "resolve_contextual_string_arg",
+        "strip_assistant_content_with_tool_calls"
       ],
       "scorer_activated": false,
       "scorer_emitted_args": null,
@@ -285,11 +286,11 @@
       "scorer_selected_tool": null
     },
     {
-      "baseline_success": false,
+      "baseline_success": true,
       "candidate_success": false,
       "case_fixed": false,
       "case_id": "multi_turn_miss_param_9",
-      "case_regressed": false,
+      "case_regressed": true,
       "emitted_args_available": false,
       "feedback_action": null,
       "gap_type": "no_proxy_gap",
@@ -302,8 +303,7 @@
       "real_tool_match": false,
       "repair_kinds": [
         "coerce_no_tool_text_to_empty",
-        "resolve_contextual_string_arg",
-        "strip_assistant_content_with_tool_calls"
+        "resolve_contextual_string_arg"
       ],
       "scorer_activated": false,
       "scorer_emitted_args": null,
@@ -361,10 +361,10 @@
     },
     {
       "baseline_success": true,
-      "candidate_success": false,
+      "candidate_success": true,
       "case_fixed": false,
       "case_id": "multi_turn_miss_param_21",
-      "case_regressed": true,
+      "case_regressed": false,
       "emitted_args_available": false,
       "feedback_action": "record_only",
       "gap_type": "no_proxy_gap",
@@ -375,7 +375,9 @@
       "proxy_activated": false,
       "real_raw_arg_match": false,
       "real_tool_match": false,
-      "repair_kinds": [],
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
       "scorer_activated": false,
       "scorer_emitted_args": null,
       "scorer_feedback_applied": true,
@@ -416,7 +418,7 @@
       "case_regressed": true,
       "emitted_args_available": false,
       "feedback_action": "record_only",
-      "gap_type": "proxy_arg_ok_scorer_arg_wrong",
+      "gap_type": "proxy_activated_but_scorer_not_activated",
       "offline_arg_match_proxy": true,
       "offline_candidate_args": {
         "file_name": "config.py"
@@ -425,15 +427,15 @@
       "offline_tool_match_proxy": true,
       "proxy_activated": true,
       "real_raw_arg_match": false,
-      "real_tool_match": true,
+      "real_tool_match": false,
       "repair_kinds": [
         "coerce_no_tool_text_to_empty",
         "resolve_contextual_string_arg"
       ],
-      "scorer_activated": true,
+      "scorer_activated": false,
       "scorer_emitted_args": null,
       "scorer_feedback_applied": true,
-      "scorer_selected_tool": "cat"
+      "scorer_selected_tool": null
     },
     {
       "baseline_success": false,
@@ -511,8 +513,8 @@
       "scorer_selected_tool": null
     },
     {
-      "baseline_success": false,
-      "candidate_success": false,
+      "baseline_success": true,
+      "candidate_success": true,
       "case_fixed": false,
       "case_id": "multi_turn_miss_param_45",
       "case_regressed": false,
@@ -552,7 +554,6 @@
       "real_tool_match": false,
       "repair_kinds": [
         "coerce_no_tool_text_to_empty",
-        "resolve_contextual_string_arg",
         "strip_assistant_content_with_tool_calls"
       ],
       "scorer_activated": false,
@@ -734,8 +735,7 @@
       "real_raw_arg_match": false,
       "real_tool_match": false,
       "repair_kinds": [
-        "coerce_no_tool_text_to_empty",
-        "strip_assistant_content_with_tool_calls"
+        "coerce_no_tool_text_to_empty"
       ],
       "scorer_activated": false,
       "scorer_emitted_args": null,
@@ -750,64 +750,12 @@
       "case_regressed": true,
       "emitted_args_available": false,
       "feedback_action": "record_only",
-      "gap_type": "proxy_ok_trajectory_failed",
+      "gap_type": "proxy_arg_ok_scorer_arg_wrong",
       "offline_arg_match_proxy": true,
       "offline_candidate_args": {
         "file_name": "marker.txt"
       },
       "offline_selected_tool": "touch",
-      "offline_tool_match_proxy": true,
-      "proxy_activated": true,
-      "real_raw_arg_match": true,
-      "real_tool_match": true,
-      "repair_kinds": [
-        "coerce_no_tool_text_to_empty"
-      ],
-      "scorer_activated": true,
-      "scorer_emitted_args": null,
-      "scorer_feedback_applied": true,
-      "scorer_selected_tool": "touch"
-    }
-  ],
-  "diagnostic": {
-    "do_not_rerun_bfcl_until_gap_has_code_fix": false,
-    "emitted_args_unavailable_from_case_report": true,
-    "offline_proxy_is_not_scorer_evidence": true,
-    "postmortem_recommended_next_focus": "regression_and_rule_retention"
-  },
-  "fixed_by_code_change": true,
-  "gap_case_count": 11,
-  "gap_type_distribution": {
-    "no_proxy_gap": 19,
-    "proxy_activated_but_scorer_not_activated": 1,
-    "proxy_arg_ok_scorer_arg_wrong": 2,
-    "proxy_ok_trajectory_failed": 4,
-    "proxy_tool_ok_scorer_tool_wrong": 4
-  },
-  "last_scorer_raw_arg_match_rate": 0.45454545454545453,
-  "last_scorer_tool_match_rate": 0.6363636363636364,
-  "m27x_scorer_proxy_gap_explained": true,
-  "m27x_scorer_proxy_gap_passed": true,
-  "m27y_scorer_feedback_ready": true,
-  "net_case_gain": -2,
-  "offline_arg_match_proxy": 1.0,
-  "offline_tool_match_proxy": 1.0,
-  "regressed_case_count": 4,
-  "regression_cases": [
-    {
-      "baseline_success": true,
-      "candidate_success": false,
-      "case_fixed": false,
-      "case_id": "multi_turn_miss_param_22",
-      "case_regressed": true,
-      "emitted_args_available": false,
-      "feedback_action": "record_only",
-      "gap_type": "proxy_arg_ok_scorer_arg_wrong",
-      "offline_arg_match_proxy": true,
-      "offline_candidate_args": {
-        "file_name": "analysis_report.txt"
-      },
-      "offline_selected_tool": "cat",
       "offline_tool_match_proxy": true,
       "proxy_activated": true,
       "real_raw_arg_match": false,
@@ -819,15 +767,41 @@
       "scorer_emitted_args": null,
       "scorer_feedback_applied": true,
       "scorer_selected_tool": "cat"
-    },
+    }
+  ],
+  "diagnostic": {
+    "do_not_rerun_bfcl_until_gap_has_code_fix": true,
+    "emitted_args_unavailable_from_case_report": true,
+    "offline_proxy_is_not_scorer_evidence": true,
+    "postmortem_recommended_next_focus": "regression_and_rule_retention"
+  },
+  "fixed_by_code_change": false,
+  "gap_case_count": 12,
+  "gap_type_distribution": {
+    "no_proxy_gap": 18,
+    "proxy_activated_but_scorer_not_activated": 3,
+    "proxy_arg_ok_scorer_arg_wrong": 2,
+    "proxy_ok_trajectory_failed": 3,
+    "proxy_tool_ok_scorer_tool_wrong": 4
+  },
+  "last_scorer_raw_arg_match_rate": 0.3333333333333333,
+  "last_scorer_tool_match_rate": 0.5555555555555556,
+  "m27x_scorer_proxy_gap_explained": true,
+  "m27x_scorer_proxy_gap_passed": false,
+  "m27y_scorer_feedback_ready": true,
+  "net_case_gain": -2,
+  "offline_arg_match_proxy": 1.0,
+  "offline_tool_match_proxy": 1.0,
+  "regressed_case_count": 3,
+  "regression_cases": [
     {
       "baseline_success": true,
       "candidate_success": false,
       "case_fixed": false,
-      "case_id": "multi_turn_miss_param_21",
+      "case_id": "multi_turn_miss_param_9",
       "case_regressed": true,
       "emitted_args_available": false,
-      "feedback_action": "record_only",
+      "feedback_action": null,
       "gap_type": "no_proxy_gap",
       "offline_arg_match_proxy": null,
       "offline_candidate_args": null,
@@ -836,10 +810,13 @@
       "proxy_activated": false,
       "real_raw_arg_match": false,
       "real_tool_match": false,
-      "repair_kinds": [],
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "resolve_contextual_string_arg"
+      ],
       "scorer_activated": false,
       "scorer_emitted_args": null,
-      "scorer_feedback_applied": true,
+      "scorer_feedback_applied": false,
       "scorer_selected_tool": null
     },
     {
@@ -850,7 +827,7 @@
       "case_regressed": true,
       "emitted_args_available": false,
       "feedback_action": "record_only",
-      "gap_type": "proxy_arg_ok_scorer_arg_wrong",
+      "gap_type": "proxy_activated_but_scorer_not_activated",
       "offline_arg_match_proxy": true,
       "offline_candidate_args": {
         "file_name": "config.py"
@@ -859,15 +836,15 @@
       "offline_tool_match_proxy": true,
       "proxy_activated": true,
       "real_raw_arg_match": false,
-      "real_tool_match": true,
+      "real_tool_match": false,
       "repair_kinds": [
         "coerce_no_tool_text_to_empty",
         "resolve_contextual_string_arg"
       ],
-      "scorer_activated": true,
+      "scorer_activated": false,
       "scorer_emitted_args": null,
       "scorer_feedback_applied": true,
-      "scorer_selected_tool": "cat"
+      "scorer_selected_tool": null
     },
     {
       "baseline_success": true,
@@ -877,7 +854,7 @@
       "case_regressed": true,
       "emitted_args_available": false,
       "feedback_action": "record_only",
-      "gap_type": "proxy_ok_trajectory_failed",
+      "gap_type": "proxy_arg_ok_scorer_arg_wrong",
       "offline_arg_match_proxy": true,
       "offline_candidate_args": {
         "file_name": "marker.txt"
@@ -885,7 +862,7 @@
       "offline_selected_tool": "touch",
       "offline_tool_match_proxy": true,
       "proxy_activated": true,
-      "real_raw_arg_match": true,
+      "real_raw_arg_match": false,
       "real_tool_match": true,
       "repair_kinds": [
         "coerce_no_tool_text_to_empty"
@@ -893,12 +870,12 @@
       "scorer_activated": true,
       "scorer_emitted_args": null,
       "scorer_feedback_applied": true,
-      "scorer_selected_tool": "touch"
+      "scorer_selected_tool": "cat"
     }
   ],
   "report_scope": "m2_7x_scorer_proxy_gap",
   "scorer_feedback_case_count": 12,
   "scorer_feedback_code_fix_id": "m27y_scorer_feedback_overlay_v1",
-  "scorer_feedback_covers_gap_cases": true,
-  "scorer_feedback_covers_regression_cases": true
+  "scorer_feedback_covers_gap_cases": false,
+  "scorer_feedback_covers_regression_cases": false
 }

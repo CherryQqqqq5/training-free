@@ -1,0 +1,347 @@
+{
+  "artifact_root": "outputs/artifacts/bfcl_ctspc_subset30_v1",
+  "current_gap_summary": {
+    "fixed_by_code_change": false,
+    "gap_type_distribution": {
+      "no_proxy_gap": 18,
+      "proxy_activated_but_scorer_not_activated": 3,
+      "proxy_arg_ok_scorer_arg_wrong": 2,
+      "proxy_ok_trajectory_failed": 3,
+      "proxy_tool_ok_scorer_tool_wrong": 4
+    },
+    "m27x_scorer_proxy_gap_explained": true,
+    "m27x_scorer_proxy_gap_passed": false,
+    "regressed_case_count": 3
+  },
+  "current_summary": {
+    "baseline_accuracy": 20.0,
+    "candidate_accuracy": 13.33,
+    "case_fixed_count": 1,
+    "case_level_gate_allowed": true,
+    "case_regressed_count": 3,
+    "case_report_trace_mapping": "prompt_user_prefix",
+    "net_case_gain": -2,
+    "policy_plan_activated_count": 9,
+    "raw_normalized_arg_match_rate_among_activated": 0.3333333333333333,
+    "recommended_tool_match_rate_among_activated": 0.5555555555555556
+  },
+  "diagnostic": {
+    "do_not_run_holdout_unless_formal_dev_gate_passes": true,
+    "interpretation": "M2.7z dev rerun compact feedback-effect diagnostic. Use stop_loss and formal M2.7f gate before considering any holdout request."
+  },
+  "diagnostic_only_feedback_case_ids": [
+    "multi_turn_miss_param_17",
+    "multi_turn_miss_param_19",
+    "multi_turn_miss_param_27",
+    "multi_turn_miss_param_28",
+    "multi_turn_miss_param_29",
+    "multi_turn_miss_param_30",
+    "multi_turn_miss_param_4",
+    "multi_turn_miss_param_5"
+  ],
+  "diagnostic_only_gap_activated_cases": [
+    {
+      "baseline_success": false,
+      "blocked_reason": "activation_predicates_unmet",
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_19",
+      "case_regressed": false,
+      "policy_plan_activated": true,
+      "present": true,
+      "raw_normalized_arg_match": true,
+      "recommended_tool_match": true,
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "selected_next_tool": "cp"
+    },
+    {
+      "baseline_success": false,
+      "blocked_reason": "activation_predicates_unmet",
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_27",
+      "case_regressed": false,
+      "policy_plan_activated": true,
+      "present": true,
+      "raw_normalized_arg_match": true,
+      "recommended_tool_match": true,
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "strip_assistant_content_with_tool_calls"
+      ],
+      "selected_next_tool": "mv"
+    },
+    {
+      "baseline_success": false,
+      "blocked_reason": "activation_predicates_unmet",
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_28",
+      "case_regressed": false,
+      "policy_plan_activated": true,
+      "present": true,
+      "raw_normalized_arg_match": false,
+      "recommended_tool_match": false,
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "resolve_contextual_string_arg"
+      ],
+      "selected_next_tool": "cat"
+    },
+    {
+      "baseline_success": false,
+      "blocked_reason": "activation_predicates_unmet",
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_29",
+      "case_regressed": false,
+      "policy_plan_activated": true,
+      "present": true,
+      "raw_normalized_arg_match": false,
+      "recommended_tool_match": false,
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "resolve_contextual_string_arg"
+      ],
+      "selected_next_tool": "cat"
+    },
+    {
+      "baseline_success": false,
+      "blocked_reason": "activation_predicates_unmet",
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_4",
+      "case_regressed": false,
+      "policy_plan_activated": true,
+      "present": true,
+      "raw_normalized_arg_match": false,
+      "recommended_tool_match": false,
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "selected_next_tool": "cat"
+    },
+    {
+      "baseline_success": false,
+      "blocked_reason": "activation_predicates_unmet",
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_5",
+      "case_regressed": false,
+      "policy_plan_activated": true,
+      "present": true,
+      "raw_normalized_arg_match": false,
+      "recommended_tool_match": false,
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "selected_next_tool": "cat"
+    }
+  ],
+  "diagnostic_only_gap_case_activation_count": 6,
+  "fixed_case_preservation_status": {
+    "cases": {
+      "multi_turn_miss_param_25": {
+        "baseline_success": false,
+        "blocked_reason": "activation_predicates_unmet",
+        "candidate_success": true,
+        "case_fixed": true,
+        "case_regressed": false,
+        "policy_plan_activated": false,
+        "present": true,
+        "raw_normalized_arg_match": false,
+        "recommended_tool_match": false,
+        "repair_kinds": [
+          "coerce_no_tool_text_to_empty"
+        ],
+        "selected_next_tool": null
+      },
+      "multi_turn_miss_param_31": {
+        "baseline_success": false,
+        "blocked_reason": "activation_predicates_unmet",
+        "candidate_success": false,
+        "case_fixed": false,
+        "case_regressed": false,
+        "policy_plan_activated": true,
+        "present": true,
+        "raw_normalized_arg_match": true,
+        "recommended_tool_match": true,
+        "repair_kinds": [
+          "coerce_no_tool_text_to_empty"
+        ],
+        "selected_next_tool": "cat"
+      }
+    },
+    "preserved_case_ids": [
+      "multi_turn_miss_param_25"
+    ],
+    "preserved_count": 1,
+    "previous_fixed_case_count": 2,
+    "previous_fixed_case_ids": [
+      "multi_turn_miss_param_31",
+      "multi_turn_miss_param_25"
+    ],
+    "regressed_previous_fixed_case_ids": [],
+    "source": "m27q_postmortem.previous_fixed_cases"
+  },
+  "m27z_feedback_effect_ready": true,
+  "new_regression_cases": [
+    {
+      "baseline_success": true,
+      "blocked_reason": "activation_predicates_unmet",
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_9",
+      "case_regressed": true,
+      "feedback_action": null,
+      "policy_plan_activated": false,
+      "present": true,
+      "raw_normalized_arg_match": false,
+      "recommended_tool_match": false,
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "resolve_contextual_string_arg"
+      ],
+      "selected_next_tool": null
+    }
+  ],
+  "previous_regression_case_count": 4,
+  "previous_regression_cases_resolved": [
+    "multi_turn_miss_param_21",
+    "multi_turn_miss_param_22"
+  ],
+  "previous_regression_cases_resolved_count": 2,
+  "previous_regression_cases_status": {
+    "multi_turn_miss_param_21": {
+      "baseline_success": true,
+      "blocked_reason": "activation_predicates_unmet",
+      "candidate_success": true,
+      "case_fixed": false,
+      "case_regressed": false,
+      "feedback_action": "record_only",
+      "policy_plan_activated": false,
+      "present": true,
+      "previous_gap_type": "no_proxy_gap",
+      "raw_normalized_arg_match": false,
+      "recommended_tool_match": false,
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "selected_next_tool": null
+    },
+    "multi_turn_miss_param_22": {
+      "baseline_success": true,
+      "blocked_reason": "activation_predicates_unmet",
+      "candidate_success": true,
+      "case_fixed": false,
+      "case_regressed": false,
+      "feedback_action": "record_only",
+      "policy_plan_activated": true,
+      "present": true,
+      "previous_gap_type": "proxy_arg_ok_scorer_arg_wrong",
+      "raw_normalized_arg_match": false,
+      "recommended_tool_match": true,
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "selected_next_tool": "cat"
+    },
+    "multi_turn_miss_param_35": {
+      "baseline_success": true,
+      "blocked_reason": "activation_predicates_unmet",
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_regressed": true,
+      "feedback_action": "record_only",
+      "policy_plan_activated": false,
+      "present": true,
+      "previous_gap_type": "proxy_arg_ok_scorer_arg_wrong",
+      "raw_normalized_arg_match": false,
+      "recommended_tool_match": false,
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "resolve_contextual_string_arg"
+      ],
+      "selected_next_tool": null
+    },
+    "multi_turn_miss_param_39": {
+      "baseline_success": true,
+      "blocked_reason": "activation_predicates_unmet",
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_regressed": true,
+      "feedback_action": "record_only",
+      "policy_plan_activated": true,
+      "present": true,
+      "previous_gap_type": "proxy_ok_trajectory_failed",
+      "raw_normalized_arg_match": false,
+      "recommended_tool_match": true,
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "selected_next_tool": "cat"
+    }
+  },
+  "previous_regression_cases_still_regressed": [
+    "multi_turn_miss_param_35",
+    "multi_turn_miss_param_39"
+  ],
+  "previous_regression_cases_still_regressed_count": 2,
+  "previous_regression_status_distribution": {
+    "candidate_success": 2,
+    "still_regressed": 2
+  },
+  "record_only_feedback_case_ids": [
+    "multi_turn_miss_param_21",
+    "multi_turn_miss_param_22",
+    "multi_turn_miss_param_35",
+    "multi_turn_miss_param_39"
+  ],
+  "record_only_signature_activated_cases": [
+    {
+      "baseline_success": true,
+      "blocked_reason": "activation_predicates_unmet",
+      "candidate_success": true,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_22",
+      "case_regressed": false,
+      "policy_plan_activated": true,
+      "present": true,
+      "raw_normalized_arg_match": false,
+      "recommended_tool_match": true,
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "selected_next_tool": "cat"
+    },
+    {
+      "baseline_success": true,
+      "blocked_reason": "activation_predicates_unmet",
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_39",
+      "case_regressed": true,
+      "policy_plan_activated": true,
+      "present": true,
+      "raw_normalized_arg_match": false,
+      "recommended_tool_match": true,
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "selected_next_tool": "cat"
+    }
+  ],
+  "record_only_signature_activation_count": 2,
+  "report_scope": "m2_7z_feedback_effect",
+  "source_feedback_path": "outputs/artifacts/bfcl_ctspc_subset30_v1/m27y_scorer_feedback.json",
+  "source_gap_path": "outputs/artifacts/bfcl_ctspc_subset30_v1/m27x_scorer_proxy_gap.json",
+  "stop_loss": {
+    "candidate_accuracy_ge_baseline_accuracy": false,
+    "case_regressed_count_le_1": false,
+    "net_case_gain_ge_0": false,
+    "raw_normalized_arg_match_rate_ge_previous_0_455": false
+  },
+  "stop_loss_passed": false
+}
