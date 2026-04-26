@@ -4,25 +4,6 @@
   "blocked_candidate_signatures": [
     {
       "args": {
-        "file_name": "marker.txt"
-      },
-      "tool": "touch"
-    },
-    {
-      "args": {
-        "destination": "final_document.txt",
-        "source": "test_document.txt"
-      },
-      "tool": "cp"
-    },
-    {
-      "args": {
-        "file_name": "test_results.json"
-      },
-      "tool": "cat"
-    },
-    {
-      "args": {
         "file_name": "analysis_report.txt"
       },
       "tool": "cat"
@@ -35,10 +16,9 @@
     },
     {
       "args": {
-        "destination": "project_overview.md",
-        "source": "project_plan.md"
+        "file_name": "marker.txt"
       },
-      "tool": "mv"
+      "tool": "touch"
     }
   ],
   "blocked_case_ids": [
@@ -69,40 +49,43 @@
     "does_not_change_bfcl_results": true,
     "offline_only": true
   },
-  "feedback_application": "downgrade_scorer_gap_and_regression_candidates_to_record_only_for_offline_readiness",
+  "feedback_application": "downgrade_regression_candidates_to_record_only_and_keep_non_regression_gaps_diagnostic",
   "feedback_case_count": 12,
   "feedback_cases": [
     {
       "candidate_policy_action": "reject_or_record_only_until_scorer_gap_fixed",
       "case_id": "multi_turn_miss_param_17",
       "case_regressed": false,
-      "feedback_action": "record_only",
+      "feedback_action": "diagnostic_only",
       "gap_type": "proxy_ok_trajectory_failed",
-      "intervention_mode_override": "record_only",
+      "intervention_mode_override": null,
       "offline_selected_tool": "touch",
       "reason": "local_tool_arg_match_but_trajectory_failed",
+      "runtime_blocked": false,
       "selected_tool": "touch"
     },
     {
       "candidate_policy_action": "reject_or_record_only_until_scorer_gap_fixed",
       "case_id": "multi_turn_miss_param_19",
       "case_regressed": false,
-      "feedback_action": "record_only",
+      "feedback_action": "diagnostic_only",
       "gap_type": "proxy_ok_trajectory_failed",
-      "intervention_mode_override": "record_only",
+      "intervention_mode_override": null,
       "offline_selected_tool": "cp",
       "reason": "local_tool_arg_match_but_trajectory_failed",
+      "runtime_blocked": false,
       "selected_tool": "cp"
     },
     {
       "candidate_policy_action": "reject_or_record_only_until_scorer_gap_fixed",
       "case_id": "multi_turn_miss_param_5",
       "case_regressed": false,
-      "feedback_action": "record_only",
+      "feedback_action": "diagnostic_only",
       "gap_type": "proxy_tool_ok_scorer_tool_wrong",
-      "intervention_mode_override": "record_only",
+      "intervention_mode_override": null,
       "offline_selected_tool": "cat",
       "reason": "scorer_tool_mismatch_after_guidance",
+      "runtime_blocked": false,
       "selected_tool": "cat"
     },
     {
@@ -114,6 +97,7 @@
       "intervention_mode_override": "record_only",
       "offline_selected_tool": "cat",
       "reason": "scorer_regression",
+      "runtime_blocked": true,
       "selected_tool": "cat"
     },
     {
@@ -125,17 +109,19 @@
       "intervention_mode_override": "record_only",
       "offline_selected_tool": null,
       "reason": "scorer_regression",
+      "runtime_blocked": true,
       "selected_tool": null
     },
     {
       "candidate_policy_action": "reject_or_record_only_until_scorer_gap_fixed",
       "case_id": "multi_turn_miss_param_28",
       "case_regressed": false,
-      "feedback_action": "record_only",
+      "feedback_action": "diagnostic_only",
       "gap_type": "proxy_tool_ok_scorer_tool_wrong",
-      "intervention_mode_override": "record_only",
+      "intervention_mode_override": null,
       "offline_selected_tool": "cat",
       "reason": "scorer_tool_mismatch_after_guidance",
+      "runtime_blocked": false,
       "selected_tool": "cat"
     },
     {
@@ -147,50 +133,55 @@
       "intervention_mode_override": "record_only",
       "offline_selected_tool": "cat",
       "reason": "scorer_regression",
+      "runtime_blocked": true,
       "selected_tool": "cat"
     },
     {
       "candidate_policy_action": "reject_or_record_only_until_scorer_gap_fixed",
       "case_id": "multi_turn_miss_param_4",
       "case_regressed": false,
-      "feedback_action": "record_only",
+      "feedback_action": "diagnostic_only",
       "gap_type": "proxy_tool_ok_scorer_tool_wrong",
-      "intervention_mode_override": "record_only",
+      "intervention_mode_override": null,
       "offline_selected_tool": "cat",
       "reason": "scorer_tool_mismatch_after_guidance",
+      "runtime_blocked": false,
       "selected_tool": "cat"
     },
     {
       "candidate_policy_action": "reject_or_record_only_until_scorer_gap_fixed",
       "case_id": "multi_turn_miss_param_27",
       "case_regressed": false,
-      "feedback_action": "record_only",
+      "feedback_action": "diagnostic_only",
       "gap_type": "proxy_ok_trajectory_failed",
-      "intervention_mode_override": "record_only",
+      "intervention_mode_override": null,
       "offline_selected_tool": "mv",
       "reason": "local_tool_arg_match_but_trajectory_failed",
+      "runtime_blocked": false,
       "selected_tool": "mv"
     },
     {
       "candidate_policy_action": "reject_or_record_only_until_scorer_gap_fixed",
       "case_id": "multi_turn_miss_param_29",
       "case_regressed": false,
-      "feedback_action": "record_only",
+      "feedback_action": "diagnostic_only",
       "gap_type": "proxy_tool_ok_scorer_tool_wrong",
-      "intervention_mode_override": "record_only",
+      "intervention_mode_override": null,
       "offline_selected_tool": "cat",
       "reason": "scorer_tool_mismatch_after_guidance",
+      "runtime_blocked": false,
       "selected_tool": "cat"
     },
     {
       "candidate_policy_action": "reject_or_record_only_until_scorer_gap_fixed",
       "case_id": "multi_turn_miss_param_30",
       "case_regressed": false,
-      "feedback_action": "record_only",
+      "feedback_action": "diagnostic_only",
       "gap_type": "proxy_activated_but_scorer_not_activated",
-      "intervention_mode_override": "record_only",
+      "intervention_mode_override": null,
       "offline_selected_tool": "cat",
       "reason": "proxy_activated_but_scorer_not_activated",
+      "runtime_blocked": false,
       "selected_tool": null
     },
     {
@@ -202,6 +193,7 @@
       "intervention_mode_override": "record_only",
       "offline_selected_tool": "touch",
       "reason": "scorer_regression",
+      "runtime_blocked": true,
       "selected_tool": "touch"
     }
   ],
