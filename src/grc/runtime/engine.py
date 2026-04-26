@@ -707,6 +707,8 @@ class RuleEngine:
         lowered = request_text.lower()
         if any(token in lowered for token in ("post", "send", "submit", "ticket", "email")):
             return "submit_or_send"
+        if any(token in lowered for token in ("cd", "change directory", "go to", "navigate", "enter directory", "switch directory")) and any(token in lowered for token in ("directory", "folder", "dir", "cd")):
+            return "directory_navigation"
         if any(token in lowered for token in ("move", "copy", "rename", "duplicate")):
             return "move_or_copy"
         if "compare" in lowered or "diff" in lowered:
@@ -734,6 +736,7 @@ class RuleEngine:
             "target_path_changed": "move_or_copy",
             "content_written": "write_content",
             "comparison_result": "compare",
+            "current_directory_changed": "directory_navigation",
         }.get(str(postcondition.get("kind") or ""), "unknown")
 
     def _action_candidate_score_components(
@@ -1000,9 +1003,11 @@ class RuleEngine:
             return {"accepted": True, "reason": "clean_cwd_listing_binding", "risk_flags": risk_flags, "trajectory_risk_score": trajectory_risk_score, "intervention_mode": intervention_mode}
         if strong_literal_arg and not (tool_name == "cat" and "cat_competing_intent" in risk_flags) and "write_intent_unconfirmed" not in risk_flags and "repeat_same_tool_without_new_evidence" not in risk_flags and "post_write_tool_intervention" not in risk_flags:
             return {"accepted": True, "reason": "literal_arg_match", "risk_flags": risk_flags, "trajectory_risk_score": trajectory_risk_score, "intervention_mode": intervention_mode}
-        if risk_flags:
-            return {"accepted": False, "reason": risk_flags[0], "risk_flags": risk_flags, "trajectory_risk_score": trajectory_risk_score, "intervention_mode": intervention_mode}
-        return {"accepted": True, "reason": "guard_passed", "risk_flags": risk_flags, "trajectory_risk_score": trajectory_risk_score, "intervention_mode": intervention_mode}
+        nonblocking_diagnostic_flags = {"trajectory_sensitive_tool", "weak_arg_binding_evidence"}
+        blocking_residual_flags = [flag for flag in risk_flags if flag not in nonblocking_diagnostic_flags]
+        if blocking_residual_flags:
+            return {"accepted": False, "reason": blocking_residual_flags[0], "risk_flags": risk_flags, "trajectory_risk_score": trajectory_risk_score, "intervention_mode": intervention_mode}
+        return {"accepted": True, "reason": "guard_passed_with_diagnostic_risk" if risk_flags else "guard_passed", "risk_flags": risk_flags, "trajectory_risk_score": trajectory_risk_score, "intervention_mode": intervention_mode}
 
     def _guarded_action_candidate_selection(
         self,

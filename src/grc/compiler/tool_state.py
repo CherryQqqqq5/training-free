@@ -40,6 +40,7 @@ _MOVE_COPY_TOKENS = ("move", "copy", "rename", "duplicate")
 _SEARCH_TOKENS = ("search", "find", "grep", "locate", "match", "matches")
 _SUBMIT_TOKENS = ("post", "send", "submit", "ticket", "email")
 _CREATE_TOKENS = ("create", "make", "add", "touch")
+_DIRECTORY_NAV_TOKENS = ("cd", "change directory", "go to", "navigate", "enter directory", "switch directory")
 _REFERENCE_LITERAL_VALUES = {
     "it",
     "this",
@@ -177,6 +178,8 @@ def _pending_goal_family(text: str, prior_outputs: list[PriorToolOutput]) -> str
         return "final_answer"
     if _has_any(lowered, _SUBMIT_TOKENS):
         return "submit_or_send"
+    if _has_any(lowered, _DIRECTORY_NAV_TOKENS) and any(token in lowered for token in ("directory", "folder", "dir", "cd")):
+        return "directory_navigation"
     if _has_any(lowered, _MOVE_COPY_TOKENS):
         return "move_or_copy"
     if "compare" in lowered or "diff" in lowered:

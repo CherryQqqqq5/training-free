@@ -216,6 +216,7 @@ _POSTCONDITION_GOALS = {
     "target_path_changed": "move_or_copy",
     "content_written": "write_content",
     "comparison_result": "compare",
+    "current_directory_changed": "directory_navigation",
 }
 
 
@@ -235,6 +236,8 @@ def _postcondition(tool: str, arg_name: str | None, *, binding_type: str) -> dic
         return {"kind": "content_written", "expected_state_key": "file_content", "target_arg": target_arg, "confidence": 0.65}
     if tool == "diff":
         return {"kind": "comparison_result", "expected_state_key": "diff", "target_arg": target_arg, "confidence": 0.65}
+    if tool == "cd":
+        return {"kind": "current_directory_changed", "expected_state_key": "current_working_directory", "target_arg": target_arg, "confidence": 0.65}
     return {}
 
 
@@ -379,6 +382,7 @@ def _tool_matches_pending_goal(tool: str, pending_goal_family: str) -> bool:
         "copy_file": "move_or_copy",
         "echo": "write_content",
         "diff": "compare",
+        "cd": "directory_navigation",
     }.get(tool)
     return expected is None or expected == pending_goal_family
 
