@@ -1,0 +1,228 @@
+{
+  "artifact_root": "outputs/artifacts/bfcl_ctspc_subset30_v1",
+  "block_all_would_break_m27m_readiness": true,
+  "cases": [
+    {
+      "activation_if_allow_low_risk": 10,
+      "activation_if_block_all": 9,
+      "block_all_would_break_m27m_readiness": true,
+      "case_id": "multi_turn_miss_param_39",
+      "fallback_candidates_ranked": [
+        {
+          "args": {
+            "file_name": "test_results.json"
+          },
+          "binding_source": "prior_tool_output.matches[0]|basename",
+          "fallback_selection_action": "diagnostic_only",
+          "fallback_selection_class": "ambiguous_fallback",
+          "fallback_selection_reason": "diagnostic regression pattern overlap without hard block",
+          "fallback_selection_risk_score": 4,
+          "guard_reason": null,
+          "intervention_mode": "guidance",
+          "matched_fallback_guard_key": null,
+          "matched_regression_guard_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"resolve_contextual_string_arg\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}",
+          "postcondition": {
+            "confidence": 0.8,
+            "expected_state_key": "file_content",
+            "kind": "file_content",
+            "target_arg": "file_name"
+          },
+          "rank_tuple": null,
+          "scorer_feedback_fallback_action": null,
+          "scorer_feedback_fallback_guard_matched": false,
+          "scorer_feedback_pattern_action": "diagnostic_only",
+          "scorer_feedback_pattern_matched": true,
+          "status": "selected",
+          "tool": "cat",
+          "trajectory_risk_flags": [
+            "trajectory_sensitive_tool"
+          ]
+        },
+        {
+          "args": {
+            "file_name": "analysis_report.txt"
+          },
+          "binding_source": "prior_tool_output.matches[0]|basename",
+          "fallback_selection_action": "record_only",
+          "fallback_selection_class": "unsafe_fallback",
+          "fallback_selection_reason": "exact post-feedback fallback context matched",
+          "fallback_selection_risk_score": 4,
+          "guard_reason": "intervention_mode_record_only",
+          "intervention_mode": "record_only",
+          "matched_fallback_guard_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"prior_tool_output.cwd_or_listing\",\"postcondition_family\":\"create_file\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\"],\"selected_tool_family\":\"create_file\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\",\"weak_cwd_or_listing_binding\"]}",
+          "matched_regression_guard_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"resolve_contextual_string_arg\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}",
+          "postcondition": {
+            "confidence": 0.8,
+            "expected_state_key": "file_content",
+            "kind": "file_content",
+            "target_arg": "file_name"
+          },
+          "rank_tuple": [
+            16,
+            6,
+            10,
+            0,
+            0.8,
+            -3,
+            -4
+          ],
+          "scorer_feedback_fallback_action": "record_only",
+          "scorer_feedback_fallback_guard_matched": true,
+          "scorer_feedback_pattern_action": "diagnostic_only",
+          "scorer_feedback_pattern_matched": true,
+          "status": "rejected",
+          "tool": "cat",
+          "trajectory_risk_flags": [
+            "trajectory_sensitive_tool",
+            "scorer_feedback_record_only",
+            "scorer_feedback_fallback_record_only"
+          ]
+        }
+      ],
+      "fallback_selection_action": "diagnostic_only",
+      "fallback_selection_class": "fallback_chain_recall_tradeoff",
+      "fallback_selection_reason": "fallback is risky, but blocking the chain would break M2.7m activation readiness",
+      "fixed_case_collateral": {
+        "fixed_case_blocked_count": 0,
+        "productive_nonregression_case_blocked_count": 0
+      },
+      "next_fallback_selected": {
+        "args": {
+          "file_name": "test_results.json"
+        },
+        "binding_source": "prior_tool_output.matches[0]|basename",
+        "fallback_selection_action": "diagnostic_only",
+        "fallback_selection_class": "ambiguous_fallback",
+        "fallback_selection_reason": "diagnostic regression pattern overlap without hard block",
+        "fallback_selection_risk_score": 4,
+        "guard_reason": null,
+        "intervention_mode": "guidance",
+        "matched_fallback_guard_key": null,
+        "matched_regression_guard_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"resolve_contextual_string_arg\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}",
+        "postcondition": {
+          "confidence": 0.8,
+          "expected_state_key": "file_content",
+          "kind": "file_content",
+          "target_arg": "file_name"
+        },
+        "rank_tuple": null,
+        "scorer_feedback_fallback_action": null,
+        "scorer_feedback_fallback_guard_matched": false,
+        "scorer_feedback_pattern_action": "diagnostic_only",
+        "scorer_feedback_pattern_matched": true,
+        "status": "selected",
+        "tool": "cat",
+        "trajectory_risk_flags": [
+          "trajectory_sensitive_tool"
+        ]
+      },
+      "primary_candidate": {
+        "args": {
+          "file_name": "analysis_report.txt"
+        },
+        "binding_source": "prior_tool_output.matches[0]|basename",
+        "fallback_selection_action": null,
+        "fallback_selection_class": null,
+        "fallback_selection_reason": null,
+        "fallback_selection_risk_score": null,
+        "guard_reason": null,
+        "intervention_mode": "guidance",
+        "matched_fallback_guard_key": null,
+        "matched_regression_guard_key": null,
+        "postcondition": {
+          "confidence": 0.8,
+          "expected_state_key": "file_content",
+          "kind": "file_content",
+          "target_arg": "file_name"
+        },
+        "rank_tuple": null,
+        "scorer_feedback_fallback_action": null,
+        "scorer_feedback_fallback_guard_matched": false,
+        "scorer_feedback_pattern_action": null,
+        "scorer_feedback_pattern_matched": false,
+        "status": "primary_before_guard",
+        "tool": "cat",
+        "trajectory_risk_flags": [
+          "trajectory_sensitive_tool"
+        ]
+      },
+      "regression_risk": {
+        "baseline_success_proxy": true,
+        "class": "fallback_chain_recall_tradeoff",
+        "gap_type": "proxy_arg_ok_scorer_arg_wrong",
+        "score": 5
+      },
+      "repair_no_tool_evidence": {
+        "has_coerce_no_tool_text_to_empty": true,
+        "repair_kinds": [
+          "coerce_no_tool_text_to_empty"
+        ]
+      },
+      "which_fallback_was_blocked": [
+        {
+          "args": {
+            "file_name": "analysis_report.txt"
+          },
+          "binding_source": "prior_tool_output.matches[0]|basename",
+          "fallback_selection_action": "record_only",
+          "fallback_selection_class": "unsafe_fallback",
+          "fallback_selection_reason": "exact post-feedback fallback context matched",
+          "fallback_selection_risk_score": 4,
+          "guard_reason": "intervention_mode_record_only",
+          "intervention_mode": "record_only",
+          "matched_fallback_guard_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"prior_tool_output.cwd_or_listing\",\"postcondition_family\":\"create_file\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\"],\"selected_tool_family\":\"create_file\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\",\"weak_cwd_or_listing_binding\"]}",
+          "matched_regression_guard_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"resolve_contextual_string_arg\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}",
+          "postcondition": {
+            "confidence": 0.8,
+            "expected_state_key": "file_content",
+            "kind": "file_content",
+            "target_arg": "file_name"
+          },
+          "rank_tuple": [
+            16,
+            6,
+            10,
+            0,
+            0.8,
+            -3,
+            -4
+          ],
+          "scorer_feedback_fallback_action": "record_only",
+          "scorer_feedback_fallback_guard_matched": true,
+          "scorer_feedback_pattern_action": "diagnostic_only",
+          "scorer_feedback_pattern_matched": true,
+          "status": "rejected",
+          "tool": "cat",
+          "trajectory_risk_flags": [
+            "trajectory_sensitive_tool",
+            "scorer_feedback_record_only",
+            "scorer_feedback_fallback_record_only"
+          ]
+        }
+      ],
+      "why_next_fallback_selected": "fallback is risky, but blocking the chain would break M2.7m activation readiness"
+    }
+  ],
+  "diagnostic": {
+    "allows_residual_only_when_recall_tradeoff_or_repair_policy": true,
+    "does_not_authorize_holdout_or_100_case": true,
+    "does_not_run_bfcl": true,
+    "offline_only": true
+  },
+  "dominant_selected_next_tool_rate_after_guard": 0.8,
+  "fallback_chain_recall_tradeoff_count": 1,
+  "fixed_case_blocked_count": 0,
+  "m27ad_fallback_selection_passed": true,
+  "m2_7m_guidance_only_readiness_passed": true,
+  "old_regression_unresolved_count_after_repair": 1,
+  "plan_activated_count_after_guard": 10,
+  "repair_policy_or_no_tool_coercion_count": 0,
+  "report_scope": "m2_7ad_fallback_selection",
+  "source_reports": {
+    "m27aa": "outputs/artifacts/bfcl_ctspc_subset30_v1/m27aa_regression_patterns.json",
+    "m27ab": "outputs/artifacts/bfcl_ctspc_subset30_v1/m27ab_unresolved_regression_repair.json",
+    "m27ac": "outputs/artifacts/bfcl_ctspc_subset30_v1/m27ac_pattern_guard_recall.json",
+    "m27x": "outputs/artifacts/bfcl_ctspc_subset30_v1/m27x_scorer_proxy_gap.json"
+  },
+  "unsafe_fallback_unblocked_count": 0
+}

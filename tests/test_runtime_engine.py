@@ -2995,6 +2995,9 @@ action:
         self.assertTrue(rejected["scorer_feedback_fallback_guard_matched"])
         self.assertEqual(rejected["matched_fallback_guard_key"], source_key)
         self.assertEqual(rejected["scorer_feedback_fallback_action"], "record_only")
+        self.assertEqual(rejected["fallback_selection_class"], "unsafe_fallback")
+        self.assertEqual(rejected["fallback_selection_action"], "record_only")
+        self.assertEqual(rejected["fallback_selection_reason"], "exact post-feedback fallback context matched")
 
     def test_scorer_feedback_pattern_does_not_block_non_matching_candidate(self) -> None:
         action_candidate = {

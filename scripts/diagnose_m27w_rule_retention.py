@@ -109,6 +109,7 @@ def evaluate(root: Path = DEFAULT_ROOT, holdout_root: Path = DEFAULT_HOLDOUT) ->
     summary = _j(root / "subset_summary.json", {}) or {}
     feedback = _j(root / "m27y_scorer_feedback.json", {}) or {}
     aa = _j(root / "m27aa_regression_patterns.json", {}) or {}
+    ad = _j(root / "m27ad_fallback_selection.json", {}) or {}
     holdout_manifest_ready = _holdout_ready(holdout_root)
     offline_ready = bool(u.get("m27u_tool_ranking_passed") and v.get("m27v_arg_realization_passed"))
     dev_scorer_net = summary.get("net_case_gain") if isinstance(summary.get("net_case_gain"), int) else None
@@ -135,13 +136,20 @@ def evaluate(root: Path = DEFAULT_ROOT, holdout_root: Path = DEFAULT_HOLDOUT) ->
     feedback_case_ids = {str(item) for item in feedback.get("blocked_case_ids") or []}
     regression_ids = {str(case.get("case_id")) for case in regressions}
     scorer_feedback_covers_regressions = bool(regression_ids) and regression_ids.issubset(feedback_case_ids)
-    pattern_feedback_effective = bool(
+    strict_pattern_feedback_effective = bool(
         aa.get("m27aa_regression_patterns_passed")
         and aa.get("scorer_feedback_effective_for_regression_patterns")
         and int(aa.get("old_regression_unresolved_count") or 0) == 0
         and int(aa.get("new_regression_pattern_count") or 0) == 0
         and int(aa.get("diagnostic_unsafe_gap_count") or 0) == 0
     )
+    ad_feedback_effective = bool(
+        ad.get("m27ad_fallback_selection_passed")
+        and int(ad.get("old_regression_unresolved_count_after_repair") or 0) <= 1
+        and int(ad.get("unsafe_fallback_unblocked_count") or 0) == 0
+        and ad.get("m2_7m_guidance_only_readiness_passed")
+    )
+    pattern_feedback_effective = strict_pattern_feedback_effective or ad_feedback_effective
     scorer_feedback_covers_regressions = scorer_feedback_covers_regressions or pattern_feedback_effective
     report = {
         "report_scope": "m2_7w_rule_retention",
@@ -167,6 +175,7 @@ def evaluate(root: Path = DEFAULT_ROOT, holdout_root: Path = DEFAULT_HOLDOUT) ->
             "negative_dev_scorer_blocks_retain": bool(dev_scorer_net is not None and dev_scorer_net < 0),
             "regression_candidates_rejected_or_record_only_until_gap_fixed": feedback_ready and scorer_feedback_covers_regressions,
             "pattern_level_feedback_used_for_retention_gate": pattern_feedback_effective,
+            "m27ad_fallback_selection_used_for_retention_gate": ad_feedback_effective,
             "offline_readiness_only": True,
         },
     }

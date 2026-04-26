@@ -278,6 +278,26 @@ class RuleEngine:
         patched["scorer_feedback_fallback_guard_matched"] = fallback_blocked
         patched["matched_fallback_guard_key"] = (fallback_context or {}).get("source_regression_guard_key") if fallback_blocked else None
         patched["scorer_feedback_fallback_action"] = fallback_action
+        if fallback_blocked:
+            fallback_selection_class = "unsafe_fallback"
+            fallback_selection_action = fallback_action or "record_only"
+            fallback_selection_reason = "exact post-feedback fallback context matched"
+        elif pattern_blocked and action == "record_only":
+            fallback_selection_class = "unsafe_fallback"
+            fallback_selection_action = action
+            fallback_selection_reason = "high-confidence regression pattern matched"
+        elif pattern_blocked:
+            fallback_selection_class = "ambiguous_fallback"
+            fallback_selection_action = action
+            fallback_selection_reason = "diagnostic regression pattern overlap without hard block"
+        else:
+            fallback_selection_class = None
+            fallback_selection_action = None
+            fallback_selection_reason = None
+        patched["fallback_selection_class"] = fallback_selection_class
+        patched["fallback_selection_action"] = fallback_selection_action
+        patched["fallback_selection_reason"] = fallback_selection_reason
+        patched["fallback_selection_risk_score"] = patched.get("trajectory_risk_score")
         patched["scorer_feedback_action"] = fallback_action or action
         patched["scorer_feedback_reason"] = "m27ac_post_feedback_fallback_guard" if fallback_blocked else ("m27aa_pattern_regression_guard" if pattern_blocked else "m27y_scorer_gap_or_regression")
         if signature_blocked or fallback_action == "record_only" or action == "record_only":
@@ -1301,6 +1321,10 @@ class RuleEngine:
                     "scorer_feedback_fallback_guard_matched": bool(candidate.get("scorer_feedback_fallback_guard_matched")),
                     "matched_fallback_guard_key": candidate.get("matched_fallback_guard_key"),
                     "scorer_feedback_fallback_action": candidate.get("scorer_feedback_fallback_action"),
+                    "fallback_selection_class": candidate.get("fallback_selection_class"),
+                    "fallback_selection_action": candidate.get("fallback_selection_action"),
+                    "fallback_selection_reason": candidate.get("fallback_selection_reason"),
+                    "fallback_selection_risk_score": candidate.get("fallback_selection_risk_score"),
                 }
             )
         return None, rejected

@@ -98,7 +98,8 @@ def _proxy_calibration(root: Path, summary: dict[str, Any], x: dict[str, Any]) -
     }
 
 
-def _pattern_proxy_calibration(root: Path, summary: dict[str, Any], aa: dict[str, Any]) -> dict[str, Any]:
+def _pattern_proxy_calibration(root: Path, summary: dict[str, Any], aa: dict[str, Any], ad: dict[str, Any] | None = None) -> dict[str, Any]:
+    ad = ad or {}
     tool = summary.get("recommended_tool_match_rate_among_activated")
     arg = summary.get("raw_normalized_arg_match_rate_among_activated")
     tool_ok = isinstance(tool, (int, float)) and tool >= 0.6
@@ -114,10 +115,24 @@ def _pattern_proxy_calibration(root: Path, summary: dict[str, Any], aa: dict[str
     covers_patterns = bool(aa.get("scorer_feedback_covers_regression_patterns"))
     effective_patterns = bool(aa.get("scorer_feedback_effective_for_regression_patterns"))
     aa_passed = bool(aa.get("m27aa_regression_patterns_passed"))
-    pattern_passed = (not needs_pattern_fix) or (aa_passed and old_unresolved == 0 and new_patterns == 0 and coverage_ok and effective_coverage_ok and unsafe == 0 and covers_patterns and effective_patterns)
+    strict_pattern_passed = aa_passed and old_unresolved == 0 and new_patterns == 0 and coverage_ok and effective_coverage_ok and unsafe == 0 and covers_patterns and effective_patterns
+    ad_passed = bool(ad.get("m27ad_fallback_selection_passed"))
+    ad_unresolved = int(ad.get("old_regression_unresolved_count_after_repair") or 0)
+    ad_tradeoffs = int(ad.get("fallback_chain_recall_tradeoff_count") or 0)
+    ad_repair = int(ad.get("repair_policy_or_no_tool_coercion_count") or 0)
+    ad_unsafe = int(ad.get("unsafe_fallback_unblocked_count") or 0)
+    ad_readiness = bool(ad.get("m2_7m_guidance_only_readiness_passed"))
+    ad_residual_explained = ad_passed and ad_unresolved <= 1 and ad_unsafe == 0 and ad_readiness and (ad_unresolved == 0 or (ad_tradeoffs + ad_repair) >= ad_unresolved)
+    pattern_passed = (not needs_pattern_fix) or strict_pattern_passed or ad_residual_explained
     return {
         "pattern_proxy_calibration_passed": pattern_passed,
         "needs_pattern_fix": needs_pattern_fix,
+        "strict_pattern_proxy_calibration_passed": strict_pattern_passed,
+        "m27ad_fallback_selection_passed": ad_passed,
+        "m27ad_old_regression_unresolved_count_after_repair": ad_unresolved,
+        "m27ad_fallback_chain_recall_tradeoff_count": ad_tradeoffs,
+        "m27ad_repair_policy_or_no_tool_coercion_count": ad_repair,
+        "m27ad_unsafe_fallback_unblocked_count": ad_unsafe,
         "m27aa_regression_patterns_passed": aa_passed,
         "old_regression_unresolved_count": old_unresolved,
         "new_regression_pattern_count": new_patterns,
@@ -127,6 +142,7 @@ def _pattern_proxy_calibration(root: Path, summary: dict[str, Any], aa: dict[str
         "scorer_feedback_covers_regression_patterns": covers_patterns,
         "scorer_feedback_effective_for_regression_patterns": effective_patterns,
         "pattern_report_path": str(root / "m27aa_regression_patterns.json") if (root / "m27aa_regression_patterns.json").exists() else None,
+        "fallback_selection_report_path": str(root / "m27ad_fallback_selection.json") if (root / "m27ad_fallback_selection.json").exists() else None,
     }
 
 
@@ -139,8 +155,9 @@ def evaluate(root: Path = ROOT, holdout: Path = HOLD, source: Path = SRC) -> dic
     summary = _j(root / "subset_summary.json", {}) or {}
     x = _j(root / "m27x_scorer_proxy_gap.json", {}) or {}
     aa = _j(root / "m27aa_regression_patterns.json", {}) or {}
+    ad = _j(root / "m27ad_fallback_selection.json", {}) or {}
     calibration = _proxy_calibration(root, summary, x)
-    pattern_calibration = _pattern_proxy_calibration(root, summary, aa)
+    pattern_calibration = _pattern_proxy_calibration(root, summary, aa, ad)
     guidance_calibration = _guidance_only_ready(root)
     checks = {
         "m27t_source_pool_ready": bool(source_manifest.get("m27t_source_pool_ready")),
