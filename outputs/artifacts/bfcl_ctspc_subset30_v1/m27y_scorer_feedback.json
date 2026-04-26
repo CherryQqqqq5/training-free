@@ -32,7 +32,8 @@
   ],
   "blocked_regression_patterns": [
     {
-      "action": "record_only",
+      "action": "diagnostic_only",
+      "action_source": "m27ac_pattern_guard_recall",
       "baseline_success_proxy": true,
       "binding_source": "prior_tool_output.matches[0]|basename",
       "case_ids": [
@@ -50,7 +51,8 @@
       ]
     },
     {
-      "action": "record_only",
+      "action": "diagnostic_only",
+      "action_source": "m27ac_pattern_guard_recall",
       "baseline_success_proxy": true,
       "binding_source": "prior_tool_output.cwd_or_listing",
       "case_ids": [
@@ -68,7 +70,8 @@
       ]
     },
     {
-      "action": "record_only",
+      "action": "diagnostic_only",
+      "action_source": "m27ac_pattern_guard_recall",
       "baseline_success_proxy": true,
       "binding_source": "unknown",
       "case_ids": [
@@ -267,9 +270,15 @@
   },
   "fixed_by_code_change": true,
   "m27aa_regression_patterns_passed": false,
+  "m27ac_pattern_guard_recall_passed": true,
   "m27y_scorer_feedback_ready": true,
   "missing_regression_coverage": [],
   "net_case_gain": -2,
+  "pattern_action_overrides": {
+    "{\"baseline_success_proxy\":true,\"binding_source\":\"prior_tool_output.cwd_or_listing\",\"postcondition_family\":\"create_file\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\"],\"selected_tool_family\":\"create_file\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\",\"weak_cwd_or_listing_binding\"]}": "diagnostic_only",
+    "{\"baseline_success_proxy\":true,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"resolve_contextual_string_arg\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}": "diagnostic_only",
+    "{\"baseline_success_proxy\":true,\"binding_source\":\"unknown\",\"postcondition_family\":\"unknown\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"resolve_contextual_string_arg\"],\"selected_tool_family\":\"unknown\",\"trajectory_risk_flags\":[]}": "diagnostic_only"
+  },
   "pattern_source_report": "outputs/artifacts/bfcl_ctspc_subset30_v1/m27aa_regression_patterns.json",
   "regression_case_ids": [
     "multi_turn_miss_param_35",

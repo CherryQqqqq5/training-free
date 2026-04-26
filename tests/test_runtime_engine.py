@@ -2903,6 +2903,47 @@ action:
         self.assertEqual(rejected["scorer_feedback_pattern_action"], "record_only")
         self.assertEqual(rejected["scorer_feedback_reason"], "m27aa_pattern_regression_guard")
 
+
+    def test_scorer_feedback_diagnostic_pattern_observes_without_blocking(self) -> None:
+        action_candidate = {
+            "tool": "cat",
+            "args": {"file_name": "b.txt"},
+            "binding_source": "explicit_literal",
+            "arg_bindings": {"file_name": {"source": "explicit_literal", "value": "b.txt"}},
+            "postcondition": {"kind": "file_content"},
+            "recommended_tools": ["cat"],
+        }
+        rule = self._next_tool_rule(recommended_tools=["cat"], action_candidates=[action_candidate])
+        request = {
+            "model": "demo-model",
+            "messages": [{"role": "user", "content": "Read 'b.txt'."}],
+            "tools": [{"type": "function", "function": {"name": "cat", "parameters": {"type": "object", "properties": {"file_name": {"type": "string"}}, "required": ["file_name"]}}}],
+        }
+        feedback = {
+            "m27y_scorer_feedback_ready": True,
+            "blocked_regression_patterns": [
+                {
+                    "selected_tool_family": "read_content",
+                    "postcondition_family": "read_content",
+                    "binding_source": "explicit_literal",
+                    "trajectory_risk_flags": ["trajectory_sensitive_tool"],
+                    "action": "diagnostic_only",
+                    "regression_guard_key": "pattern-key",
+                }
+            ],
+        }
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir, runtime_policy={"exact_next_tool_choice_mode": "guidance_only", "scorer_feedback": feedback})
+            engine.rules = [rule]
+            _, request_patches = engine.apply_request(request)
+
+        self.assertTrue(request_patches.next_tool_plan["activated"])
+        selected = request_patches.next_tool_plan["selected_action_candidate"]
+        self.assertEqual(selected["tool"], "cat")
+        self.assertTrue(selected["scorer_feedback_pattern_matched"])
+        self.assertEqual(selected["matched_regression_guard_key"], "pattern-key")
+        self.assertEqual(selected["scorer_feedback_pattern_action"], "diagnostic_only")
+
     def test_scorer_feedback_pattern_does_not_block_non_matching_candidate(self) -> None:
         action_candidate = {
             "tool": "cp",

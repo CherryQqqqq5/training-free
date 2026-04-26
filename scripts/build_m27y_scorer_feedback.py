@@ -36,6 +36,7 @@ def _write_json(path: Path, data: dict[str, Any]) -> None:
 def build_feedback(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
     gap = _j(root / "m27x_scorer_proxy_gap.json", {}) or {}
     aa = _j(root / "m27aa_regression_patterns.json", {}) or {}
+    ac = _j(root / "m27ac_pattern_guard_recall.json", {}) or {}
     summary = _j(root / "subset_summary.json", {}) or {}
     cases = gap.get("cases") if isinstance(gap.get("cases"), list) else []
     feedback_cases: list[dict[str, Any]] = []
@@ -82,6 +83,18 @@ def build_feedback(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
     regression_case_ids = sorted({str(case.get("case_id")) for case in cases if case.get("case_regressed")})
     covered_case_ids = sorted({case["case_id"] for case in feedback_cases})
     missing_regression_coverage = sorted(set(regression_case_ids) - set(covered_case_ids))
+    pattern_action_overrides = ac.get("pattern_action_overrides") if isinstance(ac.get("pattern_action_overrides"), dict) else {}
+    blocked_patterns = []
+    for pattern in aa.get("blocked_regression_patterns") or []:
+        if not isinstance(pattern, dict):
+            continue
+        item = dict(pattern)
+        key = str(item.get("regression_guard_key") or "")
+        if key in pattern_action_overrides:
+            item["action"] = str(pattern_action_overrides[key])
+            item["action_source"] = "m27ac_pattern_guard_recall"
+        blocked_patterns.append(item)
+
     report = {
         "report_scope": "m2_7y_scorer_feedback",
         "artifact_root": str(root),
@@ -96,7 +109,9 @@ def build_feedback(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
         "feedback_case_count": len(feedback_cases),
         "feedback_cases": feedback_cases,
         "blocked_candidate_signatures": blocked_signatures,
-        "blocked_regression_patterns": aa.get("blocked_regression_patterns") or [],
+        "blocked_regression_patterns": blocked_patterns,
+        "m27ac_pattern_guard_recall_passed": bool(ac.get("m27ac_pattern_guard_recall_passed")),
+        "pattern_action_overrides": pattern_action_overrides,
         "scorer_feedback_covers_regression_patterns": bool(aa.get("scorer_feedback_covers_regression_patterns")),
         "m27aa_regression_patterns_passed": bool(aa.get("m27aa_regression_patterns_passed")),
         "pattern_source_report": str(root / "m27aa_regression_patterns.json") if (root / "m27aa_regression_patterns.json").exists() else None,

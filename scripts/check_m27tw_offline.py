@@ -31,6 +31,54 @@ def _holdout_ready(manifest: dict[str, Any]) -> bool:
     return bool(manifest.get("m27tw_holdout_manifest_ready")) and int(manifest.get("selected_case_count") or 0) >= 20 and int(manifest.get("candidate_generatable_count") or 0) >= 15 and not (manifest.get("overlap_with_dev_case_ids") or [])
 
 
+
+def _guidance_only_ready(root: Path) -> dict[str, Any]:
+    m = _j(root / "m27m_guidance_only_readiness.json", {}) or {}
+    i = _j(root / "m27i_guard_preflight.json", {}) or {}
+    activated = m.get("plan_activated_count_after_guard", i.get("plan_activated_count_after_guard"))
+    dominant = m.get("dominant_selected_next_tool_rate_after_guard", i.get("dominant_selected_next_tool_rate_after_guard"))
+    fixed_keeps = i.get("guard_keeps_fixed_cases")
+    exact_coverage = m.get("exact_tool_choice_coverage")
+    activated_ok = isinstance(activated, int) and 10 <= activated <= 25
+    dominant_ok = isinstance(dominant, (int, float)) and dominant <= 0.8
+    fixed_ok = isinstance(fixed_keeps, int) and fixed_keeps >= 1
+    exact_ok = isinstance(exact_coverage, (int, float)) and exact_coverage == 0.0
+    passed = bool(
+        m.get("m2_7m_preflight_passed")
+        and m.get("m2_7m_guidance_only_readiness_passed")
+        and i.get("m2_7i_guard_preflight_passed")
+        and activated_ok
+        and dominant_ok
+        and fixed_ok
+        and exact_ok
+    )
+    first_failed = None
+    for key, ok in [
+        ("m2_7m_preflight_passed", bool(m.get("m2_7m_preflight_passed"))),
+        ("m2_7m_guidance_only_readiness_passed", bool(m.get("m2_7m_guidance_only_readiness_passed"))),
+        ("m2_7i_guard_preflight_passed", bool(i.get("m2_7i_guard_preflight_passed"))),
+        ("plan_activated_count_after_guard_range", activated_ok),
+        ("dominant_selected_next_tool_rate_after_guard", dominant_ok),
+        ("guard_keeps_fixed_cases", fixed_ok),
+        ("exact_tool_choice_coverage", exact_ok),
+    ]:
+        if not ok:
+            first_failed = key
+            break
+    return {
+        "m27m_guidance_only_readiness_passed": passed,
+        "m2_7m_preflight_passed": bool(m.get("m2_7m_preflight_passed")),
+        "m2_7m_guidance_only_readiness_passed": bool(m.get("m2_7m_guidance_only_readiness_passed")),
+        "m2_7i_guard_preflight_passed": bool(i.get("m2_7i_guard_preflight_passed")),
+        "plan_activated_count_after_guard": activated,
+        "dominant_selected_next_tool_rate_after_guard": dominant,
+        "guard_keeps_fixed_cases": fixed_keeps,
+        "exact_tool_choice_coverage": exact_coverage,
+        "first_failed_criterion": first_failed,
+        "m27m_guidance_only_readiness_path": str(root / "m27m_guidance_only_readiness.json") if (root / "m27m_guidance_only_readiness.json").exists() else None,
+        "m27i_guard_preflight_path": str(root / "m27i_guard_preflight.json") if (root / "m27i_guard_preflight.json").exists() else None,
+    }
+
 def _proxy_calibration(root: Path, summary: dict[str, Any], x: dict[str, Any]) -> dict[str, Any]:
     tool = summary.get("recommended_tool_match_rate_among_activated")
     arg = summary.get("raw_normalized_arg_match_rate_among_activated")
@@ -93,12 +141,14 @@ def evaluate(root: Path = ROOT, holdout: Path = HOLD, source: Path = SRC) -> dic
     aa = _j(root / "m27aa_regression_patterns.json", {}) or {}
     calibration = _proxy_calibration(root, summary, x)
     pattern_calibration = _pattern_proxy_calibration(root, summary, aa)
+    guidance_calibration = _guidance_only_ready(root)
     checks = {
         "m27t_source_pool_ready": bool(source_manifest.get("m27t_source_pool_ready")),
         "m27tw_holdout_manifest_ready": _holdout_ready(holdout_manifest),
         "m27u_tool_ranking_passed": bool(u.get("m27u_tool_ranking_passed")),
         "m27v_arg_realization_passed": bool(v.get("m27v_arg_realization_passed")),
         "m27w_rule_retention_passed": bool(w.get("m27w_rule_retention_passed")),
+        "m27m_guidance_only_readiness_passed": bool(guidance_calibration.get("m27m_guidance_only_readiness_passed")),
         "proxy_calibration_passed": bool(calibration.get("proxy_calibration_passed")),
         "pattern_proxy_calibration_passed": bool(pattern_calibration.get("pattern_proxy_calibration_passed")),
     }
@@ -111,6 +161,7 @@ def evaluate(root: Path = ROOT, holdout: Path = HOLD, source: Path = SRC) -> dic
         "tool_ranking": {key: u.get(key) for key in ["tool_mismatch_before_arg_realization_count", "offline_recommended_tool_match_proxy", "dominant_selected_next_tool_rate", "last_scorer_tool_match_rate"]},
         "arg_realization": {key: v.get(key) for key in ["raw_arg_match_rate_proxy", "emitted_arg_wrong_or_guidance_not_followed_count", "canonical_arg_validation_coverage", "last_scorer_raw_arg_match_rate"]},
         "rule_retention": {key: w.get(key) for key in ["decision_distribution", "holdout_manifest_ready", "holdout_scorer_evidence_available", "offline_u_v_readiness_passed", "scorer_override_applied"]},
+        "guidance_only_readiness": guidance_calibration,
         "proxy_calibration": calibration,
         "pattern_proxy_calibration": pattern_calibration,
         "diagnostic": {
@@ -127,7 +178,7 @@ def evaluate(root: Path = ROOT, holdout: Path = HOLD, source: Path = SRC) -> dic
 
 def render_markdown(report: dict[str, Any]) -> str:
     lines = ["# M2.7tw Offline Summary", "", f"- Passed: `{report['m2_7tw_offline_passed']}`", "", "| Check | Passed |", "| --- | ---: |"]
-    for key in ["m27t_source_pool_ready", "m27tw_holdout_manifest_ready", "m27u_tool_ranking_passed", "m27v_arg_realization_passed", "m27w_rule_retention_passed", "proxy_calibration_passed", "pattern_proxy_calibration_passed"]:
+    for key in ["m27t_source_pool_ready", "m27tw_holdout_manifest_ready", "m27u_tool_ranking_passed", "m27v_arg_realization_passed", "m27w_rule_retention_passed", "m27m_guidance_only_readiness_passed", "proxy_calibration_passed", "pattern_proxy_calibration_passed"]:
         lines.append(f"| `{key}` | `{report[key]}` |")
     lines.extend(["", "This summary is an offline readiness gate only. Proxy readiness is blocked when scorer gaps are unexplained, unfixed, or not covered by regression patterns.", ""])
     return "\n".join(lines)
@@ -146,7 +197,7 @@ def main() -> int:
     _write_json(args.output, report)
     args.markdown_output.write_text(render_markdown(report), encoding="utf-8")
     if args.compact:
-        print(json.dumps({key: report.get(key) for key in ["m2_7tw_offline_passed", "m27t_source_pool_ready", "m27tw_holdout_manifest_ready", "m27u_tool_ranking_passed", "m27v_arg_realization_passed", "m27w_rule_retention_passed", "proxy_calibration_passed", "pattern_proxy_calibration_passed"]}, indent=2, sort_keys=True))
+        print(json.dumps({key: report.get(key) for key in ["m2_7tw_offline_passed", "m27t_source_pool_ready", "m27tw_holdout_manifest_ready", "m27u_tool_ranking_passed", "m27v_arg_realization_passed", "m27w_rule_retention_passed", "m27m_guidance_only_readiness_passed", "proxy_calibration_passed", "pattern_proxy_calibration_passed"]}, indent=2, sort_keys=True))
     return 0
 
 

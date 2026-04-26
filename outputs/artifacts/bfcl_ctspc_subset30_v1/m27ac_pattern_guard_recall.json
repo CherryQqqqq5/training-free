@@ -1,0 +1,164 @@
+{
+  "artifact_root": "outputs/artifacts/bfcl_ctspc_subset30_v1",
+  "diagnostic": {
+    "does_not_authorize_holdout_or_100_case": true,
+    "does_not_run_bfcl": true,
+    "offline_only": true,
+    "record_only_requires_no_fixed_or_productive_collateral": true
+  },
+  "dominant_selected_next_tool_rate_after_guard": 0.8,
+  "fixed_case_blocked_count": 0,
+  "fixed_cases_blocked": [],
+  "m27ac_pattern_guard_recall_passed": true,
+  "pattern_action_overrides": {
+    "{\"baseline_success_proxy\":true,\"binding_source\":\"prior_tool_output.cwd_or_listing\",\"postcondition_family\":\"create_file\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\"],\"selected_tool_family\":\"create_file\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\",\"weak_cwd_or_listing_binding\"]}": "diagnostic_only",
+    "{\"baseline_success_proxy\":true,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"resolve_contextual_string_arg\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}": "diagnostic_only",
+    "{\"baseline_success_proxy\":true,\"binding_source\":\"unknown\",\"postcondition_family\":\"unknown\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"resolve_contextual_string_arg\"],\"selected_tool_family\":\"unknown\",\"trajectory_risk_flags\":[]}": "diagnostic_only"
+  },
+  "patterns": [
+    {
+      "fixed_cases_blocked": [],
+      "matched_candidate_count": 46,
+      "matched_case_ids": [
+        "multi_turn_miss_param_0",
+        "multi_turn_miss_param_10",
+        "multi_turn_miss_param_16",
+        "multi_turn_miss_param_17",
+        "multi_turn_miss_param_19",
+        "multi_turn_miss_param_2",
+        "multi_turn_miss_param_21",
+        "multi_turn_miss_param_22",
+        "multi_turn_miss_param_25",
+        "multi_turn_miss_param_27",
+        "multi_turn_miss_param_3",
+        "multi_turn_miss_param_31",
+        "multi_turn_miss_param_35",
+        "multi_turn_miss_param_36",
+        "multi_turn_miss_param_37",
+        "multi_turn_miss_param_38",
+        "multi_turn_miss_param_40",
+        "multi_turn_miss_param_43",
+        "multi_turn_miss_param_45",
+        "multi_turn_miss_param_6",
+        "multi_turn_miss_param_7",
+        "multi_turn_miss_param_8",
+        "multi_turn_miss_param_9"
+      ],
+      "net_recall_loss": 0,
+      "pattern": {
+        "action": "record_only",
+        "baseline_success_proxy": true,
+        "binding_source": "prior_tool_output.cwd_or_listing",
+        "case_ids": [
+          "multi_turn_miss_param_39"
+        ],
+        "postcondition_family": "create_file",
+        "regression_guard_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"prior_tool_output.cwd_or_listing\",\"postcondition_family\":\"create_file\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\"],\"selected_tool_family\":\"create_file\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\",\"weak_cwd_or_listing_binding\"]}",
+        "repair_kinds": [
+          "coerce_no_tool_text_to_empty"
+        ],
+        "selected_tool_family": "create_file",
+        "trajectory_risk_flags": [
+          "trajectory_sensitive_tool",
+          "weak_cwd_or_listing_binding"
+        ]
+      },
+      "pattern_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"prior_tool_output.cwd_or_listing\",\"postcondition_family\":\"create_file\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\"],\"selected_tool_family\":\"create_file\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\",\"weak_cwd_or_listing_binding\"]}",
+      "productive_nonregression_cases_blocked": [],
+      "reason": "overbroad_pattern_match",
+      "recommended_action": "diagnostic_only",
+      "regression_cases_blocked": []
+    },
+    {
+      "fixed_cases_blocked": [],
+      "matched_candidate_count": 124,
+      "matched_case_ids": [
+        "multi_turn_miss_param_0",
+        "multi_turn_miss_param_10",
+        "multi_turn_miss_param_16",
+        "multi_turn_miss_param_17",
+        "multi_turn_miss_param_18",
+        "multi_turn_miss_param_19",
+        "multi_turn_miss_param_2",
+        "multi_turn_miss_param_21",
+        "multi_turn_miss_param_22",
+        "multi_turn_miss_param_25",
+        "multi_turn_miss_param_27",
+        "multi_turn_miss_param_28",
+        "multi_turn_miss_param_29",
+        "multi_turn_miss_param_3",
+        "multi_turn_miss_param_30",
+        "multi_turn_miss_param_31",
+        "multi_turn_miss_param_35",
+        "multi_turn_miss_param_36",
+        "multi_turn_miss_param_37",
+        "multi_turn_miss_param_38",
+        "multi_turn_miss_param_39",
+        "multi_turn_miss_param_4",
+        "multi_turn_miss_param_40",
+        "multi_turn_miss_param_43",
+        "multi_turn_miss_param_45",
+        "multi_turn_miss_param_5",
+        "multi_turn_miss_param_6",
+        "multi_turn_miss_param_7",
+        "multi_turn_miss_param_8",
+        "multi_turn_miss_param_9"
+      ],
+      "net_recall_loss": 0,
+      "pattern": {
+        "action": "record_only",
+        "baseline_success_proxy": true,
+        "binding_source": "prior_tool_output.matches[0]|basename",
+        "case_ids": [
+          "multi_turn_miss_param_35"
+        ],
+        "postcondition_family": "read_content",
+        "regression_guard_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"resolve_contextual_string_arg\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}",
+        "repair_kinds": [
+          "coerce_no_tool_text_to_empty",
+          "resolve_contextual_string_arg"
+        ],
+        "selected_tool_family": "read_content",
+        "trajectory_risk_flags": [
+          "trajectory_sensitive_tool"
+        ]
+      },
+      "pattern_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"resolve_contextual_string_arg\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}",
+      "productive_nonregression_cases_blocked": [],
+      "reason": "overbroad_pattern_match",
+      "recommended_action": "diagnostic_only",
+      "regression_cases_blocked": []
+    },
+    {
+      "fixed_cases_blocked": [],
+      "matched_candidate_count": 0,
+      "matched_case_ids": [],
+      "net_recall_loss": 0,
+      "pattern": {
+        "action": "record_only",
+        "baseline_success_proxy": true,
+        "binding_source": "unknown",
+        "case_ids": [
+          "multi_turn_miss_param_9"
+        ],
+        "postcondition_family": "unknown",
+        "regression_guard_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"unknown\",\"postcondition_family\":\"unknown\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"resolve_contextual_string_arg\"],\"selected_tool_family\":\"unknown\",\"trajectory_risk_flags\":[]}",
+        "repair_kinds": [
+          "coerce_no_tool_text_to_empty",
+          "resolve_contextual_string_arg"
+        ],
+        "selected_tool_family": "unknown",
+        "trajectory_risk_flags": []
+      },
+      "pattern_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"unknown\",\"postcondition_family\":\"unknown\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"resolve_contextual_string_arg\"],\"selected_tool_family\":\"unknown\",\"trajectory_risk_flags\":[]}",
+      "productive_nonregression_cases_blocked": [],
+      "reason": "no_current_replay_regression_block",
+      "recommended_action": "diagnostic_only",
+      "regression_cases_blocked": []
+    }
+  ],
+  "plan_activated_count_after_guard": 10,
+  "productive_nonregression_case_blocked_count": 0,
+  "productive_nonregression_cases_blocked": [],
+  "report_scope": "m2_7ac_pattern_guard_recall"
+}

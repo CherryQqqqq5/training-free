@@ -1,10 +1,10 @@
 # M2.7aa Regression Patterns
 
-- Passed: `True`
-- Old unresolved regressions: `0`
+- Passed: `False`
+- Old unresolved regressions: `1`
 - New regression patterns: `0`
 - Regression pattern coverage: `1.0`
-- Pattern effective coverage: `1.0`
+- Pattern effective coverage: `0.6666666666666666`
 - Diagnostic unsafe gaps: `0`
 
 ## Regression / Gap Cases

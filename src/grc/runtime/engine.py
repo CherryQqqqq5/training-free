@@ -221,17 +221,18 @@ class RuleEngine:
         if not signature_blocked and not pattern_blocked:
             return candidate
         patched = dict(candidate)
-        patched["intervention_mode"] = "record_only"
-        flags = list(patched.get("trajectory_risk_flags") or [])
-        if "scorer_feedback_record_only" not in flags:
-            flags.append("scorer_feedback_record_only")
-        patched["trajectory_risk_flags"] = flags
-        action = str((matched_pattern or {}).get("action") or "record_only")
-        patched["scorer_feedback_action"] = "record_only"
+        action = str((matched_pattern or {}).get("action") or "record_only") if pattern_blocked else "record_only"
         patched["scorer_feedback_pattern_matched"] = pattern_blocked
         patched["scorer_feedback_pattern_action"] = action if pattern_blocked else None
         patched["matched_regression_guard_key"] = (matched_pattern or {}).get("regression_guard_key")
+        patched["scorer_feedback_action"] = action
         patched["scorer_feedback_reason"] = "m27aa_pattern_regression_guard" if pattern_blocked else "m27y_scorer_gap_or_regression"
+        if signature_blocked or action == "record_only":
+            patched["intervention_mode"] = "record_only"
+            flags = list(patched.get("trajectory_risk_flags") or [])
+            if "scorer_feedback_record_only" not in flags:
+                flags.append("scorer_feedback_record_only")
+            patched["trajectory_risk_flags"] = flags
         return patched
 
     def _load_rules(self) -> List[Rule]:

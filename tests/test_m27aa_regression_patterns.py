@@ -71,6 +71,8 @@ def test_tw_offline_can_pass_after_pattern_calibration(tmp_path: Path) -> None:
     _wj(root / "subset_summary.json", {"recommended_tool_match_rate_among_activated": 0.7, "raw_normalized_arg_match_rate_among_activated": 0.4})
     _wj(root / "m27x_scorer_proxy_gap.json", {"m27x_scorer_proxy_gap_explained": True, "fixed_by_code_change": True})
     _wj(root / "m27aa_regression_patterns.json", {"m27aa_regression_patterns_passed": True, "old_regression_unresolved_count": 0, "new_regression_pattern_count": 0, "regression_pattern_coverage": 1.0, "pattern_effective_coverage": 1.0, "diagnostic_unsafe_gap_count": 0, "scorer_feedback_covers_regression_patterns": True, "scorer_feedback_effective_for_regression_patterns": True})
+    _wj(root / "m27m_guidance_only_readiness.json", {"m2_7m_preflight_passed": True, "m2_7m_guidance_only_readiness_passed": True, "plan_activated_count_after_guard": 10, "dominant_selected_next_tool_rate_after_guard": 0.5, "exact_tool_choice_coverage": 0.0})
+    _wj(root / "m27i_guard_preflight.json", {"m2_7i_guard_preflight_passed": True, "guard_keeps_fixed_cases": 1})
     out = evaluate_tw(root, hold, source)
     assert out["pattern_proxy_calibration_passed"] is True
     assert out["m2_7tw_offline_passed"] is True
