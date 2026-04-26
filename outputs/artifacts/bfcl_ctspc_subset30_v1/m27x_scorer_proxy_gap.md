@@ -1,8 +1,8 @@
 # M2.7x Scorer-Proxy Gap
 
 - Gap explained: `True`
-- Fixed by code change: `False`
-- Passed: `False`
+- Fixed by code change: `True`
+- Passed: `True`
 - Baseline/Candidate accuracy: `13.33` / `6.67`
 - Net case gain: `-2`
 - Gap distribution: `{'no_proxy_gap': 19, 'proxy_activated_but_scorer_not_activated': 1, 'proxy_arg_ok_scorer_arg_wrong': 2, 'proxy_ok_trajectory_failed': 4, 'proxy_tool_ok_scorer_tool_wrong': 4}`
