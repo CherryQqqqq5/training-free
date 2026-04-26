@@ -192,10 +192,13 @@ class ValidationRecord(BaseModel):
     next_tool_matches_recommendation: Optional[bool] = None
     next_tool_args_emitted: Optional[bool] = None
     next_tool_args_match_binding: Optional[bool] = None
+    candidate_arg_json: Dict[str, Any] = Field(default_factory=dict)
+    emitted_arg_json: Dict[str, Any] = Field(default_factory=dict)
     arg_binding_validation: Dict[str, Dict[str, Any]] = Field(default_factory=dict)
     next_tool_args_match_binding_normalized: Optional[bool] = None
     normalized_arg_binding_validation: Dict[str, Dict[str, Any]] = Field(default_factory=dict)
     next_tool_final_args_match_binding: Optional[bool] = None
+    final_emitted_arg_json: Dict[str, Any] = Field(default_factory=dict)
     final_arg_binding_validation: Dict[str, Dict[str, Any]] = Field(default_factory=dict)
     next_tool_final_args_match_binding_normalized: Optional[bool] = None
     final_normalized_arg_binding_validation: Dict[str, Dict[str, Any]] = Field(default_factory=dict)

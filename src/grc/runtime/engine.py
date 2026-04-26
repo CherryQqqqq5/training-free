@@ -659,12 +659,19 @@ class RuleEngine:
         return json.dumps(items[-12:], ensure_ascii=False).lower()
 
     def _request_intent_text_for_ranking(self, request_json: Dict[str, Any]) -> str:
-        items = [
-            item
-            for item in self._conversation_items(request_json)
-            if item.get("role") == "user"
-        ]
-        return json.dumps(items[-4:], ensure_ascii=False).lower()
+        values: List[str] = []
+        for item in self._conversation_items(request_json):
+            if item.get("role") != "user":
+                continue
+            content = item.get("content")
+            if isinstance(content, str):
+                values.append(content)
+            elif content is not None:
+                try:
+                    values.append(json.dumps(content, ensure_ascii=False))
+                except Exception:
+                    values.append(str(content))
+        return "\n".join(values[-4:]).lower()
 
     @staticmethod
     def _request_intent_hits(request_text: str) -> Dict[str, int]:
@@ -694,6 +701,38 @@ class RuleEngine:
         elif score:
             score += 2
         return score
+
+    @staticmethod
+    def _request_pending_goal_family(request_text: str) -> str:
+        lowered = request_text.lower()
+        if any(token in lowered for token in ("post", "send", "submit", "ticket", "email")):
+            return "submit_or_send"
+        if any(token in lowered for token in ("move", "copy", "rename", "duplicate")):
+            return "move_or_copy"
+        if "compare" in lowered or "diff" in lowered:
+            return "compare"
+        if any(token in lowered for token in ("write", "modify", "replace", "update", "append", "put", "edit")):
+            return "write_content"
+        if any(token in lowered for token in ("create", "make", "add", "touch", "new file", "new directory", "new folder")):
+            if any(token in lowered for token in ("directory", "folder", " dir")):
+                return "create_directory"
+            return "create_file"
+        if any(token in lowered for token in ("read", "open", "show", "display", "contents", "content")):
+            return "read_content"
+        if any(token in lowered for token in ("search", "find", "grep", "locate", "match", "matches")):
+            return "search"
+        return "unknown"
+
+    @staticmethod
+    def _postcondition_goal_family(candidate: Dict[str, Any]) -> str:
+        postcondition = candidate.get("postcondition") if isinstance(candidate.get("postcondition"), dict) else {}
+        return {
+            "file_content": "read_content",
+            "file_exists": "create_file",
+            "directory_exists": "create_directory",
+            "matches": "search",
+            "target_path_changed": "move_or_copy",
+        }.get(str(postcondition.get("kind") or ""), "unknown")
 
     def _action_candidate_score_components(
         self,
@@ -772,7 +811,16 @@ class RuleEngine:
             components["arg_binding_score"] = 8
 
         intent_text = self._request_intent_text_for_ranking(request_json)
+        request_pending_goal = self._request_pending_goal_family(intent_text)
+        postcondition_goal = self._postcondition_goal_family(candidate)
+        components["request_pending_goal_family"] = request_pending_goal
+        components["postcondition_goal_family"] = postcondition_goal
+        components["postcondition_goal_matches_request"] = request_pending_goal in {"unknown", postcondition_goal} or postcondition_goal == "unknown"
         components["intent_score"] = self._tool_intent_score(tool_name, intent_text)
+        if components["postcondition_goal_matches_request"] is False:
+            components["intent_score"] = int(components["intent_score"]) - 12
+        if tool_name == "cat" and request_pending_goal not in {"unknown", "read_content"}:
+            components["intent_score"] = int(components["intent_score"]) - 8
         components["score"] = (
             int(components["arg_binding_score"])
             + int(components["state_compatibility_score"])
@@ -876,6 +924,10 @@ class RuleEngine:
             risk_flags.append("high_trajectory_risk")
         if intervention_mode != "guidance":
             risk_flags.append(f"intervention_mode_{intervention_mode}")
+        if components.get("postcondition_goal_matches_request") is False:
+            risk_flags.append("pending_goal_postcondition_request_mismatch")
+        if tool_name == "cat" and components.get("request_pending_goal_family") not in {"unknown", "read_content"}:
+            risk_flags.append("cat_request_goal_mismatch")
         generic_tools = {"cat", "touch", "mkdir"}
         needs_prior_output = any(source.startswith("prior_tool_output") for source in binding_sources) or bool(components.get("prior_output_keys_required"))
         if any(source.startswith("explicit_literal") for source in binding_sources) and literal_score <= 0:
@@ -904,6 +956,8 @@ class RuleEngine:
             "intervention_mode_record_only",
             "intervention_mode_weak_guidance",
             "explicit_literal_not_in_current_state",
+            "pending_goal_postcondition_request_mismatch",
+            "cat_request_goal_mismatch",
         }
         if any(flag in risk_flags for flag in blocking_trajectory_flags):
             return {
@@ -1150,6 +1204,11 @@ class RuleEngine:
                 sources.add(str(binding["source"]).strip())
         return sorted(sources)
 
+    @staticmethod
+    def _candidate_arg_guidance_json(candidate: Dict[str, Any]) -> str:
+        args = candidate.get("args") if isinstance(candidate.get("args"), dict) else {}
+        return json.dumps(args, ensure_ascii=False, sort_keys=True)
+
     def _recommended_policy_tool_fragments(
         self,
         request_json: Dict[str, Any],
@@ -1167,13 +1226,13 @@ class RuleEngine:
             and candidate
             and str(candidate.get("tool") or "").strip() == selected_tool
         ):
-            args = candidate.get("args") if isinstance(candidate.get("args"), dict) else {}
-            args_text = json.dumps(args, ensure_ascii=False, sort_keys=True)
+            args_text = self._candidate_arg_guidance_json(candidate)
             sources = self._action_candidate_guidance_sources(candidate)
             source_text = ", ".join(sources) if sources else "action_candidate.args"
             fragments.append(
-                f"Policy selected next tool: call `{selected_tool}` next with grounded arguments {args_text}; "
-                f"binding sources: {source_text}; preserve these exact path/file literal values unless the current user explicitly changes them."
+                f"Policy selected next tool: call `{selected_tool}` next. Use this exact argument JSON if you choose the policy tool: {args_text}. "
+                f"Do not rename JSON keys or values. binding sources: {source_text}. "
+                "Preserve these exact path/file literal values unless the current user explicitly changes them."
             )
         if not recommended:
             return fragments
@@ -1444,8 +1503,32 @@ class RuleEngine:
             return False
         return not self._has_explicit_no_tool_recovery(issue_kind, rule_hits)
 
-    @staticmethod
-    def _validate_action_candidate_args(candidate: Dict[str, Any], observed_args: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
+    _ARG_ALIAS_GROUPS = (
+        {"file_name", "filename", "file", "path"},
+        {"dir_name", "directory", "folder", "path"},
+        {"source", "src", "from", "file_name"},
+        {"destination", "dest", "target", "to", "path"},
+    )
+
+    @classmethod
+    def _canonical_arg_aliases(cls, field: str) -> List[str]:
+        field_name = str(field)
+        lowered = field_name.lower()
+        aliases = [field_name]
+        for group in cls._ARG_ALIAS_GROUPS:
+            if lowered in group:
+                aliases.extend(sorted(group))
+        return list(dict.fromkeys(aliases))
+
+    @classmethod
+    def _observed_arg_with_alias(cls, observed_args: Dict[str, Any], field: str) -> tuple[str | None, Any]:
+        for alias in cls._canonical_arg_aliases(field):
+            if alias in observed_args:
+                return alias, observed_args.get(alias)
+        return None, None
+
+    @classmethod
+    def _validate_action_candidate_args(cls, candidate: Dict[str, Any], observed_args: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
         bindings = candidate.get("arg_bindings") if isinstance(candidate.get("arg_bindings"), dict) else {}
         expected_args = candidate.get("args") if isinstance(candidate.get("args"), dict) else {}
         fields = list(dict.fromkeys(list(expected_args.keys()) + list(bindings.keys())))
@@ -1453,13 +1536,19 @@ class RuleEngine:
         for field in fields:
             binding = bindings.get(field) if isinstance(bindings.get(field), dict) else {}
             expected = binding.get("value", expected_args.get(field))
-            observed = observed_args.get(field)
-            validation[str(field)] = {
+            observed_field, observed = cls._observed_arg_with_alias(observed_args, str(field))
+            key_mismatch = observed_field is not None and observed_field != str(field)
+            row = {
                 "expected": expected,
                 "observed": observed,
                 "source": binding.get("source") or candidate.get("binding_source") or "action_candidate.args",
                 "match": observed == expected,
             }
+            if key_mismatch:
+                row["observed_field"] = observed_field
+                row["key_mismatch"] = True
+                row["value_mismatch"] = observed != expected
+            validation[str(field)] = row
         return validation
 
     @staticmethod
@@ -1894,9 +1983,11 @@ class RuleEngine:
                     raw_selected_args = self._selected_tool_call_args(raw_tool_calls, validation.selected_next_tool)
                     final_selected_args = self._selected_tool_call_args(tool_calls, validation.selected_next_tool)
                     validation.next_tool_args_emitted = raw_selected_args is not None
+                    validation.candidate_arg_json = dict(validation.selected_action_candidate.get("args") or {})
                     if raw_selected_args is None:
                         validation.next_tool_args_match_binding = False
                     if raw_selected_args is not None:
+                        validation.emitted_arg_json = dict(raw_selected_args)
                         validation.arg_binding_validation = self._validate_action_candidate_args(
                             validation.selected_action_candidate,
                             raw_selected_args,
@@ -1917,6 +2008,7 @@ class RuleEngine:
                         validation.next_tool_final_args_match_binding = False
                         validation.next_tool_final_args_match_binding_normalized = False
                     if final_selected_args is not None:
+                        validation.final_emitted_arg_json = dict(final_selected_args)
                         validation.final_arg_binding_validation = self._validate_action_candidate_args(
                             validation.selected_action_candidate,
                             final_selected_args,
