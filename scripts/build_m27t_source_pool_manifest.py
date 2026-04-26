@@ -85,7 +85,7 @@ def build_source_pool_manifest(
     cases_per_category: int = DEFAULT_CASES_PER_CATEGORY,
 ) -> dict[str, Any]:
     dev = _j(dev_root / "paired_subset_manifest.json")
-    existing_roots = [Path(str(dev.get("source_run_root") or ""))]
+    dev_source_root = Path(str(dev.get("source_run_root") or ""))
     cats = categories or CATEGORIES
     runtime = Path(str(dev.get("runtime_config") or "configs/runtime_bfcl_structured.yaml"))
     if not runtime.is_absolute():
@@ -94,7 +94,8 @@ def build_source_pool_manifest(
     rows: list[dict[str, Any]] = []
     commands: list[str] = []
     for i, cat in enumerate(cats):
-        existing = [str(root) for root in existing_roots if _has_source(root, cat)]
+        candidate_roots = [dev_source_root, out_root / cat / "baseline"]
+        existing = [str(root) for root in candidate_roots if _has_source(root, cat)]
         ready = bool(existing)
         cmd = None
         selected_ids: list[str] = []
