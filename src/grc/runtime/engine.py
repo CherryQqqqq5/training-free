@@ -732,6 +732,8 @@ class RuleEngine:
             "directory_exists": "create_directory",
             "matches": "search",
             "target_path_changed": "move_or_copy",
+            "content_written": "write_content",
+            "comparison_result": "compare",
         }.get(str(postcondition.get("kind") or ""), "unknown")
 
     def _action_candidate_score_components(
@@ -1508,6 +1510,7 @@ class RuleEngine:
         {"dir_name", "directory", "folder", "path"},
         {"source", "src", "from", "file_name"},
         {"destination", "dest", "target", "to", "path"},
+        {"pattern", "query", "name", "content"},
     )
 
     @classmethod
@@ -1547,6 +1550,7 @@ class RuleEngine:
             if key_mismatch:
                 row["observed_field"] = observed_field
                 row["key_mismatch"] = True
+                row["alias_match"] = observed == expected
                 row["value_mismatch"] = observed != expected
             validation[str(field)] = row
         return validation
@@ -1590,6 +1594,7 @@ class RuleEngine:
                 "match": match,
                 "strict_match": bool(row.get("match")),
                 "normalization": reason,
+                "path_normalized_match": bool(match and reason == "path_basename"),
             }
         return normalized
 

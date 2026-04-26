@@ -21,6 +21,7 @@ class ActionCandidate:
     binding_type: str = "unknown"
     intervention_mode: str = "guidance"
     pending_goal_family: str = "unknown"
+    canonical_arg_map: dict[str, dict[str, Any]] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -37,7 +38,41 @@ class ActionCandidate:
             "binding_type": self.binding_type,
             "intervention_mode": self.intervention_mode,
             "pending_goal_family": self.pending_goal_family,
+            "canonical_arg_map": self.canonical_arg_map,
         }
+
+
+
+_CANONICAL_ARG_GROUPS = {
+    "file": {"file_name", "filename", "file", "path"},
+    "directory": {"dir_name", "directory", "folder", "path"},
+    "source_path": {"source", "src", "from", "file_name"},
+    "destination_path": {"destination", "dest", "target", "to", "path"},
+    "pattern": {"pattern", "query", "name", "content"},
+}
+
+
+def _canonical_arg_entry(arg_name: str, *, tool: str, binding_type: str) -> dict[str, Any]:
+    lowered = str(arg_name).lower()
+    for group_name, aliases in _CANONICAL_ARG_GROUPS.items():
+        if lowered in aliases:
+            return {
+                "schema_arg_name": arg_name,
+                "alias_group": group_name,
+                "aliases": sorted(aliases),
+                "normalization_type": "path_basename" if group_name in {"file", "directory", "source_path", "destination_path"} else "string_exact",
+            }
+    fallback_group = "content" if tool == "echo" or binding_type == "content" else "unknown"
+    return {
+        "schema_arg_name": arg_name,
+        "alias_group": fallback_group,
+        "aliases": [arg_name],
+        "normalization_type": "string_exact",
+    }
+
+
+def _canonical_arg_map(args: dict[str, Any], *, tool: str, binding_type: str) -> dict[str, dict[str, Any]]:
+    return {str(name): _canonical_arg_entry(str(name), tool=tool, binding_type=binding_type) for name in args}
 
 
 def _has_tool(state: ToolState, tool_name: str) -> bool:
@@ -166,9 +201,9 @@ def _binding_type(tool: str, value: str | None) -> str:
         return "file" if _looks_like_file(value) else "unknown"
     if tool == "mkdir":
         return "directory" if _looks_like_directory(value) else "unknown"
-    if tool in {"grep", "find"}:
+    if tool in {"grep", "find", "echo"}:
         return "content"
-    if tool in {"cp", "mv", "move_file", "copy_file"}:
+    if tool in {"cp", "mv", "move_file", "copy_file", "diff"}:
         return "path"
     return "unknown"
 
@@ -179,6 +214,8 @@ _POSTCONDITION_GOALS = {
     "directory_exists": "create_directory",
     "matches": "search",
     "target_path_changed": "move_or_copy",
+    "content_written": "write_content",
+    "comparison_result": "compare",
 }
 
 
@@ -194,6 +231,10 @@ def _postcondition(tool: str, arg_name: str | None, *, binding_type: str) -> dic
         return {"kind": "matches", "expected_state_key": "matches", "target_arg": target_arg, "confidence": 0.7}
     if tool in {"cp", "mv", "move_file", "copy_file"}:
         return {"kind": "target_path_changed", "expected_state_key": "current_directory_content", "target_arg": target_arg, "confidence": 0.7}
+    if tool == "echo":
+        return {"kind": "content_written", "expected_state_key": "file_content", "target_arg": target_arg, "confidence": 0.65}
+    if tool == "diff":
+        return {"kind": "comparison_result", "expected_state_key": "diff", "target_arg": target_arg, "confidence": 0.65}
     return {}
 
 
@@ -245,13 +286,13 @@ def _candidate(
     pending_goal_family = str(evidence.get("pending_goal_family") or "unknown")
     binding_type = _binding_type(tool, value)
     postcondition = _postcondition(tool, arg_name, binding_type=binding_type)
+    args = {arg_name: value} if arg_name and value is not None else {}
     risk_score, risk_flags = _candidate_risk(
         tool,
         source=source,
         postcondition=postcondition,
         pending_goal_family=pending_goal_family,
     )
-    args = {arg_name: value} if arg_name and value is not None else {}
     bindings = (
         {
             arg_name: {
@@ -277,6 +318,7 @@ def _candidate(
         binding_type=binding_type,
         intervention_mode=_intervention_mode(risk_score),
         pending_goal_family=pending_goal_family,
+        canonical_arg_map=_canonical_arg_map(args, tool=tool, binding_type=binding_type),
     )
 
 
@@ -320,6 +362,7 @@ def _multi_arg_candidate(
         binding_type=binding_type,
         intervention_mode=_intervention_mode(risk_score),
         pending_goal_family=pending_goal_family,
+        canonical_arg_map=_canonical_arg_map(args, tool=tool, binding_type=binding_type),
     )
 
 
@@ -334,6 +377,8 @@ def _tool_matches_pending_goal(tool: str, pending_goal_family: str) -> bool:
         "cp": "move_or_copy",
         "move_file": "move_or_copy",
         "copy_file": "move_or_copy",
+        "echo": "write_content",
+        "diff": "compare",
     }.get(tool)
     return expected is None or expected == pending_goal_family
 
