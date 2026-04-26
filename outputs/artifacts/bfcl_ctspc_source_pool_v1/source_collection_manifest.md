@@ -2,12 +2,13 @@
 
 - Ready: `False`
 - Source collection commands: `3`
+- Cases per missing category: `30`
 
-| Category | Available | Needs Collection |
-| --- | ---: | ---: |
-| `multi_turn_base` | `False` | `True` |
-| `multi_turn_miss_func` | `False` | `True` |
-| `multi_turn_long_context` | `False` | `True` |
+| Category | Available | Needs Collection | Selected Cases | Run IDs File |
+| --- | ---: | ---: | ---: | --- |
+| `multi_turn_base` | `False` | `True` | `30` | `outputs/artifacts/bfcl_ctspc_source_pool_v1/multi_turn_base/baseline/bfcl/test_case_ids_to_generate.json` |
+| `multi_turn_miss_func` | `False` | `True` | `30` | `outputs/artifacts/bfcl_ctspc_source_pool_v1/multi_turn_miss_func/baseline/bfcl/test_case_ids_to_generate.json` |
+| `multi_turn_long_context` | `False` | `True` | `30` | `outputs/artifacts/bfcl_ctspc_source_pool_v1/multi_turn_long_context/baseline/bfcl/test_case_ids_to_generate.json` |
 
 ## Planned Baseline-Only Commands
 ```bash
