@@ -44,11 +44,12 @@ class ActionCandidate:
 
 
 _CANONICAL_ARG_GROUPS = {
-    "file": {"file_name", "filename", "file", "path"},
-    "directory": {"dir_name", "directory", "folder", "path"},
-    "source_path": {"source", "src", "from", "file_name"},
-    "destination_path": {"destination", "dest", "target", "to", "path"},
-    "pattern": {"pattern", "query", "name", "content"},
+    "file": {"file_name", "filename", "file", "filepath", "path"},
+    "directory": {"dir_name", "dirname", "directory", "folder", "dir", "path"},
+    "source_path": {"source", "src", "from", "source_path", "file_name"},
+    "destination_path": {"destination", "dest", "target", "to", "target_path", "path"},
+    "pattern": {"pattern", "query", "name", "needle"},
+    "content": {"content", "text", "message", "body", "value"},
 }
 
 
@@ -201,7 +202,9 @@ def _binding_type(tool: str, value: str | None) -> str:
         return "file" if _looks_like_file(value) else "unknown"
     if tool == "mkdir":
         return "directory" if _looks_like_directory(value) else "unknown"
-    if tool in {"grep", "find", "echo"}:
+    if tool in {"grep", "find"}:
+        return "content"
+    if tool == "echo":
         return "content"
     if tool in {"cp", "mv", "move_file", "copy_file", "diff"}:
         return "path"
@@ -255,6 +258,9 @@ def _candidate_risk(tool: str, *, source: str, postcondition: dict[str, Any], pe
     if tool in {"cat", "touch", "mkdir"}:
         flags.append("trajectory_sensitive_tool")
         score += 2
+    if pending_goal_family == "unknown":
+        flags.append("unknown_pending_goal")
+        score += 5
     if not postcondition:
         flags.append("postcondition_missing")
         score += 8

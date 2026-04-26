@@ -1,30 +1,145 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import argparse,json
+
+import argparse
+import json
 from collections import Counter
 from pathlib import Path
 from typing import Any
-DEFAULT_ROOT=Path('outputs/artifacts/bfcl_ctspc_subset30_v1'); DEFAULT_HOLDOUT=Path('outputs/artifacts/bfcl_ctspc_holdout30_v1'); OUT=DEFAULT_ROOT/'m27w_rule_retention.json'; MD=DEFAULT_ROOT/'m27w_rule_retention.md'
-def _j(p:Path, default:Any=None):
-    if not p.exists():
-        if default is not None: return default
-        raise FileNotFoundError(p)
-    return json.loads(p.read_text())
-def _w(p:Path,d): p.parent.mkdir(parents=True,exist_ok=True); p.write_text(json.dumps(d,indent=2,sort_keys=True)+"\n")
-def decide(rule, holdout_ready:bool):
-    net=int(rule.get('net_case_gain') or 0); reg=int(rule.get('regressed_count') or 0); tool=float(rule.get('tool_match_rate') or 0); arg=float(rule.get('arg_match_rate') or 0); traj=int(rule.get('trajectory_fail_count') or 0); fixed=int(rule.get('fixed_count') or 0)
-    if net>0 and reg==0 and tool>=0.6 and arg>=0.6 and traj<=fixed and holdout_ready: return 'retain','positive_dev_and_holdout_evidence'
-    if net>=0 and reg==0 and (tool>=0.6 or arg>=0.6): return 'demote','dev_only_or_partial_alignment_signal_requires_holdout'
-    return 'reject','no_positive_retention_signal'
-def evaluate(root:Path=DEFAULT_ROOT,holdout_root:Path=DEFAULT_HOLDOUT)->dict[str,Any]:
-    base=_j(root/'m27r_rule_retention.json',{}); hold=_j(holdout_root/'holdout_manifest.json',{}); hold_ready=bool(hold.get('m27tw_holdout_manifest_ready') or hold.get('m27s_holdout_manifest_ready'))
-    rules=[]; dist=Counter()
-    for r in base.get('rules') or []:
-        d,reason=decide(r,hold_ready); item={**r,'decision':d,'reason':reason,'holdout_evidence_available':hold_ready}; rules.append(item); dist[d]+=1
-    report={'report_scope':'m2_7w_rule_retention','artifact_root':str(root),'holdout_root':str(holdout_root),'holdout_evidence_available':hold_ready,'rule_count':len(rules),'rules':rules,'decision_distribution':{k:dist.get(k,0) for k in ['retain','demote','reject']},'m27w_rule_retention_passed':(dist.get('retain',0)+dist.get('demote',0))>=1 and hold_ready,'diagnostic':{'dev_only_cannot_promote_to_retained_memory':True}}
+
+DEFAULT_ROOT = Path("outputs/artifacts/bfcl_ctspc_subset30_v1")
+DEFAULT_HOLDOUT = Path("outputs/artifacts/bfcl_ctspc_holdout30_v1")
+OUT = DEFAULT_ROOT / "m27w_rule_retention.json"
+MD = DEFAULT_ROOT / "m27w_rule_retention.md"
+
+
+def _j(path: Path, default: Any = None) -> Any:
+    if not path.exists():
+        return default
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return default
+
+
+def _write_json(path: Path, data: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def _holdout_ready(holdout_root: Path) -> bool:
+    holdout = _j(holdout_root / "holdout_manifest.json", {}) or {}
+    selected = int(holdout.get("selected_case_count") or 0)
+    generatable = int(holdout.get("candidate_generatable_count") or 0)
+    overlap = holdout.get("overlap_with_dev_case_ids") or []
+    return bool(holdout.get("m27tw_holdout_manifest_ready")) and selected >= 20 and generatable >= 15 and not overlap
+
+
+def decide(rule: dict[str, Any], holdout_ready: bool, offline_ready: bool = False) -> tuple[str, str, dict[str, Any]]:
+    net = int(rule.get("net_case_gain") or 0)
+    regressed = int(rule.get("regressed_count") or 0)
+    fixed = int(rule.get("fixed_count") or 0)
+    tool = float(rule.get("tool_match_rate") or 0.0)
+    arg = float(rule.get("arg_match_rate") or 0.0)
+    trajectory_fail = int(rule.get("trajectory_fail_count") or 0)
+    blockers: list[str] = []
+    if regressed > 0:
+        blockers.append("has_regression")
+    if net < 0:
+        blockers.append("negative_dev_net_gain")
+    if tool < 0.6:
+        blockers.append("dev_tool_match_below_floor")
+    if arg < 0.6:
+        blockers.append("dev_arg_match_below_floor")
+    if trajectory_fail > max(fixed, 0):
+        blockers.append("trajectory_fail_exceeds_fixed")
+    if not holdout_ready:
+        blockers.append("holdout_manifest_not_ready")
+    if not offline_ready:
+        blockers.append("offline_u_v_readiness_not_passed")
+
+    if net > 0 and regressed == 0 and tool >= 0.6 and arg >= 0.6 and trajectory_fail <= fixed and holdout_ready:
+        # Holdout manifest readiness is not holdout scorer evidence; this remains retain-ready only.
+        return "demote", "dev_positive_holdout_scorer_required_before_retain", {"retain_blocked_by": "missing_holdout_scorer_evidence", "blockers": []}
+    if offline_ready and holdout_ready and net >= 0 and regressed == 0 and fixed > 0:
+        return "demote", "offline_ready_with_nonnegative_dev_signal_requires_scorer_validation", {"retain_blocked_by": "missing_holdout_scorer_evidence", "blockers": blockers}
+    return "reject", "no_positive_retention_signal", {"retain_blocked_by": "missing_positive_dev_and_holdout_evidence", "blockers": blockers}
+
+
+def evaluate(root: Path = DEFAULT_ROOT, holdout_root: Path = DEFAULT_HOLDOUT) -> dict[str, Any]:
+    base = _j(root / "m27r_rule_retention.json", {}) or _j(root / "m27f_rule_level_report.json", {}) or {}
+    u = _j(root / "m27u_tool_ranking.json", {}) or {}
+    v = _j(root / "m27v_arg_realization.json", {}) or {}
+    holdout_manifest_ready = _holdout_ready(holdout_root)
+    offline_ready = bool(u.get("m27u_tool_ranking_passed") and v.get("m27v_arg_realization_passed"))
+    rules: list[dict[str, Any]] = []
+    distribution: Counter[str] = Counter()
+    for rule in base.get("rules") or []:
+        decision, reason, extra = decide(rule, holdout_manifest_ready, offline_ready)
+        item = {
+            **rule,
+            "decision": decision,
+            "reason": reason,
+            "dev_only_signal": bool(int(rule.get("activation_count") or 0) > 0),
+            "holdout_manifest_ready": holdout_manifest_ready,
+            "holdout_required_for_retain": True,
+            "holdout_scorer_evidence_available": False,
+            "decision_blocker": extra,
+        }
+        rules.append(item)
+        distribution[decision] += 1
+    demote_or_retain = distribution.get("demote", 0) + distribution.get("retain", 0)
+    report = {
+        "report_scope": "m2_7w_rule_retention",
+        "artifact_root": str(root),
+        "holdout_root": str(holdout_root),
+        "holdout_manifest_ready": holdout_manifest_ready,
+        "holdout_scorer_evidence_available": False,
+        "offline_u_v_readiness_passed": offline_ready,
+        "rule_count": len(rules),
+        "rules": rules,
+        "decision_distribution": {key: distribution.get(key, 0) for key in ["retain", "demote", "reject"]},
+        "m27w_rule_retention_passed": demote_or_retain >= 1 and holdout_manifest_ready and offline_ready,
+        "diagnostic": {
+            "dev_only_cannot_promote_to_retained_memory": True,
+            "retain_requires_future_holdout_scorer_evidence": True,
+            "offline_readiness_only": True,
+        },
+    }
     return report
-def md(r): return '\n'.join(['# M2.7w Rule Retention','',f"- Passed: `{r['m27w_rule_retention_passed']}`",f"- Holdout evidence: `{r['holdout_evidence_available']}`",f"- Decisions: `{r['decision_distribution']}`",''])
-def main():
-    ap=argparse.ArgumentParser(); ap.add_argument('--root',type=Path,default=DEFAULT_ROOT); ap.add_argument('--holdout-root',type=Path,default=DEFAULT_HOLDOUT); ap.add_argument('--output',type=Path,default=OUT); ap.add_argument('--markdown-output',type=Path,default=MD); ap.add_argument('--compact',action='store_true'); a=ap.parse_args(); r=evaluate(a.root,a.holdout_root); _w(a.output,r); a.markdown_output.write_text(md(r));
-    if a.compact: print(json.dumps({k:r.get(k) for k in ['holdout_evidence_available','decision_distribution','m27w_rule_retention_passed']},indent=2,sort_keys=True))
-if __name__=='__main__': main()
+
+
+def render_markdown(report: dict[str, Any]) -> str:
+    return "\n".join(
+        [
+            "# M2.7w Rule Retention",
+            "",
+            f"- Passed: `{report['m27w_rule_retention_passed']}`",
+            f"- Holdout manifest ready: `{report['holdout_manifest_ready']}`",
+            f"- Offline U/V readiness: `{report['offline_u_v_readiness_passed']}`",
+            f"- Decisions: `{report['decision_distribution']}`",
+            "",
+            "Retain remains blocked until holdout scorer evidence exists; offline success can only mark rules as demote-ready.",
+            "",
+        ]
+    )
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--root", type=Path, default=DEFAULT_ROOT)
+    parser.add_argument("--holdout-root", type=Path, default=DEFAULT_HOLDOUT)
+    parser.add_argument("--output", type=Path, default=OUT)
+    parser.add_argument("--markdown-output", type=Path, default=MD)
+    parser.add_argument("--compact", action="store_true")
+    args = parser.parse_args()
+    report = evaluate(args.root, args.holdout_root)
+    _write_json(args.output, report)
+    args.markdown_output.write_text(render_markdown(report), encoding="utf-8")
+    if args.compact:
+        print(json.dumps({k: report.get(k) for k in ["holdout_manifest_ready", "offline_u_v_readiness_passed", "decision_distribution", "m27w_rule_retention_passed"]}, indent=2, sort_keys=True))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

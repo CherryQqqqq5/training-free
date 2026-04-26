@@ -1913,8 +1913,8 @@ action:
         self.assertEqual(request_patches.next_tool_plan["blocked_reason"], "action_candidate_guard_rejected")
         guard = request_patches.next_tool_plan["rejected_action_candidates"][0]["guard"]
         self.assertFalse(guard["accepted"])
-        self.assertEqual(guard["reason"], "postcondition_missing")
-        self.assertIn("high_trajectory_risk", guard["risk_flags"])
+        self.assertEqual(guard["reason"], "intervention_mode_record_only")
+        self.assertIn("intervention_mode_record_only", guard["risk_flags"])
 
     def test_next_tool_guard_blocks_weak_generic_prior_output_candidate(self) -> None:
         action_candidate = {
@@ -2301,15 +2301,15 @@ action:
         self.assertTrue(validation.next_tool_args_match_binding_normalized)
         self.assertTrue(validation.next_tool_final_args_match_binding)
         self.assertTrue(validation.next_tool_final_args_match_binding_normalized)
-        self.assertEqual(
-            validation.arg_binding_validation["file_name"],
-            {
-                "expected": "report.txt",
-                "observed": "report.txt",
-                "source": "explicit_literal",
-                "match": True,
-            },
-        )
+        row = validation.arg_binding_validation["file_name"]
+        self.assertEqual(row["expected"], "report.txt")
+        self.assertEqual(row["observed"], "report.txt")
+        self.assertEqual(row["source"], "explicit_literal")
+        self.assertTrue(row["match"])
+        self.assertTrue(row["key_match"])
+        self.assertFalse(row["key_mismatch"])
+        self.assertTrue(row["value_match"])
+        self.assertTrue(row["required_pair_complete"])
         self.assertEqual(validation.final_arg_binding_validation, validation.arg_binding_validation)
 
     def test_next_tool_arg_binding_keeps_raw_match_when_contextual_repair_changes_final_arg(self) -> None:

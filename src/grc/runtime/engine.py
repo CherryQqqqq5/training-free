@@ -580,7 +580,29 @@ class RuleEngine:
     @staticmethod
     def _candidate_postcondition(candidate: Dict[str, Any]) -> Dict[str, Any]:
         postcondition = candidate.get("postcondition")
-        return postcondition if isinstance(postcondition, dict) else {}
+        if isinstance(postcondition, dict) and postcondition:
+            return postcondition
+        tool = str(candidate.get("tool") or "")
+        args = candidate.get("args") if isinstance(candidate.get("args"), dict) else {}
+        target_arg = next(iter(args.keys()), "") if args else ""
+        inferred = {
+            "cat": ("file_content", "file_content"),
+            "touch": ("file_exists", "current_directory_content"),
+            "mkdir": ("directory_exists", "current_directory_content"),
+            "grep": ("matches", "matches"),
+            "find": ("matches", "matches"),
+            "cp": ("target_path_changed", "current_directory_content"),
+            "mv": ("target_path_changed", "current_directory_content"),
+            "move_file": ("target_path_changed", "current_directory_content"),
+            "copy_file": ("target_path_changed", "current_directory_content"),
+            "echo": ("content_written", "file_content"),
+            "diff": ("comparison_result", "diff"),
+            "cd": ("current_directory_changed", "current_working_directory"),
+        }.get(tool)
+        if not inferred:
+            return {}
+        kind, expected_key = inferred
+        return {"kind": kind, "expected_state_key": expected_key, "target_arg": target_arg, "confidence": 0.5, "inferred_from_legacy_candidate": True}
 
     @staticmethod
     def _candidate_declared_risk_flags(candidate: Dict[str, Any]) -> list[str]:
@@ -727,7 +749,7 @@ class RuleEngine:
 
     @staticmethod
     def _postcondition_goal_family(candidate: Dict[str, Any]) -> str:
-        postcondition = candidate.get("postcondition") if isinstance(candidate.get("postcondition"), dict) else {}
+        postcondition = RuleEngine._candidate_postcondition(candidate)
         return {
             "file_content": "read_content",
             "file_exists": "create_file",
@@ -818,14 +840,30 @@ class RuleEngine:
         intent_text = self._request_intent_text_for_ranking(request_json)
         request_pending_goal = self._request_pending_goal_family(intent_text)
         postcondition_goal = self._postcondition_goal_family(candidate)
+        candidate_pending_goal = str(candidate.get("pending_goal_family") or "unknown")
+        if request_pending_goal != "unknown":
+            effective_pending_goal = request_pending_goal
+            pending_goal_source = "request_text"
+        elif candidate_pending_goal != "unknown":
+            effective_pending_goal = candidate_pending_goal
+            pending_goal_source = "candidate_policy"
+        elif postcondition_goal != "unknown":
+            effective_pending_goal = postcondition_goal
+            pending_goal_source = "candidate_postcondition"
+        else:
+            effective_pending_goal = "unknown"
+            pending_goal_source = "unknown"
         components["request_pending_goal_family"] = request_pending_goal
+        components["candidate_pending_goal_family"] = candidate_pending_goal
+        components["effective_pending_goal_family"] = effective_pending_goal
+        components["pending_goal_source"] = pending_goal_source
         components["postcondition_goal_family"] = postcondition_goal
-        components["postcondition_goal_matches_request"] = request_pending_goal in {"unknown", postcondition_goal} or postcondition_goal == "unknown"
+        components["postcondition_goal_matches_request"] = effective_pending_goal != "unknown" and postcondition_goal == effective_pending_goal
         components["intent_score"] = self._tool_intent_score(tool_name, intent_text)
         if components["postcondition_goal_matches_request"] is False:
+            components["intent_score"] = int(components["intent_score"]) - (8 if effective_pending_goal == "unknown" else 18)
+        if tool_name == "cat" and effective_pending_goal != "read_content":
             components["intent_score"] = int(components["intent_score"]) - 12
-        if tool_name == "cat" and request_pending_goal not in {"unknown", "read_content"}:
-            components["intent_score"] = int(components["intent_score"]) - 8
         components["score"] = (
             int(components["arg_binding_score"])
             + int(components["state_compatibility_score"])
@@ -929,10 +967,19 @@ class RuleEngine:
             risk_flags.append("high_trajectory_risk")
         if intervention_mode != "guidance":
             risk_flags.append(f"intervention_mode_{intervention_mode}")
+        if components.get("effective_pending_goal_family") == "unknown":
+            risk_flags.append("unknown_pending_goal_for_guidance")
         if components.get("postcondition_goal_matches_request") is False:
             risk_flags.append("pending_goal_postcondition_request_mismatch")
-        if tool_name == "cat" and components.get("request_pending_goal_family") not in {"unknown", "read_content"}:
+        if tool_name == "cat" and components.get("effective_pending_goal_family") != "read_content":
             risk_flags.append("cat_request_goal_mismatch")
+        if (
+            tool_name == "cat"
+            and components.get("request_pending_goal_family") != "read_content"
+            and components.get("pending_goal_source") != "request_text"
+            and literal_score <= 0
+        ):
+            risk_flags.append("cat_without_request_read_goal")
         generic_tools = {"cat", "touch", "mkdir"}
         needs_prior_output = any(source.startswith("prior_tool_output") for source in binding_sources) or bool(components.get("prior_output_keys_required"))
         if any(source.startswith("explicit_literal") for source in binding_sources) and literal_score <= 0:
@@ -955,14 +1002,36 @@ class RuleEngine:
             risk_flags.append("post_write_tool_intervention")
         if tool_name == "cat" and last_prior_tool in {"grep", "find"} and "explicit_literal" in binding_sources:
             risk_flags.append("post_search_literal_cat_intervention")
+        if not self._candidate_required_pair_complete(candidate):
+            risk_flags.append("required_arg_pair_incomplete")
+        early_clean_cwd_listing = (
+            tool_name in {"touch", "mkdir"}
+            and "prior_tool_output.cwd_or_listing" in binding_sources
+            and state_score >= 9
+            and arg_score >= 6
+            and "current_directory_content" in observed_prior_keys
+            and observed_prior_keys.issubset({"current_directory_content", "current_working_directory"})
+            and not (tool_name == "touch" and has_context_file_literal)
+        )
+        if early_clean_cwd_listing:
+            risk_flags = [
+                flag
+                for flag in risk_flags
+                if flag not in {"high_trajectory_risk", "intervention_mode_weak_guidance", "weak_cwd_or_listing_binding"}
+            ]
+            trajectory_risk_score = min(trajectory_risk_score, self._DEFAULT_HIGH_TRAJECTORY_RISK_THRESHOLD - 1)
+            intervention_mode = "guidance"
         blocking_trajectory_flags = {
             "postcondition_missing",
             "high_trajectory_risk",
             "intervention_mode_record_only",
             "intervention_mode_weak_guidance",
             "explicit_literal_not_in_current_state",
+            "unknown_pending_goal_for_guidance",
             "pending_goal_postcondition_request_mismatch",
             "cat_request_goal_mismatch",
+            "cat_without_request_read_goal",
+            "required_arg_pair_incomplete",
         }
         if any(flag in risk_flags for flag in blocking_trajectory_flags):
             return {
@@ -1216,6 +1285,20 @@ class RuleEngine:
         args = candidate.get("args") if isinstance(candidate.get("args"), dict) else {}
         return json.dumps(args, ensure_ascii=False, sort_keys=True)
 
+    @staticmethod
+    def _candidate_arg_guidance_schema_text(candidate: Dict[str, Any]) -> str:
+        cmap = candidate.get("canonical_arg_map") if isinstance(candidate.get("canonical_arg_map"), dict) else {}
+        if not cmap:
+            return "canonical args: use the JSON keys exactly as shown"
+        parts: list[str] = []
+        for key, meta in cmap.items():
+            if not isinstance(meta, dict):
+                continue
+            group = meta.get("alias_group") or "unknown"
+            norm = meta.get("normalization_type") or "string_exact"
+            parts.append(f"{key}->{group}/{norm}")
+        return "canonical args: " + "; ".join(parts) if parts else "canonical args: use the JSON keys exactly as shown"
+
     def _recommended_policy_tool_fragments(
         self,
         request_json: Dict[str, Any],
@@ -1238,6 +1321,7 @@ class RuleEngine:
             source_text = ", ".join(sources) if sources else "action_candidate.args"
             fragments.append(
                 f"Policy selected next tool: call `{selected_tool}` next. Use this exact argument JSON if you choose the policy tool: {args_text}. "
+                f"{self._candidate_arg_guidance_schema_text(candidate)}. "
                 f"Do not rename JSON keys or values. binding sources: {source_text}. "
                 "Preserve these exact path/file literal values unless the current user explicitly changes them."
             )
@@ -1511,12 +1595,33 @@ class RuleEngine:
         return not self._has_explicit_no_tool_recovery(issue_kind, rule_hits)
 
     _ARG_ALIAS_GROUPS = (
-        {"file_name", "filename", "file", "path"},
-        {"dir_name", "directory", "folder", "path"},
-        {"source", "src", "from", "file_name"},
-        {"destination", "dest", "target", "to", "path"},
-        {"pattern", "query", "name", "content"},
+        {"file_name", "filename", "file", "filepath", "path"},
+        {"dir_name", "dirname", "directory", "folder", "dir", "path"},
+        {"source", "src", "from", "source_path", "file_name"},
+        {"destination", "dest", "target", "to", "target_path", "path"},
+        {"pattern", "query", "name", "needle"},
+        {"content", "text", "message", "body", "value"},
     )
+    _REQUIRED_PAIR_TOOL_FIELDS = {
+        "cp": (("source", "src", "from", "file_name"), ("destination", "dest", "target", "to", "path")),
+        "mv": (("source", "src", "from", "file_name"), ("destination", "dest", "target", "to", "path")),
+        "move_file_pair": (("source", "src", "from", "file_name"), ("destination", "dest", "target", "to", "path")),
+        "copy_file_pair": (("source", "src", "from", "file_name"), ("destination", "dest", "target", "to", "path")),
+        "diff": (("source", "src", "from", "file_name", "path"), ("destination", "dest", "target", "to", "path")),
+    }
+
+    @classmethod
+    def _candidate_required_pair_complete(cls, candidate: Dict[str, Any]) -> bool:
+        tool = str(candidate.get("tool") or "")
+        required = cls._REQUIRED_PAIR_TOOL_FIELDS.get(tool)
+        if not required:
+            return True
+        args = candidate.get("args") if isinstance(candidate.get("args"), dict) else {}
+        arg_keys = {str(key).lower() for key in args}
+        for aliases in required:
+            if not any(alias in arg_keys for alias in aliases):
+                return False
+        return True
 
     @classmethod
     def _canonical_arg_aliases(cls, field: str) -> List[str]:
@@ -1545,18 +1650,22 @@ class RuleEngine:
             binding = bindings.get(field) if isinstance(bindings.get(field), dict) else {}
             expected = binding.get("value", expected_args.get(field))
             observed_field, observed = cls._observed_arg_with_alias(observed_args, str(field))
-            key_mismatch = observed_field is not None and observed_field != str(field)
+            key_match = observed_field == str(field)
+            alias_match = observed_field is not None and observed_field != str(field)
+            value_match = observed == expected
             row = {
                 "expected": expected,
                 "observed": observed,
+                "observed_field": observed_field,
                 "source": binding.get("source") or candidate.get("binding_source") or "action_candidate.args",
-                "match": observed == expected,
+                "match": observed_field is not None and value_match,
+                "key_match": key_match,
+                "key_mismatch": observed_field is None or observed_field != str(field),
+                "alias_match": alias_match and value_match,
+                "value_match": value_match,
+                "value_mismatch": observed_field is not None and not value_match,
+                "required_pair_complete": cls._candidate_required_pair_complete(candidate),
             }
-            if key_mismatch:
-                row["observed_field"] = observed_field
-                row["key_mismatch"] = True
-                row["alias_match"] = observed == expected
-                row["value_mismatch"] = observed != expected
             validation[str(field)] = row
         return validation
 

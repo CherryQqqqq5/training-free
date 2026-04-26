@@ -33,8 +33,8 @@ def test_runtime_validation_alias_and_path_normalized_fields():
 
 def test_rule_retention_requires_holdout_for_retain():
     rule={'net_case_gain':1,'regressed_count':0,'tool_match_rate':1.0,'arg_match_rate':1.0,'trajectory_fail_count':0,'fixed_count':1}
-    assert decide(rule, False)[0]=='demote'
-    assert decide(rule, True)[0]=='retain'
+    assert decide(rule, False, True)[0]=='reject'
+    assert decide(rule, True, True)[0]=='demote'
 
 def test_m27tw_summary_requires_all_gates(tmp_path:Path):
     root=tmp_path/'subset'; hold=tmp_path/'hold'; source=tmp_path/'source'
@@ -45,3 +45,16 @@ def test_m27tw_summary_requires_all_gates(tmp_path:Path):
     _wj(root/'m27w_rule_retention.json',{'m27w_rule_retention_passed':True})
     out=evaluate_tw(root,hold,source)
     assert out['m2_7tw_offline_passed'] is False
+
+
+def test_rule_retention_can_mark_demote_ready_after_offline_uv_with_holdout():
+    rule={'net_case_gain':1,'regressed_count':0,'tool_match_rate':1.0,'arg_match_rate':1.0,'trajectory_fail_count':0,'fixed_count':1}
+    decision, reason, extra = decide(rule, True, True)
+    assert decision == 'demote'
+    assert extra['retain_blocked_by'] == 'missing_holdout_scorer_evidence'
+
+def test_required_pair_validation_blocks_incomplete_cp_candidate():
+    candidate={'tool':'cp','args':{'source':'a.txt'},'arg_bindings':{'source':{'source':'explicit_literal','value':'a.txt'}}}
+    assert RuleEngine._candidate_required_pair_complete(candidate) is False
+    validation = RuleEngine._validate_action_candidate_args(candidate, {'source':'a.txt'})
+    assert validation['source']['required_pair_complete'] is False
