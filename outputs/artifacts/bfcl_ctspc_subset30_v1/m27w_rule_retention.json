@@ -1,20 +1,89 @@
 {
   "artifact_root": "outputs/artifacts/bfcl_ctspc_subset30_v1",
   "decision_distribution": {
-    "demote": 1,
-    "reject": 2,
+    "demote": 0,
+    "reject": 3,
     "retain": 0
   },
+  "dev_scorer_net_case_gain": -2,
   "diagnostic": {
     "dev_only_cannot_promote_to_retained_memory": true,
+    "negative_dev_scorer_blocks_retain": true,
     "offline_readiness_only": true,
+    "regression_candidates_rejected_or_record_only_until_gap_fixed": true,
     "retain_requires_future_holdout_scorer_evidence": true
   },
   "holdout_manifest_ready": true,
   "holdout_root": "outputs/artifacts/bfcl_ctspc_holdout30_v1",
   "holdout_scorer_evidence_available": false,
-  "m27w_rule_retention_passed": true,
+  "m27w_rule_retention_passed": false,
   "offline_u_v_readiness_passed": true,
+  "regression_case_count": 4,
+  "regression_cases": [
+    {
+      "candidate_policy_action": "reject_or_record_only_until_gap_fixed",
+      "case_id": "multi_turn_miss_param_22",
+      "emitted_tool": null,
+      "failure_mechanism": "regression",
+      "final_arg_match": false,
+      "policy_plan_activated": true,
+      "raw_arg_match": false,
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "rule_id": null,
+      "selected_action_candidate": {},
+      "selected_tool": "cat",
+      "tool_match": true
+    },
+    {
+      "candidate_policy_action": "reject_or_record_only_until_gap_fixed",
+      "case_id": "multi_turn_miss_param_21",
+      "emitted_tool": null,
+      "failure_mechanism": "regression",
+      "final_arg_match": false,
+      "policy_plan_activated": false,
+      "raw_arg_match": false,
+      "repair_kinds": [],
+      "rule_id": null,
+      "selected_action_candidate": {},
+      "selected_tool": null,
+      "tool_match": false
+    },
+    {
+      "candidate_policy_action": "reject_or_record_only_until_gap_fixed",
+      "case_id": "multi_turn_miss_param_35",
+      "emitted_tool": null,
+      "failure_mechanism": "regression",
+      "final_arg_match": false,
+      "policy_plan_activated": true,
+      "raw_arg_match": false,
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "resolve_contextual_string_arg"
+      ],
+      "rule_id": null,
+      "selected_action_candidate": {},
+      "selected_tool": "cat",
+      "tool_match": true
+    },
+    {
+      "candidate_policy_action": "reject_or_record_only_until_gap_fixed",
+      "case_id": "multi_turn_miss_param_39",
+      "emitted_tool": null,
+      "failure_mechanism": "regression",
+      "final_arg_match": true,
+      "policy_plan_activated": true,
+      "raw_arg_match": true,
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "rule_id": null,
+      "selected_action_candidate": {},
+      "selected_tool": "touch",
+      "tool_match": true
+    }
+  ],
   "report_scope": "m2_7w_rule_retention",
   "rule_count": 3,
   "rules": [
@@ -41,11 +110,13 @@
         "blockers": [
           "dev_tool_match_below_floor",
           "dev_arg_match_below_floor",
-          "trajectory_fail_exceeds_fixed"
+          "trajectory_fail_exceeds_fixed",
+          "negative_overall_dev_scorer_net_gain"
         ],
         "retain_blocked_by": "missing_positive_dev_and_holdout_evidence"
       },
       "dev_only_signal": true,
+      "dev_scorer_net_case_gain": -2,
       "fixed_count": 0,
       "holdout_manifest_ready": true,
       "holdout_required_for_retain": true,
@@ -79,11 +150,13 @@
         "blockers": [
           "dev_tool_match_below_floor",
           "dev_arg_match_below_floor",
-          "trajectory_fail_exceeds_fixed"
+          "trajectory_fail_exceeds_fixed",
+          "negative_overall_dev_scorer_net_gain"
         ],
         "retain_blocked_by": "missing_positive_dev_and_holdout_evidence"
       },
       "dev_only_signal": true,
+      "dev_scorer_net_case_gain": -2,
       "fixed_count": 0,
       "holdout_manifest_ready": true,
       "holdout_required_for_retain": true,
@@ -113,27 +186,30 @@
       ],
       "activation_count": 12,
       "arg_match_rate": 0.3333333333333333,
-      "decision": "demote",
+      "decision": "reject",
       "decision_blocker": {
         "blockers": [
           "dev_tool_match_below_floor",
           "dev_arg_match_below_floor",
-          "trajectory_fail_exceeds_fixed"
+          "trajectory_fail_exceeds_fixed",
+          "negative_overall_dev_scorer_net_gain"
         ],
-        "retain_blocked_by": "missing_holdout_scorer_evidence"
+        "retain_blocked_by": "missing_positive_dev_and_holdout_evidence"
       },
       "dev_only_signal": true,
+      "dev_scorer_net_case_gain": -2,
       "fixed_count": 1,
       "holdout_manifest_ready": true,
       "holdout_required_for_retain": true,
       "holdout_scorer_evidence_available": false,
       "net_case_gain": 1,
       "not_activated_count": 18,
-      "reason": "offline_ready_with_nonnegative_dev_signal_requires_scorer_validation",
+      "reason": "no_positive_retention_signal",
       "regressed_count": 0,
       "rule_id": "rule_global_no_tool_post_tool_prose_summary_v1",
       "tool_match_rate": 0.5833333333333334,
       "trajectory_fail_count": 3
     }
-  ]
+  ],
+  "scorer_override_applied": true
 }

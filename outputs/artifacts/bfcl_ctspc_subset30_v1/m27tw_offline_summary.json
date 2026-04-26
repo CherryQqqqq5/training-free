@@ -11,6 +11,7 @@
     "no_bfcl_rerun": true,
     "no_full_bfcl": true,
     "no_m2_8": true,
+    "offline_proxy_requires_scorer_gap_calibration": true,
     "offline_readiness_only": true
   },
   "holdout": {
@@ -23,18 +24,29 @@
   "m27tw_holdout_manifest_ready": true,
   "m27u_tool_ranking_passed": true,
   "m27v_arg_realization_passed": true,
-  "m27w_rule_retention_passed": true,
-  "m2_7tw_offline_passed": true,
+  "m27w_rule_retention_passed": false,
+  "m2_7tw_offline_passed": false,
+  "proxy_calibration": {
+    "fixed_by_code_change": false,
+    "gap_report_path": "outputs/artifacts/bfcl_ctspc_subset30_v1/m27x_scorer_proxy_gap.json",
+    "last_scorer_raw_arg_match_rate": 0.45454545454545453,
+    "last_scorer_tool_match_rate": 0.6363636363636364,
+    "m27x_scorer_proxy_gap_explained": true,
+    "needs_gap_fix": true,
+    "proxy_calibration_passed": false
+  },
+  "proxy_calibration_passed": false,
   "report_scope": "m2_7tw_offline_summary",
   "rule_retention": {
     "decision_distribution": {
-      "demote": 1,
-      "reject": 2,
+      "demote": 0,
+      "reject": 3,
       "retain": 0
     },
     "holdout_manifest_ready": true,
     "holdout_scorer_evidence_available": false,
-    "offline_u_v_readiness_passed": true
+    "offline_u_v_readiness_passed": true,
+    "scorer_override_applied": true
   },
   "source_pool": {
     "candidate_commands": [],

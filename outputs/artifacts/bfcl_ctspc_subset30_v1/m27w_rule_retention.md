@@ -1,8 +1,10 @@
 # M2.7w Rule Retention
 
-- Passed: `True`
+- Passed: `False`
 - Holdout manifest ready: `True`
 - Offline U/V readiness: `True`
-- Decisions: `{'retain': 0, 'demote': 1, 'reject': 2}`
+- Dev scorer net case gain: `-2`
+- Decisions: `{'retain': 0, 'demote': 0, 'reject': 3}`
+- Regression cases: `4`
 
-Retain remains blocked until holdout scorer evidence exists; offline success can only mark rules as demote-ready.
+Retain remains blocked until holdout scorer evidence exists; negative dev scorer evidence forces regression-causing candidates to reject or record-only.
