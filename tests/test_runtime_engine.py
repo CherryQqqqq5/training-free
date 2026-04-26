@@ -2859,5 +2859,75 @@ action:
         self.assertEqual(rejected["guard"]["intervention_mode"], "record_only")
         self.assertIn("scorer_feedback_record_only", rejected["guard"]["risk_flags"])
 
+
+    def test_scorer_feedback_pattern_downgrades_matching_candidate(self) -> None:
+        action_candidate = {
+            "tool": "cat",
+            "args": {"file_name": "b.txt"},
+            "binding_source": "explicit_literal",
+            "arg_bindings": {"file_name": {"source": "explicit_literal", "value": "b.txt"}},
+            "postcondition": {"kind": "file_content"},
+            "trajectory_risk_flags": ["trajectory_sensitive_tool"],
+            "recommended_tools": ["cat"],
+        }
+        rule = self._next_tool_rule(recommended_tools=["cat"], action_candidates=[action_candidate])
+        request = {
+            "model": "demo-model",
+            "messages": [{"role": "user", "content": "Read 'b.txt'."}],
+            "tools": [{"type": "function", "function": {"name": "cat", "parameters": {"type": "object", "properties": {"file_name": {"type": "string"}}, "required": ["file_name"]}}}],
+        }
+        feedback = {
+            "m27y_scorer_feedback_ready": True,
+            "blocked_regression_patterns": [
+                {
+                    "selected_tool_family": "read_content",
+                    "postcondition_family": "read_content",
+                    "binding_source": "explicit_literal",
+                    "trajectory_risk_flags": ["trajectory_sensitive_tool"],
+                    "action": "record_only",
+                }
+            ],
+        }
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir, runtime_policy={"exact_next_tool_choice_mode": "guidance_only", "scorer_feedback": feedback})
+            engine.rules = [rule]
+            patched, request_patches = engine.apply_request(request)
+
+        self.assertNotIn("tool_choice", patched)
+        self.assertFalse(any(str(patch).startswith("prompt_injector:Policy selected next tool:") for patch in request_patches))
+        rejected = request_patches.next_tool_plan["rejected_action_candidates"][0]
+        self.assertEqual(rejected["guard"]["intervention_mode"], "record_only")
+        self.assertIn("scorer_feedback_record_only", rejected["guard"]["risk_flags"])
+        self.assertEqual(rejected["tool"], "cat")
+
+    def test_scorer_feedback_pattern_does_not_block_non_matching_candidate(self) -> None:
+        action_candidate = {
+            "tool": "cp",
+            "args": {"source": "a.txt", "destination": "b.txt"},
+            "binding_source": "explicit_literal_pair",
+            "arg_bindings": {
+                "source": {"source": "explicit_literal_pair", "value": "a.txt"},
+                "destination": {"source": "explicit_literal_pair", "value": "b.txt"},
+            },
+            "postcondition": {"kind": "target_path_changed"},
+            "trajectory_risk_flags": [],
+            "pending_goal_family": "move_or_copy",
+            "recommended_tools": ["cp"],
+        }
+        rule = self._next_tool_rule(recommended_tools=["cp"], action_candidates=[action_candidate])
+        request = {
+            "model": "demo-model",
+            "messages": [{"role": "user", "content": "Copy 'a.txt' to 'b.txt'."}],
+            "tools": [{"type": "function", "function": {"name": "cp", "parameters": {"type": "object", "properties": {"source": {"type": "string"}, "destination": {"type": "string"}}, "required": ["source", "destination"]}}}],
+        }
+        feedback = {"m27y_scorer_feedback_ready": True, "blocked_regression_patterns": [{"selected_tool_family": "read_content", "postcondition_family": "read_content", "binding_source": "explicit_literal"}]}
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(rules_dir, runtime_policy={"exact_next_tool_choice_mode": "guidance_only", "scorer_feedback": feedback})
+            engine.rules = [rule]
+            _, request_patches = engine.apply_request(request)
+
+        self.assertTrue(any(str(patch).startswith("prompt_injector:Policy selected next tool:") for patch in request_patches))
+        self.assertEqual(request_patches.next_tool_plan["selected_action_candidate"]["tool"], "cp")
+
 if __name__ == "__main__":
     unittest.main()

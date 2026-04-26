@@ -1,13 +1,7 @@
 {
   "artifact_root": "outputs/artifacts/bfcl_ctspc_subset30_v1",
-  "baseline_accuracy": 13.33,
+  "baseline_accuracy": 20.0,
   "blocked_candidate_signatures": [
-    {
-      "args": {
-        "file_name": "analysis_report.txt"
-      },
-      "tool": "cat"
-    },
     {
       "args": {
         "file_name": "config.py"
@@ -24,16 +18,71 @@
   "blocked_case_ids": [
     "multi_turn_miss_param_17",
     "multi_turn_miss_param_19",
-    "multi_turn_miss_param_21",
     "multi_turn_miss_param_22",
     "multi_turn_miss_param_27",
     "multi_turn_miss_param_28",
     "multi_turn_miss_param_29",
     "multi_turn_miss_param_30",
+    "multi_turn_miss_param_31",
     "multi_turn_miss_param_35",
     "multi_turn_miss_param_39",
     "multi_turn_miss_param_4",
-    "multi_turn_miss_param_5"
+    "multi_turn_miss_param_5",
+    "multi_turn_miss_param_9"
+  ],
+  "blocked_regression_patterns": [
+    {
+      "action": "record_only",
+      "baseline_success_proxy": true,
+      "binding_source": "prior_tool_output.matches[0]|basename",
+      "case_ids": [
+        "multi_turn_miss_param_35"
+      ],
+      "postcondition_family": "read_content",
+      "regression_guard_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"resolve_contextual_string_arg\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "resolve_contextual_string_arg"
+      ],
+      "selected_tool_family": "read_content",
+      "trajectory_risk_flags": [
+        "trajectory_sensitive_tool"
+      ]
+    },
+    {
+      "action": "record_only",
+      "baseline_success_proxy": true,
+      "binding_source": "prior_tool_output.cwd_or_listing",
+      "case_ids": [
+        "multi_turn_miss_param_39"
+      ],
+      "postcondition_family": "create_file",
+      "regression_guard_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"prior_tool_output.cwd_or_listing\",\"postcondition_family\":\"create_file\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\"],\"selected_tool_family\":\"create_file\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\",\"weak_cwd_or_listing_binding\"]}",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "selected_tool_family": "create_file",
+      "trajectory_risk_flags": [
+        "trajectory_sensitive_tool",
+        "weak_cwd_or_listing_binding"
+      ]
+    },
+    {
+      "action": "record_only",
+      "baseline_success_proxy": true,
+      "binding_source": "unknown",
+      "case_ids": [
+        "multi_turn_miss_param_9"
+      ],
+      "postcondition_family": "unknown",
+      "regression_guard_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"unknown\",\"postcondition_family\":\"unknown\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"resolve_contextual_string_arg\"],\"selected_tool_family\":\"unknown\",\"trajectory_risk_flags\":[]}",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "resolve_contextual_string_arg"
+      ],
+      "selected_tool_family": "unknown",
+      "trajectory_risk_flags": []
+    }
   ],
   "blocking_gap_types": [
     "proxy_activated_but_scorer_not_activated",
@@ -42,7 +91,7 @@
     "proxy_ok_trajectory_failed",
     "proxy_tool_ok_scorer_tool_wrong"
   ],
-  "candidate_accuracy": 6.67,
+  "candidate_accuracy": 13.33,
   "code_fix_id": "m27y_scorer_feedback_overlay_v1",
   "diagnostic": {
     "does_not_authorize_holdout_or_100_case": true,
@@ -50,19 +99,19 @@
     "offline_only": true
   },
   "feedback_application": "downgrade_regression_candidates_to_record_only_and_keep_non_regression_gaps_diagnostic",
-  "feedback_case_count": 12,
+  "feedback_case_count": 13,
   "feedback_cases": [
     {
       "candidate_policy_action": "reject_or_record_only_until_scorer_gap_fixed",
       "case_id": "multi_turn_miss_param_17",
       "case_regressed": false,
       "feedback_action": "diagnostic_only",
-      "gap_type": "proxy_ok_trajectory_failed",
+      "gap_type": "proxy_activated_but_scorer_not_activated",
       "intervention_mode_override": null,
       "offline_selected_tool": "touch",
-      "reason": "local_tool_arg_match_but_trajectory_failed",
+      "reason": "proxy_activated_but_scorer_not_activated",
       "runtime_blocked": false,
-      "selected_tool": "touch"
+      "selected_tool": null
     },
     {
       "candidate_policy_action": "reject_or_record_only_until_scorer_gap_fixed",
@@ -75,6 +124,18 @@
       "reason": "local_tool_arg_match_but_trajectory_failed",
       "runtime_blocked": false,
       "selected_tool": "cp"
+    },
+    {
+      "candidate_policy_action": "reject_or_record_only_until_scorer_gap_fixed",
+      "case_id": "multi_turn_miss_param_31",
+      "case_regressed": false,
+      "feedback_action": "diagnostic_only",
+      "gap_type": "proxy_ok_trajectory_failed",
+      "intervention_mode_override": null,
+      "offline_selected_tool": "cat",
+      "reason": "local_tool_arg_match_but_trajectory_failed",
+      "runtime_blocked": false,
+      "selected_tool": "cat"
     },
     {
       "candidate_policy_action": "reject_or_record_only_until_scorer_gap_fixed",
@@ -91,18 +152,18 @@
     {
       "candidate_policy_action": "reject_or_record_only_until_scorer_gap_fixed",
       "case_id": "multi_turn_miss_param_22",
-      "case_regressed": true,
-      "feedback_action": "record_only",
+      "case_regressed": false,
+      "feedback_action": "diagnostic_only",
       "gap_type": "proxy_arg_ok_scorer_arg_wrong",
-      "intervention_mode_override": "record_only",
+      "intervention_mode_override": null,
       "offline_selected_tool": "cat",
-      "reason": "scorer_regression",
-      "runtime_blocked": true,
+      "reason": "scorer_arg_mismatch_after_guidance",
+      "runtime_blocked": false,
       "selected_tool": "cat"
     },
     {
       "candidate_policy_action": "reject_or_record_only_until_scorer_gap_fixed",
-      "case_id": "multi_turn_miss_param_21",
+      "case_id": "multi_turn_miss_param_9",
       "case_regressed": true,
       "feedback_action": "record_only",
       "gap_type": "no_proxy_gap",
@@ -129,12 +190,12 @@
       "case_id": "multi_turn_miss_param_35",
       "case_regressed": true,
       "feedback_action": "record_only",
-      "gap_type": "proxy_arg_ok_scorer_arg_wrong",
+      "gap_type": "proxy_activated_but_scorer_not_activated",
       "intervention_mode_override": "record_only",
       "offline_selected_tool": "cat",
       "reason": "scorer_regression",
       "runtime_blocked": true,
-      "selected_tool": "cat"
+      "selected_tool": null
     },
     {
       "candidate_policy_action": "reject_or_record_only_until_scorer_gap_fixed",
@@ -189,30 +250,33 @@
       "case_id": "multi_turn_miss_param_39",
       "case_regressed": true,
       "feedback_action": "record_only",
-      "gap_type": "proxy_ok_trajectory_failed",
+      "gap_type": "proxy_arg_ok_scorer_arg_wrong",
       "intervention_mode_override": "record_only",
       "offline_selected_tool": "touch",
       "reason": "scorer_regression",
       "runtime_blocked": true,
-      "selected_tool": "touch"
+      "selected_tool": "cat"
     }
   ],
   "feedback_reason_distribution": {
     "local_tool_arg_match_but_trajectory_failed": 3,
-    "proxy_activated_but_scorer_not_activated": 1,
-    "scorer_regression": 4,
+    "proxy_activated_but_scorer_not_activated": 2,
+    "scorer_arg_mismatch_after_guidance": 1,
+    "scorer_regression": 3,
     "scorer_tool_mismatch_after_guidance": 4
   },
   "fixed_by_code_change": true,
+  "m27aa_regression_patterns_passed": false,
   "m27y_scorer_feedback_ready": true,
   "missing_regression_coverage": [],
   "net_case_gain": -2,
+  "pattern_source_report": "outputs/artifacts/bfcl_ctspc_subset30_v1/m27aa_regression_patterns.json",
   "regression_case_ids": [
-    "multi_turn_miss_param_21",
-    "multi_turn_miss_param_22",
     "multi_turn_miss_param_35",
-    "multi_turn_miss_param_39"
+    "multi_turn_miss_param_39",
+    "multi_turn_miss_param_9"
   ],
   "report_scope": "m2_7y_scorer_feedback",
+  "scorer_feedback_covers_regression_patterns": true,
   "source_gap_report": "outputs/artifacts/bfcl_ctspc_subset30_v1/m27x_scorer_proxy_gap.json"
 }

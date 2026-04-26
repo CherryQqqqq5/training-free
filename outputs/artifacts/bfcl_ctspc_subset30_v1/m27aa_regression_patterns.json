@@ -1,0 +1,741 @@
+{
+  "artifact_root": "outputs/artifacts/bfcl_ctspc_subset30_v1",
+  "blocked_regression_patterns": [
+    {
+      "action": "record_only",
+      "baseline_success_proxy": true,
+      "binding_source": "prior_tool_output.matches[0]|basename",
+      "case_ids": [
+        "multi_turn_miss_param_35"
+      ],
+      "postcondition_family": "read_content",
+      "regression_guard_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"resolve_contextual_string_arg\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "resolve_contextual_string_arg"
+      ],
+      "selected_tool_family": "read_content",
+      "trajectory_risk_flags": [
+        "trajectory_sensitive_tool"
+      ]
+    },
+    {
+      "action": "record_only",
+      "baseline_success_proxy": true,
+      "binding_source": "prior_tool_output.cwd_or_listing",
+      "case_ids": [
+        "multi_turn_miss_param_39"
+      ],
+      "postcondition_family": "create_file",
+      "regression_guard_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"prior_tool_output.cwd_or_listing\",\"postcondition_family\":\"create_file\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\"],\"selected_tool_family\":\"create_file\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\",\"weak_cwd_or_listing_binding\"]}",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "selected_tool_family": "create_file",
+      "trajectory_risk_flags": [
+        "trajectory_sensitive_tool",
+        "weak_cwd_or_listing_binding"
+      ]
+    },
+    {
+      "action": "record_only",
+      "baseline_success_proxy": true,
+      "binding_source": "unknown",
+      "case_ids": [
+        "multi_turn_miss_param_9"
+      ],
+      "postcondition_family": "unknown",
+      "regression_guard_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"unknown\",\"postcondition_family\":\"unknown\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"resolve_contextual_string_arg\"],\"selected_tool_family\":\"unknown\",\"trajectory_risk_flags\":[]}",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "resolve_contextual_string_arg"
+      ],
+      "selected_tool_family": "unknown",
+      "trajectory_risk_flags": []
+    }
+  ],
+  "case_level_gate_allowed": true,
+  "case_report_trace_mapping": "prompt_user_prefix",
+  "cases": [
+    {
+      "baseline_success": false,
+      "binding_source": "prior_tool_output.cwd_or_listing",
+      "candidate_args": {
+        "file_name": "marker.txt"
+      },
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_17",
+      "case_regressed": false,
+      "diagnostic_gap_safety": "diagnostic_safe_gap",
+      "gap_type": "proxy_activated_but_scorer_not_activated",
+      "old_or_new_regression": "gap_only",
+      "pending_goal": "create_file",
+      "policy_activated": false,
+      "postcondition": {
+        "confidence": 0.75,
+        "expected_state_key": "current_directory_content",
+        "kind": "file_exists",
+        "target_arg": "file_name"
+      },
+      "postcondition_family": "create_file",
+      "regression_guard_key": "{\"baseline_success_proxy\":false,\"binding_source\":\"prior_tool_output.cwd_or_listing\",\"postcondition_family\":\"create_file\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\"],\"selected_tool_family\":\"create_file\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\",\"weak_cwd_or_listing_binding\"]}",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "rule_id": "rule_global_no_tool_redundant_clarification_request_v1",
+      "selected_tool": "touch",
+      "shared_pattern_key": "{\"baseline_success_proxy\":false,\"binding_source\":\"prior_tool_output.cwd_or_listing\",\"gap_type\":\"proxy_activated_but_scorer_not_activated\",\"postcondition_family\":\"create_file\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\"],\"selected_tool_family\":\"create_file\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\",\"weak_cwd_or_listing_binding\"]}",
+      "suggested_guard": "diagnostic_only",
+      "trajectory_risk_flags": [
+        "trajectory_sensitive_tool",
+        "weak_cwd_or_listing_binding"
+      ]
+    },
+    {
+      "baseline_success": false,
+      "binding_source": "explicit_literal_pair",
+      "candidate_args": {
+        "destination": "final_document.txt",
+        "source": "test_document.txt"
+      },
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_19",
+      "case_regressed": false,
+      "diagnostic_gap_safety": "diagnostic_safe_gap",
+      "gap_type": "proxy_ok_trajectory_failed",
+      "old_or_new_regression": "gap_only",
+      "pending_goal": "move_or_copy",
+      "policy_activated": true,
+      "postcondition": {
+        "confidence": 0.7,
+        "expected_state_key": "current_directory_content",
+        "kind": "target_path_changed",
+        "target_arg": "destination"
+      },
+      "postcondition_family": "move_or_copy",
+      "regression_guard_key": "{\"baseline_success_proxy\":false,\"binding_source\":\"explicit_literal_pair\",\"postcondition_family\":\"move_or_copy\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\"],\"selected_tool_family\":\"move_or_copy\",\"trajectory_risk_flags\":[]}",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "rule_id": "rule_global_no_tool_actionable_no_tool_decision_prior_explicit_literals_present_prior_tool_outputs_present_tools_available_v1",
+      "selected_tool": "cp",
+      "shared_pattern_key": "{\"baseline_success_proxy\":false,\"binding_source\":\"explicit_literal_pair\",\"gap_type\":\"proxy_ok_trajectory_failed\",\"postcondition_family\":\"move_or_copy\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\"],\"selected_tool_family\":\"move_or_copy\",\"trajectory_risk_flags\":[]}",
+      "suggested_guard": "diagnostic_only",
+      "trajectory_risk_flags": []
+    },
+    {
+      "baseline_success": true,
+      "binding_source": "prior_tool_output.matches[0]|basename",
+      "candidate_args": {
+        "file_name": "analysis_report.txt"
+      },
+      "candidate_success": true,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_22",
+      "case_regressed": false,
+      "diagnostic_gap_safety": "diagnostic_safe_gap",
+      "gap_type": "proxy_arg_ok_scorer_arg_wrong",
+      "old_or_new_regression": "gap_only",
+      "pending_goal": "read_content",
+      "policy_activated": true,
+      "postcondition": {
+        "confidence": 0.8,
+        "expected_state_key": "file_content",
+        "kind": "file_content",
+        "target_arg": "file_name"
+      },
+      "postcondition_family": "read_content",
+      "regression_guard_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "rule_id": "rule_global_no_tool_actionable_no_tool_decision_prior_explicit_literals_present_prior_tool_outputs_present_tools_available_v1",
+      "selected_tool": "cat",
+      "shared_pattern_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"gap_type\":\"proxy_arg_ok_scorer_arg_wrong\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}",
+      "suggested_guard": "diagnostic_only",
+      "trajectory_risk_flags": [
+        "trajectory_sensitive_tool"
+      ]
+    },
+    {
+      "baseline_success": false,
+      "binding_source": "explicit_literal_pair",
+      "candidate_args": {
+        "destination": "project_overview.md",
+        "source": "project_plan.md"
+      },
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_27",
+      "case_regressed": false,
+      "diagnostic_gap_safety": "diagnostic_safe_gap",
+      "gap_type": "proxy_ok_trajectory_failed",
+      "old_or_new_regression": "gap_only",
+      "pending_goal": "move_or_copy",
+      "policy_activated": true,
+      "postcondition": {
+        "confidence": 0.7,
+        "expected_state_key": "current_directory_content",
+        "kind": "target_path_changed",
+        "target_arg": "destination"
+      },
+      "postcondition_family": "move_or_copy",
+      "regression_guard_key": "{\"baseline_success_proxy\":false,\"binding_source\":\"explicit_literal_pair\",\"postcondition_family\":\"move_or_copy\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"strip_assistant_content_with_tool_calls\"],\"selected_tool_family\":\"move_or_copy\",\"trajectory_risk_flags\":[]}",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "strip_assistant_content_with_tool_calls"
+      ],
+      "rule_id": "rule_global_no_tool_actionable_no_tool_decision_prior_explicit_literals_present_prior_tool_outputs_present_tools_available_v1",
+      "selected_tool": "mv",
+      "shared_pattern_key": "{\"baseline_success_proxy\":false,\"binding_source\":\"explicit_literal_pair\",\"gap_type\":\"proxy_ok_trajectory_failed\",\"postcondition_family\":\"move_or_copy\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"strip_assistant_content_with_tool_calls\"],\"selected_tool_family\":\"move_or_copy\",\"trajectory_risk_flags\":[]}",
+      "suggested_guard": "diagnostic_only",
+      "trajectory_risk_flags": []
+    },
+    {
+      "baseline_success": false,
+      "binding_source": "prior_tool_output.matches[0]|basename",
+      "candidate_args": {
+        "file_name": "analysis_report.txt"
+      },
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_28",
+      "case_regressed": false,
+      "diagnostic_gap_safety": "diagnostic_safe_gap",
+      "gap_type": "proxy_tool_ok_scorer_tool_wrong",
+      "old_or_new_regression": "gap_only",
+      "pending_goal": "read_content",
+      "policy_activated": true,
+      "postcondition": {
+        "confidence": 0.8,
+        "expected_state_key": "file_content",
+        "kind": "file_content",
+        "target_arg": "file_name"
+      },
+      "postcondition_family": "read_content",
+      "regression_guard_key": "{\"baseline_success_proxy\":false,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"resolve_contextual_string_arg\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "resolve_contextual_string_arg"
+      ],
+      "rule_id": "rule_global_no_tool_actionable_no_tool_decision_prior_explicit_literals_present_prior_tool_outputs_present_tools_available_v1",
+      "selected_tool": "cat",
+      "shared_pattern_key": "{\"baseline_success_proxy\":false,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"gap_type\":\"proxy_tool_ok_scorer_tool_wrong\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"resolve_contextual_string_arg\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}",
+      "suggested_guard": "diagnostic_only",
+      "trajectory_risk_flags": [
+        "trajectory_sensitive_tool"
+      ]
+    },
+    {
+      "baseline_success": false,
+      "binding_source": "prior_tool_output.matches[0]|basename",
+      "candidate_args": {
+        "file_name": "analysis_report.txt"
+      },
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_29",
+      "case_regressed": false,
+      "diagnostic_gap_safety": "diagnostic_safe_gap",
+      "gap_type": "proxy_tool_ok_scorer_tool_wrong",
+      "old_or_new_regression": "gap_only",
+      "pending_goal": "read_content",
+      "policy_activated": true,
+      "postcondition": {
+        "confidence": 0.8,
+        "expected_state_key": "file_content",
+        "kind": "file_content",
+        "target_arg": "file_name"
+      },
+      "postcondition_family": "read_content",
+      "regression_guard_key": "{\"baseline_success_proxy\":false,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"resolve_contextual_string_arg\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "resolve_contextual_string_arg"
+      ],
+      "rule_id": "rule_global_no_tool_actionable_no_tool_decision_prior_explicit_literals_present_prior_tool_outputs_present_tools_available_v1",
+      "selected_tool": "cat",
+      "shared_pattern_key": "{\"baseline_success_proxy\":false,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"gap_type\":\"proxy_tool_ok_scorer_tool_wrong\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"resolve_contextual_string_arg\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}",
+      "suggested_guard": "diagnostic_only",
+      "trajectory_risk_flags": [
+        "trajectory_sensitive_tool"
+      ]
+    },
+    {
+      "baseline_success": false,
+      "binding_source": "prior_tool_output.matches[0]|basename",
+      "candidate_args": {
+        "file_name": "test_results.json"
+      },
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_30",
+      "case_regressed": false,
+      "diagnostic_gap_safety": "diagnostic_safe_gap",
+      "gap_type": "proxy_activated_but_scorer_not_activated",
+      "old_or_new_regression": "gap_only",
+      "pending_goal": "read_content",
+      "policy_activated": false,
+      "postcondition": {
+        "confidence": 0.8,
+        "expected_state_key": "file_content",
+        "kind": "file_content",
+        "target_arg": "file_name"
+      },
+      "postcondition_family": "read_content",
+      "regression_guard_key": "{\"baseline_success_proxy\":false,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"resolve_contextual_string_arg\",\"strip_assistant_content_with_tool_calls\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "resolve_contextual_string_arg",
+        "strip_assistant_content_with_tool_calls"
+      ],
+      "rule_id": "rule_global_no_tool_actionable_no_tool_decision_prior_tool_outputs_present_tools_available_v1",
+      "selected_tool": "cat",
+      "shared_pattern_key": "{\"baseline_success_proxy\":false,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"gap_type\":\"proxy_activated_but_scorer_not_activated\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"resolve_contextual_string_arg\",\"strip_assistant_content_with_tool_calls\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}",
+      "suggested_guard": "diagnostic_only",
+      "trajectory_risk_flags": [
+        "trajectory_sensitive_tool"
+      ]
+    },
+    {
+      "baseline_success": false,
+      "binding_source": "prior_tool_output.matches[0]|basename",
+      "candidate_args": {
+        "file_name": "data.txt"
+      },
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_31",
+      "case_regressed": false,
+      "diagnostic_gap_safety": "diagnostic_safe_gap",
+      "gap_type": "proxy_ok_trajectory_failed",
+      "old_or_new_regression": "gap_only",
+      "pending_goal": "read_content",
+      "policy_activated": true,
+      "postcondition": {
+        "confidence": 0.8,
+        "expected_state_key": "file_content",
+        "kind": "file_content",
+        "target_arg": "file_name"
+      },
+      "postcondition_family": "read_content",
+      "regression_guard_key": "{\"baseline_success_proxy\":false,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "rule_id": "rule_global_no_tool_post_tool_prose_summary_v1",
+      "selected_tool": "cat",
+      "shared_pattern_key": "{\"baseline_success_proxy\":false,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"gap_type\":\"proxy_ok_trajectory_failed\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}",
+      "suggested_guard": "diagnostic_only",
+      "trajectory_risk_flags": [
+        "trajectory_sensitive_tool"
+      ]
+    },
+    {
+      "baseline_success": true,
+      "binding_source": "prior_tool_output.matches[0]|basename",
+      "candidate_args": {
+        "file_name": "config.py"
+      },
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_35",
+      "case_regressed": true,
+      "diagnostic_gap_safety": null,
+      "gap_type": "proxy_activated_but_scorer_not_activated",
+      "old_or_new_regression": "old_unresolved",
+      "pending_goal": "read_content",
+      "policy_activated": false,
+      "postcondition": {
+        "confidence": 0.8,
+        "expected_state_key": "file_content",
+        "kind": "file_content",
+        "target_arg": "file_name"
+      },
+      "postcondition_family": "read_content",
+      "regression_guard_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"resolve_contextual_string_arg\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "resolve_contextual_string_arg"
+      ],
+      "rule_id": "rule_global_no_tool_post_tool_prose_summary_v1",
+      "selected_tool": "cat",
+      "shared_pattern_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"gap_type\":\"proxy_activated_but_scorer_not_activated\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"resolve_contextual_string_arg\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}",
+      "suggested_guard": "record_only",
+      "trajectory_risk_flags": [
+        "trajectory_sensitive_tool"
+      ]
+    },
+    {
+      "baseline_success": true,
+      "binding_source": "prior_tool_output.cwd_or_listing",
+      "candidate_args": {
+        "file_name": "marker.txt"
+      },
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_39",
+      "case_regressed": true,
+      "diagnostic_gap_safety": null,
+      "gap_type": "proxy_arg_ok_scorer_arg_wrong",
+      "old_or_new_regression": "old_unresolved",
+      "pending_goal": "create_file",
+      "policy_activated": true,
+      "postcondition": {
+        "confidence": 0.75,
+        "expected_state_key": "current_directory_content",
+        "kind": "file_exists",
+        "target_arg": "file_name"
+      },
+      "postcondition_family": "create_file",
+      "regression_guard_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"prior_tool_output.cwd_or_listing\",\"postcondition_family\":\"create_file\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\"],\"selected_tool_family\":\"create_file\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\",\"weak_cwd_or_listing_binding\"]}",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "rule_id": "rule_global_no_tool_redundant_clarification_request_v1",
+      "selected_tool": "touch",
+      "shared_pattern_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"prior_tool_output.cwd_or_listing\",\"gap_type\":\"proxy_arg_ok_scorer_arg_wrong\",\"postcondition_family\":\"create_file\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\"],\"selected_tool_family\":\"create_file\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\",\"weak_cwd_or_listing_binding\"]}",
+      "suggested_guard": "record_only",
+      "trajectory_risk_flags": [
+        "trajectory_sensitive_tool",
+        "weak_cwd_or_listing_binding"
+      ]
+    },
+    {
+      "baseline_success": false,
+      "binding_source": "prior_tool_output.matches[0]|basename",
+      "candidate_args": {
+        "file_name": "analysis_report.txt"
+      },
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_4",
+      "case_regressed": false,
+      "diagnostic_gap_safety": "diagnostic_safe_gap",
+      "gap_type": "proxy_tool_ok_scorer_tool_wrong",
+      "old_or_new_regression": "gap_only",
+      "pending_goal": "read_content",
+      "policy_activated": true,
+      "postcondition": {
+        "confidence": 0.8,
+        "expected_state_key": "file_content",
+        "kind": "file_content",
+        "target_arg": "file_name"
+      },
+      "postcondition_family": "read_content",
+      "regression_guard_key": "{\"baseline_success_proxy\":false,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "rule_id": "rule_global_no_tool_actionable_no_tool_decision_prior_explicit_literals_present_prior_tool_outputs_present_tools_available_v1",
+      "selected_tool": "cat",
+      "shared_pattern_key": "{\"baseline_success_proxy\":false,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"gap_type\":\"proxy_tool_ok_scorer_tool_wrong\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}",
+      "suggested_guard": "diagnostic_only",
+      "trajectory_risk_flags": [
+        "trajectory_sensitive_tool"
+      ]
+    },
+    {
+      "baseline_success": false,
+      "binding_source": "prior_tool_output.matches[0]|basename",
+      "candidate_args": {
+        "file_name": "test_results.json"
+      },
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_5",
+      "case_regressed": false,
+      "diagnostic_gap_safety": "diagnostic_safe_gap",
+      "gap_type": "proxy_tool_ok_scorer_tool_wrong",
+      "old_or_new_regression": "gap_only",
+      "pending_goal": "read_content",
+      "policy_activated": true,
+      "postcondition": {
+        "confidence": 0.8,
+        "expected_state_key": "file_content",
+        "kind": "file_content",
+        "target_arg": "file_name"
+      },
+      "postcondition_family": "read_content",
+      "regression_guard_key": "{\"baseline_success_proxy\":false,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "rule_id": "rule_global_no_tool_actionable_no_tool_decision_prior_tool_outputs_present_tools_available_v1",
+      "selected_tool": "cat",
+      "shared_pattern_key": "{\"baseline_success_proxy\":false,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"gap_type\":\"proxy_tool_ok_scorer_tool_wrong\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}",
+      "suggested_guard": "diagnostic_only",
+      "trajectory_risk_flags": [
+        "trajectory_sensitive_tool"
+      ]
+    },
+    {
+      "baseline_success": true,
+      "binding_source": "unknown",
+      "candidate_args": {},
+      "candidate_success": false,
+      "case_fixed": false,
+      "case_id": "multi_turn_miss_param_9",
+      "case_regressed": true,
+      "diagnostic_gap_safety": null,
+      "gap_type": "no_proxy_gap",
+      "old_or_new_regression": "old_unresolved",
+      "pending_goal": "unknown",
+      "policy_activated": false,
+      "postcondition": null,
+      "postcondition_family": "unknown",
+      "regression_guard_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"unknown\",\"postcondition_family\":\"unknown\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"resolve_contextual_string_arg\"],\"selected_tool_family\":\"unknown\",\"trajectory_risk_flags\":[]}",
+      "repair_kinds": [
+        "coerce_no_tool_text_to_empty",
+        "resolve_contextual_string_arg"
+      ],
+      "rule_id": null,
+      "selected_tool": null,
+      "shared_pattern_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"unknown\",\"gap_type\":\"no_proxy_gap\",\"postcondition_family\":\"unknown\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"resolve_contextual_string_arg\"],\"selected_tool_family\":\"unknown\",\"trajectory_risk_flags\":[]}",
+      "suggested_guard": "record_only",
+      "trajectory_risk_flags": []
+    }
+  ],
+  "diagnostic": {
+    "does_not_authorize_holdout_or_100_case": true,
+    "offline_only": true,
+    "pattern_gate_requires_future_code_or_scorer_evidence": true
+  },
+  "diagnostic_unsafe_gap_case_ids": [],
+  "diagnostic_unsafe_gap_count": 0,
+  "latest_dev_net_case_gain": -2,
+  "m27aa_regression_patterns_passed": false,
+  "new_regression_pattern_count": 0,
+  "new_regression_pattern_keys": [],
+  "old_regression_unresolved_case_ids": [
+    "multi_turn_miss_param_35",
+    "multi_turn_miss_param_39",
+    "multi_turn_miss_param_9"
+  ],
+  "old_regression_unresolved_count": 3,
+  "pattern_groups": [
+    {
+      "case_ids": [
+        "multi_turn_miss_param_27"
+      ],
+      "diagnostic_gap_case_ids": [
+        "multi_turn_miss_param_27"
+      ],
+      "example": {
+        "binding_source": "explicit_literal_pair",
+        "postcondition_family": "move_or_copy",
+        "repair_kinds": [
+          "coerce_no_tool_text_to_empty",
+          "strip_assistant_content_with_tool_calls"
+        ],
+        "trajectory_risk_flags": []
+      },
+      "regression_case_ids": [],
+      "regression_guard_key": "{\"baseline_success_proxy\":false,\"binding_source\":\"explicit_literal_pair\",\"postcondition_family\":\"move_or_copy\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"strip_assistant_content_with_tool_calls\"],\"selected_tool_family\":\"move_or_copy\",\"trajectory_risk_flags\":[]}",
+      "suggested_guard": "diagnostic_only"
+    },
+    {
+      "case_ids": [
+        "multi_turn_miss_param_19"
+      ],
+      "diagnostic_gap_case_ids": [
+        "multi_turn_miss_param_19"
+      ],
+      "example": {
+        "binding_source": "explicit_literal_pair",
+        "postcondition_family": "move_or_copy",
+        "repair_kinds": [
+          "coerce_no_tool_text_to_empty"
+        ],
+        "trajectory_risk_flags": []
+      },
+      "regression_case_ids": [],
+      "regression_guard_key": "{\"baseline_success_proxy\":false,\"binding_source\":\"explicit_literal_pair\",\"postcondition_family\":\"move_or_copy\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\"],\"selected_tool_family\":\"move_or_copy\",\"trajectory_risk_flags\":[]}",
+      "suggested_guard": "diagnostic_only"
+    },
+    {
+      "case_ids": [
+        "multi_turn_miss_param_17"
+      ],
+      "diagnostic_gap_case_ids": [
+        "multi_turn_miss_param_17"
+      ],
+      "example": {
+        "binding_source": "prior_tool_output.cwd_or_listing",
+        "postcondition_family": "create_file",
+        "repair_kinds": [
+          "coerce_no_tool_text_to_empty"
+        ],
+        "trajectory_risk_flags": [
+          "trajectory_sensitive_tool",
+          "weak_cwd_or_listing_binding"
+        ]
+      },
+      "regression_case_ids": [],
+      "regression_guard_key": "{\"baseline_success_proxy\":false,\"binding_source\":\"prior_tool_output.cwd_or_listing\",\"postcondition_family\":\"create_file\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\"],\"selected_tool_family\":\"create_file\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\",\"weak_cwd_or_listing_binding\"]}",
+      "suggested_guard": "diagnostic_only"
+    },
+    {
+      "case_ids": [
+        "multi_turn_miss_param_30"
+      ],
+      "diagnostic_gap_case_ids": [
+        "multi_turn_miss_param_30"
+      ],
+      "example": {
+        "binding_source": "prior_tool_output.matches[0]|basename",
+        "postcondition_family": "read_content",
+        "repair_kinds": [
+          "coerce_no_tool_text_to_empty",
+          "resolve_contextual_string_arg",
+          "strip_assistant_content_with_tool_calls"
+        ],
+        "trajectory_risk_flags": [
+          "trajectory_sensitive_tool"
+        ]
+      },
+      "regression_case_ids": [],
+      "regression_guard_key": "{\"baseline_success_proxy\":false,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"resolve_contextual_string_arg\",\"strip_assistant_content_with_tool_calls\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}",
+      "suggested_guard": "diagnostic_only"
+    },
+    {
+      "case_ids": [
+        "multi_turn_miss_param_28",
+        "multi_turn_miss_param_29"
+      ],
+      "diagnostic_gap_case_ids": [
+        "multi_turn_miss_param_28",
+        "multi_turn_miss_param_29"
+      ],
+      "example": {
+        "binding_source": "prior_tool_output.matches[0]|basename",
+        "postcondition_family": "read_content",
+        "repair_kinds": [
+          "coerce_no_tool_text_to_empty",
+          "resolve_contextual_string_arg"
+        ],
+        "trajectory_risk_flags": [
+          "trajectory_sensitive_tool"
+        ]
+      },
+      "regression_case_ids": [],
+      "regression_guard_key": "{\"baseline_success_proxy\":false,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"resolve_contextual_string_arg\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}",
+      "suggested_guard": "diagnostic_only"
+    },
+    {
+      "case_ids": [
+        "multi_turn_miss_param_31",
+        "multi_turn_miss_param_4",
+        "multi_turn_miss_param_5"
+      ],
+      "diagnostic_gap_case_ids": [
+        "multi_turn_miss_param_31",
+        "multi_turn_miss_param_4",
+        "multi_turn_miss_param_5"
+      ],
+      "example": {
+        "binding_source": "prior_tool_output.matches[0]|basename",
+        "postcondition_family": "read_content",
+        "repair_kinds": [
+          "coerce_no_tool_text_to_empty"
+        ],
+        "trajectory_risk_flags": [
+          "trajectory_sensitive_tool"
+        ]
+      },
+      "regression_case_ids": [],
+      "regression_guard_key": "{\"baseline_success_proxy\":false,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}",
+      "suggested_guard": "diagnostic_only"
+    },
+    {
+      "case_ids": [
+        "multi_turn_miss_param_39"
+      ],
+      "diagnostic_gap_case_ids": [],
+      "example": {
+        "binding_source": "prior_tool_output.cwd_or_listing",
+        "postcondition_family": "create_file",
+        "repair_kinds": [
+          "coerce_no_tool_text_to_empty"
+        ],
+        "trajectory_risk_flags": [
+          "trajectory_sensitive_tool",
+          "weak_cwd_or_listing_binding"
+        ]
+      },
+      "regression_case_ids": [
+        "multi_turn_miss_param_39"
+      ],
+      "regression_guard_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"prior_tool_output.cwd_or_listing\",\"postcondition_family\":\"create_file\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\"],\"selected_tool_family\":\"create_file\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\",\"weak_cwd_or_listing_binding\"]}",
+      "suggested_guard": "record_only"
+    },
+    {
+      "case_ids": [
+        "multi_turn_miss_param_35"
+      ],
+      "diagnostic_gap_case_ids": [],
+      "example": {
+        "binding_source": "prior_tool_output.matches[0]|basename",
+        "postcondition_family": "read_content",
+        "repair_kinds": [
+          "coerce_no_tool_text_to_empty",
+          "resolve_contextual_string_arg"
+        ],
+        "trajectory_risk_flags": [
+          "trajectory_sensitive_tool"
+        ]
+      },
+      "regression_case_ids": [
+        "multi_turn_miss_param_35"
+      ],
+      "regression_guard_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"resolve_contextual_string_arg\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}",
+      "suggested_guard": "record_only"
+    },
+    {
+      "case_ids": [
+        "multi_turn_miss_param_22"
+      ],
+      "diagnostic_gap_case_ids": [
+        "multi_turn_miss_param_22"
+      ],
+      "example": {
+        "binding_source": "prior_tool_output.matches[0]|basename",
+        "postcondition_family": "read_content",
+        "repair_kinds": [
+          "coerce_no_tool_text_to_empty"
+        ],
+        "trajectory_risk_flags": [
+          "trajectory_sensitive_tool"
+        ]
+      },
+      "regression_case_ids": [],
+      "regression_guard_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"prior_tool_output.matches[0]|basename\",\"postcondition_family\":\"read_content\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\"],\"selected_tool_family\":\"read_content\",\"trajectory_risk_flags\":[\"trajectory_sensitive_tool\"]}",
+      "suggested_guard": "diagnostic_only"
+    },
+    {
+      "case_ids": [
+        "multi_turn_miss_param_9"
+      ],
+      "diagnostic_gap_case_ids": [],
+      "example": {
+        "binding_source": "unknown",
+        "postcondition_family": "unknown",
+        "repair_kinds": [
+          "coerce_no_tool_text_to_empty",
+          "resolve_contextual_string_arg"
+        ],
+        "trajectory_risk_flags": []
+      },
+      "regression_case_ids": [
+        "multi_turn_miss_param_9"
+      ],
+      "regression_guard_key": "{\"baseline_success_proxy\":true,\"binding_source\":\"unknown\",\"postcondition_family\":\"unknown\",\"repair_kinds\":[\"coerce_no_tool_text_to_empty\",\"resolve_contextual_string_arg\"],\"selected_tool_family\":\"unknown\",\"trajectory_risk_flags\":[]}",
+      "suggested_guard": "record_only"
+    }
+  ],
+  "regression_pattern_coverage": 1.0,
+  "report_scope": "m2_7aa_regression_patterns",
+  "scorer_feedback_covers_regression_patterns": true
+}

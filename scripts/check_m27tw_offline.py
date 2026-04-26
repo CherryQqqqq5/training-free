@@ -50,6 +50,33 @@ def _proxy_calibration(root: Path, summary: dict[str, Any], x: dict[str, Any]) -
     }
 
 
+def _pattern_proxy_calibration(root: Path, summary: dict[str, Any], aa: dict[str, Any]) -> dict[str, Any]:
+    tool = summary.get("recommended_tool_match_rate_among_activated")
+    arg = summary.get("raw_normalized_arg_match_rate_among_activated")
+    tool_ok = isinstance(tool, (int, float)) and tool >= 0.6
+    arg_ok = isinstance(arg, (int, float)) and arg >= 0.6
+    needs_pattern_fix = not (tool_ok and arg_ok)
+    old_unresolved = int(aa.get("old_regression_unresolved_count") or 0)
+    new_patterns = int(aa.get("new_regression_pattern_count") or 0)
+    coverage = aa.get("regression_pattern_coverage")
+    coverage_ok = isinstance(coverage, (int, float)) and coverage >= 1.0
+    unsafe = int(aa.get("diagnostic_unsafe_gap_count") or 0)
+    covers_patterns = bool(aa.get("scorer_feedback_covers_regression_patterns"))
+    aa_passed = bool(aa.get("m27aa_regression_patterns_passed"))
+    pattern_passed = (not needs_pattern_fix) or (aa_passed and old_unresolved == 0 and new_patterns == 0 and coverage_ok and unsafe == 0 and covers_patterns)
+    return {
+        "pattern_proxy_calibration_passed": pattern_passed,
+        "needs_pattern_fix": needs_pattern_fix,
+        "m27aa_regression_patterns_passed": aa_passed,
+        "old_regression_unresolved_count": old_unresolved,
+        "new_regression_pattern_count": new_patterns,
+        "regression_pattern_coverage": coverage,
+        "diagnostic_unsafe_gap_count": unsafe,
+        "scorer_feedback_covers_regression_patterns": covers_patterns,
+        "pattern_report_path": str(root / "m27aa_regression_patterns.json") if (root / "m27aa_regression_patterns.json").exists() else None,
+    }
+
+
 def evaluate(root: Path = ROOT, holdout: Path = HOLD, source: Path = SRC) -> dict[str, Any]:
     source_manifest = _j(source / "source_collection_manifest.json", {}) or {}
     holdout_manifest = _j(holdout / "holdout_manifest.json", {}) or {}
@@ -58,7 +85,9 @@ def evaluate(root: Path = ROOT, holdout: Path = HOLD, source: Path = SRC) -> dic
     w = _j(root / "m27w_rule_retention.json", {}) or {}
     summary = _j(root / "subset_summary.json", {}) or {}
     x = _j(root / "m27x_scorer_proxy_gap.json", {}) or {}
+    aa = _j(root / "m27aa_regression_patterns.json", {}) or {}
     calibration = _proxy_calibration(root, summary, x)
+    pattern_calibration = _pattern_proxy_calibration(root, summary, aa)
     checks = {
         "m27t_source_pool_ready": bool(source_manifest.get("m27t_source_pool_ready")),
         "m27tw_holdout_manifest_ready": _holdout_ready(holdout_manifest),
@@ -66,6 +95,7 @@ def evaluate(root: Path = ROOT, holdout: Path = HOLD, source: Path = SRC) -> dic
         "m27v_arg_realization_passed": bool(v.get("m27v_arg_realization_passed")),
         "m27w_rule_retention_passed": bool(w.get("m27w_rule_retention_passed")),
         "proxy_calibration_passed": bool(calibration.get("proxy_calibration_passed")),
+        "pattern_proxy_calibration_passed": bool(pattern_calibration.get("pattern_proxy_calibration_passed")),
     }
     return {
         "report_scope": "m2_7tw_offline_summary",
@@ -77,6 +107,7 @@ def evaluate(root: Path = ROOT, holdout: Path = HOLD, source: Path = SRC) -> dic
         "arg_realization": {key: v.get(key) for key in ["raw_arg_match_rate_proxy", "emitted_arg_wrong_or_guidance_not_followed_count", "canonical_arg_validation_coverage", "last_scorer_raw_arg_match_rate"]},
         "rule_retention": {key: w.get(key) for key in ["decision_distribution", "holdout_manifest_ready", "holdout_scorer_evidence_available", "offline_u_v_readiness_passed", "scorer_override_applied"]},
         "proxy_calibration": calibration,
+        "pattern_proxy_calibration": pattern_calibration,
         "diagnostic": {
             "offline_readiness_only": True,
             "last_scorer_metrics_retained_for_postmortem_only": True,
@@ -91,9 +122,9 @@ def evaluate(root: Path = ROOT, holdout: Path = HOLD, source: Path = SRC) -> dic
 
 def render_markdown(report: dict[str, Any]) -> str:
     lines = ["# M2.7tw Offline Summary", "", f"- Passed: `{report['m2_7tw_offline_passed']}`", "", "| Check | Passed |", "| --- | ---: |"]
-    for key in ["m27t_source_pool_ready", "m27tw_holdout_manifest_ready", "m27u_tool_ranking_passed", "m27v_arg_realization_passed", "m27w_rule_retention_passed", "proxy_calibration_passed"]:
+    for key in ["m27t_source_pool_ready", "m27tw_holdout_manifest_ready", "m27u_tool_ranking_passed", "m27v_arg_realization_passed", "m27w_rule_retention_passed", "proxy_calibration_passed", "pattern_proxy_calibration_passed"]:
         lines.append(f"| `{key}` | `{report[key]}` |")
-    lines.extend(["", "This summary is an offline readiness gate only. Proxy readiness is blocked when the latest scorer gap is unexplained or unfixed.", ""])
+    lines.extend(["", "This summary is an offline readiness gate only. Proxy readiness is blocked when scorer gaps are unexplained, unfixed, or not covered by regression patterns.", ""])
     return "\n".join(lines)
 
 
@@ -110,7 +141,7 @@ def main() -> int:
     _write_json(args.output, report)
     args.markdown_output.write_text(render_markdown(report), encoding="utf-8")
     if args.compact:
-        print(json.dumps({key: report.get(key) for key in ["m2_7tw_offline_passed", "m27t_source_pool_ready", "m27tw_holdout_manifest_ready", "m27u_tool_ranking_passed", "m27v_arg_realization_passed", "m27w_rule_retention_passed", "proxy_calibration_passed"]}, indent=2, sort_keys=True))
+        print(json.dumps({key: report.get(key) for key in ["m2_7tw_offline_passed", "m27t_source_pool_ready", "m27tw_holdout_manifest_ready", "m27u_tool_ranking_passed", "m27v_arg_realization_passed", "m27w_rule_retention_passed", "proxy_calibration_passed", "pattern_proxy_calibration_passed"]}, indent=2, sort_keys=True))
     return 0
 
 

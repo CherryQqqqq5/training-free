@@ -35,6 +35,7 @@ def _write_json(path: Path, data: dict[str, Any]) -> None:
 
 def build_feedback(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
     gap = _j(root / "m27x_scorer_proxy_gap.json", {}) or {}
+    aa = _j(root / "m27aa_regression_patterns.json", {}) or {}
     summary = _j(root / "subset_summary.json", {}) or {}
     cases = gap.get("cases") if isinstance(gap.get("cases"), list) else []
     feedback_cases: list[dict[str, Any]] = []
@@ -95,6 +96,10 @@ def build_feedback(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
         "feedback_case_count": len(feedback_cases),
         "feedback_cases": feedback_cases,
         "blocked_candidate_signatures": blocked_signatures,
+        "blocked_regression_patterns": aa.get("blocked_regression_patterns") or [],
+        "scorer_feedback_covers_regression_patterns": bool(aa.get("scorer_feedback_covers_regression_patterns")),
+        "m27aa_regression_patterns_passed": bool(aa.get("m27aa_regression_patterns_passed")),
+        "pattern_source_report": str(root / "m27aa_regression_patterns.json") if (root / "m27aa_regression_patterns.json").exists() else None,
         "feedback_reason_distribution": dict(sorted(reasons.items())),
         "blocked_case_ids": covered_case_ids,
         "regression_case_ids": regression_case_ids,

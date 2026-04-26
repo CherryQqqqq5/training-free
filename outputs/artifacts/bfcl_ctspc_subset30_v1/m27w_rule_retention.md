@@ -1,6 +1,6 @@
 # M2.7w Rule Retention
 
-- Passed: `True`
+- Passed: `False`
 - Holdout manifest ready: `True`
 - Offline U/V readiness: `True`
 - Dev scorer net case gain: `-2`
