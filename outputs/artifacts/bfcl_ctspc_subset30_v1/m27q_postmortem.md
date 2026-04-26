@@ -5,11 +5,11 @@
 - Evidence status: `durable`
 - Trace mapping: `prompt_user_prefix`
 - Case-level gate allowed: `True`
-- Accuracy: baseline `6.67`, candidate `6.67`
-- Fixed/regressed/net: `1` / `1` / `0`
-- Tool match rate: `0.625`
-- Raw arg match rate: `0.375`
-- Recommended next focus: `binding_serialization_or_argument_realization`
+- Accuracy: baseline `13.33`, candidate `6.67`
+- Fixed/regressed/net: `2` / `4` / `-2`
+- Tool match rate: `0.6363636363636364`
+- Raw arg match rate: `0.45454545454545453`
+- Recommended next focus: `regression_and_rule_retention`
 
 ## Failed Gate Criteria
 
@@ -23,12 +23,12 @@
 | Layer | Count |
 | --- | ---: |
 | `aligned_success` | 1 |
-| `arg_match_low` | 4 |
-| `fixed` | 1 |
-| `not_activated` | 14 |
-| `regression` | 1 |
-| `tool_match_low` | 6 |
-| `trajectory_continuation_or_postcondition` | 5 |
+| `arg_match_low` | 2 |
+| `fixed` | 2 |
+| `not_activated` | 19 |
+| `regression` | 4 |
+| `tool_match_low` | 4 |
+| `trajectory_continuation_or_postcondition` | 4 |
 
 ## Rule Retention
 
@@ -41,5 +41,5 @@
 ## Recommendations
 
 - `do_not_rerun_m2_7f_on_this_30_case_dev_subset_without_new_offline_gate`
-- `plan_m2_7r_binding_serialization_and_argument_realization`
+- `demote_or_reject_rules_with_nonpositive_net_case_gain`
 - `keep_current_default_rule_decision_reject_unless_rule_has_positive_local_evidence`
