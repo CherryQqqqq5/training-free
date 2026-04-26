@@ -1,13 +1,16 @@
-# M2.7r Holdout Manifest
+# M2.7s Holdout Manifest
 
-- Holdout subset: `bfcl_ctspc_holdout30_v1`
 - Ready: `False`
-- Selected cases: `4` / `30`
-- Dev overlap: `[]`
-- Planned commands: `[]`
+- Selected: `4`
+- Overlap: `[]`
+
+## Category Scan
+- `multi_turn_miss_param` available=`True` selected=`4`
+- `multi_turn_base` available=`False` selected=`0`
+- `multi_turn_miss_func` available=`False` selected=`0`
+- `multi_turn_long_context` available=`False` selected=`0`
 
 ## Selected Cases
-
 - `multi_turn_miss_param_42`
 - `multi_turn_miss_param_49`
 - `multi_turn_miss_param_34`
