@@ -2813,5 +2813,51 @@ action:
         self.assertNotIn("tool_choice:function(policy_next_tool)=move_file", request_patches)
         self.assertTrue(any(str(patch).startswith("prompt_injector:Policy selected next tool:") for patch in request_patches))
 
+
+    def test_scorer_feedback_downgrades_matching_candidate_to_record_only(self) -> None:
+        action_candidate = {
+            "tool": "cat",
+            "args": {"file_name": "a.txt"},
+            "binding_source": "explicit_literal",
+            "arg_bindings": {"file_name": {"source": "explicit_literal", "value": "a.txt"}},
+            "recommended_tools": ["cat"],
+        }
+        rule = self._next_tool_rule(recommended_tools=["cat"], action_candidates=[action_candidate])
+        request = {
+            "model": "demo-model",
+            "messages": [{"role": "user", "content": "Read 'a.txt'."}],
+            "tools": [
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "cat",
+                        "parameters": {
+                            "type": "object",
+                            "properties": {"file_name": {"type": "string"}},
+                            "required": ["file_name"],
+                        },
+                    },
+                }
+            ],
+        }
+        feedback = {
+            "m27y_scorer_feedback_ready": True,
+            "blocked_candidate_signatures": [{"tool": "cat", "args": {"file_name": "a.txt"}}],
+        }
+        with tempfile.TemporaryDirectory() as rules_dir:
+            engine = RuleEngine(
+                rules_dir,
+                runtime_policy={"exact_next_tool_choice_mode": "guidance_only", "scorer_feedback": feedback},
+            )
+            engine.rules = [rule]
+            patched, request_patches = engine.apply_request(request)
+
+        self.assertNotIn("tool_choice", patched)
+        self.assertFalse(any(str(patch).startswith("prompt_injector:Policy selected next tool:") for patch in request_patches))
+        self.assertEqual(request_patches.next_tool_plan["blocked_reason"], "action_candidate_guard_rejected")
+        rejected = request_patches.next_tool_plan["rejected_action_candidates"][0]
+        self.assertEqual(rejected["guard"]["intervention_mode"], "record_only")
+        self.assertIn("scorer_feedback_record_only", rejected["guard"]["risk_flags"])
+
 if __name__ == "__main__":
     unittest.main()

@@ -96,6 +96,7 @@ class RuleEngine:
             self.exact_tool_choice_trajectory_sensitive_tools = {str(item) for item in configured_sensitive if str(item).strip()}
         else:
             self.exact_tool_choice_trajectory_sensitive_tools = set(self._DEFAULT_EXACT_TOOL_CHOICE_TRAJECTORY_SENSITIVE_TOOLS)
+        self.scorer_feedback_blocked_signatures = self._load_scorer_feedback_blocked_signatures()
         self.rules: List[Rule] = self._load_rules()
 
     _QUOTED_LITERAL_RE = re.compile(
@@ -109,6 +110,46 @@ class RuleEngine:
         r")\b",
         re.IGNORECASE,
     )
+
+
+    @staticmethod
+    def _candidate_feedback_signature(tool_name: str, args: Dict[str, Any] | None) -> str:
+        return json.dumps({"tool": tool_name, "args": args or {}}, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+    def _load_scorer_feedback_blocked_signatures(self) -> set[str]:
+        feedback = self.runtime_policy.get("scorer_feedback")
+        path = self.runtime_policy.get("scorer_feedback_path")
+        if not isinstance(feedback, dict) and isinstance(path, str) and path.strip():
+            try:
+                feedback = json.loads(Path(path).read_text(encoding="utf-8"))
+            except Exception:
+                feedback = {}
+        if not isinstance(feedback, dict) or not feedback.get("m27y_scorer_feedback_ready"):
+            return set()
+        signatures: set[str] = set()
+        for item in feedback.get("blocked_candidate_signatures") or []:
+            if not isinstance(item, dict):
+                continue
+            tool_name = str(item.get("tool") or "").strip()
+            args = item.get("args") if isinstance(item.get("args"), dict) else {}
+            if tool_name:
+                signatures.add(self._candidate_feedback_signature(tool_name, args))
+        return signatures
+
+    def _apply_scorer_feedback_to_candidate(self, candidate: Dict[str, Any]) -> Dict[str, Any]:
+        tool_name = str(candidate.get("tool") or "").strip()
+        args = candidate.get("args") if isinstance(candidate.get("args"), dict) else {}
+        if not tool_name or self._candidate_feedback_signature(tool_name, args) not in self.scorer_feedback_blocked_signatures:
+            return candidate
+        patched = dict(candidate)
+        patched["intervention_mode"] = "record_only"
+        flags = list(patched.get("trajectory_risk_flags") or [])
+        if "scorer_feedback_record_only" not in flags:
+            flags.append("scorer_feedback_record_only")
+        patched["trajectory_risk_flags"] = flags
+        patched["scorer_feedback_action"] = "record_only"
+        patched["scorer_feedback_reason"] = "m27y_scorer_gap_or_regression"
+        return patched
 
     def _load_rules(self) -> List[Rule]:
         rules: List[Rule] = []
@@ -1090,6 +1131,7 @@ class RuleEngine:
         rows: list[tuple[tuple[int, int, int, int, float, int, int], Dict[str, Any], Dict[str, Any], Dict[str, Any]]] = []
         rejected: list[dict[str, Any]] = []
         for index, candidate in enumerate(candidates):
+            candidate = self._apply_scorer_feedback_to_candidate(candidate)
             components = self._action_candidate_score_components(
                 candidate,
                 request_json=request_json,

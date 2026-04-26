@@ -91,3 +91,38 @@ def test_m27tw_proxy_calibration_allows_explicit_gap_fix(tmp_path:Path):
     out=evaluate_tw(root,hold,source)
     assert out['proxy_calibration_passed'] is True
     assert out['m2_7tw_offline_passed'] is True
+
+
+
+def test_m27tw_offline_passes_after_scorer_feedback_and_reject_only_retention(tmp_path:Path):
+    root=tmp_path/'subset'; hold=tmp_path/'hold'; source=tmp_path/'source'
+    _wj(source/'source_collection_manifest.json',{'m27t_source_pool_ready':True})
+    _wj(hold/'holdout_manifest.json',{'m27tw_holdout_manifest_ready':True,'selected_case_count':30,'candidate_generatable_count':30,'overlap_with_dev_case_ids':[]})
+    _wj(root/'m27u_tool_ranking.json',{'m27u_tool_ranking_passed':True})
+    _wj(root/'m27v_arg_realization.json',{'m27v_arg_realization_passed':True})
+    _wj(root/'subset_summary.json',{'recommended_tool_match_rate_among_activated':0.63,'raw_normalized_arg_match_rate_among_activated':0.45,'net_case_gain':-2})
+    _wj(root/'m27x_scorer_proxy_gap.json',{'m27x_scorer_proxy_gap_explained':True,'fixed_by_code_change':True})
+    _wj(root/'m27w_rule_retention.json',{
+        'm27w_rule_retention_passed':True,
+        'decision_distribution':{'retain':0,'demote':0,'reject':3},
+        'm27y_scorer_feedback_ready':True,
+        'scorer_feedback_covers_regressions':True,
+    })
+    out=evaluate_tw(root,hold,source)
+    assert out['proxy_calibration_passed'] is True
+    assert out['m27w_rule_retention_passed'] is True
+    assert out['m2_7tw_offline_passed'] is True
+
+
+def test_m27tw_offline_remains_blocked_without_scorer_feedback_fix(tmp_path:Path):
+    root=tmp_path/'subset'; hold=tmp_path/'hold'; source=tmp_path/'source'
+    _wj(source/'source_collection_manifest.json',{'m27t_source_pool_ready':True})
+    _wj(hold/'holdout_manifest.json',{'m27tw_holdout_manifest_ready':True,'selected_case_count':30,'candidate_generatable_count':30,'overlap_with_dev_case_ids':[]})
+    _wj(root/'m27u_tool_ranking.json',{'m27u_tool_ranking_passed':True})
+    _wj(root/'m27v_arg_realization.json',{'m27v_arg_realization_passed':True})
+    _wj(root/'m27w_rule_retention.json',{'m27w_rule_retention_passed':True})
+    _wj(root/'subset_summary.json',{'recommended_tool_match_rate_among_activated':0.63,'raw_normalized_arg_match_rate_among_activated':0.45})
+    _wj(root/'m27x_scorer_proxy_gap.json',{'m27x_scorer_proxy_gap_explained':True,'fixed_by_code_change':False})
+    out=evaluate_tw(root,hold,source)
+    assert out['proxy_calibration_passed'] is False
+    assert out['m2_7tw_offline_passed'] is False

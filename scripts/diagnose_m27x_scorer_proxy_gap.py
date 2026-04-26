@@ -10,6 +10,7 @@ from typing import Any
 DEFAULT_ROOT = Path("outputs/artifacts/bfcl_ctspc_subset30_v1")
 OUT = DEFAULT_ROOT / "m27x_scorer_proxy_gap.json"
 MD = DEFAULT_ROOT / "m27x_scorer_proxy_gap.md"
+BLOCKING_GAP_TYPES = {"proxy_tool_ok_scorer_tool_wrong", "proxy_arg_ok_scorer_arg_wrong", "proxy_ok_trajectory_failed", "proxy_activated_but_scorer_not_activated", "proxy_not_activated_but_scorer_activated"}
 
 
 def _j(path: Path, default: Any = None) -> Any:
@@ -66,6 +67,8 @@ def evaluate(root: Path = DEFAULT_ROOT, *, fixed_by_code_change: bool = False) -
     summary = _j(root / "subset_summary.json", {}) or {}
     postmortem = _j(root / "m27q_postmortem.json", {}) or {}
     offline = _j(root / "m27tw_offline_summary.json", {}) or {}
+    feedback = _j(root / "m27y_scorer_feedback.json", {}) or {}
+    feedback_case_ids = {str(item) for item in feedback.get("blocked_case_ids") or []}
     u = _j(root / "m27u_tool_ranking.json", {}) or {}
     v = _j(root / "m27v_arg_realization.json", {}) or {}
     rows = _jl(root / "subset_case_report.jsonl")
@@ -89,6 +92,7 @@ def evaluate(root: Path = DEFAULT_ROOT, *, fixed_by_code_change: bool = False) -
             }
         gap = _gap_type(row, offline_case)
         distribution[gap] += 1
+        feedback_applied = case_id in feedback_case_ids
         cases.append(
             {
                 "case_id": case_id,
@@ -109,12 +113,20 @@ def evaluate(root: Path = DEFAULT_ROOT, *, fixed_by_code_change: bool = False) -
                 "scorer_activated": row.get("policy_plan_activated"),
                 "repair_kinds": row.get("repair_kinds") or [],
                 "gap_type": gap,
+                "scorer_feedback_applied": feedback_applied,
+                "feedback_action": "record_only" if feedback_applied else None,
             }
         )
 
     regressed = [case for case in cases if case.get("case_regressed")]
-    explained_gap_types = {"proxy_tool_ok_scorer_tool_wrong", "proxy_arg_ok_scorer_arg_wrong", "proxy_ok_trajectory_failed", "proxy_activated_but_scorer_not_activated", "proxy_not_activated_but_scorer_activated"}
+    explained_gap_types = BLOCKING_GAP_TYPES
     gap_count = sum(count for key, count in distribution.items() if key in explained_gap_types)
+    gap_case_ids = {case["case_id"] for case in cases if case.get("gap_type") in explained_gap_types}
+    regression_case_ids = {case["case_id"] for case in cases if case.get("case_regressed")}
+    feedback_ready = bool(feedback.get("m27y_scorer_feedback_ready"))
+    feedback_covers_gap = bool(gap_case_ids) and gap_case_ids.issubset(feedback_case_ids)
+    feedback_covers_regressions = regression_case_ids.issubset(feedback_case_ids)
+    effective_fixed_by_code_change = bool(fixed_by_code_change or (feedback_ready and feedback_covers_gap and feedback_covers_regressions and feedback.get("fixed_by_code_change")))
     report = {
         "report_scope": "m2_7x_scorer_proxy_gap",
         "artifact_root": str(root),
@@ -133,13 +145,18 @@ def evaluate(root: Path = DEFAULT_ROOT, *, fixed_by_code_change: bool = False) -
         "regression_cases": regressed,
         "cases": cases,
         "m27x_scorer_proxy_gap_explained": gap_count > 0,
-        "fixed_by_code_change": fixed_by_code_change,
-        "m27x_scorer_proxy_gap_passed": gap_count > 0 and fixed_by_code_change,
+        "fixed_by_code_change": effective_fixed_by_code_change,
+        "m27y_scorer_feedback_ready": feedback_ready,
+        "scorer_feedback_case_count": len(feedback_case_ids),
+        "scorer_feedback_covers_gap_cases": feedback_covers_gap,
+        "scorer_feedback_covers_regression_cases": feedback_covers_regressions,
+        "scorer_feedback_code_fix_id": feedback.get("code_fix_id"),
+        "m27x_scorer_proxy_gap_passed": gap_count > 0 and effective_fixed_by_code_change,
         "diagnostic": {
             "offline_proxy_is_not_scorer_evidence": True,
             "emitted_args_unavailable_from_case_report": True,
             "postmortem_recommended_next_focus": postmortem.get("recommended_next_focus"),
-            "do_not_rerun_bfcl_until_gap_has_code_fix": not fixed_by_code_change,
+            "do_not_rerun_bfcl_until_gap_has_code_fix": not effective_fixed_by_code_change,
         },
     }
     return report

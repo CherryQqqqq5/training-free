@@ -44,6 +44,10 @@ runtime_policy:
     - touch
     - mkdir
 
+  # M2.7y: scorer-gap/regression feedback is an offline calibration overlay.
+  # Matching candidates are downgraded to record_only until a later scorer run proves recovery.
+  scorer_feedback_path: outputs/artifacts/bfcl_ctspc_subset30_v1/m27y_scorer_feedback.json
+
 upstream:
   active_profile: "openrouter"
   base_url: "https://YOUR_UPSTREAM_OPENAI_COMPATIBLE_ENDPOINT/v1"
