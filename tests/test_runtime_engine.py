@@ -2867,7 +2867,6 @@ action:
             "binding_source": "explicit_literal",
             "arg_bindings": {"file_name": {"source": "explicit_literal", "value": "b.txt"}},
             "postcondition": {"kind": "file_content"},
-            "trajectory_risk_flags": ["trajectory_sensitive_tool"],
             "recommended_tools": ["cat"],
         }
         rule = self._next_tool_rule(recommended_tools=["cat"], action_candidates=[action_candidate])
@@ -2899,6 +2898,10 @@ action:
         self.assertEqual(rejected["guard"]["intervention_mode"], "record_only")
         self.assertIn("scorer_feedback_record_only", rejected["guard"]["risk_flags"])
         self.assertEqual(rejected["tool"], "cat")
+        self.assertTrue(rejected["scorer_feedback_pattern_matched"])
+        self.assertEqual(rejected["matched_regression_guard_key"], None)
+        self.assertEqual(rejected["scorer_feedback_pattern_action"], "record_only")
+        self.assertEqual(rejected["scorer_feedback_reason"], "m27aa_pattern_regression_guard")
 
     def test_scorer_feedback_pattern_does_not_block_non_matching_candidate(self) -> None:
         action_candidate = {

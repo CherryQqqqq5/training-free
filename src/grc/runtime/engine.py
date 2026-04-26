@@ -181,9 +181,9 @@ class RuleEngine:
                 )
         return patterns
 
-    def _candidate_feedback_pattern_matches(self, candidate: Dict[str, Any]) -> bool:
+    def _candidate_feedback_pattern_match(self, candidate: Dict[str, Any]) -> Dict[str, Any] | None:
         if not self.scorer_feedback_blocked_patterns:
-            return False
+            return None
         candidate_tool_family = self._scorer_feedback_tool_family(str(candidate.get("tool") or ""))
         candidate_postcondition_family = self._postcondition_goal_family(candidate)
         candidate_binding_sources = set(self._candidate_binding_sources(candidate))
@@ -191,6 +191,8 @@ class RuleEngine:
         if candidate_binding_source:
             candidate_binding_sources.add(candidate_binding_source)
         candidate_risk_flags = set(self._candidate_declared_risk_flags(candidate))
+        if str(candidate.get("tool") or "").strip() in {"cat", "touch", "mkdir"}:
+            candidate_risk_flags.add("trajectory_sensitive_tool")
         for pattern in self.scorer_feedback_blocked_patterns:
             expected_tool_family = pattern.get("selected_tool_family")
             if expected_tool_family and expected_tool_family != candidate_tool_family:
@@ -204,14 +206,18 @@ class RuleEngine:
             expected_flags = set(pattern.get("trajectory_risk_flags") or [])
             if expected_flags and not expected_flags.issubset(candidate_risk_flags):
                 continue
-            return True
-        return False
+            return pattern
+        return None
+
+    def _candidate_feedback_pattern_matches(self, candidate: Dict[str, Any]) -> bool:
+        return self._candidate_feedback_pattern_match(candidate) is not None
 
     def _apply_scorer_feedback_to_candidate(self, candidate: Dict[str, Any]) -> Dict[str, Any]:
         tool_name = str(candidate.get("tool") or "").strip()
         args = candidate.get("args") if isinstance(candidate.get("args"), dict) else {}
         signature_blocked = bool(tool_name and self._candidate_feedback_signature(tool_name, args) in self.scorer_feedback_blocked_signatures)
-        pattern_blocked = self._candidate_feedback_pattern_matches(candidate)
+        matched_pattern = self._candidate_feedback_pattern_match(candidate)
+        pattern_blocked = matched_pattern is not None
         if not signature_blocked and not pattern_blocked:
             return candidate
         patched = dict(candidate)
@@ -220,7 +226,11 @@ class RuleEngine:
         if "scorer_feedback_record_only" not in flags:
             flags.append("scorer_feedback_record_only")
         patched["trajectory_risk_flags"] = flags
+        action = str((matched_pattern or {}).get("action") or "record_only")
         patched["scorer_feedback_action"] = "record_only"
+        patched["scorer_feedback_pattern_matched"] = pattern_blocked
+        patched["scorer_feedback_pattern_action"] = action if pattern_blocked else None
+        patched["matched_regression_guard_key"] = (matched_pattern or {}).get("regression_guard_key")
         patched["scorer_feedback_reason"] = "m27aa_pattern_regression_guard" if pattern_blocked else "m27y_scorer_gap_or_regression"
         return patched
 
@@ -1227,6 +1237,11 @@ class RuleEngine:
                     "rank_tuple": list(rank),
                     "guard": guard,
                     "candidate_rank_scores": components,
+                    "scorer_feedback_pattern_matched": bool(candidate.get("scorer_feedback_pattern_matched")),
+                    "matched_regression_guard_key": candidate.get("matched_regression_guard_key"),
+                    "scorer_feedback_pattern_action": candidate.get("scorer_feedback_pattern_action"),
+                    "scorer_feedback_action": candidate.get("scorer_feedback_action"),
+                    "scorer_feedback_reason": candidate.get("scorer_feedback_reason"),
                 }
             )
         return None, rejected

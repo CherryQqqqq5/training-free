@@ -60,10 +60,13 @@ def _pattern_proxy_calibration(root: Path, summary: dict[str, Any], aa: dict[str
     new_patterns = int(aa.get("new_regression_pattern_count") or 0)
     coverage = aa.get("regression_pattern_coverage")
     coverage_ok = isinstance(coverage, (int, float)) and coverage >= 1.0
+    effective_coverage = aa.get("pattern_effective_coverage")
+    effective_coverage_ok = isinstance(effective_coverage, (int, float)) and effective_coverage >= 1.0
     unsafe = int(aa.get("diagnostic_unsafe_gap_count") or 0)
     covers_patterns = bool(aa.get("scorer_feedback_covers_regression_patterns"))
+    effective_patterns = bool(aa.get("scorer_feedback_effective_for_regression_patterns"))
     aa_passed = bool(aa.get("m27aa_regression_patterns_passed"))
-    pattern_passed = (not needs_pattern_fix) or (aa_passed and old_unresolved == 0 and new_patterns == 0 and coverage_ok and unsafe == 0 and covers_patterns)
+    pattern_passed = (not needs_pattern_fix) or (aa_passed and old_unresolved == 0 and new_patterns == 0 and coverage_ok and effective_coverage_ok and unsafe == 0 and covers_patterns and effective_patterns)
     return {
         "pattern_proxy_calibration_passed": pattern_passed,
         "needs_pattern_fix": needs_pattern_fix,
@@ -71,8 +74,10 @@ def _pattern_proxy_calibration(root: Path, summary: dict[str, Any], aa: dict[str
         "old_regression_unresolved_count": old_unresolved,
         "new_regression_pattern_count": new_patterns,
         "regression_pattern_coverage": coverage,
+        "pattern_effective_coverage": effective_coverage,
         "diagnostic_unsafe_gap_count": unsafe,
         "scorer_feedback_covers_regression_patterns": covers_patterns,
+        "scorer_feedback_effective_for_regression_patterns": effective_patterns,
         "pattern_report_path": str(root / "m27aa_regression_patterns.json") if (root / "m27aa_regression_patterns.json").exists() else None,
     }
 

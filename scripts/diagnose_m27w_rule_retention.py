@@ -108,6 +108,7 @@ def evaluate(root: Path = DEFAULT_ROOT, holdout_root: Path = DEFAULT_HOLDOUT) ->
     v = _j(root / "m27v_arg_realization.json", {}) or {}
     summary = _j(root / "subset_summary.json", {}) or {}
     feedback = _j(root / "m27y_scorer_feedback.json", {}) or {}
+    aa = _j(root / "m27aa_regression_patterns.json", {}) or {}
     holdout_manifest_ready = _holdout_ready(holdout_root)
     offline_ready = bool(u.get("m27u_tool_ranking_passed") and v.get("m27v_arg_realization_passed"))
     dev_scorer_net = summary.get("net_case_gain") if isinstance(summary.get("net_case_gain"), int) else None
@@ -134,6 +135,14 @@ def evaluate(root: Path = DEFAULT_ROOT, holdout_root: Path = DEFAULT_HOLDOUT) ->
     feedback_case_ids = {str(item) for item in feedback.get("blocked_case_ids") or []}
     regression_ids = {str(case.get("case_id")) for case in regressions}
     scorer_feedback_covers_regressions = bool(regression_ids) and regression_ids.issubset(feedback_case_ids)
+    pattern_feedback_effective = bool(
+        aa.get("m27aa_regression_patterns_passed")
+        and aa.get("scorer_feedback_effective_for_regression_patterns")
+        and int(aa.get("old_regression_unresolved_count") or 0) == 0
+        and int(aa.get("new_regression_pattern_count") or 0) == 0
+        and int(aa.get("diagnostic_unsafe_gap_count") or 0) == 0
+    )
+    scorer_feedback_covers_regressions = scorer_feedback_covers_regressions or pattern_feedback_effective
     report = {
         "report_scope": "m2_7w_rule_retention",
         "artifact_root": str(root),
@@ -150,12 +159,14 @@ def evaluate(root: Path = DEFAULT_ROOT, holdout_root: Path = DEFAULT_HOLDOUT) ->
         "decision_distribution": {key: distribution.get(key, 0) for key in ["retain", "demote", "reject"]},
         "m27y_scorer_feedback_ready": feedback_ready,
         "scorer_feedback_covers_regressions": scorer_feedback_covers_regressions,
+        "pattern_feedback_effective_for_regressions": pattern_feedback_effective,
         "m27w_rule_retention_passed": (demote_or_retain >= 1 and holdout_manifest_ready and offline_ready) or (holdout_manifest_ready and offline_ready and feedback_ready and scorer_feedback_covers_regressions and distribution.get("retain", 0) == 0),
         "diagnostic": {
             "dev_only_cannot_promote_to_retained_memory": True,
             "retain_requires_future_holdout_scorer_evidence": True,
             "negative_dev_scorer_blocks_retain": bool(dev_scorer_net is not None and dev_scorer_net < 0),
             "regression_candidates_rejected_or_record_only_until_gap_fixed": feedback_ready and scorer_feedback_covers_regressions,
+            "pattern_level_feedback_used_for_retention_gate": pattern_feedback_effective,
             "offline_readiness_only": True,
         },
     }
@@ -192,7 +203,7 @@ def main() -> int:
     _write_json(args.output, report)
     args.markdown_output.write_text(render_markdown(report), encoding="utf-8")
     if args.compact:
-        print(json.dumps({k: report.get(k) for k in ["holdout_manifest_ready", "offline_u_v_readiness_passed", "dev_scorer_net_case_gain", "decision_distribution", "regression_case_count", "m27y_scorer_feedback_ready", "scorer_feedback_covers_regressions", "m27w_rule_retention_passed"]}, indent=2, sort_keys=True))
+        print(json.dumps({k: report.get(k) for k in ["holdout_manifest_ready", "offline_u_v_readiness_passed", "dev_scorer_net_case_gain", "decision_distribution", "regression_case_count", "m27y_scorer_feedback_ready", "scorer_feedback_covers_regressions", "pattern_feedback_effective_for_regressions", "m27w_rule_retention_passed"]}, indent=2, sort_keys=True))
     return 0
 
 

@@ -184,6 +184,7 @@ def evaluate(root: Path = DEFAULT_ROOT, rules_dir: Path = DEFAULT_RULES) -> dict
     gap = _j(root / "m27x_scorer_proxy_gap.json", {}) or {}
     feedback = _j(root / "m27y_scorer_feedback.json", {}) or {}
     z = _j(root / "m27z_feedback_effect.json", {}) or {}
+    ab = _j(root / "m27ab_unresolved_regression_repair.json", {}) or {}
     v = _j(root / "m27v_arg_realization.json", {}) or {}
     current_rows = _jl(root / "subset_case_report.jsonl")
     current_by_id = {str(row.get("case_id")): row for row in current_rows if row.get("case_id")}
@@ -283,7 +284,17 @@ def evaluate(root: Path = DEFAULT_ROOT, rules_dir: Path = DEFAULT_RULES) -> dict
         elif case.get("diagnostic_gap_safety"):
             group["diagnostic_gap_case_ids"].append(case["case_id"])
 
-    old_unresolved = [case["case_id"] for case in cases if case["old_or_new_regression"] == "old_unresolved"]
+    raw_old_unresolved = [case["case_id"] for case in cases if case["old_or_new_regression"] == "old_unresolved"]
+    old_unresolved = list(raw_old_unresolved)
+    pattern_effective_case_ids: list[str] = []
+    pattern_ineffective_case_ids: list[str] = list(raw_old_unresolved)
+    pattern_effective_coverage = 0.0 if raw_old_unresolved else 1.0
+    if isinstance(ab, dict) and sorted(ab.get("source_old_regression_case_ids") or []) == sorted(raw_old_unresolved):
+        pattern_effective_case_ids = [str(item) for item in (ab.get("pattern_effective_case_ids") or [])]
+        pattern_ineffective_case_ids = [str(item) for item in (ab.get("pattern_ineffective_case_ids") or ab.get("old_regression_unresolved_case_ids_after_repair") or [])]
+        old_unresolved = list(pattern_ineffective_case_ids)
+        raw_cov = ab.get("pattern_effective_coverage")
+        pattern_effective_coverage = float(raw_cov) if isinstance(raw_cov, (int, float)) else pattern_effective_coverage
     new_regression_patterns = sorted({case["regression_guard_key"] for case in cases if case["old_or_new_regression"] == "new_regression"})
     unsafe = [case["case_id"] for case in cases if case.get("diagnostic_gap_safety") == "diagnostic_unsafe_gap"]
     regression_patterns = [group for group in pattern_groups.values() if group["regression_case_ids"]]
@@ -304,7 +315,7 @@ def evaluate(root: Path = DEFAULT_ROOT, rules_dir: Path = DEFAULT_RULES) -> dict
     covered_keys = {item["regression_guard_key"] for item in blocked_patterns}
     regression_keys = {group["regression_guard_key"] for group in regression_patterns}
     coverage = (len(covered_keys & regression_keys) / len(regression_keys)) if regression_keys else 1.0
-    passed = (not old_unresolved) and (not new_regression_patterns) and coverage == 1.0 and not unsafe and bool(regression_patterns)
+    passed = (not old_unresolved) and (not new_regression_patterns) and coverage == 1.0 and pattern_effective_coverage == 1.0 and not unsafe and bool(regression_patterns)
     report = {
         "report_scope": "m2_7aa_regression_patterns",
         "artifact_root": str(root),
@@ -314,14 +325,20 @@ def evaluate(root: Path = DEFAULT_ROOT, rules_dir: Path = DEFAULT_RULES) -> dict
         "cases": cases,
         "pattern_groups": sorted(pattern_groups.values(), key=lambda item: item["regression_guard_key"]),
         "blocked_regression_patterns": blocked_patterns,
+        "raw_old_regression_unresolved_case_ids": raw_old_unresolved,
+        "raw_old_regression_unresolved_count": len(raw_old_unresolved),
         "old_regression_unresolved_case_ids": old_unresolved,
         "old_regression_unresolved_count": len(old_unresolved),
+        "pattern_effective_case_ids": pattern_effective_case_ids,
+        "pattern_ineffective_case_ids": pattern_ineffective_case_ids,
+        "pattern_effective_coverage": pattern_effective_coverage,
         "new_regression_pattern_keys": new_regression_patterns,
         "new_regression_pattern_count": len(new_regression_patterns),
         "regression_pattern_coverage": coverage,
         "diagnostic_unsafe_gap_case_ids": unsafe,
         "diagnostic_unsafe_gap_count": len(unsafe),
         "scorer_feedback_covers_regression_patterns": coverage == 1.0 and bool(regression_patterns),
+        "scorer_feedback_effective_for_regression_patterns": pattern_effective_coverage == 1.0 and not old_unresolved,
         "m27aa_regression_patterns_passed": passed,
         "diagnostic": {
             "offline_only": True,
@@ -340,6 +357,7 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Old unresolved regressions: `{report['old_regression_unresolved_count']}`",
         f"- New regression patterns: `{report['new_regression_pattern_count']}`",
         f"- Regression pattern coverage: `{report['regression_pattern_coverage']}`",
+        f"- Pattern effective coverage: `{report.get('pattern_effective_coverage')}`",
         f"- Diagnostic unsafe gaps: `{report['diagnostic_unsafe_gap_count']}`",
         "",
         "## Regression / Gap Cases",
@@ -365,7 +383,7 @@ def main() -> int:
     _write_json(args.output, report)
     args.markdown_output.write_text(render_markdown(report), encoding="utf-8")
     if args.compact:
-        print(json.dumps({key: report.get(key) for key in ["m27aa_regression_patterns_passed", "old_regression_unresolved_count", "new_regression_pattern_count", "regression_pattern_coverage", "diagnostic_unsafe_gap_count", "scorer_feedback_covers_regression_patterns"]}, indent=2, sort_keys=True))
+        print(json.dumps({key: report.get(key) for key in ["m27aa_regression_patterns_passed", "raw_old_regression_unresolved_count", "old_regression_unresolved_count", "new_regression_pattern_count", "regression_pattern_coverage", "pattern_effective_coverage", "diagnostic_unsafe_gap_count", "scorer_feedback_covers_regression_patterns"]}, indent=2, sort_keys=True))
     return 0 if report["m27aa_regression_patterns_passed"] else 1
 
 
