@@ -69,6 +69,7 @@ def evaluate(root: Path = DEFAULT_ROOT, *, fixed_by_code_change: bool = False) -
     offline = _j(root / "m27tw_offline_summary.json", {}) or {}
     feedback = _j(root / "m27y_scorer_feedback.json", {}) or {}
     feedback_case_ids = {str(item) for item in feedback.get("blocked_case_ids") or []}
+    feedback_actions_by_case = {str(item.get("case_id")): str(item.get("feedback_action") or "diagnostic_only") for item in (feedback.get("feedback_cases") or []) if isinstance(item, dict) and item.get("case_id")}
     u = _j(root / "m27u_tool_ranking.json", {}) or {}
     v = _j(root / "m27v_arg_realization.json", {}) or {}
     rows = _jl(root / "subset_case_report.jsonl")
@@ -114,7 +115,7 @@ def evaluate(root: Path = DEFAULT_ROOT, *, fixed_by_code_change: bool = False) -
                 "repair_kinds": row.get("repair_kinds") or [],
                 "gap_type": gap,
                 "scorer_feedback_applied": feedback_applied,
-                "feedback_action": "record_only" if feedback_applied else None,
+                "feedback_action": feedback_actions_by_case.get(case_id) if feedback_applied else None,
             }
         )
 

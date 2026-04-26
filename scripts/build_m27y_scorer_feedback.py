@@ -46,6 +46,7 @@ def build_feedback(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
         is_regression = bool(case.get("case_regressed"))
         if gap_type not in BLOCKING_GAP_TYPES and not is_regression:
             continue
+        runtime_blocked = is_regression
         if is_regression:
             reason = "scorer_regression"
         elif gap_type == "proxy_tool_ok_scorer_tool_wrong":
@@ -59,7 +60,7 @@ def build_feedback(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
         reasons[reason] += 1
         offline_tool = case.get("offline_selected_tool")
         offline_args = case.get("offline_candidate_args")
-        if isinstance(offline_tool, str) and offline_tool.strip() and isinstance(offline_args, dict):
+        if runtime_blocked and isinstance(offline_tool, str) and offline_tool.strip() and isinstance(offline_args, dict):
             signature = {"tool": offline_tool.strip(), "args": offline_args}
             if signature not in blocked_signatures:
                 blocked_signatures.append(signature)
@@ -70,8 +71,9 @@ def build_feedback(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
                 "offline_selected_tool": case.get("offline_selected_tool"),
                 "gap_type": gap_type,
                 "case_regressed": is_regression,
-                "feedback_action": "record_only",
-                "intervention_mode_override": "record_only",
+                "feedback_action": "record_only" if runtime_blocked else "diagnostic_only",
+                "intervention_mode_override": "record_only" if runtime_blocked else None,
+                "runtime_blocked": runtime_blocked,
                 "reason": reason,
                 "candidate_policy_action": "reject_or_record_only_until_scorer_gap_fixed",
             }
@@ -84,7 +86,7 @@ def build_feedback(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
         "artifact_root": str(root),
         "code_fix_id": "m27y_scorer_feedback_overlay_v1",
         "fixed_by_code_change": True,
-        "feedback_application": "downgrade_scorer_gap_and_regression_candidates_to_record_only_for_offline_readiness",
+        "feedback_application": "downgrade_regression_candidates_to_record_only_and_keep_non_regression_gaps_diagnostic",
         "source_gap_report": str(root / "m27x_scorer_proxy_gap.json"),
         "baseline_accuracy": summary.get("baseline_accuracy"),
         "candidate_accuracy": summary.get("candidate_accuracy"),
@@ -114,10 +116,11 @@ def render_markdown(report: dict[str, Any]) -> str:
             "",
             f"- Ready: `{report['m27y_scorer_feedback_ready']}`",
             f"- Feedback cases: `{report['feedback_case_count']}`",
+            f"- Runtime-blocked signatures: `{len(report.get('blocked_candidate_signatures') or [])}`",
             f"- Regression cases covered: `{not report['missing_regression_coverage']}`",
             f"- Reason distribution: `{report['feedback_reason_distribution']}`",
             "",
-            "This is an offline scorer-feedback overlay. It downgrades scorer-gap and regression candidates to record-only for readiness calibration; it does not rerun BFCL or prove performance.",
+            "This is an offline scorer-feedback overlay. It downgrades regression-causing candidates to record-only and keeps non-regression scorer gaps diagnostic-only; it does not rerun BFCL or prove performance.",
             "",
         ]
     )

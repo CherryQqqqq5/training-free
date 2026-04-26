@@ -96,12 +96,17 @@ def test_m27y_feedback_marks_gap_fixed_when_it_covers_gap_and_regression(tmp_pat
     assert feedback["m27y_scorer_feedback_ready"] is True
     assert feedback["feedback_reason_distribution"]["scorer_tool_mismatch_after_guidance"] == 1
     assert feedback["feedback_reason_distribution"]["scorer_regression"] == 1
+    assert feedback["blocked_candidate_signatures"] == [{"tool": "touch", "args": {"file_name": "b.txt"}}]
+    by_feedback_case = {case["case_id"]: case for case in feedback["feedback_cases"]}
+    assert by_feedback_case["tool"]["feedback_action"] == "diagnostic_only"
+    assert by_feedback_case["reg"]["feedback_action"] == "record_only"
     assert report["fixed_by_code_change"] is True
     assert report["m27x_scorer_proxy_gap_passed"] is True
     assert report["scorer_feedback_covers_gap_cases"] is True
     assert report["scorer_feedback_covers_regression_cases"] is True
     by_case = {case["case_id"]: case for case in report["cases"]}
     assert by_case["tool"]["scorer_feedback_applied"] is True
+    assert by_case["tool"]["feedback_action"] == "diagnostic_only"
     assert by_case["reg"]["feedback_action"] == "record_only"
 
 
