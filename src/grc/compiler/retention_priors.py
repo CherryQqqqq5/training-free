@@ -32,6 +32,7 @@ BFCL_FAILURE_REASONS = {
 }
 
 EXPLICIT_REQUIRED_ARG_LITERAL_FAMILY = "explicit_required_arg_literal_completion"
+WRONG_ARG_KEY_ALIAS_FAMILY = "wrong_arg_key_alias_repair"
 
 
 def _truthy(value: Any) -> bool:
@@ -39,10 +40,16 @@ def _truthy(value: Any) -> bool:
 
 
 def _base_prior(rule: dict[str, Any], eligibility: str, *, reason: str | None = None) -> dict[str, Any]:
+    family = str(rule.get("rule_family") or rule.get("candidate_rules_type") or rule.get("rule_type") or "unknown")
+    theory_class = "schema_constraint_completion" if family == EXPLICIT_REQUIRED_ARG_LITERAL_FAMILY else "none"
+    intervention_scope = "argument_only" if family == EXPLICIT_REQUIRED_ARG_LITERAL_FAMILY else "unknown"
+    if family == WRONG_ARG_KEY_ALIAS_FAMILY:
+        theory_class = "schema_local_argument_normalization"
+        intervention_scope = "argument_key_only"
     prior = {
-        "rule_family": str(rule.get("rule_family") or rule.get("candidate_rules_type") or rule.get("rule_type") or "unknown"),
-        "theory_class": "schema_constraint_completion" if (rule.get("rule_type") == EXPLICIT_REQUIRED_ARG_LITERAL_FAMILY or rule.get("candidate_rules_type") == EXPLICIT_REQUIRED_ARG_LITERAL_FAMILY) else "none",
-        "intervention_scope": "argument_only" if (rule.get("rule_type") == EXPLICIT_REQUIRED_ARG_LITERAL_FAMILY or rule.get("candidate_rules_type") == EXPLICIT_REQUIRED_ARG_LITERAL_FAMILY) else "unknown",
+        "rule_family": family,
+        "theory_class": theory_class,
+        "intervention_scope": intervention_scope,
         "trajectory_mutation": bool(rule.get("trajectory_mutation") or not rule.get("no_next_tool_intervention", False)),
         "tool_choice_mutation": bool(rule.get("tool_choice_mutation") or rule.get("exact_tool_choice") is True),
         "exact_tool_choice": bool(rule.get("exact_tool_choice") is True),
@@ -117,6 +124,62 @@ def explicit_required_arg_literal_prior(rule: dict[str, Any]) -> dict[str, Any]:
     return prior
 
 
+
+def wrong_arg_key_alias_prior(rule: dict[str, Any]) -> dict[str, Any]:
+    """Return the theory prior for schema-local argument key normalization."""
+    family = str(rule.get("candidate_rules_type") or rule.get("rule_type") or "")
+    if family != WRONG_ARG_KEY_ALIAS_FAMILY:
+        return _base_prior(rule, NEVER_RETAIN, reason="unsupported_rule_family")
+
+    original_key = str(rule.get("original_arg_key") or "")
+    canonical_key = str(rule.get("canonical_arg_key") or rule.get("schema_arg_name") or "")
+    arg_value = rule.get("arg_value")
+    value_ok = isinstance(arg_value, (str, int, float, bool)) and str(arg_value).strip() != "" and len(str(arg_value)) <= 240
+    alias_ok = bool(original_key and canonical_key and original_key != canonical_key and rule.get("alias_ambiguous") is not True)
+    no_mutation = (
+        _truthy(rule.get("no_next_tool_intervention"))
+        and rule.get("exact_tool_choice") is False
+        and not _truthy(rule.get("ctspc_v0_action_rule"))
+        and rule.get("value_mutation") is False
+        and rule.get("tool_choice_mutation") is False
+        and rule.get("trajectory_mutation") is False
+    )
+    rejection = rule.get("rejection_reason")
+
+    eligibility = DEMOTE_CANDIDATE
+    reason = None
+    if not alias_ok:
+        eligibility = DIAGNOSTIC_ONLY
+        reason = "missing_or_ambiguous_schema_alias"
+    elif not value_ok:
+        eligibility = DIAGNOSTIC_ONLY
+        reason = "missing_or_mutated_arg_value"
+    elif not no_mutation:
+        eligibility = NEVER_RETAIN
+        reason = "trajectory_tool_or_value_mutation"
+    elif rejection:
+        eligibility = DIAGNOSTIC_ONLY
+        reason = str(rejection)
+
+    prior = {
+        "rule_family": WRONG_ARG_KEY_ALIAS_FAMILY,
+        "theory_class": "schema_local_argument_normalization",
+        "intervention_scope": "argument_key_only",
+        "trajectory_mutation": False,
+        "tool_choice_mutation": False,
+        "value_mutation": False,
+        "exact_tool_choice": False,
+        "precondition_observable": value_ok and alias_ok,
+        "postcondition_local": True,
+        "alias_mapping_deterministic": eligibility == DEMOTE_CANDIDATE,
+        "value_source": str(rule.get("value_source") or "model_emitted_args"),
+        "retain_eligibility": eligibility,
+    }
+    if reason:
+        prior["prior_rejection_reason"] = reason
+    return prior
+
+
 def evaluate_retention_prior(rule: dict[str, Any]) -> dict[str, Any]:
     """Normalize or infer a rule retention prior.
 
@@ -145,6 +208,8 @@ def evaluate_retention_prior(rule: dict[str, Any]) -> dict[str, Any]:
         return prior
     if family == EXPLICIT_REQUIRED_ARG_LITERAL_FAMILY:
         return explicit_required_arg_literal_prior(rule)
+    if family == WRONG_ARG_KEY_ALIAS_FAMILY:
+        return wrong_arg_key_alias_prior(rule)
     return _base_prior(rule, NEVER_RETAIN, reason="missing_retention_prior")
 
 

@@ -22,6 +22,7 @@ from grc.compiler.retention_priors import (
     BFCL_FAILURE_REASONS,
     explicit_required_arg_literal_prior,
     summarize_retention_priors,
+    wrong_arg_key_alias_prior,
 )
 
 DEFAULT_LOW_RISK = Path("outputs/artifacts/bfcl_ctspc_low_risk_slices_v1/low_risk_slice_manifest.json")
@@ -206,6 +207,67 @@ def _literal_candidates_for_arg(text: str, schema: dict[str, Any], emitted_args:
     return [grounding.selected_literal] if grounding.selected_literal else grounding.candidate_literals
 
 
+
+ALIAS_GROUPS: dict[str, set[str]] = {
+    "file_name": {"filename", "file", "file_path", "filepath", "path_name"},
+    "filename": {"file_name", "file", "file_path", "filepath", "path_name"},
+    "path": {"file_path", "filepath", "path_name", "dir", "directory", "folder"},
+    "dir_name": {"dir", "directory", "folder", "dirname", "folder_name"},
+    "directory": {"dir", "dir_name", "folder", "folder_name"},
+    "source": {"src", "from", "source_file", "source_path", "input", "input_file"},
+    "destination": {"dest", "dst", "to", "target", "target_file", "target_path", "output", "output_file"},
+    "pattern": {"query", "term", "search_term", "search_pattern", "regex"},
+    "query": {"pattern", "term", "search_term", "search_pattern"},
+    "content": {"text", "message", "body", "value"},
+    "message": {"text", "content", "body"},
+}
+
+
+def _normalize_arg_key(key: str) -> str:
+    return re.sub(r"[^a-z0-9]", "", key.lower())
+
+
+def _canonical_alias_candidates(arg_key: str, canonical_keys: list[str]) -> list[tuple[str, str]]:
+    norm_key = _normalize_arg_key(arg_key)
+    candidates: list[tuple[str, str]] = []
+    for canonical in canonical_keys:
+        if arg_key == canonical:
+            continue
+        norm_canonical = _normalize_arg_key(canonical)
+        aliases = ALIAS_GROUPS.get(canonical, set()) | {canonical}
+        normalized_aliases = {_normalize_arg_key(alias) for alias in aliases}
+        if norm_key == norm_canonical or norm_key in normalized_aliases:
+            evidence = "normalized_key_match" if norm_key == norm_canonical else "deterministic_alias_group"
+            candidates.append((canonical, evidence))
+    # A few safe suffix/prefix aliases are common in BFCL tool args.
+    if not candidates:
+        for canonical in canonical_keys:
+            norm_canonical = _normalize_arg_key(canonical)
+            if norm_key.endswith(norm_canonical) or norm_canonical.endswith(norm_key):
+                if len(norm_key) >= 4 and len(norm_canonical) >= 4:
+                    candidates.append((canonical, "deterministic_schema_local_substring"))
+    deduped: list[tuple[str, str]] = []
+    for item in candidates:
+        if item not in deduped:
+            deduped.append(item)
+    return deduped
+
+
+def _alias_rejection(base: dict[str, Any], reason: str, **extra: Any) -> dict[str, Any]:
+    row = {**base, **extra, "candidate_generatable": False, "rejection_reason": reason}
+    row.setdefault("rule_type", "wrong_arg_key_alias_repair")
+    row.setdefault("candidate_rules_type", "wrong_arg_key_alias_repair")
+    row.setdefault("no_next_tool_intervention", True)
+    row.setdefault("exact_tool_choice", False)
+    row.setdefault("guidance_only", True)
+    row.setdefault("ctspc_v0_action_rule", False)
+    row.setdefault("tool_choice_mutation", False)
+    row.setdefault("trajectory_mutation", False)
+    row.setdefault("value_mutation", False)
+    row["retention_prior"] = wrong_arg_key_alias_prior(row)
+    return row
+
+
 def _prior_rejection(base: dict[str, Any], reason: str, **extra: Any) -> dict[str, Any]:
     row = {**base, **extra, "candidate_generatable": False, "rejection_reason": reason}
     row.setdefault("rule_type", "explicit_required_arg_literal_completion")
@@ -216,6 +278,147 @@ def _prior_rejection(base: dict[str, Any], reason: str, **extra: Any) -> dict[st
     row.setdefault("ctspc_v0_action_rule", False)
     row["retention_prior"] = explicit_required_arg_literal_prior(row)
     return row
+
+
+
+def _compile_wrong_arg_key_alias_records(entry: dict[str, Any], result: dict[str, Any] | None, source_root: Path, category: str) -> list[dict[str, Any]]:
+    case_id = str(entry.get("id") or "")
+    base = {
+        "case_id": case_id,
+        "category": category,
+        "source_run_root": str(source_root),
+        "slice_name": "wrong_arg_key_alias_repair",
+        "low_risk_slices": ["wrong_arg_key_alias_repair"],
+        "candidate_origin": "theory_prior_wrong_arg_key_alias",
+        "ctspc_legacy_file_path_candidate": False,
+        "theory_prior_explicit_literal_candidate": False,
+        "theory_prior_wrong_arg_key_alias_candidate": True,
+    }
+    if not case_id:
+        return []
+    if category in PRIOR_AWARE_EXCLUDED_CATEGORIES:
+        return [_alias_rejection(base, "memory_or_hidden_state_category_excluded")]
+    if not result:
+        return [_alias_rejection(base, "missing_source_result")]
+    calls = _iter_tool_calls(result.get("result"))
+    if not calls:
+        return [_alias_rejection(base, "missing_emitted_tool_call")]
+    calls_by_tool: dict[str, list[tuple[str, dict[str, Any]]]] = defaultdict(list)
+    for tool, args in calls:
+        calls_by_tool[_normalize_tool_name(tool)].append((tool, args))
+    functions = _function_map(entry)
+    rows: list[dict[str, Any]] = []
+    saw_matching_tool = False
+    for norm_tool, fn in functions.items():
+        if norm_tool not in calls_by_tool:
+            continue
+        saw_matching_tool = True
+        if len(calls_by_tool[norm_tool]) != 1:
+            rows.append(_alias_rejection(base, "parallel_call_mapping_not_unique", tool=norm_tool))
+            continue
+        emitted_tool, emitted_args = calls_by_tool[norm_tool][0]
+        props = (fn.get("parameters") or {}).get("properties") or {}
+        canonical_keys = [str(key) for key in props.keys()] if isinstance(props, dict) else []
+        if not canonical_keys:
+            rows.append(_alias_rejection(base, "missing_schema_properties", tool=norm_tool))
+            continue
+        emitted_any_alias = False
+        for original_key, value in emitted_args.items():
+            original_key = str(original_key)
+            if original_key in canonical_keys:
+                continue
+            scalar_value = _scalar(value)
+            common = {
+                **base,
+                "tool": norm_tool,
+                "emitted_tool_name": emitted_tool,
+                "original_arg_key": original_key,
+                "arg_value": scalar_value,
+                "value_source": "model_emitted_args",
+                "source_value_key": original_key,
+                "no_next_tool_intervention": True,
+                "exact_tool_choice": False,
+                "guidance_only": True,
+                "ctspc_v0_action_rule": False,
+                "tool_choice_mutation": False,
+                "trajectory_mutation": False,
+                "value_mutation": False,
+                "rule_type": "wrong_arg_key_alias_repair",
+                "candidate_rules_type": "wrong_arg_key_alias_repair",
+            }
+            if scalar_value is None or str(scalar_value).strip() == "" or len(str(scalar_value)) > 240:
+                rows.append(_alias_rejection(common, "missing_or_non_scalar_arg_value"))
+                emitted_any_alias = True
+                continue
+            candidates = _canonical_alias_candidates(original_key, canonical_keys)
+            if len(candidates) != 1:
+                rows.append(_alias_rejection(common, "ambiguous_alias" if candidates else "no_schema_alias_match", alias_candidates=[c[0] for c in candidates], alias_ambiguous=len(candidates) != 1))
+                emitted_any_alias = True
+                continue
+            canonical_key, evidence = candidates[0]
+            if canonical_key in emitted_args:
+                rows.append(_alias_rejection(common, "canonical_key_already_present", canonical_arg_key=canonical_key, alias_evidence=evidence))
+                emitted_any_alias = True
+                continue
+            row = {
+                **common,
+                "canonical_arg_key": canonical_key,
+                "schema_arg_name": canonical_key,
+                "alias_evidence": evidence,
+                "alias_ambiguous": False,
+                "candidate_generatable": True,
+                "rejection_reason": None,
+                "confidence": 0.78,
+            }
+            row["retention_prior"] = wrong_arg_key_alias_prior(row)
+            rows.append(row)
+            emitted_any_alias = True
+        if not emitted_any_alias:
+            rows.append(_alias_rejection({**base, "tool": norm_tool}, "no_wrong_arg_key_alias_detected"))
+    if rows:
+        return rows
+    if not saw_matching_tool:
+        return [_alias_rejection(base, "no_matching_emitted_tool")]
+    return [_alias_rejection(base, "no_wrong_arg_key_alias_detected")]
+
+
+def _load_wrong_arg_key_alias_candidates(source_manifest_path: Path, existing_case_ids: set[str]) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, Any]]:
+    manifest = _read_json(source_manifest_path, {}) or {}
+    rows = manifest.get("category_status") or []
+    candidates: list[dict[str, Any]] = []
+    rejected: list[dict[str, Any]] = []
+    scanned_categories: list[str] = []
+    for row in rows if isinstance(rows, list) else []:
+        if not row.get("source_artifacts_available"):
+            continue
+        category = str(row.get("category") or "")
+        roots = [Path(str(root)) for root in row.get("existing_source_roots") or []]
+        if not category or not roots:
+            continue
+        entries = _load_dataset_records(category)
+        if not entries:
+            continue
+        scanned_categories.append(category)
+        for root in roots:
+            results = _load_result_records(root, category)
+            for case_id, entry in entries.items():
+                if case_id in existing_case_ids:
+                    continue
+                compiled_rows = _compile_wrong_arg_key_alias_records(entry, results.get(case_id), root, category)
+                for compiled in compiled_rows:
+                    if compiled.get("candidate_generatable"):
+                        candidates.append(compiled)
+                        existing_case_ids.add(case_id)
+                    else:
+                        rejected.append(compiled)
+    diagnostic = {
+        "wrong_arg_key_alias_scan_enabled": True,
+        "wrong_arg_key_alias_scanned_categories": sorted(set(scanned_categories)),
+        "wrong_arg_key_alias_candidate_count": len(candidates),
+        "wrong_arg_key_alias_rejected_count": len(rejected),
+        "wrong_arg_key_alias_rejection_distribution": dict(Counter(str(row.get("rejection_reason")) for row in rejected)),
+    }
+    return candidates, rejected, diagnostic
 
 
 def _compile_prior_aware_record(entry: dict[str, Any], result: dict[str, Any] | None, source_root: Path, category: str) -> dict[str, Any] | None:
@@ -593,18 +796,27 @@ def _compile_legacy_records(records: list[dict[str, Any]], slice_name: str, load
     return compiled
 
 
-def _manifest(name: str, rows: list[dict[str, Any]], *, ready: bool, slice_name: str | None = None) -> dict[str, Any]:
+def _manifest(
+    name: str,
+    rows: list[dict[str, Any]],
+    *,
+    ready: bool,
+    slice_name: str | None = None,
+    candidate_rules_type: str = "explicit_required_arg_literal_completion",
+    selection_criteria: str | None = None,
+) -> dict[str, Any]:
     return {
         "manifest_name": name,
         "selected_case_count": len(rows),
         "selected_case_ids": [str(row.get("case_id")) for row in rows],
-        "selection_criteria": "theory-prior explicit required-arg literal completion; no CTSPC-v0 next-tool intervention",
+        "selection_criteria": selection_criteria or "theory-prior explicit required-arg literal completion; no CTSPC-v0 next-tool intervention",
         "slice_name": slice_name,
         "planned_commands": [],
         "candidate_commands": [],
         "ctspc_v0_frozen": True,
         "repair_stack_default": "disabled",
-        "candidate_rules_type": "explicit_required_arg_literal_completion",
+        "candidate_rules_type": candidate_rules_type,
+        "authorized_theory_prior_families": sorted({str(row.get("candidate_rules_type") or row.get("rule_type") or candidate_rules_type) for row in rows}),
         "no_next_tool_intervention": True,
         "exact_tool_choice": False,
         "ready": ready,
@@ -647,17 +859,30 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
             "prior_aware_rejected_count": 0,
             "prior_aware_rejection_distribution": {},
         }
+        alias_candidates, alias_rejected, alias_diag = [], [], {
+            "wrong_arg_key_alias_scan_enabled": False,
+            "wrong_arg_key_alias_skip_reason": "non_default_low_risk_manifest_without_explicit_source_manifest",
+            "wrong_arg_key_alias_candidate_count": 0,
+            "wrong_arg_key_alias_rejected_count": 0,
+            "wrong_arg_key_alias_rejection_distribution": {},
+        }
     else:
         prior_candidates, prior_rejected, prior_diag = _load_prior_aware_candidates(source_manifest_path, existing_case_ids)
+        alias_candidates, alias_rejected, alias_diag = _load_wrong_arg_key_alias_candidates(source_manifest_path, set(existing_case_ids))
 
     source_result_availability_audit = _source_result_availability_audit(source_manifest_path)
     prior_scan_category_coverage = _prior_scan_category_coverage(prior_candidates + prior_rejected)
+    alias_scan_category_coverage = _prior_scan_category_coverage(alias_candidates + alias_rejected)
 
     explicit_compiled = legacy_explicit_compiled + prior_candidates + prior_rejected
-    compiler_category_coverage = _prior_scan_category_coverage(explicit_compiled)
+    alias_compiled = alias_candidates + alias_rejected
+    compiler_category_coverage = _prior_scan_category_coverage(explicit_compiled + alias_compiled)
     explicit_generatable = [item for item in explicit_compiled if item.get("candidate_generatable")]
+    alias_generatable = [item for item in alias_compiled if item.get("candidate_generatable")]
     theory_prior_generatable = [item for item in explicit_generatable if item.get("theory_prior_explicit_literal_candidate")]
     explicit_ambiguous = sum(1 for item in explicit_compiled if item.get("rejection_reason") in {"ambiguous_literal", "ambiguous_or_missing_observable_literal"})
+    alias_ambiguous_count = sum(1 for item in alias_compiled if item.get("rejection_reason") == "ambiguous_alias")
+    alias_value_mutation_count = sum(1 for item in alias_compiled if item.get("value_mutation") is True)
 
     stratified_records = _unique_records_by_case(slice_cases)
     stratified_compiled = _compile_legacy_records(stratified_records, "stratified_low_risk", load_result, load_entry)
@@ -672,6 +897,8 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
     explicit_prior_distribution = summarize_retention_priors(explicit_generatable)
     stratified_prior_distribution = summarize_retention_priors(stratified_generatable)
     retain_eligible = [row for row in explicit_generatable if row.get("retention_prior", {}).get("retain_eligibility") == DEMOTE_CANDIDATE]
+    alias_retain_eligible = [row for row in alias_generatable if row.get("retention_prior", {}).get("retain_eligibility") == DEMOTE_CANDIDATE]
+    combined_retain_eligible = retain_eligible + alias_retain_eligible
     stratified_retain_eligible = [row for row in stratified_generatable if row.get("retention_prior", {}).get("retain_eligibility") == DEMOTE_CANDIDATE]
     disambiguation_records = [
         {
@@ -694,34 +921,54 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
     ctspc_off = bool(status.get("ctspc_v0_frozen") and status.get("scorer_default") == "off" and status.get("retain") == 0 and status.get("dev_rerun_authorized") is False and status.get("holdout_authorized") is False)
     required_total = dev_size + holdout_size
     explicit_compiler_ready = len(explicit_generatable) >= dev_size and explicit_ambiguous == 0 and ctspc_off
+    alias_compiler_ready = len(alias_retain_eligible) >= dev_size and alias_ambiguous_count == 0 and alias_value_mutation_count == 0 and ctspc_off
+    combined_compiler_ready = len(combined_retain_eligible) >= dev_size and explicit_ambiguous == 0 and alias_ambiguous_count == 0 and alias_value_mutation_count == 0 and ctspc_off
     stratified_compiler_ready = len(stratified_generatable) >= dev_size and stratified_ambiguous == 0 and ctspc_off
-    compiler_ready = explicit_compiler_ready or stratified_compiler_ready
+    compiler_ready = explicit_compiler_ready or combined_compiler_ready or stratified_compiler_ready
     explicit_holdout_ready = len(retain_eligible) >= required_total and explicit_ambiguous == 0
+    alias_holdout_ready = len(alias_retain_eligible) >= required_total and alias_ambiguous_count == 0 and alias_value_mutation_count == 0
+    combined_holdout_ready = len(combined_retain_eligible) >= required_total and explicit_ambiguous == 0 and alias_ambiguous_count == 0 and alias_value_mutation_count == 0
     stratified_holdout_ready = False
     explicit_dev = retain_eligible[:dev_size]
     explicit_holdout = retain_eligible[dev_size : dev_size + holdout_size]
+    alias_dev = alias_retain_eligible[:dev_size]
+    alias_holdout = alias_retain_eligible[dev_size : dev_size + holdout_size]
+    combined_dev = combined_retain_eligible[:dev_size]
+    combined_holdout = combined_retain_eligible[dev_size : dev_size + holdout_size]
     stratified_dev = stratified_retain_eligible[:dev_size]
     stratified_holdout = stratified_retain_eligible[dev_size : dev_size + holdout_size]
-    scorer_ready = compiler_ready and explicit_holdout_ready
-    route_recommendation = (
-        "define_next_theory_family=wrong_arg_key_alias_repair"
-        if len(retain_eligible) < 35 and source_result_availability_audit.get("source_result_availability_ready")
-        else "explicit_required_arg_literal_ready_for_scorer_request"
-    )
+    scorer_ready = compiler_ready and combined_holdout_ready
+    if combined_holdout_ready:
+        route_recommendation = "theory_prior_low_risk_pool_ready_for_scorer_request"
+    elif alias_retain_eligible:
+        route_recommendation = "define_next_theory_family_after_wrong_arg_key_alias_repair"
+    else:
+        route_recommendation = "wrong_arg_key_alias_repair_coverage_insufficient"
 
     blockers = []
     if len(explicit_generatable) < required_total:
         blockers.append("explicit_total_below_40")
     if len(retain_eligible) < 35:
         blockers.append("explicit_demote_candidate_below_35")
+    if len(alias_retain_eligible) < 20:
+        blockers.append("wrong_arg_key_alias_demote_below_20")
+    if len(combined_retain_eligible) < 35:
+        blockers.append("combined_demote_candidate_below_35")
     if explicit_ambiguous:
         blockers.append("explicit_ambiguous_literal_present")
+    if alias_ambiguous_count:
+        blockers.append("wrong_arg_key_alias_ambiguous_present")
+    if alias_value_mutation_count:
+        blockers.append("wrong_arg_key_alias_value_mutation_present")
     if not explicit_holdout_ready:
         blockers.append("explicit_holdout_below_20")
+    if not combined_holdout_ready:
+        blockers.append("combined_theory_prior_holdout_below_20")
     if stratified_generatable and not stratified_holdout_ready:
         blockers.append("stratified_without_complete_theory_priors_not_authorized")
     if not ctspc_off:
         blockers.append("ctspc_v0_not_frozen")
+
 
     return {
         "report_scope": "m2_8pre_explicit_required_arg_literal_compiler",
@@ -740,11 +987,13 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
         "ctspc_v0_action_rules_enabled": False,
         "ctspc_v0_frozen": ctspc_off,
         "repair_stack_default": "disabled",
-        "candidate_rules_type": "explicit_required_arg_literal_completion",
+        "candidate_rules_type": "theory_prior_low_risk_combined",
+        "authorized_theory_prior_families": ["explicit_required_arg_literal_completion", "wrong_arg_key_alias_repair"],
         "no_next_tool_intervention": True,
         "exact_tool_choice": False,
         "retention_prior_required": True,
         "retention_prior_rule_family": "explicit_required_arg_literal_completion",
+        "retention_prior_rule_families": ["explicit_required_arg_literal_completion", "wrong_arg_key_alias_repair"],
         "bfcl_score_cannot_create_retain_rule": True,
         "stratified_pool_diagnostic_only_until_family_priors_exist": True,
         "ctspc_legacy_file_path_candidate_count": len([row for row in explicit_generatable if row.get("ctspc_legacy_file_path_candidate")]),
@@ -753,12 +1002,22 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
         "source_result_availability_audit": source_result_availability_audit,
         "source_result_availability_ready": source_result_availability_audit.get("source_result_availability_ready"),
         "prior_scan_category_coverage": prior_scan_category_coverage,
+        "alias_prior_scan": alias_diag,
+        "alias_scan_category_coverage": alias_scan_category_coverage,
         "compiler_category_coverage": compiler_category_coverage,
-        "remaining_gap_to_35_demote_candidates": max(0, 35 - len(retain_eligible)),
+        "explicit_remaining_gap_to_35_demote_candidates": max(0, 35 - len(retain_eligible)),
+        "remaining_gap_to_35_demote_candidates": max(0, 35 - len(combined_retain_eligible)),
         "route_recommendation": route_recommendation,
         "retention_prior_distribution": explicit_prior_distribution,
+        "wrong_arg_key_alias_retention_prior_distribution": summarize_retention_priors(alias_generatable),
+        "combined_retention_prior_distribution": summarize_retention_priors(explicit_generatable + alias_generatable),
         "stratified_retention_prior_distribution": stratified_prior_distribution,
         "retain_eligible_candidate_count": len(retain_eligible),
+        "wrong_arg_key_alias_candidate_count": len(alias_generatable),
+        "wrong_arg_key_alias_demote_candidate_count": len(alias_retain_eligible),
+        "wrong_arg_key_alias_ambiguous_count": alias_ambiguous_count,
+        "wrong_arg_key_alias_value_mutation_count": alias_value_mutation_count,
+        "combined_retain_eligible_candidate_count": len(combined_retain_eligible),
         "stratified_retain_eligible_candidate_count": len(stratified_retain_eligible),
         "scanner_missed_count": 0,
         "disambiguated_current_context_candidate_count": disambiguated_current_context_count,
@@ -768,9 +1027,16 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
         "candidate_generatable_count": len(explicit_generatable),
         "ambiguous_literal_count": explicit_ambiguous,
         "candidate_rules": explicit_generatable,
+        "wrong_arg_key_alias_candidate_rules": alias_generatable,
+        "combined_candidate_rules": explicit_generatable + alias_generatable,
         "rejected_candidates": [item for item in explicit_compiled if not item.get("candidate_generatable")],
+        "wrong_arg_key_alias_rejected_candidates": [item for item in alias_compiled if not item.get("candidate_generatable")],
         "dev_manifest": _manifest("explicit_required_arg_literal_dev20", explicit_dev, ready=len(explicit_dev) >= dev_size, slice_name="explicit_required_arg_literal"),
         "holdout_manifest": _manifest("explicit_required_arg_literal_holdout20", explicit_holdout, ready=explicit_holdout_ready, slice_name="explicit_required_arg_literal"),
+        "wrong_arg_key_alias_dev_manifest": _manifest("wrong_arg_key_alias_dev20", alias_dev, ready=len(alias_dev) >= dev_size, slice_name="wrong_arg_key_alias_repair", candidate_rules_type="wrong_arg_key_alias_repair", selection_criteria="theory-prior schema-local wrong-arg-key alias repair; value/tool/trajectory unchanged"),
+        "wrong_arg_key_alias_holdout_manifest": _manifest("wrong_arg_key_alias_holdout20", alias_holdout, ready=alias_holdout_ready, slice_name="wrong_arg_key_alias_repair", candidate_rules_type="wrong_arg_key_alias_repair", selection_criteria="theory-prior schema-local wrong-arg-key alias repair; value/tool/trajectory unchanged"),
+        "combined_dev_manifest": _manifest("theory_prior_low_risk_dev20", combined_dev, ready=len(combined_dev) >= dev_size, slice_name="theory_prior_low_risk_combined", candidate_rules_type="theory_prior_low_risk_combined", selection_criteria="combined theory-prior pool: explicit required-arg literal completion plus wrong-arg-key alias repair"),
+        "combined_holdout_manifest": _manifest("theory_prior_low_risk_holdout20", combined_holdout, ready=combined_holdout_ready, slice_name="theory_prior_low_risk_combined", candidate_rules_type="theory_prior_low_risk_combined", selection_criteria="combined theory-prior pool: explicit required-arg literal completion plus wrong-arg-key alias repair"),
         "stratified_candidate_rules": stratified_generatable,
         "stratified_counts": dict(sorted(stratified_counts.items())),
         "stratified_selected_case_count": len(stratified_generatable),
@@ -780,8 +1046,12 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
         "stratified_holdout_manifest": _manifest("stratified_low_risk_holdout20", stratified_holdout, ready=False, slice_name="stratified_low_risk"),
         "compiler_ready": compiler_ready,
         "explicit_compiler_ready": explicit_compiler_ready,
+        "wrong_arg_key_alias_compiler_ready": alias_compiler_ready,
+        "combined_compiler_ready": combined_compiler_ready,
         "stratified_compiler_ready": stratified_compiler_ready,
         "explicit_holdout_ready": explicit_holdout_ready,
+        "wrong_arg_key_alias_holdout_ready": alias_holdout_ready,
+        "combined_theory_prior_holdout_ready": combined_holdout_ready,
         "stratified_holdout_ready": stratified_holdout_ready,
         "scorer_authorization_ready": scorer_ready,
         "m28pre_explicit_required_arg_literal_compiler_passed": compiler_ready,
@@ -801,8 +1071,10 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Scorer authorization ready: `{report['scorer_authorization_ready']}`",
         f"- Explicit selected/generatable: `{report['selected_case_count']}` / `{report['candidate_generatable_count']}`",
         f"- Retain-eligible explicit candidates: `{report['retain_eligible_candidate_count']}`",
+        f"- Retain-eligible wrong-key alias candidates: `{report['wrong_arg_key_alias_demote_candidate_count']}`",
+        f"- Combined retain-eligible candidates: `{report['combined_retain_eligible_candidate_count']}`",
         f"- Theory-prior explicit candidates: `{report['theory_prior_explicit_literal_candidate_count']}`",
-        f"- Remaining gap to 35 demote candidates: `{report['remaining_gap_to_35_demote_candidates']}`",
+        f"- Remaining combined gap to 35 demote candidates: `{report['remaining_gap_to_35_demote_candidates']}`",
         f"- Source/result availability ready: `{report['source_result_availability_ready']}`",
         f"- Route recommendation: `{report['route_recommendation']}`",
         f"- Stratified selected/generatable: `{report['stratified_selected_case_count']}` / `{report['stratified_candidate_generatable_count']}`",
@@ -888,10 +1160,16 @@ def _render_source_result_availability_audit(report: dict[str, Any]) -> str:
 
 def write_outputs(report: dict[str, Any], out_root: Path = DEFAULT_OUT_ROOT) -> None:
     out_root.mkdir(parents=True, exist_ok=True)
-    _write_json(out_root / "compiler_summary.json", {key: value for key, value in report.items() if key not in {"candidate_rules", "rejected_candidates", "stratified_candidate_rules", "literal_disambiguation_records"}})
+    _write_json(out_root / "compiler_summary.json", {key: value for key, value in report.items() if key not in {"candidate_rules", "rejected_candidates", "wrong_arg_key_alias_candidate_rules", "wrong_arg_key_alias_rejected_candidates", "combined_candidate_rules", "stratified_candidate_rules", "literal_disambiguation_records"}})
     (out_root / "compiler_summary.md").write_text(render_markdown(report), encoding="utf-8")
     with (out_root / "candidate_rules.jsonl").open("w", encoding="utf-8") as handle:
         for row in report["candidate_rules"]:
+            handle.write(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n")
+    with (out_root / "wrong_arg_key_alias_candidate_rules.jsonl").open("w", encoding="utf-8") as handle:
+        for row in report["wrong_arg_key_alias_candidate_rules"]:
+            handle.write(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n")
+    with (out_root / "combined_theory_prior_candidate_rules.jsonl").open("w", encoding="utf-8") as handle:
+        for row in report["combined_candidate_rules"]:
             handle.write(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n")
     with (out_root / "stratified_candidate_rules.jsonl").open("w", encoding="utf-8") as handle:
         for row in report["stratified_candidate_rules"]:
@@ -902,6 +1180,10 @@ def write_outputs(report: dict[str, Any], out_root: Path = DEFAULT_OUT_ROOT) -> 
     for path, md_path, manifest in [
         (out_root / "explicit_required_arg_literal_dev20_manifest.json", out_root / "explicit_required_arg_literal_dev20_manifest.md", report["dev_manifest"]),
         (out_root / "explicit_required_arg_literal_holdout20_manifest.json", out_root / "explicit_required_arg_literal_holdout20_manifest.md", report["holdout_manifest"]),
+        (out_root / "wrong_arg_key_alias_dev20_manifest.json", out_root / "wrong_arg_key_alias_dev20_manifest.md", report["wrong_arg_key_alias_dev_manifest"]),
+        (out_root / "wrong_arg_key_alias_holdout20_manifest.json", out_root / "wrong_arg_key_alias_holdout20_manifest.md", report["wrong_arg_key_alias_holdout_manifest"]),
+        (out_root / "theory_prior_low_risk_dev20_manifest.json", out_root / "theory_prior_low_risk_dev20_manifest.md", report["combined_dev_manifest"]),
+        (out_root / "theory_prior_low_risk_holdout20_manifest.json", out_root / "theory_prior_low_risk_holdout20_manifest.md", report["combined_holdout_manifest"]),
         (out_root / "stratified_low_risk_dev20_manifest.json", out_root / "stratified_low_risk_dev20_manifest.md", report["stratified_dev_manifest"]),
         (out_root / "stratified_low_risk_holdout20_manifest.json", out_root / "stratified_low_risk_holdout20_manifest.md", report["stratified_holdout_manifest"]),
     ]:
@@ -947,6 +1229,8 @@ def main() -> int:
             "selected_case_count": report["selected_case_count"],
             "candidate_generatable_count": report["candidate_generatable_count"],
             "retain_eligible_candidate_count": report["retain_eligible_candidate_count"],
+            "wrong_arg_key_alias_demote_candidate_count": report["wrong_arg_key_alias_demote_candidate_count"],
+            "combined_retain_eligible_candidate_count": report["combined_retain_eligible_candidate_count"],
             "theory_prior_explicit_literal_candidate_count": report["theory_prior_explicit_literal_candidate_count"],
             "stratified_selected_case_count": report["stratified_selected_case_count"],
             "stratified_candidate_generatable_count": report["stratified_candidate_generatable_count"],
@@ -954,6 +1238,8 @@ def main() -> int:
             "remaining_gap_to_35_demote_candidates": report["remaining_gap_to_35_demote_candidates"],
             "route_recommendation": report["route_recommendation"],
             "retention_prior_distribution": report["retention_prior_distribution"],
+            "wrong_arg_key_alias_retention_prior_distribution": report["wrong_arg_key_alias_retention_prior_distribution"],
+            "combined_retention_prior_distribution": report["combined_retention_prior_distribution"],
             "stratified_retention_prior_distribution": report["stratified_retention_prior_distribution"],
             "blockers": report["blockers"],
             "planned_commands": report["planned_commands"],

@@ -38,8 +38,13 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
     availability = _j(low_risk_root / "m28pre_source_result_availability_audit.json", {}) or {}
     dev = _j(low_risk_root / "explicit_required_arg_literal_dev20_manifest.json", {}) or {}
     holdout = _j(low_risk_root / "explicit_required_arg_literal_holdout20_manifest.json", {}) or {}
+    alias_dev = _j(low_risk_root / "wrong_arg_key_alias_dev20_manifest.json", {}) or {}
+    alias_holdout = _j(low_risk_root / "wrong_arg_key_alias_holdout20_manifest.json", {}) or {}
+    combined_dev = _j(low_risk_root / "theory_prior_low_risk_dev20_manifest.json", {}) or {}
+    combined_holdout = _j(low_risk_root / "theory_prior_low_risk_holdout20_manifest.json", {}) or {}
     strat_dev = _j(low_risk_root / "stratified_low_risk_dev20_manifest.json", {}) or {}
     strat_holdout = _j(low_risk_root / "stratified_low_risk_holdout20_manifest.json", {}) or {}
+
     freeze = bool(
         status.get("ctspc_v0_frozen")
         and status.get("scorer_default") == "off"
@@ -49,15 +54,27 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
     )
     dev_ids = set(str(x) for x in dev.get("selected_case_ids") or [])
     holdout_ids = set(str(x) for x in holdout.get("selected_case_ids") or [])
+    alias_dev_ids = set(str(x) for x in alias_dev.get("selected_case_ids") or [])
+    alias_holdout_ids = set(str(x) for x in alias_holdout.get("selected_case_ids") or [])
+    combined_dev_ids = set(str(x) for x in combined_dev.get("selected_case_ids") or []) or dev_ids
+    combined_holdout_ids = set(str(x) for x in combined_holdout.get("selected_case_ids") or []) or holdout_ids
     strat_dev_ids = set(str(x) for x in strat_dev.get("selected_case_ids") or [])
     strat_holdout_ids = set(str(x) for x in strat_holdout.get("selected_case_ids") or [])
     explicit_disjoint = not (dev_ids & holdout_ids)
+    alias_disjoint = not (alias_dev_ids & alias_holdout_ids)
+    combined_disjoint = not (combined_dev_ids & combined_holdout_ids)
     stratified_disjoint = not (strat_dev_ids & strat_holdout_ids)
+
     compiler_ready = bool(compiler.get("compiler_ready") or compiler.get("m28pre_explicit_required_arg_literal_compiler_passed"))
     explicit_holdout_ready = bool(compiler.get("explicit_holdout_ready") or compiler.get("m28pre_explicit_required_arg_literal_holdout_ready")) and explicit_disjoint
+    alias_holdout_ready = bool(compiler.get("wrong_arg_key_alias_holdout_ready")) and alias_disjoint
+    combined_holdout_ready = bool(compiler.get("combined_theory_prior_holdout_ready", compiler.get("explicit_holdout_ready") or compiler.get("m28pre_explicit_required_arg_literal_holdout_ready"))) and combined_disjoint
     stratified_holdout_ready = bool(compiler.get("stratified_holdout_ready")) and stratified_disjoint
-    no_scorer_commands = _no_commands(compiler, coverage, raw_coverage, availability, dev, holdout, strat_dev, strat_holdout)
-    retain_eligible_count = int(compiler.get("retain_eligible_candidate_count") or 0)
+    no_scorer_commands = _no_commands(compiler, coverage, raw_coverage, availability, dev, holdout, alias_dev, alias_holdout, combined_dev, combined_holdout, strat_dev, strat_holdout)
+
+    explicit_retain_count = int(compiler.get("retain_eligible_candidate_count") or 0)
+    alias_retain_count = int(compiler.get("wrong_arg_key_alias_demote_candidate_count") or 0)
+    combined_retain_count = int(compiler.get("combined_retain_eligible_candidate_count") or explicit_retain_count + alias_retain_count)
     required_generatable = int(compiler.get("required_explicit_candidate_generatable") or DEFAULT_REQUIRED_EXPLICIT_GENERATABLE)
     coverage_ready = bool(coverage.get("m28pre_retention_prior_coverage_audit_ready"))
     coverage_zero = bool(coverage.get("explicit_prior_family_coverage_zero"))
@@ -67,26 +84,39 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
     raw_zero = bool(raw_coverage.get("source_result_literals_prompt_coverage_zero"))
     availability_audit_ready = bool(availability.get("source_result_availability_audit_ready"))
     source_result_availability_ready = bool(availability.get("source_result_availability_ready"))
-    remaining_gap_to_35 = max(0, required_generatable - retain_eligible_count)
+    remaining_gap_to_35 = max(0, required_generatable - combined_retain_count)
     prior_scan_category_coverage = compiler.get("prior_scan_category_coverage") or {}
+    alias_scan_category_coverage = compiler.get("alias_scan_category_coverage") or {}
     compiler_category_coverage = compiler.get("compiler_category_coverage") or {}
     route_recommendation = compiler.get("route_recommendation")
+
+    allowed_families = {"explicit_required_arg_literal_completion", "wrong_arg_key_alias_repair"}
+    families = set(str(f) for f in (compiler.get("authorized_theory_prior_families") or []))
+    if not families and compiler.get("candidate_rules_type") == "explicit_required_arg_literal_completion":
+        families = {"explicit_required_arg_literal_completion"}
     safeguards = bool(
         compiler.get("ctspc_v0_action_rules_enabled") is False
         and compiler.get("ctspc_v0_file_path_multi_turn_enabled") is False
         and compiler.get("repair_stack_default") == "disabled"
-        and compiler.get("candidate_rules_type") == "explicit_required_arg_literal_completion"
+        and families <= allowed_families
         and compiler.get("no_next_tool_intervention") is True
         and compiler.get("exact_tool_choice") is False
         and compiler.get("retention_prior_required") is True
-        and retain_eligible_count >= required_generatable
     )
     explicit_family_ready = bool(
         explicit_holdout_ready
-        and retain_eligible_count >= required_generatable
+        and explicit_retain_count >= required_generatable
         and coverage_ready
         and not coverage_zero
         and coverage_current_count >= required_generatable
+        and raw_ready
+        and not raw_zero
+    )
+    combined_family_ready = bool(
+        combined_holdout_ready
+        and combined_retain_count >= required_generatable
+        and alias_retain_count >= 0
+        and coverage_ready
         and raw_ready
         and not raw_zero
     )
@@ -95,8 +125,12 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         "repair_stack_split_ready": bool(repair.get("repair_stack_split_ready")),
         "compiler_ready": compiler_ready,
         "explicit_holdout_ready": explicit_holdout_ready,
+        "wrong_arg_key_alias_holdout_ready": alias_holdout_ready,
+        "combined_theory_prior_holdout_ready": combined_holdout_ready,
         "stratified_holdout_ready": stratified_holdout_ready,
         "dev_holdout_disjoint": explicit_disjoint,
+        "wrong_arg_key_alias_dev_holdout_disjoint": alias_disjoint,
+        "combined_dev_holdout_disjoint": combined_disjoint,
         "stratified_dev_holdout_disjoint": stratified_disjoint,
         "no_scorer_commands": no_scorer_commands,
         "runtime_manifest_safeguards_passed": safeguards,
@@ -107,6 +141,7 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         "source_result_availability_audit_ready": availability_audit_ready,
         "source_result_availability_ready": source_result_availability_ready,
         "explicit_family_scorer_authorization_ready": explicit_family_ready,
+        "combined_theory_prior_scorer_authorization_ready": combined_family_ready,
     }
     blockers: list[str] = []
     if not checks["ctspc_v0_frozen"]:
@@ -115,8 +150,8 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         blockers.append("repair_stack_split_not_ready")
     if not checks["compiler_ready"]:
         blockers.append("compiler_not_ready")
-    if not checks["explicit_holdout_ready"]:
-        blockers.append("explicit_holdout_not_ready")
+    if not checks["combined_theory_prior_holdout_ready"]:
+        blockers.append("combined_theory_prior_holdout_not_ready")
     if not no_scorer_commands:
         blockers.append("scorer_commands_present")
     if not safeguards:
@@ -125,16 +160,16 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         blockers.append("retention_prior_coverage_audit_missing")
     if coverage_zero:
         blockers.append("explicit_prior_family_coverage_zero")
-    if coverage_current_count < required_generatable:
-        blockers.append("explicit_current_context_coverage_below_35")
-    if not raw_ready:
-        blockers.append("raw_bfcl_literal_coverage_audit_missing")
     if raw_zero:
         blockers.append("explicit_prior_family_raw_prompt_coverage_zero")
+    if not raw_ready:
+        blockers.append("raw_bfcl_literal_coverage_audit_missing")
     if not availability_audit_ready:
         blockers.append("source_result_availability_audit_missing")
     if availability_audit_ready and not source_result_availability_ready:
         blockers.append("source_result_availability_not_ready")
+    if combined_retain_count < required_generatable:
+        blockers.append("combined_demote_candidate_below_35")
     compiler_blockers = compiler.get("blockers") or []
     for blocker in compiler_blockers if isinstance(compiler_blockers, list) else []:
         if blocker not in blockers:
@@ -147,7 +182,7 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         checks["runtime_manifest_safeguards_passed"],
         checks["source_result_availability_audit_ready"],
         checks["source_result_availability_ready"],
-        checks["explicit_family_scorer_authorization_ready"],
+        checks["combined_theory_prior_scorer_authorization_ready"],
     ])
     return {
         "report_scope": "m2_8pre_offline_summary",
@@ -155,6 +190,7 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         "source_result_literals_prompt_anchored_count": raw_prompt_anchored_count,
         "remaining_gap_to_35_demote_candidates": remaining_gap_to_35,
         "prior_scan_category_coverage": prior_scan_category_coverage,
+        "alias_scan_category_coverage": alias_scan_category_coverage,
         "compiler_category_coverage": compiler_category_coverage,
         "route_recommendation": route_recommendation,
         "scorer_authorization_ready": scorer_authorization_ready,
@@ -163,6 +199,11 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         "compiler": {key: compiler.get(key) for key in [
             "selected_case_count",
             "candidate_generatable_count",
+            "wrong_arg_key_alias_candidate_count",
+            "wrong_arg_key_alias_demote_candidate_count",
+            "wrong_arg_key_alias_ambiguous_count",
+            "wrong_arg_key_alias_value_mutation_count",
+            "combined_retain_eligible_candidate_count",
             "stratified_selected_case_count",
             "stratified_candidate_generatable_count",
             "ambiguous_literal_count",
@@ -177,7 +218,10 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
             "blockers",
             "retention_prior_required",
             "retention_prior_rule_family",
+            "retention_prior_rule_families",
             "retention_prior_distribution",
+            "wrong_arg_key_alias_retention_prior_distribution",
+            "combined_retention_prior_distribution",
             "stratified_retention_prior_distribution",
             "retain_eligible_candidate_count",
             "stratified_retain_eligible_candidate_count",
@@ -219,8 +263,12 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
             "candidate_commands",
             "planned_commands",
         ]},
-        "dev_manifest": {key: dev.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "no_next_tool_intervention", "exact_tool_choice"]},
-        "holdout_manifest": {key: holdout.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "no_next_tool_intervention", "exact_tool_choice"]},
+        "dev_manifest": {key: dev.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "authorized_theory_prior_families", "no_next_tool_intervention", "exact_tool_choice"]},
+        "holdout_manifest": {key: holdout.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "authorized_theory_prior_families", "no_next_tool_intervention", "exact_tool_choice"]},
+        "wrong_arg_key_alias_dev_manifest": {key: alias_dev.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "authorized_theory_prior_families", "no_next_tool_intervention", "exact_tool_choice"]},
+        "wrong_arg_key_alias_holdout_manifest": {key: alias_holdout.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "authorized_theory_prior_families", "no_next_tool_intervention", "exact_tool_choice"]},
+        "combined_dev_manifest": {key: combined_dev.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "authorized_theory_prior_families", "no_next_tool_intervention", "exact_tool_choice"]},
+        "combined_holdout_manifest": {key: combined_holdout.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "authorized_theory_prior_families", "no_next_tool_intervention", "exact_tool_choice"]},
         "stratified_dev_manifest": {key: strat_dev.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "no_next_tool_intervention", "exact_tool_choice"]},
         "stratified_holdout_manifest": {key: strat_holdout.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "no_next_tool_intervention", "exact_tool_choice"]},
         "diagnostic": {
@@ -232,7 +280,6 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
             "raw_prompt_coverage_does_not_create_retain_rule": True,
         },
     }
-
 
 def render_markdown(report: dict[str, Any]) -> str:
     lines = [

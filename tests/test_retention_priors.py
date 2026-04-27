@@ -74,3 +74,46 @@ def test_bfcl_mismatch_categories_for_theory_prior_rules() -> None:
     assert classify_bfcl_mismatch({**rule, "raw_normalized_arg_match": False}) == "wrong_arg_value"
     assert classify_bfcl_mismatch({**rule, "model_ignored_guidance": True}) == "model_ignored_guidance"
     assert classify_bfcl_mismatch({**rule, "case_regressed": True}) == "scorer_trajectory_mismatch"
+
+from grc.compiler.retention_priors import wrong_arg_key_alias_prior
+
+
+def _valid_alias_rule() -> dict:
+    return {
+        "rule_type": "wrong_arg_key_alias_repair",
+        "candidate_rules_type": "wrong_arg_key_alias_repair",
+        "tool": "cat",
+        "original_arg_key": "filename",
+        "canonical_arg_key": "file_name",
+        "arg_value": "report.txt",
+        "value_source": "model_emitted_args",
+        "no_next_tool_intervention": True,
+        "exact_tool_choice": False,
+        "ctspc_v0_action_rule": False,
+        "tool_choice_mutation": False,
+        "trajectory_mutation": False,
+        "value_mutation": False,
+        "alias_ambiguous": False,
+    }
+
+
+def test_wrong_arg_key_alias_repair_is_demote_candidate() -> None:
+    prior = wrong_arg_key_alias_prior(_valid_alias_rule())
+    assert prior["rule_family"] == "wrong_arg_key_alias_repair"
+    assert prior["theory_class"] == "schema_local_argument_normalization"
+    assert prior["intervention_scope"] == "argument_key_only"
+    assert prior["value_mutation"] is False
+    assert prior["alias_mapping_deterministic"] is True
+    assert prior["retain_eligibility"] == DEMOTE_CANDIDATE
+
+
+def test_wrong_arg_key_alias_rejects_ambiguous_or_mutating_repairs() -> None:
+    ambiguous = _valid_alias_rule()
+    ambiguous["alias_ambiguous"] = True
+    assert wrong_arg_key_alias_prior(ambiguous)["retain_eligibility"] == DIAGNOSTIC_ONLY
+
+    mutating = _valid_alias_rule()
+    mutating["value_mutation"] = True
+    prior = evaluate_retention_prior(mutating)
+    assert prior["retain_eligibility"] == NEVER_RETAIN
+    assert prior["prior_rejection_reason"] == "trajectory_tool_or_value_mutation"

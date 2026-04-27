@@ -492,3 +492,105 @@ def test_prior_scan_category_coverage_reports_accepts_and_rejects(tmp_path: Path
     assert coverage["rejected_count"] == 1
     assert coverage["accepted_by_tool_required_arg"] == {"calculate_area::height": 1}
     assert coverage["rejection_reason_counts"] == {"parallel_call_mapping_not_unique": 1}
+
+
+def _alias_entry(case_id: str, tool: str = "cat", canonical: str = "file_name") -> dict:
+    return {
+        "id": case_id,
+        "question": [[{"role": "user", "content": "Use the emitted tool arguments exactly as provided."}]],
+        "function": [{
+            "name": tool,
+            "parameters": {
+                "type": "dict",
+                "properties": {canonical: {"type": "string"}},
+                "required": [canonical],
+            },
+        }],
+    }
+
+
+def test_wrong_arg_key_alias_compiler_builds_demote_candidates(tmp_path: Path, monkeypatch) -> None:
+    source = tmp_path / "source"
+    category = "simple_python"
+    entries = {
+        "file_case": _alias_entry("file_case", "cat", "file_name"),
+        "dir_case": _alias_entry("dir_case", "cd", "dir_name"),
+        "dest_case": _alias_entry("dest_case", "mv", "destination"),
+    }
+    monkeypatch.setattr(explicit_builder, "_load_dataset_records", lambda cat: entries if cat == category else {})
+    low = tmp_path / "low.json"
+    status = tmp_path / "status.json"
+    source_manifest = tmp_path / "source_manifest.json"
+    _wj(low, {"slice_cases": {}})
+    _wj(status, {"ctspc_v0_frozen": True, "scorer_default": "off", "retain": 0, "dev_rerun_authorized": False, "holdout_authorized": False})
+    _source_manifest(source_manifest, category, source)
+    _result(source, category, [
+        {"id": "file_case", "result": [{"cat": json.dumps({"filename": "report.txt"})}]},
+        {"id": "dir_case", "result": [{"cd": json.dumps({"dir": "workspace"})}]},
+        {"id": "dest_case", "result": [{"mv": json.dumps({"dest": "archive.txt"})}]},
+    ])
+
+    report = build(low, status, source_manifest_path=source_manifest)
+
+    assert report["wrong_arg_key_alias_demote_candidate_count"] == 3
+    mappings = {(row["original_arg_key"], row["canonical_arg_key"]) for row in report["wrong_arg_key_alias_candidate_rules"]}
+    assert ("filename", "file_name") in mappings
+    assert ("dir", "dir_name") in mappings
+    assert ("dest", "destination") in mappings
+    assert all(row["value_mutation"] is False for row in report["wrong_arg_key_alias_candidate_rules"])
+    assert all(row["retention_prior"]["retain_eligibility"] == "demote_candidate" for row in report["wrong_arg_key_alias_candidate_rules"])
+
+
+def test_wrong_arg_key_alias_rejects_ambiguous_present_or_nonunique_calls(tmp_path: Path, monkeypatch) -> None:
+    source = tmp_path / "source"
+    category = "simple_python"
+    entries = {
+        "present": _alias_entry("present", "cat", "file_name"),
+        "parallel": _alias_entry("parallel", "cat", "file_name"),
+    }
+    monkeypatch.setattr(explicit_builder, "_load_dataset_records", lambda cat: entries if cat == category else {})
+    low = tmp_path / "low.json"
+    status = tmp_path / "status.json"
+    source_manifest = tmp_path / "source_manifest.json"
+    _wj(low, {"slice_cases": {}})
+    _wj(status, {"ctspc_v0_frozen": True, "scorer_default": "off", "retain": 0, "dev_rerun_authorized": False, "holdout_authorized": False})
+    _source_manifest(source_manifest, category, source)
+    _result(source, category, [
+        {"id": "present", "result": [{"cat": json.dumps({"filename": "report.txt", "file_name": "report.txt"})}]},
+        {"id": "parallel", "result": [{"cat": json.dumps({"filename": "a.txt"})}, {"cat": json.dumps({"filename": "b.txt"})}]},
+    ])
+
+    report = build(low, status, source_manifest_path=source_manifest)
+    reasons = {row["rejection_reason"] for row in report["wrong_arg_key_alias_rejected_candidates"]}
+
+    assert report["wrong_arg_key_alias_demote_candidate_count"] == 0
+    assert "canonical_key_already_present" in reasons
+    assert "parallel_call_mapping_not_unique" in reasons
+
+
+def test_combined_theory_prior_pool_can_authorize_only_explicit_and_alias(tmp_path: Path, monkeypatch) -> None:
+    source = tmp_path / "source"
+    category = "simple_python"
+    entries = {}
+    results = []
+    for i in range(35):
+        case_id = f"alias_{i}"
+        entries[case_id] = _alias_entry(case_id, "cat", "file_name")
+        results.append({"id": case_id, "result": [{"cat": json.dumps({"filename": f"report_{i}.txt"})}]})
+    monkeypatch.setattr(explicit_builder, "_load_dataset_records", lambda cat: entries if cat == category else {})
+    low = tmp_path / "low.json"
+    status = tmp_path / "status.json"
+    source_manifest = tmp_path / "source_manifest.json"
+    _wj(low, {"slice_cases": {}})
+    _wj(status, {"ctspc_v0_frozen": True, "scorer_default": "off", "retain": 0, "dev_rerun_authorized": False, "holdout_authorized": False})
+    _source_manifest(source_manifest, category, source)
+    _result(source, category, results)
+
+    report = build(low, status, source_manifest_path=source_manifest)
+
+    assert report["combined_retain_eligible_candidate_count"] == 35
+    assert report["combined_theory_prior_holdout_ready"] is False
+    assert report["wrong_arg_key_alias_demote_candidate_count"] == 35
+    assert set(report["combined_dev_manifest"]["authorized_theory_prior_families"]) == {"wrong_arg_key_alias_repair"}
+    assert report["planned_commands"] == []
+    assert report["candidate_commands"] == []
