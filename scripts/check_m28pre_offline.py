@@ -36,6 +36,7 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
     coverage = _j(low_risk_root / "retention_prior_coverage_audit.json", {}) or {}
     raw_coverage = _j(low_risk_root / "raw_bfcl_literal_coverage_audit.json", {}) or {}
     availability = _j(low_risk_root / "m28pre_source_result_availability_audit.json", {}) or {}
+    alias_coverage = _j(low_risk_root / "wrong_arg_key_alias_coverage_audit.json", {}) or {}
     dev = _j(low_risk_root / "explicit_required_arg_literal_dev20_manifest.json", {}) or {}
     holdout = _j(low_risk_root / "explicit_required_arg_literal_holdout20_manifest.json", {}) or {}
     alias_dev = _j(low_risk_root / "wrong_arg_key_alias_dev20_manifest.json", {}) or {}
@@ -70,7 +71,7 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
     alias_holdout_ready = bool(compiler.get("wrong_arg_key_alias_holdout_ready")) and alias_disjoint
     combined_holdout_ready = bool(compiler.get("combined_theory_prior_holdout_ready", compiler.get("explicit_holdout_ready") or compiler.get("m28pre_explicit_required_arg_literal_holdout_ready"))) and combined_disjoint
     stratified_holdout_ready = bool(compiler.get("stratified_holdout_ready")) and stratified_disjoint
-    no_scorer_commands = _no_commands(compiler, coverage, raw_coverage, availability, dev, holdout, alias_dev, alias_holdout, combined_dev, combined_holdout, strat_dev, strat_holdout)
+    no_scorer_commands = _no_commands(compiler, coverage, raw_coverage, availability, alias_coverage, dev, holdout, alias_dev, alias_holdout, combined_dev, combined_holdout, strat_dev, strat_holdout)
 
     explicit_retain_count = int(compiler.get("retain_eligible_candidate_count") or 0)
     alias_retain_count = int(compiler.get("wrong_arg_key_alias_demote_candidate_count") or 0)
@@ -84,11 +85,13 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
     raw_zero = bool(raw_coverage.get("source_result_literals_prompt_coverage_zero"))
     availability_audit_ready = bool(availability.get("source_result_availability_audit_ready"))
     source_result_availability_ready = bool(availability.get("source_result_availability_ready"))
+    alias_coverage_ready = bool(alias_coverage.get("wrong_arg_key_alias_coverage_audit_ready"))
+    alias_family_coverage_zero = bool(alias_coverage.get("wrong_arg_key_alias_family_coverage_zero"))
     remaining_gap_to_35 = max(0, required_generatable - combined_retain_count)
     prior_scan_category_coverage = compiler.get("prior_scan_category_coverage") or {}
     alias_scan_category_coverage = compiler.get("alias_scan_category_coverage") or {}
     compiler_category_coverage = compiler.get("compiler_category_coverage") or {}
-    route_recommendation = compiler.get("route_recommendation")
+    route_recommendation = alias_coverage.get("route_recommendation") or compiler.get("route_recommendation")
 
     allowed_families = {"explicit_required_arg_literal_completion", "wrong_arg_key_alias_repair"}
     families = set(str(f) for f in (compiler.get("authorized_theory_prior_families") or []))
@@ -140,6 +143,8 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         "explicit_prior_family_raw_prompt_coverage_zero": raw_zero,
         "source_result_availability_audit_ready": availability_audit_ready,
         "source_result_availability_ready": source_result_availability_ready,
+        "wrong_arg_key_alias_coverage_audit_ready": alias_coverage_ready,
+        "wrong_arg_key_alias_family_coverage_zero": alias_family_coverage_zero,
         "explicit_family_scorer_authorization_ready": explicit_family_ready,
         "combined_theory_prior_scorer_authorization_ready": combined_family_ready,
     }
@@ -168,6 +173,10 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         blockers.append("source_result_availability_audit_missing")
     if availability_audit_ready and not source_result_availability_ready:
         blockers.append("source_result_availability_not_ready")
+    if not alias_coverage_ready:
+        blockers.append("wrong_arg_key_alias_coverage_audit_missing")
+    if alias_family_coverage_zero:
+        blockers.append("wrong_arg_key_alias_family_coverage_zero")
     if combined_retain_count < required_generatable:
         blockers.append("combined_demote_candidate_below_35")
     compiler_blockers = compiler.get("blockers") or []
@@ -182,6 +191,7 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         checks["runtime_manifest_safeguards_passed"],
         checks["source_result_availability_audit_ready"],
         checks["source_result_availability_ready"],
+        checks["wrong_arg_key_alias_coverage_audit_ready"],
         checks["combined_theory_prior_scorer_authorization_ready"],
     ])
     return {
@@ -192,6 +202,17 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         "prior_scan_category_coverage": prior_scan_category_coverage,
         "alias_scan_category_coverage": alias_scan_category_coverage,
         "compiler_category_coverage": compiler_category_coverage,
+        "wrong_arg_key_alias_coverage_audit": {key: alias_coverage.get(key) for key in [
+            "wrong_arg_key_alias_coverage_audit_ready",
+            "wrong_arg_key_alias_candidate_count",
+            "wrong_arg_key_alias_demote_candidate_count",
+            "wrong_arg_key_alias_family_coverage_zero",
+            "rejection_reason_counts",
+            "route_recommendation",
+            "blockers",
+            "candidate_commands",
+            "planned_commands",
+        ]},
         "route_recommendation": route_recommendation,
         "scorer_authorization_ready": scorer_authorization_ready,
         "m2_8pre_offline_passed": scorer_authorization_ready,
@@ -307,6 +328,8 @@ def render_markdown(report: dict[str, Any]) -> str:
         "explicit_prior_family_raw_prompt_coverage_zero",
         "source_result_availability_audit_ready",
         "source_result_availability_ready",
+        "wrong_arg_key_alias_coverage_audit_ready",
+        "wrong_arg_key_alias_family_coverage_zero",
         "no_scorer_commands",
         "runtime_manifest_safeguards_passed",
     ]:
@@ -342,6 +365,8 @@ def main() -> int:
             "source_result_literals_prompt_anchored_count",
             "source_result_availability_audit_ready",
             "source_result_availability_ready",
+            "wrong_arg_key_alias_coverage_audit_ready",
+            "wrong_arg_key_alias_family_coverage_zero",
             "remaining_gap_to_35_demote_candidates",
             "route_recommendation",
             "no_scorer_commands",
