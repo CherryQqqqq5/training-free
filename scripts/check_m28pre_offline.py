@@ -13,7 +13,6 @@ DEFAULT_LOW_RISK = Path("outputs/artifacts/bfcl_explicit_required_arg_literal_v1
 OUT = DEFAULT_LOW_RISK / "m28pre_offline_summary.json"
 MD = DEFAULT_LOW_RISK / "m28pre_offline_summary.md"
 
-
 DEFAULT_REQUIRED_EXPLICIT_GENERATABLE = 35
 
 
@@ -35,6 +34,7 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
     repair = _j(subset_root / "repair_stack_contribution.json", {}) or {}
     compiler = _j(low_risk_root / "compiler_summary.json", {}) or {}
     coverage = _j(low_risk_root / "retention_prior_coverage_audit.json", {}) or {}
+    raw_coverage = _j(low_risk_root / "raw_bfcl_literal_coverage_audit.json", {}) or {}
     dev = _j(low_risk_root / "explicit_required_arg_literal_dev20_manifest.json", {}) or {}
     holdout = _j(low_risk_root / "explicit_required_arg_literal_holdout20_manifest.json", {}) or {}
     strat_dev = _j(low_risk_root / "stratified_low_risk_dev20_manifest.json", {}) or {}
@@ -55,12 +55,15 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
     compiler_ready = bool(compiler.get("compiler_ready") or compiler.get("m28pre_explicit_required_arg_literal_compiler_passed"))
     explicit_holdout_ready = bool(compiler.get("explicit_holdout_ready") or compiler.get("m28pre_explicit_required_arg_literal_holdout_ready")) and explicit_disjoint
     stratified_holdout_ready = bool(compiler.get("stratified_holdout_ready")) and stratified_disjoint
-    no_scorer_commands = _no_commands(compiler, coverage, dev, holdout, strat_dev, strat_holdout)
+    no_scorer_commands = _no_commands(compiler, coverage, raw_coverage, dev, holdout, strat_dev, strat_holdout)
     retain_eligible_count = int(compiler.get("retain_eligible_candidate_count") or 0)
     required_generatable = int(compiler.get("required_explicit_candidate_generatable") or DEFAULT_REQUIRED_EXPLICIT_GENERATABLE)
     coverage_ready = bool(coverage.get("m28pre_retention_prior_coverage_audit_ready"))
     coverage_zero = bool(coverage.get("explicit_prior_family_coverage_zero"))
     coverage_current_count = int(coverage.get("current_context_anchored_literal_candidate_count") or 0)
+    raw_ready = bool(raw_coverage.get("m28pre_raw_bfcl_literal_coverage_audit_ready"))
+    raw_prompt_anchored_count = int(raw_coverage.get("source_result_literals_prompt_anchored_count") or 0)
+    raw_zero = bool(raw_coverage.get("source_result_literals_prompt_coverage_zero"))
     safeguards = bool(
         compiler.get("ctspc_v0_action_rules_enabled") is False
         and compiler.get("ctspc_v0_file_path_multi_turn_enabled") is False
@@ -77,6 +80,8 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         and coverage_ready
         and not coverage_zero
         and coverage_current_count >= required_generatable
+        and raw_ready
+        and not raw_zero
     )
     checks = {
         "ctspc_v0_frozen": freeze,
@@ -90,6 +95,8 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         "runtime_manifest_safeguards_passed": safeguards,
         "retention_prior_coverage_audit_ready": coverage_ready,
         "explicit_prior_family_coverage_zero": coverage_zero,
+        "raw_bfcl_literal_coverage_audit_ready": raw_ready,
+        "explicit_prior_family_raw_prompt_coverage_zero": raw_zero,
         "explicit_family_scorer_authorization_ready": explicit_family_ready,
     }
     blockers: list[str] = []
@@ -111,6 +118,10 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         blockers.append("explicit_prior_family_coverage_zero")
     if coverage_current_count < required_generatable:
         blockers.append("explicit_current_context_coverage_below_35")
+    if not raw_ready:
+        blockers.append("raw_bfcl_literal_coverage_audit_missing")
+    if raw_zero:
+        blockers.append("explicit_prior_family_raw_prompt_coverage_zero")
     compiler_blockers = compiler.get("blockers") or []
     for blocker in compiler_blockers if isinstance(compiler_blockers, list) else []:
         if blocker not in blockers:
@@ -126,6 +137,7 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
     return {
         "report_scope": "m2_8pre_offline_summary",
         **checks,
+        "source_result_literals_prompt_anchored_count": raw_prompt_anchored_count,
         "scorer_authorization_ready": scorer_authorization_ready,
         "m2_8pre_offline_passed": scorer_authorization_ready,
         "blockers": blockers,
@@ -164,6 +176,18 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
             "candidate_commands",
             "planned_commands",
         ]},
+        "raw_bfcl_literal_coverage_audit": {key: raw_coverage.get(key) for key in [
+            "m28pre_raw_bfcl_literal_coverage_audit_ready",
+            "source_result_diagnostic_literal_count",
+            "source_result_literals_prompt_anchored_count",
+            "source_result_literals_retain_prior_candidate_count",
+            "source_result_literals_prompt_coverage_zero",
+            "failure_reason_counts",
+            "route_recommendation",
+            "pivot_to_next_theory_family",
+            "candidate_commands",
+            "planned_commands",
+        ]},
         "dev_manifest": {key: dev.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "no_next_tool_intervention", "exact_tool_choice"]},
         "holdout_manifest": {key: holdout.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "no_next_tool_intervention", "exact_tool_choice"]},
         "stratified_dev_manifest": {key: strat_dev.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "no_next_tool_intervention", "exact_tool_choice"]},
@@ -174,6 +198,7 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
             "no_bfcl_or_model_call": True,
             "stratified_pool_diagnostic_only_until_family_priors_exist": True,
             "bfcl_score_cannot_create_retain_rule": True,
+            "raw_prompt_coverage_does_not_create_retain_rule": True,
         },
     }
 
@@ -184,6 +209,7 @@ def render_markdown(report: dict[str, Any]) -> str:
         "",
         f"- Passed: `{report['m2_8pre_offline_passed']}`",
         f"- Scorer authorization ready: `{report['scorer_authorization_ready']}`",
+        f"- Raw prompt anchored source-result literals: `{report['source_result_literals_prompt_anchored_count']}`",
         f"- Blockers: `{report['blockers']}`",
         "",
         "| Check | Passed |",
@@ -197,6 +223,8 @@ def render_markdown(report: dict[str, Any]) -> str:
         "stratified_holdout_ready",
         "retention_prior_coverage_audit_ready",
         "explicit_prior_family_coverage_zero",
+        "raw_bfcl_literal_coverage_audit_ready",
+        "explicit_prior_family_raw_prompt_coverage_zero",
         "no_scorer_commands",
         "runtime_manifest_safeguards_passed",
     ]:
@@ -227,6 +255,9 @@ def main() -> int:
             "explicit_holdout_ready",
             "retention_prior_coverage_audit_ready",
             "explicit_prior_family_coverage_zero",
+            "raw_bfcl_literal_coverage_audit_ready",
+            "explicit_prior_family_raw_prompt_coverage_zero",
+            "source_result_literals_prompt_anchored_count",
             "no_scorer_commands",
             "blockers",
         ]}, indent=2, sort_keys=True))

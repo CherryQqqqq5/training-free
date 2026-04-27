@@ -125,6 +125,7 @@ def test_m28pre_offline_requires_freeze_repair_compiler_holdout_coverage_and_no_
     _wj(low / "explicit_required_arg_literal_dev20_manifest.json", {"selected_case_ids": [f"d{i}" for i in range(20)], "planned_commands": []})
     _wj(low / "explicit_required_arg_literal_holdout20_manifest.json", {"selected_case_ids": [f"h{i}" for i in range(20)], "planned_commands": []})
     _wj(low / "retention_prior_coverage_audit.json", {"m28pre_retention_prior_coverage_audit_ready": True, "explicit_prior_family_coverage_zero": False, "current_context_anchored_literal_candidate_count": 35, "candidate_commands": [], "planned_commands": []})
+    _wj(low / "raw_bfcl_literal_coverage_audit.json", {"m28pre_raw_bfcl_literal_coverage_audit_ready": True, "source_result_literals_prompt_anchored_count": 35, "source_result_literals_prompt_coverage_zero": False, "candidate_commands": [], "planned_commands": []})
 
     report = evaluate_m28pre(subset, low)
 
@@ -197,6 +198,7 @@ def test_m28pre_safeguards_fail_when_ctspc_or_repair_stack_enabled(tmp_path: Pat
     _wj(low / "explicit_required_arg_literal_dev20_manifest.json", {"selected_case_ids": [f"d{i}" for i in range(20)], "planned_commands": []})
     _wj(low / "explicit_required_arg_literal_holdout20_manifest.json", {"selected_case_ids": [f"h{i}" for i in range(20)], "planned_commands": []})
     _wj(low / "retention_prior_coverage_audit.json", {"m28pre_retention_prior_coverage_audit_ready": True, "explicit_prior_family_coverage_zero": False, "current_context_anchored_literal_candidate_count": 35, "candidate_commands": [], "planned_commands": []})
+    _wj(low / "raw_bfcl_literal_coverage_audit.json", {"m28pre_raw_bfcl_literal_coverage_audit_ready": True, "source_result_literals_prompt_anchored_count": 35, "source_result_literals_prompt_coverage_zero": False, "candidate_commands": [], "planned_commands": []})
 
     report = evaluate_m28pre(subset, low)
 
