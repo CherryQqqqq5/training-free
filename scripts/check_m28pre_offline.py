@@ -35,6 +35,7 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
     compiler = _j(low_risk_root / "compiler_summary.json", {}) or {}
     coverage = _j(low_risk_root / "retention_prior_coverage_audit.json", {}) or {}
     raw_coverage = _j(low_risk_root / "raw_bfcl_literal_coverage_audit.json", {}) or {}
+    availability = _j(low_risk_root / "m28pre_source_result_availability_audit.json", {}) or {}
     dev = _j(low_risk_root / "explicit_required_arg_literal_dev20_manifest.json", {}) or {}
     holdout = _j(low_risk_root / "explicit_required_arg_literal_holdout20_manifest.json", {}) or {}
     strat_dev = _j(low_risk_root / "stratified_low_risk_dev20_manifest.json", {}) or {}
@@ -55,7 +56,7 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
     compiler_ready = bool(compiler.get("compiler_ready") or compiler.get("m28pre_explicit_required_arg_literal_compiler_passed"))
     explicit_holdout_ready = bool(compiler.get("explicit_holdout_ready") or compiler.get("m28pre_explicit_required_arg_literal_holdout_ready")) and explicit_disjoint
     stratified_holdout_ready = bool(compiler.get("stratified_holdout_ready")) and stratified_disjoint
-    no_scorer_commands = _no_commands(compiler, coverage, raw_coverage, dev, holdout, strat_dev, strat_holdout)
+    no_scorer_commands = _no_commands(compiler, coverage, raw_coverage, availability, dev, holdout, strat_dev, strat_holdout)
     retain_eligible_count = int(compiler.get("retain_eligible_candidate_count") or 0)
     required_generatable = int(compiler.get("required_explicit_candidate_generatable") or DEFAULT_REQUIRED_EXPLICIT_GENERATABLE)
     coverage_ready = bool(coverage.get("m28pre_retention_prior_coverage_audit_ready"))
@@ -64,6 +65,12 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
     raw_ready = bool(raw_coverage.get("m28pre_raw_bfcl_literal_coverage_audit_ready"))
     raw_prompt_anchored_count = int(raw_coverage.get("source_result_literals_prompt_anchored_count") or 0)
     raw_zero = bool(raw_coverage.get("source_result_literals_prompt_coverage_zero"))
+    availability_audit_ready = bool(availability.get("source_result_availability_audit_ready"))
+    source_result_availability_ready = bool(availability.get("source_result_availability_ready"))
+    remaining_gap_to_35 = max(0, required_generatable - retain_eligible_count)
+    prior_scan_category_coverage = compiler.get("prior_scan_category_coverage") or {}
+    compiler_category_coverage = compiler.get("compiler_category_coverage") or {}
+    route_recommendation = compiler.get("route_recommendation")
     safeguards = bool(
         compiler.get("ctspc_v0_action_rules_enabled") is False
         and compiler.get("ctspc_v0_file_path_multi_turn_enabled") is False
@@ -97,6 +104,8 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         "explicit_prior_family_coverage_zero": coverage_zero,
         "raw_bfcl_literal_coverage_audit_ready": raw_ready,
         "explicit_prior_family_raw_prompt_coverage_zero": raw_zero,
+        "source_result_availability_audit_ready": availability_audit_ready,
+        "source_result_availability_ready": source_result_availability_ready,
         "explicit_family_scorer_authorization_ready": explicit_family_ready,
     }
     blockers: list[str] = []
@@ -122,6 +131,10 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         blockers.append("raw_bfcl_literal_coverage_audit_missing")
     if raw_zero:
         blockers.append("explicit_prior_family_raw_prompt_coverage_zero")
+    if not availability_audit_ready:
+        blockers.append("source_result_availability_audit_missing")
+    if availability_audit_ready and not source_result_availability_ready:
+        blockers.append("source_result_availability_not_ready")
     compiler_blockers = compiler.get("blockers") or []
     for blocker in compiler_blockers if isinstance(compiler_blockers, list) else []:
         if blocker not in blockers:
@@ -132,12 +145,18 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         checks["compiler_ready"],
         checks["no_scorer_commands"],
         checks["runtime_manifest_safeguards_passed"],
+        checks["source_result_availability_audit_ready"],
+        checks["source_result_availability_ready"],
         checks["explicit_family_scorer_authorization_ready"],
     ])
     return {
         "report_scope": "m2_8pre_offline_summary",
         **checks,
         "source_result_literals_prompt_anchored_count": raw_prompt_anchored_count,
+        "remaining_gap_to_35_demote_candidates": remaining_gap_to_35,
+        "prior_scan_category_coverage": prior_scan_category_coverage,
+        "compiler_category_coverage": compiler_category_coverage,
+        "route_recommendation": route_recommendation,
         "scorer_authorization_ready": scorer_authorization_ready,
         "m2_8pre_offline_passed": scorer_authorization_ready,
         "blockers": blockers,
@@ -179,6 +198,14 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
             "candidate_commands",
             "planned_commands",
         ]},
+        "source_result_availability_audit": {key: availability.get(key) for key in [
+            "source_result_availability_audit_ready",
+            "source_result_availability_ready",
+            "hard_issue_counts",
+            "issue_counts",
+            "candidate_commands",
+            "planned_commands",
+        ]},
         "raw_bfcl_literal_coverage_audit": {key: raw_coverage.get(key) for key in [
             "m28pre_raw_bfcl_literal_coverage_audit_ready",
             "source_result_diagnostic_literal_count",
@@ -214,6 +241,8 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Passed: `{report['m2_8pre_offline_passed']}`",
         f"- Scorer authorization ready: `{report['scorer_authorization_ready']}`",
         f"- Raw prompt anchored source-result literals: `{report['source_result_literals_prompt_anchored_count']}`",
+        f"- Remaining gap to 35 demote candidates: `{report['remaining_gap_to_35_demote_candidates']}`",
+        f"- Route recommendation: `{report['route_recommendation']}`",
         f"- Blockers: `{report['blockers']}`",
         "",
         "| Check | Passed |",
@@ -229,6 +258,8 @@ def render_markdown(report: dict[str, Any]) -> str:
         "explicit_prior_family_coverage_zero",
         "raw_bfcl_literal_coverage_audit_ready",
         "explicit_prior_family_raw_prompt_coverage_zero",
+        "source_result_availability_audit_ready",
+        "source_result_availability_ready",
         "no_scorer_commands",
         "runtime_manifest_safeguards_passed",
     ]:
@@ -262,6 +293,10 @@ def main() -> int:
             "raw_bfcl_literal_coverage_audit_ready",
             "explicit_prior_family_raw_prompt_coverage_zero",
             "source_result_literals_prompt_anchored_count",
+            "source_result_availability_audit_ready",
+            "source_result_availability_ready",
+            "remaining_gap_to_35_demote_candidates",
+            "route_recommendation",
             "no_scorer_commands",
             "blockers",
         ]}, indent=2, sort_keys=True))

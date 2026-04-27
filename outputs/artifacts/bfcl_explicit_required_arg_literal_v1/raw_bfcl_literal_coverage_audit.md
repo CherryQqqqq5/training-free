@@ -6,7 +6,7 @@ Offline diagnostic only. Source-result tool args are audited against raw BFCL pr
 - Source-result diagnostic literals: `25`
 - Prompt/observation anchored literals: `17`
 - Retain-prior candidates under raw prompt audit: `17`
-- Route recommendation: `fix_current_context_literal_extractor`
+- Route recommendation: `raw_prompt_grounding_complete_check_pool_threshold`
 
 | Failure reason | Count |
 | --- | ---: |

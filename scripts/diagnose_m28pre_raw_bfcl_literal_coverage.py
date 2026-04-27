@@ -292,7 +292,12 @@ def evaluate(root: Path = DEFAULT_ROOT, source_manifest_path: Path = DEFAULT_SOU
     prompt_anchored = sum(1 for record in records if record["literal_in_current_request"] or record["literal_in_current_observation"])
     retain_candidates = sum(1 for record in records if record["retain_prior_candidate"])
     scanner_missed_count = reason_counts.get(FAILURE_SCANNER_MISSED, 0)
-    route = "pivot_to_next_theory_family=wrong_arg_key_alias_repair" if prompt_anchored == 0 else "fix_current_context_literal_extractor"
+    if prompt_anchored == 0:
+        route = "pivot_to_next_theory_family=wrong_arg_key_alias_repair"
+    elif scanner_missed_count:
+        route = "fix_current_context_literal_extractor"
+    else:
+        route = "raw_prompt_grounding_complete_check_pool_threshold"
     return {
         "report_scope": "m2_8pre_raw_bfcl_literal_coverage_audit",
         "m28pre_raw_bfcl_literal_coverage_audit_ready": True,

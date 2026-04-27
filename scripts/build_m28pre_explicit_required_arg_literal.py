@@ -53,21 +53,45 @@ def _result_path(source_root: Path, category: str) -> Path | None:
     return matches[0] if matches else None
 
 
-def _load_result_records(source_root: Path, category: str) -> dict[str, dict[str, Any]]:
+def _load_result_record_stats(source_root: Path, category: str) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
     path = _result_path(source_root, category)
+    stats: dict[str, Any] = {
+        "source_root": str(source_root),
+        "category": category,
+        "result_file_path": str(path) if path else None,
+        "result_file_exists": bool(path),
+        "raw_line_count": 0,
+        "parsed_line_count": 0,
+        "parse_error_count": 0,
+        "missing_case_id_count": 0,
+        "result_record_count": 0,
+        "result_layout_unrecognized": False,
+    }
     if not path:
-        return {}
+        return {}, stats
     records: dict[str, dict[str, Any]] = {}
     for line in path.read_text(encoding="utf-8").splitlines():
         if not line.strip():
             continue
+        stats["raw_line_count"] += 1
         try:
             item = json.loads(line)
         except Exception:
+            stats["parse_error_count"] += 1
             continue
         case_id = str(item.get("id") or item.get("case_id") or "")
         if case_id:
             records[case_id] = item
+            stats["parsed_line_count"] += 1
+        else:
+            stats["missing_case_id_count"] += 1
+    stats["result_record_count"] = len(records)
+    stats["result_layout_unrecognized"] = bool(stats["raw_line_count"] and not records)
+    return records, stats
+
+
+def _load_result_records(source_root: Path, category: str) -> dict[str, dict[str, Any]]:
+    records, _stats = _load_result_record_stats(source_root, category)
     return records
 
 
@@ -272,6 +296,135 @@ def _compile_prior_aware_record(entry: dict[str, Any], result: dict[str, Any] | 
         row["retention_prior"] = explicit_required_arg_literal_prior(row)
         return row
     return _prior_rejection(base, "required_args_already_present_or_no_matching_emitted_tool")
+
+
+
+def _classify_source_result_case(entry: dict[str, Any], result: dict[str, Any] | None) -> dict[str, Any]:
+    if not result:
+        return {"availability_reason": "source_result_case_not_collected", "tool": None, "required_arg": None}
+    calls = _iter_tool_calls(result.get("result"))
+    if not calls:
+        return {"availability_reason": "baseline_no_tool_call", "tool": None, "required_arg": None}
+    calls_by_tool: dict[str, list[tuple[str, dict[str, Any]]]] = defaultdict(list)
+    for tool, args in calls:
+        calls_by_tool[_normalize_tool_name(tool)].append((tool, args))
+    functions = _function_map(entry)
+    any_required = False
+    matched_tool = False
+    complete_tool_count = 0
+    for norm_tool, fn in functions.items():
+        required = _required_args(fn)
+        if not required:
+            continue
+        any_required = True
+        if norm_tool not in calls_by_tool:
+            continue
+        matched_tool = True
+        if len(calls_by_tool[norm_tool]) != 1:
+            return {"availability_reason": "parallel_call_mapping_not_unique", "tool": norm_tool, "required_arg": None}
+        _emitted_tool, emitted_args = calls_by_tool[norm_tool][0]
+        missing = [arg for arg in required if arg not in emitted_args]
+        if not missing:
+            complete_tool_count += 1
+            continue
+        if len(missing) == 1:
+            return {"availability_reason": "missing_required_arg_candidate", "tool": norm_tool, "required_arg": missing[0]}
+        return {"availability_reason": "multiple_missing_required_args", "tool": norm_tool, "required_arg": ",".join(missing)}
+    if not any_required:
+        return {"availability_reason": "no_required_args_in_schema", "tool": None, "required_arg": None}
+    if matched_tool and complete_tool_count:
+        return {"availability_reason": "emitted_args_complete", "tool": None, "required_arg": None}
+    return {"availability_reason": "no_matching_emitted_tool", "tool": None, "required_arg": None}
+
+
+def _source_result_availability_audit(source_manifest_path: Path) -> dict[str, Any]:
+    manifest = _read_json(source_manifest_path, {}) or {}
+    category_rows = manifest.get("category_status") or []
+    category_reports: list[dict[str, Any]] = []
+    total_issue_counts: Counter[str] = Counter()
+    hard_issue_counts: Counter[str] = Counter()
+    for row in category_rows if isinstance(category_rows, list) else []:
+        category = str(row.get("category") or "")
+        roots = [Path(str(root)) for root in row.get("existing_source_roots") or []]
+        entries = _load_dataset_records(category) if category else {}
+        category_report: dict[str, Any] = {
+            "category": category,
+            "source_artifacts_available": bool(row.get("source_artifacts_available")),
+            "source_roots": [str(root) for root in roots],
+            "dataset_case_count": len(entries),
+            "root_reports": [],
+            "issue_counts": {},
+        }
+        if not category_report["source_artifacts_available"] or not roots:
+            count = len(entries) or int(row.get("selected_case_count") or 0) or 1
+            category_report["issue_counts"] = {"category_source_artifacts_missing": count}
+            total_issue_counts["category_source_artifacts_missing"] += count
+            hard_issue_counts["category_source_artifacts_missing"] += count
+            category_reports.append(category_report)
+            continue
+        for root in roots:
+            records, stats = _load_result_record_stats(root, category)
+            issue_counts: Counter[str] = Counter()
+            if not stats["result_file_exists"]:
+                issue_counts["result_file_missing"] += len(entries) or 1
+                hard_issue_counts["result_file_missing"] += len(entries) or 1
+            elif stats["result_layout_unrecognized"]:
+                issue_counts["result_layout_unrecognized"] += len(entries) or 1
+                hard_issue_counts["result_layout_unrecognized"] += len(entries) or 1
+            else:
+                for case_id, entry in entries.items():
+                    classified = _classify_source_result_case(entry, records.get(case_id))
+                    issue_counts[str(classified["availability_reason"])] += 1
+            total_issue_counts.update(issue_counts)
+            category_report["root_reports"].append({**stats, "issue_counts": dict(sorted(issue_counts.items()))})
+        combined: Counter[str] = Counter()
+        for root_report in category_report["root_reports"]:
+            combined.update(root_report.get("issue_counts") or {})
+        category_report["issue_counts"] = dict(sorted(combined.items()))
+        category_reports.append(category_report)
+    ready = not hard_issue_counts
+    return {
+        "report_scope": "m28pre_source_result_availability_audit",
+        "offline_only": True,
+        "candidate_commands": [],
+        "planned_commands": [],
+        "source_result_availability_audit_ready": True,
+        "source_result_availability_ready": ready,
+        "hard_issue_counts": dict(sorted(hard_issue_counts.items())),
+        "issue_counts": dict(sorted(total_issue_counts.items())),
+        "category_reports": category_reports,
+    }
+
+
+def _prior_scan_category_coverage(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    categories: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        category = str(row.get("category") or "unknown")
+        item = categories.setdefault(category, {
+            "accepted_count": 0,
+            "rejected_count": 0,
+            "rejection_reason_counts": Counter(),
+            "accepted_by_tool_required_arg": Counter(),
+            "rejected_by_tool_required_arg": Counter(),
+        })
+        key = f"{row.get('tool') or 'unknown'}::{row.get('required_arg') or 'unknown'}"
+        if row.get("candidate_generatable") and row.get("retention_prior", {}).get("retain_eligibility") == DEMOTE_CANDIDATE:
+            item["accepted_count"] += 1
+            item["accepted_by_tool_required_arg"][key] += 1
+        else:
+            item["rejected_count"] += 1
+            item["rejection_reason_counts"][str(row.get("rejection_reason") or "not_demote_candidate")] += 1
+            item["rejected_by_tool_required_arg"][key] += 1
+    normalized: dict[str, Any] = {}
+    for category, item in sorted(categories.items()):
+        normalized[category] = {
+            "accepted_count": item["accepted_count"],
+            "rejected_count": item["rejected_count"],
+            "rejection_reason_counts": dict(sorted(item["rejection_reason_counts"].items())),
+            "accepted_by_tool_required_arg": dict(sorted(item["accepted_by_tool_required_arg"].items())),
+            "rejected_by_tool_required_arg": dict(sorted(item["rejected_by_tool_required_arg"].items())),
+        }
+    return normalized
 
 
 def _load_prior_aware_candidates(source_manifest_path: Path, existing_case_ids: set[str]) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, Any]]:
@@ -497,7 +650,11 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
     else:
         prior_candidates, prior_rejected, prior_diag = _load_prior_aware_candidates(source_manifest_path, existing_case_ids)
 
+    source_result_availability_audit = _source_result_availability_audit(source_manifest_path)
+    prior_scan_category_coverage = _prior_scan_category_coverage(prior_candidates + prior_rejected)
+
     explicit_compiled = legacy_explicit_compiled + prior_candidates + prior_rejected
+    compiler_category_coverage = _prior_scan_category_coverage(explicit_compiled)
     explicit_generatable = [item for item in explicit_compiled if item.get("candidate_generatable")]
     theory_prior_generatable = [item for item in explicit_generatable if item.get("theory_prior_explicit_literal_candidate")]
     explicit_ambiguous = sum(1 for item in explicit_compiled if item.get("rejection_reason") in {"ambiguous_literal", "ambiguous_or_missing_observable_literal"})
@@ -546,6 +703,11 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
     stratified_dev = stratified_retain_eligible[:dev_size]
     stratified_holdout = stratified_retain_eligible[dev_size : dev_size + holdout_size]
     scorer_ready = compiler_ready and explicit_holdout_ready
+    route_recommendation = (
+        "define_next_theory_family=wrong_arg_key_alias_repair"
+        if len(retain_eligible) < 35 and source_result_availability_audit.get("source_result_availability_ready")
+        else "explicit_required_arg_literal_ready_for_scorer_request"
+    )
 
     blockers = []
     if len(explicit_generatable) < required_total:
@@ -588,6 +750,12 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
         "ctspc_legacy_file_path_candidate_count": len([row for row in explicit_generatable if row.get("ctspc_legacy_file_path_candidate")]),
         "theory_prior_explicit_literal_candidate_count": len(theory_prior_generatable),
         "prior_aware_scan": prior_diag,
+        "source_result_availability_audit": source_result_availability_audit,
+        "source_result_availability_ready": source_result_availability_audit.get("source_result_availability_ready"),
+        "prior_scan_category_coverage": prior_scan_category_coverage,
+        "compiler_category_coverage": compiler_category_coverage,
+        "remaining_gap_to_35_demote_candidates": max(0, 35 - len(retain_eligible)),
+        "route_recommendation": route_recommendation,
         "retention_prior_distribution": explicit_prior_distribution,
         "stratified_retention_prior_distribution": stratified_prior_distribution,
         "retain_eligible_candidate_count": len(retain_eligible),
@@ -634,6 +802,9 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Explicit selected/generatable: `{report['selected_case_count']}` / `{report['candidate_generatable_count']}`",
         f"- Retain-eligible explicit candidates: `{report['retain_eligible_candidate_count']}`",
         f"- Theory-prior explicit candidates: `{report['theory_prior_explicit_literal_candidate_count']}`",
+        f"- Remaining gap to 35 demote candidates: `{report['remaining_gap_to_35_demote_candidates']}`",
+        f"- Source/result availability ready: `{report['source_result_availability_ready']}`",
+        f"- Route recommendation: `{report['route_recommendation']}`",
         f"- Stratified selected/generatable: `{report['stratified_selected_case_count']}` / `{report['stratified_candidate_generatable_count']}`",
         f"- Source pool expansion required: `{report['source_pool_expansion_required']}`",
         f"- Blockers: `{report['blockers']}`",
@@ -693,6 +864,28 @@ def _render_mismatch_schema(schema: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+
+def _render_source_result_availability_audit(report: dict[str, Any]) -> str:
+    lines = [
+        "# M2.8-pre Source/Result Availability Audit",
+        "",
+        f"- Audit ready: `{report.get('source_result_availability_audit_ready')}`",
+        f"- Source/result availability ready: `{report.get('source_result_availability_ready')}`",
+        f"- Hard issue counts: `{report.get('hard_issue_counts')}`",
+        f"- Issue counts: `{report.get('issue_counts')}`",
+        "",
+        "| Category | Dataset cases | Result records | Top issues |",
+        "| --- | ---: | ---: | --- |",
+    ]
+    for row in report.get("category_reports") or []:
+        result_records = sum(int(root.get("result_record_count") or 0) for root in row.get("root_reports") or [])
+        issues = row.get("issue_counts") or {}
+        top = dict(list(issues.items())[:5])
+        lines.append(f"| `{row.get('category')}` | `{row.get('dataset_case_count')}` | `{result_records}` | `{top}` |")
+    lines.append("")
+    return "\n".join(lines)
+
+
 def write_outputs(report: dict[str, Any], out_root: Path = DEFAULT_OUT_ROOT) -> None:
     out_root.mkdir(parents=True, exist_ok=True)
     _write_json(out_root / "compiler_summary.json", {key: value for key, value in report.items() if key not in {"candidate_rules", "rejected_candidates", "stratified_candidate_rules", "literal_disambiguation_records"}})
@@ -714,6 +907,10 @@ def write_outputs(report: dict[str, Any], out_root: Path = DEFAULT_OUT_ROOT) -> 
     ]:
         _write_json(path, manifest)
         md_path.write_text(_render_manifest(manifest), encoding="utf-8")
+    availability = report.get("source_result_availability_audit") or {}
+    _write_json(out_root / "m28pre_source_result_availability_audit.json", availability)
+    (out_root / "m28pre_source_result_availability_audit.md").write_text(_render_source_result_availability_audit(availability), encoding="utf-8")
+
     disamb = {
         "report_scope": "m2_8pre_literal_disambiguation_report",
         "offline_only": True,
@@ -753,6 +950,9 @@ def main() -> int:
             "theory_prior_explicit_literal_candidate_count": report["theory_prior_explicit_literal_candidate_count"],
             "stratified_selected_case_count": report["stratified_selected_case_count"],
             "stratified_candidate_generatable_count": report["stratified_candidate_generatable_count"],
+            "source_result_availability_ready": report["source_result_availability_ready"],
+            "remaining_gap_to_35_demote_candidates": report["remaining_gap_to_35_demote_candidates"],
+            "route_recommendation": report["route_recommendation"],
             "retention_prior_distribution": report["retention_prior_distribution"],
             "stratified_retention_prior_distribution": report["stratified_retention_prior_distribution"],
             "blockers": report["blockers"],

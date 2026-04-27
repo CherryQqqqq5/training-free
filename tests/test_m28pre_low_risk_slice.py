@@ -126,6 +126,7 @@ def test_m28pre_offline_requires_freeze_repair_compiler_holdout_coverage_and_no_
     _wj(low / "explicit_required_arg_literal_holdout20_manifest.json", {"selected_case_ids": [f"h{i}" for i in range(20)], "planned_commands": []})
     _wj(low / "retention_prior_coverage_audit.json", {"m28pre_retention_prior_coverage_audit_ready": True, "explicit_prior_family_coverage_zero": False, "current_context_anchored_literal_candidate_count": 35, "candidate_commands": [], "planned_commands": []})
     _wj(low / "raw_bfcl_literal_coverage_audit.json", {"m28pre_raw_bfcl_literal_coverage_audit_ready": True, "source_result_literals_prompt_anchored_count": 35, "source_result_literals_prompt_coverage_zero": False, "candidate_commands": [], "planned_commands": []})
+    _wj(low / "m28pre_source_result_availability_audit.json", {"source_result_availability_audit_ready": True, "source_result_availability_ready": True, "hard_issue_counts": {}, "issue_counts": {}, "candidate_commands": [], "planned_commands": []})
 
     report = evaluate_m28pre(subset, low)
 
@@ -199,6 +200,7 @@ def test_m28pre_safeguards_fail_when_ctspc_or_repair_stack_enabled(tmp_path: Pat
     _wj(low / "explicit_required_arg_literal_holdout20_manifest.json", {"selected_case_ids": [f"h{i}" for i in range(20)], "planned_commands": []})
     _wj(low / "retention_prior_coverage_audit.json", {"m28pre_retention_prior_coverage_audit_ready": True, "explicit_prior_family_coverage_zero": False, "current_context_anchored_literal_candidate_count": 35, "candidate_commands": [], "planned_commands": []})
     _wj(low / "raw_bfcl_literal_coverage_audit.json", {"m28pre_raw_bfcl_literal_coverage_audit_ready": True, "source_result_literals_prompt_anchored_count": 35, "source_result_literals_prompt_coverage_zero": False, "candidate_commands": [], "planned_commands": []})
+    _wj(low / "m28pre_source_result_availability_audit.json", {"source_result_availability_audit_ready": True, "source_result_availability_ready": True, "hard_issue_counts": {}, "issue_counts": {}, "candidate_commands": [], "planned_commands": []})
 
     report = evaluate_m28pre(subset, low)
 
@@ -388,3 +390,105 @@ def test_literal_disambiguation_report_is_written(tmp_path: Path, monkeypatch) -
     assert disamb["planned_commands"] == []
     assert disamb["records"][0]["selected_literal"] == "academic_venture"
     assert disamb["records"][0]["retain_prior_candidate"] is True
+
+
+def _area_entry(case_id: str, prompt: str = "Calculate area with base 3 and height 7.") -> dict:
+    return {
+        "id": case_id,
+        "question": [[{"role": "user", "content": prompt}]],
+        "function": [{
+            "name": "calculate_area",
+            "parameters": {
+                "type": "dict",
+                "properties": {"base": {"type": "integer"}, "height": {"type": "integer"}},
+                "required": ["base", "height"],
+            },
+        }],
+    }
+
+
+def test_source_result_availability_audit_detects_unrecognized_result_layout(tmp_path: Path, monkeypatch) -> None:
+    source = tmp_path / "source"
+    category = "simple_python"
+    case_id = "case_layout"
+    monkeypatch.setattr(explicit_builder, "_load_dataset_records", lambda cat: {case_id: _area_entry(case_id)} if cat == category else {})
+    source_manifest = tmp_path / "source_manifest.json"
+    low = tmp_path / "low.json"
+    status = tmp_path / "status.json"
+    _wj(low, {"slice_cases": {}})
+    _wj(status, {"ctspc_v0_frozen": True, "scorer_default": "off", "retain": 0, "dev_rerun_authorized": False, "holdout_authorized": False})
+    _source_manifest(source_manifest, category, source)
+    path = source / "bfcl" / "result" / "model" / "simple" / f"BFCL_v4_{category}_result.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps({"unexpected": "shape"}) + "\n", encoding="utf-8")
+
+    report = build(low, status, source_manifest_path=source_manifest)
+    audit = report["source_result_availability_audit"]
+
+    assert audit["source_result_availability_audit_ready"] is True
+    assert audit["source_result_availability_ready"] is False
+    assert audit["hard_issue_counts"]["result_layout_unrecognized"] == 1
+    assert audit["issue_counts"]["result_layout_unrecognized"] == 1
+
+
+def test_source_result_availability_audit_classifies_case_id_no_tool_complete_and_parallel(tmp_path: Path, monkeypatch) -> None:
+    source = tmp_path / "source"
+    category = "simple_python"
+    entries = {
+        "case_missing": _area_entry("case_missing"),
+        "case_no_tool": _area_entry("case_no_tool"),
+        "case_complete": _area_entry("case_complete"),
+        "case_parallel": _area_entry("case_parallel"),
+    }
+    monkeypatch.setattr(explicit_builder, "_load_dataset_records", lambda cat: entries if cat == category else {})
+    source_manifest = tmp_path / "source_manifest.json"
+    low = tmp_path / "low.json"
+    status = tmp_path / "status.json"
+    _wj(low, {"slice_cases": {}})
+    _wj(status, {"ctspc_v0_frozen": True, "scorer_default": "off", "retain": 0, "dev_rerun_authorized": False, "holdout_authorized": False})
+    _source_manifest(source_manifest, category, source)
+    path = source / "bfcl" / "result" / "model" / "simple" / f"BFCL_v4_{category}_result.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    rows = [
+        {"id": "unmatched_case", "result": [{"calculate_area": json.dumps({"base": 3})}]},
+        {"id": "case_no_tool", "result": "no tool call"},
+        {"id": "case_complete", "result": [{"calculate_area": json.dumps({"base": 3, "height": 7})}]},
+        {"id": "case_parallel", "result": [{"calculate_area": json.dumps({"base": 3})}, {"calculate_area": json.dumps({"base": 4})}]},
+    ]
+    path.write_text("".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
+
+    report = build(low, status, source_manifest_path=source_manifest)
+    counts = report["source_result_availability_audit"]["issue_counts"]
+
+    assert counts["source_result_case_not_collected"] == 1
+    assert counts["baseline_no_tool_call"] == 1
+    assert counts["emitted_args_complete"] == 1
+    assert counts["parallel_call_mapping_not_unique"] == 1
+
+
+def test_prior_scan_category_coverage_reports_accepts_and_rejects(tmp_path: Path, monkeypatch) -> None:
+    source = tmp_path / "source"
+    category = "simple_python"
+    entries = {
+        "case_ok": _area_entry("case_ok", "Calculate area with base 3 and height 7."),
+        "case_parallel": _area_entry("case_parallel", "Calculate area with base 3 and height 7."),
+    }
+    monkeypatch.setattr(explicit_builder, "_load_dataset_records", lambda cat: entries if cat == category else {})
+    source_manifest = tmp_path / "source_manifest.json"
+    low = tmp_path / "low.json"
+    status = tmp_path / "status.json"
+    _wj(low, {"slice_cases": {}})
+    _wj(status, {"ctspc_v0_frozen": True, "scorer_default": "off", "retain": 0, "dev_rerun_authorized": False, "holdout_authorized": False})
+    _source_manifest(source_manifest, category, source)
+    _result(source, category, [
+        {"id": "case_ok", "result": [{"calculate_area": json.dumps({"base": 3})}]},
+        {"id": "case_parallel", "result": [{"calculate_area": json.dumps({"base": 3})}, {"calculate_area": json.dumps({"base": 4})}]},
+    ])
+
+    report = build(low, status, source_manifest_path=source_manifest)
+    coverage = report["prior_scan_category_coverage"][category]
+
+    assert coverage["accepted_count"] == 1
+    assert coverage["rejected_count"] == 1
+    assert coverage["accepted_by_tool_required_arg"] == {"calculate_area::height": 1}
+    assert coverage["rejection_reason_counts"] == {"parallel_call_mapping_not_unique": 1}
