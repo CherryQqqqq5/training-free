@@ -23,7 +23,7 @@
       "required_arg": "file_name",
       "rule_type": "explicit_required_arg_literal_completion",
       "schema_arg_name": "file_name",
-      "slice_name": "explicit_required_arg_literal",
+      "slice_name": "stratified_low_risk",
       "source_run_root": "outputs/artifacts/bfcl_ctspc_source_pool_v1/multi_turn_miss_func/baseline",
       "tool": "touch",
       "trajectory_sensitive_tool": true
@@ -49,7 +49,7 @@
       "required_arg": "file_name",
       "rule_type": "explicit_required_arg_literal_completion",
       "schema_arg_name": "file_name",
-      "slice_name": "explicit_required_arg_literal",
+      "slice_name": "stratified_low_risk",
       "source_run_root": "outputs/artifacts/bfcl_ctspc_source_pool_v1/multi_turn_miss_func/baseline",
       "tool": "cat",
       "trajectory_sensitive_tool": true
@@ -75,7 +75,7 @@
       "required_arg": "folder",
       "rule_type": "explicit_required_arg_literal_completion",
       "schema_arg_name": "folder",
-      "slice_name": "explicit_required_arg_literal",
+      "slice_name": "stratified_low_risk",
       "source_run_root": "outputs/artifacts/bfcl_ctspc_source_pool_v1/multi_turn_miss_func/baseline",
       "tool": "cd",
       "trajectory_sensitive_tool": true
@@ -100,7 +100,7 @@
       "required_arg": "file_name",
       "rule_type": "explicit_required_arg_literal_completion",
       "schema_arg_name": "file_name",
-      "slice_name": "explicit_required_arg_literal",
+      "slice_name": "stratified_low_risk",
       "source_run_root": "outputs/artifacts/bfcl_ctspc_source_pool_v1/multi_turn_miss_func/baseline",
       "tool": "touch",
       "trajectory_sensitive_tool": true
@@ -126,27 +126,79 @@
       "required_arg": "file_name1",
       "rule_type": "explicit_required_arg_literal_completion",
       "schema_arg_name": "file_name1",
-      "slice_name": "explicit_required_arg_literal",
+      "slice_name": "stratified_low_risk",
       "source_run_root": "outputs/artifacts/bfcl_ctspc_source_pool_v1/multi_turn_miss_func/baseline",
       "tool": "diff",
+      "trajectory_sensitive_tool": false
+    },
+    {
+      "candidate_generatable": true,
+      "candidate_rules_type": "explicit_required_arg_literal_completion",
+      "case_id": "multi_turn_long_context_20",
+      "category": "multi_turn_long_context",
+      "confidence": 0.7,
+      "ctspc_v0_action_rule": false,
+      "exact_tool_choice": false,
+      "guidance_only": true,
+      "literal_source": "source_result_tool_args",
+      "literal_value": "False",
+      "low_risk_slices": [
+        "deterministic_schema_local_non_live_repair",
+        "wrong_arg_key_alias_repair"
+      ],
+      "no_next_tool_intervention": true,
+      "rejection_reason": null,
+      "required_arg": "a",
+      "rule_type": "explicit_required_arg_literal_completion",
+      "schema_arg_name": "a",
+      "slice_name": "stratified_low_risk",
+      "source_run_root": "outputs/artifacts/bfcl_ctspc_source_pool_v1/multi_turn_long_context/baseline",
+      "tool": "ls",
+      "trajectory_sensitive_tool": false
+    },
+    {
+      "candidate_generatable": true,
+      "candidate_rules_type": "explicit_required_arg_literal_completion",
+      "case_id": "multi_turn_miss_func_17",
+      "category": "multi_turn_miss_func",
+      "confidence": 0.7,
+      "ctspc_v0_action_rule": false,
+      "exact_tool_choice": false,
+      "guidance_only": true,
+      "literal_source": "source_result_tool_args",
+      "literal_value": ".",
+      "low_risk_slices": [
+        "deterministic_schema_local_non_live_repair",
+        "wrong_arg_key_alias_repair"
+      ],
+      "no_next_tool_intervention": true,
+      "rejection_reason": null,
+      "required_arg": "path",
+      "rule_type": "explicit_required_arg_literal_completion",
+      "schema_arg_name": "path",
+      "slice_name": "stratified_low_risk",
+      "source_run_root": "outputs/artifacts/bfcl_ctspc_source_pool_v1/multi_turn_miss_func/baseline",
+      "tool": "find",
       "trajectory_sensitive_tool": false
     }
   ],
   "ctspc_v0_frozen": true,
   "exact_tool_choice": false,
-  "manifest_name": "explicit_required_arg_literal_holdout20",
+  "manifest_name": "stratified_low_risk_holdout20",
   "no_next_tool_intervention": true,
   "planned_commands": [],
   "ready": false,
   "repair_stack_default": "disabled",
-  "selected_case_count": 5,
+  "selected_case_count": 7,
   "selected_case_ids": [
     "multi_turn_miss_func_12",
     "multi_turn_miss_func_25",
     "multi_turn_miss_func_26",
     "multi_turn_miss_func_15",
-    "multi_turn_miss_func_24"
+    "multi_turn_miss_func_24",
+    "multi_turn_long_context_20",
+    "multi_turn_miss_func_17"
   ],
   "selection_criteria": "low-risk argument completion; schema-local; no CTSPC-v0 next-tool intervention",
-  "slice_name": "explicit_required_arg_literal"
+  "slice_name": "stratified_low_risk"
 }

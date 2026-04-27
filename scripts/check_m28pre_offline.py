@@ -23,12 +23,18 @@ def _j(path: Path, default: Any = None) -> Any:
         return default
 
 
+def _no_commands(*items: dict[str, Any]) -> bool:
+    return not any(item.get("planned_commands") or item.get("candidate_commands") for item in items)
+
+
 def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_LOW_RISK) -> dict[str, Any]:
     status = _j(subset_root / "m27ae_ctspc_v0_status.json", {}) or {}
     repair = _j(subset_root / "repair_stack_contribution.json", {}) or {}
     compiler = _j(low_risk_root / "compiler_summary.json", {}) or {}
     dev = _j(low_risk_root / "explicit_required_arg_literal_dev20_manifest.json", {}) or {}
     holdout = _j(low_risk_root / "explicit_required_arg_literal_holdout20_manifest.json", {}) or {}
+    strat_dev = _j(low_risk_root / "stratified_low_risk_dev20_manifest.json", {}) or {}
+    strat_holdout = _j(low_risk_root / "stratified_low_risk_holdout20_manifest.json", {}) or {}
     freeze = bool(
         status.get("ctspc_v0_frozen")
         and status.get("scorer_default") == "off"
@@ -38,35 +44,72 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
     )
     dev_ids = set(str(x) for x in dev.get("selected_case_ids") or [])
     holdout_ids = set(str(x) for x in holdout.get("selected_case_ids") or [])
+    strat_dev_ids = set(str(x) for x in strat_dev.get("selected_case_ids") or [])
+    strat_holdout_ids = set(str(x) for x in strat_holdout.get("selected_case_ids") or [])
+    explicit_disjoint = not (dev_ids & holdout_ids)
+    stratified_disjoint = not (strat_dev_ids & strat_holdout_ids)
+    compiler_ready = bool(compiler.get("compiler_ready") or compiler.get("m28pre_explicit_required_arg_literal_compiler_passed"))
+    explicit_holdout_ready = bool(compiler.get("explicit_holdout_ready") or compiler.get("m28pre_explicit_required_arg_literal_holdout_ready")) and explicit_disjoint
+    stratified_holdout_ready = bool(compiler.get("stratified_holdout_ready")) and stratified_disjoint
+    no_scorer_commands = _no_commands(compiler, dev, holdout, strat_dev, strat_holdout)
+    safeguards = bool(
+        compiler.get("ctspc_v0_action_rules_enabled") is False
+        and compiler.get("ctspc_v0_file_path_multi_turn_enabled") is False
+        and compiler.get("repair_stack_default") == "disabled"
+        and compiler.get("candidate_rules_type") == "explicit_required_arg_literal_completion"
+        and compiler.get("no_next_tool_intervention") is True
+        and compiler.get("exact_tool_choice") is False
+    )
     checks = {
         "ctspc_v0_frozen": freeze,
         "repair_stack_split_ready": bool(repair.get("repair_stack_split_ready")),
-        "explicit_required_arg_literal_compiler_passed": bool(compiler.get("m28pre_explicit_required_arg_literal_compiler_passed")),
-        "explicit_required_arg_literal_holdout_ready": bool(compiler.get("m28pre_explicit_required_arg_literal_holdout_ready")),
-        "dev_holdout_disjoint": not (dev_ids & holdout_ids),
-        "no_scorer_commands": not (compiler.get("planned_commands") or compiler.get("candidate_commands") or dev.get("planned_commands") or holdout.get("planned_commands")),
-        "ctspc_v0_action_rules_disabled": compiler.get("ctspc_v0_action_rules_enabled") is False,
+        "compiler_ready": compiler_ready,
+        "explicit_holdout_ready": explicit_holdout_ready,
+        "stratified_holdout_ready": stratified_holdout_ready,
+        "dev_holdout_disjoint": explicit_disjoint,
+        "stratified_dev_holdout_disjoint": stratified_disjoint,
+        "no_scorer_commands": no_scorer_commands,
+        "runtime_manifest_safeguards_passed": safeguards,
     }
+    scorer_authorization_ready = all([
+        checks["ctspc_v0_frozen"],
+        checks["repair_stack_split_ready"],
+        checks["compiler_ready"],
+        checks["no_scorer_commands"],
+        checks["runtime_manifest_safeguards_passed"],
+        checks["explicit_holdout_ready"] or checks["stratified_holdout_ready"],
+    ])
     return {
         "report_scope": "m2_8pre_offline_summary",
         **checks,
-        "m2_8pre_offline_passed": all(checks.values()),
-        "compiler": {key: compiler.get(key) for key in ["selected_case_count", "candidate_generatable_count", "ambiguous_literal_count", "blockers"]},
-        "dev_manifest": {key: dev.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands"]},
-        "holdout_manifest": {key: holdout.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands"]},
+        "scorer_authorization_ready": scorer_authorization_ready,
+        "m2_8pre_offline_passed": scorer_authorization_ready,
+        "compiler": {key: compiler.get(key) for key in [
+            "selected_case_count",
+            "candidate_generatable_count",
+            "stratified_selected_case_count",
+            "stratified_candidate_generatable_count",
+            "ambiguous_literal_count",
+            "stratified_ambiguous_literal_count",
+            "blockers",
+        ]},
+        "dev_manifest": {key: dev.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "no_next_tool_intervention", "exact_tool_choice"]},
+        "holdout_manifest": {key: holdout.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "no_next_tool_intervention", "exact_tool_choice"]},
+        "stratified_dev_manifest": {key: strat_dev.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "no_next_tool_intervention", "exact_tool_choice"]},
+        "stratified_holdout_manifest": {key: strat_holdout.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "no_next_tool_intervention", "exact_tool_choice"]},
         "diagnostic": {
             "offline_readiness_only": True,
-            "does_not_authorize_scorer": True,
+            "does_not_authorize_scorer_without_separate_request": True,
             "no_bfcl_or_model_call": True,
         },
     }
 
 
 def render_markdown(report: dict[str, Any]) -> str:
-    lines = ["# M2.8-pre Offline Summary", "", f"- Passed: `{report['m2_8pre_offline_passed']}`", "", "| Check | Passed |", "| --- | ---: |"]
-    for key in ["ctspc_v0_frozen", "repair_stack_split_ready", "explicit_required_arg_literal_compiler_passed", "explicit_required_arg_literal_holdout_ready", "dev_holdout_disjoint", "no_scorer_commands", "ctspc_v0_action_rules_disabled"]:
+    lines = ["# M2.8-pre Offline Summary", "", f"- Passed: `{report['m2_8pre_offline_passed']}`", f"- Scorer authorization ready: `{report['scorer_authorization_ready']}`", "", "| Check | Passed |", "| --- | ---: |"]
+    for key in ["ctspc_v0_frozen", "repair_stack_split_ready", "compiler_ready", "explicit_holdout_ready", "stratified_holdout_ready", "no_scorer_commands", "runtime_manifest_safeguards_passed"]:
         lines.append(f"| `{key}` | `{report[key]}` |")
-    lines.extend(["", "Offline readiness only. No scorer is authorized by this artifact.", ""])
+    lines.extend(["", "Offline readiness only. No scorer command is emitted by this artifact.", ""])
     return "\n".join(lines)
 
 
@@ -83,7 +126,7 @@ def main() -> int:
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     args.markdown_output.write_text(render_markdown(report), encoding="utf-8")
     if args.compact:
-        print(json.dumps({key: report.get(key) for key in ["m2_8pre_offline_passed", "ctspc_v0_frozen", "repair_stack_split_ready", "explicit_required_arg_literal_compiler_passed", "explicit_required_arg_literal_holdout_ready", "no_scorer_commands"]}, indent=2, sort_keys=True))
+        print(json.dumps({key: report.get(key) for key in ["m2_8pre_offline_passed", "scorer_authorization_ready", "ctspc_v0_frozen", "repair_stack_split_ready", "compiler_ready", "explicit_holdout_ready", "stratified_holdout_ready", "no_scorer_commands"]}, indent=2, sort_keys=True))
     return 0
 
 

@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
@@ -29,6 +30,11 @@ PREFERRED_ARG_BY_TOOL = {
     "mkdir": ["dir_name", "directory", "path"],
     "cat": ["file_name", "filename", "path"],
 }
+STRATIFIED_SLICES = [
+    "explicit_required_arg_literal",
+    "wrong_arg_key_alias_repair",
+    "deterministic_schema_local_non_live_repair",
+]
 
 
 def _read_json(path: Path, default: Any = None) -> Any:
@@ -101,11 +107,18 @@ def _pick_arg(tool: str, args: dict[str, Any]) -> tuple[str | None, Any | None]:
     return None, None
 
 
-def _compile_record(record: dict[str, Any], result: dict[str, Any] | None) -> dict[str, Any]:
+def _compile_record(record: dict[str, Any], result: dict[str, Any] | None, slice_name: str) -> dict[str, Any]:
     case_id = str(record.get("case_id") or "")
     target_tools = [str(t) for t in (record.get("target_action_tools_present") or [])]
+    base = {
+        "case_id": case_id,
+        "category": record.get("category"),
+        "slice_name": slice_name,
+        "low_risk_slices": sorted(set(str(s) for s in (record.get("low_risk_slices") or [slice_name]))),
+        "source_run_root": record.get("source_run_root"),
+    }
     if not result:
-        return {"case_id": case_id, "candidate_generatable": False, "rejection_reason": "missing_source_result"}
+        return {**base, "candidate_generatable": False, "rejection_reason": "missing_source_result"}
     for tool, args in _iter_tool_calls(result.get("result")):
         if target_tools and tool not in target_tools:
             continue
@@ -115,10 +128,9 @@ def _compile_record(record: dict[str, Any], result: dict[str, Any] | None) -> di
         literal = str(value)
         ambiguous = literal.strip() == "" or len(literal) > 240
         if ambiguous:
-            return {"case_id": case_id, "candidate_generatable": False, "rejection_reason": "ambiguous_literal"}
+            return {**base, "candidate_generatable": False, "rejection_reason": "ambiguous_literal"}
         return {
-            "case_id": case_id,
-            "category": record.get("category"),
+            **base,
             "tool": tool,
             "required_arg": arg_name,
             "literal_value": literal,
@@ -128,49 +140,95 @@ def _compile_record(record: dict[str, Any], result: dict[str, Any] | None) -> di
             "candidate_generatable": True,
             "rejection_reason": None,
             "rule_type": "explicit_required_arg_literal_completion",
+            "candidate_rules_type": "explicit_required_arg_literal_completion",
             "no_next_tool_intervention": True,
             "exact_tool_choice": False,
             "guidance_only": True,
             "trajectory_sensitive_tool": tool in TRAJECTORY_SENSITIVE_TOOLS,
             "ctspc_v0_action_rule": False,
-            "source_run_root": record.get("source_run_root"),
         }
-    return {"case_id": case_id, "candidate_generatable": False, "rejection_reason": "no_matching_scalar_required_arg"}
+    return {**base, "candidate_generatable": False, "rejection_reason": "no_matching_scalar_required_arg"}
 
 
-def _manifest(name: str, rows: list[dict[str, Any]], *, ready: bool) -> dict[str, Any]:
+def _source_cache_loader() -> tuple[dict[tuple[str, str], dict[str, dict[str, Any]]], Any]:
+    cache: dict[tuple[str, str], dict[str, dict[str, Any]]] = {}
+
+    def load(record: dict[str, Any]) -> dict[str, dict[str, Any]]:
+        source_root = Path(str(record.get("source_run_root") or ""))
+        category = str(record.get("category") or "")
+        key = (str(source_root), category)
+        if key not in cache:
+            cache[key] = _load_result_records(source_root, category)
+        return cache[key]
+
+    return cache, load
+
+
+def _compile_records(records: list[dict[str, Any]], slice_name: str, load_result: Any) -> list[dict[str, Any]]:
+    compiled: list[dict[str, Any]] = []
+    for record in records:
+        results = load_result(record)
+        compiled.append(_compile_record(record, results.get(str(record.get("case_id") or "")), slice_name))
+    return compiled
+
+
+def _manifest(name: str, rows: list[dict[str, Any]], *, ready: bool, slice_name: str | None = None) -> dict[str, Any]:
     return {
         "manifest_name": name,
         "selected_case_count": len(rows),
         "selected_case_ids": [str(row.get("case_id")) for row in rows],
-        "selection_criteria": "explicit_required_arg_literal; schema-local; no CTSPC-v0 next-tool intervention",
+        "selection_criteria": "low-risk argument completion; schema-local; no CTSPC-v0 next-tool intervention",
+        "slice_name": slice_name,
         "planned_commands": [],
         "candidate_commands": [],
+        "ctspc_v0_frozen": True,
+        "repair_stack_default": "disabled",
+        "candidate_rules_type": "explicit_required_arg_literal_completion",
+        "no_next_tool_intervention": True,
+        "exact_tool_choice": False,
         "ready": ready,
         "cases": rows,
     }
 
 
+def _unique_records_by_case(slice_cases: dict[str, list[dict[str, Any]]]) -> list[dict[str, Any]]:
+    merged: dict[str, dict[str, Any]] = {}
+    for slice_name in STRATIFIED_SLICES:
+        for row in slice_cases.get(slice_name) or []:
+            case_id = str(row.get("case_id") or "")
+            if not case_id:
+                continue
+            item = dict(row)
+            labels = set(str(s) for s in item.get("low_risk_slices") or [])
+            labels.add(slice_name)
+            if case_id in merged:
+                labels.update(str(s) for s in merged[case_id].get("low_risk_slices") or [])
+            item["low_risk_slices"] = sorted(labels)
+            merged[case_id] = item
+    return list(merged.values())
+
+
 def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_STATUS, dev_size: int = 20, holdout_size: int = 20) -> dict[str, Any]:
     low = _read_json(low_risk_path, {}) or {}
     status = _read_json(status_path, {}) or {}
-    source_cache: dict[tuple[str, str], dict[str, dict[str, Any]]] = {}
-    explicit_records = list((low.get("slice_cases") or {}).get("explicit_required_arg_literal") or [])
-    compiled: list[dict[str, Any]] = []
-    ambiguous = 0
-    for record in explicit_records:
-        source_root = Path(str(record.get("source_run_root") or ""))
-        category = str(record.get("category") or "")
-        key = (str(source_root), category)
-        if key not in source_cache:
-            source_cache[key] = _load_result_records(source_root, category)
-        item = _compile_record(record, source_cache[key].get(str(record.get("case_id") or "")))
-        compiled.append(item)
-        if item.get("rejection_reason") == "ambiguous_literal":
-            ambiguous += 1
-    generatable = [item for item in compiled if item.get("candidate_generatable")]
-    dev = generatable[:dev_size]
-    holdout = generatable[dev_size : dev_size + holdout_size]
+    slice_cases = low.get("slice_cases") or {}
+    _, load_result = _source_cache_loader()
+
+    explicit_records = list(slice_cases.get("explicit_required_arg_literal") or [])
+    explicit_compiled = _compile_records(explicit_records, "explicit_required_arg_literal", load_result)
+    explicit_generatable = [item for item in explicit_compiled if item.get("candidate_generatable")]
+    explicit_ambiguous = sum(1 for item in explicit_compiled if item.get("rejection_reason") == "ambiguous_literal")
+
+    stratified_records = _unique_records_by_case(slice_cases)
+    stratified_compiled = _compile_records(stratified_records, "stratified_low_risk", load_result)
+    stratified_generatable = [item for item in stratified_compiled if item.get("candidate_generatable")]
+    stratified_ambiguous = sum(1 for item in stratified_compiled if item.get("rejection_reason") == "ambiguous_literal")
+    stratified_counts: dict[str, int] = defaultdict(int)
+    for item in stratified_generatable:
+        for slice_name in item.get("low_risk_slices") or []:
+            if slice_name in STRATIFIED_SLICES:
+                stratified_counts[slice_name] += 1
+
     ctspc_off = bool(
         status.get("ctspc_v0_frozen")
         and status.get("scorer_default") == "off"
@@ -178,8 +236,29 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
         and status.get("dev_rerun_authorized") is False
         and status.get("holdout_authorized") is False
     )
-    compiler_passed = len(explicit_records) >= dev_size and len(generatable) >= 15 and ambiguous == 0 and ctspc_off
-    holdout_ready = len(holdout) >= holdout_size
+    explicit_compiler_ready = len(explicit_records) >= dev_size and len(explicit_generatable) >= 15 and explicit_ambiguous == 0 and ctspc_off
+    stratified_compiler_ready = len(stratified_records) >= dev_size and len(stratified_generatable) >= 15 and stratified_ambiguous == 0 and ctspc_off
+    compiler_ready = explicit_compiler_ready or stratified_compiler_ready
+    explicit_holdout_ready = len(explicit_records) >= dev_size + holdout_size and len(explicit_generatable) >= dev_size + holdout_size and explicit_ambiguous == 0
+    stratified_holdout_ready = len(stratified_records) >= dev_size + holdout_size and len(stratified_generatable) >= dev_size + holdout_size and stratified_ambiguous == 0
+    explicit_dev = explicit_generatable[:dev_size]
+    explicit_holdout = explicit_generatable[dev_size : dev_size + holdout_size]
+    stratified_dev = stratified_generatable[:dev_size]
+    stratified_holdout = stratified_generatable[dev_size : dev_size + holdout_size]
+    scorer_ready = compiler_ready and (explicit_holdout_ready or stratified_holdout_ready)
+    blockers = []
+    if len(explicit_records) < dev_size + holdout_size:
+        blockers.append("explicit_total_below_40")
+    if len(explicit_generatable) < 35:
+        blockers.append("explicit_candidate_generatable_below_35")
+    if explicit_ambiguous:
+        blockers.append("explicit_ambiguous_literal_present")
+    if not explicit_holdout_ready:
+        blockers.append("explicit_holdout_below_20")
+    if not stratified_holdout_ready:
+        blockers.append("stratified_holdout_below_20")
+    if not ctspc_off:
+        blockers.append("ctspc_v0_not_frozen")
     return {
         "report_scope": "m2_8pre_explicit_required_arg_literal_compiler",
         "offline_only": True,
@@ -189,26 +268,34 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
         "ctspc_v0_file_path_multi_turn_enabled": False,
         "ctspc_v0_action_rules_enabled": False,
         "ctspc_v0_frozen": ctspc_off,
+        "repair_stack_default": "disabled",
+        "candidate_rules_type": "explicit_required_arg_literal_completion",
+        "no_next_tool_intervention": True,
+        "exact_tool_choice": False,
         "selected_case_count": len(explicit_records),
-        "candidate_generatable_count": len(generatable),
-        "ambiguous_literal_count": ambiguous,
-        "candidate_rules": generatable,
-        "rejected_candidates": [item for item in compiled if not item.get("candidate_generatable")],
-        "dev_manifest": _manifest("explicit_required_arg_literal_dev20", dev, ready=len(dev) >= dev_size),
-        "holdout_manifest": _manifest("explicit_required_arg_literal_holdout20", holdout, ready=holdout_ready),
-        "m28pre_explicit_required_arg_literal_compiler_passed": compiler_passed,
-        "m28pre_explicit_required_arg_literal_holdout_ready": holdout_ready,
-        "m28pre_low_risk_slice_ready": compiler_passed and holdout_ready,
-        "blockers": [
-            reason
-            for reason, blocked in [
-                ("candidate_generatable_below_15", len(generatable) < 15),
-                ("ambiguous_literal_present", ambiguous > 0),
-                ("ctspc_v0_not_frozen", not ctspc_off),
-                ("holdout_below_20", not holdout_ready),
-            ]
-            if blocked
-        ],
+        "candidate_generatable_count": len(explicit_generatable),
+        "ambiguous_literal_count": explicit_ambiguous,
+        "candidate_rules": explicit_generatable,
+        "rejected_candidates": [item for item in explicit_compiled if not item.get("candidate_generatable")],
+        "dev_manifest": _manifest("explicit_required_arg_literal_dev20", explicit_dev, ready=len(explicit_dev) >= dev_size, slice_name="explicit_required_arg_literal"),
+        "holdout_manifest": _manifest("explicit_required_arg_literal_holdout20", explicit_holdout, ready=explicit_holdout_ready, slice_name="explicit_required_arg_literal"),
+        "stratified_candidate_rules": stratified_generatable,
+        "stratified_counts": dict(sorted(stratified_counts.items())),
+        "stratified_selected_case_count": len(stratified_records),
+        "stratified_candidate_generatable_count": len(stratified_generatable),
+        "stratified_ambiguous_literal_count": stratified_ambiguous,
+        "stratified_dev_manifest": _manifest("stratified_low_risk_dev20", stratified_dev, ready=len(stratified_dev) >= dev_size, slice_name="stratified_low_risk"),
+        "stratified_holdout_manifest": _manifest("stratified_low_risk_holdout20", stratified_holdout, ready=stratified_holdout_ready, slice_name="stratified_low_risk"),
+        "compiler_ready": compiler_ready,
+        "explicit_compiler_ready": explicit_compiler_ready,
+        "stratified_compiler_ready": stratified_compiler_ready,
+        "explicit_holdout_ready": explicit_holdout_ready,
+        "stratified_holdout_ready": stratified_holdout_ready,
+        "scorer_authorization_ready": scorer_ready,
+        "m28pre_explicit_required_arg_literal_compiler_passed": compiler_ready,
+        "m28pre_explicit_required_arg_literal_holdout_ready": explicit_holdout_ready,
+        "m28pre_low_risk_slice_ready": scorer_ready,
+        "blockers": blockers,
     }
 
 
@@ -216,11 +303,12 @@ def render_markdown(report: dict[str, Any]) -> str:
     return "\n".join([
         "# M2.8-pre Explicit Required Arg Literal Compiler",
         "",
-        f"- Compiler passed: `{report['m28pre_explicit_required_arg_literal_compiler_passed']}`",
-        f"- Low-risk slice ready: `{report['m28pre_low_risk_slice_ready']}`",
-        f"- Selected cases: `{report['selected_case_count']}`",
-        f"- Candidate-generatable: `{report['candidate_generatable_count']}`",
-        f"- Ambiguous literals: `{report['ambiguous_literal_count']}`",
+        f"- Compiler ready: `{report['compiler_ready']}`",
+        f"- Explicit holdout ready: `{report['explicit_holdout_ready']}`",
+        f"- Stratified holdout ready: `{report['stratified_holdout_ready']}`",
+        f"- Scorer authorization ready: `{report['scorer_authorization_ready']}`",
+        f"- Explicit selected/generatable: `{report['selected_case_count']}` / `{report['candidate_generatable_count']}`",
+        f"- Stratified selected/generatable: `{report['stratified_selected_case_count']}` / `{report['stratified_candidate_generatable_count']}`",
         f"- Blockers: `{report['blockers']}`",
         "",
         "No BFCL scorer commands are emitted.",
@@ -233,6 +321,7 @@ def _render_manifest(manifest: dict[str, Any]) -> str:
         f"# {manifest['manifest_name']}",
         "",
         f"- Ready: `{manifest['ready']}`",
+        f"- Slice: `{manifest['slice_name']}`",
         f"- Selected cases: `{manifest['selected_case_count']}`",
         "- Planned commands: `[]`",
         "",
@@ -244,19 +333,31 @@ def write_outputs(report: dict[str, Any], out_root: Path = DEFAULT_OUT_ROOT) -> 
     summary_path = out_root / "compiler_summary.json"
     summary_md = out_root / "compiler_summary.md"
     rules_out = out_root / "candidate_rules.jsonl"
+    stratified_rules_out = out_root / "stratified_candidate_rules.jsonl"
     dev_out = out_root / "explicit_required_arg_literal_dev20_manifest.json"
     dev_md = out_root / "explicit_required_arg_literal_dev20_manifest.md"
     hold_out = out_root / "explicit_required_arg_literal_holdout20_manifest.json"
     hold_md = out_root / "explicit_required_arg_literal_holdout20_manifest.md"
-    _write_json(summary_path, {key: value for key, value in report.items() if key not in {"candidate_rules", "rejected_candidates"}})
+    strat_dev_out = out_root / "stratified_low_risk_dev20_manifest.json"
+    strat_dev_md = out_root / "stratified_low_risk_dev20_manifest.md"
+    strat_hold_out = out_root / "stratified_low_risk_holdout20_manifest.json"
+    strat_hold_md = out_root / "stratified_low_risk_holdout20_manifest.md"
+    _write_json(summary_path, {key: value for key, value in report.items() if key not in {"candidate_rules", "rejected_candidates", "stratified_candidate_rules"}})
     summary_md.write_text(render_markdown(report), encoding="utf-8")
     with rules_out.open("w", encoding="utf-8") as handle:
         for row in report["candidate_rules"]:
             handle.write(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n")
-    _write_json(dev_out, report["dev_manifest"])
-    dev_md.write_text(_render_manifest(report["dev_manifest"]), encoding="utf-8")
-    _write_json(hold_out, report["holdout_manifest"])
-    hold_md.write_text(_render_manifest(report["holdout_manifest"]), encoding="utf-8")
+    with stratified_rules_out.open("w", encoding="utf-8") as handle:
+        for row in report["stratified_candidate_rules"]:
+            handle.write(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n")
+    for path, md_path, manifest in [
+        (dev_out, dev_md, report["dev_manifest"]),
+        (hold_out, hold_md, report["holdout_manifest"]),
+        (strat_dev_out, strat_dev_md, report["stratified_dev_manifest"]),
+        (strat_hold_out, strat_hold_md, report["stratified_holdout_manifest"]),
+    ]:
+        _write_json(path, manifest)
+        md_path.write_text(_render_manifest(manifest), encoding="utf-8")
 
 
 def main() -> int:
@@ -270,12 +371,14 @@ def main() -> int:
     write_outputs(report, args.out_root)
     if args.compact:
         print(json.dumps({
-            "m28pre_low_risk_slice_ready": report["m28pre_low_risk_slice_ready"],
-            "m28pre_explicit_required_arg_literal_compiler_passed": report["m28pre_explicit_required_arg_literal_compiler_passed"],
-            "m28pre_explicit_required_arg_literal_holdout_ready": report["m28pre_explicit_required_arg_literal_holdout_ready"],
+            "compiler_ready": report["compiler_ready"],
+            "explicit_holdout_ready": report["explicit_holdout_ready"],
+            "stratified_holdout_ready": report["stratified_holdout_ready"],
+            "scorer_authorization_ready": report["scorer_authorization_ready"],
             "selected_case_count": report["selected_case_count"],
             "candidate_generatable_count": report["candidate_generatable_count"],
-            "ambiguous_literal_count": report["ambiguous_literal_count"],
+            "stratified_selected_case_count": report["stratified_selected_case_count"],
+            "stratified_candidate_generatable_count": report["stratified_candidate_generatable_count"],
             "blockers": report["blockers"],
             "planned_commands": report["planned_commands"],
         }, indent=2, sort_keys=True))

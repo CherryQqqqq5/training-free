@@ -2,16 +2,25 @@
   "compiler": {
     "ambiguous_literal_count": 0,
     "blockers": [
-      "holdout_below_20"
+      "explicit_total_below_40",
+      "explicit_candidate_generatable_below_35",
+      "explicit_holdout_below_20",
+      "stratified_holdout_below_20"
     ],
     "candidate_generatable_count": 25,
-    "selected_case_count": 28
+    "selected_case_count": 28,
+    "stratified_ambiguous_literal_count": 0,
+    "stratified_candidate_generatable_count": 27,
+    "stratified_selected_case_count": 30
   },
-  "ctspc_v0_action_rules_disabled": true,
+  "compiler_ready": true,
   "ctspc_v0_frozen": true,
   "dev_holdout_disjoint": true,
   "dev_manifest": {
+    "candidate_rules_type": "explicit_required_arg_literal_completion",
+    "exact_tool_choice": false,
     "manifest_name": "explicit_required_arg_literal_dev20",
+    "no_next_tool_intervention": true,
     "planned_commands": [],
     "selected_case_count": 20,
     "selected_case_ids": [
@@ -38,14 +47,16 @@
     ]
   },
   "diagnostic": {
-    "does_not_authorize_scorer": true,
+    "does_not_authorize_scorer_without_separate_request": true,
     "no_bfcl_or_model_call": true,
     "offline_readiness_only": true
   },
-  "explicit_required_arg_literal_compiler_passed": true,
-  "explicit_required_arg_literal_holdout_ready": false,
+  "explicit_holdout_ready": false,
   "holdout_manifest": {
+    "candidate_rules_type": "explicit_required_arg_literal_completion",
+    "exact_tool_choice": false,
     "manifest_name": "explicit_required_arg_literal_holdout20",
+    "no_next_tool_intervention": true,
     "planned_commands": [],
     "selected_case_count": 5,
     "selected_case_ids": [
@@ -59,5 +70,56 @@
   "m2_8pre_offline_passed": false,
   "no_scorer_commands": true,
   "repair_stack_split_ready": true,
-  "report_scope": "m2_8pre_offline_summary"
+  "report_scope": "m2_8pre_offline_summary",
+  "runtime_manifest_safeguards_passed": true,
+  "scorer_authorization_ready": false,
+  "stratified_dev_holdout_disjoint": true,
+  "stratified_dev_manifest": {
+    "candidate_rules_type": "explicit_required_arg_literal_completion",
+    "exact_tool_choice": false,
+    "manifest_name": "stratified_low_risk_dev20",
+    "no_next_tool_intervention": true,
+    "planned_commands": [],
+    "selected_case_count": 20,
+    "selected_case_ids": [
+      "multi_turn_long_context_4",
+      "multi_turn_long_context_8",
+      "multi_turn_long_context_25",
+      "multi_turn_long_context_26",
+      "multi_turn_long_context_24",
+      "multi_turn_miss_func_19",
+      "multi_turn_miss_func_5",
+      "multi_turn_miss_func_7",
+      "multi_turn_miss_func_16",
+      "multi_turn_miss_func_2",
+      "multi_turn_miss_func_6",
+      "multi_turn_miss_func_9",
+      "multi_turn_miss_func_10",
+      "multi_turn_miss_func_18",
+      "multi_turn_miss_func_21",
+      "multi_turn_miss_func_28",
+      "multi_turn_miss_func_0",
+      "multi_turn_miss_func_1",
+      "multi_turn_miss_func_4",
+      "multi_turn_miss_func_8"
+    ]
+  },
+  "stratified_holdout_manifest": {
+    "candidate_rules_type": "explicit_required_arg_literal_completion",
+    "exact_tool_choice": false,
+    "manifest_name": "stratified_low_risk_holdout20",
+    "no_next_tool_intervention": true,
+    "planned_commands": [],
+    "selected_case_count": 7,
+    "selected_case_ids": [
+      "multi_turn_miss_func_12",
+      "multi_turn_miss_func_25",
+      "multi_turn_miss_func_26",
+      "multi_turn_miss_func_15",
+      "multi_turn_miss_func_24",
+      "multi_turn_long_context_20",
+      "multi_turn_miss_func_17"
+    ]
+  },
+  "stratified_holdout_ready": false
 }

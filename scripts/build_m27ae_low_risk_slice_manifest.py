@@ -25,7 +25,7 @@ DEFAULT_SOURCE_POOL = Path("outputs/artifacts/bfcl_ctspc_source_pool_v1")
 DEFAULT_HOLDOUT = Path("outputs/artifacts/bfcl_ctspc_holdout30_v1")
 DEFAULT_OUT = Path("outputs/artifacts/bfcl_ctspc_low_risk_slices_v1/low_risk_slice_manifest.json")
 DEFAULT_MD = Path("outputs/artifacts/bfcl_ctspc_low_risk_slices_v1/low_risk_slice_manifest.md")
-CATEGORIES = ["multi_turn_miss_param", "multi_turn_base", "multi_turn_miss_func", "multi_turn_long_context"]
+DEFAULT_CATEGORIES = ["multi_turn_miss_param", "multi_turn_base", "multi_turn_miss_func", "multi_turn_long_context"]
 DETERMINISTIC_TOOLS = {"echo", "grep", "find", "diff", "cp", "mv", "touch", "mkdir", "cat"}
 LOWER_TRAJECTORY_RISK_TOOLS = {"echo", "grep", "find", "diff"}
 
@@ -46,6 +46,15 @@ def _write_json(path: Path, payload: dict[str, Any]) -> None:
 
 def _has_source(root: Path, category: str) -> bool:
     return bool(list((root / "bfcl").glob(f"**/BFCL_v4_{category}_score.json")))
+
+
+def _available_categories(root: Path) -> list[str]:
+    discovered = set(DEFAULT_CATEGORIES)
+    for path in (root / "bfcl").glob("**/BFCL_v4_*_score.json"):
+        name = path.name
+        if name.startswith("BFCL_v4_") and name.endswith("_score.json"):
+            discovered.add(name[len("BFCL_v4_") : -len("_score.json")])
+    return sorted(discovered)
 
 
 def _source_roots(dev_root: Path, source_pool: Path) -> list[Path]:
@@ -81,7 +90,7 @@ def build_manifest(dev_root: Path = DEFAULT_DEV_ROOT, source_pool: Path = DEFAUL
     scan_summary: list[dict[str, Any]] = []
     seen: set[str] = set()
     for root in _source_roots(dev_root, source_pool):
-        for category in CATEGORIES:
+        for category in _available_categories(root):
             available = _has_source(root, category)
             before = sum(len(v) for v in slice_cases.values())
             if available:

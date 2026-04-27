@@ -104,7 +104,7 @@ def test_m28pre_offline_requires_freeze_repair_compiler_holdout_and_no_commands(
     low = tmp_path / "low"
     _wj(subset / "m27ae_ctspc_v0_status.json", {"ctspc_v0_frozen": True, "scorer_default": "off", "retain": 0, "dev_rerun_authorized": False, "holdout_authorized": False})
     _wj(subset / "repair_stack_contribution.json", {"repair_stack_split_ready": True})
-    _wj(low / "compiler_summary.json", {"m28pre_explicit_required_arg_literal_compiler_passed": True, "m28pre_explicit_required_arg_literal_holdout_ready": True, "ctspc_v0_action_rules_enabled": False, "planned_commands": [], "candidate_commands": []})
+    _wj(low / "compiler_summary.json", {"compiler_ready": True, "explicit_holdout_ready": True, "stratified_holdout_ready": False, "ctspc_v0_action_rules_enabled": False, "ctspc_v0_file_path_multi_turn_enabled": False, "repair_stack_default": "disabled", "candidate_rules_type": "explicit_required_arg_literal_completion", "no_next_tool_intervention": True, "exact_tool_choice": False, "planned_commands": [], "candidate_commands": []})
     _wj(low / "explicit_required_arg_literal_dev20_manifest.json", {"selected_case_ids": ["a"], "planned_commands": []})
     _wj(low / "explicit_required_arg_literal_holdout20_manifest.json", {"selected_case_ids": ["b"], "planned_commands": []})
 
@@ -115,3 +115,70 @@ def test_m28pre_offline_requires_freeze_repair_compiler_holdout_and_no_commands(
     report = evaluate_m28pre(subset, low)
     assert report["dev_holdout_disjoint"] is False
     assert report["m2_8pre_offline_passed"] is False
+
+
+
+def test_explicit_only_below_40_keeps_scorer_blocked_even_when_compiler_ready(tmp_path: Path) -> None:
+    source = tmp_path / "source"
+    category = "multi_turn_base"
+    records = []
+    results = []
+    for i in range(28):
+        case_id = f"case_{i}"
+        records.append({"case_id": case_id, "category": category, "source_run_root": str(source), "schema_local": True, "target_action_tools_present": ["echo"], "low_risk_slices": ["explicit_required_arg_literal"]})
+        if i < 25:
+            results.append({"id": case_id, "result": [[[{"echo": json.dumps({"content": f"literal-{i}"})}]]]})
+    low = tmp_path / "low.json"
+    status = tmp_path / "status.json"
+    _wj(low, {"slice_cases": {"explicit_required_arg_literal": records}})
+    _wj(status, {"ctspc_v0_frozen": True, "scorer_default": "off", "retain": 0, "dev_rerun_authorized": False, "holdout_authorized": False})
+    _result(source, category, results)
+
+    report = build(low, status)
+
+    assert report["compiler_ready"] is True
+    assert report["explicit_holdout_ready"] is False
+    assert report["scorer_authorization_ready"] is False
+    assert "explicit_total_below_40" in report["blockers"]
+
+
+def test_stratified_fallback_preserves_slice_labels_without_commands(tmp_path: Path) -> None:
+    source = tmp_path / "source"
+    category = "multi_turn_base"
+    slice_cases = {"explicit_required_arg_literal": [], "wrong_arg_key_alias_repair": [], "deterministic_schema_local_non_live_repair": []}
+    results = []
+    for i in range(45):
+        case_id = f"case_{i}"
+        slice_name = list(slice_cases)[i % 3]
+        row = {"case_id": case_id, "category": category, "source_run_root": str(source), "schema_local": True, "target_action_tools_present": ["echo"], "low_risk_slices": [slice_name]}
+        slice_cases[slice_name].append(row)
+        results.append({"id": case_id, "result": [[[{"echo": json.dumps({"content": f"literal-{i}"})}]]]})
+    low = tmp_path / "low.json"
+    status = tmp_path / "status.json"
+    _wj(low, {"slice_cases": slice_cases})
+    _wj(status, {"ctspc_v0_frozen": True, "scorer_default": "off", "retain": 0, "dev_rerun_authorized": False, "holdout_authorized": False})
+    _result(source, category, results)
+
+    report = build(low, status)
+
+    assert report["explicit_holdout_ready"] is False
+    assert report["stratified_holdout_ready"] is True
+    assert report["scorer_authorization_ready"] is True
+    assert report["planned_commands"] == []
+    assert report["candidate_commands"] == []
+    assert set(report["stratified_counts"]) == set(slice_cases)
+
+
+def test_m28pre_safeguards_fail_when_ctspc_or_repair_stack_enabled(tmp_path: Path) -> None:
+    subset = tmp_path / "subset"
+    low = tmp_path / "low"
+    _wj(subset / "m27ae_ctspc_v0_status.json", {"ctspc_v0_frozen": True, "scorer_default": "off", "retain": 0, "dev_rerun_authorized": False, "holdout_authorized": False})
+    _wj(subset / "repair_stack_contribution.json", {"repair_stack_split_ready": True})
+    _wj(low / "compiler_summary.json", {"compiler_ready": True, "explicit_holdout_ready": True, "ctspc_v0_action_rules_enabled": True, "ctspc_v0_file_path_multi_turn_enabled": False, "repair_stack_default": "enabled", "candidate_rules_type": "explicit_required_arg_literal_completion", "no_next_tool_intervention": True, "exact_tool_choice": False, "planned_commands": [], "candidate_commands": []})
+    _wj(low / "explicit_required_arg_literal_dev20_manifest.json", {"selected_case_ids": ["a"], "planned_commands": []})
+    _wj(low / "explicit_required_arg_literal_holdout20_manifest.json", {"selected_case_ids": ["b"], "planned_commands": []})
+
+    report = evaluate_m28pre(subset, low)
+
+    assert report["runtime_manifest_safeguards_passed"] is False
+    assert report["scorer_authorization_ready"] is False
