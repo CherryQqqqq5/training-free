@@ -2,7 +2,6 @@
   "blockers": [
     "explicit_holdout_not_ready",
     "runtime_manifest_safeguards_failed",
-    "explicit_prior_family_coverage_zero",
     "explicit_current_context_coverage_below_35",
     "explicit_total_below_40",
     "explicit_demote_candidate_below_35",
@@ -20,34 +19,37 @@
       "stratified_without_complete_theory_priors_not_authorized"
     ],
     "candidate_generatable_count": 25,
+    "disambiguated_current_context_candidate_count": 17,
     "explicit_source_pool_expansion_required": true,
     "required_explicit_candidate_generatable": 35,
     "required_explicit_total": 40,
     "required_stratified_candidate_generatable": 35,
     "required_stratified_total": 40,
-    "retain_eligible_candidate_count": 0,
+    "retain_eligible_candidate_count": 17,
     "retention_prior_distribution": {
-      "demote_candidate": 0,
-      "diagnostic_only": 25,
+      "demote_candidate": 17,
+      "diagnostic_only": 8,
       "never_retain": 0,
       "retain_candidate_after_holdout": 0
     },
     "retention_prior_required": true,
     "retention_prior_rule_family": "explicit_required_arg_literal_completion",
+    "scanner_missed_count": 0,
     "selected_case_count": 25,
     "source_pool_expansion_required": true,
+    "source_result_only_diagnostic_count": 8,
     "stratified_ambiguous_literal_count": 0,
     "stratified_candidate_generatable_count": 27,
-    "stratified_retain_eligible_candidate_count": 0,
+    "stratified_retain_eligible_candidate_count": 17,
     "stratified_retention_prior_distribution": {
-      "demote_candidate": 0,
-      "diagnostic_only": 27,
+      "demote_candidate": 17,
+      "diagnostic_only": 10,
       "never_retain": 0,
       "retain_candidate_after_holdout": 0
     },
     "stratified_selected_case_count": 27,
     "stratified_source_pool_expansion_required": true,
-    "theory_prior_explicit_literal_candidate_count": 0
+    "theory_prior_explicit_literal_candidate_count": 17
   },
   "compiler_ready": true,
   "coverage_audit": {
@@ -55,17 +57,17 @@
     "candidate_commands": [],
     "coverage_bucket_counts": {
       "ambiguous_current_context_literal_candidate": 1,
-      "current_context_anchored_literal_candidate": 0,
+      "current_context_anchored_literal_candidate": 17,
       "no_observable_literal_case": 2626,
-      "source_result_only_diagnostic_candidate": 25
+      "source_result_only_diagnostic_candidate": 8
     },
-    "coverage_conclusion": "explicit_prior_family_coverage_zero",
-    "current_context_anchored_literal_candidate_count": 0,
-    "explicit_prior_family_coverage_zero": true,
+    "coverage_conclusion": "explicit_prior_family_has_current_context_coverage",
+    "current_context_anchored_literal_candidate_count": 17,
+    "explicit_prior_family_coverage_zero": false,
     "m28pre_retention_prior_coverage_audit_ready": true,
     "no_observable_literal_case_count": 2626,
     "planned_commands": [],
-    "source_result_only_diagnostic_candidate_count": 25
+    "source_result_only_diagnostic_candidate_count": 8
   },
   "ctspc_v0_frozen": true,
   "dev_holdout_disjoint": true,
@@ -75,8 +77,26 @@
     "manifest_name": "explicit_required_arg_literal_dev20",
     "no_next_tool_intervention": true,
     "planned_commands": [],
-    "selected_case_count": 0,
-    "selected_case_ids": []
+    "selected_case_count": 17,
+    "selected_case_ids": [
+      "multi_turn_long_context_8",
+      "multi_turn_long_context_25",
+      "multi_turn_miss_func_19",
+      "multi_turn_miss_func_7",
+      "multi_turn_miss_func_16",
+      "multi_turn_miss_func_2",
+      "multi_turn_miss_func_6",
+      "multi_turn_miss_func_9",
+      "multi_turn_miss_func_10",
+      "multi_turn_miss_func_18",
+      "multi_turn_miss_func_21",
+      "multi_turn_miss_func_28",
+      "multi_turn_miss_func_0",
+      "multi_turn_miss_func_8",
+      "multi_turn_miss_func_12",
+      "multi_turn_miss_func_25",
+      "multi_turn_miss_func_15"
+    ]
   },
   "diagnostic": {
     "bfcl_score_cannot_create_retain_rule": true,
@@ -88,7 +108,7 @@
   },
   "explicit_family_scorer_authorization_ready": false,
   "explicit_holdout_ready": false,
-  "explicit_prior_family_coverage_zero": true,
+  "explicit_prior_family_coverage_zero": false,
   "explicit_prior_family_raw_prompt_coverage_zero": false,
   "holdout_manifest": {
     "candidate_rules_type": "explicit_required_arg_literal_completion",
@@ -104,18 +124,17 @@
   "raw_bfcl_literal_coverage_audit": {
     "candidate_commands": [],
     "failure_reason_counts": {
-      "ambiguous": 16,
-      "scanner_missed": 1,
       "source_result_only": 8
     },
     "m28pre_raw_bfcl_literal_coverage_audit_ready": true,
     "pivot_to_next_theory_family": null,
     "planned_commands": [],
     "route_recommendation": "fix_current_context_literal_extractor",
+    "scanner_missed_count": 0,
     "source_result_diagnostic_literal_count": 25,
     "source_result_literals_prompt_anchored_count": 17,
     "source_result_literals_prompt_coverage_zero": false,
-    "source_result_literals_retain_prior_candidate_count": 1
+    "source_result_literals_retain_prior_candidate_count": 17
   },
   "raw_bfcl_literal_coverage_audit_ready": true,
   "repair_stack_split_ready": true,
@@ -131,8 +150,26 @@
     "manifest_name": "stratified_low_risk_dev20",
     "no_next_tool_intervention": true,
     "planned_commands": [],
-    "selected_case_count": 0,
-    "selected_case_ids": []
+    "selected_case_count": 17,
+    "selected_case_ids": [
+      "multi_turn_long_context_8",
+      "multi_turn_long_context_25",
+      "multi_turn_miss_func_19",
+      "multi_turn_miss_func_7",
+      "multi_turn_miss_func_16",
+      "multi_turn_miss_func_2",
+      "multi_turn_miss_func_6",
+      "multi_turn_miss_func_9",
+      "multi_turn_miss_func_10",
+      "multi_turn_miss_func_18",
+      "multi_turn_miss_func_21",
+      "multi_turn_miss_func_28",
+      "multi_turn_miss_func_0",
+      "multi_turn_miss_func_8",
+      "multi_turn_miss_func_12",
+      "multi_turn_miss_func_25",
+      "multi_turn_miss_func_15"
+    ]
   },
   "stratified_holdout_manifest": {
     "candidate_rules_type": "explicit_required_arg_literal_completion",

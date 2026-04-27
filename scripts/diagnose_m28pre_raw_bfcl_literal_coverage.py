@@ -15,6 +15,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+from grc.compiler.literal_grounding import ground_literal
 from scripts.build_m28pre_explicit_required_arg_literal import (
     _arg_schema,
     _function_map,
@@ -70,12 +71,9 @@ def _write_json(path: Path, payload: dict[str, Any]) -> None:
 def _source_result_diagnostic_rows(root: Path) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for row in _read_jsonl(root / "candidate_rules.jsonl"):
-        prior = row.get("retention_prior") if isinstance(row.get("retention_prior"), dict) else {}
-        if (
-            row.get("candidate_rules_type") == "explicit_required_arg_literal_completion"
-            and row.get("literal_source") == "source_result_tool_args"
-            and prior.get("retain_eligibility") == "diagnostic_only"
-        ):
+        if row.get("candidate_rules_type") != "explicit_required_arg_literal_completion":
+            continue
+        if row.get("literal_source") == "source_result_tool_args" or row.get("literal_source_before_grounding") == "source_result_tool_args":
             rows.append(row)
     return rows
 
@@ -217,15 +215,17 @@ def _audit_row(row: dict[str, Any], entry: dict[str, Any] | None, result: dict[s
     gold_or_source_tool_args = _matching_tool_args(result, tool)
     if not literal_value and required_arg in gold_or_source_tool_args:
         literal_value = _scalar(gold_or_source_tool_args.get(required_arg))
+    grounding = ground_literal(request_text, observation_text, arg_schema, required_arg, tool, literal_value)
     user_literals = _typed_literals(request_text, arg_schema, literal_value)
     observation_literals = _typed_literals(observation_text, arg_schema, literal_value)
     literal_in_request = bool(literal_value and _contains_literal(request_text, literal_value))
     literal_in_observation = bool(literal_value and _contains_literal(observation_text, literal_value))
-    schema_match = _schema_type_match(literal_value, arg_schema)
-    combined_literals = user_literals + [value for value in observation_literals if value not in user_literals]
-    literal_uniqueness = bool(literal_value and combined_literals.count(literal_value) == 1 and len(combined_literals) == 1)
-    retain_candidate = bool(schema_match and literal_uniqueness and (literal_in_request or literal_in_observation))
-    failure = _failure_reason(
+    schema_match = grounding.schema_type_match
+    literal_uniqueness = grounding.literal_uniqueness
+    retain_candidate = grounding.retain_prior_candidate
+    prior = row.get("retention_prior") if isinstance(row.get("retention_prior"), dict) else {}
+    already_compiled = prior.get("retain_eligibility") == "demote_candidate" and retain_candidate
+    failure = None if already_compiled else _failure_reason(
         schema_type_match=schema_match,
         literal_value=literal_value,
         in_request=literal_in_request,
@@ -249,6 +249,8 @@ def _audit_row(row: dict[str, Any], entry: dict[str, Any] | None, result: dict[s
         "schema_type_match": schema_match,
         "literal_uniqueness": literal_uniqueness,
         "retain_prior_candidate": retain_candidate,
+        "selected_literal": grounding.selected_literal,
+        "disambiguation_cue": grounding.disambiguation_cue,
         "failure_reason": failure,
         "candidate_origin": row.get("candidate_origin"),
         "literal_source": row.get("literal_source"),
@@ -286,9 +288,10 @@ def evaluate(root: Path = DEFAULT_ROOT, source_manifest_path: Path = DEFAULT_SOU
         if key not in result_cache:
             result_cache[key] = _load_result_records(source_root, category) if str(source_root) else {}
         records.append(_audit_row(row, dataset_cache[category].get(case_id), result_cache[key].get(case_id)))
-    reason_counts = Counter(str(record.get("failure_reason")) for record in records)
+    reason_counts = Counter(str(record.get("failure_reason")) for record in records if record.get("failure_reason"))
     prompt_anchored = sum(1 for record in records if record["literal_in_current_request"] or record["literal_in_current_observation"])
     retain_candidates = sum(1 for record in records if record["retain_prior_candidate"])
+    scanner_missed_count = reason_counts.get(FAILURE_SCANNER_MISSED, 0)
     route = "pivot_to_next_theory_family=wrong_arg_key_alias_repair" if prompt_anchored == 0 else "fix_current_context_literal_extractor"
     return {
         "report_scope": "m2_8pre_raw_bfcl_literal_coverage_audit",
@@ -302,6 +305,7 @@ def evaluate(root: Path = DEFAULT_ROOT, source_manifest_path: Path = DEFAULT_SOU
         "source_result_literals_prompt_anchored_count": prompt_anchored,
         "source_result_literals_retain_prior_candidate_count": retain_candidates,
         "source_result_literals_prompt_coverage_zero": prompt_anchored == 0,
+        "scanner_missed_count": scanner_missed_count,
         "failure_reason_counts": dict(sorted(reason_counts.items())),
         "route_recommendation": route,
         "pivot_to_next_theory_family": "wrong_arg_key_alias_repair" if prompt_anchored == 0 else None,
@@ -355,6 +359,7 @@ def main() -> int:
             "source_result_literals_prompt_anchored_count": report["source_result_literals_prompt_anchored_count"],
             "source_result_literals_retain_prior_candidate_count": report["source_result_literals_retain_prior_candidate_count"],
             "source_result_literals_prompt_coverage_zero": report["source_result_literals_prompt_coverage_zero"],
+            "scanner_missed_count": report["scanner_missed_count"],
             "route_recommendation": report["route_recommendation"],
         }, indent=2, sort_keys=True))
     return 0

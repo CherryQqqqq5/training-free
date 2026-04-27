@@ -252,3 +252,139 @@ def test_m28pre_summary_reports_source_pool_expansion_required_when_holdout_miss
     assert report["explicit_source_pool_expansion_required"] is True
     assert report["required_explicit_total"] == 40
     assert report["required_explicit_candidate_generatable"] == 35
+
+
+def test_legacy_prompt_anchored_folder_literal_becomes_demote_candidate(tmp_path: Path, monkeypatch) -> None:
+    source = tmp_path / "source"
+    category = "multi_turn_miss_func"
+    case_id = "multi_turn_miss_func_7"
+    low = tmp_path / "low.json"
+    status = tmp_path / "status.json"
+    _wj(low, {"slice_cases": {"explicit_required_arg_literal": [{
+        "case_id": case_id,
+        "category": category,
+        "source_run_root": str(source),
+        "schema_local": True,
+        "target_action_tools_present": ["cd"],
+        "low_risk_slices": ["explicit_required_arg_literal"],
+    }]}})
+    _wj(status, {"ctspc_v0_frozen": True, "scorer_default": "off", "retain": 0, "dev_rerun_authorized": False, "holdout_authorized": False})
+    _result(source, category, [{"id": case_id, "result": [[[{"cd": json.dumps({"folder": "academic_venture"})}]]]}])
+    monkeypatch.setattr(explicit_builder, "_load_dataset_records", lambda cat: {
+        case_id: {
+            "id": case_id,
+            "question": [[{"role": "user", "content": "Please cd into the academic_venture directory."}]],
+            "function": [{"name": "cd", "parameters": {"type": "dict", "properties": {"folder": {"type": "string"}}, "required": ["folder"]}}],
+        }
+    } if cat == category else {})
+
+    report = build(low, status)
+
+    assert report["retain_eligible_candidate_count"] == 1
+    rule = report["candidate_rules"][0]
+    assert rule["literal_value"] == "academic_venture"
+    assert rule["literal_source"] == "current_request"
+    assert rule["retention_prior"]["retain_eligibility"] == "demote_candidate"
+    assert report["disambiguated_current_context_candidate_count"] == 1
+    assert report["source_result_only_diagnostic_count"] == 0
+
+
+def test_legacy_file_literal_disambiguates_among_multiple_prompt_literals(tmp_path: Path, monkeypatch) -> None:
+    source = tmp_path / "source"
+    category = "multi_turn_miss_func"
+    case_id = "multi_turn_miss_func_8"
+    low = tmp_path / "low.json"
+    status = tmp_path / "status.json"
+    _wj(low, {"slice_cases": {"explicit_required_arg_literal": [{
+        "case_id": case_id,
+        "category": category,
+        "source_run_root": str(source),
+        "schema_local": True,
+        "target_action_tools_present": ["grep"],
+        "low_risk_slices": ["explicit_required_arg_literal"],
+    }]}})
+    _wj(status, {"ctspc_v0_frozen": True, "scorer_default": "off", "retain": 0, "dev_rerun_authorized": False, "holdout_authorized": False})
+    _result(source, category, [{"id": case_id, "result": [[[{"grep": json.dumps({"file_name": "experiment_log.txt", "pattern": "Anomaly"})}]]]}])
+    monkeypatch.setattr(explicit_builder, "_load_dataset_records", lambda cat: {
+        case_id: {
+            "id": case_id,
+            "question": [[{"role": "user", "content": "Search experiment_log.txt for 'Anomaly' and compare it with previous_study_log.txt."}]],
+            "function": [{"name": "grep", "parameters": {"type": "dict", "properties": {"file_name": {"type": "string"}, "pattern": {"type": "string"}}, "required": ["file_name", "pattern"]}}],
+        }
+    } if cat == category else {})
+
+    report = build(low, status)
+
+    assert report["retain_eligible_candidate_count"] == 1
+    rule = report["candidate_rules"][0]
+    assert rule["literal_value"] == "experiment_log.txt"
+    assert rule["disambiguation_cue"] == "file_name_exact_prompt_literal"
+    assert rule["retention_prior"]["retain_eligibility"] == "demote_candidate"
+
+
+def test_source_result_only_literal_remains_diagnostic(tmp_path: Path, monkeypatch) -> None:
+    source = tmp_path / "source"
+    category = "multi_turn_miss_func"
+    case_id = "source_only"
+    low = tmp_path / "low.json"
+    status = tmp_path / "status.json"
+    _wj(low, {"slice_cases": {"explicit_required_arg_literal": [{
+        "case_id": case_id,
+        "category": category,
+        "source_run_root": str(source),
+        "schema_local": True,
+        "target_action_tools_present": ["cat"],
+        "low_risk_slices": ["explicit_required_arg_literal"],
+    }]}})
+    _wj(status, {"ctspc_v0_frozen": True, "scorer_default": "off", "retain": 0, "dev_rerun_authorized": False, "holdout_authorized": False})
+    _result(source, category, [{"id": case_id, "result": [[[{"cat": json.dumps({"file_name": "hidden.txt"})}]]]}])
+    monkeypatch.setattr(explicit_builder, "_load_dataset_records", lambda cat: {
+        case_id: {
+            "id": case_id,
+            "question": [[{"role": "user", "content": "Show the relevant hidden file from the source result."}]],
+            "function": [{"name": "cat", "parameters": {"type": "dict", "properties": {"file_name": {"type": "string"}}, "required": ["file_name"]}}],
+        }
+    } if cat == category else {})
+
+    report = build(low, status)
+
+    assert report["retain_eligible_candidate_count"] == 0
+    rule = report["candidate_rules"][0]
+    assert rule["literal_source"] == "source_result_tool_args"
+    assert rule["retention_prior"]["retain_eligibility"] == "diagnostic_only"
+    assert report["source_result_only_diagnostic_count"] == 1
+
+
+def test_literal_disambiguation_report_is_written(tmp_path: Path, monkeypatch) -> None:
+    source = tmp_path / "source"
+    category = "multi_turn_miss_func"
+    case_id = "multi_turn_miss_func_7"
+    low = tmp_path / "low.json"
+    status = tmp_path / "status.json"
+    out = tmp_path / "out"
+    _wj(low, {"slice_cases": {"explicit_required_arg_literal": [{
+        "case_id": case_id,
+        "category": category,
+        "source_run_root": str(source),
+        "schema_local": True,
+        "target_action_tools_present": ["cd"],
+        "low_risk_slices": ["explicit_required_arg_literal"],
+    }]}})
+    _wj(status, {"ctspc_v0_frozen": True, "scorer_default": "off", "retain": 0, "dev_rerun_authorized": False, "holdout_authorized": False})
+    _result(source, category, [{"id": case_id, "result": [[[{"cd": json.dumps({"folder": "academic_venture"})}]]]}])
+    monkeypatch.setattr(explicit_builder, "_load_dataset_records", lambda cat: {
+        case_id: {
+            "id": case_id,
+            "question": [[{"role": "user", "content": "Please cd into the academic_venture directory."}]],
+            "function": [{"name": "cd", "parameters": {"type": "dict", "properties": {"folder": {"type": "string"}}, "required": ["folder"]}}],
+        }
+    } if cat == category else {})
+
+    report = build(low, status)
+    explicit_builder.write_outputs(report, out)
+    disamb = json.loads((out / "m28pre_literal_disambiguation_report.json").read_text())
+
+    assert disamb["candidate_commands"] == []
+    assert disamb["planned_commands"] == []
+    assert disamb["records"][0]["selected_literal"] == "academic_venture"
+    assert disamb["records"][0]["retain_prior_candidate"] is True

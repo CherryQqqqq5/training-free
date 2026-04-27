@@ -163,6 +163,9 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
             "retain_eligible_candidate_count",
             "stratified_retain_eligible_candidate_count",
             "theory_prior_explicit_literal_candidate_count",
+            "scanner_missed_count",
+            "disambiguated_current_context_candidate_count",
+            "source_result_only_diagnostic_count",
         ]},
         "coverage_audit": {key: coverage.get(key) for key in [
             "m28pre_retention_prior_coverage_audit_ready",
@@ -182,6 +185,7 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
             "source_result_literals_prompt_anchored_count",
             "source_result_literals_retain_prior_candidate_count",
             "source_result_literals_prompt_coverage_zero",
+            "scanner_missed_count",
             "failure_reason_counts",
             "route_recommendation",
             "pivot_to_next_theory_family",

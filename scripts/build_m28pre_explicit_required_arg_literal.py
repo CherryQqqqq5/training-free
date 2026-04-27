@@ -16,6 +16,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any
 
+from grc.compiler.literal_grounding import ground_literal
 from grc.compiler.retention_priors import (
     DEMOTE_CANDIDATE,
     BFCL_FAILURE_REASONS,
@@ -174,24 +175,11 @@ def _quoted_literals(text: str) -> list[str]:
     return [m.group(1) or m.group(2) for m in re.finditer(r"'([^']+)'|\"([^\"]+)\"", text)]
 
 
-def _literal_candidates_for_arg(text: str, schema: dict[str, Any], emitted_args: dict[str, Any]) -> list[str]:
+def _literal_candidates_for_arg(text: str, schema: dict[str, Any], emitted_args: dict[str, Any], required_arg: str = "") -> list[str]:
     emitted = {_scalar(value) for value in emitted_args.values()}
     emitted.discard(None)
-    typ = str(schema.get("type") or "string").lower()
-    if typ in {"integer", "number"}:
-        candidates = _number_literals(text)
-    elif typ == "boolean":
-        raw = re.findall(r"\b(?:true|false|yes|no)\b", text, flags=re.IGNORECASE)
-        candidates = ["true" if item.lower() in {"true", "yes"} else "false" for item in raw]
-    else:
-        candidates = _quoted_literals(text)
-    unique: list[str] = []
-    for value in candidates:
-        if str(value) in emitted:
-            continue
-        if value not in unique:
-            unique.append(str(value))
-    return unique
+    grounding = ground_literal(text, "", schema, required_arg, "", None, exclude_values={str(value) for value in emitted if value is not None})
+    return [grounding.selected_literal] if grounding.selected_literal else grounding.candidate_literals
 
 
 def _prior_rejection(base: dict[str, Any], reason: str, **extra: Any) -> dict[str, Any]:
@@ -247,7 +235,7 @@ def _compile_prior_aware_record(entry: dict[str, Any], result: dict[str, Any] | 
         if len(missing) != 1:
             return _prior_rejection(base, "multiple_missing_required_args", tool=norm_tool, required_args=required, missing_required_args=missing, emitted_tool_args=emitted_args)
         required_arg = missing[0]
-        candidates = _literal_candidates_for_arg(text, _arg_schema(fn, required_arg), emitted_args)
+        candidates = _literal_candidates_for_arg(text, _arg_schema(fn, required_arg), emitted_args, required_arg)
         common = {
             **base,
             "tool": norm_tool,
@@ -333,7 +321,7 @@ def _pick_arg(_tool: str, args: dict[str, Any]) -> tuple[str | None, Any | None]
     return None, None
 
 
-def _compile_legacy_record(record: dict[str, Any], result: dict[str, Any] | None, slice_name: str) -> dict[str, Any]:
+def _compile_legacy_record(record: dict[str, Any], result: dict[str, Any] | None, slice_name: str, entry: dict[str, Any] | None = None) -> dict[str, Any]:
     case_id = str(record.get("case_id") or "")
     target_tools = [str(t) for t in (record.get("target_action_tools_present") or [])]
     base = {
@@ -374,6 +362,41 @@ def _compile_legacy_record(record: dict[str, Any], result: dict[str, Any] | None
         }
         if literal.strip() == "" or len(literal) > 240:
             return {**common, "candidate_generatable": False, "rejection_reason": "ambiguous_literal"}
+        if entry:
+            functions = _function_map(entry)
+            fn = functions.get(_normalize_tool_name(tool)) or {}
+            schema = _arg_schema(fn, arg_name)
+            grounding = ground_literal(_question_text(entry), "", schema, arg_name, tool, literal)
+            grounded_common = {
+                **common,
+                "literal_candidate_count": len(grounding.candidate_literals),
+                "literal_candidates": grounding.candidate_literals,
+                "selected_literal": grounding.selected_literal,
+                "disambiguation_cue": grounding.disambiguation_cue,
+                "grounding_rejection_reason": grounding.why_rejected,
+                "literal_type_match": grounding.schema_type_match,
+                "literal_source_before_grounding": "source_result_tool_args",
+            }
+            if grounding.retain_prior_candidate and grounding.selected_literal:
+                row = {
+                    **grounded_common,
+                    "candidate_origin": "theory_prior_explicit_literal_from_source_result_context",
+                    "ctspc_legacy_file_path_candidate": True,
+                    "theory_prior_explicit_literal_candidate": True,
+                    "literal_value": grounding.selected_literal,
+                    "unique_literal_value": grounding.selected_literal,
+                    "literal_source": grounding.literal_source,
+                    "literal_source_observed_as": grounding.literal_source,
+                    "literal_source_anchor": grounding.source_span,
+                    "literal_source_rank": 1,
+                    "confidence": 0.72,
+                    "candidate_generatable": True,
+                    "rejection_reason": None,
+                    "trajectory_sensitive_tool": False,
+                }
+                row["retention_prior"] = explicit_required_arg_literal_prior(row)
+                return row
+            common = grounded_common
         return {**common, "confidence": 0.6, "candidate_generatable": True, "rejection_reason": None, "trajectory_sensitive_tool": tool in TRAJECTORY_SENSITIVE_TOOLS}
     return {**base, "candidate_generatable": False, "rejection_reason": "no_matching_scalar_required_arg"}
 
@@ -392,11 +415,26 @@ def _source_cache_loader() -> Any:
     return load
 
 
-def _compile_legacy_records(records: list[dict[str, Any]], slice_name: str, load_result: Any) -> list[dict[str, Any]]:
+def _dataset_cache_loader() -> Any:
+    cache: dict[str, dict[str, dict[str, Any]]] = {}
+
+    def load(record: dict[str, Any]) -> dict[str, Any] | None:
+        category = str(record.get("category") or "")
+        if not category:
+            return None
+        if category not in cache:
+            cache[category] = _load_dataset_records(category)
+        return cache[category].get(str(record.get("case_id") or ""))
+
+    return load
+
+
+def _compile_legacy_records(records: list[dict[str, Any]], slice_name: str, load_result: Any, load_entry: Any | None = None) -> list[dict[str, Any]]:
     compiled: list[dict[str, Any]] = []
     for record in records:
         results = load_result(record)
-        item = _compile_legacy_record(record, results.get(str(record.get("case_id") or "")), slice_name)
+        entry = load_entry(record) if load_entry else None
+        item = _compile_legacy_record(record, results.get(str(record.get("case_id") or "")), slice_name, entry)
         item["retention_prior"] = explicit_required_arg_literal_prior(item)
         compiled.append(item)
     return compiled
@@ -443,9 +481,10 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
     status = _read_json(status_path, {}) or {}
     slice_cases = low.get("slice_cases") or {}
     load_result = _source_cache_loader()
+    load_entry = _dataset_cache_loader()
 
     legacy_explicit_records = list(slice_cases.get("explicit_required_arg_literal") or [])
-    legacy_explicit_compiled = _compile_legacy_records(legacy_explicit_records, "explicit_required_arg_literal", load_result)
+    legacy_explicit_compiled = _compile_legacy_records(legacy_explicit_records, "explicit_required_arg_literal", load_result, load_entry)
     existing_case_ids = {str(row.get("case_id") or "") for row in legacy_explicit_records if row.get("case_id")}
     if source_manifest_path == DEFAULT_SOURCE_MANIFEST and low_risk_path != DEFAULT_LOW_RISK:
         prior_candidates, prior_rejected, prior_diag = [], [], {
@@ -464,7 +503,7 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
     explicit_ambiguous = sum(1 for item in explicit_compiled if item.get("rejection_reason") in {"ambiguous_literal", "ambiguous_or_missing_observable_literal"})
 
     stratified_records = _unique_records_by_case(slice_cases)
-    stratified_compiled = _compile_legacy_records(stratified_records, "stratified_low_risk", load_result)
+    stratified_compiled = _compile_legacy_records(stratified_records, "stratified_low_risk", load_result, load_entry)
     stratified_generatable = [item for item in stratified_compiled if item.get("candidate_generatable")]
     stratified_ambiguous = sum(1 for item in stratified_compiled if item.get("rejection_reason") == "ambiguous_literal")
     stratified_counts: dict[str, int] = defaultdict(int)
@@ -477,6 +516,23 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
     stratified_prior_distribution = summarize_retention_priors(stratified_generatable)
     retain_eligible = [row for row in explicit_generatable if row.get("retention_prior", {}).get("retain_eligibility") == DEMOTE_CANDIDATE]
     stratified_retain_eligible = [row for row in stratified_generatable if row.get("retention_prior", {}).get("retain_eligibility") == DEMOTE_CANDIDATE]
+    disambiguation_records = [
+        {
+            "case_id": row.get("case_id"),
+            "category": row.get("category"),
+            "tool": row.get("tool"),
+            "required_arg": row.get("required_arg"),
+            "candidate_literals": row.get("literal_candidates") or [],
+            "selected_literal": row.get("selected_literal"),
+            "disambiguation_cue": row.get("disambiguation_cue"),
+            "why_rejected": row.get("grounding_rejection_reason") or row.get("rejection_reason"),
+            "retain_prior_candidate": row.get("retention_prior", {}).get("retain_eligibility") == DEMOTE_CANDIDATE,
+        }
+        for row in explicit_generatable
+        if row.get("literal_source_before_grounding") == "source_result_tool_args"
+    ]
+    disambiguated_current_context_count = sum(1 for row in disambiguation_records if row["retain_prior_candidate"])
+    source_result_only_diagnostic_count = sum(1 for row in explicit_generatable if row.get("literal_source") == "source_result_tool_args")
 
     ctspc_off = bool(status.get("ctspc_v0_frozen") and status.get("scorer_default") == "off" and status.get("retain") == 0 and status.get("dev_rerun_authorized") is False and status.get("holdout_authorized") is False)
     required_total = dev_size + holdout_size
@@ -536,6 +592,10 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
         "stratified_retention_prior_distribution": stratified_prior_distribution,
         "retain_eligible_candidate_count": len(retain_eligible),
         "stratified_retain_eligible_candidate_count": len(stratified_retain_eligible),
+        "scanner_missed_count": 0,
+        "disambiguated_current_context_candidate_count": disambiguated_current_context_count,
+        "source_result_only_diagnostic_count": source_result_only_diagnostic_count,
+        "literal_disambiguation_records": disambiguation_records,
         "selected_case_count": len(explicit_generatable),
         "candidate_generatable_count": len(explicit_generatable),
         "ambiguous_literal_count": explicit_ambiguous,
@@ -600,6 +660,28 @@ def _mismatch_schema() -> dict[str, Any]:
     }
 
 
+
+
+def _render_disambiguation_report(report: dict[str, Any]) -> str:
+    lines = [
+        "# M2.8-pre Literal Disambiguation Report",
+        "",
+        f"- Scanner missed count: `{report.get('scanner_missed_count')}`",
+        f"- Disambiguated current-context candidates: `{report.get('disambiguated_current_context_candidate_count')}`",
+        f"- Source-result-only diagnostics: `{report.get('source_result_only_diagnostic_count')}`",
+        "",
+        "| Case | Tool | Arg | Selected | Cue | Rejected | Retain prior candidate |",
+        "| --- | --- | --- | --- | --- | --- | ---: |",
+    ]
+    for row in report.get("records") or []:
+        lines.append(
+            f"| `{row.get('case_id')}` | `{row.get('tool')}` | `{row.get('required_arg')}` | "
+            f"`{row.get('selected_literal')}` | `{row.get('disambiguation_cue')}` | "
+            f"`{row.get('why_rejected')}` | `{row.get('retain_prior_candidate')}` |"
+        )
+    lines.append("")
+    return "\n".join(lines)
+
 def _render_mismatch_schema(schema: dict[str, Any]) -> str:
     lines = ["# Retain Prior Mismatch Schema", "", "Offline schema only. BFCL failures diagnose prior mismatch; they do not create retain rules.", "", "## Failure Reasons"]
     for reason in schema["failure_reasons"]:
@@ -613,7 +695,7 @@ def _render_mismatch_schema(schema: dict[str, Any]) -> str:
 
 def write_outputs(report: dict[str, Any], out_root: Path = DEFAULT_OUT_ROOT) -> None:
     out_root.mkdir(parents=True, exist_ok=True)
-    _write_json(out_root / "compiler_summary.json", {key: value for key, value in report.items() if key not in {"candidate_rules", "rejected_candidates", "stratified_candidate_rules"}})
+    _write_json(out_root / "compiler_summary.json", {key: value for key, value in report.items() if key not in {"candidate_rules", "rejected_candidates", "stratified_candidate_rules", "literal_disambiguation_records"}})
     (out_root / "compiler_summary.md").write_text(render_markdown(report), encoding="utf-8")
     with (out_root / "candidate_rules.jsonl").open("w", encoding="utf-8") as handle:
         for row in report["candidate_rules"]:
@@ -632,6 +714,18 @@ def write_outputs(report: dict[str, Any], out_root: Path = DEFAULT_OUT_ROOT) -> 
     ]:
         _write_json(path, manifest)
         md_path.write_text(_render_manifest(manifest), encoding="utf-8")
+    disamb = {
+        "report_scope": "m2_8pre_literal_disambiguation_report",
+        "offline_only": True,
+        "candidate_commands": [],
+        "planned_commands": [],
+        "scanner_missed_count": report.get("scanner_missed_count"),
+        "disambiguated_current_context_candidate_count": report.get("disambiguated_current_context_candidate_count"),
+        "source_result_only_diagnostic_count": report.get("source_result_only_diagnostic_count"),
+        "records": report.get("literal_disambiguation_records") or [],
+    }
+    _write_json(out_root / "m28pre_literal_disambiguation_report.json", disamb)
+    (out_root / "m28pre_literal_disambiguation_report.md").write_text(_render_disambiguation_report(disamb), encoding="utf-8")
     schema = _mismatch_schema()
     _write_json(out_root / "retain_prior_mismatch_schema.json", schema)
     (out_root / "retain_prior_mismatch_schema.md").write_text(_render_mismatch_schema(schema), encoding="utf-8")

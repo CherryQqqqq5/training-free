@@ -5,13 +5,11 @@ Offline diagnostic only. Source-result tool args are audited against raw BFCL pr
 - Audit ready: `True`
 - Source-result diagnostic literals: `25`
 - Prompt/observation anchored literals: `17`
-- Retain-prior candidates under raw prompt audit: `1`
+- Retain-prior candidates under raw prompt audit: `17`
 - Route recommendation: `fix_current_context_literal_extractor`
 
 | Failure reason | Count |
 | --- | ---: |
-| `ambiguous` | `16` |
-| `scanner_missed` | `1` |
 | `source_result_only` | `8` |
 
 No scorer commands are emitted.

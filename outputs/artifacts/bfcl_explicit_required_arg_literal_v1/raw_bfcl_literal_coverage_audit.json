@@ -3,8 +3,6 @@
   "candidate_family_to_debug": "explicit_required_arg_literal_completion",
   "does_not_authorize_scorer": true,
   "failure_reason_counts": {
-    "ambiguous": 16,
-    "scanner_missed": 1,
     "source_result_only": 8
   },
   "m28pre_raw_bfcl_literal_coverage_audit_ready": true,
@@ -33,6 +31,7 @@
       "candidate_origin": "ctspc_legacy_file_path",
       "case_id": "multi_turn_long_context_4",
       "category": "multi_turn_long_context",
+      "disambiguation_cue": null,
       "failure_reason": "source_result_only",
       "gold_or_source_tool_args": {
         "file_name": "report.txt"
@@ -49,6 +48,7 @@
         "file_name"
       ],
       "schema_type_match": true,
+      "selected_literal": null,
       "tool": "sort",
       "tool_observation_literals": [],
       "user_prompt_literals": [
@@ -56,10 +56,11 @@
       ]
     },
     {
-      "candidate_origin": "ctspc_legacy_file_path",
+      "candidate_origin": "theory_prior_explicit_literal_from_source_result_context",
       "case_id": "multi_turn_long_context_8",
       "category": "multi_turn_long_context",
-      "failure_reason": "ambiguous",
+      "disambiguation_cue": "file_name_exact_prompt_literal",
+      "failure_reason": null,
       "gold_or_source_tool_args": {
         "file_name": "experiment_log.txt",
         "pattern": "Anomaly"
@@ -67,16 +68,17 @@
       "literal_in_current_observation": false,
       "literal_in_current_request": true,
       "literal_only_in_source_result": false,
-      "literal_source": "source_result_tool_args",
-      "literal_uniqueness": false,
+      "literal_source": "current_request",
+      "literal_uniqueness": true,
       "literal_value": "experiment_log.txt",
       "required_arg": "file_name",
-      "retain_prior_candidate": false,
+      "retain_prior_candidate": true,
       "schema_required_args": [
         "file_name",
         "pattern"
       ],
       "schema_type_match": true,
+      "selected_literal": "experiment_log.txt",
       "tool": "grep",
       "tool_observation_literals": [],
       "user_prompt_literals": [
@@ -90,25 +92,27 @@
       ]
     },
     {
-      "candidate_origin": "ctspc_legacy_file_path",
+      "candidate_origin": "theory_prior_explicit_literal_from_source_result_context",
       "case_id": "multi_turn_long_context_25",
       "category": "multi_turn_long_context",
-      "failure_reason": "ambiguous",
+      "disambiguation_cue": "file_name_exact_prompt_literal",
+      "failure_reason": null,
       "gold_or_source_tool_args": {
         "file_name": "summary.txt"
       },
       "literal_in_current_observation": false,
       "literal_in_current_request": true,
       "literal_only_in_source_result": false,
-      "literal_source": "source_result_tool_args",
-      "literal_uniqueness": false,
+      "literal_source": "current_request",
+      "literal_uniqueness": true,
       "literal_value": "summary.txt",
       "required_arg": "file_name",
-      "retain_prior_candidate": false,
+      "retain_prior_candidate": true,
       "schema_required_args": [
         "file_name"
       ],
       "schema_type_match": true,
+      "selected_literal": "summary.txt",
       "tool": "cat",
       "tool_observation_literals": [],
       "user_prompt_literals": [
@@ -122,6 +126,7 @@
       "candidate_origin": "ctspc_legacy_file_path",
       "case_id": "multi_turn_long_context_26",
       "category": "multi_turn_long_context",
+      "disambiguation_cue": null,
       "failure_reason": "source_result_only",
       "gold_or_source_tool_args": {
         "folder": "tmp"
@@ -138,6 +143,7 @@
         "folder"
       ],
       "schema_type_match": true,
+      "selected_literal": null,
       "tool": "cd",
       "tool_observation_literals": [],
       "user_prompt_literals": []
@@ -146,6 +152,7 @@
       "candidate_origin": "ctspc_legacy_file_path",
       "case_id": "multi_turn_long_context_24",
       "category": "multi_turn_long_context",
+      "disambiguation_cue": null,
       "failure_reason": "source_result_only",
       "gold_or_source_tool_args": {
         "file_name1": "report_draft.txt",
@@ -164,6 +171,7 @@
         "file_name2"
       ],
       "schema_type_match": true,
+      "selected_literal": null,
       "tool": "diff",
       "tool_observation_literals": [],
       "user_prompt_literals": [
@@ -174,10 +182,11 @@
       ]
     },
     {
-      "candidate_origin": "ctspc_legacy_file_path",
+      "candidate_origin": "theory_prior_explicit_literal_from_source_result_context",
       "case_id": "multi_turn_miss_func_19",
       "category": "multi_turn_miss_func",
-      "failure_reason": "ambiguous",
+      "disambiguation_cue": "directory_cue_exact_prompt_literal",
+      "failure_reason": null,
       "gold_or_source_tool_args": {
         "name": "test_document.txt",
         "path": "."
@@ -185,13 +194,14 @@
       "literal_in_current_observation": false,
       "literal_in_current_request": true,
       "literal_only_in_source_result": false,
-      "literal_source": "source_result_tool_args",
-      "literal_uniqueness": false,
+      "literal_source": "current_request",
+      "literal_uniqueness": true,
       "literal_value": ".",
       "required_arg": "path",
-      "retain_prior_candidate": false,
+      "retain_prior_candidate": true,
       "schema_required_args": [],
       "schema_type_match": true,
+      "selected_literal": ".",
       "tool": "find",
       "tool_observation_literals": [],
       "user_prompt_literals": [
@@ -204,6 +214,7 @@
       "candidate_origin": "ctspc_legacy_file_path",
       "case_id": "multi_turn_miss_func_5",
       "category": "multi_turn_miss_func",
+      "disambiguation_cue": null,
       "failure_reason": "source_result_only",
       "gold_or_source_tool_args": {
         "name": "analysis_report.csv",
@@ -219,6 +230,7 @@
       "retain_prior_candidate": false,
       "schema_required_args": [],
       "schema_type_match": true,
+      "selected_literal": null,
       "tool": "find",
       "tool_observation_literals": [],
       "user_prompt_literals": [
@@ -230,17 +242,18 @@
       ]
     },
     {
-      "candidate_origin": "ctspc_legacy_file_path",
+      "candidate_origin": "theory_prior_explicit_literal_from_source_result_context",
       "case_id": "multi_turn_miss_func_7",
       "category": "multi_turn_miss_func",
-      "failure_reason": "scanner_missed",
+      "disambiguation_cue": "directory_cue_exact_prompt_literal",
+      "failure_reason": null,
       "gold_or_source_tool_args": {
         "folder": "academic_venture"
       },
       "literal_in_current_observation": false,
       "literal_in_current_request": true,
       "literal_only_in_source_result": false,
-      "literal_source": "source_result_tool_args",
+      "literal_source": "current_request",
       "literal_uniqueness": true,
       "literal_value": "academic_venture",
       "required_arg": "folder",
@@ -249,6 +262,7 @@
         "folder"
       ],
       "schema_type_match": true,
+      "selected_literal": "academic_venture",
       "tool": "cd",
       "tool_observation_literals": [],
       "user_prompt_literals": [
@@ -256,10 +270,11 @@
       ]
     },
     {
-      "candidate_origin": "ctspc_legacy_file_path",
+      "candidate_origin": "theory_prior_explicit_literal_from_source_result_context",
       "case_id": "multi_turn_miss_func_16",
       "category": "multi_turn_miss_func",
-      "failure_reason": "ambiguous",
+      "disambiguation_cue": "source_file_exact_prompt_literal",
+      "failure_reason": null,
       "gold_or_source_tool_args": {
         "destination": "archives/2024_research_backup.txt",
         "source": "research_notes.txt"
@@ -267,16 +282,17 @@
       "literal_in_current_observation": false,
       "literal_in_current_request": true,
       "literal_only_in_source_result": false,
-      "literal_source": "source_result_tool_args",
-      "literal_uniqueness": false,
+      "literal_source": "current_request",
+      "literal_uniqueness": true,
       "literal_value": "research_notes.txt",
       "required_arg": "source",
-      "retain_prior_candidate": false,
+      "retain_prior_candidate": true,
       "schema_required_args": [
         "source",
         "destination"
       ],
       "schema_type_match": true,
+      "selected_literal": "research_notes.txt",
       "tool": "mv",
       "tool_observation_literals": [],
       "user_prompt_literals": [
@@ -286,25 +302,27 @@
       ]
     },
     {
-      "candidate_origin": "ctspc_legacy_file_path",
+      "candidate_origin": "theory_prior_explicit_literal_from_source_result_context",
       "case_id": "multi_turn_miss_func_2",
       "category": "multi_turn_miss_func",
-      "failure_reason": "ambiguous",
+      "disambiguation_cue": "file_name_exact_prompt_literal",
+      "failure_reason": null,
       "gold_or_source_tool_args": {
         "file_name": "TeamNotes.txt"
       },
       "literal_in_current_observation": false,
       "literal_in_current_request": true,
       "literal_only_in_source_result": false,
-      "literal_source": "source_result_tool_args",
-      "literal_uniqueness": false,
+      "literal_source": "current_request",
+      "literal_uniqueness": true,
       "literal_value": "TeamNotes.txt",
       "required_arg": "file_name",
-      "retain_prior_candidate": false,
+      "retain_prior_candidate": true,
       "schema_required_args": [
         "file_name"
       ],
       "schema_type_match": true,
+      "selected_literal": "TeamNotes.txt",
       "tool": "touch",
       "tool_observation_literals": [],
       "user_prompt_literals": [
@@ -319,23 +337,25 @@
       ]
     },
     {
-      "candidate_origin": "ctspc_legacy_file_path",
+      "candidate_origin": "theory_prior_explicit_literal_from_source_result_context",
       "case_id": "multi_turn_miss_func_6",
       "category": "multi_turn_miss_func",
-      "failure_reason": "ambiguous",
+      "disambiguation_cue": "file_name_exact_prompt_literal",
+      "failure_reason": null,
       "gold_or_source_tool_args": {
         "file_name": "Annual_Report_2023.docx"
       },
       "literal_in_current_observation": false,
       "literal_in_current_request": true,
       "literal_only_in_source_result": false,
-      "literal_source": "source_result_tool_args",
-      "literal_uniqueness": false,
+      "literal_source": "current_request",
+      "literal_uniqueness": true,
       "literal_value": "Annual_Report_2023.docx",
       "required_arg": "file_name",
-      "retain_prior_candidate": false,
+      "retain_prior_candidate": true,
       "schema_required_args": [],
       "schema_type_match": true,
+      "selected_literal": "Annual_Report_2023.docx",
       "tool": "touch",
       "tool_observation_literals": [],
       "user_prompt_literals": [
@@ -348,25 +368,27 @@
       ]
     },
     {
-      "candidate_origin": "ctspc_legacy_file_path",
+      "candidate_origin": "theory_prior_explicit_literal_from_source_result_context",
       "case_id": "multi_turn_miss_func_9",
       "category": "multi_turn_miss_func",
-      "failure_reason": "ambiguous",
+      "disambiguation_cue": "directory_cue_exact_prompt_literal",
+      "failure_reason": null,
       "gold_or_source_tool_args": {
         "folder": "Documentation"
       },
       "literal_in_current_observation": false,
       "literal_in_current_request": true,
       "literal_only_in_source_result": false,
-      "literal_source": "source_result_tool_args",
-      "literal_uniqueness": false,
+      "literal_source": "current_request",
+      "literal_uniqueness": true,
       "literal_value": "Documentation",
       "required_arg": "folder",
-      "retain_prior_candidate": false,
+      "retain_prior_candidate": true,
       "schema_required_args": [
         "folder"
       ],
       "schema_type_match": true,
+      "selected_literal": "Documentation",
       "tool": "cd",
       "tool_observation_literals": [],
       "user_prompt_literals": [
@@ -377,25 +399,27 @@
       ]
     },
     {
-      "candidate_origin": "ctspc_legacy_file_path",
+      "candidate_origin": "theory_prior_explicit_literal_from_source_result_context",
       "case_id": "multi_turn_miss_func_10",
       "category": "multi_turn_miss_func",
-      "failure_reason": "ambiguous",
+      "disambiguation_cue": "directory_cue_exact_prompt_literal",
+      "failure_reason": null,
       "gold_or_source_tool_args": {
         "dir_name": "Projects"
       },
       "literal_in_current_observation": false,
       "literal_in_current_request": true,
       "literal_only_in_source_result": false,
-      "literal_source": "source_result_tool_args",
-      "literal_uniqueness": false,
+      "literal_source": "current_request",
+      "literal_uniqueness": true,
       "literal_value": "Projects",
       "required_arg": "dir_name",
-      "retain_prior_candidate": false,
+      "retain_prior_candidate": true,
       "schema_required_args": [
         "dir_name"
       ],
       "schema_type_match": true,
+      "selected_literal": "Projects",
       "tool": "mkdir",
       "tool_observation_literals": [],
       "user_prompt_literals": [
@@ -412,25 +436,27 @@
       ]
     },
     {
-      "candidate_origin": "ctspc_legacy_file_path",
+      "candidate_origin": "theory_prior_explicit_literal_from_source_result_context",
       "case_id": "multi_turn_miss_func_18",
       "category": "multi_turn_miss_func",
-      "failure_reason": "ambiguous",
+      "disambiguation_cue": "file_name_exact_prompt_literal",
+      "failure_reason": null,
       "gold_or_source_tool_args": {
         "file_name": "MonthlySummary.docx"
       },
       "literal_in_current_observation": false,
       "literal_in_current_request": true,
       "literal_only_in_source_result": false,
-      "literal_source": "source_result_tool_args",
-      "literal_uniqueness": false,
+      "literal_source": "current_request",
+      "literal_uniqueness": true,
       "literal_value": "MonthlySummary.docx",
       "required_arg": "file_name",
-      "retain_prior_candidate": false,
+      "retain_prior_candidate": true,
       "schema_required_args": [
         "file_name"
       ],
       "schema_type_match": true,
+      "selected_literal": "MonthlySummary.docx",
       "tool": "cat",
       "tool_observation_literals": [],
       "user_prompt_literals": [
@@ -444,25 +470,27 @@
       ]
     },
     {
-      "candidate_origin": "ctspc_legacy_file_path",
+      "candidate_origin": "theory_prior_explicit_literal_from_source_result_context",
       "case_id": "multi_turn_miss_func_21",
       "category": "multi_turn_miss_func",
-      "failure_reason": "ambiguous",
+      "disambiguation_cue": "file_name_exact_prompt_literal",
+      "failure_reason": null,
       "gold_or_source_tool_args": {
         "file_name": "ProjectOverview.txt"
       },
       "literal_in_current_observation": false,
       "literal_in_current_request": true,
       "literal_only_in_source_result": false,
-      "literal_source": "source_result_tool_args",
-      "literal_uniqueness": false,
+      "literal_source": "current_request",
+      "literal_uniqueness": true,
       "literal_value": "ProjectOverview.txt",
       "required_arg": "file_name",
-      "retain_prior_candidate": false,
+      "retain_prior_candidate": true,
       "schema_required_args": [
         "file_name"
       ],
       "schema_type_match": true,
+      "selected_literal": "ProjectOverview.txt",
       "tool": "cat",
       "tool_observation_literals": [],
       "user_prompt_literals": [
@@ -477,23 +505,25 @@
       ]
     },
     {
-      "candidate_origin": "ctspc_legacy_file_path",
+      "candidate_origin": "theory_prior_explicit_literal_from_source_result_context",
       "case_id": "multi_turn_miss_func_28",
       "category": "multi_turn_miss_func",
-      "failure_reason": "ambiguous",
+      "disambiguation_cue": "exact_prompt_literal",
+      "failure_reason": null,
       "gold_or_source_tool_args": {
         "name": "analysis"
       },
       "literal_in_current_observation": false,
       "literal_in_current_request": true,
       "literal_only_in_source_result": false,
-      "literal_source": "source_result_tool_args",
-      "literal_uniqueness": false,
+      "literal_source": "current_request",
+      "literal_uniqueness": true,
       "literal_value": "analysis",
       "required_arg": "name",
-      "retain_prior_candidate": false,
+      "retain_prior_candidate": true,
       "schema_required_args": [],
       "schema_type_match": true,
+      "selected_literal": "analysis",
       "tool": "find",
       "tool_observation_literals": [],
       "user_prompt_literals": [
@@ -502,10 +532,11 @@
       ]
     },
     {
-      "candidate_origin": "ctspc_legacy_file_path",
+      "candidate_origin": "theory_prior_explicit_literal_from_source_result_context",
       "case_id": "multi_turn_miss_func_0",
       "category": "multi_turn_miss_func",
-      "failure_reason": "ambiguous",
+      "disambiguation_cue": "source_file_exact_prompt_literal",
+      "failure_reason": null,
       "gold_or_source_tool_args": {
         "destination": "temp",
         "source": "final_report.pdf"
@@ -513,16 +544,17 @@
       "literal_in_current_observation": false,
       "literal_in_current_request": true,
       "literal_only_in_source_result": false,
-      "literal_source": "source_result_tool_args",
-      "literal_uniqueness": false,
+      "literal_source": "current_request",
+      "literal_uniqueness": true,
       "literal_value": "final_report.pdf",
       "required_arg": "source",
-      "retain_prior_candidate": false,
+      "retain_prior_candidate": true,
       "schema_required_args": [
         "source",
         "destination"
       ],
       "schema_type_match": true,
+      "selected_literal": "final_report.pdf",
       "tool": "mv",
       "tool_observation_literals": [],
       "user_prompt_literals": [
@@ -536,6 +568,7 @@
       "candidate_origin": "ctspc_legacy_file_path",
       "case_id": "multi_turn_miss_func_1",
       "category": "multi_turn_miss_func",
+      "disambiguation_cue": null,
       "failure_reason": "source_result_only",
       "gold_or_source_tool_args": {
         "a": true
@@ -550,6 +583,7 @@
       "retain_prior_candidate": false,
       "schema_required_args": [],
       "schema_type_match": true,
+      "selected_literal": null,
       "tool": "ls",
       "tool_observation_literals": [],
       "user_prompt_literals": []
@@ -558,6 +592,7 @@
       "candidate_origin": "ctspc_legacy_file_path",
       "case_id": "multi_turn_miss_func_4",
       "category": "multi_turn_miss_func",
+      "disambiguation_cue": null,
       "failure_reason": "source_result_only",
       "gold_or_source_tool_args": {
         "file_name": "report.txt"
@@ -572,6 +607,7 @@
       "retain_prior_candidate": false,
       "schema_required_args": [],
       "schema_type_match": true,
+      "selected_literal": null,
       "tool": "sort",
       "tool_observation_literals": [],
       "user_prompt_literals": [
@@ -579,10 +615,11 @@
       ]
     },
     {
-      "candidate_origin": "ctspc_legacy_file_path",
+      "candidate_origin": "theory_prior_explicit_literal_from_source_result_context",
       "case_id": "multi_turn_miss_func_8",
       "category": "multi_turn_miss_func",
-      "failure_reason": "ambiguous",
+      "disambiguation_cue": "file_name_exact_prompt_literal",
+      "failure_reason": null,
       "gold_or_source_tool_args": {
         "file_name": "experiment_log.txt",
         "pattern": "Anomaly"
@@ -590,16 +627,17 @@
       "literal_in_current_observation": false,
       "literal_in_current_request": true,
       "literal_only_in_source_result": false,
-      "literal_source": "source_result_tool_args",
-      "literal_uniqueness": false,
+      "literal_source": "current_request",
+      "literal_uniqueness": true,
       "literal_value": "experiment_log.txt",
       "required_arg": "file_name",
-      "retain_prior_candidate": false,
+      "retain_prior_candidate": true,
       "schema_required_args": [
         "file_name",
         "pattern"
       ],
       "schema_type_match": true,
+      "selected_literal": "experiment_log.txt",
       "tool": "grep",
       "tool_observation_literals": [],
       "user_prompt_literals": [
@@ -613,25 +651,27 @@
       ]
     },
     {
-      "candidate_origin": "ctspc_legacy_file_path",
+      "candidate_origin": "theory_prior_explicit_literal_from_source_result_context",
       "case_id": "multi_turn_miss_func_12",
       "category": "multi_turn_miss_func",
-      "failure_reason": "ambiguous",
+      "disambiguation_cue": "file_name_exact_prompt_literal",
+      "failure_reason": null,
       "gold_or_source_tool_args": {
         "file_name": "summary.txt"
       },
       "literal_in_current_observation": false,
       "literal_in_current_request": true,
       "literal_only_in_source_result": false,
-      "literal_source": "source_result_tool_args",
-      "literal_uniqueness": false,
+      "literal_source": "current_request",
+      "literal_uniqueness": true,
       "literal_value": "summary.txt",
       "required_arg": "file_name",
-      "retain_prior_candidate": false,
+      "retain_prior_candidate": true,
       "schema_required_args": [
         "file_name"
       ],
       "schema_type_match": true,
+      "selected_literal": "summary.txt",
       "tool": "touch",
       "tool_observation_literals": [],
       "user_prompt_literals": [
@@ -644,25 +684,27 @@
       ]
     },
     {
-      "candidate_origin": "ctspc_legacy_file_path",
+      "candidate_origin": "theory_prior_explicit_literal_from_source_result_context",
       "case_id": "multi_turn_miss_func_25",
       "category": "multi_turn_miss_func",
-      "failure_reason": "ambiguous",
+      "disambiguation_cue": "file_name_exact_prompt_literal",
+      "failure_reason": null,
       "gold_or_source_tool_args": {
         "file_name": "summary.txt"
       },
       "literal_in_current_observation": false,
       "literal_in_current_request": true,
       "literal_only_in_source_result": false,
-      "literal_source": "source_result_tool_args",
-      "literal_uniqueness": false,
+      "literal_source": "current_request",
+      "literal_uniqueness": true,
       "literal_value": "summary.txt",
       "required_arg": "file_name",
-      "retain_prior_candidate": false,
+      "retain_prior_candidate": true,
       "schema_required_args": [
         "file_name"
       ],
       "schema_type_match": true,
+      "selected_literal": "summary.txt",
       "tool": "cat",
       "tool_observation_literals": [],
       "user_prompt_literals": [
@@ -676,6 +718,7 @@
       "candidate_origin": "ctspc_legacy_file_path",
       "case_id": "multi_turn_miss_func_26",
       "category": "multi_turn_miss_func",
+      "disambiguation_cue": null,
       "failure_reason": "source_result_only",
       "gold_or_source_tool_args": {
         "folder": "tmp"
@@ -690,28 +733,31 @@
       "retain_prior_candidate": false,
       "schema_required_args": [],
       "schema_type_match": true,
+      "selected_literal": null,
       "tool": "cd",
       "tool_observation_literals": [],
       "user_prompt_literals": []
     },
     {
-      "candidate_origin": "ctspc_legacy_file_path",
+      "candidate_origin": "theory_prior_explicit_literal_from_source_result_context",
       "case_id": "multi_turn_miss_func_15",
       "category": "multi_turn_miss_func",
-      "failure_reason": "ambiguous",
+      "disambiguation_cue": "file_name_exact_prompt_literal",
+      "failure_reason": null,
       "gold_or_source_tool_args": {
         "file_name": "DataSet1.csv"
       },
       "literal_in_current_observation": false,
       "literal_in_current_request": true,
       "literal_only_in_source_result": false,
-      "literal_source": "source_result_tool_args",
-      "literal_uniqueness": false,
+      "literal_source": "current_request",
+      "literal_uniqueness": true,
       "literal_value": "DataSet1.csv",
       "required_arg": "file_name",
-      "retain_prior_candidate": false,
+      "retain_prior_candidate": true,
       "schema_required_args": [],
       "schema_type_match": true,
+      "selected_literal": "DataSet1.csv",
       "tool": "touch",
       "tool_observation_literals": [],
       "user_prompt_literals": [
@@ -730,6 +776,7 @@
       "candidate_origin": "ctspc_legacy_file_path",
       "case_id": "multi_turn_miss_func_24",
       "category": "multi_turn_miss_func",
+      "disambiguation_cue": null,
       "failure_reason": "source_result_only",
       "gold_or_source_tool_args": {
         "file_name1": "./report_draft.txt",
@@ -748,6 +795,7 @@
         "file_name2"
       ],
       "schema_type_match": true,
+      "selected_literal": null,
       "tool": "diff",
       "tool_observation_literals": [],
       "user_prompt_literals": [
@@ -760,8 +808,9 @@
   ],
   "report_scope": "m2_8pre_raw_bfcl_literal_coverage_audit",
   "route_recommendation": "fix_current_context_literal_extractor",
+  "scanner_missed_count": 0,
   "source_result_diagnostic_literal_count": 25,
   "source_result_literals_prompt_anchored_count": 17,
   "source_result_literals_prompt_coverage_zero": false,
-  "source_result_literals_retain_prior_candidate_count": 1
+  "source_result_literals_retain_prior_candidate_count": 17
 }

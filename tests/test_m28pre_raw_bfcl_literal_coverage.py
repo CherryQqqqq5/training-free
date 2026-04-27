@@ -66,7 +66,7 @@ def test_raw_prompt_audit_classifies_prompt_source_ambiguous_schema_and_scanner_
     entries = {
         "prompt_unique": _entry("prompt_unique", "Set height to 5."),
         "source_only": _entry("source_only", "Set the height from the available source."),
-        "ambiguous": _entry("ambiguous", "Try height 5 and width 6."),
+        "ambiguous": _entry("ambiguous", "Try values 5 and 6."),
         "schema_bad": _entry("schema_bad", "Set height to five."),
     }
     results = {case_id: _result(row["literal_value"]) for case_id, row in [("prompt_unique", _candidate("prompt_unique", 5)), ("source_only", _candidate("source_only", 5)), ("ambiguous", _candidate("ambiguous", 5)), ("schema_bad", _candidate("schema_bad", "five"))]}
