@@ -72,7 +72,7 @@ def _classify_slice(row: dict[str, Any]) -> list[str]:
     return sorted(set(slices))
 
 
-def build_manifest(dev_root: Path = DEFAULT_DEV_ROOT, source_pool: Path = DEFAULT_SOURCE_POOL, holdout_root: Path = DEFAULT_HOLDOUT, max_cases_per_slice: int = 20) -> dict[str, Any]:
+def build_manifest(dev_root: Path = DEFAULT_DEV_ROOT, source_pool: Path = DEFAULT_SOURCE_POOL, holdout_root: Path = DEFAULT_HOLDOUT, max_cases_per_slice: int = 40) -> dict[str, Any]:
     dev = _read_json(dev_root / "paired_subset_manifest.json", {}) or {}
     holdout = _read_json(holdout_root / "holdout_manifest.json", {}) or {}
     excluded = {str(x) for x in dev.get("selected_case_ids") or []}
@@ -162,9 +162,10 @@ def main() -> int:
     parser.add_argument("--holdout-root", type=Path, default=DEFAULT_HOLDOUT)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUT)
     parser.add_argument("--markdown-output", type=Path, default=DEFAULT_MD)
+    parser.add_argument("--max-cases-per-slice", type=int, default=40)
     parser.add_argument("--compact", action="store_true")
     args = parser.parse_args()
-    report = build_manifest(args.dev_root, args.source_pool_root, args.holdout_root)
+    report = build_manifest(args.dev_root, args.source_pool_root, args.holdout_root, max_cases_per_slice=args.max_cases_per_slice)
     _write_json(args.output, report)
     args.markdown_output.parent.mkdir(parents=True, exist_ok=True)
     args.markdown_output.write_text(render_markdown(report), encoding="utf-8")
