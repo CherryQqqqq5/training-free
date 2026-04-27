@@ -7,8 +7,31 @@ from grc.runtime.engine import RuleEngine
 from scripts.build_m27t_source_pool_manifest import build_source_pool_manifest, discover_source_categories, _load_category_ids
 from scripts.check_m27tw_offline import evaluate as evaluate_tw
 from scripts.diagnose_m27w_rule_retention import decide
+from grc.compiler.retention_priors import explicit_required_arg_literal_prior
 
 def _wj(p:Path,d:dict): p.parent.mkdir(parents=True,exist_ok=True); p.write_text(json.dumps(d)+'\n')
+
+def _retention_prior_rule(**overrides):
+    rule={
+        'rule_type':'explicit_required_arg_literal_completion',
+        'candidate_rules_type':'explicit_required_arg_literal_completion',
+        'required_arg':'content',
+        'schema_arg_name':'content',
+        'literal_value':'hello',
+        'literal_source':'source_result_tool_args',
+        'no_next_tool_intervention':True,
+        'exact_tool_choice':False,
+        'ctspc_v0_action_rule':False,
+        'net_case_gain':1,
+        'regressed_count':0,
+        'tool_match_rate':1.0,
+        'arg_match_rate':1.0,
+        'trajectory_fail_count':0,
+        'fixed_count':1,
+    }
+    rule.update(overrides)
+    rule['retention_prior']=explicit_required_arg_literal_prior(rule)
+    return rule
 def test_source_pool_manifest_emits_baseline_only_commands_when_missing(tmp_path:Path):
     dev=tmp_path/'dev'; _wj(dev/'paired_subset_manifest.json',{'source_run_root':str(tmp_path/'source'),'runtime_config':'configs/runtime_bfcl_structured.yaml'})
     r=build_source_pool_manifest(dev,tmp_path/'pool',tmp_path/'repo',categories=['multi_turn_base'])
@@ -90,8 +113,10 @@ def test_runtime_validation_alias_and_path_normalized_fields():
     norm=RuleEngine._validate_action_candidate_args_normalized(candidate, {'path':'/workspace/a.txt'})
     assert norm['file_name']['path_normalized_match'] is True
 
-def test_rule_retention_requires_holdout_for_retain():
-    rule={'net_case_gain':1,'regressed_count':0,'tool_match_rate':1.0,'arg_match_rate':1.0,'trajectory_fail_count':0,'fixed_count':1}
+def test_rule_retention_requires_theory_prior_and_holdout_for_demote():
+    no_prior={'net_case_gain':1,'regressed_count':0,'tool_match_rate':1.0,'arg_match_rate':1.0,'trajectory_fail_count':0,'fixed_count':1}
+    assert decide(no_prior, True, True)[0]=='reject'
+    rule=_retention_prior_rule()
     assert decide(rule, False, True)[0]=='reject'
     assert decide(rule, True, True)[0]=='demote'
 
@@ -107,10 +132,11 @@ def test_m27tw_summary_requires_all_gates(tmp_path:Path):
 
 
 def test_rule_retention_can_mark_demote_ready_after_offline_uv_with_holdout():
-    rule={'net_case_gain':1,'regressed_count':0,'tool_match_rate':1.0,'arg_match_rate':1.0,'trajectory_fail_count':0,'fixed_count':1}
+    rule=_retention_prior_rule()
     decision, reason, extra = decide(rule, True, True)
     assert decision == 'demote'
     assert extra['retain_blocked_by'] == 'missing_holdout_scorer_evidence'
+    assert extra['retain_prior_match'] is True
 
 def test_required_pair_validation_blocks_incomplete_cp_candidate():
     candidate={'tool':'cp','args':{'source':'a.txt'},'arg_bindings':{'source':{'source':'explicit_literal','value':'a.txt'}}}
@@ -120,11 +146,12 @@ def test_required_pair_validation_blocks_incomplete_cp_candidate():
 
 
 def test_rule_retention_negative_dev_scorer_blocks_demote_ready():
-    rule={'net_case_gain':1,'regressed_count':0,'tool_match_rate':1.0,'arg_match_rate':1.0,'trajectory_fail_count':0,'fixed_count':1}
+    rule=_retention_prior_rule()
     decision, reason, extra = decide(rule, True, True, dev_scorer_net_case_gain=-2)
-    assert decision == 'demote'
+    assert decision == 'reject'
+    assert reason == 'negative_scorer_evidence_creates_mismatch_diagnostic'
     assert 'negative_overall_dev_scorer_net_gain' in extra['blockers']
-    assert extra['retain_blocked_by'] == 'missing_holdout_scorer_evidence'
+    assert extra['retain_blocked_by'] == 'negative_dev_scorer_mismatch_diagnostic_required'
 
 def test_m27tw_proxy_calibration_blocks_when_last_scorer_arg_low(tmp_path:Path):
     root=tmp_path/'subset'; hold=tmp_path/'hold'; source=tmp_path/'source'

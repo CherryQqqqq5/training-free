@@ -14,6 +14,8 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
+from grc.compiler.retention_priors import explicit_required_arg_literal_prior, summarize_retention_priors
+
 DEFAULT_LOW_RISK = Path("outputs/artifacts/bfcl_ctspc_low_risk_slices_v1/low_risk_slice_manifest.json")
 DEFAULT_STATUS = Path("outputs/artifacts/bfcl_ctspc_subset30_v1/m27ae_ctspc_v0_status.json")
 DEFAULT_OUT_ROOT = Path("outputs/artifacts/bfcl_explicit_required_arg_literal_v1")
@@ -130,7 +132,22 @@ def _compile_record(record: dict[str, Any], result: dict[str, Any] | None, slice
         literal = str(value)
         ambiguous = literal.strip() == "" or len(literal) > 240
         if ambiguous:
-            return {**base, "candidate_generatable": False, "rejection_reason": "ambiguous_literal"}
+            return {
+                **base,
+                "tool": tool,
+                "required_arg": arg_name,
+                "literal_value": literal,
+                "literal_source": "source_result_tool_args",
+                "schema_arg_name": arg_name,
+                "candidate_generatable": False,
+                "rejection_reason": "ambiguous_literal",
+                "rule_type": "explicit_required_arg_literal_completion",
+                "candidate_rules_type": "explicit_required_arg_literal_completion",
+                "no_next_tool_intervention": True,
+                "exact_tool_choice": False,
+                "guidance_only": True,
+                "ctspc_v0_action_rule": False,
+            }
         return {
             **base,
             "tool": tool,
@@ -170,7 +187,9 @@ def _compile_records(records: list[dict[str, Any]], slice_name: str, load_result
     compiled: list[dict[str, Any]] = []
     for record in records:
         results = load_result(record)
-        compiled.append(_compile_record(record, results.get(str(record.get("case_id") or "")), slice_name))
+        item = _compile_record(record, results.get(str(record.get("case_id") or "")), slice_name)
+        item["retention_prior"] = explicit_required_arg_literal_prior(item)
+        compiled.append(item)
     return compiled
 
 
@@ -230,6 +249,10 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
         for slice_name in item.get("low_risk_slices") or []:
             if slice_name in STRATIFIED_SLICES:
                 stratified_counts[slice_name] += 1
+    explicit_prior_distribution = summarize_retention_priors(explicit_generatable)
+    stratified_prior_distribution = summarize_retention_priors(stratified_generatable)
+    retain_eligible_candidate_count = explicit_prior_distribution.get("demote_candidate", 0) + explicit_prior_distribution.get("retain_candidate_after_holdout", 0)
+    stratified_retain_eligible_candidate_count = stratified_prior_distribution.get("demote_candidate", 0) + stratified_prior_distribution.get("retain_candidate_after_holdout", 0)
 
     ctspc_off = bool(
         status.get("ctspc_v0_frozen")
@@ -281,6 +304,12 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
         "candidate_rules_type": "explicit_required_arg_literal_completion",
         "no_next_tool_intervention": True,
         "exact_tool_choice": False,
+        "retention_prior_required": True,
+        "retention_prior_rule_family": "explicit_required_arg_literal_completion",
+        "retention_prior_distribution": explicit_prior_distribution,
+        "stratified_retention_prior_distribution": stratified_prior_distribution,
+        "retain_eligible_candidate_count": retain_eligible_candidate_count,
+        "stratified_retain_eligible_candidate_count": stratified_retain_eligible_candidate_count,
         "selected_case_count": len(explicit_records),
         "candidate_generatable_count": len(explicit_generatable),
         "ambiguous_literal_count": explicit_ambiguous,
@@ -389,6 +418,8 @@ def main() -> int:
             "candidate_generatable_count": report["candidate_generatable_count"],
             "stratified_selected_case_count": report["stratified_selected_case_count"],
             "stratified_candidate_generatable_count": report["stratified_candidate_generatable_count"],
+            "retention_prior_distribution": report["retention_prior_distribution"],
+            "stratified_retention_prior_distribution": report["stratified_retention_prior_distribution"],
             "blockers": report["blockers"],
             "planned_commands": report["planned_commands"],
         }, indent=2, sort_keys=True))

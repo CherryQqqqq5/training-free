@@ -78,6 +78,11 @@ def test_explicit_required_arg_literal_compiler_builds_dev_holdout_without_comma
     assert len(set(report["dev_manifest"]["selected_case_ids"]) & set(report["holdout_manifest"]["selected_case_ids"])) == 0
     assert all(rule["no_next_tool_intervention"] for rule in report["candidate_rules"])
     assert all(rule["exact_tool_choice"] is False for rule in report["candidate_rules"])
+    assert all(rule["retention_prior"]["retain_eligibility"] == "demote_candidate" for rule in report["candidate_rules"])
+    assert report["retention_prior_distribution"]["demote_candidate"] == 40
+    assert report["retain_eligible_candidate_count"] == 40
+    assert all(rule["retention_prior"]["trajectory_mutation"] is False for rule in report["candidate_rules"])
+    assert all(rule["retention_prior"]["tool_choice_mutation"] is False for rule in report["candidate_rules"])
 
 
 def test_explicit_literal_compiler_rejects_ambiguous_or_missing_literals(tmp_path: Path) -> None:
@@ -96,6 +101,7 @@ def test_explicit_literal_compiler_rejects_ambiguous_or_missing_literals(tmp_pat
 
     assert report["candidate_generatable_count"] == 0
     assert report["ambiguous_literal_count"] == 1
+    assert report["rejected_candidates"][0]["retention_prior"]["retain_eligibility"] == "diagnostic_only"
     assert {row["rejection_reason"] for row in report["rejected_candidates"]} == {"ambiguous_literal", "missing_source_result"}
 
 
@@ -104,7 +110,7 @@ def test_m28pre_offline_requires_freeze_repair_compiler_holdout_and_no_commands(
     low = tmp_path / "low"
     _wj(subset / "m27ae_ctspc_v0_status.json", {"ctspc_v0_frozen": True, "scorer_default": "off", "retain": 0, "dev_rerun_authorized": False, "holdout_authorized": False})
     _wj(subset / "repair_stack_contribution.json", {"repair_stack_split_ready": True})
-    _wj(low / "compiler_summary.json", {"compiler_ready": True, "explicit_holdout_ready": True, "stratified_holdout_ready": False, "ctspc_v0_action_rules_enabled": False, "ctspc_v0_file_path_multi_turn_enabled": False, "repair_stack_default": "disabled", "candidate_rules_type": "explicit_required_arg_literal_completion", "no_next_tool_intervention": True, "exact_tool_choice": False, "planned_commands": [], "candidate_commands": []})
+    _wj(low / "compiler_summary.json", {"compiler_ready": True, "explicit_holdout_ready": True, "stratified_holdout_ready": False, "ctspc_v0_action_rules_enabled": False, "ctspc_v0_file_path_multi_turn_enabled": False, "repair_stack_default": "disabled", "candidate_rules_type": "explicit_required_arg_literal_completion", "no_next_tool_intervention": True, "exact_tool_choice": False, "retention_prior_required": True, "retain_eligible_candidate_count": 1, "planned_commands": [], "candidate_commands": []})
     _wj(low / "explicit_required_arg_literal_dev20_manifest.json", {"selected_case_ids": ["a"], "planned_commands": []})
     _wj(low / "explicit_required_arg_literal_holdout20_manifest.json", {"selected_case_ids": ["b"], "planned_commands": []})
 
@@ -164,6 +170,7 @@ def test_stratified_fallback_preserves_slice_labels_without_commands(tmp_path: P
     assert report["explicit_holdout_ready"] is False
     assert report["stratified_holdout_ready"] is True
     assert report["scorer_authorization_ready"] is True
+    assert report["stratified_retention_prior_distribution"]["demote_candidate"] == 45
     assert report["planned_commands"] == []
     assert report["candidate_commands"] == []
     assert set(report["stratified_counts"]) == set(slice_cases)
@@ -174,7 +181,7 @@ def test_m28pre_safeguards_fail_when_ctspc_or_repair_stack_enabled(tmp_path: Pat
     low = tmp_path / "low"
     _wj(subset / "m27ae_ctspc_v0_status.json", {"ctspc_v0_frozen": True, "scorer_default": "off", "retain": 0, "dev_rerun_authorized": False, "holdout_authorized": False})
     _wj(subset / "repair_stack_contribution.json", {"repair_stack_split_ready": True})
-    _wj(low / "compiler_summary.json", {"compiler_ready": True, "explicit_holdout_ready": True, "ctspc_v0_action_rules_enabled": True, "ctspc_v0_file_path_multi_turn_enabled": False, "repair_stack_default": "enabled", "candidate_rules_type": "explicit_required_arg_literal_completion", "no_next_tool_intervention": True, "exact_tool_choice": False, "planned_commands": [], "candidate_commands": []})
+    _wj(low / "compiler_summary.json", {"compiler_ready": True, "explicit_holdout_ready": True, "ctspc_v0_action_rules_enabled": True, "ctspc_v0_file_path_multi_turn_enabled": False, "repair_stack_default": "enabled", "candidate_rules_type": "explicit_required_arg_literal_completion", "no_next_tool_intervention": True, "exact_tool_choice": False, "retention_prior_required": True, "retain_eligible_candidate_count": 1, "planned_commands": [], "candidate_commands": []})
     _wj(low / "explicit_required_arg_literal_dev20_manifest.json", {"selected_case_ids": ["a"], "planned_commands": []})
     _wj(low / "explicit_required_arg_literal_holdout20_manifest.json", {"selected_case_ids": ["b"], "planned_commands": []})
 

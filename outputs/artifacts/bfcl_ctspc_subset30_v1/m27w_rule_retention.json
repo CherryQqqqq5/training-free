@@ -7,13 +7,16 @@
   },
   "dev_scorer_net_case_gain": -3,
   "diagnostic": {
+    "bfcl_score_cannot_create_retain_rule": true,
     "dev_only_cannot_promote_to_retained_memory": true,
     "m27ad_fallback_selection_used_for_retention_gate": true,
+    "missing_prior_defaults_to_never_retain": true,
     "negative_dev_scorer_blocks_retain": true,
     "offline_readiness_only": true,
     "pattern_level_feedback_used_for_retention_gate": true,
     "regression_candidates_rejected_or_record_only_until_gap_fixed": true,
-    "retain_requires_future_holdout_scorer_evidence": true
+    "retain_requires_future_holdout_scorer_evidence": true,
+    "theory_prior_required_for_retention": true
   },
   "holdout_manifest_ready": true,
   "holdout_root": "outputs/artifacts/bfcl_ctspc_holdout30_v1",
@@ -112,15 +115,32 @@
       ],
       "activation_count": 13,
       "arg_match_rate": 0.3076923076923077,
+      "bfcl_failure_reason": "rule_not_applicable",
       "decision": "reject",
       "decision_blocker": {
+        "bfcl_failure_reason": "rule_not_applicable",
         "blockers": [
+          "retention_prior_never_retain",
           "dev_tool_match_below_floor",
           "dev_arg_match_below_floor",
           "trajectory_fail_exceeds_fixed",
           "negative_overall_dev_scorer_net_gain"
         ],
-        "retain_blocked_by": "missing_positive_dev_and_holdout_evidence"
+        "retain_blocked_by": "missing_theory_guided_retention_prior",
+        "retain_prior_match": false,
+        "retention_prior": {
+          "exact_tool_choice": false,
+          "intervention_scope": "unknown",
+          "literal_source": "unknown",
+          "postcondition_local": false,
+          "precondition_observable": false,
+          "prior_rejection_reason": "missing_retention_prior",
+          "retain_eligibility": "never_retain",
+          "rule_family": "unknown",
+          "theory_class": "none",
+          "tool_choice_mutation": false,
+          "trajectory_mutation": true
+        }
       },
       "dev_only_signal": true,
       "dev_scorer_net_case_gain": -3,
@@ -130,8 +150,22 @@
       "holdout_scorer_evidence_available": false,
       "net_case_gain": 0,
       "not_activated_count": 17,
-      "reason": "no_positive_retention_signal",
+      "reason": "retention_prior_not_eligible",
       "regressed_count": 0,
+      "retain_prior_match": false,
+      "retention_prior": {
+        "exact_tool_choice": false,
+        "intervention_scope": "unknown",
+        "literal_source": "unknown",
+        "postcondition_local": false,
+        "precondition_observable": false,
+        "prior_rejection_reason": "missing_retention_prior",
+        "retain_eligibility": "never_retain",
+        "rule_family": "unknown",
+        "theory_class": "none",
+        "tool_choice_mutation": false,
+        "trajectory_mutation": true
+      },
       "rule_id": "rule_global_no_tool_actionable_no_tool_decision_prior_explicit_literals_present_prior_tool_outputs_present_tools_available_v1",
       "tool_match_rate": 0.5384615384615384,
       "trajectory_fail_count": 4
@@ -152,15 +186,32 @@
       ],
       "activation_count": 11,
       "arg_match_rate": 0.36363636363636365,
+      "bfcl_failure_reason": "rule_not_applicable",
       "decision": "reject",
       "decision_blocker": {
+        "bfcl_failure_reason": "rule_not_applicable",
         "blockers": [
+          "retention_prior_never_retain",
           "dev_tool_match_below_floor",
           "dev_arg_match_below_floor",
           "trajectory_fail_exceeds_fixed",
           "negative_overall_dev_scorer_net_gain"
         ],
-        "retain_blocked_by": "missing_positive_dev_and_holdout_evidence"
+        "retain_blocked_by": "missing_theory_guided_retention_prior",
+        "retain_prior_match": false,
+        "retention_prior": {
+          "exact_tool_choice": false,
+          "intervention_scope": "unknown",
+          "literal_source": "unknown",
+          "postcondition_local": false,
+          "precondition_observable": false,
+          "prior_rejection_reason": "missing_retention_prior",
+          "retain_eligibility": "never_retain",
+          "rule_family": "unknown",
+          "theory_class": "none",
+          "tool_choice_mutation": false,
+          "trajectory_mutation": true
+        }
       },
       "dev_only_signal": true,
       "dev_scorer_net_case_gain": -3,
@@ -170,8 +221,22 @@
       "holdout_scorer_evidence_available": false,
       "net_case_gain": 0,
       "not_activated_count": 19,
-      "reason": "no_positive_retention_signal",
+      "reason": "retention_prior_not_eligible",
       "regressed_count": 0,
+      "retain_prior_match": false,
+      "retention_prior": {
+        "exact_tool_choice": false,
+        "intervention_scope": "unknown",
+        "literal_source": "unknown",
+        "postcondition_local": false,
+        "precondition_observable": false,
+        "prior_rejection_reason": "missing_retention_prior",
+        "retain_eligibility": "never_retain",
+        "rule_family": "unknown",
+        "theory_class": "none",
+        "tool_choice_mutation": false,
+        "trajectory_mutation": true
+      },
       "rule_id": "rule_global_no_tool_actionable_no_tool_decision_prior_tool_outputs_present_tools_available_v1",
       "tool_match_rate": 0.5454545454545454,
       "trajectory_fail_count": 4
@@ -193,15 +258,32 @@
       ],
       "activation_count": 12,
       "arg_match_rate": 0.3333333333333333,
+      "bfcl_failure_reason": "rule_not_applicable",
       "decision": "reject",
       "decision_blocker": {
+        "bfcl_failure_reason": "rule_not_applicable",
         "blockers": [
+          "retention_prior_never_retain",
           "dev_tool_match_below_floor",
           "dev_arg_match_below_floor",
           "trajectory_fail_exceeds_fixed",
           "negative_overall_dev_scorer_net_gain"
         ],
-        "retain_blocked_by": "missing_positive_dev_and_holdout_evidence"
+        "retain_blocked_by": "missing_theory_guided_retention_prior",
+        "retain_prior_match": false,
+        "retention_prior": {
+          "exact_tool_choice": false,
+          "intervention_scope": "unknown",
+          "literal_source": "unknown",
+          "postcondition_local": false,
+          "precondition_observable": false,
+          "prior_rejection_reason": "missing_retention_prior",
+          "retain_eligibility": "never_retain",
+          "rule_family": "unknown",
+          "theory_class": "none",
+          "tool_choice_mutation": false,
+          "trajectory_mutation": true
+        }
       },
       "dev_only_signal": true,
       "dev_scorer_net_case_gain": -3,
@@ -211,8 +293,22 @@
       "holdout_scorer_evidence_available": false,
       "net_case_gain": 1,
       "not_activated_count": 18,
-      "reason": "no_positive_retention_signal",
+      "reason": "retention_prior_not_eligible",
       "regressed_count": 0,
+      "retain_prior_match": false,
+      "retention_prior": {
+        "exact_tool_choice": false,
+        "intervention_scope": "unknown",
+        "literal_source": "unknown",
+        "postcondition_local": false,
+        "precondition_observable": false,
+        "prior_rejection_reason": "missing_retention_prior",
+        "retain_eligibility": "never_retain",
+        "rule_family": "unknown",
+        "theory_class": "none",
+        "tool_choice_mutation": false,
+        "trajectory_mutation": true
+      },
       "rule_id": "rule_global_no_tool_post_tool_prose_summary_v1",
       "tool_match_rate": 0.5833333333333334,
       "trajectory_fail_count": 3

@@ -59,6 +59,8 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         and compiler.get("candidate_rules_type") == "explicit_required_arg_literal_completion"
         and compiler.get("no_next_tool_intervention") is True
         and compiler.get("exact_tool_choice") is False
+        and compiler.get("retention_prior_required") is True
+        and int(compiler.get("retain_eligible_candidate_count") or 0) > 0
     )
     checks = {
         "ctspc_v0_frozen": freeze,
@@ -99,6 +101,12 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
             "required_stratified_total",
             "required_stratified_candidate_generatable",
             "blockers",
+            "retention_prior_required",
+            "retention_prior_rule_family",
+            "retention_prior_distribution",
+            "stratified_retention_prior_distribution",
+            "retain_eligible_candidate_count",
+            "stratified_retain_eligible_candidate_count",
         ]},
         "dev_manifest": {key: dev.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "no_next_tool_intervention", "exact_tool_choice"]},
         "holdout_manifest": {key: holdout.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "no_next_tool_intervention", "exact_tool_choice"]},

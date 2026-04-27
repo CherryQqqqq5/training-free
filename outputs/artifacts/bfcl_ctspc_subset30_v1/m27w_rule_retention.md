@@ -7,4 +7,4 @@
 - Decisions: `{'retain': 0, 'demote': 0, 'reject': 3}`
 - Regression cases: `4`
 
-Retain remains blocked until holdout scorer evidence exists; negative dev scorer evidence forces regression-causing candidates to reject or record-only.
+Retain remains blocked until a theory-guided prior and holdout scorer evidence both exist; BFCL score alone cannot create retained memory.

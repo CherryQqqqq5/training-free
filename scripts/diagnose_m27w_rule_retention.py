@@ -7,6 +7,15 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+from grc.compiler.retention_priors import (
+    DEMOTE_CANDIDATE,
+    DIAGNOSTIC_ONLY,
+    NEVER_RETAIN,
+    RETAIN_CANDIDATE_AFTER_HOLDOUT,
+    classify_bfcl_mismatch,
+    evaluate_retention_prior,
+)
+
 DEFAULT_ROOT = Path("outputs/artifacts/bfcl_ctspc_subset30_v1")
 DEFAULT_HOLDOUT = Path("outputs/artifacts/bfcl_ctspc_holdout30_v1")
 OUT = DEFAULT_ROOT / "m27w_rule_retention.json"
@@ -42,13 +51,24 @@ def _holdout_ready(holdout_root: Path) -> bool:
 
 
 def decide(rule: dict[str, Any], holdout_ready: bool, offline_ready: bool = False, *, dev_scorer_net_case_gain: int | None = None) -> tuple[str, str, dict[str, Any]]:
+    prior = evaluate_retention_prior(rule)
+    eligibility = str(prior.get("retain_eligibility") or NEVER_RETAIN)
+    retain_prior_match = eligibility in {DEMOTE_CANDIDATE, RETAIN_CANDIDATE_AFTER_HOLDOUT}
+    bfcl_failure_reason = classify_bfcl_mismatch(rule)
+    blockers: list[str] = []
+    if eligibility == NEVER_RETAIN:
+        blockers.append("retention_prior_never_retain")
+    elif eligibility == DIAGNOSTIC_ONLY:
+        blockers.append("retention_prior_diagnostic_only")
+    elif not retain_prior_match:
+        blockers.append("retention_prior_not_retain_eligible")
+
     net = int(rule.get("net_case_gain") or 0)
     regressed = int(rule.get("regressed_count") or 0)
     fixed = int(rule.get("fixed_count") or 0)
     tool = float(rule.get("tool_match_rate") or 0.0)
     arg = float(rule.get("arg_match_rate") or 0.0)
     trajectory_fail = int(rule.get("trajectory_fail_count") or 0)
-    blockers: list[str] = []
     if regressed > 0:
         blockers.append("has_regression")
     if net < 0:
@@ -66,11 +86,25 @@ def decide(rule: dict[str, Any], holdout_ready: bool, offline_ready: bool = Fals
     if dev_scorer_net_case_gain is not None and dev_scorer_net_case_gain < 0:
         blockers.append("negative_overall_dev_scorer_net_gain")
 
-    positive_zero_regression = net > 0 and regressed == 0 and fixed > 0 and tool >= 0.6 and arg >= 0.6 and trajectory_fail <= fixed
-    if positive_zero_regression and holdout_ready and offline_ready:
-        return "demote", "dev_positive_holdout_scorer_required_before_retain", {"retain_blocked_by": "missing_holdout_scorer_evidence", "blockers": blockers}
-    return "reject", "no_positive_retention_signal", {"retain_blocked_by": "missing_positive_dev_and_holdout_evidence", "blockers": blockers}
+    extra = {
+        "retention_prior": prior,
+        "retain_prior_match": retain_prior_match,
+        "bfcl_failure_reason": bfcl_failure_reason,
+        "blockers": blockers,
+    }
+    if not retain_prior_match:
+        extra["retain_blocked_by"] = "missing_theory_guided_retention_prior"
+        return "reject", "retention_prior_not_eligible", extra
 
+    positive_zero_regression = net > 0 and regressed == 0 and fixed > 0 and tool >= 0.6 and arg >= 0.6 and trajectory_fail <= fixed
+    if dev_scorer_net_case_gain is not None and dev_scorer_net_case_gain < 0:
+        extra["retain_blocked_by"] = "negative_dev_scorer_mismatch_diagnostic_required"
+        return "reject", "negative_scorer_evidence_creates_mismatch_diagnostic", extra
+    if positive_zero_regression and holdout_ready and offline_ready:
+        extra["retain_blocked_by"] = "missing_holdout_scorer_evidence"
+        return "demote", "theory_prior_dev_positive_holdout_scorer_required_before_retain", extra
+    extra["retain_blocked_by"] = "missing_positive_dev_and_holdout_evidence"
+    return "reject", "no_positive_retention_signal", extra
 
 def _regression_cases(root: Path) -> list[dict[str, Any]]:
     postmortem = _j(root / "m27q_postmortem.json", {}) or {}
@@ -122,6 +156,9 @@ def evaluate(root: Path = DEFAULT_ROOT, holdout_root: Path = DEFAULT_HOLDOUT) ->
             **rule,
             "decision": decision,
             "reason": reason,
+            "retention_prior": extra.get("retention_prior"),
+            "retain_prior_match": extra.get("retain_prior_match"),
+            "bfcl_failure_reason": extra.get("bfcl_failure_reason"),
             "dev_only_signal": bool(int(rule.get("activation_count") or 0) > 0),
             "holdout_manifest_ready": holdout_manifest_ready,
             "holdout_required_for_retain": True,
@@ -170,6 +207,9 @@ def evaluate(root: Path = DEFAULT_ROOT, holdout_root: Path = DEFAULT_HOLDOUT) ->
         "pattern_feedback_effective_for_regressions": pattern_feedback_effective,
         "m27w_rule_retention_passed": (demote_or_retain >= 1 and holdout_manifest_ready and offline_ready) or (holdout_manifest_ready and offline_ready and feedback_ready and scorer_feedback_covers_regressions and distribution.get("retain", 0) == 0),
         "diagnostic": {
+            "theory_prior_required_for_retention": True,
+            "bfcl_score_cannot_create_retain_rule": True,
+            "missing_prior_defaults_to_never_retain": True,
             "dev_only_cannot_promote_to_retained_memory": True,
             "retain_requires_future_holdout_scorer_evidence": True,
             "negative_dev_scorer_blocks_retain": bool(dev_scorer_net is not None and dev_scorer_net < 0),
@@ -194,7 +234,7 @@ def render_markdown(report: dict[str, Any]) -> str:
             f"- Decisions: `{report['decision_distribution']}`",
             f"- Regression cases: `{report['regression_case_count']}`",
             "",
-            "Retain remains blocked until holdout scorer evidence exists; negative dev scorer evidence forces regression-causing candidates to reject or record-only.",
+            "Retain remains blocked until a theory-guided prior and holdout scorer evidence both exist; BFCL score alone cannot create retained memory.",
             "",
         ]
     )
