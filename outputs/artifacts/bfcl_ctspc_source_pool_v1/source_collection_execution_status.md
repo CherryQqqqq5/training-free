@@ -1,9 +1,12 @@
 # M2.8-pre-c Source Collection Execution Status
 
 - Passed: `False`
-- Completed source collections: `0` / `8`
-- Failed stage: `baseline_preflight`
-- Failure reason: `http 402: {'error': {'message': 'Insufficient credits. Add more using https://openrouter.ai/settings/credits', 'code': 402}}`
-- Next blocker: `openrouter_insufficient_credits_for_baseline_source_collection`
+- Completed source collections: `1` / `8`
+- Completed categories: `['irrelevance']`
+- Failed category: `memory`
+- Failed stage: `bfcl_generate_dataset_entry_load`
+- Failure reason: `KeyError: 'MemoryAPI_' while BFCL loaded memory category predefined function docs`
+- Remaining missing categories: `['memory', 'multiple', 'parallel', 'parallel_multiple', 'simple_java', 'simple_javascript', 'simple_python']`
+- Next blocker: `bfcl_memory_category_dataset_function_doc_key_error`
 
 No candidate commands were run. No scorer authorization is granted.

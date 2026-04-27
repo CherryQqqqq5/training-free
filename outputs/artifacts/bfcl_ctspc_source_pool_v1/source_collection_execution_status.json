@@ -1,25 +1,57 @@
 {
-  "attempted_category": "irrelevance",
-  "attempted_command_index": 1,
+  "attempted_category": "memory",
+  "attempted_command_index": 2,
   "bfcl_evaluation_started": false,
-  "bfcl_generation_started": false,
+  "bfcl_generation_started": true,
   "candidate_commands": [],
-  "completed_source_collection_count": 0,
+  "completed_categories": [
+    "irrelevance"
+  ],
+  "completed_source_collection_count": 1,
   "does_not_authorize_scorer": true,
   "environment_key_present": true,
-  "failure_reason": "http 402: {'error': {'message': 'Insufficient credits. Add more using https://openrouter.ai/settings/credits', 'code': 402}}",
-  "failure_stage": "baseline_preflight",
-  "head": "a8ec7e5a",
-  "http_statuses": [
-    402
-  ],
-  "next_blocker": "openrouter_insufficient_credits_for_baseline_source_collection",
+  "failure_reason": "KeyError: 'MemoryAPI_' while BFCL loaded memory category predefined function docs",
+  "failure_stage": "bfcl_generate_dataset_entry_load",
+  "head": "6426127f",
+  "next_blocker": "bfcl_memory_category_dataset_function_doc_key_error",
   "no_candidate_rules": true,
-  "planned_command_count": 8,
-  "raw_trace_artifacts_uncommitted": true,
+  "planned_command_count_initial": 8,
+  "planned_command_count_remaining": 7,
+  "post_rebuild": {
+    "candidate_commands": [],
+    "m27t_source_pool_ready": false,
+    "missing_source_categories": [
+      "memory",
+      "multiple",
+      "parallel",
+      "parallel_multiple",
+      "simple_java",
+      "simple_javascript",
+      "simple_python"
+    ],
+    "ready_categories": [
+      "irrelevance",
+      "multi_turn_base",
+      "multi_turn_long_context",
+      "multi_turn_miss_func",
+      "multi_turn_miss_param"
+    ]
+  },
+  "raw_trace_score_result_artifacts_uncommitted": true,
+  "remaining_missing_categories": [
+    "memory",
+    "multiple",
+    "parallel",
+    "parallel_multiple",
+    "simple_java",
+    "simple_javascript",
+    "simple_python"
+  ],
   "report_scope": "m2_8pre_c_source_collection_execution_status",
-  "score_result_artifacts_created": false,
+  "score_result_artifacts_created_for_completed_categories": true,
   "source_collection_execution_passed": false,
   "source_collection_only": true,
-  "stopped_on_first_failure": true
+  "stopped_on_first_failure": true,
+  "upstream_model": "gpt-5.4",
+  "upstream_profile": "novacode"
 }
