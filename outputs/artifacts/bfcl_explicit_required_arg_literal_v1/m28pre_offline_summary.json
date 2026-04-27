@@ -1,4 +1,15 @@
 {
+  "blockers": [
+    "explicit_holdout_not_ready",
+    "runtime_manifest_safeguards_failed",
+    "explicit_prior_family_coverage_zero",
+    "explicit_current_context_coverage_below_35",
+    "explicit_total_below_40",
+    "explicit_demote_candidate_below_35",
+    "explicit_ambiguous_literal_present",
+    "explicit_holdout_below_20",
+    "stratified_without_complete_theory_priors_not_authorized"
+  ],
   "compiler": {
     "ambiguous_literal_count": 1,
     "blockers": [
@@ -35,9 +46,27 @@
       "retain_candidate_after_holdout": 0
     },
     "stratified_selected_case_count": 27,
-    "stratified_source_pool_expansion_required": true
+    "stratified_source_pool_expansion_required": true,
+    "theory_prior_explicit_literal_candidate_count": 0
   },
   "compiler_ready": true,
+  "coverage_audit": {
+    "ambiguous_current_context_literal_candidate_count": 1,
+    "candidate_commands": [],
+    "coverage_bucket_counts": {
+      "ambiguous_current_context_literal_candidate": 1,
+      "current_context_anchored_literal_candidate": 0,
+      "no_observable_literal_case": 2626,
+      "source_result_only_diagnostic_candidate": 25
+    },
+    "coverage_conclusion": "explicit_prior_family_coverage_zero",
+    "current_context_anchored_literal_candidate_count": 0,
+    "explicit_prior_family_coverage_zero": true,
+    "m28pre_retention_prior_coverage_audit_ready": true,
+    "no_observable_literal_case_count": 2626,
+    "planned_commands": [],
+    "source_result_only_diagnostic_candidate_count": 25
+  },
   "ctspc_v0_frozen": true,
   "dev_holdout_disjoint": true,
   "dev_manifest": {
@@ -50,11 +79,15 @@
     "selected_case_ids": []
   },
   "diagnostic": {
+    "bfcl_score_cannot_create_retain_rule": true,
     "does_not_authorize_scorer_without_separate_request": true,
     "no_bfcl_or_model_call": true,
-    "offline_readiness_only": true
+    "offline_readiness_only": true,
+    "stratified_pool_diagnostic_only_until_family_priors_exist": true
   },
+  "explicit_family_scorer_authorization_ready": false,
   "explicit_holdout_ready": false,
+  "explicit_prior_family_coverage_zero": true,
   "holdout_manifest": {
     "candidate_rules_type": "explicit_required_arg_literal_completion",
     "exact_tool_choice": false,
@@ -68,6 +101,7 @@
   "no_scorer_commands": true,
   "repair_stack_split_ready": true,
   "report_scope": "m2_8pre_offline_summary",
+  "retention_prior_coverage_audit_ready": true,
   "runtime_manifest_safeguards_passed": false,
   "scorer_authorization_ready": false,
   "stratified_dev_holdout_disjoint": true,

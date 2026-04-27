@@ -116,19 +116,20 @@ def test_explicit_literal_compiler_rejects_ambiguous_or_missing_literals(tmp_pat
     assert {row["rejection_reason"] for row in report["rejected_candidates"]} == {"ambiguous_literal", "missing_source_result"}
 
 
-def test_m28pre_offline_requires_freeze_repair_compiler_holdout_and_no_commands(tmp_path: Path) -> None:
+def test_m28pre_offline_requires_freeze_repair_compiler_holdout_coverage_and_no_commands(tmp_path: Path) -> None:
     subset = tmp_path / "subset"
     low = tmp_path / "low"
     _wj(subset / "m27ae_ctspc_v0_status.json", {"ctspc_v0_frozen": True, "scorer_default": "off", "retain": 0, "dev_rerun_authorized": False, "holdout_authorized": False})
     _wj(subset / "repair_stack_contribution.json", {"repair_stack_split_ready": True})
-    _wj(low / "compiler_summary.json", {"compiler_ready": True, "explicit_holdout_ready": True, "stratified_holdout_ready": False, "ctspc_v0_action_rules_enabled": False, "ctspc_v0_file_path_multi_turn_enabled": False, "repair_stack_default": "disabled", "candidate_rules_type": "explicit_required_arg_literal_completion", "no_next_tool_intervention": True, "exact_tool_choice": False, "retention_prior_required": True, "retain_eligible_candidate_count": 1, "planned_commands": [], "candidate_commands": []})
-    _wj(low / "explicit_required_arg_literal_dev20_manifest.json", {"selected_case_ids": ["a"], "planned_commands": []})
-    _wj(low / "explicit_required_arg_literal_holdout20_manifest.json", {"selected_case_ids": ["b"], "planned_commands": []})
+    _wj(low / "compiler_summary.json", {"compiler_ready": True, "explicit_holdout_ready": True, "stratified_holdout_ready": False, "ctspc_v0_action_rules_enabled": False, "ctspc_v0_file_path_multi_turn_enabled": False, "repair_stack_default": "disabled", "candidate_rules_type": "explicit_required_arg_literal_completion", "no_next_tool_intervention": True, "exact_tool_choice": False, "retention_prior_required": True, "retain_eligible_candidate_count": 35, "required_explicit_candidate_generatable": 35, "planned_commands": [], "candidate_commands": []})
+    _wj(low / "explicit_required_arg_literal_dev20_manifest.json", {"selected_case_ids": [f"d{i}" for i in range(20)], "planned_commands": []})
+    _wj(low / "explicit_required_arg_literal_holdout20_manifest.json", {"selected_case_ids": [f"h{i}" for i in range(20)], "planned_commands": []})
+    _wj(low / "retention_prior_coverage_audit.json", {"m28pre_retention_prior_coverage_audit_ready": True, "explicit_prior_family_coverage_zero": False, "current_context_anchored_literal_candidate_count": 35, "candidate_commands": [], "planned_commands": []})
 
     report = evaluate_m28pre(subset, low)
 
     assert report["m2_8pre_offline_passed"] is True
-    _wj(low / "explicit_required_arg_literal_holdout20_manifest.json", {"selected_case_ids": ["a"], "planned_commands": []})
+    _wj(low / "explicit_required_arg_literal_holdout20_manifest.json", {"selected_case_ids": ["d0"], "planned_commands": []})
     report = evaluate_m28pre(subset, low)
     assert report["dev_holdout_disjoint"] is False
     assert report["m2_8pre_offline_passed"] is False
@@ -192,9 +193,10 @@ def test_m28pre_safeguards_fail_when_ctspc_or_repair_stack_enabled(tmp_path: Pat
     low = tmp_path / "low"
     _wj(subset / "m27ae_ctspc_v0_status.json", {"ctspc_v0_frozen": True, "scorer_default": "off", "retain": 0, "dev_rerun_authorized": False, "holdout_authorized": False})
     _wj(subset / "repair_stack_contribution.json", {"repair_stack_split_ready": True})
-    _wj(low / "compiler_summary.json", {"compiler_ready": True, "explicit_holdout_ready": True, "ctspc_v0_action_rules_enabled": True, "ctspc_v0_file_path_multi_turn_enabled": False, "repair_stack_default": "enabled", "candidate_rules_type": "explicit_required_arg_literal_completion", "no_next_tool_intervention": True, "exact_tool_choice": False, "retention_prior_required": True, "retain_eligible_candidate_count": 1, "planned_commands": [], "candidate_commands": []})
-    _wj(low / "explicit_required_arg_literal_dev20_manifest.json", {"selected_case_ids": ["a"], "planned_commands": []})
-    _wj(low / "explicit_required_arg_literal_holdout20_manifest.json", {"selected_case_ids": ["b"], "planned_commands": []})
+    _wj(low / "compiler_summary.json", {"compiler_ready": True, "explicit_holdout_ready": True, "ctspc_v0_action_rules_enabled": True, "ctspc_v0_file_path_multi_turn_enabled": False, "repair_stack_default": "enabled", "candidate_rules_type": "explicit_required_arg_literal_completion", "no_next_tool_intervention": True, "exact_tool_choice": False, "retention_prior_required": True, "retain_eligible_candidate_count": 35, "required_explicit_candidate_generatable": 35, "planned_commands": [], "candidate_commands": []})
+    _wj(low / "explicit_required_arg_literal_dev20_manifest.json", {"selected_case_ids": [f"d{i}" for i in range(20)], "planned_commands": []})
+    _wj(low / "explicit_required_arg_literal_holdout20_manifest.json", {"selected_case_ids": [f"h{i}" for i in range(20)], "planned_commands": []})
+    _wj(low / "retention_prior_coverage_audit.json", {"m28pre_retention_prior_coverage_audit_ready": True, "explicit_prior_family_coverage_zero": False, "current_context_anchored_literal_candidate_count": 35, "candidate_commands": [], "planned_commands": []})
 
     report = evaluate_m28pre(subset, low)
 
