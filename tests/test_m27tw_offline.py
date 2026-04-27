@@ -4,7 +4,7 @@ from pathlib import Path
 from grc.compiler.action_candidates import generate_action_candidates
 from grc.compiler.tool_state import ToolState
 from grc.runtime.engine import RuleEngine
-from scripts.build_m27t_source_pool_manifest import build_source_pool_manifest, discover_source_categories
+from scripts.build_m27t_source_pool_manifest import build_source_pool_manifest, discover_source_categories, _load_category_ids
 from scripts.check_m27tw_offline import evaluate as evaluate_tw
 from scripts.diagnose_m27w_rule_retention import decide
 
@@ -30,7 +30,7 @@ def test_source_pool_manifest_discovers_installed_non_live_categories(tmp_path:P
     assert 'multi_turn_base' in categories
     assert 'live_simple' not in categories
     assert 'web_search' not in categories
-    assert diagnostic['category_discovery_source'] == 'installed_bfcl_data'
+    assert diagnostic['category_discovery_source'] == 'bfcl_runnable_categories_plus_raw_files'
 
     dev=tmp_path/'dev'; _wj(dev/'paired_subset_manifest.json',{'source_run_root':str(tmp_path/'source'),'runtime_config':'configs/runtime_bfcl_structured.yaml'})
     report = build_source_pool_manifest(dev, tmp_path/'pool', tmp_path/'repo', data_root=data, cases_per_category=2)
@@ -42,6 +42,38 @@ def test_source_pool_manifest_discovers_installed_non_live_categories(tmp_path:P
     simple_row = next(row for row in report['category_status'] if row['category'] == 'simple_python')
     assert simple_row['selected_case_count'] == 2
     assert Path(simple_row['test_case_ids_path']).name == 'test_case_ids_to_generate.json'
+
+
+
+def test_source_pool_discovery_uses_runnable_memory_backends_not_generic_memory(tmp_path:Path):
+    categories, diagnostic = discover_source_categories()
+    assert 'memory' not in categories
+    assert {'memory_kv', 'memory_vector', 'memory_rec_sum'}.issubset(set(categories))
+    assert 'memory' in diagnostic['excluded_categories']
+    ids, source = _load_category_ids('memory_kv', 3)
+    assert source == 'bfcl_dataset_api'
+    assert len(ids) == 3
+    assert all(case_id.startswith('memory_kv_') for case_id in ids)
+
+    dev=tmp_path/'dev'; _wj(dev/'paired_subset_manifest.json',{'source_run_root':str(tmp_path/'source'),'runtime_config':'configs/runtime_bfcl_structured.yaml'})
+    report = build_source_pool_manifest(dev, tmp_path/'pool', tmp_path/'repo', categories=['memory_kv'], cases_per_category=3)
+    row = report['category_status'][0]
+    assert row['category'] == 'memory_kv'
+    assert row['selected_case_id_source'] == 'bfcl_dataset_api'
+    assert row['selected_case_count'] == 3
+    assert all(case_id.startswith('memory_kv_') for case_id in row['selected_case_ids'])
+    assert report['candidate_commands'] == []
+    assert report['source_collection_only'] is True
+
+
+def test_source_pool_raw_file_fallback_for_fixture_categories(tmp_path:Path):
+    data = tmp_path / 'bfcl_data'
+    (data / 'BFCL_v4_custom_fixture.json').parent.mkdir(parents=True, exist_ok=True)
+    (data / 'BFCL_v4_custom_fixture.json').write_text('\n'.join(json.dumps({'id': f'custom_fixture_{i}'}) for i in range(4)) + '\n', encoding='utf-8')
+    ids, source = _load_category_ids('custom_fixture', 2, data_root=data)
+    assert source == 'raw_category_file'
+    assert ids == ['custom_fixture_0', 'custom_fixture_1']
+
 
 def test_tool_family_candidates_include_echo_diff_and_reject_cat_for_write_goal():
     write=ToolState(available_tools=['cat','echo'], tool_schemas={'cat':{'properties':{'file_name':{}},'required':['file_name']}, 'echo':{'properties':{'content':{}},'required':['content']}}, latest_user_text="Write 'hello'", explicit_literals=['hello'], user_intent_family='explicit_literal_action', pending_goal_family='write_content')

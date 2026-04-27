@@ -11,7 +11,7 @@ DEFAULT_DEV_ROOT = Path("outputs/artifacts/bfcl_ctspc_subset30_v1")
 DEFAULT_OUT_ROOT = Path("outputs/artifacts/bfcl_ctspc_source_pool_v1")
 DEFAULT_SEED_CATEGORIES = ["multi_turn_base", "multi_turn_miss_func", "multi_turn_long_context"]
 EXCLUDED_CATEGORY_PREFIXES = ("live_",)
-EXCLUDED_CATEGORIES = {"web_search"}
+EXCLUDED_CATEGORIES = {"format_sensitivity", "memory", "web_search", "web_search_base", "web_search_no_snippet"}
 MODEL = "gpt-4o-mini-2024-07-18-FC"
 DEFAULT_CASES_PER_CATEGORY = 30
 
@@ -36,7 +36,7 @@ def _bfcl_data_root() -> Path:
     return Path(spec.origin).parent / "data"
 
 
-def _installed_bfcl_categories(data_root: Path | None = None) -> list[str]:
+def _raw_bfcl_categories(data_root: Path | None = None) -> list[str]:
     root = data_root or _bfcl_data_root()
     categories: set[str] = set()
     for path in root.glob("BFCL_v4_*.json"):
@@ -46,40 +46,23 @@ def _installed_bfcl_categories(data_root: Path | None = None) -> list[str]:
     return sorted(categories)
 
 
+def _bfcl_runnable_categories() -> list[str]:
+    try:
+        from bfcl_eval.constants.category_mapping import ALL_CATEGORIES
+    except Exception:
+        return []
+    return sorted(str(category) for category in ALL_CATEGORIES)
+
+
 def _is_low_risk_source_category(category: str) -> bool:
     if category in EXCLUDED_CATEGORIES:
         return False
     return not any(category.startswith(prefix) for prefix in EXCLUDED_CATEGORY_PREFIXES)
 
 
-def discover_source_categories(seed_categories: list[str] | None = None, data_root: Path | None = None) -> tuple[list[str], dict[str, Any]]:
-    installed = _installed_bfcl_categories(data_root)
-    seeds = list(seed_categories or DEFAULT_SEED_CATEGORIES)
-    usable = {cat for cat in installed if _category_has_case_ids(cat, data_root)}
-    candidates = sorted(({cat for cat in usable if _is_low_risk_source_category(cat)} | set(seeds)).intersection(usable))
-    excluded = sorted(cat for cat in installed if cat not in candidates)
-    return candidates, {
-        "category_discovery_source": "installed_bfcl_data",
-        "installed_category_count": len(installed),
-        "installed_categories": installed,
-        "candidate_source_category_count": len(candidates),
-        "candidate_source_categories": candidates,
-        "excluded_category_count": len(excluded),
-        "excluded_categories": excluded,
-        "excluded_category_policy": {
-            "excluded_prefixes": list(EXCLUDED_CATEGORY_PREFIXES),
-            "excluded_categories": sorted(EXCLUDED_CATEGORIES),
-            "reason": "avoid live/external-search or non-case-list source collection for low-risk offline slice planning",
-        },
-    }
-
-
 def _ids_from_records(records: Any, limit: int) -> list[str]:
     ids: list[str] = []
-    if isinstance(records, list):
-        iterator = records
-    else:
-        iterator = []
+    iterator = records if isinstance(records, list) else []
     for row in iterator:
         if isinstance(row, dict):
             case_id = str(row.get("id") or "")
@@ -94,13 +77,27 @@ def _ids_from_records(records: Any, limit: int) -> list[str]:
     return ids
 
 
-def _load_category_ids(category: str, limit: int, data_root: Path | None = None) -> list[str]:
+def _load_category_ids_from_bfcl_api(category: str, limit: int) -> list[str]:
+    try:
+        from bfcl_eval.utils import load_dataset_entry
+    except Exception:
+        return []
+    try:
+        records = load_dataset_entry(category, include_prereq=False)
+    except Exception:
+        return []
+    return _ids_from_records(records, limit)
+
+
+def _load_category_ids_from_raw_file(category: str, limit: int, data_root: Path | None = None) -> list[str]:
     path = (data_root or _bfcl_data_root()) / f"BFCL_v4_{category}.json"
+    if not path.exists():
+        return []
     text = path.read_text(encoding="utf-8")
     try:
         data = json.loads(text)
         if isinstance(data, dict):
-            # Some BFCL helper files are maps of other categories and are not directly runnable categories.
+            # Helper mapping files are not directly runnable categories.
             return [str(data["id"])] if isinstance(data.get("id"), str) else []
         return _ids_from_records(data, limit)
     except json.JSONDecodeError:
@@ -117,11 +114,53 @@ def _load_category_ids(category: str, limit: int, data_root: Path | None = None)
         return ids
 
 
+def _load_category_ids(category: str, limit: int, data_root: Path | None = None) -> tuple[list[str], str | None]:
+    # Test fixtures can pass an explicit data_root; prefer raw files there so tests do not depend on installed BFCL.
+    if data_root is None:
+        ids = _load_category_ids_from_bfcl_api(category, limit)
+        if ids:
+            return ids, "bfcl_dataset_api"
+    ids = _load_category_ids_from_raw_file(category, limit, data_root=data_root)
+    if ids:
+        return ids, "raw_category_file"
+    return [], None
+
+
 def _category_has_case_ids(category: str, data_root: Path | None = None) -> bool:
     try:
-        return bool(_load_category_ids(category, 1, data_root=data_root))
+        ids, _source = _load_category_ids(category, 1, data_root=data_root)
+        return bool(ids)
     except Exception:
         return False
+
+
+def discover_source_categories(seed_categories: list[str] | None = None, data_root: Path | None = None) -> tuple[list[str], dict[str, Any]]:
+    raw_categories = _raw_bfcl_categories(data_root)
+    runnable_categories = [] if data_root is not None else _bfcl_runnable_categories()
+    seeds = list(seed_categories or DEFAULT_SEED_CATEGORIES)
+    discovered = set(raw_categories) | set(runnable_categories) | set(seeds)
+    candidates = sorted(
+        category
+        for category in discovered
+        if _is_low_risk_source_category(category) and _category_has_case_ids(category, data_root=data_root)
+    )
+    excluded = sorted(category for category in discovered if category not in candidates)
+    return candidates, {
+        "category_discovery_source": "bfcl_runnable_categories_plus_raw_files",
+        "raw_category_count": len(raw_categories),
+        "raw_categories": raw_categories,
+        "bfcl_runnable_category_count": len(runnable_categories),
+        "bfcl_runnable_categories": runnable_categories,
+        "candidate_source_category_count": len(candidates),
+        "candidate_source_categories": candidates,
+        "excluded_category_count": len(excluded),
+        "excluded_categories": excluded,
+        "excluded_category_policy": {
+            "excluded_prefixes": list(EXCLUDED_CATEGORY_PREFIXES),
+            "excluded_categories": sorted(EXCLUDED_CATEGORIES),
+            "reason": "avoid live/web-search and non-runnable generic memory categories for low-risk offline slice planning",
+        },
+    }
 
 
 def _has_source(root: Path, cat: str) -> bool:
@@ -165,11 +204,13 @@ def build_source_pool_manifest(
         cats, discovery = discover_source_categories(data_root=data_root)
     else:
         cats = categories
-        installed = _installed_bfcl_categories(data_root) if data_root is not None else []
+        raw_categories = _raw_bfcl_categories(data_root) if data_root is not None else []
         discovery = {
             "category_discovery_source": "explicit_categories_arg",
-            "installed_category_count": len(installed),
-            "installed_categories": installed,
+            "raw_category_count": len(raw_categories),
+            "raw_categories": raw_categories,
+            "bfcl_runnable_category_count": 0,
+            "bfcl_runnable_categories": [],
             "candidate_source_category_count": len(cats),
             "candidate_source_categories": cats,
             "excluded_category_count": 0,
@@ -187,9 +228,10 @@ def build_source_pool_manifest(
         ready = bool(existing)
         cmd = None
         selected_ids: list[str] = []
+        selected_id_source = None
         id_path = None
         if not ready:
-            selected_ids = _load_category_ids(cat, cases_per_category, data_root=data_root)
+            selected_ids, selected_id_source = _load_category_ids(cat, cases_per_category, data_root=data_root)
             id_path = _write_run_ids(out_root, cat, selected_ids)
             cmd = _baseline_command(repo_root, out_root, cat, 8070 + i, runtime)
             commands.append(cmd)
@@ -201,6 +243,7 @@ def build_source_pool_manifest(
                 "baseline_source_collection_required": not ready,
                 "selected_case_count": len(selected_ids),
                 "selected_case_ids": selected_ids,
+                "selected_case_id_source": selected_id_source,
                 "test_case_ids_path": str(id_path) if id_path else None,
                 "planned_source_collection_command": cmd,
                 "source_collection_only": True,
@@ -248,14 +291,14 @@ def md(r: dict[str, Any]) -> str:
         f"- Discovery source: `{diagnostic.get('category_discovery_source')}`",
         f"- Candidate source categories: `{diagnostic.get('candidate_source_category_count')}`",
         "",
-        "| Category | Available | Needs Collection | Selected Cases | Run IDs File |",
-        "| --- | ---: | ---: | ---: | --- |",
+        "| Category | Available | Needs Collection | Selected Cases | ID Source | Run IDs File |",
+        "| --- | ---: | ---: | ---: | --- | --- |",
     ]
     for x in r["category_status"]:
         lines.append(
             f"| `{x['category']}` | `{x['source_artifacts_available']}` | "
             f"`{x['baseline_source_collection_required']}` | `{x['selected_case_count']}` | "
-            f"`{x['test_case_ids_path']}` |"
+            f"`{x['selected_case_id_source']}` | `{x['test_case_ids_path']}` |"
         )
     lines += ["", "## Planned Baseline-Only Commands"]
     lines += [f"```bash\n{cmd}\n```" for cmd in r["planned_source_collection_commands"]]
