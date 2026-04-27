@@ -11,6 +11,6 @@
 | `explicit_holdout_ready` | `False` |
 | `stratified_holdout_ready` | `False` |
 | `no_scorer_commands` | `True` |
-| `runtime_manifest_safeguards_passed` | `True` |
+| `runtime_manifest_safeguards_passed` | `False` |
 
 Offline readiness only. No scorer command is emitted by this artifact.

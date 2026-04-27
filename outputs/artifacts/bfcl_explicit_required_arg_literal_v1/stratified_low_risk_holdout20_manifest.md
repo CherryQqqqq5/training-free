@@ -2,5 +2,5 @@
 
 - Ready: `False`
 - Slice: `stratified_low_risk`
-- Selected cases: `7`
+- Selected cases: `0`
 - Planned commands: `[]`

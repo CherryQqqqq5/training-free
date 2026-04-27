@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import scripts.build_m28pre_explicit_required_arg_literal as explicit_builder
 from scripts.build_m28pre_explicit_required_arg_literal import build
 from scripts.check_m28pre_offline import evaluate as evaluate_m28pre
 from scripts.diagnose_repair_stack_contribution import evaluate as evaluate_repair_stack
@@ -22,6 +23,20 @@ def _result(root: Path, category: str, rows: list[dict]) -> None:
     path = root / "bfcl" / "result" / "model" / "multi_turn" / f"BFCL_v4_{category}_result.json"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
+
+
+def _source_manifest(path: Path, category: str, source_root: Path) -> None:
+    _wj(path, {
+        "category_status": [{
+            "category": category,
+            "source_artifacts_available": True,
+            "existing_source_roots": [str(source_root)],
+        }],
+        "candidate_commands": [],
+        "planned_commands": [],
+        "source_collection_only": True,
+        "no_candidate_rules": True,
+    })
 
 
 def test_repair_stack_splits_repair_only_action_and_mixed_sources(tmp_path: Path) -> None:
@@ -46,44 +61,40 @@ def test_repair_stack_splits_repair_only_action_and_mixed_sources(tmp_path: Path
     assert report["repairs"]["resolve_contextual_string_arg"]["interaction_with_action_policy"] == 1
 
 
-def test_explicit_required_arg_literal_compiler_builds_dev_holdout_without_commands(tmp_path: Path) -> None:
+def test_explicit_required_arg_literal_compiler_builds_dev_holdout_without_commands(tmp_path: Path, monkeypatch) -> None:
     source = tmp_path / "source"
-    category = "multi_turn_base"
-    records = []
+    category = "simple_python"
+    entries = {}
     results = []
     for i in range(40):
         case_id = f"case_{i}"
-        records.append({
-            "case_id": case_id,
-            "category": category,
-            "source_run_root": str(source),
-            "schema_local": True,
-            "target_action_tools_present": ["echo"],
-            "low_risk_slices": ["explicit_required_arg_literal"],
-        })
-        results.append({"id": case_id, "result": [[[{"echo": json.dumps({"content": f"literal-{i}"})}]]]})
+        entries[case_id] = {
+            "id": case_id,
+            "question": [[{"role": "user", "content": f"Calculate the area with base {i} and height {100+i}."}]],
+            "function": [{"name": "calculate_area", "parameters": {"type": "dict", "properties": {"base": {"type": "integer"}, "height": {"type": "integer"}}, "required": ["base", "height"]}}],
+        }
+        results.append({"id": case_id, "result": [{"calculate_area": json.dumps({"base": i})}]})
+    monkeypatch.setattr(explicit_builder, "_load_dataset_records", lambda cat: entries if cat == category else {})
     low = tmp_path / "low.json"
     status = tmp_path / "status.json"
-    _wj(low, {"slice_cases": {"explicit_required_arg_literal": records}})
+    source_manifest = tmp_path / "source_manifest.json"
+    _wj(low, {"slice_cases": {}})
     _wj(status, {"ctspc_v0_frozen": True, "scorer_default": "off", "retain": 0, "dev_rerun_authorized": False, "holdout_authorized": False})
+    _source_manifest(source_manifest, category, source)
     _result(source, category, results)
 
-    report = build(low, status)
+    report = build(low, status, source_manifest_path=source_manifest)
 
     assert report["m28pre_low_risk_slice_ready"] is True
     assert report["candidate_generatable_count"] == 40
-    assert report["ambiguous_literal_count"] == 0
+    assert report["retain_eligible_candidate_count"] == 40
+    assert report["theory_prior_explicit_literal_candidate_count"] == 40
     assert report["planned_commands"] == []
     assert report["candidate_commands"] == []
     assert len(set(report["dev_manifest"]["selected_case_ids"]) & set(report["holdout_manifest"]["selected_case_ids"])) == 0
-    assert all(rule["no_next_tool_intervention"] for rule in report["candidate_rules"])
-    assert all(rule["exact_tool_choice"] is False for rule in report["candidate_rules"])
+    assert all(rule["literal_source"] == "current_request" for rule in report["candidate_rules"])
     assert all(rule["retention_prior"]["retain_eligibility"] == "demote_candidate" for rule in report["candidate_rules"])
     assert report["retention_prior_distribution"]["demote_candidate"] == 40
-    assert report["retain_eligible_candidate_count"] == 40
-    assert all(rule["retention_prior"]["trajectory_mutation"] is False for rule in report["candidate_rules"])
-    assert all(rule["retention_prior"]["tool_choice_mutation"] is False for rule in report["candidate_rules"])
-
 
 def test_explicit_literal_compiler_rejects_ambiguous_or_missing_literals(tmp_path: Path) -> None:
     source = tmp_path / "source"
@@ -168,13 +179,13 @@ def test_stratified_fallback_preserves_slice_labels_without_commands(tmp_path: P
     report = build(low, status)
 
     assert report["explicit_holdout_ready"] is False
-    assert report["stratified_holdout_ready"] is True
-    assert report["scorer_authorization_ready"] is True
-    assert report["stratified_retention_prior_distribution"]["demote_candidate"] == 45
+    assert report["stratified_holdout_ready"] is False
+    assert report["scorer_authorization_ready"] is False
+    assert report["stratified_retention_prior_distribution"]["diagnostic_only"] == 45
     assert report["planned_commands"] == []
     assert report["candidate_commands"] == []
     assert set(report["stratified_counts"]) == set(slice_cases)
-
+    assert "stratified_without_complete_theory_priors_not_authorized" in report["blockers"]
 
 def test_m28pre_safeguards_fail_when_ctspc_or_repair_stack_enabled(tmp_path: Path) -> None:
     subset = tmp_path / "subset"

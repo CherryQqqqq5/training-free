@@ -72,7 +72,11 @@ def explicit_required_arg_literal_prior(rule: dict[str, Any]) -> dict[str, Any]:
     has_required_arg = bool(rule.get("required_arg") or rule.get("schema_arg_name"))
     no_tool_mutation = _truthy(rule.get("no_next_tool_intervention")) and rule.get("exact_tool_choice") is False and not _truthy(rule.get("ctspc_v0_action_rule"))
     source = str(rule.get("literal_source") or "")
-    observable_source = source in {"current_request", "current_observation", "source_result_tool_args", "current_request_or_current_observation"}
+    source_anchor = str(rule.get("literal_source_anchor") or rule.get("literal_source_observed_as") or "")
+    directly_observable_sources = {"current_request", "current_observation", "current_request_or_current_observation"}
+    observable_source = source in directly_observable_sources or (
+        source == "source_result_tool_args" and source_anchor in directly_observable_sources
+    )
     rejection = rule.get("rejection_reason")
 
     eligibility = DEMOTE_CANDIDATE

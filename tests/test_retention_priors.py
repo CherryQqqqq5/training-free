@@ -18,7 +18,7 @@ def _valid_explicit_rule() -> dict:
         "required_arg": "content",
         "schema_arg_name": "content",
         "literal_value": "hello",
-        "literal_source": "source_result_tool_args",
+        "literal_source": "current_request",
         "no_next_tool_intervention": True,
         "exact_tool_choice": False,
         "ctspc_v0_action_rule": False,

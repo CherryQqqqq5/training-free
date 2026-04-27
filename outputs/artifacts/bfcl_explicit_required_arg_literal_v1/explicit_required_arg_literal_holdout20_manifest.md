@@ -2,5 +2,5 @@
 
 - Ready: `False`
 - Slice: `explicit_required_arg_literal`
-- Selected cases: `5`
+- Selected cases: `0`
 - Planned commands: `[]`
