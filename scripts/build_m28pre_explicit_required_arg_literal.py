@@ -53,6 +53,8 @@ def _write_json(path: Path, payload: dict[str, Any]) -> None:
 
 def _result_path(source_root: Path, category: str) -> Path | None:
     matches = sorted((source_root / "bfcl" / "result").glob(f"*/multi_turn/BFCL_v4_{category}_result.json"))
+    if not matches:
+        matches = sorted((source_root / "bfcl" / "result").glob(f"**/BFCL_v4_{category}_result.json"))
     return matches[0] if matches else None
 
 
@@ -262,6 +264,13 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
     return {
         "report_scope": "m2_8pre_explicit_required_arg_literal_compiler",
         "offline_only": True,
+        "source_pool_expansion_required": not scorer_ready,
+        "explicit_source_pool_expansion_required": not explicit_holdout_ready,
+        "stratified_source_pool_expansion_required": not stratified_holdout_ready,
+        "required_explicit_total": dev_size + holdout_size,
+        "required_explicit_candidate_generatable": 35,
+        "required_stratified_total": dev_size + holdout_size,
+        "required_stratified_candidate_generatable": 35,
         "no_bfcl_or_model_call": True,
         "planned_commands": [],
         "candidate_commands": [],
@@ -309,6 +318,7 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Scorer authorization ready: `{report['scorer_authorization_ready']}`",
         f"- Explicit selected/generatable: `{report['selected_case_count']}` / `{report['candidate_generatable_count']}`",
         f"- Stratified selected/generatable: `{report['stratified_selected_case_count']}` / `{report['stratified_candidate_generatable_count']}`",
+        f"- Source pool expansion required: `{report['source_pool_expansion_required']}`",
         f"- Blockers: `{report['blockers']}`",
         "",
         "No BFCL scorer commands are emitted.",

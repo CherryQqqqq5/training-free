@@ -56,6 +56,8 @@ def _score_json_path(run_root: Path, category: str) -> Path | None:
     candidates = sorted(bfcl_root.glob(f"**/score/**/multi_turn/BFCL_v4_{category}_score.json"))
     if not candidates:
         candidates = sorted((bfcl_root / "score").glob(f"*/multi_turn/BFCL_v4_{category}_score.json"))
+    if not candidates:
+        candidates = sorted(bfcl_root.glob(f"**/score/**/BFCL_v4_{category}_score.json"))
     return candidates[0] if candidates else None
 
 
@@ -64,6 +66,8 @@ def _result_json_path(run_root: Path, category: str) -> Path | None:
     candidates = sorted(bfcl_root.glob(f"**/result/**/multi_turn/BFCL_v4_{category}_result.json"))
     if not candidates:
         candidates = sorted((bfcl_root / "result").glob(f"*/multi_turn/BFCL_v4_{category}_result.json"))
+    if not candidates:
+        candidates = sorted(bfcl_root.glob(f"**/result/**/BFCL_v4_{category}_result.json"))
     return candidates[0] if candidates else None
 
 

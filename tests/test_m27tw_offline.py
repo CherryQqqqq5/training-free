@@ -4,7 +4,7 @@ from pathlib import Path
 from grc.compiler.action_candidates import generate_action_candidates
 from grc.compiler.tool_state import ToolState
 from grc.runtime.engine import RuleEngine
-from scripts.build_m27t_source_pool_manifest import build_source_pool_manifest
+from scripts.build_m27t_source_pool_manifest import build_source_pool_manifest, discover_source_categories
 from scripts.check_m27tw_offline import evaluate as evaluate_tw
 from scripts.diagnose_m27w_rule_retention import decide
 
@@ -15,6 +15,33 @@ def test_source_pool_manifest_emits_baseline_only_commands_when_missing(tmp_path
     assert r['m27t_source_pool_ready'] is False
     assert r['candidate_commands']==[]
     assert 'run_bfcl_v4_baseline.sh' in r['planned_source_collection_commands'][0]
+
+
+
+def test_source_pool_manifest_discovers_installed_non_live_categories(tmp_path:Path):
+    data = tmp_path / 'bfcl_data'
+    for category in ['multi_turn_base', 'multi_turn_miss_func', 'multi_turn_long_context', 'simple_python', 'parallel', 'live_simple', 'web_search']:
+        rows = [{'id': f'{category}_{i}'} for i in range(3)]
+        (data / f'BFCL_v4_{category}.json').parent.mkdir(parents=True, exist_ok=True)
+        (data / f'BFCL_v4_{category}.json').write_text(''.join(json.dumps(row) + '\n' for row in rows), encoding='utf-8')
+    categories, diagnostic = discover_source_categories(data_root=data)
+    assert 'simple_python' in categories
+    assert 'parallel' in categories
+    assert 'multi_turn_base' in categories
+    assert 'live_simple' not in categories
+    assert 'web_search' not in categories
+    assert diagnostic['category_discovery_source'] == 'installed_bfcl_data'
+
+    dev=tmp_path/'dev'; _wj(dev/'paired_subset_manifest.json',{'source_run_root':str(tmp_path/'source'),'runtime_config':'configs/runtime_bfcl_structured.yaml'})
+    report = build_source_pool_manifest(dev, tmp_path/'pool', tmp_path/'repo', data_root=data, cases_per_category=2)
+    assert report['candidate_commands'] == []
+    assert report['source_collection_only'] is True
+    assert report['no_candidate_rules'] is True
+    assert 'simple_python' in report['missing_source_categories']
+    assert all('run_bfcl_v4_baseline.sh' in cmd for cmd in report['planned_source_collection_commands'])
+    simple_row = next(row for row in report['category_status'] if row['category'] == 'simple_python')
+    assert simple_row['selected_case_count'] == 2
+    assert Path(simple_row['test_case_ids_path']).name == 'test_case_ids_to_generate.json'
 
 def test_tool_family_candidates_include_echo_diff_and_reject_cat_for_write_goal():
     write=ToolState(available_tools=['cat','echo'], tool_schemas={'cat':{'properties':{'file_name':{}},'required':['file_name']}, 'echo':{'properties':{'content':{}},'required':['content']}}, latest_user_text="Write 'hello'", explicit_literals=['hello'], user_intent_family='explicit_literal_action', pending_goal_family='write_content')
