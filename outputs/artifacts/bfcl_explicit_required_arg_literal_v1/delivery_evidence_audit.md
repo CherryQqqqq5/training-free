@@ -76,6 +76,18 @@
 - Classification distribution: `{'diagnostic_stateful_directory_trajectory': 3, 'readonly_directory_obligation_candidate': 1, 'reject_mutation_adjacent_directory_request': 4}`
 - Next action: `manual_review_before_theory_family`
 
+## Observable Output Contract Preservation
+
+- Audit ready: `True`
+- Rule family: `observable_output_contract_preservation_v1`
+- Retain prior candidate: `True`
+- Wrapper-only repair candidates: `6`
+- Dropped final-answer payloads before fix: `6`
+- Preserved final-answer payloads after fix: `6`
+- Relative gain after preservation fix: `0.0`
+- Performance claim ready: `False`
+- Next action: `build_output_contract_preservation_broader_coverage_audit`
+
 ## Memory Operation Obligation Evidence
 
 - Memory audit ready: `True`

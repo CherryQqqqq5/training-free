@@ -34,6 +34,7 @@ BFCL_FAILURE_REASONS = {
 EXPLICIT_REQUIRED_ARG_LITERAL_FAMILY = "explicit_required_arg_literal_completion"
 WRONG_ARG_KEY_ALIAS_FAMILY = "wrong_arg_key_alias_repair"
 DETERMINISTIC_SCHEMA_LOCAL_NON_LIVE_FAMILY = "deterministic_schema_local_non_live_repair"
+OBSERVABLE_OUTPUT_CONTRACT_FAMILY = "observable_output_contract_preservation_v1"
 
 
 def _truthy(value: Any) -> bool:
@@ -50,6 +51,9 @@ def _base_prior(rule: dict[str, Any], eligibility: str, *, reason: str | None = 
     if family == DETERMINISTIC_SCHEMA_LOCAL_NON_LIVE_FAMILY:
         theory_class = "schema_local_deterministic_normalization"
         intervention_scope = "argument_value_or_call_shape_only"
+    if family == OBSERVABLE_OUTPUT_CONTRACT_FAMILY:
+        theory_class = "runtime_output_contract_preservation"
+        intervention_scope = "wrapper_or_container_only"
     prior = {
         "rule_family": family,
         "theory_class": theory_class,
@@ -248,6 +252,69 @@ def deterministic_schema_local_non_live_prior(rule: dict[str, Any]) -> dict[str,
         prior["prior_rejection_reason"] = reason
     return prior
 
+
+def observable_output_contract_prior(rule: dict[str, Any]) -> dict[str, Any]:
+    """Return the theory prior for preserving already-emitted structured output."""
+    family = str(rule.get("candidate_rules_type") or rule.get("rule_type") or "")
+    if family != OBSERVABLE_OUTPUT_CONTRACT_FAMILY:
+        return _base_prior(rule, NEVER_RETAIN, reason="unsupported_rule_family")
+
+    output_contract_observable = rule.get("output_contract_observable") is True
+    payload_parseable = rule.get("payload_parseable") is True
+    wrapper_only = rule.get("wrapper_only_repair") is True
+    no_synthesis = (
+        rule.get("value_creation") is False
+        and rule.get("argument_creation") is False
+        and rule.get("answer_synthesis") is False
+        and rule.get("payload_value_mutation") is False
+    )
+    no_policy_mutation = (
+        rule.get("tool_choice_mutation") is False
+        and rule.get("trajectory_mutation") is False
+        and rule.get("exact_tool_choice") is False
+    )
+    rejection = rule.get("rejection_reason")
+
+    eligibility = DEMOTE_CANDIDATE
+    reason = None
+    if not output_contract_observable:
+        eligibility = DIAGNOSTIC_ONLY
+        reason = "output_contract_not_observable"
+    elif not payload_parseable or not wrapper_only:
+        eligibility = DIAGNOSTIC_ONLY
+        reason = "payload_not_losslessly_preservable"
+    elif not no_synthesis:
+        eligibility = NEVER_RETAIN
+        reason = "value_or_answer_synthesis_required"
+    elif not no_policy_mutation:
+        eligibility = NEVER_RETAIN
+        reason = "tool_choice_or_trajectory_mutation"
+    elif rejection:
+        eligibility = DIAGNOSTIC_ONLY
+        reason = str(rejection)
+
+    prior = {
+        "rule_family": OBSERVABLE_OUTPUT_CONTRACT_FAMILY,
+        "theory_class": "runtime_output_contract_preservation",
+        "intervention_scope": "wrapper_or_container_only",
+        "trajectory_mutation": False,
+        "tool_choice_mutation": False,
+        "exact_tool_choice": False,
+        "value_creation": False,
+        "argument_creation": False,
+        "answer_synthesis": False,
+        "payload_value_mutation": False,
+        "precondition_observable": output_contract_observable and payload_parseable,
+        "postcondition_local": True,
+        "output_contract_observable": output_contract_observable,
+        "payload_parseable": payload_parseable,
+        "wrapper_only_repair": wrapper_only,
+        "retain_eligibility": eligibility,
+    }
+    if reason:
+        prior["prior_rejection_reason"] = reason
+    return prior
+
 def evaluate_retention_prior(rule: dict[str, Any]) -> dict[str, Any]:
     """Normalize or infer a rule retention prior.
 
@@ -280,6 +347,8 @@ def evaluate_retention_prior(rule: dict[str, Any]) -> dict[str, Any]:
         return wrong_arg_key_alias_prior(rule)
     if family == DETERMINISTIC_SCHEMA_LOCAL_NON_LIVE_FAMILY:
         return deterministic_schema_local_non_live_prior(rule)
+    if family == OBSERVABLE_OUTPUT_CONTRACT_FAMILY:
+        return observable_output_contract_prior(rule)
     return _base_prior(rule, NEVER_RETAIN, reason="missing_retention_prior")
 
 

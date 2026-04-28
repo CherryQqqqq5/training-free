@@ -33,6 +33,7 @@ DEFAULT_POSTCONDITION_SATISFACTION = Path("outputs/artifacts/phase2/postconditio
 DEFAULT_POSTCONDITION_PROTOCOL = Path("outputs/artifacts/phase2/postcondition_guided_policy_runtime_smoke_v1/approved_low_risk/postcondition_guided_dev_smoke_protocol.json")
 DEFAULT_UNMET_POSTCONDITION_AUDIT = Path("outputs/artifacts/phase2/policy_conversion_opportunity_v1/unmet_postcondition_source_expansion_audit.json")
 DEFAULT_DIRECTORY_OBLIGATION_AUDIT = Path("outputs/artifacts/phase2/policy_conversion_opportunity_v1/directory_obligation_readonly_audit.json")
+DEFAULT_OUTPUT_CONTRACT_AUDIT = Path("outputs/artifacts/phase2/output_contract_preservation_v1/observable_output_contract_preservation_audit.json")
 DEFAULT_OUT = Path("outputs/artifacts/bfcl_explicit_required_arg_literal_v1/delivery_evidence_audit.json")
 DEFAULT_MD = Path("outputs/artifacts/bfcl_explicit_required_arg_literal_v1/delivery_evidence_audit.md")
 
@@ -317,6 +318,20 @@ def directory_obligation_status(path: Path = DEFAULT_DIRECTORY_OBLIGATION_AUDIT)
         "directory_obligation_next_required_action": report.get("next_required_action"),
     }
 
+def output_contract_status(path: Path = DEFAULT_OUTPUT_CONTRACT_AUDIT) -> dict[str, Any]:
+    report = _load_json(path, {}) or {}
+    return {
+        "output_contract_preservation_audit_ready": bool(report.get("output_contract_preservation_audit_ready")),
+        "output_contract_rule_family": report.get("rule_family"),
+        "output_contract_retain_prior_candidate": bool(report.get("retain_prior_candidate")),
+        "output_contract_wrapper_only_candidate_count": int(report.get("wrapper_only_repair_candidate_count") or 0),
+        "output_contract_dropped_final_answer_payload_count": int(report.get("dropped_final_answer_payload_count") or 0),
+        "output_contract_preserved_final_answer_payload_count": int(report.get("preserved_final_answer_payload_count") or 0),
+        "output_contract_relative_gain_after_preservation_fix": report.get("relative_gain_after_preservation_fix"),
+        "output_contract_performance_claim_ready": bool(report.get("performance_claim_ready")),
+        "output_contract_next_required_action": report.get("next_required_action"),
+    }
+
 def source_result_layout_status(low_risk_root: Path = DEFAULT_LOW_RISK) -> dict[str, Any]:
     availability = _load_json(low_risk_root / "m28pre_source_result_availability_audit.json", {}) or {}
     alias = _load_json(low_risk_root / "wrong_arg_key_alias_coverage_audit.json", {}) or {}
@@ -374,6 +389,7 @@ def evaluate(
     postcondition_smoke = postcondition_smoke_status()
     unmet_postcondition = unmet_postcondition_source_status()
     directory_obligation = directory_obligation_status()
+    output_contract = output_contract_status()
     p0_blockers: list[str] = []
     if not boundary["artifact_boundary_passed"]:
         p0_blockers.append("artifact_boundary_not_clean")
@@ -433,6 +449,7 @@ def evaluate(
         "postcondition_smoke": postcondition_smoke,
         "unmet_postcondition_source_expansion": unmet_postcondition,
         "directory_obligation_readonly": directory_obligation,
+        "output_contract_preservation": output_contract,
         "memory_operation_obligation": memory_obligation,
         "memory_operation_dry_run": memory_dry_run,
         "memory_tool_family_resolver": memory_resolver,
@@ -526,6 +543,18 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Classification distribution: `{report['directory_obligation_readonly']['directory_obligation_classification_distribution']}`",
         f"- Next action: `{report['directory_obligation_readonly']['directory_obligation_next_required_action']}`",
         "",
+        "## Observable Output Contract Preservation",
+        "",
+        f"- Audit ready: `{report['output_contract_preservation']['output_contract_preservation_audit_ready']}`",
+        f"- Rule family: `{report['output_contract_preservation']['output_contract_rule_family']}`",
+        f"- Retain prior candidate: `{report['output_contract_preservation']['output_contract_retain_prior_candidate']}`",
+        f"- Wrapper-only repair candidates: `{report['output_contract_preservation']['output_contract_wrapper_only_candidate_count']}`",
+        f"- Dropped final-answer payloads before fix: `{report['output_contract_preservation']['output_contract_dropped_final_answer_payload_count']}`",
+        f"- Preserved final-answer payloads after fix: `{report['output_contract_preservation']['output_contract_preserved_final_answer_payload_count']}`",
+        f"- Relative gain after preservation fix: `{report['output_contract_preservation']['output_contract_relative_gain_after_preservation_fix']}`",
+        f"- Performance claim ready: `{report['output_contract_preservation']['output_contract_performance_claim_ready']}`",
+        f"- Next action: `{report['output_contract_preservation']['output_contract_next_required_action']}`",
+        "",
         "## Memory Operation Obligation Evidence",
         "",
         f"- Memory audit ready: `{report['memory_operation_obligation']['memory_operation_obligation_audit_ready']}`",
@@ -612,6 +641,10 @@ def main() -> int:
             "low_risk_strong_unmet_postcondition_count": report["unmet_postcondition_source_expansion"]["low_risk_strong_unmet_candidate_count"],
             "high_risk_strong_unmet_postcondition_count": report["unmet_postcondition_source_expansion"]["high_risk_strong_unmet_candidate_count"],
             "readonly_directory_obligation_candidate_count": report["directory_obligation_readonly"]["readonly_directory_obligation_candidate_count"],
+            "output_contract_preservation_audit_ready": report["output_contract_preservation"]["output_contract_preservation_audit_ready"],
+            "output_contract_wrapper_only_candidate_count": report["output_contract_preservation"]["output_contract_wrapper_only_candidate_count"],
+            "output_contract_preserved_final_answer_payload_count": report["output_contract_preservation"]["output_contract_preserved_final_answer_payload_count"],
+            "output_contract_performance_claim_ready": report["output_contract_preservation"]["output_contract_performance_claim_ready"],
             "memory_operation_candidate_count": report["memory_operation_obligation"]["memory_operation_candidate_count"],
             "memory_operation_runtime_enabled": report["memory_operation_obligation"]["memory_operation_runtime_enabled"],
             "memory_operation_negative_control_audit_passed": report["memory_operation_obligation"]["memory_operation_negative_control_audit_passed"],

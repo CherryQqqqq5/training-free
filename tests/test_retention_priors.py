@@ -161,3 +161,44 @@ def test_deterministic_schema_local_rejects_value_creation_or_mutation() -> None
     mutating["exact_tool_choice"] = True
     prior = evaluate_retention_prior(mutating)
     assert prior["retain_eligibility"] == NEVER_RETAIN
+
+
+def test_observable_output_contract_preservation_is_demote_candidate() -> None:
+    from grc.compiler.retention_priors import DEMOTE_CANDIDATE, evaluate_retention_prior
+
+    prior = evaluate_retention_prior({
+        "rule_type": "observable_output_contract_preservation_v1",
+        "output_contract_observable": True,
+        "payload_parseable": True,
+        "wrapper_only_repair": True,
+        "value_creation": False,
+        "argument_creation": False,
+        "answer_synthesis": False,
+        "payload_value_mutation": False,
+        "tool_choice_mutation": False,
+        "trajectory_mutation": False,
+        "exact_tool_choice": False,
+    })
+
+    assert prior["retain_eligibility"] == DEMOTE_CANDIDATE
+    assert prior["intervention_scope"] == "wrapper_or_container_only"
+
+
+def test_observable_output_contract_rejects_answer_synthesis() -> None:
+    from grc.compiler.retention_priors import NEVER_RETAIN, evaluate_retention_prior
+
+    prior = evaluate_retention_prior({
+        "rule_type": "observable_output_contract_preservation_v1",
+        "output_contract_observable": True,
+        "payload_parseable": True,
+        "wrapper_only_repair": True,
+        "value_creation": False,
+        "argument_creation": False,
+        "answer_synthesis": True,
+        "payload_value_mutation": False,
+        "tool_choice_mutation": False,
+        "trajectory_mutation": False,
+        "exact_tool_choice": False,
+    })
+
+    assert prior["retain_eligibility"] == NEVER_RETAIN
