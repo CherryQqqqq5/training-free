@@ -72,8 +72,8 @@
 
 - Audit ready: `True`
 - Directory strong-unmet scanned: `8`
-- Read-only directory candidates: `5`
-- Classification distribution: `{'diagnostic_stateful_directory_trajectory': 3, 'readonly_directory_obligation_candidate': 5}`
+- Read-only directory candidates: `1`
+- Classification distribution: `{'diagnostic_stateful_directory_trajectory': 3, 'readonly_directory_obligation_candidate': 1, 'reject_mutation_adjacent_directory_request': 4}`
 - Next action: `manual_review_before_theory_family`
 
 ## Memory Operation Obligation Evidence

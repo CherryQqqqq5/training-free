@@ -20,7 +20,24 @@ DEFAULT_UNMET_AUDIT = Path("outputs/artifacts/phase2/policy_conversion_opportuni
 DEFAULT_OUT = Path("outputs/artifacts/phase2/policy_conversion_opportunity_v1/directory_obligation_readonly_audit.json")
 DEFAULT_MD = Path("outputs/artifacts/phase2/policy_conversion_opportunity_v1/directory_obligation_readonly_audit.md")
 
-MUTATION_CUES = {"create", "write", "copy", "move", "rename", "delete", "remove", "modify", "edit", "append"}
+MUTATION_CUES = {
+    "create",
+    "creation",
+    "new file",
+    "new directory",
+    "set up",
+    "setup",
+    "initiate",
+    "write",
+    "copy",
+    "move",
+    "rename",
+    "delete",
+    "remove",
+    "modify",
+    "edit",
+    "append",
+}
 READONLY_DIRECTORY_CUES = {"list", "show", "display", "current files", "files", "directory", "folder", "pwd", "where"}
 TRAJECTORY_CUES = {"for each", "then", "after", "count", "open", "read", "search", "scour"}
 

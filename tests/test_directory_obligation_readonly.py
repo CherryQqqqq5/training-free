@@ -24,3 +24,13 @@ def test_directory_audit_has_no_scorer_commands(tmp_path) -> None:
     assert report["candidate_commands"] == []
     assert report["planned_commands"] == []
     assert report["does_not_authorize_scorer"] is True
+
+
+def test_directory_creation_phrasing_rejected() -> None:
+    row = audit._classify({"trace_id": "c", "postcondition_gap": "directory_navigation", "user_text_excerpt": "Please initiate a file creation in our communal folder."})
+    assert row["directory_obligation_label"] == "reject_mutation_adjacent_directory_request"
+
+
+def test_directory_setup_new_directory_rejected() -> None:
+    row = audit._classify({"trace_id": "c", "postcondition_gap": "directory_navigation", "user_text_excerpt": "Set up a new directory named Projects in the workspace folder."})
+    assert row["directory_obligation_label"] == "reject_mutation_adjacent_directory_request"

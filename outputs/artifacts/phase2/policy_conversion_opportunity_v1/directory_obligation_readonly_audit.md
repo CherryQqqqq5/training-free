@@ -2,8 +2,8 @@
 
 - Ready: `True`
 - Directory strong-unmet records scanned: `8`
-- Read-only directory candidates: `5`
-- Classification distribution: `{'diagnostic_stateful_directory_trajectory': 3, 'readonly_directory_obligation_candidate': 5}`
+- Read-only directory candidates: `1`
+- Classification distribution: `{'diagnostic_stateful_directory_trajectory': 3, 'readonly_directory_obligation_candidate': 1, 'reject_mutation_adjacent_directory_request': 4}`
 - Next required action: `manual_review_before_theory_family`
 
 Offline diagnostic only. It does not authorize BFCL/model/scorer runs.
