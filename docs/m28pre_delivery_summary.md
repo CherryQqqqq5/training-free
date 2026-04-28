@@ -72,6 +72,7 @@ Required local verification commands:
 PATH="$PWD/.venv/bin:$PATH" .venv/bin/python -m pytest -q
 PYTHONPATH=.:src .venv/bin/python scripts/check_m28pre_offline.py --compact --strict
 PYTHONPATH=.:src .venv/bin/python scripts/check_artifact_boundary.py
+PYTHONPATH=.:src .venv/bin/python scripts/audit_delivery_evidence.py --compact
 ```
 
 Expected current behavior:
