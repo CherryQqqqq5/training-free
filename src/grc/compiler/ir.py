@@ -132,6 +132,12 @@ class FailureCase(BaseModel):
     predicate_evidence: Dict[str, bool] = Field(default_factory=dict)
     recommended_tools: List[str] = Field(default_factory=list)
     action_candidates: List[Dict[str, Any]] = Field(default_factory=list)
+    evidence_family: Optional[str] = None
+    required_evidence_type: Optional[str] = None
+    observed_evidence_types: List[str] = Field(default_factory=list)
+    terminal_evidence_keys: List[str] = Field(default_factory=list)
+    typed_satisfaction_label: Optional[str] = None
+    postcondition_risk_lane: Optional[str] = None
     tool_schema_hash: str = "*"
 
 
@@ -152,6 +158,12 @@ class FailureIR(BaseModel):
     predicate_evidence: Dict[str, int] = Field(default_factory=dict)
     recommended_tools: List[str] = Field(default_factory=list)
     action_candidates: List[Dict[str, Any]] = Field(default_factory=list)
+    evidence_families: List[str] = Field(default_factory=list)
+    required_evidence_types: List[str] = Field(default_factory=list)
+    observed_evidence_types: List[str] = Field(default_factory=list)
+    terminal_evidence_keys: List[str] = Field(default_factory=list)
+    typed_satisfaction_labels: List[str] = Field(default_factory=list)
+    postcondition_risk_lanes: List[str] = Field(default_factory=list)
     tool_schema_hash: str = "*"
 
 

@@ -46,3 +46,33 @@ class FailureSignatureTests(unittest.TestCase):
         self.assertEqual(summaries[0].count, 2)
         self.assertEqual(summaries[0].failure_labels, ["(PRE_TOOL,ACTIONABLE_NO_TOOL_DECISION)"])
         self.assertEqual(summaries[0].signature.tool_schema_hash, "hash_a")
+
+
+def test_failure_ir_preserves_typed_evidence_fields(tmp_path):
+    from grc.compiler.trace_to_patch import _build_failure_ir
+    from collections import defaultdict
+
+    failure = FailureCase(
+        trace_id="t1",
+        turn_index=0,
+        tool_name="__none__",
+        error_type="actionable_no_tool_decision",
+        request_predicates=["prior_tool_outputs_present"],
+        evidence_family="read",
+        required_evidence_type="full_content",
+        observed_evidence_types=["search_match"],
+        terminal_evidence_keys=["matching_lines"],
+        typed_satisfaction_label="satisfied_weak",
+        postcondition_risk_lane="low_risk_observation",
+    )
+    grouped = defaultdict(list)
+    grouped["__none__"].append(failure)
+
+    ir = _build_failure_ir(grouped)[0]
+
+    assert ir.evidence_families == ["read"]
+    assert ir.required_evidence_types == ["full_content"]
+    assert ir.observed_evidence_types == ["search_match"]
+    assert ir.terminal_evidence_keys == ["matching_lines"]
+    assert ir.typed_satisfaction_labels == ["satisfied_weak"]
+    assert ir.postcondition_risk_lanes == ["low_risk_observation"]

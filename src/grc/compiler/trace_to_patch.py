@@ -97,6 +97,12 @@ def _taxonomy_fields(failures: List[FailureCase]) -> Dict[str, object]:
         "failure_types": sorted({case.failure_type for case in failures if case.failure_type}),
         "failure_labels": sorted({case.failure_label for case in failures if case.failure_label}),
         "predicate_evidence": dict(sorted(predicate_evidence.items())),
+        "evidence_families": sorted({case.evidence_family for case in failures if case.evidence_family}),
+        "required_evidence_types": sorted({case.required_evidence_type for case in failures if case.required_evidence_type}),
+        "observed_evidence_types": sorted({item for case in failures for item in case.observed_evidence_types if isinstance(item, str) and item}),
+        "terminal_evidence_keys": sorted({item for case in failures for item in case.terminal_evidence_keys if isinstance(item, str) and item}),
+        "typed_satisfaction_labels": sorted({case.typed_satisfaction_label for case in failures if case.typed_satisfaction_label}),
+        "postcondition_risk_lanes": sorted({case.postcondition_risk_lane for case in failures if case.postcondition_risk_lane}),
     }
 
 
@@ -176,6 +182,12 @@ def _build_failure_ir(grouped: DefaultDict[str, List[FailureCase]]) -> List[Fail
                         predicate_evidence=taxonomy["predicate_evidence"],
                         recommended_tools=_recommended_tools_from_failures(scoped_failures),
                         action_candidates=_action_candidates_from_failures(scoped_failures),
+                        evidence_families=taxonomy["evidence_families"],
+                        required_evidence_types=taxonomy["required_evidence_types"],
+                        observed_evidence_types=taxonomy["observed_evidence_types"],
+                        terminal_evidence_keys=taxonomy["terminal_evidence_keys"],
+                        typed_satisfaction_labels=taxonomy["typed_satisfaction_labels"],
+                        postcondition_risk_lanes=taxonomy["postcondition_risk_lanes"],
                         tool_schema_hash=_tool_schema_hash_from_failures(scoped_failures),
                     )
                 )
@@ -217,6 +229,12 @@ def _build_failure_ir(grouped: DefaultDict[str, List[FailureCase]]) -> List[Fail
                 predicate_evidence=taxonomy["predicate_evidence"],
                 recommended_tools=_recommended_tools_from_failures(failures),
                 action_candidates=_action_candidates_from_failures(failures),
+                evidence_families=taxonomy["evidence_families"],
+                required_evidence_types=taxonomy["required_evidence_types"],
+                observed_evidence_types=taxonomy["observed_evidence_types"],
+                terminal_evidence_keys=taxonomy["terminal_evidence_keys"],
+                typed_satisfaction_labels=taxonomy["typed_satisfaction_labels"],
+                postcondition_risk_lanes=taxonomy["postcondition_risk_lanes"],
                 tool_schema_hash=_tool_schema_hash_from_failures(failures),
             )
         )
@@ -254,6 +272,11 @@ def _failure_summary(
                 "field_names": item.field_names,
                 "recommended_tools": item.recommended_tools,
                 "action_candidates": item.action_candidates,
+                "evidence_families": item.evidence_families,
+                "required_evidence_types": item.required_evidence_types,
+                "observed_evidence_types": item.observed_evidence_types,
+                "typed_satisfaction_labels": item.typed_satisfaction_labels,
+                "postcondition_risk_lanes": item.postcondition_risk_lanes,
                 "tool_schema_hash": item.tool_schema_hash,
             }
             for item in failure_irs
