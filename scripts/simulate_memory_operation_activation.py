@@ -48,8 +48,17 @@ def evaluate(resolver_path: Path = DEFAULT_RESOLVER, negative_path: Path = DEFAU
             blocked_records.append({**base, "activated": False, "block_reason": "activation_precondition_failed"})
     controls = negative.get("negative_control_evaluations") or {}
     negative_control_activation_count = sum(int(control.get("activation_count") or 0) for control in controls.values())
-    weak_lookup_activation_count = 0
-    simulation_passed = bool(activation_records) and not blocked_records and negative_control_activation_count == 0 and int(approval.get("second_pass_review_candidate_count") or 0) >= 0
+    weak_lookup_activation_count = int(resolver.get("weak_witness_records_resolved_count") or 0)
+    upstream_gate_status = {
+        "resolver_audit_passed": resolver.get("resolver_audit_passed") is True,
+        "negative_control_audit_passed": negative.get("negative_control_audit_passed") is True,
+        "approval_manifest_ready_for_review": approval.get("approval_manifest_ready_for_review") is True,
+        "approval_manifest_sanitized": approval.get("approval_manifest_sanitized") is True,
+        "review_manifest_compiler_input_eligible_zero": int(approval.get("compiler_input_eligible_count") or 0) == 0,
+        "resolver_weak_witness_records_resolved_zero": weak_lookup_activation_count == 0,
+    }
+    upstream_gates_passed = all(upstream_gate_status.values())
+    simulation_passed = bool(activation_records) and not blocked_records and negative_control_activation_count == 0 and upstream_gates_passed
     return {
         "report_scope": "memory_operation_runtime_like_activation_simulation",
         "offline_only": True,
@@ -61,6 +70,10 @@ def evaluate(resolver_path: Path = DEFAULT_RESOLVER, negative_path: Path = DEFAU
         "candidate_commands": [],
         "planned_commands": [],
         "activation_simulation_passed": simulation_passed,
+        "upstream_gates_passed": upstream_gates_passed,
+        "upstream_gate_status": upstream_gate_status,
+        "activation_records_diagnostic_only": True,
+        "runtime_must_not_read_activation_records": True,
         "policy_unit_id": "memory_first_pass_retrieve_soft_v1",
         "activation_count": len(activation_records),
         "blocked_count": len(blocked_records),
@@ -84,6 +97,7 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"Activation count: `{report['activation_count']}`",
         f"Blocked count: `{report['blocked_count']}`",
         f"Negative-control activation count: `{report['negative_control_activation_count']}`",
+        f"Upstream gates passed: `{report['upstream_gates_passed']}`",
         f"Weak lookup activation count: `{report['weak_lookup_witness_activation_count']}`",
         f"Runtime enabled: `{report['runtime_enabled']}`",
         f"Argument creation count: `{report['argument_creation_count']}`",
@@ -113,6 +127,7 @@ def main() -> int:
             "activation_count",
             "blocked_count",
             "negative_control_activation_count",
+            "upstream_gates_passed",
             "weak_lookup_witness_activation_count",
             "argument_creation_count",
             "runtime_enabled",
