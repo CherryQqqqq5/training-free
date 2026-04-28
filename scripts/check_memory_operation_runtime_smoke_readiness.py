@@ -50,6 +50,29 @@ def _read_yaml_files(path: Path) -> list[tuple[Path, Any, str]]:
     return rows
 
 
+
+
+def _synthetic_memory_request() -> dict[str, Any]:
+    return {
+        "messages": [{"role": "user", "content": "Please recall what you remember about my saved preference."}],
+        "tools": [
+            {
+                "type": "function",
+                "function": {
+                    "name": "core_memory_retrieve",
+                    "parameters": {"type": "object", "properties": {}},
+                },
+            }
+        ],
+    }
+
+
+def _runtime_prompt_injection_observed(runtime_rules_dir: Path) -> bool:
+    engine = RuleEngine(runtime_rules_dir)
+    patched, patches = engine.apply_request(_synthetic_memory_request())
+    text = "\n".join(str(message.get("content") or "") for message in patched.get("messages") or [] if isinstance(message, dict))
+    return "memory retrieval" in text.lower() and any(str(item).startswith("prompt_injector:") for item in patches)
+
 def _runtime_rule_summaries(rules: list[Any]) -> list[dict[str, Any]]:
     summaries = []
     for rule in rules:
@@ -135,8 +158,16 @@ def evaluate(
 
     summaries = _runtime_rule_summaries(loaded_rules)
     memory_rules = [row for row in summaries if str(row.get("rule_id") or "").startswith(POLICY_UNIT_ID)]
+    synthetic_prompt_injection_passed = False
     if loaded_rules and not memory_rules:
         failures.append({"check": "memory_first_pass_runtime_rule_present", "loaded_rule_ids": [row.get("rule_id") for row in summaries]})
+    if loaded_rules and memory_rules:
+        try:
+            synthetic_prompt_injection_passed = _runtime_prompt_injection_observed(runtime_rules_dir)
+        except Exception as exc:  # pragma: no cover - malformed future runtime artifacts
+            failures.append({"check": "runtime_adapter_synthetic_prompt_injection", "error": str(exc)})
+        if not synthetic_prompt_injection_passed:
+            failures.append({"check": "runtime_adapter_synthetic_prompt_injection"})
     for row in summaries:
         if row.get("candidate_commands") or row.get("planned_commands"):
             failures.append({"check": "runtime_rule_policy_has_commands", "rule_id": row.get("rule_id")})
@@ -161,6 +192,7 @@ def evaluate(
         "memory_dev_smoke_ready": adapter_ready,
         "loaded_runtime_rule_count": len(loaded_rules),
         "loaded_memory_runtime_rule_count": len(memory_rules),
+        "runtime_adapter_synthetic_prompt_injection_passed": synthetic_prompt_injection_passed,
         "runtime_rule_summaries": summaries,
         "failure_count": len(failures),
         "first_failure": failures[0] if failures else None,
@@ -179,6 +211,7 @@ def render_markdown(report: dict[str, Any]) -> str:
         "- Memory dev smoke ready: `{}`".format(report["memory_dev_smoke_ready"]),
         "- Loaded runtime rules: `{}`".format(report["loaded_runtime_rule_count"]),
         "- Loaded memory runtime rules: `{}`".format(report["loaded_memory_runtime_rule_count"]),
+        "- Synthetic prompt injection passed: `{}`".format(report["runtime_adapter_synthetic_prompt_injection_passed"]),
         "- Dry-run boundary passed: `{}`".format(report["dry_run_policy_boundary_check_passed"]),
         "- Activation simulation passed: `{}`".format(report["activation_simulation_passed"]),
         "- Activation count: `{}`".format(report["activation_count"]),
@@ -214,6 +247,7 @@ def main() -> int:
             "memory_dev_smoke_ready",
             "loaded_runtime_rule_count",
             "loaded_memory_runtime_rule_count",
+            "runtime_adapter_synthetic_prompt_injection_passed",
             "dry_run_policy_boundary_check_passed",
             "activation_simulation_passed",
             "activation_count",

@@ -4,11 +4,11 @@ This document explains why the project does not yet have a retained rule or BFCL
 
 ## Current Decision
 
-Verdict: `REQUEST CHANGES` before smoke BFCL.
+Verdict: runtime adapter readiness is now offline-ready, but BFCL smoke still requires a separate explicit approval and frozen smoke protocol.
 
-The best retain candidate is `memory_first_pass_retrieve_soft_v1`, but it is currently a dry-run policy unit. It is not a runtime rule loaded by the BFCL candidate runner.
+The best retain candidate is `memory_first_pass_retrieve_soft_v1`. It now has both a dry-run policy unit and a runtime-compatible adapter rule for future smoke testing.
 
-## Engineering Blocker
+## Engineering Blocker Resolved
 
 The BFCL patch runner starts GRC with a `rules-dir`. The runtime engine loads YAML files containing `rules` or single `Rule` documents. It explicitly skips YAML files whose top-level key is `policy_units`, because those are selector/compiler metadata.
 
@@ -38,16 +38,16 @@ The repository now has a fail-closed checker:
 PYTHONPATH=.:src .venv/bin/python scripts/check_memory_operation_runtime_smoke_readiness.py --compact
 ```
 
-Current expected output is fail-closed:
+Current expected output after the runtime adapter compile step:
 
 ```text
-memory_runtime_adapter_ready = false
-memory_dev_smoke_ready = false
-first_failure = runtime_rule_yaml_present
-next_required_action = implement_runtime_rule_adapter_before_memory_dev_smoke
+memory_runtime_adapter_ready = true
+memory_dev_smoke_ready = true
+loaded_memory_runtime_rule_count = 1
+next_required_action = request_separate_memory_only_dev_smoke_approval
 ```
 
-This is the correct state. It prevents a BFCL run that would not exercise the proposed memory policy.
+This still does not authorize BFCL execution. It only proves a future smoke would exercise a runtime-loadable adapter rather than a metadata-only `policy_unit.yaml`.
 
 ## Smoke Preconditions
 

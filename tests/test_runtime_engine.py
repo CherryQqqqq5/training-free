@@ -3028,5 +3028,73 @@ action:
         self.assertTrue(any(str(patch).startswith("prompt_injector:Policy selected next tool:") for patch in request_patches))
         self.assertEqual(request_patches.next_tool_plan["selected_action_candidate"]["tool"], "cp")
 
+    def test_memory_runtime_predicates_gate_prompt_injection(self) -> None:
+        with tempfile.TemporaryDirectory() as rules_dir_raw:
+            rules_dir = Path(rules_dir_raw)
+            (rules_dir / "rule.yaml").write_text(
+                """
+rule_id: memory_first_pass_retrieve_soft_v1_runtime_adapter
+priority: 8
+enabled: true
+trigger:
+  error_types:
+    - memory_first_pass_retrieve_obligation
+  request_predicates:
+    - tools_available
+    - memory_tools_available
+    - no_prior_tool_outputs_present
+scope:
+  patch_sites:
+    - prompt_injector
+action:
+  prompt_fragments:
+    - "Prefer read-only memory retrieval before final prose."
+""".strip(),
+                encoding="utf-8",
+            )
+            engine = RuleEngine(rules_dir)
+            request = {
+                "messages": [{"role": "user", "content": "What do you remember about my account?"}],
+                "tools": [{"type": "function", "function": {"name": "core_memory_retrieve", "parameters": {"type": "object", "properties": {}}}}],
+            }
+            patched, patches = engine.apply_request(request)
+
+        assert any("Prefer read-only memory retrieval" in (message.get("content") or "") for message in patched["messages"])
+        assert any(item.startswith("prompt_injector:") for item in patches)
+
+    def test_memory_runtime_predicates_block_after_tool_output(self) -> None:
+        with tempfile.TemporaryDirectory() as rules_dir_raw:
+            rules_dir = Path(rules_dir_raw)
+            (rules_dir / "rule.yaml").write_text(
+                """
+rule_id: memory_first_pass_retrieve_soft_v1_runtime_adapter
+enabled: true
+trigger:
+  request_predicates:
+    - tools_available
+    - memory_tools_available
+    - no_prior_tool_outputs_present
+scope:
+  patch_sites:
+    - prompt_injector
+action:
+  prompt_fragments:
+    - "Prefer read-only memory retrieval before final prose."
+""".strip(),
+                encoding="utf-8",
+            )
+            engine = RuleEngine(rules_dir)
+            request = {
+                "messages": [
+                    {"role": "user", "content": "What do you remember?"},
+                    {"role": "tool", "content": "{\"memory\": \"done\"}"},
+                ],
+                "tools": [{"type": "function", "function": {"name": "core_memory_retrieve", "parameters": {"type": "object", "properties": {}}}}],
+            }
+            patched, patches = engine.apply_request(request)
+
+        assert not any("Prefer read-only memory retrieval" in (message.get("content") or "") for message in patched["messages"])
+        assert not any(item.startswith("prompt_injector:") for item in patches)
+
 if __name__ == "__main__":
     unittest.main()

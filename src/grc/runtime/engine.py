@@ -418,12 +418,18 @@ class RuleEngine:
 
     def _observable_request_predicates(self, request_json: Dict[str, Any]) -> set[str]:
         predicates: set[str] = set()
-        if self._tool_schema_map(request_json):
+        tool_names = set(self._tool_schema_map(request_json).keys())
+        if tool_names:
             predicates.add("tools_available")
+        lowered_tool_names = {name.lower() for name in tool_names}
+        if any("memory" in name for name in lowered_tool_names):
+            predicates.add("memory_tools_available")
         if self._collect_context_literals(request_json):
             predicates.add("prior_explicit_literals_present")
         if self._has_prior_tool_outputs(request_json):
             predicates.add("prior_tool_outputs_present")
+        else:
+            predicates.add("no_prior_tool_outputs_present")
         return predicates
 
     def _request_predicates_met(self, predicates: List[str], request_json: Dict[str, Any] | None) -> bool:

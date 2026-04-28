@@ -22,7 +22,7 @@ Disallowed claim:
 
 ## Current Evidence Snapshot
 
-Latest status: memory-operation offline workflow is present, but smoke readiness is fail-closed until a runtime-compatible adapter is implemented.
+Latest status: memory-operation offline workflow and runtime adapter readiness are present; BFCL smoke remains unexecuted and requires separate explicit approval.
 
 M2.7 CTSPC-v0:
 
@@ -95,15 +95,16 @@ The memory-operation line now has an explicit fail-closed readiness check for a 
 PYTHONPATH=.:src .venv/bin/python scripts/check_memory_operation_runtime_smoke_readiness.py --compact
 ```
 
-Current expected state is not smoke-ready:
+Current state after adapter compilation is smoke-ready but not scorer-authorized:
 
 ```text
-memory_runtime_adapter_ready = false
-memory_dev_smoke_ready = false
-next_required_action = implement_runtime_rule_adapter_before_memory_dev_smoke
+memory_runtime_adapter_ready = true
+memory_dev_smoke_ready = true
+loaded_memory_runtime_rule_count = 1
+next_required_action = request_separate_memory_only_dev_smoke_approval
 ```
 
-This is an engineering blocker, not a negative algorithm result. The dry-run policy exists as `policy_unit.yaml`, but the BFCL patch runner loads runtime `Rule` YAML from `rules-dir`; the runtime engine skips top-level `policy_units` metadata. Running BFCL before a runtime-compatible adapter exists would not test `memory_first_pass_retrieve_soft_v1`.
+The adapter resolves the earlier engineering blocker: the BFCL patch runner can load a runtime `Rule` YAML rather than metadata-only `policy_unit.yaml`. A memory-only smoke still requires a separate explicit approval, fixed case list, 创智/novacode provider, and preregistered baseline/candidate commands.
 
 ## Delivery Gates
 

@@ -65,6 +65,10 @@
 - Memory activation count: `48`
 - Memory activation negative-control count: `0`
 - Memory activation argument creation count: `0`
+- Memory runtime adapter ready: `True`
+- Memory dev smoke ready: `True`
+- Memory runtime loaded memory rules: `1`
+- Memory runtime smoke next action: `request_separate_memory_only_dev_smoke_approval`
 
 ## Source/Layout Evidence
 

@@ -1,0 +1,27 @@
+action:
+  decision_policy:
+    candidate_commands: []
+    planned_commands: []
+    recommended_tools: []
+    request_predicates:
+    - tools_available
+    - memory_tools_available
+    - no_prior_tool_outputs_present
+  prompt_fragments:
+  - 'When the user asks for memory-backed information and no memory tool result is
+    present, prefer a read-only memory retrieval, search, or list capability before
+    final prose. Keep the action capability-only: use values already grounded by the
+    current request or tool schema, and do not invent arguments.'
+enabled: true
+priority: 8
+rule_id: memory_first_pass_retrieve_soft_v1_runtime_adapter
+scope:
+  patch_sites:
+  - prompt_injector
+trigger:
+  error_types:
+  - memory_first_pass_retrieve_obligation
+  request_predicates:
+  - tools_available
+  - memory_tools_available
+  - no_prior_tool_outputs_present

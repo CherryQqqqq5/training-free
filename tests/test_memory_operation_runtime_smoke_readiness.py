@@ -74,7 +74,8 @@ scope:
   patch_sites:
     - prompt_injector
 action:
-  guidance: "When memory retrieval is required and no witness is present, prefer a schema-available memory retrieval capability before answering. Do not create arguments."
+  prompt_fragments:
+    - "When memory retrieval is required and no witness is present, prefer a schema-available memory retrieval capability before answering. Do not create arguments."
   decision_policy:
     policy_family: memory_operation_obligation
     recommended_tools: []
