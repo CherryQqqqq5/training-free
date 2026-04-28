@@ -1,0 +1,34 @@
+candidate_commands: []
+planned_commands: []
+policy_units:
+- decision_policy:
+    argument_policy: no_argument_creation_or_binding
+    capability_only: true
+    recommended_tool_capability_families:
+    - memory_key_or_text_search
+    - memory_list_keys
+    - memory_value_retrieve
+  evidence_requirements:
+  - compiler_allowlist_first_pass_only
+  - forbidden_field_scan_clean
+  - weak_lookup_witness_excluded
+  - negative_controls_passed
+  - no_raw_audit_or_review_manifest_input
+  exact_tool_choice: false
+  intervention_strength: guidance_only
+  policy_family: memory_operation_obligation
+  policy_unit_id: memory_first_pass_retrieve_soft_v1
+  retention_eligibility: diagnostic_only
+  runtime_enabled: false
+  support_count: 48
+  theory_class: memory_postcondition_obligation
+  tool_choice_mode: soft
+  trigger:
+    empty_or_error_witness_present: false
+    memory_tools_available: true
+    memory_witness_strength: no_witness
+    operation: retrieve
+    operation_scope: retrieve_only
+    retrieve_intent_observable: true
+    strong_value_witness_present: false
+runtime_enabled: false

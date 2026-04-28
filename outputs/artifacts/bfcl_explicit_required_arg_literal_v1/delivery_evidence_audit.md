@@ -53,6 +53,10 @@
 - Memory compiler allowlist input count: `48`
 - Memory first-pass review candidates: `48`
 - Memory second-pass review candidates: `30`
+- Memory dry-run policy ready: `True`
+- Memory dry-run policy units: `1`
+- Memory dry-run first-pass support: `48`
+- Memory dry-run argument creation count: `0`
 
 ## Source/Layout Evidence
 
