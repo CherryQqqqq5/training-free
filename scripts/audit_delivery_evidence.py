@@ -20,6 +20,8 @@ DEFAULT_SUBSET = Path("outputs/artifacts/bfcl_ctspc_subset30_v1")
 DEFAULT_LOW_RISK = Path("outputs/artifacts/bfcl_explicit_required_arg_literal_v1")
 DEFAULT_PHASE2_VALIDATION = Path("outputs/phase2_validation/required_next_tool_choice_v1")
 DEFAULT_POLICY_OPPORTUNITY = Path("outputs/artifacts/phase2/policy_conversion_opportunity_v1/policy_conversion_opportunity_audit.json")
+DEFAULT_POLICY_MANIFEST = Path("outputs/artifacts/phase2/policy_conversion_opportunity_v1/postcondition_guided_policy_candidate_manifest.json")
+DEFAULT_POLICY_NEGATIVE_CONTROLS = Path("outputs/artifacts/phase2/policy_conversion_opportunity_v1/postcondition_guided_negative_control_audit.json")
 DEFAULT_OUT = Path("outputs/artifacts/bfcl_explicit_required_arg_literal_v1/delivery_evidence_audit.json")
 DEFAULT_MD = Path("outputs/artifacts/bfcl_explicit_required_arg_literal_v1/delivery_evidence_audit.md")
 
@@ -129,14 +131,35 @@ def artifact_boundary_status(max_print: int = 20) -> dict[str, Any]:
     }
 
 
-def policy_opportunity_status(path: Path = DEFAULT_POLICY_OPPORTUNITY) -> dict[str, Any]:
+def policy_opportunity_status(
+    path: Path = DEFAULT_POLICY_OPPORTUNITY,
+    manifest_path: Path = DEFAULT_POLICY_MANIFEST,
+    negative_control_path: Path = DEFAULT_POLICY_NEGATIVE_CONTROLS,
+) -> dict[str, Any]:
     report = _load_json(path, {}) or {}
+    manifest = _load_json(manifest_path, {}) or {}
+    negative = _load_json(negative_control_path, {}) or {}
+    low_risk_count = int(manifest.get("low_risk_dry_run_review_eligible_count") or 0)
+    runtime_dry_run_compiler_ready = bool(low_risk_count >= 20 and negative.get("negative_control_audit_ready"))
+    if low_risk_count < 20:
+        runtime_blocker = "low_risk_support_too_small_or_witness_precision_pending"
+    elif not negative.get("negative_control_audit_ready"):
+        runtime_blocker = "negative_control_audit_not_ready"
+    else:
+        runtime_blocker = None
     return {
         "policy_conversion_opportunity_audit_ready": bool(report.get("policy_conversion_opportunity_audit_ready")),
         "policy_candidate_count": int(report.get("policy_candidate_count") or 0),
         "recommended_tools_count": int(report.get("recommended_tools_count") or 0),
         "candidate_capability_distribution": report.get("candidate_capability_distribution") or {},
         "recommended_tool_distribution": report.get("recommended_tool_distribution") or {},
+        "postcondition_already_satisfied_count": int((report.get("rejection_reason_counts") or {}).get("postcondition_already_satisfied") or 0),
+        "postcondition_low_risk_review_eligible_count": low_risk_count,
+        "postcondition_negative_control_ready": bool(negative.get("negative_control_audit_ready")),
+        "postcondition_negative_control_activation_count": int(negative.get("negative_control_activation_count") or 0),
+        "postcondition_negative_control_activation_rate": negative.get("negative_control_activation_rate"),
+        "runtime_dry_run_compiler_ready": runtime_dry_run_compiler_ready,
+        "runtime_dry_run_compiler_blocker": runtime_blocker,
         "next_required_action": report.get("next_required_action"),
     }
 
@@ -201,6 +224,8 @@ def evaluate(
         p0_blockers.append("policy_conversion_not_observed_in_existing_traces")
     if not policy_opportunity.get("policy_conversion_opportunity_audit_ready"):
         p0_blockers.append("policy_conversion_opportunity_audit_missing")
+    if not policy_opportunity.get("runtime_dry_run_compiler_ready"):
+        p0_blockers.append("runtime_dry_run_compiler_not_ready")
     if ctspc_status.get("retain") != 0:
         p0_blockers.append("ctspc_v0_retain_not_zero")
     if ctspc_status.get("scorer_default") != "off":
@@ -274,6 +299,12 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Policy candidate count: `{report['policy_conversion_opportunity']['policy_candidate_count']}`",
         f"- Recommended tools count: `{report['policy_conversion_opportunity']['recommended_tools_count']}`",
         f"- Candidate capability distribution: `{report['policy_conversion_opportunity']['candidate_capability_distribution']}`",
+        f"- Postcondition low-risk review eligible: `{report['policy_conversion_opportunity']['postcondition_low_risk_review_eligible_count']}`",
+        f"- Postcondition already satisfied filtered: `{report['policy_conversion_opportunity']['postcondition_already_satisfied_count']}`",
+        f"- Postcondition negative controls ready: `{report['policy_conversion_opportunity']['postcondition_negative_control_ready']}`",
+        f"- Postcondition negative-control activation count: `{report['policy_conversion_opportunity']['postcondition_negative_control_activation_count']}`",
+        f"- Runtime dry-run compiler ready: `{report['policy_conversion_opportunity']['runtime_dry_run_compiler_ready']}`",
+        f"- Runtime dry-run compiler blocker: `{report['policy_conversion_opportunity']['runtime_dry_run_compiler_blocker']}`",
         "",
         "## Source/Layout Evidence",
         "",
@@ -313,6 +344,11 @@ def main() -> int:
             "m2_8pre_offline_passed": report["m28pre_gate"]["m2_8pre_offline_passed"],
             "scorer_authorization_ready": report["m28pre_gate"]["scorer_authorization_ready"],
             "policy_conversion_observed": report["policy_conversion"]["policy_conversion_observed"],
+            "postcondition_policy_candidate_count": report["policy_conversion_opportunity"]["policy_candidate_count"],
+            "postcondition_low_risk_review_eligible_count": report["policy_conversion_opportunity"]["postcondition_low_risk_review_eligible_count"],
+            "postcondition_already_satisfied_count": report["policy_conversion_opportunity"]["postcondition_already_satisfied_count"],
+            "postcondition_negative_control_ready": report["policy_conversion_opportunity"]["postcondition_negative_control_ready"],
+            "runtime_dry_run_compiler_ready": report["policy_conversion_opportunity"]["runtime_dry_run_compiler_ready"],
             "policy_opportunity_candidate_count": report["policy_conversion_opportunity"]["policy_candidate_count"],
             "next_required_action": report["next_required_action"],
         }, indent=2, sort_keys=True))

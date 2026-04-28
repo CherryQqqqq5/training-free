@@ -3,7 +3,7 @@
 - Claim status: `scaffold_and_diagnostic_package_only`
 - SOTA +3pp claim ready: `False`
 - Offline only: `True`
-- P0 blockers: `['artifact_boundary_not_clean', 'm2_8pre_offline_not_passed', 'scorer_authorization_not_ready', 'policy_conversion_not_observed_in_existing_traces']`
+- P0 blockers: `['artifact_boundary_not_clean', 'm2_8pre_offline_not_passed', 'scorer_authorization_not_ready', 'policy_conversion_not_observed_in_existing_traces', 'runtime_dry_run_compiler_not_ready']`
 
 ## Gate Snapshot
 
@@ -28,9 +28,15 @@
 ## Policy Opportunity Evidence
 
 - Opportunity audit ready: `True`
-- Policy candidate count: `145`
-- Recommended tools count: `176`
-- Candidate capability distribution: `{'copy': 6, 'create_file': 18, 'directory_navigation': 56, 'move_or_rename': 4, 'read_content': 18, 'search_or_find': 31, 'write_content': 12}`
+- Policy candidate count: `63`
+- Recommended tools count: `67`
+- Candidate capability distribution: `{'copy': 6, 'create_file': 18, 'directory_navigation': 18, 'move_or_rename': 4, 'read_content': 8, 'search_or_find': 4, 'write_content': 5}`
+- Postcondition low-risk review eligible: `12`
+- Postcondition already satisfied filtered: `82`
+- Postcondition negative controls ready: `True`
+- Postcondition negative-control activation count: `0`
+- Runtime dry-run compiler ready: `False`
+- Runtime dry-run compiler blocker: `low_risk_support_too_small_or_witness_precision_pending`
 
 ## Source/Layout Evidence
 

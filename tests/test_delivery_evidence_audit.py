@@ -56,7 +56,9 @@ def test_delivery_audit_reports_scaffold_status_when_gates_fail(tmp_path: Path, 
     assert "m2_8pre_offline_not_passed" in report["p0_blockers"]
     assert "scorer_authorization_not_ready" in report["p0_blockers"]
     assert "policy_conversion_not_observed_in_existing_traces" in report["p0_blockers"]
+    assert "runtime_dry_run_compiler_not_ready" in report["p0_blockers"]
     assert report["ctspc_v0"]["latest_net_case_gain"] == -3
+    assert report["policy_conversion_opportunity"]["runtime_dry_run_compiler_ready"] is False
 
 
 def test_policy_conversion_counters_explain_rule_hits_without_policy(tmp_path: Path) -> None:
