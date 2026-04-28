@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 import scripts.build_m28pre_explicit_required_arg_literal as explicit_builder
+import scripts.check_m28pre_offline as m28pre_check
 from scripts.build_m28pre_explicit_required_arg_literal import build
 from scripts.check_m28pre_offline import evaluate as evaluate_m28pre
 from scripts.diagnose_repair_stack_contribution import evaluate as evaluate_repair_stack
@@ -602,3 +603,45 @@ def test_combined_theory_prior_pool_can_authorize_explicit_and_deterministic(tmp
     assert set(report["combined_dev_manifest"]["authorized_theory_prior_families"]) == {"deterministic_schema_local_non_live_repair"}
     assert report["planned_commands"] == []
     assert report["candidate_commands"] == []
+
+
+def test_m28pre_strict_cli_returns_nonzero_when_offline_gate_fails(tmp_path: Path) -> None:
+    subset = tmp_path / "subset"
+    low = tmp_path / "low"
+    _wj(subset / "m27ae_ctspc_v0_status.json", {"ctspc_v0_frozen": True, "scorer_default": "off", "retain": 0, "dev_rerun_authorized": False, "holdout_authorized": False})
+    _wj(subset / "repair_stack_contribution.json", {"repair_stack_split_ready": True})
+    _wj(low / "compiler_summary.json", {"compiler_ready": True, "explicit_holdout_ready": False, "ctspc_v0_action_rules_enabled": False, "ctspc_v0_file_path_multi_turn_enabled": False, "repair_stack_default": "disabled", "candidate_rules_type": "explicit_required_arg_literal_completion", "no_next_tool_intervention": True, "exact_tool_choice": False, "retention_prior_required": True, "retain_eligible_candidate_count": 17, "required_explicit_candidate_generatable": 35, "planned_commands": [], "candidate_commands": []})
+    _wj(low / "retention_prior_coverage_audit.json", {"m28pre_retention_prior_coverage_audit_ready": True, "explicit_prior_family_coverage_zero": False, "current_context_anchored_literal_candidate_count": 17, "candidate_commands": [], "planned_commands": []})
+    _wj(low / "raw_bfcl_literal_coverage_audit.json", {"m28pre_raw_bfcl_literal_coverage_audit_ready": True, "source_result_literals_prompt_anchored_count": 17, "source_result_literals_prompt_coverage_zero": False, "candidate_commands": [], "planned_commands": []})
+    _wj(low / "m28pre_source_result_availability_audit.json", {"source_result_availability_audit_ready": True, "source_result_availability_ready": True, "candidate_commands": [], "planned_commands": []})
+    _wj(low / "wrong_arg_key_alias_coverage_audit.json", {"wrong_arg_key_alias_coverage_audit_ready": True, "wrong_arg_key_alias_family_coverage_zero": True, "candidate_commands": [], "planned_commands": []})
+    _wj(low / "deterministic_schema_local_coverage_audit.json", {"deterministic_schema_local_coverage_audit_ready": True, "deterministic_schema_local_family_coverage_zero": True, "candidate_commands": [], "planned_commands": []})
+
+    rc = m28pre_check.main([
+        "--subset-root", str(subset),
+        "--low-risk-root", str(low),
+        "--output", str(low / "summary.json"),
+        "--markdown-output", str(low / "summary.md"),
+        "--strict",
+    ])
+
+    assert rc == 1
+
+
+def test_m28pre_non_strict_cli_still_writes_summary_for_diagnostics(tmp_path: Path) -> None:
+    subset = tmp_path / "subset"
+    low = tmp_path / "low"
+    _wj(subset / "m27ae_ctspc_v0_status.json", {})
+    output = low / "summary.json"
+    md = low / "summary.md"
+
+    rc = m28pre_check.main([
+        "--subset-root", str(subset),
+        "--low-risk-root", str(low),
+        "--output", str(output),
+        "--markdown-output", str(md),
+    ])
+
+    assert rc == 0
+    assert output.exists()
+    assert md.exists()

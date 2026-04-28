@@ -377,14 +377,15 @@ def render_markdown(report: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--subset-root", type=Path, default=DEFAULT_SUBSET)
     parser.add_argument("--low-risk-root", type=Path, default=DEFAULT_LOW_RISK)
     parser.add_argument("--output", type=Path, default=OUT)
     parser.add_argument("--markdown-output", type=Path, default=MD)
     parser.add_argument("--compact", action="store_true")
-    args = parser.parse_args()
+    parser.add_argument("--strict", action="store_true", help="Exit non-zero when m2_8pre_offline_passed is false.")
+    args = parser.parse_args(argv)
     report = evaluate(args.subset_root, args.low_risk_root)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -413,6 +414,8 @@ def main() -> int:
             "no_scorer_commands",
             "blockers",
         ]}, indent=2, sort_keys=True))
+    if args.strict and not report.get("m2_8pre_offline_passed"):
+        return 1
     return 0
 
 

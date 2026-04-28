@@ -18,6 +18,26 @@
 4. 把 patch 作用到 prompt、tool guard、argument sanitizer、verification hook、fallback routing。
 5. 用 BFCL 指标和 Pareto 规则决定 patch 是否被保留。
 
+
+## Current Delivery Status
+
+The current first-stage delivery status is documented in [docs/m28pre_delivery_summary.md](docs/m28pre_delivery_summary.md).
+
+Short version:
+
+- M2.7 CTSPC-v0 is frozen as `diagnostic_experimental`; it is not a BFCL performance claim.
+- M2.8-pre uses theory-guided retention priors; BFCL score cannot create retained rules.
+- Current M2.8-pre offline state is fail-closed: `scorer_authorization_ready=false` and `m2_8pre_offline_passed=false`.
+- No BFCL scorer, holdout, 100-case, M2.8, full BFCL, or retained-memory claim is authorized by the current artifacts.
+
+Use strict delivery gates before any handoff:
+
+```bash
+PATH="$PWD/.venv/bin:$PATH" .venv/bin/python -m pytest -q
+PYTHONPATH=.:src .venv/bin/python scripts/check_m28pre_offline.py --compact --strict
+PYTHONPATH=.:src .venv/bin/python scripts/check_artifact_boundary.py
+```
+
 ## 当前状态
 
 仓库已经完成的部分:
