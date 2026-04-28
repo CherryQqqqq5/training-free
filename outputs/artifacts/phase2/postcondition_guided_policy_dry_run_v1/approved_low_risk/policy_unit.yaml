@@ -1,7 +1,16 @@
 candidate_commands: []
 planned_commands: []
 policy_units:
-- decision_policy:
+- ambiguity_guard:
+    reject_if_ambiguity_flags_any:
+    - multi_step_required
+    - directory_vs_file_ambiguous
+    - copy_move_destructive
+    - write_intent_unconfirmed
+    - state_mutating_capability
+    - cue_only_match
+    require_ambiguity_flags_empty: true
+  decision_policy:
     argument_policy: no_argument_creation_or_binding
     capability_only: true
     recommended_tools:
@@ -31,7 +40,16 @@ policy_units:
     request_predicates_all:
     - prior_tool_outputs_present
     - tools_available
-- decision_policy:
+- ambiguity_guard:
+    reject_if_ambiguity_flags_any:
+    - multi_step_required
+    - directory_vs_file_ambiguous
+    - copy_move_destructive
+    - write_intent_unconfirmed
+    - state_mutating_capability
+    - cue_only_match
+    require_ambiguity_flags_empty: true
+  decision_policy:
     argument_policy: no_argument_creation_or_binding
     capability_only: true
     recommended_tools:

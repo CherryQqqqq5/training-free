@@ -83,6 +83,17 @@ def evaluate(manifest_path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
                 "argument_policy": "no_argument_creation_or_binding",
                 "capability_only": True,
             },
+            "ambiguity_guard": {
+                "require_ambiguity_flags_empty": True,
+                "reject_if_ambiguity_flags_any": [
+                    "multi_step_required",
+                    "directory_vs_file_ambiguous",
+                    "copy_move_destructive",
+                    "write_intent_unconfirmed",
+                    "state_mutating_capability",
+                    "cue_only_match",
+                ],
+            },
             "evidence_requirements": [
                 "recommended_tool_available_in_current_schema",
                 "prior_tool_output_present",

@@ -43,6 +43,7 @@ def evaluate(policy_dir: Path = DEFAULT_POLICY_DIR, manifest_path: Path = DEFAUL
     approved_rows = [row for row in rows if str(row.get("candidate_id")) in approved_ids]
     generic_matches = [row for row in rows if _row_key(row) in unit_keys and row.get("low_risk_dry_run_review_eligible")]
     ambiguous_generic_matches = [row for row in generic_matches if row.get("ambiguity_flags")]
+    generic_matches_with_ambiguity_guard = [row for row in generic_matches if not row.get("ambiguity_flags")]
     approved_activations = [row for row in approved_rows if _row_key(row) in unit_keys and not row.get("ambiguity_flags")]
     negative_activation_count = 0
     return {
@@ -51,13 +52,15 @@ def evaluate(policy_dir: Path = DEFAULT_POLICY_DIR, manifest_path: Path = DEFAUL
         "does_not_call_bfcl_or_model": True,
         "does_not_authorize_scorer": True,
         "activation_audit_scope": "approved_record_replay_only",
+        "trace_level_ambiguity_guard_spec_ready": True,
         "runtime_generalization_ready": False,
-        "runtime_generalization_blocker": "generic_policy_needs_trace_level_ambiguity_guard_before_runtime_enablement",
+        "runtime_generalization_blocker": "ambiguity guard spec is offline only; runtime detector is not implemented or enabled",
         "policy_unit_count": len(units),
         "approved_support_count": len(approved_rows),
         "approved_record_replay_activation_count": len(approved_activations),
         "generic_low_risk_match_without_ambiguity_guard_count": len(generic_matches),
         "ambiguous_low_risk_would_activate_without_guard_count": len(ambiguous_generic_matches),
+        "generic_low_risk_match_with_ambiguity_guard_count": len(generic_matches_with_ambiguity_guard),
         "negative_control_activation_count": negative_activation_count,
         "approved_record_replay_passed": len(approved_activations) == len(approved_rows) and negative_activation_count == 0,
         "sample_ambiguous_would_activate": [{
@@ -84,6 +87,7 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Approved replay activations: `{report['approved_record_replay_activation_count']}`",
         f"- Generic low-risk matches without ambiguity guard: `{report['generic_low_risk_match_without_ambiguity_guard_count']}`",
         f"- Ambiguous low-risk would activate without guard: `{report['ambiguous_low_risk_would_activate_without_guard_count']}`",
+        f"- Generic low-risk matches with ambiguity guard: `{report['generic_low_risk_match_with_ambiguity_guard_count']}`",
         f"- Next action: `{report['next_required_action']}`",
         "",
         "Offline audit only. This does not enable runtime policy execution or authorize BFCL/model/scorer runs.",
@@ -110,6 +114,8 @@ def main() -> int:
             "approved_record_replay_activation_count",
             "generic_low_risk_match_without_ambiguity_guard_count",
             "ambiguous_low_risk_would_activate_without_guard_count",
+            "generic_low_risk_match_with_ambiguity_guard_count",
+            "trace_level_ambiguity_guard_spec_ready",
             "runtime_generalization_ready",
             "next_required_action",
         ]}, indent=2, sort_keys=True))

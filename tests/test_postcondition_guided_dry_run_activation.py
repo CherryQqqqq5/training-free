@@ -47,6 +47,8 @@ def test_activation_audit_reports_approved_replay_and_ambiguous_generic_risk(tmp
     assert report["approved_record_replay_activation_count"] == 1
     assert report["generic_low_risk_match_without_ambiguity_guard_count"] == 2
     assert report["ambiguous_low_risk_would_activate_without_guard_count"] == 1
+    assert report["generic_low_risk_match_with_ambiguity_guard_count"] == 1
+    assert report["trace_level_ambiguity_guard_spec_ready"] is True
     assert report["runtime_generalization_ready"] is False
     assert report["candidate_commands"] == []
     assert report["planned_commands"] == []

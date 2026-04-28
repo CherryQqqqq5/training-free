@@ -92,6 +92,7 @@ def test_builds_non_ambiguous_low_risk_policy_units_without_runtime_case_fields(
         assert unit["tool_choice_mode"] == "soft"
         assert unit["exact_tool_choice"] is False
         assert unit["decision_policy"]["argument_policy"] == "no_argument_creation_or_binding"
+        assert unit["ambiguity_guard"]["require_ambiguity_flags_empty"] is True
 
 
 def test_dry_run_policy_checker_passes_compiled_artifact(tmp_path: Path) -> None:
