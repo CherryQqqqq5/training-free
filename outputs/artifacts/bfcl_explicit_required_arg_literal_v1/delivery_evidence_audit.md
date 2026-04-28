@@ -115,7 +115,7 @@
 - Deterministic family coverage zero: `True`
 - Source result root cause: `source_collection_subset_vs_full_dataset_audit_scope_mismatch`
 - Source scope mismatch count: `2065`
-- Audit missing source result count: `1690`
+- Audit missing source result count: `0`
 - Route recommendation: `align_audit_scope_with_source_collection_subset`
 
 This audit is diagnostic. It does not authorize BFCL/model/scorer runs.

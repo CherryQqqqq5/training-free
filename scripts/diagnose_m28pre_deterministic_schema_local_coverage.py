@@ -98,8 +98,18 @@ def evaluate(source_manifest_path: Path = DEFAULT_SOURCE_MANIFEST) -> dict[str, 
         scanned_categories.add(category)
         for root in roots:
             results = _load_result_records(root, category)
-            for case_id, entry in entries.items():
-                rows = _compile_deterministic_schema_local_records(entry, results.get(case_id), root, category)
+            for case_id, result in results.items():
+                entry = entries.get(case_id)
+                if entry is None:
+                    records.append({
+                        "case_id": case_id,
+                        "category": category,
+                        "source_run_root": str(root),
+                        "candidate_generatable": False,
+                        "rejection_reason": "source_result_case_not_in_dataset",
+                    })
+                    continue
+                rows = _compile_deterministic_schema_local_records(entry, result, root, category)
                 records.extend(rows)
     candidate_rows = [row for row in records if row.get("candidate_generatable") and (row.get("retention_prior") or {}).get("retain_eligibility") == DEMOTE_CANDIDATE]
     reasons = Counter(str(row.get("rejection_reason") or "retain_prior_candidate") for row in records)

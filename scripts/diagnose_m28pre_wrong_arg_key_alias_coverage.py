@@ -269,8 +269,12 @@ def evaluate(source_manifest_path: Path = DEFAULT_SOURCE_MANIFEST) -> dict[str, 
         scanned_categories.add(category)
         for root in roots:
             results = _load_result_records(root, category)
-            for case_id, entry in entries.items():
-                records.extend(_audit_case(category, root, entry, results.get(case_id)))
+            for case_id, result in results.items():
+                entry = entries.get(case_id)
+                if entry is None:
+                    records.append(_base_record(category, root, case_id, reason="source_result_case_not_in_dataset"))
+                    continue
+                records.extend(_audit_case(category, root, entry, result))
 
     reasons = Counter(str(row.get("rejection_reason") or "retain_prior_candidate") for row in records)
     candidate_count = sum(1 for row in records if row.get("retain_prior_candidate"))

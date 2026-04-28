@@ -814,11 +814,16 @@ def _source_result_availability_audit(source_manifest_path: Path) -> dict[str, A
                 issue_counts["result_layout_unrecognized"] += len(entries) or 1
                 hard_issue_counts["result_layout_unrecognized"] += len(entries) or 1
             else:
-                for case_id, entry in entries.items():
-                    classified = _classify_source_result_case(entry, records.get(case_id))
+                collected_ids = [case_id for case_id in records if case_id in entries]
+                for case_id in collected_ids:
+                    classified = _classify_source_result_case(entries[case_id], records.get(case_id))
                     issue_counts[str(classified["availability_reason"])] += 1
+                uncollected_count = max(len(entries) - len(collected_ids), 0)
+                if uncollected_count:
+                    issue_counts["source_result_case_not_collected"] += uncollected_count
             total_issue_counts.update(issue_counts)
-            category_report["root_reports"].append({**stats, "issue_counts": dict(sorted(issue_counts.items()))})
+            collected_ids_count = len([case_id for case_id in records if case_id in entries]) if records else 0
+            category_report["root_reports"].append({**stats, "source_result_case_count_scanned": collected_ids_count, "issue_counts": dict(sorted(issue_counts.items()))})
         combined: Counter[str] = Counter()
         for root_report in category_report["root_reports"]:
             combined.update(root_report.get("issue_counts") or {})

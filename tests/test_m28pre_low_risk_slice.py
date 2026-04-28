@@ -645,3 +645,26 @@ def test_m28pre_non_strict_cli_still_writes_summary_for_diagnostics(tmp_path: Pa
     assert rc == 0
     assert output.exists()
     assert md.exists()
+
+
+def test_source_result_availability_scans_collected_cases_only(tmp_path, monkeypatch):
+    import scripts.build_m28pre_explicit_required_arg_literal as build
+
+    source_root = tmp_path / "cat" / "baseline"
+    result_dir = source_root / "bfcl" / "result"
+    result_dir.mkdir(parents=True)
+    (result_dir / "BFCL_v4_cat_result.json").write_text('{"id": "case_a", "result": {"tool": "{}"}}\n')
+    manifest = {"category_status": [{"category": "cat", "source_artifacts_available": True, "existing_source_roots": [str(source_root)]}]}
+    manifest_path = tmp_path / "manifest.json"
+    manifest_path.write_text(json.dumps(manifest))
+    monkeypatch.setattr(build, "_load_dataset_records", lambda category: {
+        "case_a": {"id": "case_a", "function": [{"name": "tool", "parameters": {"properties": {}, "required": []}}]},
+        "case_b": {"id": "case_b", "function": [{"name": "tool", "parameters": {"properties": {}, "required": []}}]},
+    })
+
+    report = build._source_result_availability_audit(manifest_path)
+
+    root = report["category_reports"][0]["root_reports"][0]
+    assert root["source_result_case_count_scanned"] == 1
+    assert report["issue_counts"].get("source_result_case_not_collected") == 1
+    assert report["hard_issue_counts"] == {}

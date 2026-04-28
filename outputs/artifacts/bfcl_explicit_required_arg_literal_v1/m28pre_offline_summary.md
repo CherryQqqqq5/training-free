@@ -4,7 +4,7 @@
 - Scorer authorization ready: `False`
 - Raw prompt anchored source-result literals: `17`
 - Remaining gap to 35 demote candidates: `18`
-- Route recommendation: `fix_parser_or_source_result_layout`
+- Route recommendation: `define_next_theory_family_after_deterministic_schema_local_non_live_repair`
 - Blockers: `['combined_theory_prior_holdout_not_ready', 'wrong_arg_key_alias_family_coverage_zero', 'deterministic_schema_local_family_coverage_zero', 'combined_demote_candidate_below_35', 'explicit_total_below_40', 'explicit_demote_candidate_below_35', 'wrong_arg_key_alias_demote_below_20', 'deterministic_schema_local_demote_below_20', 'explicit_ambiguous_literal_present', 'explicit_holdout_below_20', 'combined_theory_prior_holdout_below_20', 'stratified_without_complete_theory_priors_not_authorized']`
 
 | Check | Passed |

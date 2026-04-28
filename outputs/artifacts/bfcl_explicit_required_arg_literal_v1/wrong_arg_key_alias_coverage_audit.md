@@ -7,10 +7,9 @@
 - Blockers: `['wrong_arg_key_alias_family_coverage_zero', 'baseline_emitted_args_mostly_canonical_or_no_alias']`
 
 ## Rejection Reasons
-- `memory_or_hidden_state_category_excluded`: `465`
+- `memory_or_hidden_state_category_excluded`: `90`
 - `missing_emitted_tool_args`: `6`
 - `missing_schema_properties`: `166`
-- `missing_source_result`: `1690`
 - `no_wrong_arg_key_alias_detected`: `2552`
 - `parallel_call_mapping_not_unique`: `506`
 
@@ -90,11 +89,11 @@
 | `irrelevance` | `thermodynamics_calculate_boiling_point` | `pressure` | `1` | `{'no_wrong_arg_key_alias_detected': 1}` |
 | `irrelevance` | `thermodynamics_calculate_boiling_point` | `substance` | `1` | `{'no_wrong_arg_key_alias_detected': 1}` |
 | `irrelevance` | `thermodynamics_calculate_boiling_point` | `unit` | `1` | `{'no_wrong_arg_key_alias_detected': 1}` |
-| `irrelevance` | `unknown` | `unknown` | `210` | `{'missing_source_result': 210}` |
-| `memory_kv` | `unknown` | `unknown` | `155` | `{'memory_or_hidden_state_category_excluded': 155}` |
-| `memory_rec_sum` | `unknown` | `unknown` | `155` | `{'memory_or_hidden_state_category_excluded': 155}` |
-| `memory_vector` | `unknown` | `unknown` | `155` | `{'memory_or_hidden_state_category_excluded': 155}` |
+| `memory_kv` | `unknown` | `unknown` | `30` | `{'memory_or_hidden_state_category_excluded': 30}` |
+| `memory_rec_sum` | `unknown` | `unknown` | `30` | `{'memory_or_hidden_state_category_excluded': 30}` |
+| `memory_vector` | `unknown` | `unknown` | `30` | `{'memory_or_hidden_state_category_excluded': 30}` |
 | `multi_turn_base` | `add_contact` | `user_name` | `2` | `{'no_wrong_arg_key_alias_detected': 2}` |
 | `multi_turn_base` | `authenticate_twitter` | `password` | `4` | `{'no_wrong_arg_key_alias_detected': 4}` |
 | `multi_turn_base` | `authenticate_twitter` | `username` | `4` | `{'no_wrong_arg_key_alias_detected': 4}` |
 | `multi_turn_base` | `cat` | `file_name` | `10` | `{'no_wrong_arg_key_alias_detected': 10}` |
+| `multi_turn_base` | `cat` | `unknown` | `2` | `{'parallel_call_mapping_not_unique': 2}` |
