@@ -22,7 +22,7 @@ Disallowed claim:
 
 ## Current Evidence Snapshot
 
-Latest pushed HEAD for this delivery status: `a3b6320d`.
+Latest status: memory-operation offline workflow is present, but smoke readiness is fail-closed until a runtime-compatible adapter is implemented.
 
 M2.7 CTSPC-v0:
 
@@ -85,6 +85,25 @@ Current compact evidence:
 - Argument creation count: `0`.
 
 This is stronger workflow evidence for a training-free self-evolution loop, but it is not BFCL performance evidence and does not authorize runtime/scorer use.
+
+
+## Memory Smoke Readiness Update
+
+The memory-operation line now has an explicit fail-closed readiness check for a future small dev smoke:
+
+```bash
+PYTHONPATH=.:src .venv/bin/python scripts/check_memory_operation_runtime_smoke_readiness.py --compact
+```
+
+Current expected state is not smoke-ready:
+
+```text
+memory_runtime_adapter_ready = false
+memory_dev_smoke_ready = false
+next_required_action = implement_runtime_rule_adapter_before_memory_dev_smoke
+```
+
+This is an engineering blocker, not a negative algorithm result. The dry-run policy exists as `policy_unit.yaml`, but the BFCL patch runner loads runtime `Rule` YAML from `rules-dir`; the runtime engine skips top-level `policy_units` metadata. Running BFCL before a runtime-compatible adapter exists would not test `memory_first_pass_retrieve_soft_v1`.
 
 ## Delivery Gates
 
