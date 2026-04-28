@@ -38,6 +38,14 @@
 - Runtime dry-run compiler ready: `False`
 - Runtime dry-run compiler blocker: `low_risk_support_too_small_or_witness_precision_pending`
 
+## Memory Operation Obligation Evidence
+
+- Memory audit ready: `True`
+- Memory operation candidates: `48`
+- Memory candidate operations: `{'retrieve': 48}`
+- Memory candidate categories: `{'memory_kv': 24, 'memory_rec_sum': 24}`
+- Memory runtime enabled: `False`
+
 ## Source/Layout Evidence
 
 - Source result availability ready: `True`

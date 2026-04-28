@@ -22,6 +22,7 @@ DEFAULT_PHASE2_VALIDATION = Path("outputs/phase2_validation/required_next_tool_c
 DEFAULT_POLICY_OPPORTUNITY = Path("outputs/artifacts/phase2/policy_conversion_opportunity_v1/policy_conversion_opportunity_audit.json")
 DEFAULT_POLICY_MANIFEST = Path("outputs/artifacts/phase2/policy_conversion_opportunity_v1/postcondition_guided_policy_candidate_manifest.json")
 DEFAULT_POLICY_NEGATIVE_CONTROLS = Path("outputs/artifacts/phase2/policy_conversion_opportunity_v1/postcondition_guided_negative_control_audit.json")
+DEFAULT_MEMORY_OBLIGATION = Path("outputs/artifacts/phase2/memory_operation_obligation_v1/memory_operation_obligation_audit.json")
 DEFAULT_OUT = Path("outputs/artifacts/bfcl_explicit_required_arg_literal_v1/delivery_evidence_audit.json")
 DEFAULT_MD = Path("outputs/artifacts/bfcl_explicit_required_arg_literal_v1/delivery_evidence_audit.md")
 
@@ -164,6 +165,19 @@ def policy_opportunity_status(
     }
 
 
+def memory_obligation_status(path: Path = DEFAULT_MEMORY_OBLIGATION) -> dict[str, Any]:
+    report = _load_json(path, {}) or {}
+    return {
+        "memory_operation_obligation_audit_ready": bool(report.get("candidate_count") is not None),
+        "memory_operation_candidate_count": int(report.get("candidate_count") or 0),
+        "memory_operation_candidate_distribution": report.get("candidate_operation_distribution") or {},
+        "memory_operation_category_distribution": report.get("candidate_category_distribution") or {},
+        "memory_operation_rejection_reason_counts": report.get("rejection_reason_counts") or {},
+        "memory_operation_runtime_enabled": bool(report.get("runtime_enabled")),
+        "memory_operation_next_required_action": report.get("next_required_action"),
+    }
+
+
 def source_result_layout_status(low_risk_root: Path = DEFAULT_LOW_RISK) -> dict[str, Any]:
     availability = _load_json(low_risk_root / "m28pre_source_result_availability_audit.json", {}) or {}
     alias = _load_json(low_risk_root / "wrong_arg_key_alias_coverage_audit.json", {}) or {}
@@ -213,6 +227,7 @@ def evaluate(
     policy = policy_conversion_counters(phase2_validation_root)
     source_layout = source_result_layout_status(low_risk_root)
     policy_opportunity = policy_opportunity_status()
+    memory_obligation = memory_obligation_status()
     p0_blockers: list[str] = []
     if not boundary["artifact_boundary_passed"]:
         p0_blockers.append("artifact_boundary_not_clean")
@@ -259,6 +274,7 @@ def evaluate(
         },
         "policy_conversion": policy,
         "policy_conversion_opportunity": policy_opportunity,
+        "memory_operation_obligation": memory_obligation,
         "source_result_layout": source_layout,
         "next_required_action": "root_cause_audit_before_any_scorer",
     }
@@ -306,6 +322,14 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Runtime dry-run compiler ready: `{report['policy_conversion_opportunity']['runtime_dry_run_compiler_ready']}`",
         f"- Runtime dry-run compiler blocker: `{report['policy_conversion_opportunity']['runtime_dry_run_compiler_blocker']}`",
         "",
+        "## Memory Operation Obligation Evidence",
+        "",
+        f"- Memory audit ready: `{report['memory_operation_obligation']['memory_operation_obligation_audit_ready']}`",
+        f"- Memory operation candidates: `{report['memory_operation_obligation']['memory_operation_candidate_count']}`",
+        f"- Memory candidate operations: `{report['memory_operation_obligation']['memory_operation_candidate_distribution']}`",
+        f"- Memory candidate categories: `{report['memory_operation_obligation']['memory_operation_category_distribution']}`",
+        f"- Memory runtime enabled: `{report['memory_operation_obligation']['memory_operation_runtime_enabled']}`",
+        "",
         "## Source/Layout Evidence",
         "",
         f"- Source result availability ready: `{report['source_result_layout']['source_result_availability_ready']}`",
@@ -349,6 +373,8 @@ def main() -> int:
             "postcondition_already_satisfied_count": report["policy_conversion_opportunity"]["postcondition_already_satisfied_count"],
             "postcondition_negative_control_ready": report["policy_conversion_opportunity"]["postcondition_negative_control_ready"],
             "runtime_dry_run_compiler_ready": report["policy_conversion_opportunity"]["runtime_dry_run_compiler_ready"],
+            "memory_operation_candidate_count": report["memory_operation_obligation"]["memory_operation_candidate_count"],
+            "memory_operation_runtime_enabled": report["memory_operation_obligation"]["memory_operation_runtime_enabled"],
             "policy_opportunity_candidate_count": report["policy_conversion_opportunity"]["policy_candidate_count"],
             "next_required_action": report["next_required_action"],
         }, indent=2, sort_keys=True))

@@ -59,6 +59,7 @@ def test_delivery_audit_reports_scaffold_status_when_gates_fail(tmp_path: Path, 
     assert "runtime_dry_run_compiler_not_ready" in report["p0_blockers"]
     assert report["ctspc_v0"]["latest_net_case_gain"] == -3
     assert report["policy_conversion_opportunity"]["runtime_dry_run_compiler_ready"] is False
+    assert report["memory_operation_obligation"]["memory_operation_candidate_count"] >= 0
 
 
 def test_policy_conversion_counters_explain_rule_hits_without_policy(tmp_path: Path) -> None:
