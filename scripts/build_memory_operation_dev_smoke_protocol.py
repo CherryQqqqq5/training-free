@@ -7,6 +7,11 @@ import json
 from pathlib import Path
 from typing import Any
 
+try:  # Imported at module scope so tests can monkeypatch it.
+    from bfcl_eval.utils import load_dataset_entry
+except Exception:  # pragma: no cover - defensive for minimal test envs
+    load_dataset_entry = None  # type: ignore[assignment]
+
 DEFAULT_SOURCE_ROOT = Path("outputs/artifacts/bfcl_ctspc_source_pool_v1")
 DEFAULT_RUNTIME_DIR = Path("outputs/artifacts/phase2/memory_operation_obligation_runtime_smoke_v1/first_pass")
 DEFAULT_OUT_DIR = Path("outputs/artifacts/phase2/memory_operation_dev_smoke_v1")
@@ -30,6 +35,50 @@ def _ids_for_category(source_root: Path, category: str) -> list[str]:
     return [str(item) for item in ids or []]
 
 
+def _bfcl_entries_by_id(category: str) -> dict[str, dict[str, Any]]:
+    if load_dataset_entry is None:
+        return {}
+    try:
+        entries = load_dataset_entry(category, include_prereq=True)  # type: ignore[misc]
+    except TypeError:
+        entries = load_dataset_entry(category)  # type: ignore[misc]
+    except Exception:
+        return {}
+    return {str(entry.get("id")): entry for entry in entries if isinstance(entry, dict) and entry.get("id")}
+
+
+def _dependency_expanded_ids(category: str, target_ids: list[str]) -> tuple[list[str], dict[str, list[str]], list[str], bool]:
+    entries_by_id = _bfcl_entries_by_id(category)
+    if not entries_by_id:
+        return list(target_ids), {}, [], False
+
+    expanded: list[str] = []
+    seen: set[str] = set()
+    missing: list[str] = []
+    deps_by_target: dict[str, list[str]] = {}
+
+    def add(case_id: str) -> None:
+        if case_id in seen:
+            return
+        entry = entries_by_id.get(case_id)
+        if entry is None:
+            missing.append(case_id)
+            seen.add(case_id)
+            return
+        for dep_id in entry.get("depends_on") or []:
+            add(str(dep_id))
+        seen.add(case_id)
+        expanded.append(case_id)
+
+    for target_id in target_ids:
+        entry = entries_by_id.get(target_id)
+        deps = [str(dep_id) for dep_id in (entry or {}).get("depends_on") or []]
+        deps_by_target[target_id] = deps
+        add(target_id)
+
+    return expanded, deps_by_target, sorted(set(missing)), True
+
+
 def _sha256_file(path: Path) -> str | None:
     if not path.exists():
         return None
@@ -45,28 +94,63 @@ def evaluate(source_root: Path = DEFAULT_SOURCE_ROOT, runtime_dir: Path = DEFAUL
     selected: list[dict[str, str]] = []
     max_case_bound_valid = max_cases == 6
     per_category = max(1, max_cases // len(DEFAULT_CATEGORIES))
-    category_counts = {}
-    missing = []
+    category_counts: dict[str, int] = {}
+    generation_case_counts: dict[str, int] = {}
+    prereq_case_counts: dict[str, int] = {}
+    target_ids_by_category: dict[str, list[str]] = {}
+    generation_ids_by_category: dict[str, list[str]] = {}
+    deps_by_category: dict[str, dict[str, list[str]]] = {}
+    missing_dependency_ids_by_category: dict[str, list[str]] = {}
+    metadata_available_by_category: dict[str, bool] = {}
+    missing: list[str] = []
+
     for category in DEFAULT_CATEGORIES:
         ids = _ids_for_category(source_root, category)
         if not ids:
             missing.append(category)
             continue
         take = ids[:per_category]
+        expanded, deps_by_target, missing_deps, metadata_available = _dependency_expanded_ids(category, take)
         category_counts[category] = len(take)
+        generation_case_counts[category] = len(expanded)
+        prereq_case_counts[category] = len([case_id for case_id in expanded if "prereq" in case_id])
+        target_ids_by_category[category] = take
+        generation_ids_by_category[category] = expanded
+        deps_by_category[category] = deps_by_target
+        missing_dependency_ids_by_category[category] = missing_deps
+        metadata_available_by_category[category] = metadata_available
         selected.extend({"category": category, "case_id": case_id} for case_id in take)
+
     selected = selected[:max_cases]
     readiness = _load_json(runtime_dir / "memory_operation_runtime_smoke_readiness.json") or {}
     adapter_status = _load_json(runtime_dir / "memory_operation_runtime_adapter_compile_status.json") or {}
+    snapshot_dependency_closure_ready = bool(
+        generation_ids_by_category
+        and all(metadata_available_by_category.get(category) for category in DEFAULT_CATEGORIES if category_counts.get(category))
+        and not any(missing_dependency_ids_by_category.get(category) for category in DEFAULT_CATEGORIES)
+        and all(prereq_case_counts.get(category, 0) > 0 for category in DEFAULT_CATEGORIES if category_counts.get(category))
+    )
     protocol_ready = bool(
         max_case_bound_valid
         and len(selected) == max_cases
         and not missing
+        and snapshot_dependency_closure_ready
         and readiness.get("memory_dev_smoke_ready") is True
         and adapter_status.get("runtime_adapter_compile_ready") is True
     )
     case_hash = _hash_payload(selected)
-    report = {
+    generation_hash = _hash_payload(generation_ids_by_category)
+    first_failure = None
+    if not protocol_ready:
+        first_failure = {
+            "check": "protocol_inputs_ready",
+            "missing_categories": missing,
+            "max_case_bound_valid": max_case_bound_valid,
+            "snapshot_dependency_closure_ready": snapshot_dependency_closure_ready,
+            "missing_dependency_ids_by_category": missing_dependency_ids_by_category,
+            "memory_dependency_metadata_available_by_category": metadata_available_by_category,
+        }
+    return {
         "report_scope": "memory_operation_dev_smoke_protocol",
         "offline_only": True,
         "does_not_call_bfcl_or_model": True,
@@ -74,12 +158,24 @@ def evaluate(source_root: Path = DEFAULT_SOURCE_ROOT, runtime_dir: Path = DEFAUL
         "smoke_protocol_ready_for_review": protocol_ready,
         "provider_required": PROVIDER,
         "max_cases": max_cases,
+        "target_case_count": len(selected),
         "selected_case_count": len(selected),
+        "generation_case_count": sum(generation_case_counts.values()),
+        "prereq_case_count": sum(prereq_case_counts.values()),
         "max_case_bound_valid": max_case_bound_valid,
         "selected_categories": DEFAULT_CATEGORIES,
         "selected_category_counts": category_counts,
+        "generation_case_counts": generation_case_counts,
+        "prereq_case_counts": prereq_case_counts,
         "selected_cases": selected,
+        "target_ids_by_category": target_ids_by_category,
+        "generation_ids_by_category": generation_ids_by_category,
+        "memory_dependencies_by_target": deps_by_category,
+        "missing_dependency_ids_by_category": missing_dependency_ids_by_category,
+        "memory_dependency_metadata_available_by_category": metadata_available_by_category,
+        "memory_snapshot_dependency_closure_ready": snapshot_dependency_closure_ready,
         "selected_case_list_hash": case_hash,
+        "generation_case_list_hash": generation_hash,
         "runtime_rule_path": str(runtime_dir / "rule.yaml"),
         "runtime_rule_sha256": _sha256_file(runtime_dir / "rule.yaml"),
         "runtime_adapter_compile_ready": adapter_status.get("runtime_adapter_compile_ready") is True,
@@ -119,10 +215,9 @@ def evaluate(source_root: Path = DEFAULT_SOURCE_ROOT, runtime_dir: Path = DEFAUL
             "weak_lookup_policy_activation_count_eq_0": True,
         },
         "failure_count": 0 if protocol_ready else 1,
-        "first_failure": None if protocol_ready else {"check": "protocol_inputs_ready", "missing_categories": missing, "max_case_bound_valid": max_case_bound_valid},
+        "first_failure": first_failure,
         "next_required_action": "request_explicit_memory_only_dev_smoke_execution_approval" if protocol_ready else "fix_protocol_inputs_before_smoke_request",
     }
-    return report
 
 
 def write_outputs(report: dict[str, Any], out_dir: Path) -> None:
@@ -136,9 +231,14 @@ def write_outputs(report: dict[str, Any], out_dir: Path) -> None:
         "",
         f"- Ready for review: `{report['smoke_protocol_ready_for_review']}`",
         f"- Provider required: `{report['provider_required']}`",
-        f"- Selected case count: `{report['selected_case_count']}`",
+        f"- Target case count: `{report['target_case_count']}`",
+        f"- Generation case count: `{report['generation_case_count']}`",
+        f"- Prereq case count: `{report['prereq_case_count']}`",
         f"- Selected category counts: `{report['selected_category_counts']}`",
+        f"- Generation category counts: `{report['generation_case_counts']}`",
+        f"- Snapshot dependency closure ready: `{report['memory_snapshot_dependency_closure_ready']}`",
         f"- Case list hash: `{report['selected_case_list_hash']}`",
+        f"- Generation list hash: `{report['generation_case_list_hash']}`",
         f"- Runtime rule hash: `{report['runtime_rule_sha256']}`",
         f"- Candidate commands: `{report['candidate_commands']}`",
         f"- Planned commands: `{report['planned_commands']}`",
@@ -146,6 +246,7 @@ def write_outputs(report: dict[str, Any], out_dir: Path) -> None:
         f"- Next action: `{report['next_required_action']}`",
         "",
         "This protocol freezes the small memory-only dev smoke design. It does not execute BFCL/model/scorer.",
+        "Memory target cases require BFCL prerequisite entries to initialize snapshots before the target turns run.",
         "",
     ]
     (out_dir / "memory_operation_dev_smoke_protocol.md").write_text("\n".join(lines), encoding="utf-8")
@@ -165,10 +266,15 @@ def main() -> int:
         keys = [
             "smoke_protocol_ready_for_review",
             "provider_required",
-            "selected_case_count",
+            "target_case_count",
+            "generation_case_count",
+            "prereq_case_count",
             "max_case_bound_valid",
             "selected_category_counts",
+            "generation_case_counts",
+            "memory_snapshot_dependency_closure_ready",
             "selected_case_list_hash",
+            "generation_case_list_hash",
             "runtime_rule_sha256",
             "candidate_commands",
             "planned_commands",

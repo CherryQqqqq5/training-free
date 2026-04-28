@@ -30,29 +30,47 @@ def _write_runtime(runtime_dir: Path, *, ready: bool = True) -> None:
     )
 
 
-def test_protocol_builds_six_case_memory_only_manifest(tmp_path: Path) -> None:
+def _fake_memory_entries(category: str, include_prereq: bool = True):
+    prereqs = [
+        {"id": f"{category}_prereq_{i}-customer-{i}", "depends_on": [f"{category}_prereq_{j}-customer-{j}" for j in range(i)]}
+        for i in range(2)
+    ]
+    targets = [
+        {"id": f"{category}_{i}-customer-{i}", "depends_on": [item["id"] for item in prereqs]}
+        for i in range(5)
+    ]
+    return prereqs + targets if include_prereq else targets
+
+
+def test_protocol_builds_six_target_case_memory_only_manifest_with_prereqs(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(protocol, "load_dataset_entry", _fake_memory_entries)
     source = tmp_path / "source"
     runtime = tmp_path / "runtime"
-    _write_ids(source, "memory_kv", [f"memory_kv_{i}" for i in range(5)])
-    _write_ids(source, "memory_rec_sum", [f"memory_rec_sum_{i}" for i in range(5)])
+    _write_ids(source, "memory_kv", [f"memory_kv_{i}-customer-{i}" for i in range(5)])
+    _write_ids(source, "memory_rec_sum", [f"memory_rec_sum_{i}-customer-{i}" for i in range(5)])
     _write_runtime(runtime, ready=True)
 
     report = protocol.evaluate(source, runtime, max_cases=6)
 
     assert report["smoke_protocol_ready_for_review"] is True
     assert report["provider_required"] == "novacode"
+    assert report["target_case_count"] == 6
     assert report["selected_case_count"] == 6
+    assert report["generation_case_count"] == 10
+    assert report["prereq_case_count"] == 4
+    assert report["memory_snapshot_dependency_closure_ready"] is True
     assert report["selected_category_counts"] == {"memory_kv": 3, "memory_rec_sum": 3}
     assert report["candidate_commands"] == []
     assert report["planned_commands"] == []
     assert report["does_not_authorize_scorer"] is True
 
 
-def test_protocol_fails_when_runtime_not_ready(tmp_path: Path) -> None:
+def test_protocol_fails_when_runtime_not_ready(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(protocol, "load_dataset_entry", _fake_memory_entries)
     source = tmp_path / "source"
     runtime = tmp_path / "runtime"
-    _write_ids(source, "memory_kv", [f"memory_kv_{i}" for i in range(5)])
-    _write_ids(source, "memory_rec_sum", [f"memory_rec_sum_{i}" for i in range(5)])
+    _write_ids(source, "memory_kv", [f"memory_kv_{i}-customer-{i}" for i in range(5)])
+    _write_ids(source, "memory_rec_sum", [f"memory_rec_sum_{i}-customer-{i}" for i in range(5)])
     _write_runtime(runtime, ready=False)
 
     report = protocol.evaluate(source, runtime, max_cases=6)
@@ -61,10 +79,11 @@ def test_protocol_fails_when_runtime_not_ready(tmp_path: Path) -> None:
     assert report["failure_count"] == 1
 
 
-def test_protocol_fails_when_category_ids_missing(tmp_path: Path) -> None:
+def test_protocol_fails_when_category_ids_missing(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(protocol, "load_dataset_entry", _fake_memory_entries)
     source = tmp_path / "source"
     runtime = tmp_path / "runtime"
-    _write_ids(source, "memory_kv", [f"memory_kv_{i}" for i in range(5)])
+    _write_ids(source, "memory_kv", [f"memory_kv_{i}-customer-{i}" for i in range(5)])
     _write_runtime(runtime, ready=True)
 
     report = protocol.evaluate(source, runtime, max_cases=6)
@@ -73,11 +92,12 @@ def test_protocol_fails_when_category_ids_missing(tmp_path: Path) -> None:
     assert report["first_failure"]["missing_categories"] == ["memory_rec_sum"]
 
 
-def test_protocol_rejects_non_six_case_scope(tmp_path: Path) -> None:
+def test_protocol_rejects_non_six_case_scope(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(protocol, "load_dataset_entry", _fake_memory_entries)
     source = tmp_path / "source"
     runtime = tmp_path / "runtime"
-    _write_ids(source, "memory_kv", [f"memory_kv_{i}" for i in range(50)])
-    _write_ids(source, "memory_rec_sum", [f"memory_rec_sum_{i}" for i in range(50)])
+    _write_ids(source, "memory_kv", [f"memory_kv_{i}-customer-{i}" for i in range(50)])
+    _write_ids(source, "memory_rec_sum", [f"memory_rec_sum_{i}-customer-{i}" for i in range(50)])
     _write_runtime(runtime, ready=True)
 
     report = protocol.evaluate(source, runtime, max_cases=20)
@@ -85,3 +105,18 @@ def test_protocol_rejects_non_six_case_scope(tmp_path: Path) -> None:
     assert report["smoke_protocol_ready_for_review"] is False
     assert report["max_case_bound_valid"] is False
     assert report["first_failure"]["max_case_bound_valid"] is False
+
+
+def test_protocol_fails_without_bfcl_memory_dependency_metadata(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(protocol, "load_dataset_entry", lambda category, include_prereq=True: [])
+    source = tmp_path / "source"
+    runtime = tmp_path / "runtime"
+    _write_ids(source, "memory_kv", [f"memory_kv_{i}" for i in range(5)])
+    _write_ids(source, "memory_rec_sum", [f"memory_rec_sum_{i}" for i in range(5)])
+    _write_runtime(runtime, ready=True)
+
+    report = protocol.evaluate(source, runtime, max_cases=6)
+
+    assert report["smoke_protocol_ready_for_review"] is False
+    assert report["memory_snapshot_dependency_closure_ready"] is False
+    assert report["first_failure"]["memory_dependency_metadata_available_by_category"] == {"memory_kv": False, "memory_rec_sum": False}
