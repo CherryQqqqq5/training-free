@@ -32,6 +32,17 @@ def test_negative_controls_bucket_rejected_traces_without_activation(tmp_path: P
     manifest = tmp_path / "manifest.json"
     _wj(manifest, {"runtime_enabled": False, "candidate_commands": [], "planned_commands": []})
     _trace(
+        tmp_path / "run" / "traces" / "satisfied.json",
+        user="Please search for budget analysis.",
+        labels=["(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)"],
+        predicates=["prior_tool_outputs_present", "tools_available"],
+        rule_hits=["rule1"],
+        tools=["grep", "find"],
+    )
+    payload = json.loads((tmp_path / "run" / "traces" / "satisfied.json").read_text())
+    payload["request_original"]["input"][-1]["output"] = json.dumps({"matches": ["./budget.txt"]})
+    (tmp_path / "run" / "traces" / "satisfied.json").write_text(json.dumps(payload) + "\n")
+    _trace(
         tmp_path / "run" / "traces" / "not_no_tool.json",
         user="Please read report.txt.",
         labels=["(OTHER,FAILURE)"],
@@ -56,6 +67,17 @@ def test_negative_controls_bucket_rejected_traces_without_activation(tmp_path: P
         rule_hits=["rule1"],
         tools=["cat"],
     )
+    _trace(
+        tmp_path / "run" / "traces" / "satisfied.json",
+        user="Please search for budget analysis.",
+        labels=["(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)"],
+        predicates=["prior_tool_outputs_present", "tools_available"],
+        rule_hits=["rule1"],
+        tools=["grep", "find"],
+    )
+    payload = json.loads((tmp_path / "run" / "traces" / "satisfied.json").read_text())
+    payload["request_original"]["input"][-1]["output"] = json.dumps({"matches": ["./budget.txt"]})
+    (tmp_path / "run" / "traces" / "satisfied.json").write_text(json.dumps(payload) + "\n")
 
     report = neg.evaluate(tmp_path, manifest)
 
@@ -65,7 +87,9 @@ def test_negative_controls_bucket_rejected_traces_without_activation(tmp_path: P
         "missing_recommended_tool": 1,
         "no_prior_observation": 1,
         "no_toolless_failure_slice": 1,
+        "postcondition_already_satisfied": 1,
     }
+    assert report["postcondition_already_satisfied_control_evaluable"] is True
     assert report["candidate_commands"] == []
     assert report["planned_commands"] == []
 

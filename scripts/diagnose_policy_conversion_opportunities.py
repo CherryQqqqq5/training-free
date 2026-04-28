@@ -25,6 +25,19 @@ NO_TOOL_POLICY_LABELS = {
     "(POST_TOOL,TERMINATION_INADMISSIBLE)",
 }
 
+WITNESS_KEY_ALIASES: dict[str, set[str]] = {
+    "file_exists": {"file_exists", "exists", "created", "path"},
+    "file_content": {"file_content", "content"},
+    "file_content_changed": {"file_content", "content", "written", "updated"},
+    "matching_results": {"matching_results", "matches", "results", "files", "paths"},
+    "comparison_result": {"comparison_result", "diff", "differences"},
+    "target_path_changed": {"target_path_changed", "destination", "target", "path"},
+    "current_working_directory": {"current_working_directory", "cwd"},
+    "memory_records": {"memory_records", "records", "memories"},
+    "search_results": {"search_results", "results"},
+}
+
+
 CAPABILITY_RULES: list[tuple[str, list[str], list[str], list[str]]] = [
     ("create_file", ["create", "new file", "set up a new file", "produce a file"], ["touch"], ["file_exists"]),
     ("write_content", ["write", "append", "add content", "put", "save"], ["echo"], ["file_content_changed"]),
@@ -129,6 +142,53 @@ def _infer_capability(user_text: str, available_tools: list[str]) -> tuple[str |
     return None, [], [], None
 
 
+
+def _load_json_from_text(text: str) -> Any | None:
+    try:
+        return json.loads(text)
+    except Exception:
+        return None
+
+
+def _tool_output_payloads(request: dict[str, Any]) -> list[Any]:
+    payloads: list[Any] = []
+    for msg in _input_messages(request):
+        if msg.get("type") not in {"function_call_output", "tool_result"} and msg.get("role") != "tool":
+            continue
+        raw = msg.get("output", msg.get("content"))
+        if isinstance(raw, str):
+            parsed = _load_json_from_text(raw)
+            payloads.append(parsed if parsed is not None else raw)
+        elif raw is not None:
+            payloads.append(raw)
+    return payloads
+
+
+def _flatten_keys(obj: Any) -> set[str]:
+    keys: set[str] = set()
+    if isinstance(obj, dict):
+        for key, value in obj.items():
+            keys.add(str(key))
+            keys.update(_flatten_keys(value))
+    elif isinstance(obj, list):
+        for item in obj:
+            keys.update(_flatten_keys(item))
+    return keys
+
+
+def _postcondition_already_satisfied(request: dict[str, Any], witnesses: list[str]) -> tuple[bool, list[str]]:
+    if not witnesses:
+        return False, []
+    aliases: set[str] = set()
+    for witness in witnesses:
+        aliases.update(WITNESS_KEY_ALIASES.get(witness, {witness}))
+    matched: set[str] = set()
+    for payload in _tool_output_payloads(request):
+        keys = _flatten_keys(payload)
+        matched.update(key for key in keys if key in aliases)
+    return bool(matched), sorted(matched)
+
+
 def _record_from_trace(path: Path, root: Path) -> dict[str, Any] | None:
     payload = _load_json(path)
     if not isinstance(payload, dict):
@@ -144,6 +204,7 @@ def _record_from_trace(path: Path, root: Path) -> dict[str, Any] | None:
     text = _user_text(req)
     policy_failure = bool(set(labels) & NO_TOOL_POLICY_LABELS)
     capability, recommended, witnesses, cue = _infer_capability(text, available)
+    postcondition_satisfied, satisfied_witness_keys = _postcondition_already_satisfied(req, witnesses)
     rejection_reason = None
     if not policy_failure:
         rejection_reason = "not_no_tool_policy_failure"
@@ -155,6 +216,8 @@ def _record_from_trace(path: Path, root: Path) -> dict[str, Any] | None:
         rejection_reason = "no_rule_hit"
     elif not recommended:
         rejection_reason = "no_schema_local_recommended_tool"
+    elif postcondition_satisfied:
+        rejection_reason = "postcondition_already_satisfied"
     candidate_ready = rejection_reason is None
     rel = str(path.relative_to(root)) if path.is_relative_to(root) else str(path)
     return {
@@ -179,6 +242,8 @@ def _record_from_trace(path: Path, root: Path) -> dict[str, Any] | None:
         "exact_tool_choice": False,
         "precondition_observable": bool(candidate_ready),
         "postcondition_witness_available": bool(candidate_ready and witnesses),
+        "postcondition_already_satisfied": postcondition_satisfied,
+        "satisfied_witness_keys": satisfied_witness_keys,
         "target_or_scorer_field_dependency": False,
         "candidate_ready": candidate_ready,
         "rejection_reason": rejection_reason,

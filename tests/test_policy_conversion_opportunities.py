@@ -91,3 +91,25 @@ def test_policy_opportunity_requires_schema_local_recommended_tool(tmp_path: Pat
 
     assert report["policy_candidate_count"] == 0
     assert report["rejection_reason_counts"]["no_schema_local_recommended_tool"] == 1
+
+
+def test_policy_opportunity_rejects_already_satisfied_postcondition(tmp_path: Path) -> None:
+    _trace(
+        tmp_path / "soft_target" / "traces" / "already.json",
+        user="Please search for budget analysis.",
+        labels=["(POST_TOOL,POST_TOOL_PROSE_SUMMARY)"],
+        predicates=["prior_tool_outputs_present", "tools_available"],
+        rule_hits=["rule1"],
+        tools=["grep", "find"],
+    )
+    payload = json.loads((tmp_path / "soft_target" / "traces" / "already.json").read_text())
+    payload["request_original"]["input"][-1]["output"] = json.dumps({"matches": ["./budget.txt"]})
+    (tmp_path / "soft_target" / "traces" / "already.json").write_text(json.dumps(payload) + "\n")
+
+    report = audit.evaluate(tmp_path)
+
+    assert report["policy_candidate_count"] == 0
+    assert report["rejection_reason_counts"]["postcondition_already_satisfied"] == 1
+    rejected = report["sample_rejections"][0]
+    assert rejected["postcondition_already_satisfied"] is True
+    assert rejected["satisfied_witness_keys"] == ["matches"]

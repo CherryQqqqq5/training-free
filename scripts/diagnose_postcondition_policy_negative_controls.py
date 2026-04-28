@@ -20,6 +20,7 @@ NEGATIVE_BUCKETS = {
     "no_schema_local_recommended_tool": "missing_recommended_tool",
     "no_rule_hit": "no_rule_hit",
     "no_tools_available": "no_tools_available",
+    "postcondition_already_satisfied": "postcondition_already_satisfied",
 }
 
 
@@ -70,8 +71,8 @@ def evaluate(trace_root: Path = DEFAULT_TRACE_ROOT, manifest_path: Path = DEFAUL
             sample_by_bucket[bucket].append(compact)
     total_negative = sum(bucket_counts.values())
     total_activations = sum(activation_counts.values())
-    postcondition_satisfied_evaluable = False
-    controls_ready = bool(total_negative) and total_activations == 0 and manifest.get("runtime_enabled") is False
+    postcondition_satisfied_evaluable = bucket_counts.get("postcondition_already_satisfied", 0) > 0
+    controls_ready = bool(total_negative) and total_activations == 0 and manifest.get("runtime_enabled") is False and postcondition_satisfied_evaluable
     return {
         "report_scope": "postcondition_guided_policy_negative_control_audit",
         "offline_only": True,
@@ -89,11 +90,11 @@ def evaluate(trace_root: Path = DEFAULT_TRACE_ROOT, manifest_path: Path = DEFAUL
         "bucket_counts": dict(sorted(bucket_counts.items())),
         "bucket_activation_counts": dict(sorted(activation_counts.items())),
         "postcondition_already_satisfied_control_evaluable": postcondition_satisfied_evaluable,
-        "postcondition_already_satisfied_control_note": "current trace artifacts do not expose a reliable satisfied-postcondition witness predicate; this control must be added before runtime enablement",
+        "postcondition_already_satisfied_control_note": "satisfied-postcondition witness is extracted from prior tool outputs via schema-local witness key aliases" if postcondition_satisfied_evaluable else "current trace artifacts do not expose a reliable satisfied-postcondition witness predicate; this control must be added before runtime enablement",
         "sample_negative_controls": {key: value for key, value in sorted(sample_by_bucket.items())},
         "candidate_commands": [],
         "planned_commands": [],
-        "next_required_action": "add_postcondition_satisfied_witness_control_before_runtime_enablement" if not postcondition_satisfied_evaluable else "review_negative_controls_before_runtime_compiler",
+        "next_required_action": "review_negative_controls_before_runtime_compiler" if controls_ready else "add_postcondition_satisfied_witness_control_before_runtime_enablement",
     }
 
 

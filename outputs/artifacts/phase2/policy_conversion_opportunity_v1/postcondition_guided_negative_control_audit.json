@@ -3,7 +3,8 @@
   "bucket_counts": {
     "missing_recommended_tool": 552,
     "no_rule_hit": 372,
-    "no_toolless_failure_slice": 8185
+    "no_toolless_failure_slice": 8185,
+    "postcondition_already_satisfied": 82
   },
   "candidate_commands": [],
   "candidate_manifest_commands_empty": true,
@@ -14,12 +15,12 @@
   "negative_control_activation_count": 0,
   "negative_control_activation_rate": 0.0,
   "negative_control_audit_ready": true,
-  "negative_control_trace_count": 9109,
-  "next_required_action": "add_postcondition_satisfied_witness_control_before_runtime_enablement",
+  "negative_control_trace_count": 9191,
+  "next_required_action": "review_negative_controls_before_runtime_compiler",
   "offline_only": true,
   "planned_commands": [],
-  "postcondition_already_satisfied_control_evaluable": false,
-  "postcondition_already_satisfied_control_note": "current trace artifacts do not expose a reliable satisfied-postcondition witness predicate; this control must be added before runtime enablement",
+  "postcondition_already_satisfied_control_evaluable": true,
+  "postcondition_already_satisfied_control_note": "satisfied-postcondition witness is extracted from prior tool outputs via schema-local witness key aliases",
   "report_scope": "postcondition_guided_policy_negative_control_audit",
   "sample_negative_controls": {
     "missing_recommended_tool": [
@@ -243,6 +244,106 @@
         "rejection_reason": "not_no_tool_policy_failure",
         "request_predicates": [],
         "trace_pointer": "baseline_holdout/traces/03e5e42a-358b-4f46-8af7-c1962043513c.json"
+      }
+    ],
+    "postcondition_already_satisfied": [
+      {
+        "failure_labels": [
+          "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+          "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+        ],
+        "negative_control_bucket": "postcondition_already_satisfied",
+        "policy_candidate_would_activate": false,
+        "postcondition_gap": "search_or_find",
+        "recommended_tools": [
+          "grep",
+          "find"
+        ],
+        "rejection_reason": "postcondition_already_satisfied",
+        "request_predicates": [
+          "prior_explicit_literals_present",
+          "prior_tool_outputs_present",
+          "tools_available"
+        ],
+        "trace_pointer": "required_target/traces/1ec14a0b-09bf-44c9-9c6c-33805b4de87a.json"
+      },
+      {
+        "failure_labels": [
+          "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+          "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+        ],
+        "negative_control_bucket": "postcondition_already_satisfied",
+        "policy_candidate_would_activate": false,
+        "postcondition_gap": "search_or_find",
+        "recommended_tools": [
+          "grep",
+          "find"
+        ],
+        "rejection_reason": "postcondition_already_satisfied",
+        "request_predicates": [
+          "prior_explicit_literals_present",
+          "prior_tool_outputs_present",
+          "tools_available"
+        ],
+        "trace_pointer": "required_target/traces/2f4b5787-78a4-4b38-8073-a5e850454d18.json"
+      },
+      {
+        "failure_labels": [
+          "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+          "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+        ],
+        "negative_control_bucket": "postcondition_already_satisfied",
+        "policy_candidate_would_activate": false,
+        "postcondition_gap": "search_or_find",
+        "recommended_tools": [
+          "grep",
+          "find"
+        ],
+        "rejection_reason": "postcondition_already_satisfied",
+        "request_predicates": [
+          "prior_explicit_literals_present",
+          "prior_tool_outputs_present",
+          "tools_available"
+        ],
+        "trace_pointer": "required_target/traces/3381ddad-1d6a-4056-af97-5914503ea1ec.json"
+      },
+      {
+        "failure_labels": [
+          "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+          "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+        ],
+        "negative_control_bucket": "postcondition_already_satisfied",
+        "policy_candidate_would_activate": false,
+        "postcondition_gap": "write_content",
+        "recommended_tools": [
+          "echo"
+        ],
+        "rejection_reason": "postcondition_already_satisfied",
+        "request_predicates": [
+          "prior_explicit_literals_present",
+          "prior_tool_outputs_present",
+          "tools_available"
+        ],
+        "trace_pointer": "required_target/traces/356bedfb-5e23-4096-a57e-6596846c18e7.json"
+      },
+      {
+        "failure_labels": [
+          "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+          "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+        ],
+        "negative_control_bucket": "postcondition_already_satisfied",
+        "policy_candidate_would_activate": false,
+        "postcondition_gap": "directory_navigation",
+        "recommended_tools": [
+          "cd"
+        ],
+        "rejection_reason": "postcondition_already_satisfied",
+        "request_predicates": [
+          "prior_explicit_literals_present",
+          "prior_tool_outputs_present",
+          "tools_available"
+        ],
+        "trace_pointer": "required_target/traces/3d02360c-0c3e-49cf-8856-d6498b96f604.json"
       }
     ]
   },
