@@ -34,6 +34,7 @@ DEFAULT_POSTCONDITION_PROTOCOL = Path("outputs/artifacts/phase2/postcondition_gu
 DEFAULT_UNMET_POSTCONDITION_AUDIT = Path("outputs/artifacts/phase2/policy_conversion_opportunity_v1/unmet_postcondition_source_expansion_audit.json")
 DEFAULT_DIRECTORY_OBLIGATION_AUDIT = Path("outputs/artifacts/phase2/policy_conversion_opportunity_v1/directory_obligation_readonly_audit.json")
 DEFAULT_OUTPUT_CONTRACT_AUDIT = Path("outputs/artifacts/phase2/output_contract_preservation_v1/observable_output_contract_preservation_audit.json")
+DEFAULT_OUTPUT_CONTRACT_BROADER_AUDIT = Path("outputs/artifacts/phase2/output_contract_preservation_v1/observable_output_contract_broader_audit.json")
 DEFAULT_OUT = Path("outputs/artifacts/bfcl_explicit_required_arg_literal_v1/delivery_evidence_audit.json")
 DEFAULT_MD = Path("outputs/artifacts/bfcl_explicit_required_arg_literal_v1/delivery_evidence_audit.md")
 
@@ -318,8 +319,12 @@ def directory_obligation_status(path: Path = DEFAULT_DIRECTORY_OBLIGATION_AUDIT)
         "directory_obligation_next_required_action": report.get("next_required_action"),
     }
 
-def output_contract_status(path: Path = DEFAULT_OUTPUT_CONTRACT_AUDIT) -> dict[str, Any]:
+def output_contract_status(
+    path: Path = DEFAULT_OUTPUT_CONTRACT_AUDIT,
+    broader_path: Path = DEFAULT_OUTPUT_CONTRACT_BROADER_AUDIT,
+) -> dict[str, Any]:
     report = _load_json(path, {}) or {}
+    broader = _load_json(broader_path, {}) or {}
     return {
         "output_contract_preservation_audit_ready": bool(report.get("output_contract_preservation_audit_ready")),
         "output_contract_rule_family": report.get("rule_family"),
@@ -330,6 +335,14 @@ def output_contract_status(path: Path = DEFAULT_OUTPUT_CONTRACT_AUDIT) -> dict[s
         "output_contract_relative_gain_after_preservation_fix": report.get("relative_gain_after_preservation_fix"),
         "output_contract_performance_claim_ready": bool(report.get("performance_claim_ready")),
         "output_contract_next_required_action": report.get("next_required_action"),
+        "output_contract_broader_audit_ready": bool(broader.get("report_scope") == "observable_output_contract_broader_audit"),
+        "output_contract_broader_retain_prior_coverage_ready": bool(broader.get("retain_prior_coverage_ready")),
+        "output_contract_broader_eligible_candidate_count": int(broader.get("eligible_preservation_candidate_count") or 0),
+        "output_contract_broader_raw_repair_pair_count": int(broader.get("raw_repair_pair_count") or 0),
+        "output_contract_broader_eligible_by_slice": broader.get("eligible_by_benchmark_slice") or {},
+        "output_contract_broader_eligible_by_payload_kind": broader.get("eligible_by_payload_kind") or {},
+        "output_contract_broader_blockers": broader.get("blockers") or [],
+        "output_contract_broader_next_required_action": broader.get("next_required_action"),
     }
 
 def source_result_layout_status(low_risk_root: Path = DEFAULT_LOW_RISK) -> dict[str, Any]:
@@ -553,7 +566,14 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Preserved final-answer payloads after fix: `{report['output_contract_preservation']['output_contract_preserved_final_answer_payload_count']}`",
         f"- Relative gain after preservation fix: `{report['output_contract_preservation']['output_contract_relative_gain_after_preservation_fix']}`",
         f"- Performance claim ready: `{report['output_contract_preservation']['output_contract_performance_claim_ready']}`",
+        f"- Broader audit ready: `{report['output_contract_preservation']['output_contract_broader_audit_ready']}`",
+        f"- Broader retain-prior coverage ready: `{report['output_contract_preservation']['output_contract_broader_retain_prior_coverage_ready']}`",
+        f"- Broader eligible candidates: `{report['output_contract_preservation']['output_contract_broader_eligible_candidate_count']}`",
+        f"- Broader raw repair pairs: `{report['output_contract_preservation']['output_contract_broader_raw_repair_pair_count']}`",
+        f"- Broader eligible by slice: `{report['output_contract_preservation']['output_contract_broader_eligible_by_slice']}`",
+        f"- Broader blockers: `{report['output_contract_preservation']['output_contract_broader_blockers']}`",
         f"- Next action: `{report['output_contract_preservation']['output_contract_next_required_action']}`",
+        f"- Broader next action: `{report['output_contract_preservation']['output_contract_broader_next_required_action']}`",
         "",
         "## Memory Operation Obligation Evidence",
         "",
@@ -645,6 +665,8 @@ def main() -> int:
             "output_contract_wrapper_only_candidate_count": report["output_contract_preservation"]["output_contract_wrapper_only_candidate_count"],
             "output_contract_preserved_final_answer_payload_count": report["output_contract_preservation"]["output_contract_preserved_final_answer_payload_count"],
             "output_contract_performance_claim_ready": report["output_contract_preservation"]["output_contract_performance_claim_ready"],
+            "output_contract_broader_retain_prior_coverage_ready": report["output_contract_preservation"]["output_contract_broader_retain_prior_coverage_ready"],
+            "output_contract_broader_eligible_candidate_count": report["output_contract_preservation"]["output_contract_broader_eligible_candidate_count"],
             "memory_operation_candidate_count": report["memory_operation_obligation"]["memory_operation_candidate_count"],
             "memory_operation_runtime_enabled": report["memory_operation_obligation"]["memory_operation_runtime_enabled"],
             "memory_operation_negative_control_audit_passed": report["memory_operation_obligation"]["memory_operation_negative_control_audit_passed"],
