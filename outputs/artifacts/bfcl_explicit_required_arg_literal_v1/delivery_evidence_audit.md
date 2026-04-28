@@ -57,6 +57,10 @@
 - Memory dry-run policy units: `1`
 - Memory dry-run first-pass support: `48`
 - Memory dry-run argument creation count: `0`
+- Memory resolver audit passed: `True`
+- Memory resolver resolved schemas: `48`
+- Memory resolver blocked destructive tools: `288`
+- Memory resolver forbidden mutation resolved count: `0`
 
 ## Source/Layout Evidence
 
