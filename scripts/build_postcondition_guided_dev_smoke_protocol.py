@@ -7,6 +7,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from grc.runtime.engine import RuleEngine
+
 import scripts.check_postcondition_guided_runtime_smoke_readiness as readiness
 
 DEFAULT_CANDIDATE_MANIFEST = Path("outputs/artifacts/phase2/policy_conversion_opportunity_v1/postcondition_guided_policy_candidate_manifest.json")
@@ -50,7 +52,13 @@ def _trace_root(audit: dict[str, Any]) -> Path:
     return Path(str(root))
 
 
-def _case_record(row: dict[str, Any], trace_root: Path) -> tuple[dict[str, Any], dict[str, Any] | None]:
+def _runtime_plan(runtime_dir: Path, request_payload: dict[str, Any]) -> dict[str, Any]:
+    engine = RuleEngine(str(runtime_dir), runtime_policy={"enable_required_next_tool_choice": True})
+    _patched, patches = engine.apply_request(request_payload)
+    return dict(getattr(patches, "next_tool_plan", {}) or {})
+
+
+def _case_record(row: dict[str, Any], trace_root: Path, runtime_dir: Path) -> tuple[dict[str, Any], dict[str, Any] | None]:
     rel = Path(str(row.get("trace_relative_path") or row.get("source_audit_record_pointer") or ""))
     trace_path = trace_root / rel
     failure = None
@@ -71,6 +79,9 @@ def _case_record(row: dict[str, Any], trace_root: Path) -> tuple[dict[str, Any],
         "exact_tool_choice": row.get("exact_tool_choice"),
         "argument_creation": False,
         "source_runtime_enabled": row.get("runtime_enabled"),
+        "runtime_plan_activated": False,
+        "runtime_plan_selected_tool": None,
+        "runtime_plan_blocked_reason": None,
     }
     if trace_path.exists():
         try:
@@ -78,6 +89,10 @@ def _case_record(row: dict[str, Any], trace_root: Path) -> tuple[dict[str, Any],
             request_payload = trace.get("request") if isinstance(trace, dict) else None
             if request_payload is not None:
                 case["trace_request_sha256"] = _stable_hash(request_payload)
+                plan = _runtime_plan(runtime_dir, request_payload)
+                case["runtime_plan_activated"] = bool(plan.get("activated"))
+                case["runtime_plan_selected_tool"] = plan.get("selected_tool")
+                case["runtime_plan_blocked_reason"] = plan.get("blocked_reason")
         except Exception as exc:  # pragma: no cover - corrupt local artifact guard
             failure = {"check": "source_trace_json_readable", "candidate_id": row.get("candidate_id"), "error": str(exc)}
     return case, failure
@@ -113,7 +128,7 @@ def evaluate(
             failures.append({"check": "exact_tool_choice_false", "candidate_id": row.get("candidate_id")})
         if row.get("intervention_strength") != "guidance_only":
             failures.append({"check": "guidance_only_intervention", "candidate_id": row.get("candidate_id")})
-        case, failure = _case_record(row, trace_root)
+        case, failure = _case_record(row, trace_root, runtime_dir)
         cases.append(case)
         if failure:
             failures.append(failure)
@@ -123,6 +138,19 @@ def evaluate(
         gap = str(case.get("postcondition_gap") or "")
         capability_distribution[gap] = capability_distribution.get(gap, 0) + 1
 
+    runtime_replay_activation_count = sum(int(bool(case.get("runtime_plan_activated"))) for case in cases)
+    runtime_replay_inactive_cases = [
+        {
+            "candidate_id": case.get("candidate_id"),
+            "postcondition_gap": case.get("postcondition_gap"),
+            "blocked_reason": case.get("runtime_plan_blocked_reason"),
+        }
+        for case in cases
+        if not case.get("runtime_plan_activated")
+    ]
+    if runtime_replay_activation_count < 1:
+        failures.append({"check": "runtime_replay_activation_count_positive", "actual": runtime_replay_activation_count})
+
     selected_case_hash = _stable_hash([
         {
             "candidate_id": case.get("candidate_id"),
@@ -130,6 +158,8 @@ def evaluate(
             "postcondition_gap": case.get("postcondition_gap"),
             "recommended_tools": case.get("recommended_tools"),
             "trace_request_sha256": case.get("trace_request_sha256"),
+            "runtime_plan_activated": case.get("runtime_plan_activated"),
+            "runtime_plan_selected_tool": case.get("runtime_plan_selected_tool"),
         }
         for case in cases
     ])
@@ -148,13 +178,17 @@ def evaluate(
         "runtime_rule_path": str(runtime_dir / "rule.yaml"),
         "runtime_rule_sha256": _sha256_file(runtime_dir / "rule.yaml"),
         "capability_distribution": capability_distribution,
+        "runtime_replay_activation_count": runtime_replay_activation_count,
+        "runtime_replay_inactive_case_count": len(runtime_replay_inactive_cases),
+        "runtime_replay_inactive_cases": runtime_replay_inactive_cases,
         "selected_smoke_cases": cases,
         "postcondition_guided_runtime_smoke_ready": ready.get("postcondition_guided_runtime_smoke_ready"),
         "synthetic_final_answer_negative_control_activated": ready.get("synthetic_final_answer_negative_control_activated"),
         "synthetic_no_prior_tool_output_negative_control_activated": ready.get("synthetic_no_prior_tool_output_negative_control_activated"),
         "synthetic_missing_capability_negative_control_activated": ready.get("synthetic_missing_capability_negative_control_activated"),
         "hard_pins": ["provider_required", "selected_case_list_hash", "runtime_rule_sha256"],
-        "positive_lane_case_count": len(cases),
+        "positive_lane_case_count": runtime_replay_activation_count,
+        "diagnostic_inactive_case_count": len(runtime_replay_inactive_cases),
         "control_lane": {
             "synthetic_final_answer_negative_control_activated": ready.get("synthetic_final_answer_negative_control_activated"),
             "synthetic_no_prior_tool_output_negative_control_activated": ready.get("synthetic_no_prior_tool_output_negative_control_activated"),
@@ -235,6 +269,7 @@ def write_outputs(report: dict[str, Any], out_dir: Path) -> None:
         f"- Planned commands: `{report['planned_commands']}`",
         f"- Does not authorize scorer: `{report['does_not_authorize_scorer']}`",
         f"- Positive lane case count: `{report['positive_lane_case_count']}`",
+        f"- Diagnostic inactive case count: `{report['diagnostic_inactive_case_count']}`",
         f"- Control lane: `{report['control_lane']}`",
         f"- Hard pins: `{report['hard_pins']}`",
         f"- First failure: `{report['first_failure']}`",
@@ -266,6 +301,8 @@ def main() -> int:
             "selected_case_list_hash",
             "runtime_rule_sha256",
             "capability_distribution",
+            "runtime_replay_activation_count",
+            "runtime_replay_inactive_case_count",
             "hard_pins",
             "control_lane",
             "candidate_commands",

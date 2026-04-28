@@ -27,6 +27,10 @@ def _write_trace(trace_root: Path, rel: str, text: str = "read report") -> None:
     path.write_text(json.dumps({"request": {"messages": [{"role": "user", "content": text}], "tools": []}}), encoding="utf-8")
 
 
+def _always_activated_plan(runtime_dir: Path, request_payload: dict) -> dict:
+    return {"activated": True, "selected_tool": "cat", "blocked_reason": "activated"}
+
+
 def _row(index: int, gap: str = "read_content") -> dict:
     return {
         "candidate_id": f"pc_{index}",
@@ -61,6 +65,7 @@ def test_postcondition_guided_protocol_freezes_nine_low_risk_cases(tmp_path: Pat
         "synthetic_no_prior_tool_output_negative_control_activated": False,
         "synthetic_missing_capability_negative_control_activated": False,
     })
+    monkeypatch.setattr(protocol, "_runtime_plan", _always_activated_plan)
 
     report = protocol.evaluate(manifest, audit, runtime)
 
@@ -68,6 +73,8 @@ def test_postcondition_guided_protocol_freezes_nine_low_risk_cases(tmp_path: Pat
     assert report["provider_required"] == "novacode"
     assert report["selected_case_count"] == 9
     assert report["capability_distribution"] == {"search_or_find": 3, "read_content": 6}
+    assert report["runtime_replay_activation_count"] == 9
+    assert report["runtime_replay_inactive_case_count"] == 0
     assert report["candidate_commands"] == []
     assert report["planned_commands"] == []
     assert report["does_not_authorize_scorer"] is True
@@ -93,6 +100,7 @@ def test_postcondition_guided_protocol_rejects_commands(tmp_path: Path, monkeypa
     _write_manifest(manifest, rows, commands=["bash run_bfcl.sh"])
     _write_audit(audit, trace_root)
     monkeypatch.setattr(protocol.readiness, "evaluate", lambda runtime_dir: {"postcondition_guided_runtime_smoke_ready": True})
+    monkeypatch.setattr(protocol, "_runtime_plan", _always_activated_plan)
 
     report = protocol.evaluate(manifest, audit, runtime)
 
@@ -112,6 +120,7 @@ def test_postcondition_guided_protocol_rejects_ambiguous_or_non_low_risk_rows(tm
     _write_manifest(manifest, rows)
     _write_audit(audit, trace_root)
     monkeypatch.setattr(protocol.readiness, "evaluate", lambda runtime_dir: {"postcondition_guided_runtime_smoke_ready": True})
+    monkeypatch.setattr(protocol, "_runtime_plan", _always_activated_plan)
 
     report = protocol.evaluate(manifest, audit, runtime)
 
@@ -131,6 +140,7 @@ def test_postcondition_guided_protocol_rejects_forbidden_gap(tmp_path: Path, mon
     _write_manifest(manifest, rows)
     _write_audit(audit, trace_root)
     monkeypatch.setattr(protocol.readiness, "evaluate", lambda runtime_dir: {"postcondition_guided_runtime_smoke_ready": True})
+    monkeypatch.setattr(protocol, "_runtime_plan", _always_activated_plan)
 
     report = protocol.evaluate(manifest, audit, runtime)
 

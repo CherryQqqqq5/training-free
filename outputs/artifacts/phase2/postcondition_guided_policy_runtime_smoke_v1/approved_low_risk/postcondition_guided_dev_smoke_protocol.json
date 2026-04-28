@@ -13,6 +13,7 @@
     "synthetic_missing_capability_negative_control_activated": false,
     "synthetic_no_prior_tool_output_negative_control_activated": false
   },
+  "diagnostic_inactive_case_count": 3,
   "does_not_authorize_scorer": true,
   "does_not_call_bfcl_or_model": true,
   "exact_tool_choice": false,
@@ -48,7 +49,7 @@
   "next_required_action": "request_explicit_postcondition_guided_paired_smoke_execution_approval",
   "offline_only": true,
   "planned_commands": [],
-  "positive_lane_case_count": 9,
+  "positive_lane_case_count": 6,
   "postcondition_guided_runtime_smoke_ready": true,
   "pre_registered_diagnostic_metrics": [
     "activation_by_capability",
@@ -79,10 +80,29 @@
   },
   "provider_required": "novacode",
   "report_scope": "postcondition_guided_dev_smoke_protocol",
+  "runtime_replay_activation_count": 6,
+  "runtime_replay_inactive_case_count": 3,
+  "runtime_replay_inactive_cases": [
+    {
+      "blocked_reason": "request_predicates_unmet",
+      "candidate_id": "postcondition_guided_trajectory_policy_0004",
+      "postcondition_gap": "search_or_find"
+    },
+    {
+      "blocked_reason": "request_predicates_unmet",
+      "candidate_id": "postcondition_guided_trajectory_policy_0037",
+      "postcondition_gap": "search_or_find"
+    },
+    {
+      "blocked_reason": "request_predicates_unmet",
+      "candidate_id": "postcondition_guided_trajectory_policy_0062",
+      "postcondition_gap": "read_content"
+    }
+  ],
   "runtime_rule_path": "outputs/artifacts/phase2/postcondition_guided_policy_runtime_smoke_v1/approved_low_risk/rule.yaml",
   "runtime_rule_sha256": "849c82f79806518caaa8a4d9ce69641517ef808228aed66aaf01bf19d698c475",
   "selected_case_count": 9,
-  "selected_case_list_hash": "a90b91e5c9adab03d03b841861d768ab0e9be8c1557f74a4a7e6421ed86a3860",
+  "selected_case_list_hash": "c22610fcd61419f981f369a9d3e04bad93c5f8813cecef5301db77e0a69d620e",
   "selected_smoke_cases": [
     {
       "argument_creation": false,
@@ -104,6 +124,9 @@
         "tools_available"
       ],
       "run_name": "required_target",
+      "runtime_plan_activated": false,
+      "runtime_plan_blocked_reason": "request_predicates_unmet",
+      "runtime_plan_selected_tool": null,
       "source_runtime_enabled": false,
       "trace_relative_path": "required_target/traces/20a19562-1338-41c6-a7a9-241297e6282a.json",
       "trace_request_sha256": "75633196d0a8406282cf886cc6e785feeec50c232f06d92b75b0ae0cf61232be",
@@ -129,6 +152,9 @@
         "tools_available"
       ],
       "run_name": "required_target",
+      "runtime_plan_activated": true,
+      "runtime_plan_blocked_reason": "activated",
+      "runtime_plan_selected_tool": "grep",
       "source_runtime_enabled": false,
       "trace_relative_path": "required_target/traces/36ad3761-3af6-498d-a7ba-dda0c26e990b.json",
       "trace_request_sha256": "ff48d92e51d28fc3f313dad722bc4c43253da3a06a8cb84505cebdf2a73ae2dc",
@@ -153,6 +179,9 @@
         "tools_available"
       ],
       "run_name": "required_target",
+      "runtime_plan_activated": true,
+      "runtime_plan_blocked_reason": "activated",
+      "runtime_plan_selected_tool": "cat",
       "source_runtime_enabled": false,
       "trace_relative_path": "required_target/traces/52c0df6e-fc93-4a48-91b3-c12bf8486c83.json",
       "trace_request_sha256": "8a1adb90e06d446336142560c15008b461e41b529e391078df33c0e4dce3e795",
@@ -177,6 +206,9 @@
         "tools_available"
       ],
       "run_name": "required_target",
+      "runtime_plan_activated": true,
+      "runtime_plan_blocked_reason": "activated",
+      "runtime_plan_selected_tool": "cat",
       "source_runtime_enabled": false,
       "trace_relative_path": "required_target/traces/d3cd2282-a2b9-4f00-8434-23a92e0af5d1.json",
       "trace_request_sha256": "d339fdf3a0865384f2a6aa8f68fa1c77496dc8f30b965a9f1c05ba6edbbb99db",
@@ -202,6 +234,9 @@
         "tools_available"
       ],
       "run_name": "soft_target",
+      "runtime_plan_activated": false,
+      "runtime_plan_blocked_reason": "request_predicates_unmet",
+      "runtime_plan_selected_tool": null,
       "source_runtime_enabled": false,
       "trace_relative_path": "soft_target/traces/6942aaeb-09b0-480b-bd6d-7f218944fc67.json",
       "trace_request_sha256": "de4318184b61252f45143b325bcd3096dd6a3995f3bafd6f02b6b20af810e45a",
@@ -226,6 +261,9 @@
         "tools_available"
       ],
       "run_name": "soft_target",
+      "runtime_plan_activated": true,
+      "runtime_plan_blocked_reason": "activated",
+      "runtime_plan_selected_tool": "cat",
       "source_runtime_enabled": false,
       "trace_relative_path": "soft_target/traces/7cc122b9-c815-4f4d-abd8-0d6a46a13c68.json",
       "trace_request_sha256": "d1e46e854fa18b8dd168c86cdd0ae6917eccb4cdd4d5db4f967aae026d7deea7",
@@ -250,6 +288,9 @@
         "tools_available"
       ],
       "run_name": "soft_target",
+      "runtime_plan_activated": true,
+      "runtime_plan_blocked_reason": "activated",
+      "runtime_plan_selected_tool": "cat",
       "source_runtime_enabled": false,
       "trace_relative_path": "soft_target/traces/cb147d78-7e00-461a-903b-6c464edc3b79.json",
       "trace_request_sha256": "ac04721b329fbba294f9635630234f12869dd35f6fd77ee4c9c05c8eab5f6632",
@@ -274,6 +315,9 @@
         "tools_available"
       ],
       "run_name": "soft_target",
+      "runtime_plan_activated": true,
+      "runtime_plan_blocked_reason": "activated",
+      "runtime_plan_selected_tool": "cat",
       "source_runtime_enabled": false,
       "trace_relative_path": "soft_target/traces/e8eaadc3-c030-4275-ae13-73e86558f337.json",
       "trace_request_sha256": "fb0168c79beb66830f28075e037a71892d5222b61253788e015ff051d76862c8",
@@ -298,6 +342,9 @@
         "tools_available"
       ],
       "run_name": "soft_target",
+      "runtime_plan_activated": false,
+      "runtime_plan_blocked_reason": "request_predicates_unmet",
+      "runtime_plan_selected_tool": null,
       "source_runtime_enabled": false,
       "trace_relative_path": "soft_target/traces/f71ee639-d173-4b29-8abe-3a20e7e6aba2.json",
       "trace_request_sha256": "90042359a28a81d248dbfabab37cfe7bd6053e40a2318ff2e161415d04853b21",
