@@ -44,7 +44,7 @@ def test_memory_retrieve_obligation_candidate_when_memory_intent_unsatisfied(tmp
     assert report["planned_commands"] == []
 
 
-def test_memory_obligation_rejects_satisfied_retrieve(tmp_path: Path) -> None:
+def test_memory_obligation_accepts_weak_lookup_for_second_pass_retrieve(tmp_path: Path) -> None:
     _trace(
         tmp_path / "memory_kv" / "baseline" / "traces" / "one.json",
         user="What magazine does my kitchen look like a page out of?",
@@ -54,8 +54,8 @@ def test_memory_obligation_rejects_satisfied_retrieve(tmp_path: Path) -> None:
 
     report = mem.evaluate(tmp_path)
 
-    assert report["candidate_count"] == 0
-    assert report["rejection_reason_counts"]["memory_postcondition_already_satisfied"] == 1
+    assert report["candidate_count"] == 1
+    assert report["candidate_records"][0]["memory_witness_strength"] == "weak_lookup_witness"
 
 
 def test_memory_obligation_rejects_delete_until_reviewed(tmp_path: Path) -> None:
@@ -69,3 +69,17 @@ def test_memory_obligation_rejects_delete_until_reviewed(tmp_path: Path) -> None
 
     assert report["candidate_count"] == 0
     assert report["rejection_reason_counts"]["delete_operation_requires_explicit_reviewer_approval"] == 1
+
+
+def test_memory_obligation_rejects_strong_value_witness(tmp_path: Path) -> None:
+    _trace(
+        tmp_path / "memory_kv" / "baseline" / "traces" / "strong.json",
+        user="What magazine does my kitchen look like a page out of?",
+        tools=["archival_memory_key_search", "archival_memory_retrieve"],
+        calls=[("archival_memory_retrieve", json.dumps({"value": "Architectural Digest"}))],
+    )
+
+    report = mem.evaluate(tmp_path)
+
+    assert report["candidate_count"] == 0
+    assert report["rejection_reason_counts"]["memory_postcondition_already_satisfied"] == 1

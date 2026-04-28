@@ -41,9 +41,9 @@
 ## Memory Operation Obligation Evidence
 
 - Memory audit ready: `True`
-- Memory operation candidates: `48`
-- Memory candidate operations: `{'retrieve': 48}`
-- Memory candidate categories: `{'memory_kv': 24, 'memory_rec_sum': 24}`
+- Memory operation candidates: `78`
+- Memory candidate operations: `{'retrieve': 78}`
+- Memory candidate categories: `{'memory_kv': 30, 'memory_rec_sum': 48}`
 - Memory runtime enabled: `False`
 
 ## Source/Layout Evidence
