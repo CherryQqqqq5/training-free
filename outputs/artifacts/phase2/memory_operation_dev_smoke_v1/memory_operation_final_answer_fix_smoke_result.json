@@ -1,0 +1,172 @@
+{
+  "artifact_type": "memory_operation_final_answer_fix_smoke_result",
+  "created_at_utc": "2026-04-28T11:16:40Z",
+  "commit": "188c87c5",
+  "provider": "novacode",
+  "model": "gpt-4o-mini-2024-07-18-FC",
+  "run_root": "outputs/artifacts/phase2/memory_operation_dev_smoke_v1/runs_final_answer_fix_v1",
+  "target_case_count": 6,
+  "generation_case_count": 26,
+  "prereq_case_count": 20,
+  "baseline": {
+    "target_case_count": 6,
+    "correct_count": 6,
+    "total_count": 6,
+    "accuracy": 1.0,
+    "category_accuracy": {
+      "kv": 1.0,
+      "rec_sum": 1.0
+    },
+    "records": [
+      {
+        "case_id": "memory_kv_0-customer-0",
+        "category": "kv",
+        "scored_correct_by_category_aggregate": true,
+        "tool": "core_memory_retrieve",
+        "args": "{\"key\":\"customer_name\"}",
+        "final_answer_empty": false
+      },
+      {
+        "case_id": "memory_kv_1-customer-1",
+        "category": "kv",
+        "scored_correct_by_category_aggregate": true,
+        "tool": "core_memory_retrieve",
+        "args": "{\"key\":\"customer_profile\"}",
+        "final_answer_empty": false
+      },
+      {
+        "case_id": "memory_kv_2-customer-2",
+        "category": "kv",
+        "scored_correct_by_category_aggregate": true,
+        "tool": "core_memory_retrieve",
+        "args": "{\"key\":\"customer_profile\"}",
+        "final_answer_empty": false
+      },
+      {
+        "case_id": "memory_rec_sum_0-customer-0",
+        "category": "rec_sum",
+        "scored_correct_by_category_aggregate": true,
+        "tool": "memory_retrieve",
+        "args": "{}",
+        "final_answer_empty": false
+      },
+      {
+        "case_id": "memory_rec_sum_1-customer-1",
+        "category": "rec_sum",
+        "scored_correct_by_category_aggregate": true,
+        "tool": "memory_retrieve",
+        "args": "{}",
+        "final_answer_empty": false
+      },
+      {
+        "case_id": "memory_rec_sum_2-customer-2",
+        "category": "rec_sum",
+        "scored_correct_by_category_aggregate": true,
+        "tool": "memory_retrieve",
+        "args": "{}",
+        "final_answer_empty": false
+      }
+    ],
+    "final_answer_missing_count": 0
+  },
+  "candidate": {
+    "target_case_count": 6,
+    "correct_count": 6,
+    "total_count": 6,
+    "accuracy": 1.0,
+    "category_accuracy": {
+      "kv": 1.0,
+      "rec_sum": 1.0
+    },
+    "records": [
+      {
+        "case_id": "memory_kv_0-customer-0",
+        "category": "kv",
+        "scored_correct_by_category_aggregate": true,
+        "tool": "core_memory_retrieve",
+        "args": "{\"key\":\"customer_name\"}",
+        "final_answer_empty": false
+      },
+      {
+        "case_id": "memory_kv_1-customer-1",
+        "category": "kv",
+        "scored_correct_by_category_aggregate": true,
+        "tool": "core_memory_key_search",
+        "args": "{\"query\": \"age birthday date of birth Michael\", \"k\": 5}",
+        "final_answer_empty": false
+      },
+      {
+        "case_id": "memory_kv_2-customer-2",
+        "category": "kv",
+        "scored_correct_by_category_aggregate": true,
+        "tool": "core_memory_retrieve",
+        "args": "{\"key\":\"customer_location\"}",
+        "final_answer_empty": false
+      },
+      {
+        "case_id": "memory_rec_sum_0-customer-0",
+        "category": "rec_sum",
+        "scored_correct_by_category_aggregate": true,
+        "tool": "memory_retrieve",
+        "args": "{}",
+        "final_answer_empty": false
+      },
+      {
+        "case_id": "memory_rec_sum_1-customer-1",
+        "category": "rec_sum",
+        "scored_correct_by_category_aggregate": true,
+        "tool": "memory_retrieve",
+        "args": "{}",
+        "final_answer_empty": false
+      },
+      {
+        "case_id": "memory_rec_sum_2-customer-2",
+        "category": "rec_sum",
+        "scored_correct_by_category_aggregate": true,
+        "tool": "memory_retrieve",
+        "args": "{}",
+        "final_answer_empty": false
+      }
+    ],
+    "final_answer_missing_count": 0
+  },
+  "baseline_accuracy": 1.0,
+  "candidate_accuracy": 1.0,
+  "absolute_pp_delta": 0.0,
+  "case_fixed_count": 0,
+  "case_regressed_count": 0,
+  "candidate_changed_retrieval_keys_count": 2,
+  "changed_retrieval_keys_compact": [
+    {
+      "case_id": "memory_kv_1-customer-1",
+      "baseline": {
+        "tool": "core_memory_retrieve",
+        "args": "{\"key\":\"customer_profile\"}"
+      },
+      "candidate": {
+        "tool": "core_memory_key_search",
+        "args": "{\"query\": \"age birthday date of birth Michael\", \"k\": 5}"
+      }
+    },
+    {
+      "case_id": "memory_kv_2-customer-2",
+      "baseline": {
+        "tool": "core_memory_retrieve",
+        "args": "{\"key\":\"customer_profile\"}"
+      },
+      "candidate": {
+        "tool": "core_memory_retrieve",
+        "args": "{\"key\":\"customer_location\"}"
+      }
+    }
+  ],
+  "no_last_message_cleared": true,
+  "interpretation": "runtime_final_answer_preservation_restored_smoke_validity_for_both_baseline_and_candidate; no relative candidate gain",
+  "retain_rule_created": false,
+  "bfcl_plus_3pp_claim": false,
+  "holdout_authorized": false,
+  "hundred_case_authorized": false,
+  "full_bfcl_authorized": false,
+  "next_route_recommendation": "do_not_retain_memory_first_pass_from_this_smoke; use as runtime correctness evidence and return to theory-prior performance families",
+  "net_case_gain": 0
+}
