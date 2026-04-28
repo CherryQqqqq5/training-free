@@ -4,11 +4,11 @@ Status: `review_required_before_runtime_integration`
 
 This is an offline theory-prior family card. It does not enable runtime policy execution and does not authorize BFCL/model/scorer runs.
 
-- Candidate count: `63`
-- Low-risk dry-run review eligible: `12`
-- Risk distribution: `{'high': 10, 'low': 12, 'medium': 41}`
-- Capability distribution: `{'copy': 6, 'create_file': 18, 'directory_navigation': 18, 'move_or_rename': 4, 'read_content': 8, 'search_or_find': 4, 'write_content': 5}`
-- Ambiguity flags: `{'copy_move_destructive': 10, 'cue_only_match': 29, 'directory_vs_file_ambiguous': 16, 'multi_step_required': 12, 'state_mutating_capability': 51}`
+- Candidate count: `54`
+- Low-risk dry-run review eligible: `3`
+- Risk distribution: `{'high': 10, 'low': 3, 'medium': 41}`
+- Capability distribution: `{'copy': 6, 'create_file': 18, 'directory_navigation': 18, 'move_or_rename': 4, 'read_content': 1, 'search_or_find': 2, 'write_content': 5}`
+- Ambiguity flags: `{'copy_move_destructive': 10, 'cue_only_match': 29, 'directory_vs_file_ambiguous': 16, 'multi_step_required': 9, 'state_mutating_capability': 51}`
 
 ## Theory Prior
 

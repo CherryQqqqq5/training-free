@@ -27,6 +27,10 @@ DEFAULT_MEMORY_DRY_RUN = Path("outputs/artifacts/phase2/memory_operation_obligat
 DEFAULT_MEMORY_RESOLVER = Path("outputs/artifacts/phase2/memory_operation_obligation_dry_run_v1/first_pass/memory_tool_family_resolver_audit.json")
 DEFAULT_MEMORY_ACTIVATION = Path("outputs/artifacts/phase2/memory_operation_obligation_dry_run_v1/first_pass/memory_operation_activation_simulation.json")
 DEFAULT_MEMORY_RUNTIME_SMOKE = Path("outputs/artifacts/phase2/memory_operation_obligation_runtime_smoke_v1/first_pass/memory_operation_runtime_smoke_readiness.json")
+DEFAULT_POSTCONDITION_SMOKE_RESULT = Path("outputs/artifacts/phase2/postcondition_guided_policy_runtime_smoke_v1/approved_low_risk/postcondition_guided_dev_smoke_result.json")
+DEFAULT_POSTCONDITION_SMOKE_FAILURE = Path("outputs/artifacts/phase2/postcondition_guided_policy_runtime_smoke_v1/approved_low_risk/postcondition_guided_dev_smoke_failure_diagnosis.json")
+DEFAULT_POSTCONDITION_SATISFACTION = Path("outputs/artifacts/phase2/postcondition_guided_policy_runtime_smoke_v1/approved_low_risk/postcondition_satisfaction_audit.json")
+DEFAULT_POSTCONDITION_PROTOCOL = Path("outputs/artifacts/phase2/postcondition_guided_policy_runtime_smoke_v1/approved_low_risk/postcondition_guided_dev_smoke_protocol.json")
 DEFAULT_OUT = Path("outputs/artifacts/bfcl_explicit_required_arg_literal_v1/delivery_evidence_audit.json")
 DEFAULT_MD = Path("outputs/artifacts/bfcl_explicit_required_arg_literal_v1/delivery_evidence_audit.md")
 
@@ -244,6 +248,48 @@ def memory_runtime_smoke_status(path: Path = DEFAULT_MEMORY_RUNTIME_SMOKE) -> di
         "memory_runtime_smoke_next_required_action": report.get("next_required_action"),
     }
 
+
+def postcondition_smoke_status(
+    result_path: Path = DEFAULT_POSTCONDITION_SMOKE_RESULT,
+    failure_path: Path = DEFAULT_POSTCONDITION_SMOKE_FAILURE,
+    satisfaction_path: Path = DEFAULT_POSTCONDITION_SATISFACTION,
+    protocol_path: Path = DEFAULT_POSTCONDITION_PROTOCOL,
+) -> dict[str, Any]:
+    result = _load_json(result_path, {}) or {}
+    failure = _load_json(failure_path, {}) or {}
+    satisfaction = _load_json(satisfaction_path, {}) or {}
+    protocol = _load_json(protocol_path, {}) or {}
+    return {
+        "postcondition_smoke_result_ready": bool(result.get("report_scope") == "postcondition_guided_dev_smoke_result"),
+        "postcondition_smoke_stop_loss_passed": bool(result.get("stop_loss_passed")),
+        "postcondition_smoke_case_count": int(result.get("case_count") or 0),
+        "postcondition_smoke_activated_case_count": int(result.get("activated_case_count") or 0),
+        "postcondition_smoke_diagnostic_inactive_case_count": int(result.get("diagnostic_inactive_case_count") or 0),
+        "postcondition_smoke_case_fixed_count": int(result.get("case_fixed_count") or 0),
+        "postcondition_smoke_case_regressed_count": int(result.get("case_regressed_count") or 0),
+        "postcondition_smoke_net_case_gain": int(result.get("net_case_gain") or 0),
+        "postcondition_smoke_candidate_recommended_tool_match_count": int(result.get("candidate_recommended_tool_match_count") or 0),
+        "postcondition_smoke_baseline_recommended_tool_match_count": int(result.get("baseline_recommended_tool_match_count") or 0),
+        "postcondition_smoke_next_required_action": result.get("next_required_action"),
+        "postcondition_smoke_failure_diagnosis_ready": bool(failure.get("report_scope") == "postcondition_guided_dev_smoke_failure_diagnosis"),
+        "postcondition_smoke_primary_failure_source": failure.get("primary_failure_source"),
+        "postcondition_smoke_activated_candidate_no_tool_count": int(failure.get("activated_candidate_no_tool_count") or 0),
+        "postcondition_smoke_failure_source_distribution": failure.get("failure_source_distribution") or {},
+        "postcondition_satisfaction_audit_ready": bool(satisfaction.get("report_scope") == "postcondition_satisfaction_audit"),
+        "postcondition_candidate_mining_gap_filter_passed": bool(satisfaction.get("candidate_mining_gap_filter_passed")),
+        "postcondition_already_satisfied_in_smoke_count": int(satisfaction.get("postcondition_already_satisfied_count") or 0),
+        "postcondition_unmet_strong_in_smoke_count": int(satisfaction.get("postcondition_unmet_strong_count") or 0),
+        "postcondition_satisfaction_recommended_next_action": satisfaction.get("recommended_next_action"),
+        "postcondition_smoke_protocol_ready_for_review": bool(protocol.get("smoke_protocol_ready_for_review")),
+        "postcondition_smoke_protocol_selected_case_count": int(protocol.get("selected_case_count") or 0),
+        "postcondition_smoke_protocol_runtime_replay_activation_count": int(protocol.get("runtime_replay_activation_count") or 0),
+        "postcondition_smoke_protocol_first_failure": protocol.get("first_failure"),
+        "postcondition_protocol_gating_state": "ready_for_review" if protocol.get("smoke_protocol_ready_for_review") else "fail_closed",
+        "postcondition_smoke_evidence_classification": "negative_evidence_blocked_claim"
+        if result.get("report_scope") == "postcondition_guided_dev_smoke_result" and not result.get("stop_loss_passed")
+        else "not_run_or_positive_pending",
+    }
+
 def source_result_layout_status(low_risk_root: Path = DEFAULT_LOW_RISK) -> dict[str, Any]:
     availability = _load_json(low_risk_root / "m28pre_source_result_availability_audit.json", {}) or {}
     alias = _load_json(low_risk_root / "wrong_arg_key_alias_coverage_audit.json", {}) or {}
@@ -298,6 +344,7 @@ def evaluate(
     memory_resolver = memory_resolver_status()
     memory_activation = memory_activation_status()
     memory_runtime_smoke = memory_runtime_smoke_status()
+    postcondition_smoke = postcondition_smoke_status()
     p0_blockers: list[str] = []
     if not boundary["artifact_boundary_passed"]:
         p0_blockers.append("artifact_boundary_not_clean")
@@ -315,6 +362,12 @@ def evaluate(
         p0_blockers.append("ctspc_v0_retain_not_zero")
     if ctspc_status.get("scorer_default") != "off":
         p0_blockers.append("ctspc_v0_not_off_by_default")
+    if postcondition_smoke.get("postcondition_smoke_result_ready") and not postcondition_smoke.get("postcondition_smoke_stop_loss_passed"):
+        p0_blockers.append("postcondition_dev_smoke_stop_loss_failed")
+    if postcondition_smoke.get("postcondition_satisfaction_audit_ready") and not postcondition_smoke.get("postcondition_candidate_mining_gap_filter_passed"):
+        p0_blockers.append("postcondition_candidate_mining_gap_filter_not_passed")
+    if postcondition_smoke.get("postcondition_smoke_protocol_selected_case_count") and not postcondition_smoke.get("postcondition_smoke_protocol_ready_for_review"):
+        p0_blockers.append("postcondition_smoke_protocol_not_ready")
     if memory_activation.get("memory_activation_simulation_passed") and not memory_runtime_smoke.get("memory_runtime_adapter_ready"):
         p0_blockers.append("memory_runtime_adapter_not_ready")
     return {
@@ -346,6 +399,7 @@ def evaluate(
         },
         "policy_conversion": policy,
         "policy_conversion_opportunity": policy_opportunity,
+        "postcondition_smoke": postcondition_smoke,
         "memory_operation_obligation": memory_obligation,
         "memory_operation_dry_run": memory_dry_run,
         "memory_tool_family_resolver": memory_resolver,
@@ -397,6 +451,26 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Postcondition negative-control activation count: `{report['policy_conversion_opportunity']['postcondition_negative_control_activation_count']}`",
         f"- Runtime dry-run compiler ready: `{report['policy_conversion_opportunity']['runtime_dry_run_compiler_ready']}`",
         f"- Runtime dry-run compiler blocker: `{report['policy_conversion_opportunity']['runtime_dry_run_compiler_blocker']}`",
+        "",
+
+        "## Postcondition Dev Smoke Evidence",
+        "",
+        f"- Smoke result ready: `{report['postcondition_smoke']['postcondition_smoke_result_ready']}`",
+        f"- Smoke stop-loss passed: `{report['postcondition_smoke']['postcondition_smoke_stop_loss_passed']}`",
+        f"- Smoke cases / activated / diagnostic inactive: `{report['postcondition_smoke']['postcondition_smoke_case_count']}` / `{report['postcondition_smoke']['postcondition_smoke_activated_case_count']}` / `{report['postcondition_smoke']['postcondition_smoke_diagnostic_inactive_case_count']}`",
+        f"- Fixed / regressed / net gain: `{report['postcondition_smoke']['postcondition_smoke_case_fixed_count']}` / `{report['postcondition_smoke']['postcondition_smoke_case_regressed_count']}` / `{report['postcondition_smoke']['postcondition_smoke_net_case_gain']}`",
+        f"- Candidate recommended-tool matches: `{report['postcondition_smoke']['postcondition_smoke_candidate_recommended_tool_match_count']}`",
+        f"- Primary failure source: `{report['postcondition_smoke']['postcondition_smoke_primary_failure_source']}`",
+        f"- Activated candidate no-tool count: `{report['postcondition_smoke']['postcondition_smoke_activated_candidate_no_tool_count']}`",
+        f"- Satisfaction audit ready: `{report['postcondition_smoke']['postcondition_satisfaction_audit_ready']}`",
+        f"- Candidate mining gap filter passed: `{report['postcondition_smoke']['postcondition_candidate_mining_gap_filter_passed']}`",
+        f"- Already satisfied in smoke: `{report['postcondition_smoke']['postcondition_already_satisfied_in_smoke_count']}`",
+        f"- Strong unmet in smoke: `{report['postcondition_smoke']['postcondition_unmet_strong_in_smoke_count']}`",
+        f"- Current smoke protocol ready: `{report['postcondition_smoke']['postcondition_smoke_protocol_ready_for_review']}`",
+        f"- Current selected cases / runtime replay activation: `{report['postcondition_smoke']['postcondition_smoke_protocol_selected_case_count']}` / `{report['postcondition_smoke']['postcondition_smoke_protocol_runtime_replay_activation_count']}`",
+        f"- Current protocol first failure: `{report['postcondition_smoke']['postcondition_smoke_protocol_first_failure']}`",
+        f"- Protocol gating state: `{report['postcondition_smoke']['postcondition_protocol_gating_state']}`",
+        f"- Evidence classification: `{report['postcondition_smoke']['postcondition_smoke_evidence_classification']}`",
         "",
         "## Memory Operation Obligation Evidence",
         "",
@@ -473,6 +547,14 @@ def main() -> int:
             "postcondition_already_satisfied_count": report["policy_conversion_opportunity"]["postcondition_already_satisfied_count"],
             "postcondition_negative_control_ready": report["policy_conversion_opportunity"]["postcondition_negative_control_ready"],
             "runtime_dry_run_compiler_ready": report["policy_conversion_opportunity"]["runtime_dry_run_compiler_ready"],
+            "postcondition_smoke_stop_loss_passed": report["postcondition_smoke"]["postcondition_smoke_stop_loss_passed"],
+            "postcondition_smoke_net_case_gain": report["postcondition_smoke"]["postcondition_smoke_net_case_gain"],
+            "postcondition_candidate_mining_gap_filter_passed": report["postcondition_smoke"]["postcondition_candidate_mining_gap_filter_passed"],
+            "postcondition_already_satisfied_in_smoke_count": report["postcondition_smoke"]["postcondition_already_satisfied_in_smoke_count"],
+            "postcondition_unmet_strong_in_smoke_count": report["postcondition_smoke"]["postcondition_unmet_strong_in_smoke_count"],
+            "postcondition_smoke_protocol_ready_for_review": report["postcondition_smoke"]["postcondition_smoke_protocol_ready_for_review"],
+            "postcondition_protocol_gating_state": report["postcondition_smoke"]["postcondition_protocol_gating_state"],
+            "postcondition_smoke_evidence_classification": report["postcondition_smoke"]["postcondition_smoke_evidence_classification"],
             "memory_operation_candidate_count": report["memory_operation_obligation"]["memory_operation_candidate_count"],
             "memory_operation_runtime_enabled": report["memory_operation_obligation"]["memory_operation_runtime_enabled"],
             "memory_operation_negative_control_audit_passed": report["memory_operation_obligation"]["memory_operation_negative_control_audit_passed"],

@@ -27,10 +27,10 @@ NO_TOOL_POLICY_LABELS = {
 
 WITNESS_KEY_ALIASES: dict[str, set[str]] = {
     "file_exists": {"file_exists", "exists", "created", "path"},
-    "file_content": {"file_content", "content"},
-    "file_content_changed": {"file_content", "content", "written", "updated"},
-    "matching_results": {"matching_results", "matches", "results", "files", "paths"},
-    "comparison_result": {"comparison_result", "diff", "differences"},
+    "file_content": {"file_content", "content", "last_lines", "sorted_content"},
+    "file_content_changed": {"file_content", "content", "written", "updated", "sorted_content"},
+    "matching_results": {"matching_results", "matches", "matching_lines", "results", "files", "paths"},
+    "comparison_result": {"comparison_result", "diff", "diff_lines", "differences"},
     "target_path_changed": {"target_path_changed", "destination", "target", "path"},
     "current_working_directory": {"current_working_directory", "cwd"},
     "memory_records": {"memory_records", "records", "memories"},
@@ -176,7 +176,13 @@ def _flatten_keys(obj: Any) -> set[str]:
     return keys
 
 
-def _postcondition_already_satisfied(request: dict[str, Any], witnesses: list[str]) -> tuple[bool, list[str]]:
+def _postcondition_already_satisfied(
+    request: dict[str, Any],
+    witnesses: list[str],
+    *,
+    capability: str | None = None,
+    user_text: str = "",
+) -> tuple[bool, list[str]]:
     if not witnesses:
         return False, []
     aliases: set[str] = set()
@@ -186,6 +192,13 @@ def _postcondition_already_satisfied(request: dict[str, Any], witnesses: list[st
     for payload in _tool_output_payloads(request):
         keys = _flatten_keys(payload)
         matched.update(key for key in keys if key in aliases)
+        if (
+            capability == "read_content"
+            and "current_directory_content" in keys
+            and "list" in user_text.lower()
+            and any(token in user_text.lower() for token in ["file", "files", "directory", "folder"])
+        ):
+            matched.add("current_directory_content")
     return bool(matched), sorted(matched)
 
 
@@ -204,7 +217,12 @@ def _record_from_trace(path: Path, root: Path) -> dict[str, Any] | None:
     text = _user_text(req)
     policy_failure = bool(set(labels) & NO_TOOL_POLICY_LABELS)
     capability, recommended, witnesses, cue = _infer_capability(text, available)
-    postcondition_satisfied, satisfied_witness_keys = _postcondition_already_satisfied(req, witnesses)
+    postcondition_satisfied, satisfied_witness_keys = _postcondition_already_satisfied(
+        req,
+        witnesses,
+        capability=capability,
+        user_text=text,
+    )
     rejection_reason = None
     if not policy_failure:
         rejection_reason = "not_no_tool_policy_failure"

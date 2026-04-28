@@ -3,12 +3,12 @@
 - Claim status: `scaffold_and_diagnostic_package_only`
 - SOTA +3pp claim ready: `False`
 - Offline only: `True`
-- P0 blockers: `['artifact_boundary_not_clean', 'm2_8pre_offline_not_passed', 'scorer_authorization_not_ready', 'policy_conversion_not_observed_in_existing_traces', 'runtime_dry_run_compiler_not_ready']`
+- P0 blockers: `['artifact_boundary_not_clean', 'm2_8pre_offline_not_passed', 'scorer_authorization_not_ready', 'policy_conversion_not_observed_in_existing_traces', 'runtime_dry_run_compiler_not_ready', 'postcondition_dev_smoke_stop_loss_failed', 'postcondition_candidate_mining_gap_filter_not_passed', 'postcondition_smoke_protocol_not_ready']`
 
 ## Gate Snapshot
 
 - Artifact boundary passed: `False`
-- Forbidden artifact count: `14992`
+- Forbidden artifact count: `16903`
 - M2.8-pre passed: `False`
 - Scorer authorization ready: `False`
 - Remaining gap to 35 demote candidates: `18`
@@ -28,15 +28,34 @@
 ## Policy Opportunity Evidence
 
 - Opportunity audit ready: `True`
-- Policy candidate count: `63`
-- Recommended tools count: `67`
-- Candidate capability distribution: `{'copy': 6, 'create_file': 18, 'directory_navigation': 18, 'move_or_rename': 4, 'read_content': 8, 'search_or_find': 4, 'write_content': 5}`
-- Postcondition low-risk review eligible: `12`
-- Postcondition already satisfied filtered: `82`
+- Policy candidate count: `54`
+- Recommended tools count: `56`
+- Candidate capability distribution: `{'copy': 6, 'create_file': 18, 'directory_navigation': 18, 'move_or_rename': 4, 'read_content': 1, 'search_or_find': 2, 'write_content': 5}`
+- Postcondition low-risk review eligible: `3`
+- Postcondition already satisfied filtered: `91`
 - Postcondition negative controls ready: `True`
 - Postcondition negative-control activation count: `0`
 - Runtime dry-run compiler ready: `False`
 - Runtime dry-run compiler blocker: `low_risk_support_too_small_or_witness_precision_pending`
+
+## Postcondition Dev Smoke Evidence
+
+- Smoke result ready: `True`
+- Smoke stop-loss passed: `False`
+- Smoke cases / activated / diagnostic inactive: `9` / `6` / `3`
+- Fixed / regressed / net gain: `0` / `0` / `0`
+- Candidate recommended-tool matches: `0`
+- Primary failure source: `model_ignored_soft_guidance_or_postcondition_gap_overestimated`
+- Activated candidate no-tool count: `6`
+- Satisfaction audit ready: `True`
+- Candidate mining gap filter passed: `False`
+- Already satisfied in smoke: `9`
+- Strong unmet in smoke: `0`
+- Current smoke protocol ready: `False`
+- Current selected cases / runtime replay activation: `3` / `1`
+- Current protocol first failure: `{'actual': 3, 'check': 'selected_low_risk_case_count', 'expected': 9}`
+- Protocol gating state: `fail_closed`
+- Evidence classification: `negative_evidence_blocked_claim`
 
 ## Memory Operation Obligation Evidence
 

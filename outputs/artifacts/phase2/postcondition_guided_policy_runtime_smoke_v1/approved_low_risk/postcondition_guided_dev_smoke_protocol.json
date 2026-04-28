@@ -4,8 +4,8 @@
   "candidate_command": null,
   "candidate_commands": [],
   "capability_distribution": {
-    "read_content": 6,
-    "search_or_find": 3
+    "read_content": 1,
+    "search_or_find": 2
   },
   "control_lane": {
     "required_control_activation_count": 0,
@@ -13,13 +13,23 @@
     "synthetic_missing_capability_negative_control_activated": false,
     "synthetic_no_prior_tool_output_negative_control_activated": false
   },
-  "diagnostic_inactive_case_count": 3,
+  "diagnostic_inactive_case_count": 2,
   "does_not_authorize_scorer": true,
   "does_not_call_bfcl_or_model": true,
   "exact_tool_choice": false,
-  "failure_count": 0,
-  "failures": [],
-  "first_failure": null,
+  "failure_count": 1,
+  "failures": [
+    {
+      "actual": 3,
+      "check": "selected_low_risk_case_count",
+      "expected": 9
+    }
+  ],
+  "first_failure": {
+    "actual": 3,
+    "check": "selected_low_risk_case_count",
+    "expected": 9
+  },
   "forbidden_scope": [
     "holdout",
     "100-case",
@@ -46,10 +56,10 @@
     "activation_outside_read_content_or_search_or_find"
   ],
   "max_cases": 9,
-  "next_required_action": "request_explicit_postcondition_guided_paired_smoke_execution_approval",
+  "next_required_action": "fix_postcondition_guided_smoke_protocol_inputs",
   "offline_only": true,
   "planned_commands": [],
-  "positive_lane_case_count": 6,
+  "positive_lane_case_count": 1,
   "postcondition_guided_runtime_smoke_ready": true,
   "pre_registered_diagnostic_metrics": [
     "activation_by_capability",
@@ -80,33 +90,28 @@
   },
   "provider_required": "novacode",
   "report_scope": "postcondition_guided_dev_smoke_protocol",
-  "runtime_replay_activation_count": 6,
-  "runtime_replay_inactive_case_count": 3,
+  "runtime_replay_activation_count": 1,
+  "runtime_replay_inactive_case_count": 2,
   "runtime_replay_inactive_cases": [
     {
       "blocked_reason": "request_predicates_unmet",
-      "candidate_id": "postcondition_guided_trajectory_policy_0004",
+      "candidate_id": "postcondition_guided_trajectory_policy_0003",
       "postcondition_gap": "search_or_find"
     },
     {
       "blocked_reason": "request_predicates_unmet",
-      "candidate_id": "postcondition_guided_trajectory_policy_0037",
+      "candidate_id": "postcondition_guided_trajectory_policy_0033",
       "postcondition_gap": "search_or_find"
-    },
-    {
-      "blocked_reason": "request_predicates_unmet",
-      "candidate_id": "postcondition_guided_trajectory_policy_0062",
-      "postcondition_gap": "read_content"
     }
   ],
   "runtime_rule_path": "outputs/artifacts/phase2/postcondition_guided_policy_runtime_smoke_v1/approved_low_risk/rule.yaml",
   "runtime_rule_sha256": "849c82f79806518caaa8a4d9ce69641517ef808228aed66aaf01bf19d698c475",
-  "selected_case_count": 9,
-  "selected_case_list_hash": "c22610fcd61419f981f369a9d3e04bad93c5f8813cecef5301db77e0a69d620e",
+  "selected_case_count": 3,
+  "selected_case_list_hash": "ecf93f7a1568a20fe242615d015f5b985413386f581a3e1997c4125a0d57bd73",
   "selected_smoke_cases": [
     {
       "argument_creation": false,
-      "candidate_id": "postcondition_guided_trajectory_policy_0004",
+      "candidate_id": "postcondition_guided_trajectory_policy_0003",
       "exact_tool_choice": false,
       "failure_labels": [
         "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
@@ -134,89 +139,7 @@
     },
     {
       "argument_creation": false,
-      "candidate_id": "postcondition_guided_trajectory_policy_0007",
-      "exact_tool_choice": false,
-      "failure_labels": [
-        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
-        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
-      ],
-      "intervention_strength": "guidance_only",
-      "postcondition_gap": "search_or_find",
-      "recommended_tools": [
-        "grep",
-        "find"
-      ],
-      "request_predicates": [
-        "prior_explicit_literals_present",
-        "prior_tool_outputs_present",
-        "tools_available"
-      ],
-      "run_name": "required_target",
-      "runtime_plan_activated": true,
-      "runtime_plan_blocked_reason": "activated",
-      "runtime_plan_selected_tool": "grep",
-      "source_runtime_enabled": false,
-      "trace_relative_path": "required_target/traces/36ad3761-3af6-498d-a7ba-dda0c26e990b.json",
-      "trace_request_sha256": "ff48d92e51d28fc3f313dad722bc4c43253da3a06a8cb84505cebdf2a73ae2dc",
-      "trace_sha256": "dbf1072163aced1c4c612d0bc781ee83dc1c4fb2f23b41b9dc6846ff8419b3c0"
-    },
-    {
-      "argument_creation": false,
-      "candidate_id": "postcondition_guided_trajectory_policy_0012",
-      "exact_tool_choice": false,
-      "failure_labels": [
-        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
-        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
-      ],
-      "intervention_strength": "guidance_only",
-      "postcondition_gap": "read_content",
-      "recommended_tools": [
-        "cat"
-      ],
-      "request_predicates": [
-        "prior_explicit_literals_present",
-        "prior_tool_outputs_present",
-        "tools_available"
-      ],
-      "run_name": "required_target",
-      "runtime_plan_activated": true,
-      "runtime_plan_blocked_reason": "activated",
-      "runtime_plan_selected_tool": "cat",
-      "source_runtime_enabled": false,
-      "trace_relative_path": "required_target/traces/52c0df6e-fc93-4a48-91b3-c12bf8486c83.json",
-      "trace_request_sha256": "8a1adb90e06d446336142560c15008b461e41b529e391078df33c0e4dce3e795",
-      "trace_sha256": "48feff8074daaaacfabb21f4a736ae81aeb0018cf8cfcc5ac9595e42669b8f24"
-    },
-    {
-      "argument_creation": false,
-      "candidate_id": "postcondition_guided_trajectory_policy_0025",
-      "exact_tool_choice": false,
-      "failure_labels": [
-        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
-        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
-      ],
-      "intervention_strength": "guidance_only",
-      "postcondition_gap": "read_content",
-      "recommended_tools": [
-        "cat"
-      ],
-      "request_predicates": [
-        "prior_explicit_literals_present",
-        "prior_tool_outputs_present",
-        "tools_available"
-      ],
-      "run_name": "required_target",
-      "runtime_plan_activated": true,
-      "runtime_plan_blocked_reason": "activated",
-      "runtime_plan_selected_tool": "cat",
-      "source_runtime_enabled": false,
-      "trace_relative_path": "required_target/traces/d3cd2282-a2b9-4f00-8434-23a92e0af5d1.json",
-      "trace_request_sha256": "d339fdf3a0865384f2a6aa8f68fa1c77496dc8f30b965a9f1c05ba6edbbb99db",
-      "trace_sha256": "823dd8da75443f73339f9d1afe217b151c787f3e51b5f866598324f68dfe34af"
-    },
-    {
-      "argument_creation": false,
-      "candidate_id": "postcondition_guided_trajectory_policy_0037",
+      "candidate_id": "postcondition_guided_trajectory_policy_0033",
       "exact_tool_choice": false,
       "failure_labels": [
         "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
@@ -244,34 +167,7 @@
     },
     {
       "argument_creation": false,
-      "candidate_id": "postcondition_guided_trajectory_policy_0041",
-      "exact_tool_choice": false,
-      "failure_labels": [
-        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
-        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
-      ],
-      "intervention_strength": "guidance_only",
-      "postcondition_gap": "read_content",
-      "recommended_tools": [
-        "cat"
-      ],
-      "request_predicates": [
-        "prior_explicit_literals_present",
-        "prior_tool_outputs_present",
-        "tools_available"
-      ],
-      "run_name": "soft_target",
-      "runtime_plan_activated": true,
-      "runtime_plan_blocked_reason": "activated",
-      "runtime_plan_selected_tool": "cat",
-      "source_runtime_enabled": false,
-      "trace_relative_path": "soft_target/traces/7cc122b9-c815-4f4d-abd8-0d6a46a13c68.json",
-      "trace_request_sha256": "d1e46e854fa18b8dd168c86cdd0ae6917eccb4cdd4d5db4f967aae026d7deea7",
-      "trace_sha256": "16207684b7ef7af2e76a8c992f87d31e3ad6f9d5a484ee448a6cad3af29da8ce"
-    },
-    {
-      "argument_creation": false,
-      "candidate_id": "postcondition_guided_trajectory_policy_0053",
+      "candidate_id": "postcondition_guided_trajectory_policy_0048",
       "exact_tool_choice": false,
       "failure_labels": [
         "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
@@ -295,64 +191,10 @@
       "trace_relative_path": "soft_target/traces/cb147d78-7e00-461a-903b-6c464edc3b79.json",
       "trace_request_sha256": "ac04721b329fbba294f9635630234f12869dd35f6fd77ee4c9c05c8eab5f6632",
       "trace_sha256": "a1bb73bd2b5d78ef596f04a8fade638bcc77c834d6072db531e1816fe894e1dc"
-    },
-    {
-      "argument_creation": false,
-      "candidate_id": "postcondition_guided_trajectory_policy_0057",
-      "exact_tool_choice": false,
-      "failure_labels": [
-        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
-        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
-      ],
-      "intervention_strength": "guidance_only",
-      "postcondition_gap": "read_content",
-      "recommended_tools": [
-        "cat"
-      ],
-      "request_predicates": [
-        "prior_explicit_literals_present",
-        "prior_tool_outputs_present",
-        "tools_available"
-      ],
-      "run_name": "soft_target",
-      "runtime_plan_activated": true,
-      "runtime_plan_blocked_reason": "activated",
-      "runtime_plan_selected_tool": "cat",
-      "source_runtime_enabled": false,
-      "trace_relative_path": "soft_target/traces/e8eaadc3-c030-4275-ae13-73e86558f337.json",
-      "trace_request_sha256": "fb0168c79beb66830f28075e037a71892d5222b61253788e015ff051d76862c8",
-      "trace_sha256": "dddd1eb05c19fe5146629d8a2c7aa8633d06b83b9c7e07c8229c883bccbe09df"
-    },
-    {
-      "argument_creation": false,
-      "candidate_id": "postcondition_guided_trajectory_policy_0062",
-      "exact_tool_choice": false,
-      "failure_labels": [
-        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
-        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
-      ],
-      "intervention_strength": "guidance_only",
-      "postcondition_gap": "read_content",
-      "recommended_tools": [
-        "cat"
-      ],
-      "request_predicates": [
-        "prior_explicit_literals_present",
-        "prior_tool_outputs_present",
-        "tools_available"
-      ],
-      "run_name": "soft_target",
-      "runtime_plan_activated": false,
-      "runtime_plan_blocked_reason": "request_predicates_unmet",
-      "runtime_plan_selected_tool": null,
-      "source_runtime_enabled": false,
-      "trace_relative_path": "soft_target/traces/f71ee639-d173-4b29-8abe-3a20e7e6aba2.json",
-      "trace_request_sha256": "90042359a28a81d248dbfabab37cfe7bd6053e40a2318ff2e161415d04853b21",
-      "trace_sha256": "2b08501d1e3a13b69e4b0075f97848afc2571181db9c4224f59a19732493558a"
     }
   ],
   "smoke_execution_requires_explicit_approval": true,
-  "smoke_protocol_ready_for_review": true,
+  "smoke_protocol_ready_for_review": false,
   "synthetic_final_answer_negative_control_activated": false,
   "synthetic_missing_capability_negative_control_activated": false,
   "synthetic_no_prior_tool_output_negative_control_activated": false,

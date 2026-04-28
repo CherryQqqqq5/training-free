@@ -1,7 +1,7 @@
 {
   "artifact_boundary": {
     "artifact_boundary_passed": false,
-    "forbidden_artifact_count": 14992,
+    "forbidden_artifact_count": 16903,
     "forbidden_artifact_examples": [
       "outputs/artifacts/bfcl_ctspc_source_pool_v1/irrelevance/baseline/artifacts/repairs.jsonl",
       "outputs/artifacts/bfcl_ctspc_source_pool_v1/irrelevance/baseline/bfcl/.env",
@@ -128,7 +128,10 @@
     "m2_8pre_offline_not_passed",
     "scorer_authorization_not_ready",
     "policy_conversion_not_observed_in_existing_traces",
-    "runtime_dry_run_compiler_not_ready"
+    "runtime_dry_run_compiler_not_ready",
+    "postcondition_dev_smoke_stop_loss_failed",
+    "postcondition_candidate_mining_gap_filter_not_passed",
+    "postcondition_smoke_protocol_not_ready"
   ],
   "policy_conversion": {
     "next_tool_emitted": 0,
@@ -163,31 +166,66 @@
       "create_file": 18,
       "directory_navigation": 18,
       "move_or_rename": 4,
-      "read_content": 8,
-      "search_or_find": 4,
+      "read_content": 1,
+      "search_or_find": 2,
       "write_content": 5
     },
     "next_required_action": "review_policy_family_before_runtime_integration",
-    "policy_candidate_count": 63,
+    "policy_candidate_count": 54,
     "policy_conversion_opportunity_audit_ready": true,
-    "postcondition_already_satisfied_count": 82,
-    "postcondition_low_risk_review_eligible_count": 12,
+    "postcondition_already_satisfied_count": 91,
+    "postcondition_low_risk_review_eligible_count": 3,
     "postcondition_negative_control_activation_count": 0,
     "postcondition_negative_control_activation_rate": 0.0,
     "postcondition_negative_control_ready": true,
     "recommended_tool_distribution": {
-      "cat": 8,
+      "cat": 1,
       "cd": 18,
       "cp": 6,
       "echo": 5,
-      "find": 4,
-      "grep": 4,
+      "find": 2,
+      "grep": 2,
       "mv": 4,
       "touch": 18
     },
-    "recommended_tools_count": 67,
+    "recommended_tools_count": 56,
     "runtime_dry_run_compiler_blocker": "low_risk_support_too_small_or_witness_precision_pending",
     "runtime_dry_run_compiler_ready": false
+  },
+  "postcondition_smoke": {
+    "postcondition_already_satisfied_in_smoke_count": 9,
+    "postcondition_candidate_mining_gap_filter_passed": false,
+    "postcondition_protocol_gating_state": "fail_closed",
+    "postcondition_satisfaction_audit_ready": true,
+    "postcondition_satisfaction_recommended_next_action": "fix_postcondition_candidate_mining_satisfaction_filter_before_any_rerun",
+    "postcondition_smoke_activated_candidate_no_tool_count": 6,
+    "postcondition_smoke_activated_case_count": 6,
+    "postcondition_smoke_baseline_recommended_tool_match_count": 0,
+    "postcondition_smoke_candidate_recommended_tool_match_count": 0,
+    "postcondition_smoke_case_count": 9,
+    "postcondition_smoke_case_fixed_count": 0,
+    "postcondition_smoke_case_regressed_count": 0,
+    "postcondition_smoke_diagnostic_inactive_case_count": 3,
+    "postcondition_smoke_evidence_classification": "negative_evidence_blocked_claim",
+    "postcondition_smoke_failure_diagnosis_ready": true,
+    "postcondition_smoke_failure_source_distribution": {
+      "model_ignored_soft_guidance_or_gap_overestimated": 6,
+      "runtime_scope_mismatch_diagnostic_inactive": 3
+    },
+    "postcondition_smoke_net_case_gain": 0,
+    "postcondition_smoke_next_required_action": "stop_and_diagnose_postcondition_smoke_failure",
+    "postcondition_smoke_primary_failure_source": "model_ignored_soft_guidance_or_postcondition_gap_overestimated",
+    "postcondition_smoke_protocol_first_failure": {
+      "actual": 3,
+      "check": "selected_low_risk_case_count",
+      "expected": 9
+    },
+    "postcondition_smoke_protocol_ready_for_review": false,
+    "postcondition_smoke_protocol_runtime_replay_activation_count": 1,
+    "postcondition_smoke_protocol_selected_case_count": 3,
+    "postcondition_smoke_result_ready": true,
+    "postcondition_smoke_stop_loss_passed": false,
+    "postcondition_unmet_strong_in_smoke_count": 0
   },
   "report_scope": "first_stage_delivery_evidence_audit",
   "sota_3pp_claim_ready": false,

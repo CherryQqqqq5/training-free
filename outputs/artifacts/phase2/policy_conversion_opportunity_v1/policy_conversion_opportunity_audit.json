@@ -4,8 +4,8 @@
     "create_file": 18,
     "directory_navigation": 18,
     "move_or_rename": 4,
-    "read_content": 8,
-    "search_or_find": 4,
+    "read_content": 1,
+    "search_or_find": 2,
     "write_content": 5
   },
   "candidate_commands": [],
@@ -226,84 +226,6 @@
     },
     {
       "available_tools": [
-        "absolute_value",
-        "add",
-        "cat",
-        "cd",
-        "cp",
-        "diff",
-        "divide",
-        "du",
-        "echo",
-        "find",
-        "grep",
-        "imperial_si_conversion",
-        "logarithm",
-        "ls",
-        "max_value",
-        "mean",
-        "min_value",
-        "mkdir",
-        "multiply",
-        "mv",
-        "percentage",
-        "power",
-        "pwd",
-        "rm",
-        "rmdir",
-        "round_number",
-        "si_unit_conversion",
-        "sort",
-        "square_root",
-        "standard_deviation",
-        "subtract",
-        "sum_values",
-        "tail",
-        "touch",
-        "wc"
-      ],
-      "candidate_ready": true,
-      "disambiguation_cue": "display",
-      "exact_tool_choice": false,
-      "expected_observation_keys": [
-        "file_content"
-      ],
-      "failure_labels": [
-        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
-        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
-      ],
-      "intervention_strength": "guidance_only",
-      "policy_family": "postcondition_guided_trajectory_policy",
-      "policy_hits": [],
-      "postcondition_already_satisfied": false,
-      "postcondition_gap": "read_content",
-      "postcondition_witness_available": true,
-      "precondition_observable": true,
-      "recommended_tools": [
-        "cat"
-      ],
-      "rejection_reason": null,
-      "request_patch_count": 9,
-      "request_predicates": [
-        "prior_explicit_literals_present",
-        "prior_tool_outputs_present",
-        "tools_available"
-      ],
-      "rule_hits": [
-        "rule_global_no_tool_actionable_no_tool_decision_prior_explicit_literals_present_prior_tool_outputs_present_tools_available_v1",
-        "rule_global_no_tool_actionable_no_tool_decision_prior_tool_outputs_present_tools_available_v1"
-      ],
-      "run_name": "required_target",
-      "satisfied_witness_keys": [],
-      "target_or_scorer_field_dependency": false,
-      "theory_class": "postcondition_guided_trajectory_progress",
-      "trace_id": "1f33ea9e-1aff-4302-9aec-14c268e533e5",
-      "trace_path": "outputs/phase2_validation/required_next_tool_choice_v1/required_target/traces/1f33ea9e-1aff-4302-9aec-14c268e533e5.json",
-      "trace_relative_path": "required_target/traces/1f33ea9e-1aff-4302-9aec-14c268e533e5.json",
-      "user_text_excerpt": "Find a file named 'config.py' somewhere deep in the file system and once you have located it, display the last line of the first occuring file."
-    },
-    {
-      "available_tools": [
         "cat",
         "cd",
         "close_ticket",
@@ -503,78 +425,6 @@
       "trace_path": "outputs/phase2_validation/required_next_tool_choice_v1/required_target/traces/2668a790-6eb2-4453-b3f5-239836173670.json",
       "trace_relative_path": "required_target/traces/2668a790-6eb2-4453-b3f5-239836173670.json",
       "user_text_excerpt": "Could you go to temp directory, and for each file in there, count the number of lines.\nNow, scour through the mysterious file and hunt for any mentions or whispers of 'server error'."
-    },
-    {
-      "available_tools": [
-        "add_contact",
-        "cat",
-        "cd",
-        "cp",
-        "delete_message",
-        "diff",
-        "du",
-        "echo",
-        "find",
-        "get_message_stats",
-        "get_user_id",
-        "grep",
-        "list_users",
-        "ls",
-        "message_get_login_status",
-        "message_login",
-        "mkdir",
-        "mv",
-        "pwd",
-        "rm",
-        "rmdir",
-        "search_messages",
-        "send_message",
-        "sort",
-        "tail",
-        "touch",
-        "view_messages_sent",
-        "wc"
-      ],
-      "candidate_ready": true,
-      "disambiguation_cue": "find",
-      "exact_tool_choice": false,
-      "expected_observation_keys": [
-        "matching_results"
-      ],
-      "failure_labels": [
-        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
-        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
-      ],
-      "intervention_strength": "guidance_only",
-      "policy_family": "postcondition_guided_trajectory_policy",
-      "policy_hits": [],
-      "postcondition_already_satisfied": false,
-      "postcondition_gap": "search_or_find",
-      "postcondition_witness_available": true,
-      "precondition_observable": true,
-      "recommended_tools": [
-        "grep",
-        "find"
-      ],
-      "rejection_reason": null,
-      "request_patch_count": 9,
-      "request_predicates": [
-        "prior_explicit_literals_present",
-        "prior_tool_outputs_present",
-        "tools_available"
-      ],
-      "rule_hits": [
-        "rule_global_no_tool_actionable_no_tool_decision_prior_explicit_literals_present_prior_tool_outputs_present_tools_available_v1",
-        "rule_global_no_tool_actionable_no_tool_decision_prior_tool_outputs_present_tools_available_v1"
-      ],
-      "run_name": "required_target",
-      "satisfied_witness_keys": [],
-      "target_or_scorer_field_dependency": false,
-      "theory_class": "postcondition_guided_trajectory_progress",
-      "trace_id": "36ad3761-3af6-498d-a7ba-dda0c26e990b",
-      "trace_path": "outputs/phase2_validation/required_next_tool_choice_v1/required_target/traces/36ad3761-3af6-498d-a7ba-dda0c26e990b.json",
-      "trace_relative_path": "required_target/traces/36ad3761-3af6-498d-a7ba-dda0c26e990b.json",
-      "user_text_excerpt": "What's the name of the python file my current directory? There should be only one. Do not list hidden files.\nUse grep to find out the name of the function of the script."
     },
     {
       "available_tools": [
@@ -876,81 +726,6 @@
       "trace_path": "outputs/phase2_validation/required_next_tool_choice_v1/required_target/traces/4eef4908-5845-474f-8767-14fdcebbfacf.json",
       "trace_relative_path": "required_target/traces/4eef4908-5845-474f-8767-14fdcebbfacf.json",
       "user_text_excerpt": "Kindly draft a document titled 'project_summary.txt' right here in documents directory. Yield an error if it already exists.\n I need it archived. Replicate it into the archive folder, but rename it to 'summary_2024.txt'."
-    },
-    {
-      "available_tools": [
-        "authenticate_twitter",
-        "cat",
-        "cd",
-        "comment",
-        "cp",
-        "diff",
-        "du",
-        "echo",
-        "find",
-        "follow_user",
-        "get_tweet",
-        "get_tweet_comments",
-        "get_user_stats",
-        "get_user_tweets",
-        "grep",
-        "list_all_following",
-        "ls",
-        "mention",
-        "mkdir",
-        "mv",
-        "post_tweet",
-        "posting_get_login_status",
-        "pwd",
-        "retweet",
-        "rm",
-        "rmdir",
-        "search_tweets",
-        "sort",
-        "tail",
-        "touch",
-        "unfollow_user",
-        "wc"
-      ],
-      "candidate_ready": true,
-      "disambiguation_cue": "show",
-      "exact_tool_choice": false,
-      "expected_observation_keys": [
-        "file_content"
-      ],
-      "failure_labels": [
-        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
-        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
-      ],
-      "intervention_strength": "guidance_only",
-      "policy_family": "postcondition_guided_trajectory_policy",
-      "policy_hits": [],
-      "postcondition_already_satisfied": false,
-      "postcondition_gap": "read_content",
-      "postcondition_witness_available": true,
-      "precondition_observable": true,
-      "recommended_tools": [
-        "cat"
-      ],
-      "rejection_reason": null,
-      "request_patch_count": 9,
-      "request_predicates": [
-        "prior_explicit_literals_present",
-        "prior_tool_outputs_present",
-        "tools_available"
-      ],
-      "rule_hits": [
-        "rule_global_no_tool_actionable_no_tool_decision_prior_explicit_literals_present_prior_tool_outputs_present_tools_available_v1",
-        "rule_global_no_tool_actionable_no_tool_decision_prior_tool_outputs_present_tools_available_v1"
-      ],
-      "run_name": "required_target",
-      "satisfied_witness_keys": [],
-      "target_or_scorer_field_dependency": false,
-      "theory_class": "postcondition_guided_trajectory_progress",
-      "trace_id": "52c0df6e-fc93-4a48-91b3-c12bf8486c83",
-      "trace_path": "outputs/phase2_validation/required_next_tool_choice_v1/required_target/traces/52c0df6e-fc93-4a48-91b3-c12bf8486c83.json",
-      "trace_relative_path": "required_target/traces/52c0df6e-fc93-4a48-91b3-c12bf8486c83.json",
-      "user_text_excerpt": "Could you kindly show me the list of files in tmp directory in my file system including the hidden one?"
     },
     {
       "available_tools": [
@@ -1762,81 +1537,6 @@
       "trace_path": "outputs/phase2_validation/required_next_tool_choice_v1/required_target/traces/b6149d0a-be1c-4207-be4d-df067dc11eb8.json",
       "trace_relative_path": "required_target/traces/b6149d0a-be1c-4207-be4d-df067dc11eb8.json",
       "user_text_excerpt": "Pop on over to the 'Documents' directory and craft a new file dubbed 'summary.txt', would you? If it already exists, return an error\nIn 'Documents', let's capture some profound topic 'quantum computing' and jot them down in the 'summary.txt"
-    },
-    {
-      "available_tools": [
-        "authenticate_twitter",
-        "cat",
-        "cd",
-        "comment",
-        "cp",
-        "diff",
-        "du",
-        "echo",
-        "find",
-        "follow_user",
-        "get_tweet",
-        "get_tweet_comments",
-        "get_user_stats",
-        "get_user_tweets",
-        "grep",
-        "list_all_following",
-        "ls",
-        "mention",
-        "mkdir",
-        "mv",
-        "post_tweet",
-        "posting_get_login_status",
-        "pwd",
-        "retweet",
-        "rm",
-        "rmdir",
-        "search_tweets",
-        "sort",
-        "tail",
-        "touch",
-        "unfollow_user",
-        "wc"
-      ],
-      "candidate_ready": true,
-      "disambiguation_cue": "display",
-      "exact_tool_choice": false,
-      "expected_observation_keys": [
-        "file_content"
-      ],
-      "failure_labels": [
-        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
-        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
-      ],
-      "intervention_strength": "guidance_only",
-      "policy_family": "postcondition_guided_trajectory_policy",
-      "policy_hits": [],
-      "postcondition_already_satisfied": false,
-      "postcondition_gap": "read_content",
-      "postcondition_witness_available": true,
-      "precondition_observable": true,
-      "recommended_tools": [
-        "cat"
-      ],
-      "rejection_reason": null,
-      "request_patch_count": 9,
-      "request_predicates": [
-        "prior_explicit_literals_present",
-        "prior_tool_outputs_present",
-        "tools_available"
-      ],
-      "rule_hits": [
-        "rule_global_no_tool_actionable_no_tool_decision_prior_explicit_literals_present_prior_tool_outputs_present_tools_available_v1",
-        "rule_global_no_tool_actionable_no_tool_decision_prior_tool_outputs_present_tools_available_v1"
-      ],
-      "run_name": "required_target",
-      "satisfied_witness_keys": [],
-      "target_or_scorer_field_dependency": false,
-      "theory_class": "postcondition_guided_trajectory_progress",
-      "trace_id": "d3cd2282-a2b9-4f00-8434-23a92e0af5d1",
-      "trace_path": "outputs/phase2_validation/required_next_tool_choice_v1/required_target/traces/d3cd2282-a2b9-4f00-8434-23a92e0af5d1.json",
-      "trace_relative_path": "required_target/traces/d3cd2282-a2b9-4f00-8434-23a92e0af5d1.json",
-      "user_text_excerpt": "In documents directory, there's a file that piques my curiosity regarding its contents. Could you display the last line of that file for me?"
     },
     {
       "available_tools": [
@@ -2873,81 +2573,6 @@
       "trace_path": "outputs/phase2_validation/required_next_tool_choice_v1/soft_target/traces/75f4a649-51ed-4623-a39a-b1798d10b6a1.json",
       "trace_relative_path": "soft_target/traces/75f4a649-51ed-4623-a39a-b1798d10b6a1.json",
       "user_text_excerpt": "Move 'final_report.pdf' within document directory to 'temp' directory in document. Make sure to create the directory\nPerform a detailed search using grep to identify sections in the file pertaining to 'budget analysis'.\nUpon identifying the"
-    },
-    {
-      "available_tools": [
-        "authenticate_twitter",
-        "cat",
-        "cd",
-        "comment",
-        "cp",
-        "diff",
-        "du",
-        "echo",
-        "find",
-        "follow_user",
-        "get_tweet",
-        "get_tweet_comments",
-        "get_user_stats",
-        "get_user_tweets",
-        "grep",
-        "list_all_following",
-        "ls",
-        "mention",
-        "mkdir",
-        "mv",
-        "post_tweet",
-        "posting_get_login_status",
-        "pwd",
-        "retweet",
-        "rm",
-        "rmdir",
-        "search_tweets",
-        "sort",
-        "tail",
-        "touch",
-        "unfollow_user",
-        "wc"
-      ],
-      "candidate_ready": true,
-      "disambiguation_cue": "display",
-      "exact_tool_choice": false,
-      "expected_observation_keys": [
-        "file_content"
-      ],
-      "failure_labels": [
-        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
-        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
-      ],
-      "intervention_strength": "guidance_only",
-      "policy_family": "postcondition_guided_trajectory_policy",
-      "policy_hits": [],
-      "postcondition_already_satisfied": false,
-      "postcondition_gap": "read_content",
-      "postcondition_witness_available": true,
-      "precondition_observable": true,
-      "recommended_tools": [
-        "cat"
-      ],
-      "rejection_reason": null,
-      "request_patch_count": 9,
-      "request_predicates": [
-        "prior_explicit_literals_present",
-        "prior_tool_outputs_present",
-        "tools_available"
-      ],
-      "rule_hits": [
-        "rule_global_no_tool_actionable_no_tool_decision_prior_explicit_literals_present_prior_tool_outputs_present_tools_available_v1",
-        "rule_global_no_tool_actionable_no_tool_decision_prior_tool_outputs_present_tools_available_v1"
-      ],
-      "run_name": "soft_target",
-      "satisfied_witness_keys": [],
-      "target_or_scorer_field_dependency": false,
-      "theory_class": "postcondition_guided_trajectory_progress",
-      "trace_id": "7cc122b9-c815-4f4d-abd8-0d6a46a13c68",
-      "trace_path": "outputs/phase2_validation/required_next_tool_choice_v1/soft_target/traces/7cc122b9-c815-4f4d-abd8-0d6a46a13c68.json",
-      "trace_relative_path": "soft_target/traces/7cc122b9-c815-4f4d-abd8-0d6a46a13c68.json",
-      "user_text_excerpt": "In documents directory, there's a file that piques my curiosity regarding its contents. Could you display the last line of that file for me?"
     },
     {
       "available_tools": [
@@ -4014,231 +3639,6 @@
         "wc"
       ],
       "candidate_ready": true,
-      "disambiguation_cue": "show",
-      "exact_tool_choice": false,
-      "expected_observation_keys": [
-        "file_content"
-      ],
-      "failure_labels": [
-        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
-        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
-      ],
-      "intervention_strength": "guidance_only",
-      "policy_family": "postcondition_guided_trajectory_policy",
-      "policy_hits": [],
-      "postcondition_already_satisfied": false,
-      "postcondition_gap": "read_content",
-      "postcondition_witness_available": true,
-      "precondition_observable": true,
-      "recommended_tools": [
-        "cat"
-      ],
-      "rejection_reason": null,
-      "request_patch_count": 9,
-      "request_predicates": [
-        "prior_explicit_literals_present",
-        "prior_tool_outputs_present",
-        "tools_available"
-      ],
-      "rule_hits": [
-        "rule_global_no_tool_actionable_no_tool_decision_prior_explicit_literals_present_prior_tool_outputs_present_tools_available_v1",
-        "rule_global_no_tool_actionable_no_tool_decision_prior_tool_outputs_present_tools_available_v1"
-      ],
-      "run_name": "soft_target",
-      "satisfied_witness_keys": [],
-      "target_or_scorer_field_dependency": false,
-      "theory_class": "postcondition_guided_trajectory_progress",
-      "trace_id": "e8eaadc3-c030-4275-ae13-73e86558f337",
-      "trace_path": "outputs/phase2_validation/required_next_tool_choice_v1/soft_target/traces/e8eaadc3-c030-4275-ae13-73e86558f337.json",
-      "trace_relative_path": "soft_target/traces/e8eaadc3-c030-4275-ae13-73e86558f337.json",
-      "user_text_excerpt": "Could you kindly show me the list of files in tmp directory in my file system including the hidden one?"
-    },
-    {
-      "available_tools": [
-        "absolute_value",
-        "add",
-        "cat",
-        "cd",
-        "cp",
-        "diff",
-        "divide",
-        "du",
-        "echo",
-        "find",
-        "grep",
-        "imperial_si_conversion",
-        "logarithm",
-        "ls",
-        "max_value",
-        "mean",
-        "min_value",
-        "mkdir",
-        "multiply",
-        "mv",
-        "percentage",
-        "power",
-        "pwd",
-        "rm",
-        "rmdir",
-        "round_number",
-        "si_unit_conversion",
-        "sort",
-        "square_root",
-        "standard_deviation",
-        "subtract",
-        "sum_values",
-        "tail",
-        "touch",
-        "wc"
-      ],
-      "candidate_ready": true,
-      "disambiguation_cue": "display",
-      "exact_tool_choice": false,
-      "expected_observation_keys": [
-        "file_content"
-      ],
-      "failure_labels": [
-        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
-        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
-      ],
-      "intervention_strength": "guidance_only",
-      "policy_family": "postcondition_guided_trajectory_policy",
-      "policy_hits": [],
-      "postcondition_already_satisfied": false,
-      "postcondition_gap": "read_content",
-      "postcondition_witness_available": true,
-      "precondition_observable": true,
-      "recommended_tools": [
-        "cat"
-      ],
-      "rejection_reason": null,
-      "request_patch_count": 9,
-      "request_predicates": [
-        "prior_explicit_literals_present",
-        "prior_tool_outputs_present",
-        "tools_available"
-      ],
-      "rule_hits": [
-        "rule_global_no_tool_actionable_no_tool_decision_prior_explicit_literals_present_prior_tool_outputs_present_tools_available_v1",
-        "rule_global_no_tool_actionable_no_tool_decision_prior_tool_outputs_present_tools_available_v1"
-      ],
-      "run_name": "soft_target",
-      "satisfied_witness_keys": [],
-      "target_or_scorer_field_dependency": false,
-      "theory_class": "postcondition_guided_trajectory_progress",
-      "trace_id": "ec5e401a-5649-4136-afcb-8b20926986f1",
-      "trace_path": "outputs/phase2_validation/required_next_tool_choice_v1/soft_target/traces/ec5e401a-5649-4136-afcb-8b20926986f1.json",
-      "trace_relative_path": "soft_target/traces/ec5e401a-5649-4136-afcb-8b20926986f1.json",
-      "user_text_excerpt": "Find a file named 'config.py' somewhere deep in the file system and once you have located it, display the last line of the first occuring file."
-    },
-    {
-      "available_tools": [
-        "add_contact",
-        "cat",
-        "cd",
-        "cp",
-        "delete_message",
-        "diff",
-        "du",
-        "echo",
-        "find",
-        "get_message_stats",
-        "get_user_id",
-        "grep",
-        "list_users",
-        "ls",
-        "message_get_login_status",
-        "message_login",
-        "mkdir",
-        "mv",
-        "pwd",
-        "rm",
-        "rmdir",
-        "search_messages",
-        "send_message",
-        "sort",
-        "tail",
-        "touch",
-        "view_messages_sent",
-        "wc"
-      ],
-      "candidate_ready": true,
-      "disambiguation_cue": "find",
-      "exact_tool_choice": false,
-      "expected_observation_keys": [
-        "matching_results"
-      ],
-      "failure_labels": [
-        "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
-        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
-      ],
-      "intervention_strength": "guidance_only",
-      "policy_family": "postcondition_guided_trajectory_policy",
-      "policy_hits": [],
-      "postcondition_already_satisfied": false,
-      "postcondition_gap": "search_or_find",
-      "postcondition_witness_available": true,
-      "precondition_observable": true,
-      "recommended_tools": [
-        "grep",
-        "find"
-      ],
-      "rejection_reason": null,
-      "request_patch_count": 9,
-      "request_predicates": [
-        "prior_explicit_literals_present",
-        "prior_tool_outputs_present",
-        "tools_available"
-      ],
-      "rule_hits": [
-        "rule_global_no_tool_actionable_no_tool_decision_prior_explicit_literals_present_prior_tool_outputs_present_tools_available_v1",
-        "rule_global_no_tool_actionable_no_tool_decision_prior_tool_outputs_present_tools_available_v1"
-      ],
-      "run_name": "soft_target",
-      "satisfied_witness_keys": [],
-      "target_or_scorer_field_dependency": false,
-      "theory_class": "postcondition_guided_trajectory_progress",
-      "trace_id": "f409cdbd-f858-490a-ac93-9971ad904799",
-      "trace_path": "outputs/phase2_validation/required_next_tool_choice_v1/soft_target/traces/f409cdbd-f858-490a-ac93-9971ad904799.json",
-      "trace_relative_path": "soft_target/traces/f409cdbd-f858-490a-ac93-9971ad904799.json",
-      "user_text_excerpt": "What's the name of the python file my current directory? There should be only one. Do not list hidden files.\nUse grep to find out the name of the function of the script.\nAnd while we're diving into the deployments, let's pinpoint every ment"
-    },
-    {
-      "available_tools": [
-        "authenticate_twitter",
-        "cat",
-        "cd",
-        "comment",
-        "cp",
-        "diff",
-        "du",
-        "echo",
-        "find",
-        "follow_user",
-        "get_tweet",
-        "get_tweet_comments",
-        "get_user_stats",
-        "get_user_tweets",
-        "grep",
-        "list_all_following",
-        "ls",
-        "mention",
-        "mkdir",
-        "mv",
-        "post_tweet",
-        "posting_get_login_status",
-        "pwd",
-        "retweet",
-        "rm",
-        "rmdir",
-        "search_tweets",
-        "sort",
-        "tail",
-        "touch",
-        "unfollow_user",
-        "wc"
-      ],
-      "candidate_ready": true,
       "disambiguation_cue": "folder",
       "exact_tool_choice": false,
       "expected_observation_keys": [
@@ -4355,86 +3755,11 @@
       "trace_path": "outputs/phase2_validation/required_next_tool_choice_v1/soft_target/traces/f6c854d2-1cc5-4226-bb5b-54fc4eeecf0c.json",
       "trace_relative_path": "soft_target/traces/f6c854d2-1cc5-4226-bb5b-54fc4eeecf0c.json",
       "user_text_excerpt": "In my existing folder called 'Lectures', I'd like to set up a new file.\nThe name file called 'Notes2023.txt'.\nInside 'Notes2023.txt', I shall jot down some pivotal reminders: 'Study diligently, practice programming, master algorithms.'\nAsce"
-    },
-    {
-      "available_tools": [
-        "authenticate_twitter",
-        "cat",
-        "cd",
-        "comment",
-        "cp",
-        "diff",
-        "du",
-        "echo",
-        "find",
-        "follow_user",
-        "get_tweet",
-        "get_tweet_comments",
-        "get_user_stats",
-        "get_user_tweets",
-        "grep",
-        "list_all_following",
-        "ls",
-        "mention",
-        "mkdir",
-        "mv",
-        "post_tweet",
-        "posting_get_login_status",
-        "pwd",
-        "retweet",
-        "rm",
-        "rmdir",
-        "search_tweets",
-        "sort",
-        "tail",
-        "touch",
-        "unfollow_user",
-        "wc"
-      ],
-      "candidate_ready": true,
-      "disambiguation_cue": "show",
-      "exact_tool_choice": false,
-      "expected_observation_keys": [
-        "file_content"
-      ],
-      "failure_labels": [
-        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
-        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
-      ],
-      "intervention_strength": "guidance_only",
-      "policy_family": "postcondition_guided_trajectory_policy",
-      "policy_hits": [],
-      "postcondition_already_satisfied": false,
-      "postcondition_gap": "read_content",
-      "postcondition_witness_available": true,
-      "precondition_observable": true,
-      "recommended_tools": [
-        "cat"
-      ],
-      "rejection_reason": null,
-      "request_patch_count": 9,
-      "request_predicates": [
-        "prior_explicit_literals_present",
-        "prior_tool_outputs_present",
-        "tools_available"
-      ],
-      "rule_hits": [
-        "rule_global_no_tool_actionable_no_tool_decision_prior_explicit_literals_present_prior_tool_outputs_present_tools_available_v1",
-        "rule_global_no_tool_actionable_no_tool_decision_prior_tool_outputs_present_tools_available_v1"
-      ],
-      "run_name": "soft_target",
-      "satisfied_witness_keys": [],
-      "target_or_scorer_field_dependency": false,
-      "theory_class": "postcondition_guided_trajectory_progress",
-      "trace_id": "f71ee639-d173-4b29-8abe-3a20e7e6aba2",
-      "trace_path": "outputs/phase2_validation/required_next_tool_choice_v1/soft_target/traces/f71ee639-d173-4b29-8abe-3a20e7e6aba2.json",
-      "trace_relative_path": "soft_target/traces/f71ee639-d173-4b29-8abe-3a20e7e6aba2.json",
-      "user_text_excerpt": "Could you kindly show me the list of files in tmp directory in my file system including the hidden one?\nThere is a report in my current directory. I have noticed the report appears somewhat cluttered; it could benefit from having its lines "
     }
   ],
   "candidate_runs": {
-    "required_target": 30,
-    "soft_target": 33
+    "required_target": 26,
+    "soft_target": 28
   },
   "does_not_authorize_scorer": true,
   "does_not_call_bfcl_or_model": true,
@@ -4442,25 +3767,25 @@
   "no_tool_policy_failure_count": 1069,
   "offline_only": true,
   "planned_commands": [],
-  "policy_candidate_count": 63,
+  "policy_candidate_count": 54,
   "policy_conversion_opportunity_audit_ready": true,
   "recommended_tool_distribution": {
-    "cat": 8,
+    "cat": 1,
     "cd": 18,
     "cp": 6,
     "echo": 5,
-    "find": 4,
-    "grep": 4,
+    "find": 2,
+    "grep": 2,
     "mv": 4,
     "touch": 18
   },
-  "recommended_tools_count": 67,
+  "recommended_tools_count": 56,
   "rejection_reason_counts": {
-    "candidate_ready": 63,
+    "candidate_ready": 54,
     "no_rule_hit": 372,
     "no_schema_local_recommended_tool": 552,
     "not_no_tool_policy_failure": 8185,
-    "postcondition_already_satisfied": 82
+    "postcondition_already_satisfied": 91
   },
   "report_scope": "policy_conversion_opportunity_audit",
   "rule_hit_trace_count": 697,
@@ -4681,84 +4006,6 @@
     },
     {
       "available_tools": [
-        "absolute_value",
-        "add",
-        "cat",
-        "cd",
-        "cp",
-        "diff",
-        "divide",
-        "du",
-        "echo",
-        "find",
-        "grep",
-        "imperial_si_conversion",
-        "logarithm",
-        "ls",
-        "max_value",
-        "mean",
-        "min_value",
-        "mkdir",
-        "multiply",
-        "mv",
-        "percentage",
-        "power",
-        "pwd",
-        "rm",
-        "rmdir",
-        "round_number",
-        "si_unit_conversion",
-        "sort",
-        "square_root",
-        "standard_deviation",
-        "subtract",
-        "sum_values",
-        "tail",
-        "touch",
-        "wc"
-      ],
-      "candidate_ready": true,
-      "disambiguation_cue": "display",
-      "exact_tool_choice": false,
-      "expected_observation_keys": [
-        "file_content"
-      ],
-      "failure_labels": [
-        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
-        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
-      ],
-      "intervention_strength": "guidance_only",
-      "policy_family": "postcondition_guided_trajectory_policy",
-      "policy_hits": [],
-      "postcondition_already_satisfied": false,
-      "postcondition_gap": "read_content",
-      "postcondition_witness_available": true,
-      "precondition_observable": true,
-      "recommended_tools": [
-        "cat"
-      ],
-      "rejection_reason": null,
-      "request_patch_count": 9,
-      "request_predicates": [
-        "prior_explicit_literals_present",
-        "prior_tool_outputs_present",
-        "tools_available"
-      ],
-      "rule_hits": [
-        "rule_global_no_tool_actionable_no_tool_decision_prior_explicit_literals_present_prior_tool_outputs_present_tools_available_v1",
-        "rule_global_no_tool_actionable_no_tool_decision_prior_tool_outputs_present_tools_available_v1"
-      ],
-      "run_name": "required_target",
-      "satisfied_witness_keys": [],
-      "target_or_scorer_field_dependency": false,
-      "theory_class": "postcondition_guided_trajectory_progress",
-      "trace_id": "1f33ea9e-1aff-4302-9aec-14c268e533e5",
-      "trace_path": "outputs/phase2_validation/required_next_tool_choice_v1/required_target/traces/1f33ea9e-1aff-4302-9aec-14c268e533e5.json",
-      "trace_relative_path": "required_target/traces/1f33ea9e-1aff-4302-9aec-14c268e533e5.json",
-      "user_text_excerpt": "Find a file named 'config.py' somewhere deep in the file system and once you have located it, display the last line of the first occuring file."
-    },
-    {
-      "available_tools": [
         "cat",
         "cd",
         "close_ticket",
@@ -4958,78 +4205,6 @@
       "trace_path": "outputs/phase2_validation/required_next_tool_choice_v1/required_target/traces/2668a790-6eb2-4453-b3f5-239836173670.json",
       "trace_relative_path": "required_target/traces/2668a790-6eb2-4453-b3f5-239836173670.json",
       "user_text_excerpt": "Could you go to temp directory, and for each file in there, count the number of lines.\nNow, scour through the mysterious file and hunt for any mentions or whispers of 'server error'."
-    },
-    {
-      "available_tools": [
-        "add_contact",
-        "cat",
-        "cd",
-        "cp",
-        "delete_message",
-        "diff",
-        "du",
-        "echo",
-        "find",
-        "get_message_stats",
-        "get_user_id",
-        "grep",
-        "list_users",
-        "ls",
-        "message_get_login_status",
-        "message_login",
-        "mkdir",
-        "mv",
-        "pwd",
-        "rm",
-        "rmdir",
-        "search_messages",
-        "send_message",
-        "sort",
-        "tail",
-        "touch",
-        "view_messages_sent",
-        "wc"
-      ],
-      "candidate_ready": true,
-      "disambiguation_cue": "find",
-      "exact_tool_choice": false,
-      "expected_observation_keys": [
-        "matching_results"
-      ],
-      "failure_labels": [
-        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
-        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
-      ],
-      "intervention_strength": "guidance_only",
-      "policy_family": "postcondition_guided_trajectory_policy",
-      "policy_hits": [],
-      "postcondition_already_satisfied": false,
-      "postcondition_gap": "search_or_find",
-      "postcondition_witness_available": true,
-      "precondition_observable": true,
-      "recommended_tools": [
-        "grep",
-        "find"
-      ],
-      "rejection_reason": null,
-      "request_patch_count": 9,
-      "request_predicates": [
-        "prior_explicit_literals_present",
-        "prior_tool_outputs_present",
-        "tools_available"
-      ],
-      "rule_hits": [
-        "rule_global_no_tool_actionable_no_tool_decision_prior_explicit_literals_present_prior_tool_outputs_present_tools_available_v1",
-        "rule_global_no_tool_actionable_no_tool_decision_prior_tool_outputs_present_tools_available_v1"
-      ],
-      "run_name": "required_target",
-      "satisfied_witness_keys": [],
-      "target_or_scorer_field_dependency": false,
-      "theory_class": "postcondition_guided_trajectory_progress",
-      "trace_id": "36ad3761-3af6-498d-a7ba-dda0c26e990b",
-      "trace_path": "outputs/phase2_validation/required_next_tool_choice_v1/required_target/traces/36ad3761-3af6-498d-a7ba-dda0c26e990b.json",
-      "trace_relative_path": "required_target/traces/36ad3761-3af6-498d-a7ba-dda0c26e990b.json",
-      "user_text_excerpt": "What's the name of the python file my current directory? There should be only one. Do not list hidden files.\nUse grep to find out the name of the function of the script."
     },
     {
       "available_tools": [
@@ -5331,81 +4506,6 @@
       "trace_path": "outputs/phase2_validation/required_next_tool_choice_v1/required_target/traces/4eef4908-5845-474f-8767-14fdcebbfacf.json",
       "trace_relative_path": "required_target/traces/4eef4908-5845-474f-8767-14fdcebbfacf.json",
       "user_text_excerpt": "Kindly draft a document titled 'project_summary.txt' right here in documents directory. Yield an error if it already exists.\n I need it archived. Replicate it into the archive folder, but rename it to 'summary_2024.txt'."
-    },
-    {
-      "available_tools": [
-        "authenticate_twitter",
-        "cat",
-        "cd",
-        "comment",
-        "cp",
-        "diff",
-        "du",
-        "echo",
-        "find",
-        "follow_user",
-        "get_tweet",
-        "get_tweet_comments",
-        "get_user_stats",
-        "get_user_tweets",
-        "grep",
-        "list_all_following",
-        "ls",
-        "mention",
-        "mkdir",
-        "mv",
-        "post_tweet",
-        "posting_get_login_status",
-        "pwd",
-        "retweet",
-        "rm",
-        "rmdir",
-        "search_tweets",
-        "sort",
-        "tail",
-        "touch",
-        "unfollow_user",
-        "wc"
-      ],
-      "candidate_ready": true,
-      "disambiguation_cue": "show",
-      "exact_tool_choice": false,
-      "expected_observation_keys": [
-        "file_content"
-      ],
-      "failure_labels": [
-        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
-        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
-      ],
-      "intervention_strength": "guidance_only",
-      "policy_family": "postcondition_guided_trajectory_policy",
-      "policy_hits": [],
-      "postcondition_already_satisfied": false,
-      "postcondition_gap": "read_content",
-      "postcondition_witness_available": true,
-      "precondition_observable": true,
-      "recommended_tools": [
-        "cat"
-      ],
-      "rejection_reason": null,
-      "request_patch_count": 9,
-      "request_predicates": [
-        "prior_explicit_literals_present",
-        "prior_tool_outputs_present",
-        "tools_available"
-      ],
-      "rule_hits": [
-        "rule_global_no_tool_actionable_no_tool_decision_prior_explicit_literals_present_prior_tool_outputs_present_tools_available_v1",
-        "rule_global_no_tool_actionable_no_tool_decision_prior_tool_outputs_present_tools_available_v1"
-      ],
-      "run_name": "required_target",
-      "satisfied_witness_keys": [],
-      "target_or_scorer_field_dependency": false,
-      "theory_class": "postcondition_guided_trajectory_progress",
-      "trace_id": "52c0df6e-fc93-4a48-91b3-c12bf8486c83",
-      "trace_path": "outputs/phase2_validation/required_next_tool_choice_v1/required_target/traces/52c0df6e-fc93-4a48-91b3-c12bf8486c83.json",
-      "trace_relative_path": "required_target/traces/52c0df6e-fc93-4a48-91b3-c12bf8486c83.json",
-      "user_text_excerpt": "Could you kindly show me the list of files in tmp directory in my file system including the hidden one?"
     },
     {
       "available_tools": [
@@ -5884,6 +4984,203 @@
       "trace_path": "outputs/phase2_validation/required_next_tool_choice_v1/required_target/traces/9e7dffb1-ea9c-408b-aa59-1bdc4f0245f8.json",
       "trace_relative_path": "required_target/traces/9e7dffb1-ea9c-408b-aa59-1bdc4f0245f8.json",
       "user_text_excerpt": "In my existing folder called 'Lectures', I'd like to set up a new file."
+    },
+    {
+      "available_tools": [
+        "authenticate_twitter",
+        "cat",
+        "cd",
+        "comment",
+        "cp",
+        "diff",
+        "du",
+        "echo",
+        "find",
+        "follow_user",
+        "get_tweet",
+        "get_tweet_comments",
+        "get_user_stats",
+        "get_user_tweets",
+        "grep",
+        "list_all_following",
+        "ls",
+        "mention",
+        "mkdir",
+        "mv",
+        "post_tweet",
+        "posting_get_login_status",
+        "pwd",
+        "retweet",
+        "rm",
+        "rmdir",
+        "search_tweets",
+        "sort",
+        "tail",
+        "touch",
+        "unfollow_user",
+        "wc"
+      ],
+      "candidate_ready": true,
+      "disambiguation_cue": "create",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_exists"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "policy_hits": [],
+      "postcondition_already_satisfied": false,
+      "postcondition_gap": "create_file",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "touch"
+      ],
+      "rejection_reason": null,
+      "request_patch_count": 9,
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "rule_hits": [
+        "rule_global_no_tool_actionable_no_tool_decision_prior_explicit_literals_present_prior_tool_outputs_present_tools_available_v1",
+        "rule_global_no_tool_actionable_no_tool_decision_prior_tool_outputs_present_tools_available_v1"
+      ],
+      "run_name": "required_target",
+      "satisfied_witness_keys": [],
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_id": "a222a141-c255-4ea1-b064-9af97cb072cf",
+      "trace_path": "outputs/phase2_validation/required_next_tool_choice_v1/required_target/traces/a222a141-c255-4ea1-b064-9af97cb072cf.json",
+      "trace_relative_path": "required_target/traces/a222a141-c255-4ea1-b064-9af97cb072cf.json",
+      "user_text_excerpt": "Move 'final_report.pdf' within document directory to 'temp' directory in document. Make sure to create the directory\nPerform a detailed search using grep to identify sections in the file pertaining to 'budget analysis'."
+    },
+    {
+      "available_tools": [
+        "cat",
+        "cd",
+        "cp",
+        "diff",
+        "du",
+        "echo",
+        "find",
+        "grep",
+        "ls",
+        "mkdir",
+        "mv",
+        "pwd",
+        "rm",
+        "rmdir",
+        "sort",
+        "tail",
+        "touch",
+        "wc"
+      ],
+      "candidate_ready": true,
+      "disambiguation_cue": "copy",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "target_path_changed"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "policy_hits": [],
+      "postcondition_already_satisfied": false,
+      "postcondition_gap": "copy",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cp"
+      ],
+      "rejection_reason": null,
+      "request_patch_count": 9,
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "rule_hits": [
+        "rule_global_no_tool_actionable_no_tool_decision_prior_explicit_literals_present_prior_tool_outputs_present_tools_available_v1",
+        "rule_global_no_tool_actionable_no_tool_decision_prior_tool_outputs_present_tools_available_v1"
+      ],
+      "run_name": "required_target",
+      "satisfied_witness_keys": [],
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_id": "acf1a037-1ede-419c-afbf-05fd11856c57",
+      "trace_path": "outputs/phase2_validation/required_next_tool_choice_v1/required_target/traces/acf1a037-1ede-419c-afbf-05fd11856c57.json",
+      "trace_relative_path": "required_target/traces/acf1a037-1ede-419c-afbf-05fd11856c57.json",
+      "user_text_excerpt": "I remember I should have a document called 'FinalReport.txt' in the 'Documentation' folder.\nMake a copy of 'FinalReport.txt' to a directory inside the 'Documentation' folder, while ensuring the duplicate is preserved as 'ArchivedFinalReport"
+    },
+    {
+      "available_tools": [
+        "cat",
+        "cd",
+        "cp",
+        "diff",
+        "du",
+        "echo",
+        "find",
+        "grep",
+        "ls",
+        "mkdir",
+        "mv",
+        "pwd",
+        "rm",
+        "rmdir",
+        "sort",
+        "tail",
+        "touch",
+        "wc"
+      ],
+      "candidate_ready": true,
+      "disambiguation_cue": "directory",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "policy_hits": [],
+      "postcondition_already_satisfied": false,
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "rejection_reason": null,
+      "request_patch_count": 9,
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "rule_hits": [
+        "rule_global_no_tool_actionable_no_tool_decision_prior_explicit_literals_present_prior_tool_outputs_present_tools_available_v1",
+        "rule_global_no_tool_actionable_no_tool_decision_prior_tool_outputs_present_tools_available_v1"
+      ],
+      "run_name": "required_target",
+      "satisfied_witness_keys": [],
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_id": "aec419be-4785-4af9-b76a-eb062ddab6b9",
+      "trace_path": "outputs/phase2_validation/required_next_tool_choice_v1/required_target/traces/aec419be-4785-4af9-b76a-eb062ddab6b9.json",
+      "trace_relative_path": "required_target/traces/aec419be-4785-4af9-b76a-eb062ddab6b9.json",
+      "user_text_excerpt": "Could you go to temp directory, and for each file in there, count the number of lines."
     }
   ],
   "sample_rejections": [
