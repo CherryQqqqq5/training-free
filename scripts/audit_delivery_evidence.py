@@ -19,6 +19,7 @@ from scripts.check_m28pre_offline import evaluate as evaluate_m28pre
 DEFAULT_SUBSET = Path("outputs/artifacts/bfcl_ctspc_subset30_v1")
 DEFAULT_LOW_RISK = Path("outputs/artifacts/bfcl_explicit_required_arg_literal_v1")
 DEFAULT_PHASE2_VALIDATION = Path("outputs/phase2_validation/required_next_tool_choice_v1")
+DEFAULT_POLICY_OPPORTUNITY = Path("outputs/artifacts/phase2/policy_conversion_opportunity_v1/policy_conversion_opportunity_audit.json")
 DEFAULT_OUT = Path("outputs/artifacts/bfcl_explicit_required_arg_literal_v1/delivery_evidence_audit.json")
 DEFAULT_MD = Path("outputs/artifacts/bfcl_explicit_required_arg_literal_v1/delivery_evidence_audit.md")
 
@@ -128,6 +129,18 @@ def artifact_boundary_status(max_print: int = 20) -> dict[str, Any]:
     }
 
 
+def policy_opportunity_status(path: Path = DEFAULT_POLICY_OPPORTUNITY) -> dict[str, Any]:
+    report = _load_json(path, {}) or {}
+    return {
+        "policy_conversion_opportunity_audit_ready": bool(report.get("policy_conversion_opportunity_audit_ready")),
+        "policy_candidate_count": int(report.get("policy_candidate_count") or 0),
+        "recommended_tools_count": int(report.get("recommended_tools_count") or 0),
+        "candidate_capability_distribution": report.get("candidate_capability_distribution") or {},
+        "recommended_tool_distribution": report.get("recommended_tool_distribution") or {},
+        "next_required_action": report.get("next_required_action"),
+    }
+
+
 def source_result_layout_status(low_risk_root: Path = DEFAULT_LOW_RISK) -> dict[str, Any]:
     availability = _load_json(low_risk_root / "m28pre_source_result_availability_audit.json", {}) or {}
     alias = _load_json(low_risk_root / "wrong_arg_key_alias_coverage_audit.json", {}) or {}
@@ -176,6 +189,7 @@ def evaluate(
     boundary = artifact_boundary_status()
     policy = policy_conversion_counters(phase2_validation_root)
     source_layout = source_result_layout_status(low_risk_root)
+    policy_opportunity = policy_opportunity_status()
     p0_blockers: list[str] = []
     if not boundary["artifact_boundary_passed"]:
         p0_blockers.append("artifact_boundary_not_clean")
@@ -185,6 +199,8 @@ def evaluate(
         p0_blockers.append("scorer_authorization_not_ready")
     if not policy.get("policy_conversion_observed"):
         p0_blockers.append("policy_conversion_not_observed_in_existing_traces")
+    if not policy_opportunity.get("policy_conversion_opportunity_audit_ready"):
+        p0_blockers.append("policy_conversion_opportunity_audit_missing")
     if ctspc_status.get("retain") != 0:
         p0_blockers.append("ctspc_v0_retain_not_zero")
     if ctspc_status.get("scorer_default") != "off":
@@ -217,6 +233,7 @@ def evaluate(
             "latest_net_case_gain": ctspc_summary.get("net_case_gain"),
         },
         "policy_conversion": policy,
+        "policy_conversion_opportunity": policy_opportunity,
         "source_result_layout": source_layout,
         "next_required_action": "root_cause_audit_before_any_scorer",
     }
@@ -250,6 +267,13 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Policy conversion observed: `{report['policy_conversion']['policy_conversion_observed']}`",
         f"- Rule hits without policy hits: `{report['policy_conversion']['rule_hits_without_policy_hits']}`",
         f"- Policy conversion absent reason: `{report['policy_conversion']['policy_conversion_absent_reason']}`",
+        "",
+        "## Policy Opportunity Evidence",
+        "",
+        f"- Opportunity audit ready: `{report['policy_conversion_opportunity']['policy_conversion_opportunity_audit_ready']}`",
+        f"- Policy candidate count: `{report['policy_conversion_opportunity']['policy_candidate_count']}`",
+        f"- Recommended tools count: `{report['policy_conversion_opportunity']['recommended_tools_count']}`",
+        f"- Candidate capability distribution: `{report['policy_conversion_opportunity']['candidate_capability_distribution']}`",
         "",
         "## Source/Layout Evidence",
         "",
@@ -289,6 +313,7 @@ def main() -> int:
             "m2_8pre_offline_passed": report["m28pre_gate"]["m2_8pre_offline_passed"],
             "scorer_authorization_ready": report["m28pre_gate"]["scorer_authorization_ready"],
             "policy_conversion_observed": report["policy_conversion"]["policy_conversion_observed"],
+            "policy_opportunity_candidate_count": report["policy_conversion_opportunity"]["policy_candidate_count"],
             "next_required_action": report["next_required_action"],
         }, indent=2, sort_keys=True))
     return 0

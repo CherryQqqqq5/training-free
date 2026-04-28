@@ -25,6 +25,13 @@
 - Rule hits without policy hits: `388`
 - Policy conversion absent reason: `policy_artifact_or_runtime_candidate_missing`
 
+## Policy Opportunity Evidence
+
+- Opportunity audit ready: `True`
+- Policy candidate count: `145`
+- Recommended tools count: `176`
+- Candidate capability distribution: `{'copy': 6, 'create_file': 18, 'directory_navigation': 56, 'move_or_rename': 4, 'read_content': 18, 'search_or_find': 31, 'write_content': 12}`
+
 ## Source/Layout Evidence
 
 - Source result availability ready: `True`
