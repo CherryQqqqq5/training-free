@@ -35,6 +35,7 @@ DEFAULT_UNMET_POSTCONDITION_AUDIT = Path("outputs/artifacts/phase2/policy_conver
 DEFAULT_DIRECTORY_OBLIGATION_AUDIT = Path("outputs/artifacts/phase2/policy_conversion_opportunity_v1/directory_obligation_readonly_audit.json")
 DEFAULT_OUTPUT_CONTRACT_AUDIT = Path("outputs/artifacts/phase2/output_contract_preservation_v1/observable_output_contract_preservation_audit.json")
 DEFAULT_OUTPUT_CONTRACT_BROADER_AUDIT = Path("outputs/artifacts/phase2/output_contract_preservation_v1/observable_output_contract_broader_audit.json")
+DEFAULT_OUTPUT_CONTRACT_PAIR_INVENTORY = Path("outputs/artifacts/phase2/output_contract_preservation_v1/observable_output_contract_pair_inventory.json")
 DEFAULT_OUT = Path("outputs/artifacts/bfcl_explicit_required_arg_literal_v1/delivery_evidence_audit.json")
 DEFAULT_MD = Path("outputs/artifacts/bfcl_explicit_required_arg_literal_v1/delivery_evidence_audit.md")
 
@@ -322,9 +323,11 @@ def directory_obligation_status(path: Path = DEFAULT_DIRECTORY_OBLIGATION_AUDIT)
 def output_contract_status(
     path: Path = DEFAULT_OUTPUT_CONTRACT_AUDIT,
     broader_path: Path = DEFAULT_OUTPUT_CONTRACT_BROADER_AUDIT,
+    inventory_path: Path = DEFAULT_OUTPUT_CONTRACT_PAIR_INVENTORY,
 ) -> dict[str, Any]:
     report = _load_json(path, {}) or {}
     broader = _load_json(broader_path, {}) or {}
+    inventory = _load_json(inventory_path, {}) or {}
     return {
         "output_contract_preservation_audit_ready": bool(report.get("output_contract_preservation_audit_ready")),
         "output_contract_rule_family": report.get("rule_family"),
@@ -343,6 +346,11 @@ def output_contract_status(
         "output_contract_broader_eligible_by_payload_kind": broader.get("eligible_by_payload_kind") or {},
         "output_contract_broader_blockers": broader.get("blockers") or [],
         "output_contract_broader_next_required_action": broader.get("next_required_action"),
+        "output_contract_pair_inventory_ready": bool(inventory.get("report_scope") == "observable_output_contract_pair_inventory"),
+        "output_contract_pair_inventory_raw_pair_count": int(inventory.get("candidate_raw_repair_pair_count") or 0),
+        "output_contract_pair_inventory_non_memory_pair_count": int(inventory.get("non_memory_raw_repair_pair_count") or 0),
+        "output_contract_pair_inventory_cross_slice_ready": bool(inventory.get("cross_slice_pair_inventory_ready")),
+        "output_contract_pair_inventory_route_recommendation": inventory.get("route_recommendation"),
     }
 
 def source_result_layout_status(low_risk_root: Path = DEFAULT_LOW_RISK) -> dict[str, Any]:
@@ -572,6 +580,11 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Broader raw repair pairs: `{report['output_contract_preservation']['output_contract_broader_raw_repair_pair_count']}`",
         f"- Broader eligible by slice: `{report['output_contract_preservation']['output_contract_broader_eligible_by_slice']}`",
         f"- Broader blockers: `{report['output_contract_preservation']['output_contract_broader_blockers']}`",
+        f"- Pair inventory ready: `{report['output_contract_preservation']['output_contract_pair_inventory_ready']}`",
+        f"- Pair inventory raw pairs: `{report['output_contract_preservation']['output_contract_pair_inventory_raw_pair_count']}`",
+        f"- Pair inventory non-memory pairs: `{report['output_contract_preservation']['output_contract_pair_inventory_non_memory_pair_count']}`",
+        f"- Pair inventory cross-slice ready: `{report['output_contract_preservation']['output_contract_pair_inventory_cross_slice_ready']}`",
+        f"- Pair inventory route: `{report['output_contract_preservation']['output_contract_pair_inventory_route_recommendation']}`",
         f"- Next action: `{report['output_contract_preservation']['output_contract_next_required_action']}`",
         f"- Broader next action: `{report['output_contract_preservation']['output_contract_broader_next_required_action']}`",
         "",
@@ -667,6 +680,8 @@ def main() -> int:
             "output_contract_performance_claim_ready": report["output_contract_preservation"]["output_contract_performance_claim_ready"],
             "output_contract_broader_retain_prior_coverage_ready": report["output_contract_preservation"]["output_contract_broader_retain_prior_coverage_ready"],
             "output_contract_broader_eligible_candidate_count": report["output_contract_preservation"]["output_contract_broader_eligible_candidate_count"],
+            "output_contract_pair_inventory_non_memory_pair_count": report["output_contract_preservation"]["output_contract_pair_inventory_non_memory_pair_count"],
+            "output_contract_pair_inventory_cross_slice_ready": report["output_contract_preservation"]["output_contract_pair_inventory_cross_slice_ready"],
             "memory_operation_candidate_count": report["memory_operation_obligation"]["memory_operation_candidate_count"],
             "memory_operation_runtime_enabled": report["memory_operation_obligation"]["memory_operation_runtime_enabled"],
             "memory_operation_negative_control_audit_passed": report["memory_operation_obligation"]["memory_operation_negative_control_audit_passed"],

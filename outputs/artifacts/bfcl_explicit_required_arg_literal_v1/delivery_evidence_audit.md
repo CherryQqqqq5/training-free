@@ -92,6 +92,11 @@
 - Broader raw repair pairs: `6`
 - Broader eligible by slice: `{'memory': 6}`
 - Broader blockers: `['single_payload_or_slice_coverage_only']`
+- Pair inventory ready: `True`
+- Pair inventory raw pairs: `7`
+- Pair inventory non-memory pairs: `0`
+- Pair inventory cross-slice ready: `False`
+- Pair inventory route: `build_non_memory_output_contract_pairs`
 - Next action: `build_output_contract_preservation_broader_coverage_audit`
 - Broader next action: `expand_output_contract_raw_pairs_across_non_memory_slices`
 
