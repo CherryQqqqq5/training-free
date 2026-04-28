@@ -1,0 +1,65 @@
+candidate_commands: []
+planned_commands: []
+policy_units:
+- decision_policy:
+    argument_policy: no_argument_creation_or_binding
+    capability_only: true
+    recommended_tools:
+    - cat
+  evidence_requirements:
+  - recommended_tool_available_in_current_schema
+  - prior_tool_output_present
+  - postcondition_witness_absent
+  - forbidden_field_scan_clean
+  exact_tool_choice: false
+  intervention_strength: guidance_only
+  policy_family: postcondition_guided_trajectory_policy
+  policy_unit_id: postcondition_guided_read_content_soft_v1
+  retention_eligibility: diagnostic_only
+  runtime_enabled: false
+  support_count: 6
+  theory_class: postcondition_guided_trajectory_progress
+  tool_choice_mode: soft
+  trigger:
+    failure_labels_any:
+    - (PRE_TOOL,ACTIONABLE_NO_TOOL_DECISION)
+    - (POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)
+    - (POST_TOOL,POST_TOOL_PROSE_SUMMARY)
+    - (POST_TOOL,TERMINATION_INADMISSIBLE)
+    postcondition_already_satisfied: false
+    postcondition_gap: read_content
+    request_predicates_all:
+    - prior_tool_outputs_present
+    - tools_available
+- decision_policy:
+    argument_policy: no_argument_creation_or_binding
+    capability_only: true
+    recommended_tools:
+    - grep
+    - find
+  evidence_requirements:
+  - recommended_tool_available_in_current_schema
+  - prior_tool_output_present
+  - postcondition_witness_absent
+  - forbidden_field_scan_clean
+  exact_tool_choice: false
+  intervention_strength: guidance_only
+  policy_family: postcondition_guided_trajectory_policy
+  policy_unit_id: postcondition_guided_search_or_find_soft_v1
+  retention_eligibility: diagnostic_only
+  runtime_enabled: false
+  support_count: 3
+  theory_class: postcondition_guided_trajectory_progress
+  tool_choice_mode: soft
+  trigger:
+    failure_labels_any:
+    - (PRE_TOOL,ACTIONABLE_NO_TOOL_DECISION)
+    - (POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)
+    - (POST_TOOL,POST_TOOL_PROSE_SUMMARY)
+    - (POST_TOOL,TERMINATION_INADMISSIBLE)
+    postcondition_already_satisfied: false
+    postcondition_gap: search_or_find
+    request_predicates_all:
+    - prior_tool_outputs_present
+    - tools_available
+runtime_enabled: false
