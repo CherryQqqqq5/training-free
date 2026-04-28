@@ -55,3 +55,10 @@ def test_unmet_postcondition_does_not_emit_scorer_commands(tmp_path: Path) -> No
     assert report["candidate_commands"] == []
     assert report["planned_commands"] == []
     assert report["does_not_authorize_scorer"] is True
+
+
+def test_unmet_postcondition_audit_omits_full_records_for_compact_artifact(tmp_path: Path) -> None:
+    _trace(tmp_path / "run" / "traces" / "case.json", user="Please find the target token", output={"error": "not found"}, tools=["grep"])
+    report = audit.evaluate(tmp_path)
+    assert report["full_records_omitted_for_compact_artifact"] is True
+    assert "records" not in report

@@ -9,6 +9,7 @@
 - High-risk strong unmet candidate count: `17`
 - Strong unmet capability distribution: `{'copy': 1, 'create_file': 4, 'directory_navigation': 8, 'read_content': 1, 'write_content': 4}`
 - Strong unmet risk lane distribution: `{'high_risk_mutation_or_trajectory': 17, 'low_risk_observation': 1}`
+- Full records omitted for compact artifact: `True`
 - Next required action: `expand_source_or_state_abstraction_before_smoke`
 
 Offline diagnostic only. It does not authorize BFCL/model/scorer runs.
