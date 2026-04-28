@@ -100,6 +100,18 @@
 - Next action: `build_output_contract_preservation_broader_coverage_audit`
 - Broader next action: `expand_output_contract_raw_pairs_across_non_memory_slices`
 
+## Explicit Obligation Observable Capability
+
+- Audit ready: `True`
+- Retain-prior coverage ready: `True`
+- Smoke ready: `True`
+- Eligible candidates: `49`
+- Eligible by capability: `{'memory_retrieve': 48, 'read_content': 1}`
+- Negative-control activations: `0`
+- Performance claim ready: `False`
+- Blockers: `[]`
+- Next action: `build_multi_family_smoke_protocol`
+
 ## Memory Operation Obligation Evidence
 
 - Memory audit ready: `True`

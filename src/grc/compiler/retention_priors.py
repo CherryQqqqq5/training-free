@@ -35,6 +35,7 @@ EXPLICIT_REQUIRED_ARG_LITERAL_FAMILY = "explicit_required_arg_literal_completion
 WRONG_ARG_KEY_ALIAS_FAMILY = "wrong_arg_key_alias_repair"
 DETERMINISTIC_SCHEMA_LOCAL_NON_LIVE_FAMILY = "deterministic_schema_local_non_live_repair"
 OBSERVABLE_OUTPUT_CONTRACT_FAMILY = "observable_output_contract_preservation_v1"
+EXPLICIT_OBLIGATION_OBSERVABLE_CAPABILITY_FAMILY = "explicit_obligation_to_observable_capability_v1"
 
 
 def _truthy(value: Any) -> bool:
@@ -54,6 +55,9 @@ def _base_prior(rule: dict[str, Any], eligibility: str, *, reason: str | None = 
     if family == OBSERVABLE_OUTPUT_CONTRACT_FAMILY:
         theory_class = "runtime_output_contract_preservation"
         intervention_scope = "wrapper_or_container_only"
+    if family == EXPLICIT_OBLIGATION_OBSERVABLE_CAPABILITY_FAMILY:
+        theory_class = "trajectory_evidence_sufficiency"
+        intervention_scope = "soft_observation_capability_guidance"
     prior = {
         "rule_family": family,
         "theory_class": theory_class,
@@ -315,6 +319,65 @@ def observable_output_contract_prior(rule: dict[str, Any]) -> dict[str, Any]:
         prior["prior_rejection_reason"] = reason
     return prior
 
+
+def explicit_obligation_observable_capability_prior(rule: dict[str, Any]) -> dict[str, Any]:
+    """Return the theory prior for explicit obligation -> observable capability."""
+    family = str(rule.get("candidate_rules_type") or rule.get("rule_type") or "")
+    if family != EXPLICIT_OBLIGATION_OBSERVABLE_CAPABILITY_FAMILY:
+        return _base_prior(rule, NEVER_RETAIN, reason="unsupported_rule_family")
+
+    explicit = rule.get("explicit_obligation_present") is True
+    witness_unmet = str(rule.get("compatible_witness_status") or "") == "unmet_strong"
+    low_risk = str(rule.get("capability_risk_tier") or "") == "readonly_low"
+    capability = str(rule.get("recommended_capability_family") or "")
+    allowed_capability = capability in {"read_content", "search_or_find", "memory_retrieve", "directory_readonly"}
+    no_mutation = (
+        rule.get("soft_guidance_only") is True
+        and rule.get("exact_tool_choice") is False
+        and rule.get("argument_creation") is False
+        and rule.get("tool_choice_mutation") is False
+        and rule.get("trajectory_mutation") is False
+        and rule.get("forbidden_dependency_present") is False
+    )
+    rejection = rule.get("rejection_reason")
+
+    eligibility = DEMOTE_CANDIDATE
+    reason = None
+    if not explicit:
+        eligibility = DIAGNOSTIC_ONLY
+        reason = "no_explicit_obligation"
+    elif not witness_unmet:
+        eligibility = DIAGNOSTIC_ONLY
+        reason = "witness_not_unmet_strong"
+    elif not low_risk or not allowed_capability:
+        eligibility = DIAGNOSTIC_ONLY
+        reason = "capability_not_readonly_low_or_not_allowed"
+    elif not no_mutation:
+        eligibility = NEVER_RETAIN
+        reason = "exact_tool_argument_or_policy_mutation"
+    elif rejection:
+        eligibility = DIAGNOSTIC_ONLY
+        reason = str(rejection)
+
+    prior = {
+        "rule_family": EXPLICIT_OBLIGATION_OBSERVABLE_CAPABILITY_FAMILY,
+        "theory_class": "trajectory_evidence_sufficiency",
+        "intervention_scope": "soft_observation_capability_guidance",
+        "trajectory_mutation": False,
+        "tool_choice_mutation": False,
+        "exact_tool_choice": False,
+        "argument_creation": False,
+        "precondition_observable": explicit,
+        "postcondition_local": False,
+        "recommended_capability_family": capability,
+        "compatible_witness_status": str(rule.get("compatible_witness_status") or "unknown"),
+        "capability_risk_tier": str(rule.get("capability_risk_tier") or "unknown"),
+        "retain_eligibility": eligibility,
+    }
+    if reason:
+        prior["prior_rejection_reason"] = reason
+    return prior
+
 def evaluate_retention_prior(rule: dict[str, Any]) -> dict[str, Any]:
     """Normalize or infer a rule retention prior.
 
@@ -349,6 +412,8 @@ def evaluate_retention_prior(rule: dict[str, Any]) -> dict[str, Any]:
         return deterministic_schema_local_non_live_prior(rule)
     if family == OBSERVABLE_OUTPUT_CONTRACT_FAMILY:
         return observable_output_contract_prior(rule)
+    if family == EXPLICIT_OBLIGATION_OBSERVABLE_CAPABILITY_FAMILY:
+        return explicit_obligation_observable_capability_prior(rule)
     return _base_prior(rule, NEVER_RETAIN, reason="missing_retention_prior")
 
 
