@@ -71,3 +71,17 @@ def test_protocol_fails_when_category_ids_missing(tmp_path: Path) -> None:
 
     assert report["smoke_protocol_ready_for_review"] is False
     assert report["first_failure"]["missing_categories"] == ["memory_rec_sum"]
+
+
+def test_protocol_rejects_non_six_case_scope(tmp_path: Path) -> None:
+    source = tmp_path / "source"
+    runtime = tmp_path / "runtime"
+    _write_ids(source, "memory_kv", [f"memory_kv_{i}" for i in range(50)])
+    _write_ids(source, "memory_rec_sum", [f"memory_rec_sum_{i}" for i in range(50)])
+    _write_runtime(runtime, ready=True)
+
+    report = protocol.evaluate(source, runtime, max_cases=20)
+
+    assert report["smoke_protocol_ready_for_review"] is False
+    assert report["max_case_bound_valid"] is False
+    assert report["first_failure"]["max_case_bound_valid"] is False

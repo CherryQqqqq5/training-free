@@ -43,6 +43,7 @@ def _hash_payload(payload: Any) -> str:
 
 def evaluate(source_root: Path = DEFAULT_SOURCE_ROOT, runtime_dir: Path = DEFAULT_RUNTIME_DIR, max_cases: int = 6) -> dict[str, Any]:
     selected: list[dict[str, str]] = []
+    max_case_bound_valid = max_cases == 6
     per_category = max(1, max_cases // len(DEFAULT_CATEGORIES))
     category_counts = {}
     missing = []
@@ -58,7 +59,8 @@ def evaluate(source_root: Path = DEFAULT_SOURCE_ROOT, runtime_dir: Path = DEFAUL
     readiness = _load_json(runtime_dir / "memory_operation_runtime_smoke_readiness.json") or {}
     adapter_status = _load_json(runtime_dir / "memory_operation_runtime_adapter_compile_status.json") or {}
     protocol_ready = bool(
-        len(selected) == max_cases
+        max_case_bound_valid
+        and len(selected) == max_cases
         and not missing
         and readiness.get("memory_dev_smoke_ready") is True
         and adapter_status.get("runtime_adapter_compile_ready") is True
@@ -73,6 +75,7 @@ def evaluate(source_root: Path = DEFAULT_SOURCE_ROOT, runtime_dir: Path = DEFAUL
         "provider_required": PROVIDER,
         "max_cases": max_cases,
         "selected_case_count": len(selected),
+        "max_case_bound_valid": max_case_bound_valid,
         "selected_categories": DEFAULT_CATEGORIES,
         "selected_category_counts": category_counts,
         "selected_cases": selected,
@@ -116,7 +119,7 @@ def evaluate(source_root: Path = DEFAULT_SOURCE_ROOT, runtime_dir: Path = DEFAUL
             "weak_lookup_policy_activation_count_eq_0": True,
         },
         "failure_count": 0 if protocol_ready else 1,
-        "first_failure": None if protocol_ready else {"check": "protocol_inputs_ready", "missing_categories": missing},
+        "first_failure": None if protocol_ready else {"check": "protocol_inputs_ready", "missing_categories": missing, "max_case_bound_valid": max_case_bound_valid},
         "next_required_action": "request_explicit_memory_only_dev_smoke_execution_approval" if protocol_ready else "fix_protocol_inputs_before_smoke_request",
     }
     return report
@@ -163,6 +166,7 @@ def main() -> int:
             "smoke_protocol_ready_for_review",
             "provider_required",
             "selected_case_count",
+            "max_case_bound_valid",
             "selected_category_counts",
             "selected_case_list_hash",
             "runtime_rule_sha256",
