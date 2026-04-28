@@ -68,6 +68,14 @@
 - Strong unmet risk lane distribution: `{'high_risk_mutation_or_trajectory': 17, 'low_risk_observation': 1}`
 - Next action: `expand_source_or_state_abstraction_before_smoke`
 
+## Directory Obligation Read-Only Audit
+
+- Audit ready: `True`
+- Directory strong-unmet scanned: `8`
+- Read-only directory candidates: `5`
+- Classification distribution: `{'diagnostic_stateful_directory_trajectory': 3, 'readonly_directory_obligation_candidate': 5}`
+- Next action: `manual_review_before_theory_family`
+
 ## Memory Operation Obligation Evidence
 
 - Memory audit ready: `True`

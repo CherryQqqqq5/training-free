@@ -32,6 +32,7 @@ DEFAULT_POSTCONDITION_SMOKE_FAILURE = Path("outputs/artifacts/phase2/postconditi
 DEFAULT_POSTCONDITION_SATISFACTION = Path("outputs/artifacts/phase2/postcondition_guided_policy_runtime_smoke_v1/approved_low_risk/postcondition_satisfaction_audit.json")
 DEFAULT_POSTCONDITION_PROTOCOL = Path("outputs/artifacts/phase2/postcondition_guided_policy_runtime_smoke_v1/approved_low_risk/postcondition_guided_dev_smoke_protocol.json")
 DEFAULT_UNMET_POSTCONDITION_AUDIT = Path("outputs/artifacts/phase2/policy_conversion_opportunity_v1/unmet_postcondition_source_expansion_audit.json")
+DEFAULT_DIRECTORY_OBLIGATION_AUDIT = Path("outputs/artifacts/phase2/policy_conversion_opportunity_v1/directory_obligation_readonly_audit.json")
 DEFAULT_OUT = Path("outputs/artifacts/bfcl_explicit_required_arg_literal_v1/delivery_evidence_audit.json")
 DEFAULT_MD = Path("outputs/artifacts/bfcl_explicit_required_arg_literal_v1/delivery_evidence_audit.md")
 
@@ -305,6 +306,17 @@ def unmet_postcondition_source_status(path: Path = DEFAULT_UNMET_POSTCONDITION_A
         "unmet_postcondition_next_required_action": report.get("next_required_action"),
     }
 
+
+def directory_obligation_status(path: Path = DEFAULT_DIRECTORY_OBLIGATION_AUDIT) -> dict[str, Any]:
+    report = _load_json(path, {}) or {}
+    return {
+        "directory_obligation_readonly_audit_ready": bool(report.get("directory_obligation_readonly_audit_ready")),
+        "directory_strong_unmet_records_scanned": int(report.get("directory_strong_unmet_records_scanned") or 0),
+        "readonly_directory_obligation_candidate_count": int(report.get("readonly_directory_obligation_candidate_count") or 0),
+        "directory_obligation_classification_distribution": report.get("classification_distribution") or {},
+        "directory_obligation_next_required_action": report.get("next_required_action"),
+    }
+
 def source_result_layout_status(low_risk_root: Path = DEFAULT_LOW_RISK) -> dict[str, Any]:
     availability = _load_json(low_risk_root / "m28pre_source_result_availability_audit.json", {}) or {}
     alias = _load_json(low_risk_root / "wrong_arg_key_alias_coverage_audit.json", {}) or {}
@@ -361,6 +373,7 @@ def evaluate(
     memory_runtime_smoke = memory_runtime_smoke_status()
     postcondition_smoke = postcondition_smoke_status()
     unmet_postcondition = unmet_postcondition_source_status()
+    directory_obligation = directory_obligation_status()
     p0_blockers: list[str] = []
     if not boundary["artifact_boundary_passed"]:
         p0_blockers.append("artifact_boundary_not_clean")
@@ -419,6 +432,7 @@ def evaluate(
         "policy_conversion_opportunity": policy_opportunity,
         "postcondition_smoke": postcondition_smoke,
         "unmet_postcondition_source_expansion": unmet_postcondition,
+        "directory_obligation_readonly": directory_obligation,
         "memory_operation_obligation": memory_obligation,
         "memory_operation_dry_run": memory_dry_run,
         "memory_tool_family_resolver": memory_resolver,
@@ -502,6 +516,15 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Strong unmet capability distribution: `{report['unmet_postcondition_source_expansion']['strong_unmet_capability_distribution']}`",
         f"- Strong unmet risk lane distribution: `{report['unmet_postcondition_source_expansion']['strong_unmet_risk_lane_distribution']}`",
         f"- Next action: `{report['unmet_postcondition_source_expansion']['unmet_postcondition_next_required_action']}`",
+        "",
+
+        "## Directory Obligation Read-Only Audit",
+        "",
+        f"- Audit ready: `{report['directory_obligation_readonly']['directory_obligation_readonly_audit_ready']}`",
+        f"- Directory strong-unmet scanned: `{report['directory_obligation_readonly']['directory_strong_unmet_records_scanned']}`",
+        f"- Read-only directory candidates: `{report['directory_obligation_readonly']['readonly_directory_obligation_candidate_count']}`",
+        f"- Classification distribution: `{report['directory_obligation_readonly']['directory_obligation_classification_distribution']}`",
+        f"- Next action: `{report['directory_obligation_readonly']['directory_obligation_next_required_action']}`",
         "",
         "## Memory Operation Obligation Evidence",
         "",
@@ -588,6 +611,7 @@ def main() -> int:
             "postcondition_smoke_evidence_classification": report["postcondition_smoke"]["postcondition_smoke_evidence_classification"],
             "low_risk_strong_unmet_postcondition_count": report["unmet_postcondition_source_expansion"]["low_risk_strong_unmet_candidate_count"],
             "high_risk_strong_unmet_postcondition_count": report["unmet_postcondition_source_expansion"]["high_risk_strong_unmet_candidate_count"],
+            "readonly_directory_obligation_candidate_count": report["directory_obligation_readonly"]["readonly_directory_obligation_candidate_count"],
             "memory_operation_candidate_count": report["memory_operation_obligation"]["memory_operation_candidate_count"],
             "memory_operation_runtime_enabled": report["memory_operation_obligation"]["memory_operation_runtime_enabled"],
             "memory_operation_negative_control_audit_passed": report["memory_operation_obligation"]["memory_operation_negative_control_audit_passed"],
