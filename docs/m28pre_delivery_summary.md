@@ -22,7 +22,7 @@ Disallowed claim:
 
 ## Current Evidence Snapshot
 
-Latest pushed baseline before this delivery hardening: `a85d2406`.
+Latest pushed HEAD for this delivery status: `a3b6320d`.
 
 M2.7 CTSPC-v0:
 
@@ -57,7 +57,34 @@ Current retain-prior families:
 - `wrong_arg_key_alias_repair`
 - `deterministic_schema_local_non_live_repair`
 
-Only the explicit literal family currently has non-zero coverage.
+Only the explicit literal family currently has non-zero coverage in the argument-repair pool.
+
+## Memory Operation Obligation Line
+
+A separate theory-prior family has been added for memory-operation self-evolution. This line is still offline-only, but it now demonstrates a complete dry-run workflow:
+
+1. `memory_operation_obligation` audit finds retrieve obligations where a user asks for memory-backed information and no strong memory value witness is present.
+2. Negative controls are evaluated with non-zero denominators, using synthetic controls only when the current source pool has no strong/delete examples.
+3. A sanitized approval manifest is produced for review; it keeps `compiler_input_eligible_count=0` and excludes trace paths, case ids, raw prompts/outputs, available tool lists, scorer/gold fields, and repair records.
+4. A separate compiler allowlist contains only first-pass `no_witness` records; weak lookup witnesses remain excluded and require separate approval.
+5. A dry-run policy unit, `memory_first_pass_retrieve_soft_v1`, is compiled from the allowlist only. It is guidance-only, capability-only, argument-free, `exact_tool_choice=false`, and `runtime_enabled=false`.
+6. A schema-local resolver audit projects memory capability families onto available memory tools while blocking mutation tools.
+7. A runtime-like activation simulation confirms activation only for first-pass supported records and zero activation for negative controls.
+
+Current compact evidence:
+
+- Memory obligation candidates: `78`.
+- First-pass compiler allowlist records: `48`.
+- Weak witness compiler inputs: `0`.
+- Dry-run policy units: `1`.
+- Resolver scanned/resolved schemas: `48 / 48`.
+- Destructive memory tools blocked by resolver: `288`.
+- Forbidden mutation tools resolved: `0`.
+- Activation simulation count: `48`.
+- Negative-control activation count: `0`.
+- Argument creation count: `0`.
+
+This is stronger workflow evidence for a training-free self-evolution loop, but it is not BFCL performance evidence and does not authorize runtime/scorer use.
 
 ## Delivery Gates
 
@@ -86,7 +113,8 @@ Expected current behavior:
 P0 blockers before first-stage acceptance as a complete self-evolution system:
 
 - No accepted/retained rule with dev + holdout evidence.
-- M2.8-pre combined retain-eligible candidate count is below threshold.
+- No BFCL scorer evidence for the memory-operation dry-run policy.
+- M2.8-pre argument-repair combined retain-eligible candidate count is below threshold.
 - Wrong-key alias and deterministic schema-local families have zero current coverage.
 - Server output tree contains raw/secret/repair artifacts that must remain outside the committed delivery package.
 
@@ -96,10 +124,12 @@ The next engineering step should be evidence-driven root-cause analysis, not ano
 
 Priority:
 
-1. Use compact artifacts and source-result layout audits to decide whether zero coverage is a parser/source-layout issue or true family mismatch.
-2. If it is an implementation issue, fix parser/extractor and rerun offline audits only.
-3. If it is an algorithm or benchmark/source-layout issue, discuss the theory family with delivery review and research review before changing the compiler.
-4. Do not weaken retention priors to inflate candidate counts.
+1. Keep the memory-operation line offline until delivery/research review approves a memory-only dev scorer plan.
+2. If approved later, run only a memory-only dev scorer gate using the same base model and compare baseline vs `memory_first_pass_retrieve_soft_v1`; do not run holdout until dev passes.
+3. For the argument-repair M2.8-pre pool, use compact artifacts and source-result layout audits to decide whether zero coverage is a parser/source-layout issue or true family mismatch.
+4. If it is an implementation issue, fix parser/extractor and rerun offline audits only.
+5. If it is an algorithm or benchmark/source-layout issue, discuss the theory family with delivery review and research review before changing the compiler.
+6. Do not weaken retention priors to inflate candidate counts.
 
 ## Explicit Non-Authorization
 
