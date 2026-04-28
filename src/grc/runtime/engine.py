@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Tuple
 import yaml
 
 from grc.compiler.failure_taxonomy import classify_error_type
+from grc.compiler.tool_state import extract_tool_state
 from grc.runtime.policy_executor import (
     classify_no_tool_policy_issue,
     evaluate_no_tool_policy,
@@ -465,6 +466,17 @@ class RuleEngine:
             predicates.add("prior_tool_outputs_present")
         else:
             predicates.add("no_prior_tool_outputs_present")
+        try:
+            tool_state = extract_tool_state({"request": request_json})
+        except Exception:
+            tool_state = None
+        pending_goal = getattr(tool_state, "pending_goal_family", "") if tool_state is not None else ""
+        if pending_goal == "read_content":
+            predicates.add("pending_goal_read_content")
+            predicates.add("postcondition_gap_read_content")
+        elif pending_goal == "search":
+            predicates.add("pending_goal_search")
+            predicates.add("postcondition_gap_search_or_find")
         return predicates
 
     def _request_predicates_met(self, predicates: List[str], request_json: Dict[str, Any] | None) -> bool:

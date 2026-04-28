@@ -1,0 +1,79 @@
+patch_id: postcondition_guided_runtime_smoke_adapter
+rules:
+- action:
+    decision_policy:
+      action_candidates: []
+      continue_condition: a schema-local capability can advance the observable postcondition
+        without creating arguments
+      evidence_requirements: &id001
+      - tools_available
+      - prior_tool_outputs_present
+      - postcondition_gap_read_content
+      forbidden_terminations:
+      - prose_only_no_tool_termination
+      next_tool_policy:
+        activation_predicates: *id001
+        confidence: 0.65
+        recommended_tools: &id002
+        - cat
+        tool_choice_mode: soft
+      recommended_tools: *id002
+      request_predicates: *id001
+      stop_condition: prose-only termination is admissible only when the postcondition
+        is already satisfied or no local capability is available
+    prompt_fragments:
+    - 'When prior tool output is present and the current request still has an unsatisfied
+      `read_content` postcondition, prefer the schema-available capability family
+      `cat`. This is capability-only guidance: do not force exact tool choice, do
+      not create arguments, and do not use benchmark answers, grading artifacts, or
+      trace identifiers.'
+  enabled: true
+  priority: 6
+  rule_id: postcondition_guided_read_content_soft_v1_runtime_adapter
+  scope:
+    patch_sites:
+    - prompt_injector
+    - policy_executor
+  trigger:
+    error_types: &id005
+    - actionable_no_tool_decision
+    - post_tool_prose_summary
+    request_predicates: *id001
+- action:
+    decision_policy:
+      action_candidates: []
+      continue_condition: a schema-local capability can advance the observable postcondition
+        without creating arguments
+      evidence_requirements: &id003
+      - tools_available
+      - prior_tool_outputs_present
+      - postcondition_gap_search_or_find
+      forbidden_terminations:
+      - prose_only_no_tool_termination
+      next_tool_policy:
+        activation_predicates: *id003
+        confidence: 0.65
+        recommended_tools: &id004
+        - grep
+        - find
+        tool_choice_mode: soft
+      recommended_tools: *id004
+      request_predicates: *id003
+      stop_condition: prose-only termination is admissible only when the postcondition
+        is already satisfied or no local capability is available
+    prompt_fragments:
+    - 'When prior tool output is present and the current request still has an unsatisfied
+      `search_or_find` postcondition, prefer the schema-available capability family
+      `grep`, `find`. This is capability-only guidance: do not force exact tool choice,
+      do not create arguments, and do not use benchmark answers, grading artifacts,
+      or trace identifiers.'
+  enabled: true
+  priority: 6
+  rule_id: postcondition_guided_search_or_find_soft_v1_runtime_adapter
+  scope:
+    patch_sites:
+    - prompt_injector
+    - policy_executor
+  trigger:
+    error_types: *id005
+    request_predicates: *id003
