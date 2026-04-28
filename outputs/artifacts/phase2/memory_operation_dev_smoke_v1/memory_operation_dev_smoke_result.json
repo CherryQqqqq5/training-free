@@ -1,0 +1,271 @@
+{
+  "artifact_type": "memory_operation_dev_smoke_result",
+  "created_at_utc": "2026-04-28T08:59:04Z",
+  "commit_baseline": "dcdb88e4a29026369f29cbafa5a18c4599e42138",
+  "provider": "novacode",
+  "model": "gpt-4o-mini-2024-07-18-FC",
+  "protocol_id": "memory_operation_dev_smoke_v1",
+  "source_scope": "6 target memory cases with prereq closure generation entries",
+  "target_case_count": 6,
+  "generation_case_count": 26,
+  "prereq_case_count": 20,
+  "categories": [
+    "memory_kv",
+    "memory_rec_sum"
+  ],
+  "baseline": {
+    "metrics_acc": 0.0,
+    "evaluation_status": "incomplete",
+    "artifact_validity_issues": [
+      "subset metric missing for test_category=memory_kv,memory_rec_sum"
+    ],
+    "target_case_count": 6,
+    "target_scorer_valid_count": 0,
+    "target_scorer_invalid_count": 6,
+    "target_invalid_reason_counts": {
+      "agentic:no_last_message": 6
+    },
+    "memory_tool_called_target_count": 6,
+    "final_answer_missing_count": 6,
+    "snapshot_files_available": true,
+    "target_records_compact": [
+      {
+        "case_id": "memory_kv_0-customer-0",
+        "category": "kv",
+        "valid": false,
+        "error_type": "agentic:no_last_message",
+        "tool": "core_memory_retrieve",
+        "args": "{\"key\":\"customer_name\"}",
+        "final_answer_empty": true
+      },
+      {
+        "case_id": "memory_kv_1-customer-1",
+        "category": "kv",
+        "valid": false,
+        "error_type": "agentic:no_last_message",
+        "tool": "core_memory_retrieve",
+        "args": "{\"key\":\"customer_profile\"}",
+        "final_answer_empty": true
+      },
+      {
+        "case_id": "memory_kv_2-customer-2",
+        "category": "kv",
+        "valid": false,
+        "error_type": "agentic:no_last_message",
+        "tool": "core_memory_retrieve",
+        "args": "{\"key\":\"customer_profile\"}",
+        "final_answer_empty": true
+      },
+      {
+        "case_id": "memory_rec_sum_0-customer-0",
+        "category": "rec_sum",
+        "valid": false,
+        "error_type": "agentic:no_last_message",
+        "tool": "memory_retrieve",
+        "args": "{}",
+        "final_answer_empty": true
+      },
+      {
+        "case_id": "memory_rec_sum_1-customer-1",
+        "category": "rec_sum",
+        "valid": false,
+        "error_type": "agentic:no_last_message",
+        "tool": "memory_retrieve",
+        "args": "{}",
+        "final_answer_empty": true
+      },
+      {
+        "case_id": "memory_rec_sum_2-customer-2",
+        "category": "rec_sum",
+        "valid": false,
+        "error_type": "agentic:no_last_message",
+        "tool": "memory_retrieve",
+        "args": "{}",
+        "final_answer_empty": true
+      }
+    ],
+    "retrieve_keys_by_case": {
+      "memory_kv_0-customer-0": {
+        "tool": "core_memory_retrieve",
+        "args": "{\"key\":\"customer_name\"}"
+      },
+      "memory_kv_1-customer-1": {
+        "tool": "core_memory_retrieve",
+        "args": "{\"key\":\"customer_profile\"}"
+      },
+      "memory_kv_2-customer-2": {
+        "tool": "core_memory_retrieve",
+        "args": "{\"key\":\"customer_profile\"}"
+      },
+      "memory_rec_sum_0-customer-0": {
+        "tool": "memory_retrieve",
+        "args": "{}"
+      },
+      "memory_rec_sum_1-customer-1": {
+        "tool": "memory_retrieve",
+        "args": "{}"
+      },
+      "memory_rec_sum_2-customer-2": {
+        "tool": "memory_retrieve",
+        "args": "{}"
+      }
+    }
+  },
+  "candidate": {
+    "metrics_acc": 0.0,
+    "evaluation_status": "incomplete",
+    "artifact_validity_issues": [
+      "subset metric missing for test_category=memory_kv,memory_rec_sum"
+    ],
+    "target_case_count": 6,
+    "target_scorer_valid_count": 0,
+    "target_scorer_invalid_count": 6,
+    "target_invalid_reason_counts": {
+      "agentic:no_last_message": 6
+    },
+    "memory_tool_called_target_count": 6,
+    "final_answer_missing_count": 6,
+    "snapshot_files_available": true,
+    "target_records_compact": [
+      {
+        "case_id": "memory_kv_0-customer-0",
+        "category": "kv",
+        "valid": false,
+        "error_type": "agentic:no_last_message",
+        "tool": "core_memory_retrieve",
+        "args": "{\"key\":\"customer_name\"}",
+        "final_answer_empty": true
+      },
+      {
+        "case_id": "memory_kv_1-customer-1",
+        "category": "kv",
+        "valid": false,
+        "error_type": "agentic:no_last_message",
+        "tool": "core_memory_retrieve",
+        "args": "{\"key\":\"customer_age\"}",
+        "final_answer_empty": true
+      },
+      {
+        "case_id": "memory_kv_2-customer-2",
+        "category": "kv",
+        "valid": false,
+        "error_type": "agentic:no_last_message",
+        "tool": "core_memory_retrieve",
+        "args": "{\"key\":\"customer_location\"}",
+        "final_answer_empty": true
+      },
+      {
+        "case_id": "memory_rec_sum_0-customer-0",
+        "category": "rec_sum",
+        "valid": false,
+        "error_type": "agentic:no_last_message",
+        "tool": "memory_retrieve",
+        "args": "{}",
+        "final_answer_empty": true
+      },
+      {
+        "case_id": "memory_rec_sum_1-customer-1",
+        "category": "rec_sum",
+        "valid": false,
+        "error_type": "agentic:no_last_message",
+        "tool": "memory_retrieve",
+        "args": "{}",
+        "final_answer_empty": true
+      },
+      {
+        "case_id": "memory_rec_sum_2-customer-2",
+        "category": "rec_sum",
+        "valid": false,
+        "error_type": "agentic:no_last_message",
+        "tool": "memory_retrieve",
+        "args": "{}",
+        "final_answer_empty": true
+      }
+    ],
+    "retrieve_keys_by_case": {
+      "memory_kv_0-customer-0": {
+        "tool": "core_memory_retrieve",
+        "args": "{\"key\":\"customer_name\"}"
+      },
+      "memory_kv_1-customer-1": {
+        "tool": "core_memory_retrieve",
+        "args": "{\"key\":\"customer_age\"}"
+      },
+      "memory_kv_2-customer-2": {
+        "tool": "core_memory_retrieve",
+        "args": "{\"key\":\"customer_location\"}"
+      },
+      "memory_rec_sum_0-customer-0": {
+        "tool": "memory_retrieve",
+        "args": "{}"
+      },
+      "memory_rec_sum_1-customer-1": {
+        "tool": "memory_retrieve",
+        "args": "{}"
+      },
+      "memory_rec_sum_2-customer-2": {
+        "tool": "memory_retrieve",
+        "args": "{}"
+      }
+    }
+  },
+  "baseline_accuracy": 0.0,
+  "candidate_accuracy": 0.0,
+  "absolute_pp_delta": 0.0,
+  "case_fixed_count": 0,
+  "case_regressed_count": 0,
+  "net_case_gain": 0,
+  "candidate_changed_retrieval_keys_count": 2,
+  "changed_retrieval_keys_compact": [
+    {
+      "case_id": "memory_kv_1-customer-1",
+      "baseline": {
+        "tool": "core_memory_retrieve",
+        "args": "{\"key\":\"customer_profile\"}"
+      },
+      "candidate": {
+        "tool": "core_memory_retrieve",
+        "args": "{\"key\":\"customer_age\"}"
+      }
+    },
+    {
+      "case_id": "memory_kv_2-customer-2",
+      "baseline": {
+        "tool": "core_memory_retrieve",
+        "args": "{\"key\":\"customer_profile\"}"
+      },
+      "candidate": {
+        "tool": "core_memory_retrieve",
+        "args": "{\"key\":\"customer_location\"}"
+      }
+    }
+  ],
+  "candidate_trace_file_count": 354,
+  "candidate_trace_pattern_counts": {
+    "memory retrieval": 26,
+    "selected_next_tool": 354,
+    "memory_first_pass_retrieve_soft_v1": 0,
+    "policy_plan_activated": 0,
+    "prompt_patch": 0,
+    "scorer_feedback": 0
+  },
+  "setup_snapshot_available": true,
+  "snapshot_preflight_passed": true,
+  "target_snapshot_environment_valid_count": 6,
+  "target_scorer_valid_count_baseline": 0,
+  "target_scorer_valid_count_candidate": 0,
+  "dominant_failure_mode": "agentic:no_last_message",
+  "smoke_interpretation": "target_policy_neutral_but_final_answer_missing_after_memory_tool_call",
+  "retain_rule_created": false,
+  "bfcl_plus_3pp_claim": false,
+  "dev_scorer_authorized_next": false,
+  "holdout_authorized": false,
+  "hundred_case_authorized": false,
+  "full_bfcl_authorized": false,
+  "next_route_recommendation": "investigate_second_pass_final_answer_policy_or_memory_tool_result_to_answer_bridge_before_any_new_scorer",
+  "artifact_rules": {
+    "raw_traces_committed": false,
+    "bfcl_result_trees_committed": false,
+    "logs_committed": false
+  }
+}

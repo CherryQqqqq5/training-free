@@ -1,0 +1,141 @@
+{
+  "artifact_type": "memory_operation_final_answer_repair_audit",
+  "created_at_utc": "2026-04-28T09:14:58Z",
+  "scope": "offline_replay_of_existing_candidate_memory_target_post_tool_traces_after_repair_policy_fix",
+  "bfcl_or_model_called": false,
+  "target_post_tool_trace_count": 6,
+  "output_format_requirement_observable_count": 6,
+  "old_coerce_no_tool_text_to_empty_count": 6,
+  "new_offline_replay_preserved_final_answer_count": 6,
+  "root_cause": "coerce_no_tool_text_to_empty_repair_was_applied_to_post_tool_structured_final_answer",
+  "fix_summary": "preserve post-tool structured final answers with answer/context fields only when the final-answer format requirement is observable in the request",
+  "generalization_boundary": "applies only when prior tool output is present, last observed role is tool, the request explicitly asks for final answer fields answer/context, and the assistant content already parses as answer/context; no answer synthesis or mutation is performed",
+  "retain_rule_created": false,
+  "bfcl_plus_3pp_claim": false,
+  "dev_scorer_authorized_next": false,
+  "records": [
+    {
+      "trace_id": "269ebc41-051e-4909-b60f-af3ef9daa372",
+      "question_family": "memory_name",
+      "output_format_requirement_observable": true,
+      "old_trace_repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "old_trace_issue_kinds": [
+        "actionable_no_tool_decision"
+      ],
+      "new_offline_replay_content_preserved": true,
+      "new_offline_replay_repair_kinds": [],
+      "new_offline_replay_issue_kinds": [],
+      "last_observed_role": "tool",
+      "request_predicates": [
+        "memory_tools_available",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ]
+    },
+    {
+      "trace_id": "58a25917-2f70-4aac-b01a-e0e00f6aaedf",
+      "question_family": "memory_age",
+      "output_format_requirement_observable": true,
+      "old_trace_repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "old_trace_issue_kinds": [
+        "actionable_no_tool_decision"
+      ],
+      "new_offline_replay_content_preserved": true,
+      "new_offline_replay_repair_kinds": [],
+      "new_offline_replay_issue_kinds": [],
+      "last_observed_role": "tool",
+      "request_predicates": [
+        "memory_tools_available",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ]
+    },
+    {
+      "trace_id": "a8b62733-a258-4a25-ad0f-aa6fc98b09d4",
+      "question_family": "memory_age",
+      "output_format_requirement_observable": true,
+      "old_trace_repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "old_trace_issue_kinds": [
+        "actionable_no_tool_decision"
+      ],
+      "new_offline_replay_content_preserved": true,
+      "new_offline_replay_repair_kinds": [],
+      "new_offline_replay_issue_kinds": [],
+      "last_observed_role": "tool",
+      "request_predicates": [
+        "memory_tools_available",
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ]
+    },
+    {
+      "trace_id": "d7486dcc-3e89-471d-a7d7-a9422db22b28",
+      "question_family": "memory_location",
+      "output_format_requirement_observable": true,
+      "old_trace_repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "old_trace_issue_kinds": [
+        "actionable_no_tool_decision"
+      ],
+      "new_offline_replay_content_preserved": true,
+      "new_offline_replay_repair_kinds": [],
+      "new_offline_replay_issue_kinds": [],
+      "last_observed_role": "tool",
+      "request_predicates": [
+        "memory_tools_available",
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ]
+    },
+    {
+      "trace_id": "df926782-a1cb-4918-ae5a-cf2cf521c612",
+      "question_family": "memory_location",
+      "output_format_requirement_observable": true,
+      "old_trace_repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "old_trace_issue_kinds": [
+        "actionable_no_tool_decision"
+      ],
+      "new_offline_replay_content_preserved": true,
+      "new_offline_replay_repair_kinds": [],
+      "new_offline_replay_issue_kinds": [],
+      "last_observed_role": "tool",
+      "request_predicates": [
+        "memory_tools_available",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ]
+    },
+    {
+      "trace_id": "e1d7db5d-27a0-4a3e-889e-f62efeda89aa",
+      "question_family": "memory_name",
+      "output_format_requirement_observable": true,
+      "old_trace_repair_kinds": [
+        "coerce_no_tool_text_to_empty"
+      ],
+      "old_trace_issue_kinds": [
+        "actionable_no_tool_decision"
+      ],
+      "new_offline_replay_content_preserved": true,
+      "new_offline_replay_repair_kinds": [],
+      "new_offline_replay_issue_kinds": [],
+      "last_observed_role": "tool",
+      "request_predicates": [
+        "memory_tools_available",
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ]
+    }
+  ]
+}

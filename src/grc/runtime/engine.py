@@ -12,6 +12,7 @@ from grc.compiler.failure_taxonomy import classify_error_type
 from grc.runtime.policy_executor import (
     classify_no_tool_policy_issue,
     evaluate_no_tool_policy,
+    is_post_tool_structured_final_answer,
     is_policy_rule,
     partition_matching_rules,
 )
@@ -129,6 +130,40 @@ class RuleEngine:
             "diff": "compare",
             "cd": "directory_navigation",
         }.get(str(tool_name or "").strip(), str(tool_name or "unknown").strip() or "unknown")
+
+    @staticmethod
+    def _content_to_text(content: Any) -> str:
+        if isinstance(content, str):
+            return content
+        if isinstance(content, list):
+            parts: List[str] = []
+            for item in content:
+                if isinstance(item, str):
+                    parts.append(item)
+                elif isinstance(item, dict):
+                    value = item.get("text") or item.get("content")
+                    if value is not None:
+                        parts.append(str(value))
+            return "\n".join(parts)
+        return str(content or "")
+
+    @classmethod
+    def _structured_final_answer_format_observable(cls, request_json: Dict[str, Any]) -> bool:
+        texts: List[str] = []
+        for message in request_json.get("messages") or []:
+            if isinstance(message, dict):
+                texts.append(cls._content_to_text(message.get("content")))
+        input_payload = request_json.get("input")
+        if isinstance(input_payload, list):
+            for item in input_payload:
+                if isinstance(item, dict):
+                    texts.append(cls._content_to_text(item.get("content") or item.get("text")))
+                else:
+                    texts.append(str(item))
+        elif input_payload is not None:
+            texts.append(cls._content_to_text(input_payload))
+        joined = "\n".join(texts).lower()
+        return "final answer" in joined and "answer" in joined and "context" in joined
 
     def _load_scorer_feedback_payload(self) -> Dict[str, Any]:
         feedback = self.runtime_policy.get("scorer_feedback")
@@ -2179,6 +2214,13 @@ class RuleEngine:
                     validation.response_shapes.append(no_tool_response_shape)
                 validation.request_predicates = sorted(self._observable_request_predicates(request_json))
                 validation.last_observed_role = self._last_observed_role(request_json)
+                if is_post_tool_structured_final_answer(
+                    str(content),
+                    validation.request_predicates,
+                    validation.last_observed_role,
+                    final_answer_format_observable=self._structured_final_answer_format_observable(request_json),
+                ):
+                    continue
                 issue_kind, observed_predicates, issues, policy_rule_hits, compatibility_rule_hits = self._evaluate_no_tool_policy(
                     content,
                     request_json,

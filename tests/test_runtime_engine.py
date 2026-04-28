@@ -1016,6 +1016,59 @@ action:
         )
         self.assertEqual(repairs, self._expected_empty_repair("post_tool_prose_summary"))
 
+    def test_post_tool_structured_final_answer_is_preserved_for_bfcl_memory(self) -> None:
+        final_response, repairs, validation = self._run_no_tool_response(
+            rules=[
+                self._make_actionable_policy_rule(
+                    request_predicates=["tools_available", "prior_tool_outputs_present"],
+                )
+            ],
+            request={
+                **self._make_post_tool_summary_request(),
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "For your final answer to the user, respond with {'answer': A short answer, 'context': why it is correct}.",
+                    },
+                    *self._make_post_tool_summary_request()["messages"],
+                ],
+            },
+            response=self._make_text_response(
+                "{'answer': 'You live in Seattle.', 'context': 'The memory observation states that the user lives in Seattle.'}"
+            ),
+            runtime_policy={
+                "coerce_no_tool_response_to_empty_kinds": [
+                    "post_tool_prose_summary",
+                    "actionable_no_tool_decision",
+                ]
+            },
+        )
+
+        self.assertEqual(
+            final_response["choices"][0]["message"]["content"],
+            "{'answer': 'You live in Seattle.', 'context': 'The memory observation states that the user lives in Seattle.'}",
+        )
+        self.assertEqual(repairs, [])
+        self.assertEqual(validation.issues, [])
+        self.assertEqual(validation.last_observed_role, "tool")
+        self.assertEqual(validation.request_predicates, ["prior_tool_outputs_present", "tools_available"])
+
+    def test_post_tool_structured_answer_requires_observable_final_format(self) -> None:
+        final_response, repairs, validation = self._run_no_tool_response(
+            rules=[
+                self._make_actionable_policy_rule(
+                    request_predicates=["tools_available", "prior_tool_outputs_present"],
+                )
+            ],
+            request=self._make_post_tool_summary_request(),
+            response=self._make_text_response("{'answer': '37.85 liters', 'context': 'The tool result was converted.'}"),
+            runtime_policy={"coerce_no_tool_response_to_empty_kinds": ["actionable_no_tool_decision"]},
+        )
+
+        self.assertEqual(final_response["choices"][0]["message"]["content"], "")
+        self.assertEqual(repairs, self._expected_empty_repair("actionable_no_tool_decision"))
+        self.assertEqual([issue.kind for issue in validation.issues], ["actionable_no_tool_decision", "termination_inadmissible"])
+
     def test_post_tool_prose_summary_requires_recent_tool_output(self) -> None:
         _, _, validation = self._run_no_tool_response(
             request=self._make_move_file_request(),

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from typing import Callable, Dict, List
+import ast
+import json
+from typing import Any, Callable, Dict, List
 
 from grc.types import DecisionPolicySpec, Rule, ValidationIssue, VerificationContract
 from grc.runtime.validator import validate_termination_admissibility
@@ -57,6 +59,41 @@ def is_post_tool_prose_summary(
     if stripped.startswith(("{", "[")):
         return False
     return True
+
+
+def _parse_structured_final_answer(text: str) -> Dict[str, Any] | None:
+    stripped = text.strip()
+    if not stripped:
+        return None
+    for parser in (json.loads, ast.literal_eval):
+        try:
+            parsed = parser(stripped)
+        except Exception:
+            continue
+        if isinstance(parsed, dict):
+            return parsed
+    return None
+
+
+def is_post_tool_structured_final_answer(
+    text: str,
+    observed_predicates: List[str],
+    last_observed_role: str | None,
+    *,
+    final_answer_format_observable: bool = False,
+) -> bool:
+    if not text or last_observed_role != "tool":
+        return False
+    if not final_answer_format_observable:
+        return False
+    if "prior_tool_outputs_present" not in observed_predicates:
+        return False
+    payload = _parse_structured_final_answer(text)
+    if not payload:
+        return False
+    if not {"answer", "context"}.issubset(payload):
+        return False
+    return isinstance(payload.get("answer"), str) and isinstance(payload.get("context"), str)
 
 
 def classify_no_tool_policy_issue(
