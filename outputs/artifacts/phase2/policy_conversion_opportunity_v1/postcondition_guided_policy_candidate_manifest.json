@@ -1,0 +1,4865 @@
+{
+  "admission_criteria": [
+    "no_tool_policy_failure_label_present",
+    "rule_hit_present",
+    "prior_tool_observation_or_predicate_present",
+    "recommended_tool_is_available_in_schema",
+    "postcondition_witness_declared",
+    "guidance_only",
+    "exact_tool_choice_false",
+    "no_target_or_scorer_field_dependency"
+  ],
+  "candidate_commands": [],
+  "candidate_count": 145,
+  "candidate_records": [
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0000",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "target_path_changed"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "copy",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cp"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "high",
+      "risk_reason": "copy_or_move_policy_is_trajectory_sensitive",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/1aaa5342-07d4-4fc3-bd0f-b7fc2c8b8af7.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0001",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_exists"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "create_file",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "touch"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/1c58a848-728a-4ee6-8b6e-711d69b5a2a3.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0002",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/1c9b8dde-6094-43bc-b67c-d9d69c786201.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0003",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "matching_results"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "search_or_find",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "grep",
+        "find"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/1ec14a0b-09bf-44c9-9c6c-33805b4de87a.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0004",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_content"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "read_content",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cat"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/1f33ea9e-1aff-4302-9aec-14c268e533e5.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0005",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "matching_results"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "search_or_find",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "grep",
+        "find"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/20a19562-1338-41c6-a7a9-241297e6282a.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0006",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_content_changed"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "write_content",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "echo"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/21a694e5-b98a-42a3-ba52-e092db709d0b.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0007",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/2668a790-6eb2-4453-b3f5-239836173670.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0008",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "matching_results"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "search_or_find",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "grep",
+        "find"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/2f4b5787-78a4-4b38-8073-a5e850454d18.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0009",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "matching_results"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "search_or_find",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "grep",
+        "find"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/3381ddad-1d6a-4056-af97-5914503ea1ec.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0010",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_content_changed"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "write_content",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "echo"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/356bedfb-5e23-4096-a57e-6596846c18e7.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0011",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "matching_results"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "search_or_find",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "grep",
+        "find"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/36ad3761-3af6-498d-a7ba-dda0c26e990b.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0012",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "target_path_changed"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "move_or_rename",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "mv"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "high",
+      "risk_reason": "copy_or_move_policy_is_trajectory_sensitive",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/3c56eb63-a344-4660-9f8a-c0c7612eb628.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0013",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/3d02360c-0c3e-49cf-8856-d6498b96f604.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0014",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "matching_results"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "search_or_find",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "grep",
+        "find"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/4357c37a-60af-4558-8cd9-44c1e53560a3.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0015",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/47a47743-fa1c-4000-b2f9-09d15e00d164.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0016",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_content"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "read_content",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cat"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/47ff4e69-d5f2-4fd9-b269-7f8a32636210.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0017",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/4d18a800-2d9d-4ad9-8efe-edeee5d97741.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0018",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/4d45f6f6-6077-4ef5-bd09-4676e38fbea8.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0019",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/4ecba751-9579-4bcb-9c8d-ccfae58e2e6b.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0020",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "target_path_changed"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "move_or_rename",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "mv"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "high",
+      "risk_reason": "copy_or_move_policy_is_trajectory_sensitive",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/4eef4908-5845-474f-8767-14fdcebbfacf.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0021",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/52a21715-fd6e-435c-bd49-68d664d05b97.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0022",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_content"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "read_content",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cat"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/52c0df6e-fc93-4a48-91b3-c12bf8486c83.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0023",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_content_changed"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "write_content",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "echo"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/52f42d84-343a-4a50-9004-c73926654cd5.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0024",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/553b1dbc-ad7f-40e1-8ada-8509bec34f7d.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0025",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/59b40c8b-1cd9-4180-926e-234afefef5ba.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0026",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/5a7d3afb-bd8e-4ed5-90e6-f808c8a25850.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0027",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/5afae3fd-0f5e-4212-b58f-87f4ef336bf0.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0028",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/634916eb-00ab-429c-bac3-6fad72c5ec47.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0029",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_content"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "read_content",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cat"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/67d6950a-8314-4668-903a-607380088c4e.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0030",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/67fe0f6d-1505-482b-ba6e-af3bc0bc9baa.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0031",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_exists"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "create_file",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "touch"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/689fb6b8-59e9-4e28-a01b-aca58f5f818f.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0032",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "matching_results"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "search_or_find",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "grep",
+        "find"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/6ca2bd76-263f-4e5a-a294-4b14d1622da1.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0033",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_exists"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "create_file",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "touch"
+      ],
+      "request_predicates": [
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/720781b5-9124-4187-be42-f5f071ce36d3.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0034",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_content_changed"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "write_content",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "echo"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/77aaaeb0-ad2c-408e-9bc3-afd33b6ef208.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0035",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/780371aa-20b0-4357-b5b0-ce49b2b17854.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0036",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/781aced2-d01a-4f4d-9135-56dfc85f7a25.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0037",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "matching_results"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "search_or_find",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "grep",
+        "find"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/7bd4015b-5eb7-4a21-abaf-cedfb6d0ccce.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0038",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/81d5131d-381c-4625-9b7d-3370c3a2fff6.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0039",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/83e05222-7e2c-4817-bf2d-de7d5feda86e.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0040",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_content"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "read_content",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cat"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/89812dda-a658-42f0-8e8e-fd793b34f03a.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0041",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_content_changed"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "write_content",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "echo"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/8c980128-b04b-4305-a48d-77b24affaf30.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0042",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/8db8e192-45c0-4866-b1a5-0cc5f0cd290e.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0043",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_content_changed"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "write_content",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "echo"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/90427ace-fb4e-466e-acbd-fbb376d2b5c1.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0044",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/9223bcd5-02e9-495b-a875-2177bc88a70d.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0045",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "matching_results"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "search_or_find",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "grep",
+        "find"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/94928629-c938-483a-bcb9-749b255dbee2.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0046",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_exists"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "create_file",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "touch"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/9e7dffb1-ea9c-408b-aa59-1bdc4f0245f8.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0047",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_exists"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "create_file",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "touch"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/a222a141-c255-4ea1-b064-9af97cb072cf.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0048",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/a6360b2e-dcaa-4751-bada-51a320104666.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0049",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "matching_results"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "search_or_find",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "grep",
+        "find"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/aa875bf4-6419-43af-8d73-f62ac4ed44a4.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0050",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "target_path_changed"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "copy",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cp"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "high",
+      "risk_reason": "copy_or_move_policy_is_trajectory_sensitive",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/acf1a037-1ede-419c-afbf-05fd11856c57.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0051",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/aec419be-4785-4af9-b76a-eb062ddab6b9.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0052",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_exists"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "create_file",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "touch"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/b31dce79-9c32-4a08-a899-c58d1a925d8b.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0053",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/b59aec20-0b7f-47ec-aeb5-7fc0f2b4a394.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0054",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_exists"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "create_file",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "touch"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/b6149d0a-be1c-4207-be4d-df067dc11eb8.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0055",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/b6e10860-4600-41e8-9189-502b3035124c.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0056",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_content"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "read_content",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cat"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/bac4cc04-abfb-45dd-a0f7-bd998a5e3a86.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0057",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "matching_results"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "search_or_find",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "grep",
+        "find"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/bdf396dc-93a4-4a64-9833-c35e21b16a22.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0058",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "matching_results"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "search_or_find",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "grep",
+        "find"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/c47b6567-3d6f-4057-a79c-6a2fc61a8c05.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0059",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/c7ad0586-9e50-4788-8fb1-d61540072daa.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0060",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "matching_results"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "search_or_find",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "grep",
+        "find"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/cf765ff2-8d5a-4985-a770-f1b3aa3fba09.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0061",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_content"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "read_content",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cat"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/d3cd2282-a2b9-4f00-8434-23a92e0af5d1.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0062",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_content"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "read_content",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cat"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/da248e32-e7a9-4816-af81-0bfe1cd8fce0.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0063",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "matching_results"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "search_or_find",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "grep",
+        "find"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/df5f8ff7-6495-4546-8987-9b3e521677d2.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0064",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/e3670a40-ca8c-4e36-8b43-e039faa682da.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0065",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_content_changed"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "write_content",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "echo"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/ea801e29-f18f-427c-8249-c741561e3d45.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0066",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/ea8e0dea-b8ba-450c-bc76-cc46e2c63727.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0067",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "matching_results"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "search_or_find",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "grep",
+        "find"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/f06c67ce-10e3-4605-bcba-e61a25201c0b.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0068",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_exists"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "create_file",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "touch"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "required_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "required_target/traces/fff70389-8672-4792-94fd-49c75eaac24c.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0069",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_content"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "read_content",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cat"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/099e34ba-217f-4e4d-91ee-00c903632564.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0070",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "matching_results"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "search_or_find",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "grep",
+        "find"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/0b222296-a462-4034-a4d9-ca06bb083254.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0071",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/0d99c079-079e-4847-9470-18cc0713ecfb.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0072",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/18b89a66-ca7c-4cb2-baea-54614507e7aa.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0073",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/235b27fc-e67f-4093-96a5-6f89b7b01d05.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0074",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_content_changed"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "write_content",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "echo"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/2492d707-3cb2-4baa-b5d1-f2d885bea492.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0075",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "matching_results"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "search_or_find",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "grep",
+        "find"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/31b4b388-6dd0-420b-89c7-c238a79c6579.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0076",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "matching_results"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "search_or_find",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "grep",
+        "find"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/33a256cf-45c7-4cd3-b1ba-73dd031ef097.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0077",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/3ad13b57-a6e6-4b60-9a01-9ad1167b55b4.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0078",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "target_path_changed"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "move_or_rename",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "mv"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "high",
+      "risk_reason": "copy_or_move_policy_is_trajectory_sensitive",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/3ad53a14-0f37-4dbf-92fc-eabe22242a65.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0079",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_content_changed"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "write_content",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "echo"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/3aeaba09-67d0-4667-a4fd-1e0522944313.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0080",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/4f8ecdf5-972b-4cdc-af5a-9db37e8f33a8.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0081",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_content_changed"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "write_content",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "echo"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/50461615-2bd4-4fc7-8e9c-83fbe9fc51b0.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0082",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "target_path_changed"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "copy",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cp"
+      ],
+      "request_predicates": [
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "high",
+      "risk_reason": "copy_or_move_policy_is_trajectory_sensitive",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/566440f8-f3d9-4019-82e7-a6d6394a6ecf.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0083",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/56cc1a8d-17bb-4714-8f8a-37242711f956.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0084",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/581d3b43-1b49-4b57-a3c1-a3c6eb67ec0e.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0085",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "matching_results"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "search_or_find",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "grep",
+        "find"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/585749b3-8b84-4010-aa06-5e5cc4fd2e7c.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0086",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_content_changed"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "write_content",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "echo"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/58f27b89-3392-4863-aec7-29cde7261d0f.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0087",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "matching_results"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "search_or_find",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "grep",
+        "find"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/5b163ff0-cca6-4d90-8d2c-60191a2a8c6e.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0088",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_exists"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "create_file",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "touch"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/614c3331-d8b4-425f-a8b9-537fc98853d6.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0089",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/64d9b3fd-7e9c-4d8d-8135-8093448a57f6.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0090",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "target_path_changed"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "move_or_rename",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "mv"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "high",
+      "risk_reason": "copy_or_move_policy_is_trajectory_sensitive",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/65d3b4a8-1a83-480c-9852-7c6e29940103.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0091",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "matching_results"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "search_or_find",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "grep",
+        "find"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/6942aaeb-09b0-480b-bd6d-7f218944fc67.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0092",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_content"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "read_content",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cat"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/69a7f72e-29f9-41d2-9169-cb3b8fc2684d.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0093",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_exists"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "create_file",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "touch"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/6e73fab9-00ec-4ad9-8a84-427cd17b138d.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0094",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/6ee5216f-e0d1-4500-adb7-62c314407034.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0095",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/6f704a51-cf14-4196-b935-11076735c206.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0096",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/75c219c5-156e-46c6-bb91-0cecd9b55454.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0097",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_exists"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "create_file",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "touch"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/75f4a649-51ed-4623-a39a-b1798d10b6a1.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0098",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_content"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "read_content",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cat"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/7cc122b9-c815-4f4d-abd8-0d6a46a13c68.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0099",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "matching_results"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "search_or_find",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "grep",
+        "find"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/7f1eee64-6bfc-4e56-abad-41679fa81248.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0100",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/8034c5af-73e6-4054-a85b-113bc7e9971c.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0101",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_exists"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "create_file",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "touch"
+      ],
+      "request_predicates": [
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/854eb056-ba05-47f0-bb20-c47915062dd5.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0102",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/8590f3d9-9962-4391-8ac9-9224c934effe.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0103",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/8629573c-44a2-4b6f-bff7-18ad673e2c9c.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0104",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_exists"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "create_file",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "touch"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/89fa12b4-9fed-40b7-9aeb-5532e669d836.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0105",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_content"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "read_content",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cat"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/8ed299b4-a23e-431b-8b75-a3168557f970.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0106",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/9223e365-5cd7-4462-8957-06a8855e68e8.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0107",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "target_path_changed"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "copy",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cp"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "high",
+      "risk_reason": "copy_or_move_policy_is_trajectory_sensitive",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/950ac8c6-6e43-4c4f-9baf-367e38f80b13.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0108",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/95c0a5fd-bea6-42ac-9fb6-bef23e19bfd3.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0109",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/96e78e07-83d8-4405-a329-04e66313be52.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0110",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "matching_results"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "search_or_find",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "grep",
+        "find"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/9a25cdb4-33ab-40ec-bd3d-9b6358cb43cb.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0111",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/9e78de70-f638-48df-9838-d6113de2694a.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0112",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/9f16c409-f8bd-40a2-b2c8-4a9edf776c93.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0113",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "matching_results"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "search_or_find",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "grep",
+        "find"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/a24ae5ac-8ecf-4aaf-9f34-dc3e6982417f.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0114",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/a35a29c9-b18b-4f96-9f00-429390b55fb7.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0115",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/a3b55abe-77e4-411c-a69c-784e5b5a906b.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0116",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "target_path_changed"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "copy",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cp"
+      ],
+      "request_predicates": [
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "high",
+      "risk_reason": "copy_or_move_policy_is_trajectory_sensitive",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/a7b8737d-f693-46ef-a456-691fb2420b26.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0117",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_content"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "read_content",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cat"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/abb8dc28-3a27-4a3f-9021-5be64892f563.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0118",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/af7625cf-361e-482d-a904-107ba42116f1.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0119",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "matching_results"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "search_or_find",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "grep",
+        "find"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/b1356d22-6ac0-47c7-ac21-ceb4f6c82819.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0120",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_exists"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "create_file",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "touch"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/ba1a5290-5ca4-4ee0-8f20-ebc2d6aed580.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0121",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "matching_results"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "search_or_find",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "grep",
+        "find"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/c4a9d7b0-f7e4-44fd-b1b4-5e2a6122e4a8.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0122",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/c6435f98-8a30-4829-b149-7b4e11cf7078.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0123",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "target_path_changed"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "copy",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cp"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "high",
+      "risk_reason": "copy_or_move_policy_is_trajectory_sensitive",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/c7070694-096a-4e5e-8bf0-ecfcefd22941.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0124",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_content_changed"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "write_content",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "echo"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/c70baeab-1080-4e42-bf97-30c1c0c41090.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0125",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_exists"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "create_file",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "touch"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/c8f8708c-0e09-4973-8766-7b8f08b5fec6.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0126",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "matching_results"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "search_or_find",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "grep",
+        "find"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/c9fb73c6-d1a3-4c8a-9873-ac7ba83a9994.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0127",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_content"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "read_content",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cat"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/cb147d78-7e00-461a-903b-6c464edc3b79.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0128",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/cc338375-1319-4ae4-8cae-3792122a9526.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0129",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "matching_results"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "search_or_find",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "grep",
+        "find"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/cd3958c9-b193-4c6c-a1d2-dfb87b05e3b0.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0130",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/d2b6e8e3-2ad8-41f7-a3de-72ce301ab0b1.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0131",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_exists"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "create_file",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "touch"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/d425d904-5315-465a-a1ff-a3ed692db0b5.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0132",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_exists"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "create_file",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "touch"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/dda4c432-a183-4f9f-b60f-3bd216697e1a.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0133",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_content"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "read_content",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cat"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/e1c9d48d-e604-4987-9244-70a41375c74f.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0134",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "matching_results"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "search_or_find",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "grep",
+        "find"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/e581280d-739c-45b7-984a-115584e170f9.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0135",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_content"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "read_content",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cat"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/e8eaadc3-c030-4275-ae13-73e86558f337.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0136",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_content"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "read_content",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cat"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/ec5e401a-5649-4136-afcb-8b20926986f1.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0137",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "matching_results"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "search_or_find",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "grep",
+        "find"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/f2cd74bd-5e1f-4720-9ea5-285ba589bcb2.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0138",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "matching_results"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "search_or_find",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "grep",
+        "find"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/f409cdbd-f858-490a-ac93-9971ad904799.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0139",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/f557955f-b1b0-45cf-aef9-b71eb9df3a64.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0140",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_exists"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "create_file",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "touch"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/f6c854d2-1cc5-4226-bb5b-54fc4eeecf0c.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0141",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "file_content"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "read_content",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cat"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "low",
+      "risk_reason": "read_or_search_postcondition_with_local_witness",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/f71ee639-d173-4b29-8abe-3a20e7e6aba2.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0142",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/f8df3b1b-bca8-479c-a63c-de3748d6921a.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0143",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/fbb484e2-f517-45a6-b488-250b63208460.json"
+    },
+    {
+      "candidate_id": "postcondition_guided_trajectory_policy_0144",
+      "exact_tool_choice": false,
+      "expected_observation_keys": [
+        "current_working_directory"
+      ],
+      "failure_labels": [
+        "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)",
+        "(POST_TOOL,TERMINATION_INADMISSIBLE)"
+      ],
+      "intervention_strength": "guidance_only",
+      "policy_family": "postcondition_guided_trajectory_policy",
+      "postcondition_gap": "directory_navigation",
+      "postcondition_witness_available": true,
+      "precondition_observable": true,
+      "recommended_tools": [
+        "cd"
+      ],
+      "request_predicates": [
+        "prior_explicit_literals_present",
+        "prior_tool_outputs_present",
+        "tools_available"
+      ],
+      "requires_reviewer_approval_before_runtime": true,
+      "retention_eligibility": "diagnostic_only_until_family_review",
+      "risk_level": "medium",
+      "risk_reason": "state_mutating_or_navigation_policy_requires_reviewer_approval",
+      "run_name": "soft_target",
+      "runtime_enabled": false,
+      "target_or_scorer_field_dependency": false,
+      "theory_class": "postcondition_guided_trajectory_progress",
+      "trace_relative_path": "soft_target/traces/fefe27f9-d95c-4ed6-bcde-40bac4941823.json"
+    }
+  ],
+  "capability_distribution": {
+    "copy": 6,
+    "create_file": 18,
+    "directory_navigation": 56,
+    "move_or_rename": 4,
+    "read_content": 18,
+    "search_or_find": 31,
+    "write_content": 12
+  },
+  "does_not_authorize_scorer": true,
+  "does_not_call_bfcl_or_model": true,
+  "family_card_status": "review_required_before_runtime_integration",
+  "negative_controls_required": [
+    "activation_near_zero_on_no_toolless_failure_slices",
+    "activation_near_zero_when_required_postcondition_already_satisfied",
+    "no_activation_without_available_recommended_tool"
+  ],
+  "next_required_action": "delivery_and_research_review_before_compiler_or_runtime_integration",
+  "offline_only": true,
+  "planned_commands": [],
+  "policy_family": "postcondition_guided_trajectory_policy",
+  "rejection_criteria": [
+    "case_id_or_gold_answer_dependency",
+    "recommended_tool_not_in_schema",
+    "no_observable_prior_context",
+    "destructive_or_state_mutating_tool_without_explicit_intent",
+    "copy_move_or_directory_policy_without_reviewer_approval",
+    "exact_tool_choice_required"
+  ],
+  "report_scope": "postcondition_guided_policy_candidate_manifest",
+  "risk_level_distribution": {
+    "high": 10,
+    "low": 49,
+    "medium": 86
+  },
+  "runtime_enabled": false,
+  "theory_class": "postcondition_guided_trajectory_progress"
+}

@@ -209,6 +209,7 @@ def evaluate(trace_root: Path = DEFAULT_TRACE_ROOT) -> dict[str, Any]:
         "candidate_capability_distribution": dict(sorted(capability_counts.items())),
         "recommended_tool_distribution": dict(sorted(Counter(candidate_tools).items())),
         "rejection_reason_counts": dict(sorted(rejection_counts.items())),
+        "candidate_records": candidates,
         "sample_candidates": candidates[:20],
         "sample_rejections": [row for row in records if not row.get("candidate_ready")][:20],
         "candidate_commands": [],
