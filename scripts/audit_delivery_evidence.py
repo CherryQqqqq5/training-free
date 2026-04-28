@@ -167,6 +167,8 @@ def policy_opportunity_status(
 
 def memory_obligation_status(path: Path = DEFAULT_MEMORY_OBLIGATION) -> dict[str, Any]:
     report = _load_json(path, {}) or {}
+    negative = _load_json(path.parent / "memory_operation_negative_control_audit.json", {}) or {}
+    approval = _load_json(path.parent / "memory_operation_approval_manifest.json", {}) or {}
     return {
         "memory_operation_obligation_audit_ready": bool(report.get("candidate_count") is not None),
         "memory_operation_candidate_count": int(report.get("candidate_count") or 0),
@@ -174,9 +176,14 @@ def memory_obligation_status(path: Path = DEFAULT_MEMORY_OBLIGATION) -> dict[str
         "memory_operation_category_distribution": report.get("candidate_category_distribution") or {},
         "memory_operation_rejection_reason_counts": report.get("rejection_reason_counts") or {},
         "memory_operation_runtime_enabled": bool(report.get("runtime_enabled")),
+        "memory_operation_negative_control_audit_passed": bool(negative.get("negative_control_audit_passed")),
+        "memory_operation_approval_manifest_ready_for_review": bool(approval.get("approval_manifest_ready_for_review")),
+        "memory_operation_approval_manifest_sanitized": bool(approval.get("approval_manifest_sanitized")),
+        "memory_operation_compiler_input_eligible_count": int(approval.get("compiler_input_eligible_count") or 0),
+        "memory_operation_first_pass_review_candidate_count": int(approval.get("first_pass_review_candidate_count") or 0),
+        "memory_operation_second_pass_review_candidate_count": int(approval.get("second_pass_review_candidate_count") or 0),
         "memory_operation_next_required_action": report.get("next_required_action"),
     }
-
 
 def source_result_layout_status(low_risk_root: Path = DEFAULT_LOW_RISK) -> dict[str, Any]:
     availability = _load_json(low_risk_root / "m28pre_source_result_availability_audit.json", {}) or {}
@@ -329,6 +336,12 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Memory candidate operations: `{report['memory_operation_obligation']['memory_operation_candidate_distribution']}`",
         f"- Memory candidate categories: `{report['memory_operation_obligation']['memory_operation_category_distribution']}`",
         f"- Memory runtime enabled: `{report['memory_operation_obligation']['memory_operation_runtime_enabled']}`",
+        f"- Memory negative controls passed: `{report['memory_operation_obligation']['memory_operation_negative_control_audit_passed']}`",
+        f"- Memory approval manifest ready: `{report['memory_operation_obligation']['memory_operation_approval_manifest_ready_for_review']}`",
+        f"- Memory approval manifest sanitized: `{report['memory_operation_obligation']['memory_operation_approval_manifest_sanitized']}`",
+        f"- Memory compiler input eligible count: `{report['memory_operation_obligation']['memory_operation_compiler_input_eligible_count']}`",
+        f"- Memory first-pass review candidates: `{report['memory_operation_obligation']['memory_operation_first_pass_review_candidate_count']}`",
+        f"- Memory second-pass review candidates: `{report['memory_operation_obligation']['memory_operation_second_pass_review_candidate_count']}`",
         "",
         "## Source/Layout Evidence",
         "",
@@ -375,6 +388,9 @@ def main() -> int:
             "runtime_dry_run_compiler_ready": report["policy_conversion_opportunity"]["runtime_dry_run_compiler_ready"],
             "memory_operation_candidate_count": report["memory_operation_obligation"]["memory_operation_candidate_count"],
             "memory_operation_runtime_enabled": report["memory_operation_obligation"]["memory_operation_runtime_enabled"],
+            "memory_operation_negative_control_audit_passed": report["memory_operation_obligation"]["memory_operation_negative_control_audit_passed"],
+            "memory_operation_approval_manifest_ready_for_review": report["memory_operation_obligation"]["memory_operation_approval_manifest_ready_for_review"],
+            "memory_operation_compiler_input_eligible_count": report["memory_operation_obligation"]["memory_operation_compiler_input_eligible_count"],
             "policy_opportunity_candidate_count": report["policy_conversion_opportunity"]["policy_candidate_count"],
             "next_required_action": report["next_required_action"],
         }, indent=2, sort_keys=True))

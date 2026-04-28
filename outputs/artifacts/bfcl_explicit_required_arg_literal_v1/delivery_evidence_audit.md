@@ -45,6 +45,12 @@
 - Memory candidate operations: `{'retrieve': 78}`
 - Memory candidate categories: `{'memory_kv': 30, 'memory_rec_sum': 48}`
 - Memory runtime enabled: `False`
+- Memory negative controls passed: `True`
+- Memory approval manifest ready: `True`
+- Memory approval manifest sanitized: `True`
+- Memory compiler input eligible count: `0`
+- Memory first-pass review candidates: `48`
+- Memory second-pass review candidates: `30`
 
 ## Source/Layout Evidence
 

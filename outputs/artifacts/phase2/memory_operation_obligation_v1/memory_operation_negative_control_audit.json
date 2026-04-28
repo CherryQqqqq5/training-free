@@ -1,0 +1,75 @@
+{
+  "approval_manifest_ready_for_review": true,
+  "approval_manifest_sanitized": true,
+  "candidate_commands": [],
+  "candidate_count": 78,
+  "candidate_records_present": true,
+  "compiler_enabled": false,
+  "does_not_authorize_scorer": true,
+  "does_not_call_bfcl_or_model": true,
+  "exact_tool_choice": false,
+  "first_pass_support_count": 48,
+  "negative_control_audit_passed": true,
+  "negative_control_evaluations": {
+    "delete_clear_forget": {
+      "activation_count": 0,
+      "description": "Delete/clear/forget memory operations require separate reviewer approval and must not activate retrieve guidance.",
+      "evaluated_count": 0,
+      "passed": true,
+      "rejection_reasons": [
+        "delete_operation_requires_explicit_reviewer_approval"
+      ]
+    },
+    "empty_or_error_witness": {
+      "activation_count": 0,
+      "description": "Records with empty/error memory witness are diagnostic only and must not activate.",
+      "evaluated_count": 36,
+      "passed": true,
+      "rejection_reasons": [
+        "empty_or_error_memory_witness"
+      ]
+    },
+    "forbidden_dependency": {
+      "activation_count": 0,
+      "description": "Runtime trigger fields must not depend on gold, scorer, target, BFCL result, trace ids, or raw debug pointers.",
+      "evaluated_count": 78,
+      "passed": true,
+      "rejection_reasons": []
+    },
+    "no_memory_intent": {
+      "activation_count": 0,
+      "description": "Records without observable memory retrieve intent must never activate memory obligation guidance.",
+      "evaluated_count": 28,
+      "passed": true,
+      "rejection_reasons": [
+        "no_memory_operation_intent"
+      ]
+    },
+    "no_memory_tools": {
+      "activation_count": 0,
+      "description": "Records without memory tools must never activate memory obligation guidance.",
+      "evaluated_count": 9,
+      "passed": true,
+      "rejection_reasons": [
+        "no_memory_tools_available"
+      ]
+    },
+    "strong_value_witness": {
+      "activation_count": 0,
+      "description": "Records with a strong value/postcondition witness are already satisfied and must not activate.",
+      "evaluated_count": 0,
+      "passed": true,
+      "rejection_reasons": [
+        "memory_postcondition_already_satisfied"
+      ]
+    }
+  },
+  "next_required_action": "delivery_and_research_review_before_memory_runtime_compiler",
+  "offline_only": true,
+  "planned_commands": [],
+  "report_scope": "memory_operation_obligation_negative_control_audit",
+  "runtime_enabled": false,
+  "second_pass_support_count": 30,
+  "weak_witness_compiler_input_count": 0,
+  "weak_witness_support_count": 30
+}
