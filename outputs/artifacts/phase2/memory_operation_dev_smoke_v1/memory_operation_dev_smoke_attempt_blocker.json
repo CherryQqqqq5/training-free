@@ -1,0 +1,23 @@
+{
+  "abort_reason": "bfcl_memory_snapshot_missing_during_subset_generate",
+  "baseline_accuracy_observed": 0.0,
+  "baseline_attempted_case_count": 3,
+  "baseline_attempted_category": "memory_kv",
+  "bfcl_smoke_completed": false,
+  "candidate_commands": [],
+  "candidate_run_started": false,
+  "forbidden_followup": [
+    "do_not_run_candidate_until_snapshot_initialization_fixed",
+    "do_not_claim_performance",
+    "do_not_retain"
+  ],
+  "next_required_action": "audit_bfcl_memory_snapshot_subset_initialization_before_any_candidate_smoke",
+  "not_algorithm_evidence": true,
+  "not_retain_evidence": true,
+  "not_sota_3pp_evidence": true,
+  "offline_summary_only": true,
+  "planned_commands": [],
+  "provider_used": "novacode",
+  "report_scope": "memory_operation_dev_smoke_attempt_blocker",
+  "root_cause_hypothesis": "BFCL memory categories require memory snapshot initialization/continuity that was not present for the selected subset run; memory started empty for each attempted case, so scorer output is not attributable to the runtime policy."
+}

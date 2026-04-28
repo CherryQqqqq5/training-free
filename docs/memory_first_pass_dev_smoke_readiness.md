@@ -87,3 +87,15 @@ This document does not authorize:
 - 100-case or full BFCL.
 - Retained memory claims.
 - Huawei +3pp claims.
+
+## First Smoke Attempt Status
+
+A 3-case `memory_kv` baseline attempt was started with `novacode` after the protocol was approved. The run was stopped before candidate execution because BFCL emitted missing `memory_snapshot/customer_final.json` warnings and started each attempted case from empty memory. The observed baseline accuracy was `0.0`, so the run is not attributable to `memory_first_pass_retrieve_soft_v1` and is not algorithm evidence.
+
+Recorded compact blocker:
+
+```text
+outputs/artifacts/phase2/memory_operation_dev_smoke_v1/memory_operation_dev_smoke_attempt_blocker.json
+```
+
+Next required action is to audit BFCL memory subset snapshot initialization before any candidate smoke run.
