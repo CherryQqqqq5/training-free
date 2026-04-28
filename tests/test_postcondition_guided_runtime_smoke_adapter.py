@@ -112,6 +112,8 @@ def test_postcondition_runtime_readiness_checks_activation_and_negative_control(
     assert report["synthetic_read_content_activated"] is True
     assert report["synthetic_search_or_find_activated"] is True
     assert report["synthetic_final_answer_negative_control_activated"] is False
+    assert report["synthetic_no_prior_tool_output_negative_control_activated"] is False
+    assert report["synthetic_missing_capability_negative_control_activated"] is False
     assert report["does_not_authorize_scorer"] is True
 
 

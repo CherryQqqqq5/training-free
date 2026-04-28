@@ -53,17 +53,23 @@ def evaluate(policy_dir: Path = DEFAULT_POLICY_DIR, runtime_dir: Path = DEFAULT_
     rule_path = runtime_dir / "rule.yaml"
     if not rule_path.exists():
         failures.append({"check": "runtime_rule_yaml_present"})
-    read_plan = search_plan = final_plan = {}
+    read_plan = search_plan = final_plan = no_prior_plan = missing_tool_plan = {}
     if not failures:
         read_plan = _plan(runtime_dir, _request("Read the contents of report.txt.", ["cat"], {"matches": ["report.txt"]}))
         search_plan = _plan(runtime_dir, _request("Find the TODO marker in the files.", ["grep", "find"], {"files": ["a.txt"]}))
         final_plan = _plan(runtime_dir, _request("Summarize the prior result.", ["cat"], {"content": "done"}))
+        no_prior_plan = _plan(runtime_dir, _request("Read the contents of report.txt.", ["cat"]))
+        missing_tool_plan = _plan(runtime_dir, _request("Read the contents of report.txt.", ["echo"], {"matches": ["report.txt"]}))
         if read_plan.get("activated") is not True or read_plan.get("recommended_tools") != ["cat"]:
             failures.append({"check": "read_content_plan_activates", "plan": read_plan})
         if search_plan.get("activated") is not True or search_plan.get("recommended_tools") != ["grep", "find"]:
             failures.append({"check": "search_or_find_plan_activates", "plan": search_plan})
         if final_plan.get("activated") is True:
             failures.append({"check": "final_answer_goal_negative_control", "plan": final_plan})
+        if no_prior_plan.get("activated") is True:
+            failures.append({"check": "no_prior_tool_output_negative_control", "plan": no_prior_plan})
+        if missing_tool_plan.get("activated") is True:
+            failures.append({"check": "missing_capability_negative_control", "plan": missing_tool_plan})
     smoke_ready = not failures
     return {
         "report_scope": "postcondition_guided_runtime_smoke_readiness",
@@ -79,6 +85,8 @@ def evaluate(policy_dir: Path = DEFAULT_POLICY_DIR, runtime_dir: Path = DEFAULT_
         "synthetic_read_content_activated": bool(read_plan.get("activated")),
         "synthetic_search_or_find_activated": bool(search_plan.get("activated")),
         "synthetic_final_answer_negative_control_activated": bool(final_plan.get("activated")),
+        "synthetic_no_prior_tool_output_negative_control_activated": bool(no_prior_plan.get("activated")),
+        "synthetic_missing_capability_negative_control_activated": bool(missing_tool_plan.get("activated")),
         "exact_tool_choice": False,
         "argument_creation_count": 0,
         "candidate_commands": [],
@@ -102,6 +110,8 @@ def write_outputs(report: dict[str, Any], out: Path = DEFAULT_OUT, md_out: Path 
         f"- Synthetic read activation: `{report['synthetic_read_content_activated']}`",
         f"- Synthetic search activation: `{report['synthetic_search_or_find_activated']}`",
         f"- Final-answer negative control activated: `{report['synthetic_final_answer_negative_control_activated']}`",
+        f"- No-prior-tool-output negative control activated: `{report['synthetic_no_prior_tool_output_negative_control_activated']}`",
+        f"- Missing-capability negative control activated: `{report['synthetic_missing_capability_negative_control_activated']}`",
         f"- First failure: `{report['first_failure']}`",
         "",
         "Offline readiness only. This does not call BFCL/model/scorer and does not authorize holdout/full BFCL.",
@@ -124,7 +134,8 @@ def main() -> int:
         keys = [
             "postcondition_guided_runtime_smoke_ready", "runtime_adapter_compile_ready",
             "runtime_rule_count", "synthetic_read_content_activated", "synthetic_search_or_find_activated",
-            "synthetic_final_answer_negative_control_activated", "does_not_authorize_scorer",
+            "synthetic_final_answer_negative_control_activated", "synthetic_no_prior_tool_output_negative_control_activated",
+            "synthetic_missing_capability_negative_control_activated", "does_not_authorize_scorer",
             "candidate_commands", "planned_commands", "failure_count", "first_failure", "next_required_action",
         ]
         print(json.dumps({key: report.get(key) for key in keys}, indent=2, sort_keys=True))

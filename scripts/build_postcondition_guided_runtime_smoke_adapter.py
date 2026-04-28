@@ -44,7 +44,7 @@ def _runtime_rule(unit: dict[str, Any]) -> dict[str, Any]:
         f"`{gap}` postcondition, prefer the schema-available capability family "
         + ", ".join(f"`{tool}`" for tool in tools)
         + ". This is capability-only guidance: do not force exact tool choice, do not create arguments, "
-        "and do not use benchmark answers, grading artifacts, or trace identifiers."
+        "and do not use benchmark answers, grading artifacts, or evaluation-specific identifiers."
     )
     return {
         "rule_id": f"{unit.get('policy_unit_id')}_runtime_adapter",
