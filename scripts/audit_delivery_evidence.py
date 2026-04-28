@@ -25,6 +25,7 @@ DEFAULT_POLICY_NEGATIVE_CONTROLS = Path("outputs/artifacts/phase2/policy_convers
 DEFAULT_MEMORY_OBLIGATION = Path("outputs/artifacts/phase2/memory_operation_obligation_v1/memory_operation_obligation_audit.json")
 DEFAULT_MEMORY_DRY_RUN = Path("outputs/artifacts/phase2/memory_operation_obligation_dry_run_v1/first_pass/compile_status.json")
 DEFAULT_MEMORY_RESOLVER = Path("outputs/artifacts/phase2/memory_operation_obligation_dry_run_v1/first_pass/memory_tool_family_resolver_audit.json")
+DEFAULT_MEMORY_ACTIVATION = Path("outputs/artifacts/phase2/memory_operation_obligation_dry_run_v1/first_pass/memory_operation_activation_simulation.json")
 DEFAULT_OUT = Path("outputs/artifacts/bfcl_explicit_required_arg_literal_v1/delivery_evidence_audit.json")
 DEFAULT_MD = Path("outputs/artifacts/bfcl_explicit_required_arg_literal_v1/delivery_evidence_audit.md")
 
@@ -216,6 +217,20 @@ def memory_resolver_status(path: Path = DEFAULT_MEMORY_RESOLVER) -> dict[str, An
         "memory_resolver_next_required_action": report.get("next_required_action"),
     }
 
+
+def memory_activation_status(path: Path = DEFAULT_MEMORY_ACTIVATION) -> dict[str, Any]:
+    report = _load_json(path, {}) or {}
+    return {
+        "memory_activation_simulation_passed": bool(report.get("activation_simulation_passed")),
+        "memory_activation_count": int(report.get("activation_count") or 0),
+        "memory_activation_blocked_count": int(report.get("blocked_count") or 0),
+        "memory_activation_negative_control_count": int(report.get("negative_control_activation_count") or 0),
+        "memory_activation_weak_lookup_count": int(report.get("weak_lookup_witness_activation_count") or 0),
+        "memory_activation_argument_creation_count": int(report.get("argument_creation_count") or 0),
+        "memory_activation_runtime_enabled": bool(report.get("runtime_enabled")),
+        "memory_activation_next_required_action": report.get("next_required_action"),
+    }
+
 def source_result_layout_status(low_risk_root: Path = DEFAULT_LOW_RISK) -> dict[str, Any]:
     availability = _load_json(low_risk_root / "m28pre_source_result_availability_audit.json", {}) or {}
     alias = _load_json(low_risk_root / "wrong_arg_key_alias_coverage_audit.json", {}) or {}
@@ -268,6 +283,7 @@ def evaluate(
     memory_obligation = memory_obligation_status()
     memory_dry_run = memory_dry_run_status()
     memory_resolver = memory_resolver_status()
+    memory_activation = memory_activation_status()
     p0_blockers: list[str] = []
     if not boundary["artifact_boundary_passed"]:
         p0_blockers.append("artifact_boundary_not_clean")
@@ -317,6 +333,7 @@ def evaluate(
         "memory_operation_obligation": memory_obligation,
         "memory_operation_dry_run": memory_dry_run,
         "memory_tool_family_resolver": memory_resolver,
+        "memory_activation_simulation": memory_activation,
         "source_result_layout": source_layout,
         "next_required_action": "root_cause_audit_before_any_scorer",
     }
@@ -387,6 +404,10 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Memory resolver resolved schemas: `{report['memory_tool_family_resolver']['memory_resolver_resolved_schema_count']}`",
         f"- Memory resolver blocked destructive tools: `{report['memory_tool_family_resolver']['memory_resolver_blocked_destructive_tool_count']}`",
         f"- Memory resolver forbidden mutation resolved count: `{report['memory_tool_family_resolver']['memory_resolver_forbidden_mutation_resolved_count']}`",
+        f"- Memory activation simulation passed: `{report['memory_activation_simulation']['memory_activation_simulation_passed']}`",
+        f"- Memory activation count: `{report['memory_activation_simulation']['memory_activation_count']}`",
+        f"- Memory activation negative-control count: `{report['memory_activation_simulation']['memory_activation_negative_control_count']}`",
+        f"- Memory activation argument creation count: `{report['memory_activation_simulation']['memory_activation_argument_creation_count']}`",
         "",
         "## Source/Layout Evidence",
         "",
@@ -443,6 +464,8 @@ def main() -> int:
             "memory_dry_run_selected_first_pass_count": report["memory_operation_dry_run"]["memory_dry_run_selected_first_pass_count"],
             "memory_resolver_audit_passed": report["memory_tool_family_resolver"]["memory_resolver_audit_passed"],
             "memory_resolver_resolved_schema_count": report["memory_tool_family_resolver"]["memory_resolver_resolved_schema_count"],
+            "memory_activation_simulation_passed": report["memory_activation_simulation"]["memory_activation_simulation_passed"],
+            "memory_activation_count": report["memory_activation_simulation"]["memory_activation_count"],
             "policy_opportunity_candidate_count": report["policy_conversion_opportunity"]["policy_candidate_count"],
             "next_required_action": report["next_required_action"],
         }, indent=2, sort_keys=True))

@@ -61,6 +61,10 @@
 - Memory resolver resolved schemas: `48`
 - Memory resolver blocked destructive tools: `288`
 - Memory resolver forbidden mutation resolved count: `0`
+- Memory activation simulation passed: `True`
+- Memory activation count: `48`
+- Memory activation negative-control count: `0`
+- Memory activation argument creation count: `0`
 
 ## Source/Layout Evidence
 
