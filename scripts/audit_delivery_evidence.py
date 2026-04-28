@@ -31,6 +31,7 @@ DEFAULT_POSTCONDITION_SMOKE_RESULT = Path("outputs/artifacts/phase2/postconditio
 DEFAULT_POSTCONDITION_SMOKE_FAILURE = Path("outputs/artifacts/phase2/postcondition_guided_policy_runtime_smoke_v1/approved_low_risk/postcondition_guided_dev_smoke_failure_diagnosis.json")
 DEFAULT_POSTCONDITION_SATISFACTION = Path("outputs/artifacts/phase2/postcondition_guided_policy_runtime_smoke_v1/approved_low_risk/postcondition_satisfaction_audit.json")
 DEFAULT_POSTCONDITION_PROTOCOL = Path("outputs/artifacts/phase2/postcondition_guided_policy_runtime_smoke_v1/approved_low_risk/postcondition_guided_dev_smoke_protocol.json")
+DEFAULT_UNMET_POSTCONDITION_AUDIT = Path("outputs/artifacts/phase2/policy_conversion_opportunity_v1/unmet_postcondition_source_expansion_audit.json")
 DEFAULT_OUT = Path("outputs/artifacts/bfcl_explicit_required_arg_literal_v1/delivery_evidence_audit.json")
 DEFAULT_MD = Path("outputs/artifacts/bfcl_explicit_required_arg_literal_v1/delivery_evidence_audit.md")
 
@@ -290,6 +291,20 @@ def postcondition_smoke_status(
         else "not_run_or_positive_pending",
     }
 
+
+def unmet_postcondition_source_status(path: Path = DEFAULT_UNMET_POSTCONDITION_AUDIT) -> dict[str, Any]:
+    report = _load_json(path, {}) or {}
+    return {
+        "unmet_postcondition_source_expansion_audit_ready": bool(report.get("unmet_postcondition_source_expansion_audit_ready")),
+        "typed_satisfaction_distribution": report.get("typed_satisfaction_distribution") or {},
+        "strong_unmet_candidate_count": int(report.get("strong_unmet_candidate_count") or 0),
+        "low_risk_strong_unmet_candidate_count": int(report.get("low_risk_strong_unmet_candidate_count") or 0),
+        "high_risk_strong_unmet_candidate_count": int(report.get("high_risk_strong_unmet_candidate_count") or 0),
+        "strong_unmet_capability_distribution": report.get("strong_unmet_capability_distribution") or {},
+        "strong_unmet_risk_lane_distribution": report.get("strong_unmet_risk_lane_distribution") or {},
+        "unmet_postcondition_next_required_action": report.get("next_required_action"),
+    }
+
 def source_result_layout_status(low_risk_root: Path = DEFAULT_LOW_RISK) -> dict[str, Any]:
     availability = _load_json(low_risk_root / "m28pre_source_result_availability_audit.json", {}) or {}
     alias = _load_json(low_risk_root / "wrong_arg_key_alias_coverage_audit.json", {}) or {}
@@ -345,6 +360,7 @@ def evaluate(
     memory_activation = memory_activation_status()
     memory_runtime_smoke = memory_runtime_smoke_status()
     postcondition_smoke = postcondition_smoke_status()
+    unmet_postcondition = unmet_postcondition_source_status()
     p0_blockers: list[str] = []
     if not boundary["artifact_boundary_passed"]:
         p0_blockers.append("artifact_boundary_not_clean")
@@ -368,6 +384,8 @@ def evaluate(
         p0_blockers.append("postcondition_candidate_mining_gap_filter_not_passed")
     if postcondition_smoke.get("postcondition_smoke_protocol_selected_case_count") and not postcondition_smoke.get("postcondition_smoke_protocol_ready_for_review"):
         p0_blockers.append("postcondition_smoke_protocol_not_ready")
+    if unmet_postcondition.get("unmet_postcondition_source_expansion_audit_ready") and unmet_postcondition.get("low_risk_strong_unmet_candidate_count", 0) < 9:
+        p0_blockers.append("low_risk_unmet_postcondition_pool_too_small")
     if memory_activation.get("memory_activation_simulation_passed") and not memory_runtime_smoke.get("memory_runtime_adapter_ready"):
         p0_blockers.append("memory_runtime_adapter_not_ready")
     return {
@@ -400,6 +418,7 @@ def evaluate(
         "policy_conversion": policy,
         "policy_conversion_opportunity": policy_opportunity,
         "postcondition_smoke": postcondition_smoke,
+        "unmet_postcondition_source_expansion": unmet_postcondition,
         "memory_operation_obligation": memory_obligation,
         "memory_operation_dry_run": memory_dry_run,
         "memory_tool_family_resolver": memory_resolver,
@@ -471,6 +490,18 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Current protocol first failure: `{report['postcondition_smoke']['postcondition_smoke_protocol_first_failure']}`",
         f"- Protocol gating state: `{report['postcondition_smoke']['postcondition_protocol_gating_state']}`",
         f"- Evidence classification: `{report['postcondition_smoke']['postcondition_smoke_evidence_classification']}`",
+        "",
+
+        "## Unmet Postcondition Source Expansion",
+        "",
+        f"- Audit ready: `{report['unmet_postcondition_source_expansion']['unmet_postcondition_source_expansion_audit_ready']}`",
+        f"- Typed satisfaction distribution: `{report['unmet_postcondition_source_expansion']['typed_satisfaction_distribution']}`",
+        f"- Strong unmet candidates: `{report['unmet_postcondition_source_expansion']['strong_unmet_candidate_count']}`",
+        f"- Low-risk strong unmet candidates: `{report['unmet_postcondition_source_expansion']['low_risk_strong_unmet_candidate_count']}`",
+        f"- High-risk strong unmet candidates: `{report['unmet_postcondition_source_expansion']['high_risk_strong_unmet_candidate_count']}`",
+        f"- Strong unmet capability distribution: `{report['unmet_postcondition_source_expansion']['strong_unmet_capability_distribution']}`",
+        f"- Strong unmet risk lane distribution: `{report['unmet_postcondition_source_expansion']['strong_unmet_risk_lane_distribution']}`",
+        f"- Next action: `{report['unmet_postcondition_source_expansion']['unmet_postcondition_next_required_action']}`",
         "",
         "## Memory Operation Obligation Evidence",
         "",
@@ -555,6 +586,8 @@ def main() -> int:
             "postcondition_smoke_protocol_ready_for_review": report["postcondition_smoke"]["postcondition_smoke_protocol_ready_for_review"],
             "postcondition_protocol_gating_state": report["postcondition_smoke"]["postcondition_protocol_gating_state"],
             "postcondition_smoke_evidence_classification": report["postcondition_smoke"]["postcondition_smoke_evidence_classification"],
+            "low_risk_strong_unmet_postcondition_count": report["unmet_postcondition_source_expansion"]["low_risk_strong_unmet_candidate_count"],
+            "high_risk_strong_unmet_postcondition_count": report["unmet_postcondition_source_expansion"]["high_risk_strong_unmet_candidate_count"],
             "memory_operation_candidate_count": report["memory_operation_obligation"]["memory_operation_candidate_count"],
             "memory_operation_runtime_enabled": report["memory_operation_obligation"]["memory_operation_runtime_enabled"],
             "memory_operation_negative_control_audit_passed": report["memory_operation_obligation"]["memory_operation_negative_control_audit_passed"],

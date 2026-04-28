@@ -3,7 +3,7 @@
 - Claim status: `scaffold_and_diagnostic_package_only`
 - SOTA +3pp claim ready: `False`
 - Offline only: `True`
-- P0 blockers: `['artifact_boundary_not_clean', 'm2_8pre_offline_not_passed', 'scorer_authorization_not_ready', 'policy_conversion_not_observed_in_existing_traces', 'runtime_dry_run_compiler_not_ready', 'postcondition_dev_smoke_stop_loss_failed', 'postcondition_candidate_mining_gap_filter_not_passed', 'postcondition_smoke_protocol_not_ready']`
+- P0 blockers: `['artifact_boundary_not_clean', 'm2_8pre_offline_not_passed', 'scorer_authorization_not_ready', 'policy_conversion_not_observed_in_existing_traces', 'runtime_dry_run_compiler_not_ready', 'postcondition_dev_smoke_stop_loss_failed', 'postcondition_candidate_mining_gap_filter_not_passed', 'postcondition_smoke_protocol_not_ready', 'low_risk_unmet_postcondition_pool_too_small']`
 
 ## Gate Snapshot
 
@@ -56,6 +56,17 @@
 - Current protocol first failure: `{'actual': 3, 'check': 'selected_low_risk_case_count', 'expected': 9}`
 - Protocol gating state: `fail_closed`
 - Evidence classification: `negative_evidence_blocked_claim`
+
+## Unmet Postcondition Source Expansion
+
+- Audit ready: `True`
+- Typed satisfaction distribution: `{'ambiguous': 7413, 'satisfied_strong': 831, 'satisfied_weak': 644, 'unmet_strong': 366}`
+- Strong unmet candidates: `18`
+- Low-risk strong unmet candidates: `1`
+- High-risk strong unmet candidates: `17`
+- Strong unmet capability distribution: `{'copy': 1, 'create_file': 4, 'directory_navigation': 8, 'read_content': 1, 'write_content': 4}`
+- Strong unmet risk lane distribution: `{'high_risk_mutation_or_trajectory': 17, 'low_risk_observation': 1}`
+- Next action: `expand_source_or_state_abstraction_before_smoke`
 
 ## Memory Operation Obligation Evidence
 
