@@ -20,6 +20,7 @@ from grc.compiler.literal_grounding import ground_literal
 from grc.compiler.retention_priors import (
     DEMOTE_CANDIDATE,
     BFCL_FAILURE_REASONS,
+    deterministic_schema_local_non_live_prior,
     explicit_required_arg_literal_prior,
     summarize_retention_priors,
     wrong_arg_key_alias_prior,
@@ -420,6 +421,244 @@ def _load_wrong_arg_key_alias_candidates(source_manifest_path: Path, existing_ca
     }
     return candidates, rejected, diagnostic
 
+
+
+def _json_safe_value(value: Any) -> Any:
+    if isinstance(value, (str, int, float, bool)) or value is None:
+        return value
+    if isinstance(value, list):
+        return [_json_safe_value(item) for item in value]
+    if isinstance(value, dict):
+        return {str(k): _json_safe_value(v) for k, v in value.items()}
+    return str(value)
+
+
+def _schema_type_for_repair(schema: dict[str, Any]) -> str:
+    typ = schema.get("type")
+    if isinstance(typ, list):
+        for item in typ:
+            if item != "null":
+                return str(item).lower()
+        return "string"
+    return str(typ or "string").lower()
+
+
+def _normalize_enum_value(value: Any, schema: dict[str, Any]) -> tuple[Any | None, str | None, str | None]:
+    enum = schema.get("enum")
+    if not isinstance(enum, list) or not enum or not isinstance(value, str):
+        return None, None, None
+    norm = re.sub(r"[^a-z0-9]", "", value.lower())
+    matches = [candidate for candidate in enum if re.sub(r"[^a-z0-9]", "", str(candidate).lower()) == norm]
+    if len(matches) == 1 and matches[0] != value:
+        return matches[0], "enum_canonicalization", None
+    if len(matches) > 1:
+        return None, None, "ambiguous_enum_canonicalization"
+    return None, None, None
+
+
+def _normalize_scalar_for_schema(value: Any, schema: dict[str, Any]) -> tuple[Any | None, str | None, str | None]:
+    enum_value, enum_kind, enum_error = _normalize_enum_value(value, schema)
+    if enum_kind or enum_error:
+        return enum_value, enum_kind, enum_error
+    typ = _schema_type_for_repair(schema)
+    if typ == "boolean" and isinstance(value, str):
+        raw = value.strip().lower()
+        if raw in {"true", "yes"}:
+            return True, "boolean_string_normalization", None
+        if raw in {"false", "no"}:
+            return False, "boolean_string_normalization", None
+    if typ == "integer" and isinstance(value, str):
+        raw = value.strip()
+        if re.fullmatch(r"-?\d+", raw):
+            return int(raw), "numeric_string_to_integer", None
+    if typ == "number" and isinstance(value, str):
+        raw = value.strip()
+        if re.fullmatch(r"-?\d+(?:\.\d+)?", raw):
+            return (float(raw) if "." in raw else int(raw)), "numeric_string_to_number", None
+    if typ in {"array", "object"} and isinstance(value, str):
+        raw = value.strip()
+        if raw and raw[0] in "[{":
+            try:
+                parsed = json.loads(raw)
+            except Exception:
+                return None, None, "json_string_parse_failed"
+            if typ == "array" and isinstance(parsed, list):
+                return parsed, "json_string_to_array", None
+            if typ == "object" and isinstance(parsed, dict):
+                return parsed, "json_string_to_object", None
+            return None, None, "json_string_schema_mismatch"
+    if typ == "array" and not isinstance(value, list):
+        item_schema = schema.get("items") if isinstance(schema.get("items"), dict) else {}
+        if item_schema:
+            normalized_item, item_kind, item_error = _normalize_scalar_for_schema(value, item_schema)
+            if item_kind and item_error is None:
+                return [normalized_item], "scalar_to_singleton_array", None
+            if item_error:
+                return None, None, item_error
+        if isinstance(value, (str, int, float, bool)):
+            return [value], "scalar_to_singleton_array", None
+    return None, None, None
+
+
+def _deterministic_rejection(base: dict[str, Any], reason: str, **extra: Any) -> dict[str, Any]:
+    row = {**base, **extra, "candidate_generatable": False, "rejection_reason": reason}
+    row.setdefault("rule_type", "deterministic_schema_local_non_live_repair")
+    row.setdefault("candidate_rules_type", "deterministic_schema_local_non_live_repair")
+    row.setdefault("no_next_tool_intervention", True)
+    row.setdefault("exact_tool_choice", False)
+    row.setdefault("guidance_only", True)
+    row.setdefault("ctspc_v0_action_rule", False)
+    row.setdefault("tool_choice_mutation", False)
+    row.setdefault("trajectory_mutation", False)
+    row.setdefault("value_creation", False)
+    row.setdefault("gold_value_mutation", False)
+    row.setdefault("schema_local_deterministic", False)
+    row.setdefault("tool_call_mapping_unique", True)
+    row["retention_prior"] = deterministic_schema_local_non_live_prior(row)
+    return row
+
+
+def _compile_deterministic_schema_local_records(entry: dict[str, Any], result: dict[str, Any] | None, source_root: Path, category: str) -> list[dict[str, Any]]:
+    case_id = str(entry.get("id") or "")
+    base = {
+        "case_id": case_id,
+        "category": category,
+        "source_run_root": str(source_root),
+        "slice_name": "deterministic_schema_local_non_live_repair",
+        "low_risk_slices": ["deterministic_schema_local_non_live_repair"],
+        "candidate_origin": "theory_prior_deterministic_schema_local_non_live",
+        "ctspc_legacy_file_path_candidate": False,
+        "theory_prior_explicit_literal_candidate": False,
+        "theory_prior_wrong_arg_key_alias_candidate": False,
+        "theory_prior_deterministic_schema_local_candidate": True,
+    }
+    if not case_id:
+        return []
+    if category in PRIOR_AWARE_EXCLUDED_CATEGORIES:
+        return [_deterministic_rejection(base, "memory_or_hidden_state_category_excluded", hidden_state_category=True)]
+    if not result:
+        return [_deterministic_rejection(base, "missing_source_result")]
+    calls = _iter_tool_calls(result.get("result"))
+    if not calls:
+        return [_deterministic_rejection(base, "missing_emitted_tool_call")]
+    calls_by_tool: dict[str, list[tuple[str, dict[str, Any]]]] = defaultdict(list)
+    for tool, args in calls:
+        calls_by_tool[_normalize_tool_name(tool)].append((tool, args))
+    functions = _function_map(entry)
+    rows: list[dict[str, Any]] = []
+    saw_matching_tool = False
+    for norm_tool, fn in functions.items():
+        if norm_tool not in calls_by_tool:
+            continue
+        saw_matching_tool = True
+        props = (fn.get("parameters") or {}).get("properties") or {}
+        if not isinstance(props, dict) or not props:
+            rows.append(_deterministic_rejection(base, "missing_schema_properties", tool=norm_tool))
+            continue
+        if len(calls_by_tool[norm_tool]) != 1:
+            rows.append(_deterministic_rejection(base, "parallel_call_mapping_not_unique", tool=norm_tool, tool_call_mapping_unique=False))
+            continue
+        emitted_tool, emitted_args = calls_by_tool[norm_tool][0]
+        emitted_any_repair = False
+        for arg_key, value in emitted_args.items():
+            arg_key = str(arg_key)
+            schema = props.get(arg_key)
+            common = {
+                **base,
+                "tool": norm_tool,
+                "emitted_tool_name": emitted_tool,
+                "arg_key": arg_key,
+                "schema_arg_name": arg_key,
+                "original_value": _json_safe_value(value),
+                "schema_type": _schema_type_for_repair(schema if isinstance(schema, dict) else {}),
+                "tool_call_mapping_unique": True,
+                "no_next_tool_intervention": True,
+                "exact_tool_choice": False,
+                "guidance_only": True,
+                "ctspc_v0_action_rule": False,
+                "tool_choice_mutation": False,
+                "trajectory_mutation": False,
+                "value_creation": False,
+                "gold_value_mutation": False,
+                "rule_type": "deterministic_schema_local_non_live_repair",
+                "candidate_rules_type": "deterministic_schema_local_non_live_repair",
+            }
+            if not isinstance(schema, dict):
+                rows.append(_deterministic_rejection(common, "arg_key_not_in_schema_properties"))
+                emitted_any_repair = True
+                continue
+            normalized, repair_kind, error = _normalize_scalar_for_schema(value, schema)
+            if error:
+                rows.append(_deterministic_rejection(common, error))
+                emitted_any_repair = True
+                continue
+            if repair_kind is None:
+                continue
+            if normalized == value:
+                rows.append(_deterministic_rejection(common, "already_schema_local_canonical", normalized_value=_json_safe_value(normalized), repair_kind=repair_kind))
+                emitted_any_repair = True
+                continue
+            row = {
+                **common,
+                "normalized_value": _json_safe_value(normalized),
+                "repair_kind": repair_kind,
+                "schema_local_deterministic": True,
+                "retain_prior_candidate": True,
+                "candidate_generatable": True,
+                "rejection_reason": None,
+                "confidence": 0.8,
+            }
+            row["retention_prior"] = deterministic_schema_local_non_live_prior(row)
+            rows.append(row)
+            emitted_any_repair = True
+        if not emitted_any_repair:
+            rows.append(_deterministic_rejection({**base, "tool": norm_tool}, "no_deterministic_schema_local_repair_detected"))
+    if rows:
+        return rows
+    if not saw_matching_tool:
+        return [_deterministic_rejection(base, "no_matching_emitted_tool")]
+    return [_deterministic_rejection(base, "no_deterministic_schema_local_repair_detected")]
+
+
+def _load_deterministic_schema_local_candidates(source_manifest_path: Path, existing_case_ids: set[str]) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, Any]]:
+    manifest = _read_json(source_manifest_path, {}) or {}
+    rows = manifest.get("category_status") or []
+    candidates: list[dict[str, Any]] = []
+    rejected: list[dict[str, Any]] = []
+    scanned_categories: list[str] = []
+    for row in rows if isinstance(rows, list) else []:
+        if not row.get("source_artifacts_available"):
+            continue
+        category = str(row.get("category") or "")
+        roots = [Path(str(root)) for root in row.get("existing_source_roots") or []]
+        if not category or not roots:
+            continue
+        entries = _load_dataset_records(category)
+        if not entries:
+            continue
+        scanned_categories.append(category)
+        for root in roots:
+            results = _load_result_records(root, category)
+            for case_id, entry in entries.items():
+                if case_id in existing_case_ids:
+                    continue
+                compiled_rows = _compile_deterministic_schema_local_records(entry, results.get(case_id), root, category)
+                accepted_for_case = False
+                for compiled in compiled_rows:
+                    if compiled.get("candidate_generatable") and not accepted_for_case:
+                        candidates.append(compiled)
+                        existing_case_ids.add(case_id)
+                        accepted_for_case = True
+                    else:
+                        rejected.append(compiled)
+    diagnostic = {
+        "deterministic_schema_local_scan_enabled": True,
+        "deterministic_schema_local_scanned_categories": sorted(set(scanned_categories)),
+        "deterministic_schema_local_candidate_count": len(candidates),
+        "deterministic_schema_local_rejected_count": len(rejected),
+        "deterministic_schema_local_rejection_distribution": dict(Counter(str(row.get("rejection_reason")) for row in rejected)),
+    }
+    return candidates, rejected, diagnostic
 
 def _compile_prior_aware_record(entry: dict[str, Any], result: dict[str, Any] | None, source_root: Path, category: str) -> dict[str, Any] | None:
     case_id = str(entry.get("id") or "")
@@ -866,23 +1105,36 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
             "wrong_arg_key_alias_rejected_count": 0,
             "wrong_arg_key_alias_rejection_distribution": {},
         }
+        deterministic_candidates, deterministic_rejected, deterministic_diag = [], [], {
+            "deterministic_schema_local_scan_enabled": False,
+            "deterministic_schema_local_skip_reason": "non_default_low_risk_manifest_without_explicit_source_manifest",
+            "deterministic_schema_local_candidate_count": 0,
+            "deterministic_schema_local_rejected_count": 0,
+            "deterministic_schema_local_rejection_distribution": {},
+        }
     else:
         prior_candidates, prior_rejected, prior_diag = _load_prior_aware_candidates(source_manifest_path, existing_case_ids)
         alias_candidates, alias_rejected, alias_diag = _load_wrong_arg_key_alias_candidates(source_manifest_path, set(existing_case_ids))
+        deterministic_candidates, deterministic_rejected, deterministic_diag = _load_deterministic_schema_local_candidates(source_manifest_path, set(existing_case_ids))
 
     source_result_availability_audit = _source_result_availability_audit(source_manifest_path)
     prior_scan_category_coverage = _prior_scan_category_coverage(prior_candidates + prior_rejected)
     alias_scan_category_coverage = _prior_scan_category_coverage(alias_candidates + alias_rejected)
+    deterministic_scan_category_coverage = _prior_scan_category_coverage(deterministic_candidates + deterministic_rejected)
 
     explicit_compiled = legacy_explicit_compiled + prior_candidates + prior_rejected
     alias_compiled = alias_candidates + alias_rejected
-    compiler_category_coverage = _prior_scan_category_coverage(explicit_compiled + alias_compiled)
+    deterministic_compiled = deterministic_candidates + deterministic_rejected
+    compiler_category_coverage = _prior_scan_category_coverage(explicit_compiled + alias_compiled + deterministic_compiled)
     explicit_generatable = [item for item in explicit_compiled if item.get("candidate_generatable")]
     alias_generatable = [item for item in alias_compiled if item.get("candidate_generatable")]
+    deterministic_generatable = [item for item in deterministic_compiled if item.get("candidate_generatable")]
     theory_prior_generatable = [item for item in explicit_generatable if item.get("theory_prior_explicit_literal_candidate")]
     explicit_ambiguous = sum(1 for item in explicit_compiled if item.get("rejection_reason") in {"ambiguous_literal", "ambiguous_or_missing_observable_literal"})
     alias_ambiguous_count = sum(1 for item in alias_compiled if item.get("rejection_reason") == "ambiguous_alias")
     alias_value_mutation_count = sum(1 for item in alias_compiled if item.get("value_mutation") is True)
+    deterministic_ambiguous_count = sum(1 for item in deterministic_compiled if item.get("rejection_reason") in {"ambiguous_enum_canonicalization", "ambiguous_or_non_deterministic_schema_repair"})
+    deterministic_value_creation_count = sum(1 for item in deterministic_compiled if item.get("value_creation") is True or item.get("gold_value_mutation") is True)
 
     stratified_records = _unique_records_by_case(slice_cases)
     stratified_compiled = _compile_legacy_records(stratified_records, "stratified_low_risk", load_result, load_entry)
@@ -898,7 +1150,8 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
     stratified_prior_distribution = summarize_retention_priors(stratified_generatable)
     retain_eligible = [row for row in explicit_generatable if row.get("retention_prior", {}).get("retain_eligibility") == DEMOTE_CANDIDATE]
     alias_retain_eligible = [row for row in alias_generatable if row.get("retention_prior", {}).get("retain_eligibility") == DEMOTE_CANDIDATE]
-    combined_retain_eligible = retain_eligible + alias_retain_eligible
+    deterministic_retain_eligible = [row for row in deterministic_generatable if row.get("retention_prior", {}).get("retain_eligibility") == DEMOTE_CANDIDATE]
+    combined_retain_eligible = retain_eligible + deterministic_retain_eligible
     stratified_retain_eligible = [row for row in stratified_generatable if row.get("retention_prior", {}).get("retain_eligibility") == DEMOTE_CANDIDATE]
     disambiguation_records = [
         {
@@ -922,17 +1175,21 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
     required_total = dev_size + holdout_size
     explicit_compiler_ready = len(explicit_generatable) >= dev_size and explicit_ambiguous == 0 and ctspc_off
     alias_compiler_ready = len(alias_retain_eligible) >= dev_size and alias_ambiguous_count == 0 and alias_value_mutation_count == 0 and ctspc_off
-    combined_compiler_ready = len(combined_retain_eligible) >= dev_size and explicit_ambiguous == 0 and alias_ambiguous_count == 0 and alias_value_mutation_count == 0 and ctspc_off
+    deterministic_compiler_ready = len(deterministic_retain_eligible) >= dev_size and deterministic_ambiguous_count == 0 and deterministic_value_creation_count == 0 and ctspc_off
+    combined_compiler_ready = len(combined_retain_eligible) >= dev_size and explicit_ambiguous == 0 and deterministic_ambiguous_count == 0 and deterministic_value_creation_count == 0 and ctspc_off
     stratified_compiler_ready = len(stratified_generatable) >= dev_size and stratified_ambiguous == 0 and ctspc_off
     compiler_ready = explicit_compiler_ready or combined_compiler_ready or stratified_compiler_ready
     explicit_holdout_ready = len(retain_eligible) >= required_total and explicit_ambiguous == 0
     alias_holdout_ready = len(alias_retain_eligible) >= required_total and alias_ambiguous_count == 0 and alias_value_mutation_count == 0
-    combined_holdout_ready = len(combined_retain_eligible) >= required_total and explicit_ambiguous == 0 and alias_ambiguous_count == 0 and alias_value_mutation_count == 0
+    deterministic_holdout_ready = len(deterministic_retain_eligible) >= required_total and deterministic_ambiguous_count == 0 and deterministic_value_creation_count == 0
+    combined_holdout_ready = len(combined_retain_eligible) >= required_total and explicit_ambiguous == 0 and deterministic_ambiguous_count == 0 and deterministic_value_creation_count == 0
     stratified_holdout_ready = False
     explicit_dev = retain_eligible[:dev_size]
     explicit_holdout = retain_eligible[dev_size : dev_size + holdout_size]
     alias_dev = alias_retain_eligible[:dev_size]
     alias_holdout = alias_retain_eligible[dev_size : dev_size + holdout_size]
+    deterministic_dev = deterministic_retain_eligible[:dev_size]
+    deterministic_holdout = deterministic_retain_eligible[dev_size : dev_size + holdout_size]
     combined_dev = combined_retain_eligible[:dev_size]
     combined_holdout = combined_retain_eligible[dev_size : dev_size + holdout_size]
     stratified_dev = stratified_retain_eligible[:dev_size]
@@ -940,10 +1197,10 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
     scorer_ready = compiler_ready and combined_holdout_ready
     if combined_holdout_ready:
         route_recommendation = "theory_prior_low_risk_pool_ready_for_scorer_request"
-    elif alias_retain_eligible:
-        route_recommendation = "define_next_theory_family_after_wrong_arg_key_alias_repair"
+    elif deterministic_retain_eligible:
+        route_recommendation = "deterministic_schema_local_non_live_repair_coverage_insufficient"
     else:
-        route_recommendation = "wrong_arg_key_alias_repair_coverage_insufficient"
+        route_recommendation = "define_next_theory_family_after_deterministic_schema_local_non_live_repair"
 
     blockers = []
     if len(explicit_generatable) < required_total:
@@ -952,6 +1209,8 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
         blockers.append("explicit_demote_candidate_below_35")
     if len(alias_retain_eligible) < 20:
         blockers.append("wrong_arg_key_alias_demote_below_20")
+    if len(deterministic_retain_eligible) < 20:
+        blockers.append("deterministic_schema_local_demote_below_20")
     if len(combined_retain_eligible) < 35:
         blockers.append("combined_demote_candidate_below_35")
     if explicit_ambiguous:
@@ -960,6 +1219,10 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
         blockers.append("wrong_arg_key_alias_ambiguous_present")
     if alias_value_mutation_count:
         blockers.append("wrong_arg_key_alias_value_mutation_present")
+    if deterministic_ambiguous_count:
+        blockers.append("deterministic_schema_local_ambiguous_present")
+    if deterministic_value_creation_count:
+        blockers.append("deterministic_schema_local_value_creation_present")
     if not explicit_holdout_ready:
         blockers.append("explicit_holdout_below_20")
     if not combined_holdout_ready:
@@ -988,12 +1251,12 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
         "ctspc_v0_frozen": ctspc_off,
         "repair_stack_default": "disabled",
         "candidate_rules_type": "theory_prior_low_risk_combined",
-        "authorized_theory_prior_families": ["explicit_required_arg_literal_completion", "wrong_arg_key_alias_repair"],
+        "authorized_theory_prior_families": ["explicit_required_arg_literal_completion", "deterministic_schema_local_non_live_repair"],
         "no_next_tool_intervention": True,
         "exact_tool_choice": False,
         "retention_prior_required": True,
         "retention_prior_rule_family": "explicit_required_arg_literal_completion",
-        "retention_prior_rule_families": ["explicit_required_arg_literal_completion", "wrong_arg_key_alias_repair"],
+        "retention_prior_rule_families": ["explicit_required_arg_literal_completion", "deterministic_schema_local_non_live_repair", "wrong_arg_key_alias_repair"],
         "bfcl_score_cannot_create_retain_rule": True,
         "stratified_pool_diagnostic_only_until_family_priors_exist": True,
         "ctspc_legacy_file_path_candidate_count": len([row for row in explicit_generatable if row.get("ctspc_legacy_file_path_candidate")]),
@@ -1004,19 +1267,26 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
         "prior_scan_category_coverage": prior_scan_category_coverage,
         "alias_prior_scan": alias_diag,
         "alias_scan_category_coverage": alias_scan_category_coverage,
+        "deterministic_schema_local_prior_scan": deterministic_diag,
+        "deterministic_schema_local_scan_category_coverage": deterministic_scan_category_coverage,
         "compiler_category_coverage": compiler_category_coverage,
         "explicit_remaining_gap_to_35_demote_candidates": max(0, 35 - len(retain_eligible)),
         "remaining_gap_to_35_demote_candidates": max(0, 35 - len(combined_retain_eligible)),
         "route_recommendation": route_recommendation,
         "retention_prior_distribution": explicit_prior_distribution,
         "wrong_arg_key_alias_retention_prior_distribution": summarize_retention_priors(alias_generatable),
-        "combined_retention_prior_distribution": summarize_retention_priors(explicit_generatable + alias_generatable),
+        "deterministic_schema_local_retention_prior_distribution": summarize_retention_priors(deterministic_generatable),
+        "combined_retention_prior_distribution": summarize_retention_priors(explicit_generatable + deterministic_generatable),
         "stratified_retention_prior_distribution": stratified_prior_distribution,
         "retain_eligible_candidate_count": len(retain_eligible),
         "wrong_arg_key_alias_candidate_count": len(alias_generatable),
         "wrong_arg_key_alias_demote_candidate_count": len(alias_retain_eligible),
         "wrong_arg_key_alias_ambiguous_count": alias_ambiguous_count,
         "wrong_arg_key_alias_value_mutation_count": alias_value_mutation_count,
+        "deterministic_schema_local_candidate_count": len(deterministic_generatable),
+        "deterministic_schema_local_demote_candidate_count": len(deterministic_retain_eligible),
+        "deterministic_schema_local_ambiguous_count": deterministic_ambiguous_count,
+        "deterministic_schema_local_value_creation_count": deterministic_value_creation_count,
         "combined_retain_eligible_candidate_count": len(combined_retain_eligible),
         "stratified_retain_eligible_candidate_count": len(stratified_retain_eligible),
         "scanner_missed_count": 0,
@@ -1028,15 +1298,19 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
         "ambiguous_literal_count": explicit_ambiguous,
         "candidate_rules": explicit_generatable,
         "wrong_arg_key_alias_candidate_rules": alias_generatable,
-        "combined_candidate_rules": explicit_generatable + alias_generatable,
+        "deterministic_schema_local_candidate_rules": deterministic_generatable,
+        "combined_candidate_rules": explicit_generatable + deterministic_generatable,
         "rejected_candidates": [item for item in explicit_compiled if not item.get("candidate_generatable")],
         "wrong_arg_key_alias_rejected_candidates": [item for item in alias_compiled if not item.get("candidate_generatable")],
+        "deterministic_schema_local_rejected_candidates": [item for item in deterministic_compiled if not item.get("candidate_generatable")],
         "dev_manifest": _manifest("explicit_required_arg_literal_dev20", explicit_dev, ready=len(explicit_dev) >= dev_size, slice_name="explicit_required_arg_literal"),
         "holdout_manifest": _manifest("explicit_required_arg_literal_holdout20", explicit_holdout, ready=explicit_holdout_ready, slice_name="explicit_required_arg_literal"),
         "wrong_arg_key_alias_dev_manifest": _manifest("wrong_arg_key_alias_dev20", alias_dev, ready=len(alias_dev) >= dev_size, slice_name="wrong_arg_key_alias_repair", candidate_rules_type="wrong_arg_key_alias_repair", selection_criteria="theory-prior schema-local wrong-arg-key alias repair; value/tool/trajectory unchanged"),
         "wrong_arg_key_alias_holdout_manifest": _manifest("wrong_arg_key_alias_holdout20", alias_holdout, ready=alias_holdout_ready, slice_name="wrong_arg_key_alias_repair", candidate_rules_type="wrong_arg_key_alias_repair", selection_criteria="theory-prior schema-local wrong-arg-key alias repair; value/tool/trajectory unchanged"),
-        "combined_dev_manifest": _manifest("theory_prior_low_risk_dev20", combined_dev, ready=len(combined_dev) >= dev_size, slice_name="theory_prior_low_risk_combined", candidate_rules_type="theory_prior_low_risk_combined", selection_criteria="combined theory-prior pool: explicit required-arg literal completion plus wrong-arg-key alias repair"),
-        "combined_holdout_manifest": _manifest("theory_prior_low_risk_holdout20", combined_holdout, ready=combined_holdout_ready, slice_name="theory_prior_low_risk_combined", candidate_rules_type="theory_prior_low_risk_combined", selection_criteria="combined theory-prior pool: explicit required-arg literal completion plus wrong-arg-key alias repair"),
+        "deterministic_schema_local_dev_manifest": _manifest("deterministic_schema_local_dev20", deterministic_dev, ready=len(deterministic_dev) >= dev_size, slice_name="deterministic_schema_local_non_live_repair", candidate_rules_type="deterministic_schema_local_non_live_repair", selection_criteria="theory-prior deterministic schema-local non-live repair; value is normalized from emitted args only"),
+        "deterministic_schema_local_holdout_manifest": _manifest("deterministic_schema_local_holdout20", deterministic_holdout, ready=deterministic_holdout_ready, slice_name="deterministic_schema_local_non_live_repair", candidate_rules_type="deterministic_schema_local_non_live_repair", selection_criteria="theory-prior deterministic schema-local non-live repair; value is normalized from emitted args only"),
+        "combined_dev_manifest": _manifest("theory_prior_low_risk_dev20", combined_dev, ready=len(combined_dev) >= dev_size, slice_name="theory_prior_low_risk_combined", candidate_rules_type="theory_prior_low_risk_combined", selection_criteria="combined theory-prior pool: explicit required-arg literal completion plus deterministic schema-local non-live repair"),
+        "combined_holdout_manifest": _manifest("theory_prior_low_risk_holdout20", combined_holdout, ready=combined_holdout_ready, slice_name="theory_prior_low_risk_combined", candidate_rules_type="theory_prior_low_risk_combined", selection_criteria="combined theory-prior pool: explicit required-arg literal completion plus deterministic schema-local non-live repair"),
         "stratified_candidate_rules": stratified_generatable,
         "stratified_counts": dict(sorted(stratified_counts.items())),
         "stratified_selected_case_count": len(stratified_generatable),
@@ -1047,10 +1321,12 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
         "compiler_ready": compiler_ready,
         "explicit_compiler_ready": explicit_compiler_ready,
         "wrong_arg_key_alias_compiler_ready": alias_compiler_ready,
+        "deterministic_schema_local_compiler_ready": deterministic_compiler_ready,
         "combined_compiler_ready": combined_compiler_ready,
         "stratified_compiler_ready": stratified_compiler_ready,
         "explicit_holdout_ready": explicit_holdout_ready,
         "wrong_arg_key_alias_holdout_ready": alias_holdout_ready,
+        "deterministic_schema_local_holdout_ready": deterministic_holdout_ready,
         "combined_theory_prior_holdout_ready": combined_holdout_ready,
         "stratified_holdout_ready": stratified_holdout_ready,
         "scorer_authorization_ready": scorer_ready,
@@ -1072,6 +1348,7 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Explicit selected/generatable: `{report['selected_case_count']}` / `{report['candidate_generatable_count']}`",
         f"- Retain-eligible explicit candidates: `{report['retain_eligible_candidate_count']}`",
         f"- Retain-eligible wrong-key alias candidates: `{report['wrong_arg_key_alias_demote_candidate_count']}`",
+        f"- Retain-eligible deterministic schema-local candidates: `{report['deterministic_schema_local_demote_candidate_count']}`",
         f"- Combined retain-eligible candidates: `{report['combined_retain_eligible_candidate_count']}`",
         f"- Theory-prior explicit candidates: `{report['theory_prior_explicit_literal_candidate_count']}`",
         f"- Remaining combined gap to 35 demote candidates: `{report['remaining_gap_to_35_demote_candidates']}`",
@@ -1160,13 +1437,16 @@ def _render_source_result_availability_audit(report: dict[str, Any]) -> str:
 
 def write_outputs(report: dict[str, Any], out_root: Path = DEFAULT_OUT_ROOT) -> None:
     out_root.mkdir(parents=True, exist_ok=True)
-    _write_json(out_root / "compiler_summary.json", {key: value for key, value in report.items() if key not in {"candidate_rules", "rejected_candidates", "wrong_arg_key_alias_candidate_rules", "wrong_arg_key_alias_rejected_candidates", "combined_candidate_rules", "stratified_candidate_rules", "literal_disambiguation_records"}})
+    _write_json(out_root / "compiler_summary.json", {key: value for key, value in report.items() if key not in {"candidate_rules", "rejected_candidates", "wrong_arg_key_alias_candidate_rules", "wrong_arg_key_alias_rejected_candidates", "deterministic_schema_local_candidate_rules", "deterministic_schema_local_rejected_candidates", "combined_candidate_rules", "stratified_candidate_rules", "literal_disambiguation_records"}})
     (out_root / "compiler_summary.md").write_text(render_markdown(report), encoding="utf-8")
     with (out_root / "candidate_rules.jsonl").open("w", encoding="utf-8") as handle:
         for row in report["candidate_rules"]:
             handle.write(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n")
     with (out_root / "wrong_arg_key_alias_candidate_rules.jsonl").open("w", encoding="utf-8") as handle:
         for row in report["wrong_arg_key_alias_candidate_rules"]:
+            handle.write(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n")
+    with (out_root / "deterministic_schema_local_candidate_rules.jsonl").open("w", encoding="utf-8") as handle:
+        for row in report["deterministic_schema_local_candidate_rules"]:
             handle.write(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n")
     with (out_root / "combined_theory_prior_candidate_rules.jsonl").open("w", encoding="utf-8") as handle:
         for row in report["combined_candidate_rules"]:
@@ -1182,6 +1462,8 @@ def write_outputs(report: dict[str, Any], out_root: Path = DEFAULT_OUT_ROOT) -> 
         (out_root / "explicit_required_arg_literal_holdout20_manifest.json", out_root / "explicit_required_arg_literal_holdout20_manifest.md", report["holdout_manifest"]),
         (out_root / "wrong_arg_key_alias_dev20_manifest.json", out_root / "wrong_arg_key_alias_dev20_manifest.md", report["wrong_arg_key_alias_dev_manifest"]),
         (out_root / "wrong_arg_key_alias_holdout20_manifest.json", out_root / "wrong_arg_key_alias_holdout20_manifest.md", report["wrong_arg_key_alias_holdout_manifest"]),
+        (out_root / "deterministic_schema_local_dev20_manifest.json", out_root / "deterministic_schema_local_dev20_manifest.md", report["deterministic_schema_local_dev_manifest"]),
+        (out_root / "deterministic_schema_local_holdout20_manifest.json", out_root / "deterministic_schema_local_holdout20_manifest.md", report["deterministic_schema_local_holdout_manifest"]),
         (out_root / "theory_prior_low_risk_dev20_manifest.json", out_root / "theory_prior_low_risk_dev20_manifest.md", report["combined_dev_manifest"]),
         (out_root / "theory_prior_low_risk_holdout20_manifest.json", out_root / "theory_prior_low_risk_holdout20_manifest.md", report["combined_holdout_manifest"]),
         (out_root / "stratified_low_risk_dev20_manifest.json", out_root / "stratified_low_risk_dev20_manifest.md", report["stratified_dev_manifest"]),
@@ -1230,6 +1512,7 @@ def main() -> int:
             "candidate_generatable_count": report["candidate_generatable_count"],
             "retain_eligible_candidate_count": report["retain_eligible_candidate_count"],
             "wrong_arg_key_alias_demote_candidate_count": report["wrong_arg_key_alias_demote_candidate_count"],
+            "deterministic_schema_local_demote_candidate_count": report["deterministic_schema_local_demote_candidate_count"],
             "combined_retain_eligible_candidate_count": report["combined_retain_eligible_candidate_count"],
             "theory_prior_explicit_literal_candidate_count": report["theory_prior_explicit_literal_candidate_count"],
             "stratified_selected_case_count": report["stratified_selected_case_count"],
@@ -1239,6 +1522,7 @@ def main() -> int:
             "route_recommendation": report["route_recommendation"],
             "retention_prior_distribution": report["retention_prior_distribution"],
             "wrong_arg_key_alias_retention_prior_distribution": report["wrong_arg_key_alias_retention_prior_distribution"],
+            "deterministic_schema_local_retention_prior_distribution": report["deterministic_schema_local_retention_prior_distribution"],
             "combined_retention_prior_distribution": report["combined_retention_prior_distribution"],
             "stratified_retention_prior_distribution": report["stratified_retention_prior_distribution"],
             "blockers": report["blockers"],

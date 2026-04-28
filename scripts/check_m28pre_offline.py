@@ -37,10 +37,13 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
     raw_coverage = _j(low_risk_root / "raw_bfcl_literal_coverage_audit.json", {}) or {}
     availability = _j(low_risk_root / "m28pre_source_result_availability_audit.json", {}) or {}
     alias_coverage = _j(low_risk_root / "wrong_arg_key_alias_coverage_audit.json", {}) or {}
+    deterministic_coverage = _j(low_risk_root / "deterministic_schema_local_coverage_audit.json", {}) or {}
     dev = _j(low_risk_root / "explicit_required_arg_literal_dev20_manifest.json", {}) or {}
     holdout = _j(low_risk_root / "explicit_required_arg_literal_holdout20_manifest.json", {}) or {}
     alias_dev = _j(low_risk_root / "wrong_arg_key_alias_dev20_manifest.json", {}) or {}
     alias_holdout = _j(low_risk_root / "wrong_arg_key_alias_holdout20_manifest.json", {}) or {}
+    deterministic_dev = _j(low_risk_root / "deterministic_schema_local_dev20_manifest.json", {}) or {}
+    deterministic_holdout = _j(low_risk_root / "deterministic_schema_local_holdout20_manifest.json", {}) or {}
     combined_dev = _j(low_risk_root / "theory_prior_low_risk_dev20_manifest.json", {}) or {}
     combined_holdout = _j(low_risk_root / "theory_prior_low_risk_holdout20_manifest.json", {}) or {}
     strat_dev = _j(low_risk_root / "stratified_low_risk_dev20_manifest.json", {}) or {}
@@ -57,25 +60,30 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
     holdout_ids = set(str(x) for x in holdout.get("selected_case_ids") or [])
     alias_dev_ids = set(str(x) for x in alias_dev.get("selected_case_ids") or [])
     alias_holdout_ids = set(str(x) for x in alias_holdout.get("selected_case_ids") or [])
+    deterministic_dev_ids = set(str(x) for x in deterministic_dev.get("selected_case_ids") or [])
+    deterministic_holdout_ids = set(str(x) for x in deterministic_holdout.get("selected_case_ids") or [])
     combined_dev_ids = set(str(x) for x in combined_dev.get("selected_case_ids") or []) or dev_ids
     combined_holdout_ids = set(str(x) for x in combined_holdout.get("selected_case_ids") or []) or holdout_ids
     strat_dev_ids = set(str(x) for x in strat_dev.get("selected_case_ids") or [])
     strat_holdout_ids = set(str(x) for x in strat_holdout.get("selected_case_ids") or [])
     explicit_disjoint = not (dev_ids & holdout_ids)
     alias_disjoint = not (alias_dev_ids & alias_holdout_ids)
+    deterministic_disjoint = not (deterministic_dev_ids & deterministic_holdout_ids)
     combined_disjoint = not (combined_dev_ids & combined_holdout_ids)
     stratified_disjoint = not (strat_dev_ids & strat_holdout_ids)
 
     compiler_ready = bool(compiler.get("compiler_ready") or compiler.get("m28pre_explicit_required_arg_literal_compiler_passed"))
     explicit_holdout_ready = bool(compiler.get("explicit_holdout_ready") or compiler.get("m28pre_explicit_required_arg_literal_holdout_ready")) and explicit_disjoint
     alias_holdout_ready = bool(compiler.get("wrong_arg_key_alias_holdout_ready")) and alias_disjoint
+    deterministic_holdout_ready = bool(compiler.get("deterministic_schema_local_holdout_ready")) and deterministic_disjoint
     combined_holdout_ready = bool(compiler.get("combined_theory_prior_holdout_ready", compiler.get("explicit_holdout_ready") or compiler.get("m28pre_explicit_required_arg_literal_holdout_ready"))) and combined_disjoint
     stratified_holdout_ready = bool(compiler.get("stratified_holdout_ready")) and stratified_disjoint
-    no_scorer_commands = _no_commands(compiler, coverage, raw_coverage, availability, alias_coverage, dev, holdout, alias_dev, alias_holdout, combined_dev, combined_holdout, strat_dev, strat_holdout)
+    no_scorer_commands = _no_commands(compiler, coverage, raw_coverage, availability, alias_coverage, deterministic_coverage, dev, holdout, alias_dev, alias_holdout, deterministic_dev, deterministic_holdout, combined_dev, combined_holdout, strat_dev, strat_holdout)
 
     explicit_retain_count = int(compiler.get("retain_eligible_candidate_count") or 0)
     alias_retain_count = int(compiler.get("wrong_arg_key_alias_demote_candidate_count") or 0)
-    combined_retain_count = int(compiler.get("combined_retain_eligible_candidate_count") or explicit_retain_count + alias_retain_count)
+    deterministic_retain_count = int(compiler.get("deterministic_schema_local_demote_candidate_count") or 0)
+    combined_retain_count = int(compiler.get("combined_retain_eligible_candidate_count") or explicit_retain_count + deterministic_retain_count)
     required_generatable = int(compiler.get("required_explicit_candidate_generatable") or DEFAULT_REQUIRED_EXPLICIT_GENERATABLE)
     coverage_ready = bool(coverage.get("m28pre_retention_prior_coverage_audit_ready"))
     coverage_zero = bool(coverage.get("explicit_prior_family_coverage_zero"))
@@ -87,13 +95,15 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
     source_result_availability_ready = bool(availability.get("source_result_availability_ready"))
     alias_coverage_ready = bool(alias_coverage.get("wrong_arg_key_alias_coverage_audit_ready"))
     alias_family_coverage_zero = bool(alias_coverage.get("wrong_arg_key_alias_family_coverage_zero"))
+    deterministic_coverage_ready = bool(deterministic_coverage.get("deterministic_schema_local_coverage_audit_ready"))
+    deterministic_family_coverage_zero = bool(deterministic_coverage.get("deterministic_schema_local_family_coverage_zero"))
     remaining_gap_to_35 = max(0, required_generatable - combined_retain_count)
     prior_scan_category_coverage = compiler.get("prior_scan_category_coverage") or {}
     alias_scan_category_coverage = compiler.get("alias_scan_category_coverage") or {}
     compiler_category_coverage = compiler.get("compiler_category_coverage") or {}
-    route_recommendation = alias_coverage.get("route_recommendation") or compiler.get("route_recommendation")
+    route_recommendation = deterministic_coverage.get("route_recommendation") or alias_coverage.get("route_recommendation") or compiler.get("route_recommendation")
 
-    allowed_families = {"explicit_required_arg_literal_completion", "wrong_arg_key_alias_repair"}
+    allowed_families = {"explicit_required_arg_literal_completion", "wrong_arg_key_alias_repair", "deterministic_schema_local_non_live_repair"}
     families = set(str(f) for f in (compiler.get("authorized_theory_prior_families") or []))
     if not families and compiler.get("candidate_rules_type") == "explicit_required_arg_literal_completion":
         families = {"explicit_required_arg_literal_completion"}
@@ -129,10 +139,12 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         "compiler_ready": compiler_ready,
         "explicit_holdout_ready": explicit_holdout_ready,
         "wrong_arg_key_alias_holdout_ready": alias_holdout_ready,
+        "deterministic_schema_local_holdout_ready": deterministic_holdout_ready,
         "combined_theory_prior_holdout_ready": combined_holdout_ready,
         "stratified_holdout_ready": stratified_holdout_ready,
         "dev_holdout_disjoint": explicit_disjoint,
         "wrong_arg_key_alias_dev_holdout_disjoint": alias_disjoint,
+        "deterministic_schema_local_dev_holdout_disjoint": deterministic_disjoint,
         "combined_dev_holdout_disjoint": combined_disjoint,
         "stratified_dev_holdout_disjoint": stratified_disjoint,
         "no_scorer_commands": no_scorer_commands,
@@ -145,6 +157,8 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         "source_result_availability_ready": source_result_availability_ready,
         "wrong_arg_key_alias_coverage_audit_ready": alias_coverage_ready,
         "wrong_arg_key_alias_family_coverage_zero": alias_family_coverage_zero,
+        "deterministic_schema_local_coverage_audit_ready": deterministic_coverage_ready,
+        "deterministic_schema_local_family_coverage_zero": deterministic_family_coverage_zero,
         "explicit_family_scorer_authorization_ready": explicit_family_ready,
         "combined_theory_prior_scorer_authorization_ready": combined_family_ready,
     }
@@ -177,6 +191,10 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         blockers.append("wrong_arg_key_alias_coverage_audit_missing")
     if alias_family_coverage_zero:
         blockers.append("wrong_arg_key_alias_family_coverage_zero")
+    if not deterministic_coverage_ready:
+        blockers.append("deterministic_schema_local_coverage_audit_missing")
+    if deterministic_family_coverage_zero:
+        blockers.append("deterministic_schema_local_family_coverage_zero")
     if combined_retain_count < required_generatable:
         blockers.append("combined_demote_candidate_below_35")
     compiler_blockers = compiler.get("blockers") or []
@@ -192,6 +210,7 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         checks["source_result_availability_audit_ready"],
         checks["source_result_availability_ready"],
         checks["wrong_arg_key_alias_coverage_audit_ready"],
+        checks["deterministic_schema_local_coverage_audit_ready"],
         checks["combined_theory_prior_scorer_authorization_ready"],
     ])
     return {
@@ -202,6 +221,17 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         "prior_scan_category_coverage": prior_scan_category_coverage,
         "alias_scan_category_coverage": alias_scan_category_coverage,
         "compiler_category_coverage": compiler_category_coverage,
+        "deterministic_schema_local_coverage_audit": {key: deterministic_coverage.get(key) for key in [
+            "deterministic_schema_local_coverage_audit_ready",
+            "deterministic_schema_local_candidate_count",
+            "deterministic_schema_local_demote_candidate_count",
+            "deterministic_schema_local_family_coverage_zero",
+            "rejection_reason_counts",
+            "route_recommendation",
+            "blockers",
+            "candidate_commands",
+            "planned_commands",
+        ]},
         "wrong_arg_key_alias_coverage_audit": {key: alias_coverage.get(key) for key in [
             "wrong_arg_key_alias_coverage_audit_ready",
             "wrong_arg_key_alias_candidate_count",
@@ -224,6 +254,10 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
             "wrong_arg_key_alias_demote_candidate_count",
             "wrong_arg_key_alias_ambiguous_count",
             "wrong_arg_key_alias_value_mutation_count",
+            "deterministic_schema_local_candidate_count",
+            "deterministic_schema_local_demote_candidate_count",
+            "deterministic_schema_local_ambiguous_count",
+            "deterministic_schema_local_value_creation_count",
             "combined_retain_eligible_candidate_count",
             "stratified_selected_case_count",
             "stratified_candidate_generatable_count",
@@ -242,6 +276,7 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
             "retention_prior_rule_families",
             "retention_prior_distribution",
             "wrong_arg_key_alias_retention_prior_distribution",
+            "deterministic_schema_local_retention_prior_distribution",
             "combined_retention_prior_distribution",
             "stratified_retention_prior_distribution",
             "retain_eligible_candidate_count",
@@ -288,6 +323,8 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         "holdout_manifest": {key: holdout.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "authorized_theory_prior_families", "no_next_tool_intervention", "exact_tool_choice"]},
         "wrong_arg_key_alias_dev_manifest": {key: alias_dev.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "authorized_theory_prior_families", "no_next_tool_intervention", "exact_tool_choice"]},
         "wrong_arg_key_alias_holdout_manifest": {key: alias_holdout.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "authorized_theory_prior_families", "no_next_tool_intervention", "exact_tool_choice"]},
+        "deterministic_schema_local_dev_manifest": {key: deterministic_dev.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "authorized_theory_prior_families", "no_next_tool_intervention", "exact_tool_choice"]},
+        "deterministic_schema_local_holdout_manifest": {key: deterministic_holdout.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "authorized_theory_prior_families", "no_next_tool_intervention", "exact_tool_choice"]},
         "combined_dev_manifest": {key: combined_dev.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "authorized_theory_prior_families", "no_next_tool_intervention", "exact_tool_choice"]},
         "combined_holdout_manifest": {key: combined_holdout.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "authorized_theory_prior_families", "no_next_tool_intervention", "exact_tool_choice"]},
         "stratified_dev_manifest": {key: strat_dev.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "no_next_tool_intervention", "exact_tool_choice"]},
@@ -330,6 +367,8 @@ def render_markdown(report: dict[str, Any]) -> str:
         "source_result_availability_ready",
         "wrong_arg_key_alias_coverage_audit_ready",
         "wrong_arg_key_alias_family_coverage_zero",
+        "deterministic_schema_local_coverage_audit_ready",
+        "deterministic_schema_local_family_coverage_zero",
         "no_scorer_commands",
         "runtime_manifest_safeguards_passed",
     ]:
@@ -367,6 +406,8 @@ def main() -> int:
             "source_result_availability_ready",
             "wrong_arg_key_alias_coverage_audit_ready",
             "wrong_arg_key_alias_family_coverage_zero",
+            "deterministic_schema_local_coverage_audit_ready",
+            "deterministic_schema_local_family_coverage_zero",
             "remaining_gap_to_35_demote_candidates",
             "route_recommendation",
             "no_scorer_commands",

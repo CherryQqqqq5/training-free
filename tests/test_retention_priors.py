@@ -117,3 +117,47 @@ def test_wrong_arg_key_alias_rejects_ambiguous_or_mutating_repairs() -> None:
     prior = evaluate_retention_prior(mutating)
     assert prior["retain_eligibility"] == NEVER_RETAIN
     assert prior["prior_rejection_reason"] == "trajectory_tool_or_value_mutation"
+
+
+from grc.compiler.retention_priors import deterministic_schema_local_non_live_prior
+
+
+def _valid_deterministic_rule() -> dict:
+    return {
+        "rule_type": "deterministic_schema_local_non_live_repair",
+        "candidate_rules_type": "deterministic_schema_local_non_live_repair",
+        "tool": "set_flag",
+        "arg_key": "enabled",
+        "original_value": "true",
+        "normalized_value": True,
+        "repair_kind": "boolean_string_normalization",
+        "schema_local_deterministic": True,
+        "tool_call_mapping_unique": True,
+        "value_creation": False,
+        "gold_value_mutation": False,
+        "no_next_tool_intervention": True,
+        "exact_tool_choice": False,
+        "ctspc_v0_action_rule": False,
+        "tool_choice_mutation": False,
+        "trajectory_mutation": False,
+    }
+
+
+def test_deterministic_schema_local_repair_is_demote_candidate() -> None:
+    prior = deterministic_schema_local_non_live_prior(_valid_deterministic_rule())
+    assert prior["rule_family"] == "deterministic_schema_local_non_live_repair"
+    assert prior["theory_class"] == "schema_local_deterministic_normalization"
+    assert prior["intervention_scope"] == "argument_value_or_call_shape_only"
+    assert prior["gold_value_mutation"] is False
+    assert prior["retain_eligibility"] == DEMOTE_CANDIDATE
+
+
+def test_deterministic_schema_local_rejects_value_creation_or_mutation() -> None:
+    created = _valid_deterministic_rule()
+    created["value_creation"] = True
+    assert deterministic_schema_local_non_live_prior(created)["retain_eligibility"] == DIAGNOSTIC_ONLY
+
+    mutating = _valid_deterministic_rule()
+    mutating["exact_tool_choice"] = True
+    prior = evaluate_retention_prior(mutating)
+    assert prior["retain_eligibility"] == NEVER_RETAIN

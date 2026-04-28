@@ -33,6 +33,7 @@ BFCL_FAILURE_REASONS = {
 
 EXPLICIT_REQUIRED_ARG_LITERAL_FAMILY = "explicit_required_arg_literal_completion"
 WRONG_ARG_KEY_ALIAS_FAMILY = "wrong_arg_key_alias_repair"
+DETERMINISTIC_SCHEMA_LOCAL_NON_LIVE_FAMILY = "deterministic_schema_local_non_live_repair"
 
 
 def _truthy(value: Any) -> bool:
@@ -46,6 +47,9 @@ def _base_prior(rule: dict[str, Any], eligibility: str, *, reason: str | None = 
     if family == WRONG_ARG_KEY_ALIAS_FAMILY:
         theory_class = "schema_local_argument_normalization"
         intervention_scope = "argument_key_only"
+    if family == DETERMINISTIC_SCHEMA_LOCAL_NON_LIVE_FAMILY:
+        theory_class = "schema_local_deterministic_normalization"
+        intervention_scope = "argument_value_or_call_shape_only"
     prior = {
         "rule_family": family,
         "theory_class": theory_class,
@@ -180,6 +184,70 @@ def wrong_arg_key_alias_prior(rule: dict[str, Any]) -> dict[str, Any]:
     return prior
 
 
+
+
+def deterministic_schema_local_non_live_prior(rule: dict[str, Any]) -> dict[str, Any]:
+    """Return the theory prior for deterministic schema-local non-live repair."""
+    family = str(rule.get("candidate_rules_type") or rule.get("rule_type") or "")
+    if family != DETERMINISTIC_SCHEMA_LOCAL_NON_LIVE_FAMILY:
+        return _base_prior(rule, NEVER_RETAIN, reason="unsupported_rule_family")
+
+    deterministic = rule.get("schema_local_deterministic") is True
+    tool_call_unique = rule.get("tool_call_mapping_unique") is True
+    value_creation = rule.get("value_creation") is True
+    gold_value_mutation = rule.get("gold_value_mutation") is True
+    schema_ambiguous = rule.get("schema_match_ambiguous") is True or rule.get("repair_ambiguous") is True
+    hidden_state = rule.get("hidden_state_category") is True or str(rule.get("category") or "") in {"memory", "memory_kv", "memory_rec_sum", "memory_vector"}
+    has_values = rule.get("original_value") is not None and rule.get("normalized_value") is not None
+    no_tool_mutation = (
+        _truthy(rule.get("no_next_tool_intervention"))
+        and rule.get("exact_tool_choice") is False
+        and not _truthy(rule.get("ctspc_v0_action_rule"))
+        and rule.get("tool_choice_mutation") is False
+        and rule.get("trajectory_mutation") is False
+    )
+    rejection = rule.get("rejection_reason")
+
+    eligibility = DEMOTE_CANDIDATE
+    reason = None
+    if hidden_state:
+        eligibility = DIAGNOSTIC_ONLY
+        reason = "memory_or_hidden_state_category_excluded"
+    elif not deterministic or schema_ambiguous:
+        eligibility = DIAGNOSTIC_ONLY
+        reason = "ambiguous_or_non_deterministic_schema_repair"
+    elif not tool_call_unique:
+        eligibility = DIAGNOSTIC_ONLY
+        reason = "parallel_call_mapping_not_unique"
+    elif value_creation or gold_value_mutation or not has_values:
+        eligibility = DIAGNOSTIC_ONLY
+        reason = "value_creation_or_gold_value_mutation"
+    elif not no_tool_mutation:
+        eligibility = NEVER_RETAIN
+        reason = "trajectory_or_tool_choice_mutation"
+    elif rejection:
+        eligibility = DIAGNOSTIC_ONLY
+        reason = str(rejection)
+
+    prior = {
+        "rule_family": DETERMINISTIC_SCHEMA_LOCAL_NON_LIVE_FAMILY,
+        "theory_class": "schema_local_deterministic_normalization",
+        "intervention_scope": "argument_value_or_call_shape_only",
+        "trajectory_mutation": False,
+        "tool_choice_mutation": False,
+        "exact_tool_choice": False,
+        "gold_value_mutation": False,
+        "value_creation": False,
+        "schema_local_deterministic": deterministic,
+        "precondition_observable": has_values and deterministic and tool_call_unique and not hidden_state,
+        "postcondition_local": True,
+        "repair_kind": str(rule.get("repair_kind") or "unknown"),
+        "retain_eligibility": eligibility,
+    }
+    if reason:
+        prior["prior_rejection_reason"] = reason
+    return prior
+
 def evaluate_retention_prior(rule: dict[str, Any]) -> dict[str, Any]:
     """Normalize or infer a rule retention prior.
 
@@ -210,6 +278,8 @@ def evaluate_retention_prior(rule: dict[str, Any]) -> dict[str, Any]:
         return explicit_required_arg_literal_prior(rule)
     if family == WRONG_ARG_KEY_ALIAS_FAMILY:
         return wrong_arg_key_alias_prior(rule)
+    if family == DETERMINISTIC_SCHEMA_LOCAL_NON_LIVE_FAMILY:
+        return deterministic_schema_local_non_live_prior(rule)
     return _base_prior(rule, NEVER_RETAIN, reason="missing_retention_prior")
 
 

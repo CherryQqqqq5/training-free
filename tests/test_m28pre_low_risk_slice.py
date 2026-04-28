@@ -128,6 +128,7 @@ def test_m28pre_offline_requires_freeze_repair_compiler_holdout_coverage_and_no_
     _wj(low / "raw_bfcl_literal_coverage_audit.json", {"m28pre_raw_bfcl_literal_coverage_audit_ready": True, "source_result_literals_prompt_anchored_count": 35, "source_result_literals_prompt_coverage_zero": False, "candidate_commands": [], "planned_commands": []})
     _wj(low / "m28pre_source_result_availability_audit.json", {"source_result_availability_audit_ready": True, "source_result_availability_ready": True, "hard_issue_counts": {}, "issue_counts": {}, "candidate_commands": [], "planned_commands": []})
     _wj(low / "wrong_arg_key_alias_coverage_audit.json", {"wrong_arg_key_alias_coverage_audit_ready": True, "wrong_arg_key_alias_family_coverage_zero": False, "wrong_arg_key_alias_demote_candidate_count": 0, "candidate_commands": [], "planned_commands": []})
+    _wj(low / "deterministic_schema_local_coverage_audit.json", {"deterministic_schema_local_coverage_audit_ready": True, "deterministic_schema_local_family_coverage_zero": False, "deterministic_schema_local_demote_candidate_count": 0, "candidate_commands": [], "planned_commands": []})
 
     report = evaluate_m28pre(subset, low)
 
@@ -203,6 +204,7 @@ def test_m28pre_safeguards_fail_when_ctspc_or_repair_stack_enabled(tmp_path: Pat
     _wj(low / "raw_bfcl_literal_coverage_audit.json", {"m28pre_raw_bfcl_literal_coverage_audit_ready": True, "source_result_literals_prompt_anchored_count": 35, "source_result_literals_prompt_coverage_zero": False, "candidate_commands": [], "planned_commands": []})
     _wj(low / "m28pre_source_result_availability_audit.json", {"source_result_availability_audit_ready": True, "source_result_availability_ready": True, "hard_issue_counts": {}, "issue_counts": {}, "candidate_commands": [], "planned_commands": []})
     _wj(low / "wrong_arg_key_alias_coverage_audit.json", {"wrong_arg_key_alias_coverage_audit_ready": True, "wrong_arg_key_alias_family_coverage_zero": False, "wrong_arg_key_alias_demote_candidate_count": 0, "candidate_commands": [], "planned_commands": []})
+    _wj(low / "deterministic_schema_local_coverage_audit.json", {"deterministic_schema_local_coverage_audit_ready": True, "deterministic_schema_local_family_coverage_zero": False, "deterministic_schema_local_demote_candidate_count": 0, "candidate_commands": [], "planned_commands": []})
 
     report = evaluate_m28pre(subset, low)
 
@@ -570,15 +572,19 @@ def test_wrong_arg_key_alias_rejects_ambiguous_present_or_nonunique_calls(tmp_pa
     assert "parallel_call_mapping_not_unique" in reasons
 
 
-def test_combined_theory_prior_pool_can_authorize_only_explicit_and_alias(tmp_path: Path, monkeypatch) -> None:
+def test_combined_theory_prior_pool_can_authorize_explicit_and_deterministic(tmp_path: Path, monkeypatch) -> None:
     source = tmp_path / "source"
     category = "simple_python"
     entries = {}
     results = []
     for i in range(35):
-        case_id = f"alias_{i}"
-        entries[case_id] = _alias_entry(case_id, "cat", "file_name")
-        results.append({"id": case_id, "result": [{"cat": json.dumps({"filename": f"report_{i}.txt"})}]})
+        case_id = f"det_{i}"
+        entries[case_id] = {
+            "id": case_id,
+            "question": [[{"role": "user", "content": "Use the emitted tool arguments exactly as provided."}]],
+            "function": [{"name": "set_count", "parameters": {"type": "dict", "properties": {"count": {"type": "integer"}}, "required": ["count"]}}],
+        }
+        results.append({"id": case_id, "result": [{"set_count": json.dumps({"count": str(i)})}]})
     monkeypatch.setattr(explicit_builder, "_load_dataset_records", lambda cat: entries if cat == category else {})
     low = tmp_path / "low.json"
     status = tmp_path / "status.json"
@@ -592,7 +598,7 @@ def test_combined_theory_prior_pool_can_authorize_only_explicit_and_alias(tmp_pa
 
     assert report["combined_retain_eligible_candidate_count"] == 35
     assert report["combined_theory_prior_holdout_ready"] is False
-    assert report["wrong_arg_key_alias_demote_candidate_count"] == 35
-    assert set(report["combined_dev_manifest"]["authorized_theory_prior_families"]) == {"wrong_arg_key_alias_repair"}
+    assert report["deterministic_schema_local_demote_candidate_count"] == 35
+    assert set(report["combined_dev_manifest"]["authorized_theory_prior_families"]) == {"deterministic_schema_local_non_live_repair"}
     assert report["planned_commands"] == []
     assert report["candidate_commands"] == []
