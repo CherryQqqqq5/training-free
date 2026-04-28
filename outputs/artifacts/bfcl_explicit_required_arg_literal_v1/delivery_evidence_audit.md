@@ -109,6 +109,14 @@
 - Eligible by capability: `{'memory_retrieve': 48, 'read_content': 1}`
 - Negative-control activations: `0`
 - Performance claim ready: `False`
+- Protocol ready for review: `True`
+- Protocol lane: `memory_heavy_first_smoke`
+- Protocol positive / control cases: `12` / `8`
+- Protocol memory-heavy: `True`
+- Protocol separate approval required: `True`
+- Protocol approval/execution: `pending` / `False`
+- Protocol candidate frozen/hash: `True` / `72aeb6ac7d57031c777037f208f3910f3214c255af2d3ec7ffdff8ed522caff8`
+- Protocol allowed providers: `['novacode']`
 - Blockers: `[]`
 - Next action: `build_multi_family_smoke_protocol`
 
