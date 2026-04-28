@@ -22,12 +22,17 @@
 - Selected next tool: `0`
 - Next tool emitted: `0`
 - Policy conversion observed: `False`
+- Rule hits without policy hits: `388`
+- Policy conversion absent reason: `policy_artifact_or_runtime_candidate_missing`
 
 ## Source/Layout Evidence
 
 - Source result availability ready: `True`
 - Alias family coverage zero: `True`
 - Deterministic family coverage zero: `True`
-- Route recommendation: `fix_parser_or_source_result_layout`
+- Source result root cause: `source_collection_subset_vs_full_dataset_audit_scope_mismatch`
+- Source scope mismatch count: `2065`
+- Audit missing source result count: `1690`
+- Route recommendation: `align_audit_scope_with_source_collection_subset`
 
 This audit is diagnostic. It does not authorize BFCL/model/scorer runs.

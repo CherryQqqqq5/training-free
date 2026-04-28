@@ -69,11 +69,26 @@
   ],
   "policy_conversion": {
     "next_tool_emitted": 0,
+    "policy_artifact_or_runtime_candidate_missing": true,
+    "policy_conversion_absent_reason": "policy_artifact_or_runtime_candidate_missing",
     "policy_conversion_observed": false,
     "policy_hits": 0,
     "recommended_tools": 0,
     "required_tool_choice_records": 0,
     "rule_hits": 388,
+    "rule_hits_without_policy_hits": 388,
+    "sample_rule_hit_no_policy_traces": [
+      "outputs/phase2_validation/required_next_tool_choice_v1/required_target/traces/d5a299ad-cbf1-49c6-8a20-ab4a3c07e44b.json",
+      "outputs/phase2_validation/required_next_tool_choice_v1/required_target/traces/ca2401b9-6b91-4c2e-ae9f-9fcb2ed9b16b.json",
+      "outputs/phase2_validation/required_next_tool_choice_v1/required_target/traces/e7218ae4-910c-4501-8295-2795c341d5f8.json",
+      "outputs/phase2_validation/required_next_tool_choice_v1/required_target/traces/bc50a8c2-8f85-48ca-9d81-8212a8a2eddf.json",
+      "outputs/phase2_validation/required_next_tool_choice_v1/required_target/traces/4d825647-aeaa-4531-a7aa-c8a2c2ced244.json",
+      "outputs/phase2_validation/required_next_tool_choice_v1/required_target/traces/3846d760-2cf6-46bc-9298-e447e4efa9a8.json",
+      "outputs/phase2_validation/required_next_tool_choice_v1/required_target/traces/4f8937ae-62c6-4b8c-b9eb-36c2d839f71b.json",
+      "outputs/phase2_validation/required_next_tool_choice_v1/required_target/traces/13c1837e-c637-45e8-81a2-7c0426f86f4f.json",
+      "outputs/phase2_validation/required_next_tool_choice_v1/required_target/traces/634916eb-00ab-429c-bac3-6fad72c5ec47.json",
+      "outputs/phase2_validation/required_next_tool_choice_v1/required_target/traces/a69830bd-f8f9-426d-8cd1-39217305f869.json"
+    ],
     "selected_next_tool": 0,
     "trace_files_scanned": 5000,
     "trace_root": "outputs/phase2_validation/required_next_tool_choice_v1",
@@ -82,6 +97,7 @@
   "report_scope": "first_stage_delivery_evidence_audit",
   "sota_3pp_claim_ready": false,
   "source_result_layout": {
+    "audit_missing_source_result_count": 1690,
     "availability_hard_issue_counts": {},
     "availability_issue_counts": {
       "baseline_no_tool_call": 30,
@@ -99,8 +115,10 @@
       "no_deterministic_schema_local_repair_detected": 1357,
       "parallel_call_mapping_not_unique": 494
     },
-    "route_recommendation": "fix_parser_or_source_result_layout",
+    "route_recommendation": "align_audit_scope_with_source_collection_subset",
     "source_result_availability_ready": true,
+    "source_result_root_cause": "source_collection_subset_vs_full_dataset_audit_scope_mismatch",
+    "source_scope_mismatch_count": 2065,
     "wrong_arg_key_alias_family_coverage_zero": true,
     "wrong_arg_key_alias_rejection_reason_counts": {
       "memory_or_hidden_state_category_excluded": 465,

@@ -30,6 +30,7 @@ def test_policy_conversion_counters_detect_runtime_fields(tmp_path: Path) -> Non
     assert counters["next_tool_emitted"] == 1
     assert counters["required_tool_choice_records"] == 1
     assert counters["policy_conversion_observed"] is True
+    assert counters["rule_hits_without_policy_hits"] == 0
 
 
 def test_delivery_audit_reports_scaffold_status_when_gates_fail(tmp_path: Path, monkeypatch) -> None:
@@ -56,3 +57,41 @@ def test_delivery_audit_reports_scaffold_status_when_gates_fail(tmp_path: Path, 
     assert "scorer_authorization_not_ready" in report["p0_blockers"]
     assert "policy_conversion_not_observed_in_existing_traces" in report["p0_blockers"]
     assert report["ctspc_v0"]["latest_net_case_gain"] == -3
+
+
+def test_policy_conversion_counters_explain_rule_hits_without_policy(tmp_path: Path) -> None:
+    trace = tmp_path / "run" / "traces" / "trace.json"
+    _wj(trace, {"events": [{"rule_hits": ["r1", "r2"], "request_patches": ["prompt guidance"]}]})
+
+    counters = audit.policy_conversion_counters(tmp_path)
+
+    assert counters["rule_hits"] == 2
+    assert counters["policy_conversion_observed"] is False
+    assert counters["rule_hits_without_policy_hits"] == 2
+    assert counters["policy_conversion_absent_reason"] == "policy_artifact_or_runtime_candidate_missing"
+    assert counters["policy_artifact_or_runtime_candidate_missing"] is True
+    assert counters["sample_rule_hit_no_policy_traces"] == [str(trace)]
+
+
+def test_source_result_layout_status_distinguishes_scope_mismatch_from_parser_bug(tmp_path: Path) -> None:
+    low = tmp_path / "low"
+    _wj(low / "m28pre_source_result_availability_audit.json", {
+        "source_result_availability_ready": True,
+        "hard_issue_counts": {},
+        "issue_counts": {"source_result_case_not_collected": 7},
+    })
+    _wj(low / "wrong_arg_key_alias_coverage_audit.json", {
+        "wrong_arg_key_alias_family_coverage_zero": True,
+        "rejection_reason_counts": {"missing_source_result": 5},
+    })
+    _wj(low / "deterministic_schema_local_coverage_audit.json", {
+        "deterministic_schema_local_family_coverage_zero": True,
+        "rejection_reason_counts": {"missing_source_result": 6},
+    })
+
+    status = audit.source_result_layout_status(low)
+
+    assert status["source_result_root_cause"] == "source_collection_subset_vs_full_dataset_audit_scope_mismatch"
+    assert status["route_recommendation"] == "align_audit_scope_with_source_collection_subset"
+    assert status["source_scope_mismatch_count"] == 7
+    assert status["audit_missing_source_result_count"] == 6

@@ -68,6 +68,7 @@ def policy_conversion_counters(trace_root: Path = DEFAULT_PHASE2_VALIDATION, *, 
         "selected_next_tool": 0,
         "next_tool_emitted": 0,
         "required_tool_choice_records": 0,
+        "sample_rule_hit_no_policy_traces": [],
     }
     for path in _iter_json_files(trace_root):
         if counters["trace_files_scanned"] >= max_files:
@@ -77,16 +78,30 @@ def policy_conversion_counters(trace_root: Path = DEFAULT_PHASE2_VALIDATION, *, 
         data = _load_json(path)
         if data is None:
             continue
+        file_rule_hits = 0
+        file_policy_signal = 0
         for node in _walk_values(data):
             if not isinstance(node, dict):
                 continue
-            counters["rule_hits"] += _truthy_count(node.get("rule_hits"))
+            node_rule_hits = _truthy_count(node.get("rule_hits"))
+            node_policy_signal = (
+                _truthy_count(node.get("policy_hits"))
+                + _truthy_count(node.get("recommended_tools"))
+                + _truthy_count(node.get("selected_next_tool"))
+                + _truthy_count(node.get("next_tool_emitted"))
+            )
+            counters["rule_hits"] += node_rule_hits
             counters["policy_hits"] += _truthy_count(node.get("policy_hits"))
             counters["recommended_tools"] += _truthy_count(node.get("recommended_tools"))
             counters["selected_next_tool"] += _truthy_count(node.get("selected_next_tool"))
             counters["next_tool_emitted"] += _truthy_count(node.get("next_tool_emitted"))
             if node.get("tool_choice_mode") == "required":
                 counters["required_tool_choice_records"] += 1
+                node_policy_signal += 1
+            file_rule_hits += node_rule_hits
+            file_policy_signal += node_policy_signal
+        if file_rule_hits and not file_policy_signal and len(counters["sample_rule_hit_no_policy_traces"]) < 10:
+            counters["sample_rule_hit_no_policy_traces"].append(str(path))
     counters["policy_conversion_observed"] = bool(
         counters["policy_hits"]
         or counters["recommended_tools"]
@@ -94,6 +109,13 @@ def policy_conversion_counters(trace_root: Path = DEFAULT_PHASE2_VALIDATION, *, 
         or counters["next_tool_emitted"]
         or counters["required_tool_choice_records"]
     )
+    counters["rule_hits_without_policy_hits"] = counters["rule_hits"] if not counters["policy_conversion_observed"] else 0
+    if counters["rule_hits"] and not counters["policy_conversion_observed"]:
+        counters["policy_conversion_absent_reason"] = "policy_artifact_or_runtime_candidate_missing"
+        counters["policy_artifact_or_runtime_candidate_missing"] = True
+    else:
+        counters["policy_conversion_absent_reason"] = None
+        counters["policy_artifact_or_runtime_candidate_missing"] = False
     return counters
 
 
@@ -110,15 +132,36 @@ def source_result_layout_status(low_risk_root: Path = DEFAULT_LOW_RISK) -> dict[
     availability = _load_json(low_risk_root / "m28pre_source_result_availability_audit.json", {}) or {}
     alias = _load_json(low_risk_root / "wrong_arg_key_alias_coverage_audit.json", {}) or {}
     deterministic = _load_json(low_risk_root / "deterministic_schema_local_coverage_audit.json", {}) or {}
+    issue_counts = availability.get("issue_counts") or {}
+    hard_issue_counts = availability.get("hard_issue_counts") or {}
+    alias_rejections = alias.get("rejection_reason_counts") or {}
+    deterministic_rejections = deterministic.get("rejection_reason_counts") or {}
+    source_scope_mismatch_count = int(issue_counts.get("source_result_case_not_collected") or 0)
+    audit_missing_source_result_count = max(
+        int(alias_rejections.get("missing_source_result") or 0),
+        int(deterministic_rejections.get("missing_source_result") or 0),
+    )
+    if source_scope_mismatch_count and not hard_issue_counts:
+        root_cause = "source_collection_subset_vs_full_dataset_audit_scope_mismatch"
+        route = "align_audit_scope_with_source_collection_subset"
+    elif hard_issue_counts:
+        root_cause = "source_result_parser_or_layout_hard_issue"
+        route = "fix_parser_or_source_result_layout"
+    else:
+        root_cause = "true_low_family_coverage_or_non_unique_mapping"
+        route = deterministic.get("route_recommendation") or alias.get("route_recommendation")
     return {
         "source_result_availability_ready": availability.get("source_result_availability_ready"),
-        "availability_hard_issue_counts": availability.get("hard_issue_counts") or {},
-        "availability_issue_counts": availability.get("issue_counts") or {},
+        "availability_hard_issue_counts": hard_issue_counts,
+        "availability_issue_counts": issue_counts,
+        "source_scope_mismatch_count": source_scope_mismatch_count,
+        "audit_missing_source_result_count": audit_missing_source_result_count,
+        "source_result_root_cause": root_cause,
         "wrong_arg_key_alias_family_coverage_zero": alias.get("wrong_arg_key_alias_family_coverage_zero"),
-        "wrong_arg_key_alias_rejection_reason_counts": alias.get("rejection_reason_counts") or {},
+        "wrong_arg_key_alias_rejection_reason_counts": alias_rejections,
         "deterministic_schema_local_family_coverage_zero": deterministic.get("deterministic_schema_local_family_coverage_zero"),
-        "deterministic_schema_local_rejection_reason_counts": deterministic.get("rejection_reason_counts") or {},
-        "route_recommendation": deterministic.get("route_recommendation") or alias.get("route_recommendation"),
+        "deterministic_schema_local_rejection_reason_counts": deterministic_rejections,
+        "route_recommendation": route,
     }
 
 
@@ -205,12 +248,17 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Selected next tool: `{report['policy_conversion']['selected_next_tool']}`",
         f"- Next tool emitted: `{report['policy_conversion']['next_tool_emitted']}`",
         f"- Policy conversion observed: `{report['policy_conversion']['policy_conversion_observed']}`",
+        f"- Rule hits without policy hits: `{report['policy_conversion']['rule_hits_without_policy_hits']}`",
+        f"- Policy conversion absent reason: `{report['policy_conversion']['policy_conversion_absent_reason']}`",
         "",
         "## Source/Layout Evidence",
         "",
         f"- Source result availability ready: `{report['source_result_layout']['source_result_availability_ready']}`",
         f"- Alias family coverage zero: `{report['source_result_layout']['wrong_arg_key_alias_family_coverage_zero']}`",
         f"- Deterministic family coverage zero: `{report['source_result_layout']['deterministic_schema_local_family_coverage_zero']}`",
+        f"- Source result root cause: `{report['source_result_layout']['source_result_root_cause']}`",
+        f"- Source scope mismatch count: `{report['source_result_layout']['source_scope_mismatch_count']}`",
+        f"- Audit missing source result count: `{report['source_result_layout']['audit_missing_source_result_count']}`",
         f"- Route recommendation: `{report['source_result_layout']['route_recommendation']}`",
         "",
         "This audit is diagnostic. It does not authorize BFCL/model/scorer runs.",
