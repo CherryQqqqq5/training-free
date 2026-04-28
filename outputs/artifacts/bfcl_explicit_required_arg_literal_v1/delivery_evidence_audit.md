@@ -48,7 +48,9 @@
 - Memory negative controls passed: `True`
 - Memory approval manifest ready: `True`
 - Memory approval manifest sanitized: `True`
-- Memory compiler input eligible count: `0`
+- Memory review manifest compiler input eligible count: `0`
+- Memory compiler allowlist ready: `True`
+- Memory compiler allowlist input count: `48`
 - Memory first-pass review candidates: `48`
 - Memory second-pass review candidates: `30`
 

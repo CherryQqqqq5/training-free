@@ -10,6 +10,7 @@ from typing import Any
 DEFAULT_AUDIT = Path("outputs/artifacts/phase2/memory_operation_obligation_v1/memory_operation_obligation_audit.json")
 DEFAULT_NEGATIVE = Path("outputs/artifacts/phase2/memory_operation_obligation_v1/memory_operation_negative_control_audit.json")
 DEFAULT_APPROVAL = Path("outputs/artifacts/phase2/memory_operation_obligation_v1/memory_operation_approval_manifest.json")
+DEFAULT_ALLOWLIST = Path("outputs/artifacts/phase2/memory_operation_obligation_v1/memory_operation_compiler_allowlist.json")
 ALLOWED_RETRIEVE_TOOLS = {"memory_retrieve", "core_memory_retrieve", "core_memory_retrieve_all", "archival_memory_retrieve", "archival_memory_key_search", "core_memory_key_search", "memory_search", "memory_list", "core_memory_list_keys", "archival_memory_list_keys"}
 FORBIDDEN_TOOLS = re.compile(r"(clear|remove|delete|add|replace|update|append)", re.IGNORECASE)
 REQUIRED_FIELDS = {"candidate_id", "source_audit_record_id", "source_audit_record_pointer_debug_only", "operation", "operation_scope", "recommended_tools", "memory_witness_strength", "forbidden_field_scan", "review_eligible", "risk_level", "runtime_enabled", "exact_tool_choice", "retention_eligibility", "compiler_input_eligible"}
@@ -43,6 +44,27 @@ def _forbidden_key_paths(obj: Any, path: str = "") -> list[str]:
     elif isinstance(obj, list):
         for idx, value in enumerate(obj):
             hits.extend(_forbidden_key_paths(value, f"{path}[{idx}]"))
+    return hits
+
+
+def _forbidden_string_hits(obj: Any, path: str = "") -> list[dict[str, str]]:
+    hits: list[dict[str, str]] = []
+    uuid_re = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", re.IGNORECASE)
+    forbidden_substrings = ("traces/", ".env", "repairs.jsonl", "raw_prompt", "raw_output", "request_original")
+    if isinstance(obj, dict):
+        for key, value in obj.items():
+            key_path = f"{path}.{key}" if path else str(key)
+            hits.extend(_forbidden_string_hits(value, key_path))
+    elif isinstance(obj, list):
+        for idx, value in enumerate(obj):
+            hits.extend(_forbidden_string_hits(value, f"{path}[{idx}]"))
+    elif isinstance(obj, str):
+        lowered = obj.lower()
+        if uuid_re.search(obj):
+            hits.append({"path": path, "reason": "uuid_like_value"})
+        for substring in forbidden_substrings:
+            if substring in lowered:
+                hits.append({"path": path, "reason": f"forbidden_substring:{substring}"})
     return hits
 
 
@@ -97,6 +119,8 @@ def _check_negative(negative: dict[str, Any], report: dict[str, Any], failures: 
     if missing:
         failures.append({"check": "negative_controls_complete", "missing": missing})
     for name, control in controls.items():
+        if int(control.get("evaluated_count") or 0) <= 0:
+            failures.append({"check": "negative_control_has_coverage", "control": name, "evaluated_count": control.get("evaluated_count")})
         if int(control.get("activation_count") or 0) != 0 or control.get("passed") is not True:
             failures.append({"check": "negative_control_zero_activation", "control": name, "activation_count": control.get("activation_count")})
     if int(negative.get("weak_witness_compiler_input_count") or 0) != 0:
@@ -121,7 +145,10 @@ def _check_approval(approval: dict[str, Any], failures: list[dict[str, Any]]) ->
     support_records = approval.get("support_records") or []
     if not support_records:
         failures.append({"check": "approval_support_records_present"})
-    forbidden_paths = _forbidden_key_paths(support_records)
+    forbidden_paths = _forbidden_key_paths(approval)
+    forbidden_string_hits = _forbidden_string_hits(approval)
+    if forbidden_string_hits:
+        failures.append({"check": "approval_manifest_forbidden_values", "hits": forbidden_string_hits[:20]})
     if forbidden_paths:
         failures.append({"check": "approval_manifest_forbidden_keys", "paths": forbidden_paths[:20]})
     for idx, support in enumerate(support_records):
@@ -137,10 +164,45 @@ def _check_approval(approval: dict[str, Any], failures: list[dict[str, Any]]) ->
     return failures
 
 
+def _check_allowlist(allowlist: dict[str, Any], failures: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    if not allowlist:
+        failures.append({"check": "compiler_allowlist_present"})
+        return failures
+    if allowlist.get("candidate_commands") != [] or allowlist.get("planned_commands") != []:
+        failures.append({"check": "compiler_allowlist_no_commands"})
+    if allowlist.get("runtime_enabled") is not False or allowlist.get("compiler_enabled") is not False:
+        failures.append({"check": "compiler_allowlist_runtime_compiler_disabled"})
+    if allowlist.get("compiler_allowlist_ready") is not True:
+        failures.append({"check": "compiler_allowlist_ready"})
+    records = allowlist.get("allowlist_records") or []
+    if not records:
+        failures.append({"check": "compiler_allowlist_records_present"})
+    if int(allowlist.get("compiler_input_eligible_count") or 0) != len(records):
+        failures.append({"check": "compiler_allowlist_count_matches_records", "reported": allowlist.get("compiler_input_eligible_count"), "actual": len(records)})
+    if int(allowlist.get("weak_witness_compiler_input_count") or 0) != 0:
+        failures.append({"check": "compiler_allowlist_no_weak_witness_inputs", "count": allowlist.get("weak_witness_compiler_input_count")})
+    forbidden_paths = _forbidden_key_paths(allowlist)
+    forbidden_string_hits = _forbidden_string_hits(allowlist)
+    if forbidden_paths:
+        failures.append({"check": "compiler_allowlist_forbidden_keys", "paths": forbidden_paths[:20]})
+    if forbidden_string_hits:
+        failures.append({"check": "compiler_allowlist_forbidden_values", "hits": forbidden_string_hits[:20]})
+    for idx, record in enumerate(records):
+        if record.get("support_class") != "first_pass_retrieve" or record.get("memory_witness_strength") != "no_witness":
+            failures.append({"check": "compiler_allowlist_first_pass_only", "index": idx})
+        if record.get("compiler_input_eligible") is not True:
+            failures.append({"check": "compiler_allowlist_record_is_compiler_input", "index": idx})
+    contract = allowlist.get("compiler_contract") or {}
+    if contract.get("compiler_must_read_only_this_allowlist") is not True or contract.get("raw_audit_forbidden_as_compiler_input") is not True:
+        failures.append({"check": "compiler_allowlist_contract"})
+    return failures
+
+
 def evaluate(
     path: Path = DEFAULT_AUDIT,
     negative_path: Path | None = DEFAULT_NEGATIVE,
     approval_path: Path | None = DEFAULT_APPROVAL,
+    allowlist_path: Path | None = DEFAULT_ALLOWLIST,
     *,
     require_approval_artifacts: bool = True,
 ) -> dict[str, Any]:
@@ -149,9 +211,11 @@ def evaluate(
     _check_audit(report, failures)
     negative = _load(negative_path) if negative_path else {}
     approval = _load(approval_path) if approval_path else {}
+    allowlist = _load(allowlist_path) if allowlist_path else {}
     if require_approval_artifacts:
         _check_negative(negative, report, failures)
         _check_approval(approval, failures)
+        _check_allowlist(allowlist, failures)
     return {
         "report_scope": "memory_operation_obligation_boundary_check",
         "memory_operation_obligation_check_passed": not failures,
@@ -162,6 +226,9 @@ def evaluate(
         "negative_control_audit_passed": negative.get("negative_control_audit_passed") if negative else None,
         "approval_manifest_ready_for_review": approval.get("approval_manifest_ready_for_review") if approval else None,
         "approval_manifest_sanitized": approval.get("approval_manifest_sanitized") if approval else None,
+        "compiler_allowlist_present": bool(allowlist),
+        "compiler_allowlist_ready": allowlist.get("compiler_allowlist_ready") if allowlist else None,
+        "compiler_allowlist_input_count": allowlist.get("compiler_input_eligible_count") if allowlist else None,
         "failure_count": len(failures),
         "first_failure": failures[0] if failures else None,
         "failures": failures[:50],
@@ -175,10 +242,11 @@ def main() -> int:
     parser.add_argument("--audit", type=Path, default=DEFAULT_AUDIT)
     parser.add_argument("--negative", type=Path, default=DEFAULT_NEGATIVE)
     parser.add_argument("--approval", type=Path, default=DEFAULT_APPROVAL)
+    parser.add_argument("--allowlist", type=Path, default=DEFAULT_ALLOWLIST)
     parser.add_argument("--compact", action="store_true")
     args = parser.parse_args()
-    report = evaluate(args.audit, args.negative, args.approval)
-    print(json.dumps(report if not args.compact else {key: report.get(key) for key in ["memory_operation_obligation_check_passed", "candidate_count", "reported_candidate_count", "negative_control_audit_passed", "approval_manifest_ready_for_review", "approval_manifest_sanitized", "failure_count", "first_failure"]}, indent=2, sort_keys=True))
+    report = evaluate(args.audit, args.negative, args.approval, args.allowlist)
+    print(json.dumps(report if not args.compact else {key: report.get(key) for key in ["memory_operation_obligation_check_passed", "candidate_count", "reported_candidate_count", "negative_control_audit_passed", "approval_manifest_ready_for_review", "approval_manifest_sanitized", "compiler_allowlist_ready", "compiler_allowlist_input_count", "failure_count", "first_failure"]}, indent=2, sort_keys=True))
     return 0 if report["memory_operation_obligation_check_passed"] else 1
 
 

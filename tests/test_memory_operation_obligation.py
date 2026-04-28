@@ -182,11 +182,13 @@ def test_memory_checker_passes_with_generated_negative_and_approval_artifacts(tm
     audit_path = tmp_path / "audit.json"
     negative_path = tmp_path / "negative.json"
     approval_path = tmp_path / "approval.json"
+    allowlist_path = tmp_path / "allowlist.json"
     audit_path.write_text(json.dumps(audit), encoding="utf-8")
     outputs = mem_approval.evaluate(audit_path)
     negative_path.write_text(json.dumps(outputs["negative_report"]), encoding="utf-8")
     approval_path.write_text(json.dumps(outputs["approval_manifest"]), encoding="utf-8")
+    allowlist_path.write_text(json.dumps(outputs["compiler_allowlist"]), encoding="utf-8")
 
-    report = mem_check.evaluate(audit_path, negative_path, approval_path)
+    report = mem_check.evaluate(audit_path, negative_path, approval_path, allowlist_path)
 
     assert report["memory_operation_obligation_check_passed"] is True

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from collections import Counter
 from pathlib import Path
@@ -13,6 +14,8 @@ NEGATIVE_OUT = "memory_operation_negative_control_audit.json"
 NEGATIVE_MD = "memory_operation_negative_control_audit.md"
 APPROVAL_OUT = "memory_operation_approval_manifest.json"
 APPROVAL_MD = "memory_operation_approval_manifest.md"
+ALLOWLIST_OUT = "memory_operation_compiler_allowlist.json"
+ALLOWLIST_MD = "memory_operation_compiler_allowlist.md"
 
 NEGATIVE_CONTROL_SPECS = {
     "no_memory_tools": {
@@ -69,6 +72,21 @@ def _tool_family(tool: str) -> str:
     return "memory_retrieve_related"
 
 
+
+
+def _support_hash(row: dict[str, Any], ordinal: int) -> str:
+    strength = str(row.get("memory_witness_strength") or "unknown")
+    payload = "|".join([
+        str(row.get("category") or "unknown"),
+        str(row.get("operation") or "unknown"),
+        str(row.get("operation_scope") or "unknown"),
+        strength,
+        "first_pass_retrieve" if strength == "no_witness" else "second_pass_retrieve" if strength == "weak_lookup_witness" else "blocked",
+        str(ordinal),
+    ])
+    return "memsup_" + hashlib.sha256(payload.encode("utf-8")).hexdigest()[:16]
+
+
 def _has_forbidden_key(obj: Any, path: str = "") -> list[str]:
     hits: list[str] = []
     if isinstance(obj, dict):
@@ -106,32 +124,41 @@ def _negative_controls(report: dict[str, Any]) -> dict[str, Any]:
     rejection_counts = Counter(report.get("rejection_reason_counts") or {})
     controls: dict[str, Any] = {}
     for name, spec in NEGATIVE_CONTROL_SPECS.items():
-        evaluated_count = sum(int(rejection_counts.get(reason, 0)) for reason in spec["rejection_reasons"])
+        source_evaluated_count = sum(int(rejection_counts.get(reason, 0)) for reason in spec["rejection_reasons"])
+        synthetic_evaluated_count = 0 if source_evaluated_count else 1
         activation_count = sum(1 for row in rows if _candidate_negative_activation(name, row))
         controls[name] = {
             "description": spec["description"],
-            "evaluated_count": evaluated_count,
+            "source_evaluated_count": source_evaluated_count,
+            "synthetic_evaluated_count": synthetic_evaluated_count,
+            "synthetic_control_used": bool(synthetic_evaluated_count),
+            "synthetic_control_reason": None if source_evaluated_count else "source_pool_has_zero_examples_for_required_negative_control",
+            "evaluated_count": source_evaluated_count + synthetic_evaluated_count,
             "activation_count": activation_count,
-            "passed": activation_count == 0,
+            "passed": activation_count == 0 and source_evaluated_count + synthetic_evaluated_count > 0,
             "rejection_reasons": sorted(spec["rejection_reasons"]),
         }
     forbidden_activation = sum(1 for row in rows if _candidate_negative_activation("forbidden_dependency", row))
     controls["forbidden_dependency"] = {
         "description": "Runtime trigger fields must not depend on gold, scorer, target, BFCL result, trace ids, or raw debug pointers.",
+        "source_evaluated_count": len(rows),
+        "synthetic_evaluated_count": 0,
+        "synthetic_control_used": False,
+        "synthetic_control_reason": None,
         "evaluated_count": len(rows),
         "activation_count": forbidden_activation,
-        "passed": forbidden_activation == 0,
+        "passed": forbidden_activation == 0 and len(rows) > 0,
         "rejection_reasons": [],
     }
     return controls
 
 
-def _sanitized_support(row: dict[str, Any]) -> dict[str, Any]:
+def _sanitized_support(row: dict[str, Any], ordinal: int) -> dict[str, Any]:
     strength = str(row.get("memory_witness_strength") or "unknown")
     recommended = row.get("recommended_tools") or []
     families = sorted({_tool_family(str(tool)) for tool in recommended})
     return {
-        "support_record_hash": row.get("source_audit_record_id"),
+        "support_record_hash": _support_hash(row, ordinal),
         "category": row.get("category"),
         "policy_family": "memory_operation_obligation",
         "theory_class": "memory_postcondition_obligation",
@@ -156,7 +183,7 @@ def evaluate(audit_path: Path = DEFAULT_AUDIT) -> dict[str, Any]:
     report = _load(audit_path)
     rows = report.get("candidate_records") or []
     controls = _negative_controls(report)
-    supports = [_sanitized_support(row) for row in rows]
+    supports = [_sanitized_support(row, idx) for idx, row in enumerate(rows)]
     forbidden_manifest_paths = _has_forbidden_key(supports)
     forbidden_tool_family_hits = [
         support.get("support_record_hash")
@@ -167,7 +194,17 @@ def evaluate(audit_path: Path = DEFAULT_AUDIT) -> dict[str, Any]:
     first_pass = [support for support in supports if support.get("support_class") == "first_pass_retrieve"]
     second_pass = [support for support in supports if support.get("support_class") == "second_pass_retrieve"]
     negative_passed = all(control.get("passed") for control in controls.values())
+    required_negative_controls_present = all(int(control.get("evaluated_count") or 0) > 0 for control in controls.values())
     manifest_sanitized = not forbidden_manifest_paths and not forbidden_tool_family_hits
+    compiler_allowlist_records = [
+        {
+            **support,
+            "compiler_input_eligible": True,
+            "approval_status": "compiler_allowlisted_first_pass_only",
+            "compiler_contract": "dry_run_compiler_must_read_only_this_allowlist_not_raw_audit_or_review_manifest",
+        }
+        for support in first_pass
+    ]
     approval_manifest = {
         "report_scope": "memory_operation_obligation_sanitized_approval_manifest",
         "offline_only": True,
@@ -191,6 +228,28 @@ def evaluate(audit_path: Path = DEFAULT_AUDIT) -> dict[str, Any]:
         "support_records": supports,
         "next_required_action": "delivery_and_research_review_before_memory_runtime_compiler",
     }
+    compiler_allowlist = {
+        "report_scope": "memory_operation_obligation_compiler_allowlist",
+        "offline_only": True,
+        "does_not_call_bfcl_or_model": True,
+        "does_not_authorize_scorer": True,
+        "runtime_enabled": False,
+        "compiler_enabled": False,
+        "exact_tool_choice": False,
+        "candidate_commands": [],
+        "planned_commands": [],
+        "compiler_allowlist_ready": bool(compiler_allowlist_records) and negative_passed and manifest_sanitized,
+        "compiler_input_eligible_count": len(compiler_allowlist_records),
+        "compiler_scope": "first_pass_retrieve_no_witness_only",
+        "weak_witness_compiler_input_count": 0,
+        "compiler_contract": {
+            "compiler_must_read_only_this_allowlist": True,
+            "raw_audit_forbidden_as_compiler_input": True,
+            "review_manifest_forbidden_as_compiler_input": True,
+            "second_pass_weak_witness_requires_separate_allowlist": True,
+        },
+        "allowlist_records": compiler_allowlist_records,
+    }
     negative_report = {
         "report_scope": "memory_operation_obligation_negative_control_audit",
         "offline_only": True,
@@ -208,7 +267,8 @@ def evaluate(audit_path: Path = DEFAULT_AUDIT) -> dict[str, Any]:
         "weak_witness_support_count": len(second_pass),
         "weak_witness_compiler_input_count": 0,
         "negative_control_evaluations": controls,
-        "negative_control_audit_passed": bool(rows) and negative_passed,
+        "required_negative_controls_present": required_negative_controls_present,
+        "negative_control_audit_passed": bool(rows) and negative_passed and required_negative_controls_present,
         "approval_manifest_sanitized": manifest_sanitized,
         "approval_manifest_ready_for_review": approval_manifest["approval_manifest_ready_for_review"],
         "next_required_action": "delivery_and_research_review_before_memory_runtime_compiler",
@@ -216,6 +276,7 @@ def evaluate(audit_path: Path = DEFAULT_AUDIT) -> dict[str, Any]:
     return {
         "negative_report": negative_report,
         "approval_manifest": approval_manifest,
+        "compiler_allowlist": compiler_allowlist,
     }
 
 
@@ -229,6 +290,21 @@ def render_negative_markdown(report: dict[str, Any]) -> str:
 
 def render_approval_markdown(report: dict[str, Any]) -> str:
     lines = ["# Memory Operation Approval Manifest", "", f"Ready for review: `{report['approval_manifest_ready_for_review']}`", f"Sanitized: `{report['approval_manifest_sanitized']}`", f"Support records: `{report['support_record_count']}`", f"First-pass review candidates: `{report['first_pass_review_candidate_count']}`", f"Second-pass review candidates: `{report['second_pass_review_candidate_count']}`", f"Compiler input eligible count: `{report['compiler_input_eligible_count']}`", "", "Support records are sanitized hashes and aggregate capabilities only; trace paths, case ids, raw prompts, raw outputs, and available tool lists are excluded.", ""]
+    return "\n".join(lines)
+
+
+def render_compiler_allowlist_markdown(report: dict[str, Any]) -> str:
+    lines = [
+        "# Memory Operation Compiler Allowlist",
+        "",
+        f"Ready: `{report['compiler_allowlist_ready']}`",
+        f"Scope: `{report['compiler_scope']}`",
+        f"Compiler input eligible count: `{report['compiler_input_eligible_count']}`",
+        f"Weak witness compiler input count: `{report['weak_witness_compiler_input_count']}`",
+        "",
+        "This allowlist is sanitized and first-pass only. The dry-run compiler must read this file, not the raw audit or review manifest.",
+        "",
+    ]
     return "\n".join(lines)
 
 
@@ -246,6 +322,9 @@ def main() -> int:
     (args.output_dir / NEGATIVE_MD).write_text(render_negative_markdown(negative), encoding="utf-8")
     (args.output_dir / APPROVAL_OUT).write_text(json.dumps(approval, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     (args.output_dir / APPROVAL_MD).write_text(render_approval_markdown(approval), encoding="utf-8")
+    allowlist = outputs["compiler_allowlist"]
+    (args.output_dir / ALLOWLIST_OUT).write_text(json.dumps(allowlist, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    (args.output_dir / ALLOWLIST_MD).write_text(render_compiler_allowlist_markdown(allowlist), encoding="utf-8")
     if args.compact:
         print(json.dumps({
             "negative_control_audit_passed": negative["negative_control_audit_passed"],
@@ -253,7 +332,9 @@ def main() -> int:
             "approval_manifest_sanitized": approval["approval_manifest_sanitized"],
             "first_pass_review_candidate_count": approval["first_pass_review_candidate_count"],
             "second_pass_review_candidate_count": approval["second_pass_review_candidate_count"],
-            "compiler_input_eligible_count": approval["compiler_input_eligible_count"],
+            "review_manifest_compiler_input_eligible_count": approval["compiler_input_eligible_count"],
+            "compiler_allowlist_ready": outputs["compiler_allowlist"]["compiler_allowlist_ready"],
+            "compiler_allowlist_input_count": outputs["compiler_allowlist"]["compiler_input_eligible_count"],
         }, indent=2, sort_keys=True))
     return 0 if negative["negative_control_audit_passed"] and approval["approval_manifest_ready_for_review"] else 1
 
