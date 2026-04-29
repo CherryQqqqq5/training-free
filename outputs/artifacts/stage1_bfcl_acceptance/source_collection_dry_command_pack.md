@@ -3,6 +3,17 @@
 This artifact is a dry command pack only. It does not call the provider, BFCL,
 a model, or a scorer, and it is not performance evidence.
 
+## Acceptance State Boundary
+
+While the acceptance state is `provider_blocked`, this dry command pack is the
+only source-collection-related material that may be reviewed or maintained.
+Actual source collection, baseline scorer, candidate scorer, paired comparison,
+and full-suite BFCL commands are prohibited.
+
+The command templates below become executable only after the state advances to
+`provider_green`, provider unblock is signed, and source collection scope is
+approved. `provider_green` still does not authorize scorer execution.
+
 ## Preconditions
 
 Run only after the provider route is green:

@@ -5,6 +5,18 @@
   "does_not_call_bfcl_or_model": true,
   "does_not_authorize_scorer": true,
   "not_performance_evidence": true,
+  "acceptance_state_boundary": {
+    "provider_blocked_allowed_activity": "review_or_maintain_this_dry_command_pack_only",
+    "provider_blocked_prohibited_commands": [
+      "source_collection_rerun",
+      "baseline_scorer",
+      "candidate_scorer",
+      "paired_comparison",
+      "full_suite_bfcl_evaluation"
+    ],
+    "provider_green_authorizes_source_collection_only_after_provider_unblock_and_scope_signoff": true,
+    "provider_green_does_not_authorize_scorer": true
+  },
   "preconditions": [
     "provider_green_preflight_passed",
     "artifact_boundary_passed",

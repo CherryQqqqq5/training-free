@@ -36,14 +36,21 @@ Exit criteria:
 - Valid provider credential is approved without exposing the credential value.
 - Frozen provider profile, API key env var name, base URL, model route, BFCL
   model alias, and runtime config path are recorded.
-- Provider green preflight is allowed to run.
+- Provider green preflight is approved as the transition gate to
+  `provider_green`.
 
-Allowed commands:
+Allowed activity:
 
-```bash
-python scripts/check_provider_green_preflight.py --compact --strict
-python scripts/check_artifact_boundary.py
+```text
+Review and maintain the dry command pack only:
+outputs/artifacts/stage1_bfcl_acceptance/source_collection_dry_command_pack.md
+outputs/artifacts/stage1_bfcl_acceptance/source_collection_dry_command_pack.json
 ```
+
+The dry command pack is an offline planning artifact. It must not call the
+provider, BFCL, a model, or a scorer. Provider preflight is only the approved
+transition gate after a valid credential is installed; source collection and
+scorer commands remain prohibited while the current state is `provider_blocked`.
 
 Prohibited claim:
 
@@ -52,6 +59,14 @@ Prohibited claim:
 - Scorer authorized.
 - Stage-1 BFCL acceptance complete.
 - SOTA or `+3pp` achieved.
+
+Prohibited commands:
+
+- Source collection reruns.
+- Baseline scorer.
+- Candidate scorer.
+- Paired comparison.
+- Full-suite BFCL evaluation.
 
 ## 2. provider_green
 
@@ -78,6 +93,10 @@ python scripts/check_artifact_boundary.py
 
 After provider unblock sign-off, engineering may run the approved source
 collection commands recorded in the source collection request.
+
+This state authorizes only the provider unblock and source collection path. It
+does not authorize baseline scorer, candidate scorer, paired comparison, dev
+scorer, holdout scorer, or full-suite scorer execution.
 
 Prohibited claim:
 
