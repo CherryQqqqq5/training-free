@@ -42,9 +42,12 @@ Exit criteria:
 Allowed activity:
 
 ```text
-Review and maintain the dry command pack only:
+Review and maintain offline scaffold artifacts only:
 outputs/artifacts/stage1_bfcl_acceptance/source_collection_dry_command_pack.md
 outputs/artifacts/stage1_bfcl_acceptance/source_collection_dry_command_pack.json
+docs/explicit_literal_candidate_expansion_spec.md
+scripts/build_explicit_literal_candidate_pool.py
+tests/test_build_explicit_literal_candidate_pool.py
 ```
 
 The dry command pack is an offline planning artifact. It must not call the
@@ -52,10 +55,26 @@ provider, BFCL, a model, or a scorer. Provider preflight is only the approved
 transition gate after a valid credential is installed; source collection and
 scorer commands remain prohibited while the current state is `provider_blocked`.
 
+Extractor skeleton and fixture-matrix implementation are allowed in
+`provider_blocked` only when they remain offline-only and fail-closed:
+
+- They may define parser contracts, fixture matrices, schemas, unit tests, and
+  scaffold output locations.
+- They may read synthetic fixtures or already-committed compact scaffold inputs.
+- They must report `extractor_skeleton_only=true` or otherwise fail closed until
+  real source collection artifacts exist and the extractor implementation is
+  explicitly enabled.
+- Their outputs may be committed only as scaffold evidence, not as source
+  collection evidence, candidate pool readiness, scorer authorization, BFCL
+  performance evidence, or SOTA/`+3pp` evidence.
+- They must keep `does_not_call_provider=true`,
+  `does_not_call_bfcl_or_model=true`, and `does_not_authorize_scorer=true`.
+
 Prohibited claim:
 
 - Provider green.
 - Source collection ready.
+- Candidate pool ready.
 - Scorer authorized.
 - Stage-1 BFCL acceptance complete.
 - SOTA or `+3pp` achieved.
@@ -63,6 +82,8 @@ Prohibited claim:
 Prohibited commands:
 
 - Source collection reruns.
+- Live provider calls.
+- BFCL/model runs.
 - Baseline scorer.
 - Candidate scorer.
 - Paired comparison.
