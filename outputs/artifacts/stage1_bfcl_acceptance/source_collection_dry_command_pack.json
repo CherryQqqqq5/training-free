@@ -1,0 +1,98 @@
+{
+  "report_scope": "provider_green_source_collection_dry_command_pack",
+  "offline_only": true,
+  "does_not_call_provider": true,
+  "does_not_call_bfcl_or_model": true,
+  "does_not_authorize_scorer": true,
+  "not_performance_evidence": true,
+  "preconditions": [
+    "provider_green_preflight_passed",
+    "artifact_boundary_passed",
+    "approved_provider_profile_and_model_route_frozen",
+    "valid_provider_credential_configured"
+  ],
+  "preflight_gate": {
+    "command": "PYTHONPATH=.:src .venv/bin/python scripts/check_provider_green_preflight.py --provider-status outputs/artifacts/bfcl_ctspc_source_pool_v1/current_provider_preflight_status.json --compact --strict",
+    "fail_closed_if": [
+      "provider credential missing",
+      "HTTP 401/403/429",
+      "model unavailable",
+      "tool-call preflight failed",
+      "trace emission failed"
+    ]
+  },
+  "source_collection_priority": [
+    {
+      "priority": 1,
+      "category": "multi_turn_miss_func",
+      "port": 8076,
+      "output_dir": "outputs/artifacts/bfcl_ctspc_source_pool_v1/multi_turn_miss_func/baseline",
+      "command_template": "bash scripts/run_bfcl_v4_baseline.sh gpt-4o-mini-2024-07-18-FC outputs/artifacts/bfcl_ctspc_source_pool_v1/multi_turn_miss_func/baseline 8076 multi_turn_miss_func configs/runtime_bfcl_structured.yaml"
+    },
+    {
+      "priority": 2,
+      "category": "multi_turn_long_context",
+      "port": 8075,
+      "output_dir": "outputs/artifacts/bfcl_ctspc_source_pool_v1/multi_turn_long_context/baseline",
+      "command_template": "bash scripts/run_bfcl_v4_baseline.sh gpt-4o-mini-2024-07-18-FC outputs/artifacts/bfcl_ctspc_source_pool_v1/multi_turn_long_context/baseline 8075 multi_turn_long_context configs/runtime_bfcl_structured.yaml"
+    },
+    {
+      "priority": 3,
+      "category": "multi_turn_base",
+      "port": 8074,
+      "output_dir": "outputs/artifacts/bfcl_ctspc_source_pool_v1/multi_turn_base/baseline",
+      "command_template": "bash scripts/run_bfcl_v4_baseline.sh gpt-4o-mini-2024-07-18-FC outputs/artifacts/bfcl_ctspc_source_pool_v1/multi_turn_base/baseline 8074 multi_turn_base configs/runtime_bfcl_structured.yaml"
+    },
+    {
+      "priority": 4,
+      "category": "parallel_multiple",
+      "port": 8080,
+      "output_dir": "outputs/artifacts/bfcl_ctspc_source_pool_v1/parallel_multiple/baseline",
+      "command_template": "bash scripts/run_bfcl_v4_baseline.sh gpt-4o-mini-2024-07-18-FC outputs/artifacts/bfcl_ctspc_source_pool_v1/parallel_multiple/baseline 8080 parallel_multiple configs/runtime_bfcl_structured.yaml"
+    },
+    {
+      "priority": 5,
+      "category": "multiple",
+      "port": 8078,
+      "output_dir": "outputs/artifacts/bfcl_ctspc_source_pool_v1/multiple/baseline",
+      "command_template": "bash scripts/run_bfcl_v4_baseline.sh gpt-4o-mini-2024-07-18-FC outputs/artifacts/bfcl_ctspc_source_pool_v1/multiple/baseline 8078 multiple configs/runtime_bfcl_structured.yaml"
+    }
+  ],
+  "excluded_from_mainline": [
+    "memory_kv",
+    "memory_rec_sum",
+    "memory_vector"
+  ],
+  "expected_compact_artifacts_per_category": [
+    "artifacts/preflight_report.json",
+    "artifacts/metrics.json",
+    "artifacts/failure_summary.json",
+    "artifacts/run_manifest.json",
+    "bfcl/test_case_ids_to_generate.json"
+  ],
+  "raw_artifacts_must_not_be_committed": [
+    "traces/",
+    "bfcl/result/",
+    "bfcl/score/",
+    "bfcl/.file_locks/",
+    "logs/",
+    ".env",
+    "repairs.jsonl",
+    "*_repair_records.jsonl",
+    "*.log"
+  ],
+  "per_step_fail_closed_gates": [
+    "PYTHONPATH=.:src .venv/bin/python scripts/check_artifact_boundary.py",
+    "verify the command output contains compact artifacts only",
+    "stop on missing preflight_report.json, metrics.json, failure_summary.json, or run_manifest.json",
+    "stop on any provider preflight failure"
+  ],
+  "post_collection_rebuild_and_gates": [
+    "PYTHONPATH=.:src .venv/bin/python scripts/build_m27t_source_pool_manifest.py",
+    "PYTHONPATH=.:src .venv/bin/python scripts/build_m28pre_explicit_required_arg_literal.py",
+    "PYTHONPATH=.:src .venv/bin/python scripts/check_explicit_literal_candidate_pool.py --compact --strict",
+    "PYTHONPATH=.:src .venv/bin/python scripts/check_m28pre_offline.py --compact --strict",
+    "PYTHONPATH=.:src .venv/bin/python scripts/check_artifact_boundary.py"
+  ],
+  "current_expected_status": "blocked_until_provider_green_and_candidate_pool_gates_pass"
+}

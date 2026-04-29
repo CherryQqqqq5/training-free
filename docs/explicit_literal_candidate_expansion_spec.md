@@ -334,6 +334,262 @@ Manifest requirements:
 - `planned_commands=[]`
 - `candidate_commands=[]`
 
+## Extractor Implementation Checklist
+
+Engineering should implement the provider-green extractor as an offline script
+with explicit function boundaries. Recommended entrypoint:
+
+```text
+scripts/build_explicit_literal_candidate_pool.py
+```
+
+The script must not call BFCL, a provider, a model, or a scorer. It reads
+already-collected source artifacts and writes candidate JSONL, audit JSON, and
+dev/holdout manifest drafts only.
+
+### CLI Boundary
+
+Required CLI flags:
+
+- `--source-root`: source collection root containing BFCL result/trace artifacts.
+- `--categories`: comma-separated BFCL categories to scan.
+- `--output-root`: default
+  `outputs/artifacts/bfcl_explicit_required_arg_literal_v1`.
+- `--candidate-jsonl`: default `output-root/candidate_rules.jsonl`.
+- `--audit-json`: default `output-root/explicit_literal_extractor_audit.json`.
+- `--dev-manifest`: default
+  `output-root/explicit_required_arg_literal_dev20_manifest.json`.
+- `--holdout-manifest`: default
+  `output-root/explicit_required_arg_literal_holdout20_manifest.json`.
+- `--min-pool-size`: default `35`.
+- `--dev-count`: default `20`.
+- `--holdout-count`: default `20`.
+- `--dry-run`: compute records and audit counts without writing manifests.
+- `--strict`: return non-zero when the offline pool/split gate fails.
+
+The CLI must write `planned_commands=[]` and `candidate_commands=[]` in every
+artifact it owns. Any artifact containing scorer/provider commands is invalid
+for this stage.
+
+### Function Boundaries
+
+Use small pure functions where possible so tests can cover edge cases without
+large BFCL fixtures.
+
+Input loading:
+
+- `load_dataset_records(category: str) -> dict[str, dict]`
+  - wraps `bfcl_eval.utils.load_dataset_entry(category, include_prereq=False)`;
+  - returns records keyed by `id`;
+  - reads only dataset prompt/function schema fields.
+- `find_result_file(source_root: Path, category: str) -> Path | None`
+  - finds `BFCL_v4_{category}_result.json` under `bfcl/result`;
+  - returns `None` instead of raising when missing.
+- `load_result_records(source_root: Path, category: str) -> tuple[dict[str, dict], dict]`
+  - parses JSONL result rows keyed by `id` or `case_id`;
+  - returns stats: raw lines, parsed lines, parse errors, missing ids.
+- `load_trace_records(source_root: Path, category: str) -> dict[str, dict]`
+  - reads trace/request artifacts when present;
+  - must tolerate absent traces and mark `trace_missing_count`;
+  - must not read scorer, gold, expected, reference, or candidate-output paths.
+
+Schema helpers:
+
+- `normalize_tool_name(name: Any) -> str`
+  - normalize dots/spaces consistently with existing M2.8-pre builder.
+- `function_map(dataset_record: dict) -> dict[str, dict]`
+  - maps normalized function name to BFCL function schema;
+  - rejects duplicate normalized names for the case.
+- `required_args(function_schema: dict) -> list[str]`
+  - returns only string required args.
+- `arg_schema(function_schema: dict, arg: str) -> dict`
+  - returns `parameters.properties[arg]` or `{}`.
+
+Tool-call parser:
+
+- `parse_tool_calls(result_record: dict, trace_record: dict | None) -> list[ToolCall]`
+  - accepts the known BFCL layouts: list of `{tool_name: json_args}` mappings,
+    OpenAI-style `tool_calls[].function.{name,arguments}`, and trace-side
+    parsed tool-call lists;
+  - parses JSON string arguments into dicts;
+  - rejects non-object args for explicit literal completion;
+  - preserves call index and raw source path for audit.
+- `match_single_schema_tool_call(calls: list[ToolCall], schema_map: dict) -> ToolCall | Reject`
+  - requires exactly one call to map to exactly one schema function;
+  - when parallel calls are present, accepts only if call-to-schema mapping is
+    unique and the candidate case id remains unique;
+  - otherwise rejects with `parallel_call_mapping_not_unique`,
+    `missing_emitted_tool_call`, or `no_matching_emitted_tool`.
+- `compute_missing_required_args(call_args: dict, required: list[str]) -> list[str]`
+  - returns missing required schema args only;
+  - rejects if zero or more than one missing arg.
+
+Observable-source builder:
+
+- `extract_current_request_text(dataset_record: dict, trace_record: dict | None) -> str`
+  - concatenates model-visible system/user request text for the repaired turn;
+  - must not use gold/reference fields.
+- `extract_current_observation_text(trace_record: dict | None, call_index: int) -> str`
+  - concatenates only tool observations visible before the selected tool call;
+  - rejects observations after the selected call.
+- `observable_sources(...) -> list[ObservableSource]`
+  - returns ordered sources: `current_request` first, then
+    `current_observation`;
+  - each source carries source name, text, and stable source path/turn metadata.
+
+Literal grounder:
+
+- `ground_literals(source: ObservableSource, schema: dict, arg_name: str, emitted_args: dict) -> list[GroundedLiteral]`
+  - extracts schema-compatible literal candidates with start/end offsets;
+  - string: quoted literals, filename/path-like tokens, enum surfaces, and
+    argument-name cue spans;
+  - number/integer: numeric spans with type-safe normalization;
+  - boolean: explicit true/false/yes/no spans;
+  - enum: exact or case-insensitive enum surface, normalized to schema value;
+  - array/object: accept only a single explicit JSON literal span that parses
+    and matches schema shape, otherwise reject.
+- `select_unique_literal(candidates: list[GroundedLiteral]) -> GroundedLiteral | Reject`
+  - removes literals already present in emitted args;
+  - requires exactly one schema-compatible candidate across allowed sources;
+  - rejects with `no_observable_literal`, `ambiguous_observable_literal`, or
+    `schema_type_mismatch`.
+- `literal_source_text_hash(source_text: str, span: tuple[int, int]) -> str`
+  - hashes the exact text slice used for grounding;
+  - the slice must reproduce `selected_literal` or its typed normalized value.
+
+Leakage auditor:
+
+- `audit_record_no_leakage(record: dict, source_metadata: dict) -> tuple[bool, list[str]]`
+  - requires `literal_source in {"current_request", "current_observation"}`;
+  - requires non-empty `literal_source_span`;
+  - requires non-empty `literal_source_text_hash`;
+  - requires `used_gold_fields is False`;
+  - requires `used_score_fields is False`;
+  - requires `used_candidate_output is False`;
+  - rejects `source_result_only` and `source_result_tool_args` as pool sources;
+  - scans field names, source path fragments, and string values for the
+    checker-forbidden tokens: `gold`, `answer`, `expected`, `ground_truth`,
+    `oracle`, `checker`, `reference`, `possible_answer`;
+  - additionally audits algorithm-denied provenance tokens:
+    `score`, `valid`, `scorer`, `candidate_output`, `patched_output`,
+    `holdout_feedback`.
+
+Candidate emitter:
+
+- `build_candidate_record(...) -> dict`
+  - fills every checker-required field in the schema JSON;
+  - sets `candidate_generatable=true`;
+  - sets both `candidate_rules_type` and `rule_type` to
+    `explicit_required_arg_literal_completion`;
+  - sets `retention_prior.retain_eligibility=demote_candidate`;
+  - sets `retention_prior.intervention_scope=argument_only`;
+  - sets `used_gold_fields=false`, `used_score_fields=false`, and
+    `used_candidate_output=false`.
+- `build_reject_record(...) -> dict`
+  - preserves case/category/tool/source context;
+  - sets `candidate_generatable=false`;
+  - sets one stable `rejection_reason`;
+  - never writes rejected records into runtime candidate rules unless the
+    destination is explicitly named as a diagnostic audit file.
+
+Pool selection and manifest splitter:
+
+- `filter_pool_eligible(records: list[dict]) -> list[dict]`
+  - keeps only leakage-clean, demote-candidate, argument-only explicit literal
+    records;
+  - excludes memory categories, source-result-only records, trajectory
+    mutation, and tool-choice mutation;
+  - deduplicates by `case_id` after deterministic sorting.
+- `sort_pool(records: list[dict]) -> list[dict]`
+  - uses the category/source/confidence/tool/case ordering defined in
+    `35+ Pool Selection`.
+- `split_dev_holdout(pool: list[dict], dev_count: int = 20, holdout_count: int = 20) -> tuple[dict, dict]`
+  - runs only after the 35+ filter passes;
+  - selects dev by category round-robin with category/tool/mutating-tool caps;
+  - selects holdout from remaining cases only;
+  - writes zero dev/holdout overlap;
+  - marks `same_source_root_risk` when roots cannot be separated;
+  - never reads or uses scorer feedback.
+- `write_manifest(path: Path, selected: list[dict], pool: list[dict], split_name: str) -> None`
+  - writes all manifest fields listed above;
+  - writes `planned_commands=[]` and `candidate_commands=[]`.
+
+### Implementation Acceptance Checklist
+
+Before requesting scorer authorization, engineering must be able to check every
+box below from local artifacts:
+
+- candidate JSONL exists at
+  `outputs/artifacts/bfcl_explicit_required_arg_literal_v1/candidate_rules.jsonl`;
+- every accepted record has the 17 checker-required fields;
+- every accepted record has non-empty `literal_source_span` and
+  `literal_source_text_hash`;
+- every accepted record has `used_gold_fields=false`,
+  `used_score_fields=false`, and `used_candidate_output=false`;
+- no accepted record contains checker-forbidden provenance tokens outside the
+  allowed provenance flag keys;
+- no accepted record uses `source_result_only` or `source_result_tool_args` as
+  `literal_source`;
+- accepted records are unique by `case_id`;
+- pool has at least 35 deduplicated leakage-clean demote candidates;
+- dev manifest has exactly 20 unique ids;
+- holdout manifest has exactly 20 unique ids or is explicitly absent because
+  formal holdout is not yet authorized;
+- dev and holdout have zero overlap when both exist;
+- manifests contain no scorer/provider commands;
+- `scripts/check_explicit_literal_candidate_pool.py --strict` fails closed until
+  all pool/split conditions are met and passes only after they are met.
+
+### Test Fixture Design
+
+Add focused unit tests under `tests/test_build_explicit_literal_candidate_pool.py`.
+Use `tmp_path` and monkeypatch loaders instead of depending on live BFCL
+installation or provider output.
+
+Minimum fixtures:
+
+- `dataset_record_one_missing_arg`
+  - prompt contains one quoted filename or numeric literal;
+  - function schema has two required args;
+  - emitted tool args include one required arg and miss the grounded arg.
+- `result_record_simple_mapping`
+  - BFCL result layout as `{"result": [{"tool": "{\"arg\": \"x\"}"}]}`.
+- `result_record_openai_tool_call`
+  - OpenAI-style `tool_calls[].function.name/arguments` layout.
+- `trace_record_prior_observation`
+  - contains a prior tool observation with the literal and verifies the
+    selected source is `current_observation`.
+- `parallel_result_ambiguous`
+  - two matching calls or non-unique call/schema mapping; expects
+    `parallel_call_mapping_not_unique`.
+- `source_result_only_literal`
+  - literal appears only in emitted tool args/result, not request/observation;
+    expects reject and no pool eligibility.
+- `gold_leakage_path_or_field`
+  - source metadata includes `gold`, `expected`, or `reference`; expects
+    leakage rejection.
+- `ambiguous_prompt_literals`
+  - two schema-compatible literals in visible context; expects
+    `ambiguous_observable_literal`.
+- `schema_type_mismatch`
+  - prompt literal is visible but cannot normalize to required schema type;
+    expects `schema_type_mismatch`.
+- `dev_holdout_split_40_cases`
+  - 40 accepted records across categories/tools; expects dev20/holdout20,
+    zero overlap, no duplicate ids, and no commands.
+
+Required unit-test assertions:
+
+- accepted record contains the exact 17 checker-required fields;
+- `literal_source_span` is the exact visible text slice;
+- `literal_source_text_hash` changes when the source slice changes;
+- no test fixture reads scorer/gold/candidate-output fields to build a
+  candidate;
+- the candidate JSONL produced from 40 clean fixtures passes
+  `scripts.check_explicit_literal_candidate_pool.evaluate`;
+- fixtures with leakage, source-result-only grounding, missing span/hash,
+  duplicate case ids, or dev/holdout overlap fail closed.
+
 ## Dev Fail and Pass Branch
 
 Dev fail branch:

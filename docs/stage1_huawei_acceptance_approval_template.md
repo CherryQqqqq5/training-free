@@ -18,6 +18,7 @@ Related provider unblock documents:
 
 ```text
 docs/stage1_provider_access_request.md
+docs/stage1_acceptance_state_machine.md
 outputs/artifacts/stage1_bfcl_acceptance/provider_unblock_request.md
 ```
 
