@@ -1235,6 +1235,145 @@ The pool is still not a performance claim. It only authorizes the offline
 candidate-pool gate and a later acceptance-owner scorer authorization request
 when the existing checker passes.
 
+### R5 Provider-Green Source Collection Priority
+
+R5 handles the case where the offline existing source pool has zero usable BFCL
+result files. It defines the smallest source-collection sequence to create
+inputs for `explicit_required_arg_literal_completion` after provider preflight
+is green. R5 is source collection only: it must not run candidate scoring,
+holdout, full-suite scoring, memory policies, postcondition policies, or CTSPC
+trajectory/action policies.
+
+#### Minimal Category Order
+
+Collect categories in batches. After each batch, rebuild the explicit-literal
+candidate pool and run the offline candidate-pool gate. Stop as soon as the
+pool reaches the target metrics below.
+
+Batch 1:
+
+1. `multi_turn_miss_func`
+
+Rationale: this is the highest-yield category for missing required argument
+repairs because the failure mode is directly aligned with a tool/function miss
+or omitted schema argument. It should produce the densest `current_request` and
+prior-observation literal candidates per source-collection run.
+
+Batch 2:
+
+2. `multi_turn_long_context`
+3. `multi_turn_base`
+
+Rationale: both preserve multi-turn observable context, so they are the next
+best source for R2/R3 `current_observation` and same-literal
+request/observation priority candidates. They are still argument-only and do not
+require postcondition or trajectory repair.
+
+Batch 3:
+
+4. `multiple`
+
+Rationale: single-turn or simpler multi-function records may still contain
+prompt-visible missing required literals. They are less targeted than miss-func
+and multi-turn context categories but safer than parallel categories because
+tool-call mapping ambiguity is lower.
+
+Batch 4:
+
+5. `parallel_multiple`
+
+Rationale: this can add candidates, but only when R3 parallel mapping proves a
+unique selected call/schema mapping. Ambiguous rows must reject with
+`parallel_call_mapping_not_unique`, so expected accepted yield is lower and
+rejection accounting is more important.
+
+Do not collect memory categories for the mainline pool. `memory_kv`,
+`memory_rec_sum`, and `memory_vector` may remain diagnostic-only source lanes,
+but they do not count toward 35+ because their improvement mechanism depends on
+memory state rather than deterministic argument literal completion.
+
+#### Stop Criteria
+
+After each batch, run the extractor/checker offline. Stop source collection when
+all of the following are true:
+
+- at least 35 deduplicated accepted candidates;
+- target 40+ accepted candidates if a disjoint dev20/holdout20 split is being
+  prepared;
+- every accepted candidate has
+  `retention_prior.retain_eligibility="demote_candidate"`;
+- every accepted candidate has `literal_source` in
+  `{current_request, current_observation}`;
+- every accepted candidate has non-empty `literal_source_span` and
+  `literal_source_text_hash`;
+- zero accepted candidates from memory categories;
+- zero accepted candidates with `source_result_only`, scorer/gold/reference, or
+  candidate-output provenance;
+- zero duplicate accepted `case_id`s after deterministic sorting;
+- build summary, audit, dev manifest, and holdout manifest contain
+  `planned_commands=[]` and `candidate_commands=[]`;
+- `scripts/check_explicit_literal_candidate_pool.py --strict` passes.
+
+If Batch 4 completes and the pool is still below 35, do not lower the retention
+prior and do not add memory/postcondition/CTSPC. Instead report the category
+yield table, rejection taxonomy counts, and remaining blocker as
+`eligible_explicit_literal_candidates_below_35`.
+
+#### Yield Accounting
+
+Every batch must report:
+
+- scanned category;
+- source root;
+- result file path and parsed row count;
+- trace file availability count;
+- accepted count by source type:
+  `current_request_unique_required_literal`,
+  `current_observation_unique_required_literal`,
+  `current_request_preferred_same_literal`;
+- rejected count by canonical R4 reason;
+- deduplicated accepted count after sorting;
+- cumulative accepted count toward 35 and 40;
+- memory/postcondition/CTSPC accepted count, which must remain zero.
+
+#### Artifact Boundary
+
+R5 source collection must preserve a clean deliverable artifact boundary.
+Deliverable paths under `outputs/artifacts/` may contain only compact manifests,
+metrics, summaries, candidate JSONL, and audit summaries needed by the offline
+gate. They must not contain raw BFCL result trees, traces, logs, provider
+payloads, `.env` material, or repair records such as `repairs.jsonl`.
+
+Raw source diagnostics may be produced only under the explicit source-collection
+run root outside the deliverable summary files, or under another non-deliverable
+diagnostic path that is excluded by `scripts/check_artifact_boundary.py`. The
+source collection manifest may reference those raw paths, but checked-in
+deliverable artifacts must keep only compact counts, hashes, paths, and
+category/source-root status.
+
+After every source-collection batch, run the artifact-boundary gate before using
+the batch for explicit-literal candidate expansion. If raw diagnostics or repair
+records are found under deliverable artifacts, stop and move or exclude them
+before rebuilding the candidate pool.
+
+#### Scope Boundary
+
+Memory, postcondition, and CTSPC remain out of scope for R5 because they change
+the intervention type:
+
+- memory requires hidden or persistent state and cannot prove the literal came
+  from the current prompt/observation span;
+- postcondition-guided repair depends on outcome validation after a tool action,
+  not a deterministic missing-argument precondition;
+- CTSPC repairs trajectory/action choice and can change tool sequence, while
+  the explicit-literal pool must preserve exact tool choice and mutate only a
+  missing argument.
+
+Keeping these out of R5 protects the first-stage claim boundary: the pool tests
+deterministic argument/tool-use repair only, and any later performance result
+can be attributed to `explicit_required_arg_literal_completion` rather than a
+mixed repair stack.
+
 Minimum fixtures:
 
 - `dataset_record_one_missing_arg`

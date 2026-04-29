@@ -25,9 +25,19 @@ base_url:
 upstream_model_route:
 bfcl_model_alias:
 runtime_config_path:
+allowed_categories:
+allowed_splits: provider_preflight, source_collection
+allowed_full_suite: yes | no
+max_requests:
+max_input_tokens:
+max_output_tokens:
+request_timeout_seconds:
+overall_timeout_minutes:
+retry_policy:
+rate_limit_policy:
 allowed_benchmark: BFCL
 allowed_stage: stage1_formal_performance_acceptance
-allowed_scopes: preflight, source_collection, baseline_scorer, candidate_scorer
+allowed_scopes: provider_preflight, source_collection
 ```
 
 Required rules:
@@ -35,12 +45,23 @@ Required rules:
 - `expected_api_key_env` must name the environment variable only. Do not paste
   the credential value into this repository, logs, markdown, JSON, shell history,
   or delivery artifacts.
+- `credential_source` must name the approved secret manager, vault, or local
+  operator handoff process, not the secret value.
 - `base_url` must be sanitized in artifacts.
 - `upstream_model_route`, `bfcl_model_alias`, and `runtime_config_path` must be
   identical for baseline and candidate unless Huawei explicitly approves a
   change.
-- The approval must specify whether the credential is allowed for full-suite
-  BFCL, category BFCL, `dev20`, and `holdout20`.
+- `allowed_categories` must list the exact BFCL categories permitted for
+  provider preflight and source collection.
+- `allowed_splits` must list the exact non-scorer splits permitted before
+  scorer authorization. Provider unblock may authorize `provider_preflight` and
+  `source_collection`; it must not authorize `dev20`, `holdout20`, category
+  scorer, baseline scorer, candidate scorer, or full-suite scorer.
+- `allowed_full_suite` must be explicit. If `yes`, it only means the credential
+  can later be used for a separately signed full-suite scorer request after all
+  gates pass.
+- Budget and timeout fields must be filled before engineering runs provider
+  preflight. Empty budget or timeout fields are a provider-unblock hard fail.
 
 ## 2. BFCL Preflight Checks
 
@@ -50,6 +71,15 @@ The preflight must prove:
 ```text
 credential_present = true
 credential_value_logged = false
+provider_profile = approved value
+expected_api_key_env = approved env var name
+base_url = approved sanitized base URL
+upstream_model_route = approved route
+bfcl_model_alias = approved alias
+runtime_config_path = approved path
+allowed_categories = approved list
+allowed_splits = provider_preflight, source_collection
+budget_timeout_policy_present = true
 upstream_auth_passed = true
 model_route_available = true
 bfcl_compatible_response = true
@@ -68,10 +98,16 @@ Hard fail:
 - Missing credential environment variable.
 - Wrong provider profile, base URL, model route, BFCL model alias, or runtime
   config path.
+- Missing or ambiguous allowed categories, allowed splits, budget, timeout, rate
+  limit, retry policy, or sign-off owner.
 - Tool-call, text-response, trace-emission, or BFCL-compatible response check
   fails.
 - Raw credential, raw provider response, raw trace tree, or `.env` is captured in
   committed artifacts.
+- Source collection compact artifact directories contain `repairs.jsonl`,
+  `*_repair_records.jsonl`, logs, raw traces, raw BFCL result/score trees, or
+  other raw diagnostics. Raw diagnostics must stay outside deliverable
+  `outputs/artifacts/...` compact artifact directories.
 
 ## 3. Success Artifacts
 
@@ -102,6 +138,13 @@ base_url = sanitized
 upstream_model_route
 bfcl_model_alias
 runtime_config_path
+allowed_categories
+allowed_splits
+max_requests
+request_timeout_seconds
+overall_timeout_minutes
+rate_limit_policy
+retry_policy
 provider_green_preflight_passed = true
 artifact_boundary_passed = true
 ```
@@ -138,6 +181,24 @@ provider_access_approval_owner:
 credential_owner:
 huawei_acceptance_owner:
 engineering_execution_owner:
+budget_owner:
+provider_profile:
+expected_api_key_env:
+base_url:
+upstream_model_route:
+bfcl_model_alias:
+runtime_config_path:
+allowed_categories:
+allowed_splits:
+allowed_full_suite:
+max_requests:
+max_input_tokens:
+max_output_tokens:
+request_timeout_seconds:
+overall_timeout_minutes:
+retry_policy:
+rate_limit_policy:
+approval_timestamp_utc:
 ```
 
 Provider access approval allows engineering to run provider preflight only. It

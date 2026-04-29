@@ -16,12 +16,48 @@ Observed state: attempted provider access is failing with HTTP `401` class
 authentication errors. This blocks source collection, baseline scorer, candidate
 scorer, paired comparison, and full-suite BFCL performance claims.
 
+Additional source-artifact state: existing source roots currently contain `0`
+BFCL result files for the formal Stage-1 source collection path. Provider green
+must be cleared before source collection can produce accepted source manifests.
+
 ## Required Next Action
 
 Provide and approve a valid provider credential for the requested Stage-1 BFCL
 provider profile. The credential must be supplied through the approved
 environment variable only; do not commit or paste the credential value into this
 repository.
+
+The credential owner must provide these non-secret fields before engineering can
+attempt provider green preflight:
+
+```text
+provider_profile:
+expected_api_key_env:
+base_url:
+upstream_model_route:
+bfcl_model_alias:
+runtime_config_path:
+allowed_categories:
+allowed_splits: provider_preflight, source_collection
+allowed_full_suite: yes | no
+max_requests:
+max_input_tokens:
+max_output_tokens:
+request_timeout_seconds:
+overall_timeout_minutes:
+retry_policy:
+rate_limit_policy:
+provider_access_approval_owner:
+credential_owner:
+budget_owner:
+huawei_acceptance_owner:
+engineering_execution_owner:
+provider_approval_id:
+approval_timestamp_utc:
+```
+
+Do not provide or record the API key value. `expected_api_key_env` is the
+environment variable name only.
 
 Approval details must be recorded in:
 
@@ -86,13 +122,25 @@ scorer authorized
 ```text
 provider_access_approval_owner:
 credential_owner:
+budget_owner:
 huawei_acceptance_owner:
 engineering_execution_owner:
 provider_approval_id:
 expected_api_key_env:
 provider_profile:
+base_url:
 upstream_model_route:
 bfcl_model_alias:
 runtime_config_path:
+allowed_categories:
+allowed_splits:
+allowed_full_suite:
+max_requests:
+max_input_tokens:
+max_output_tokens:
+request_timeout_seconds:
+overall_timeout_minutes:
+retry_policy:
+rate_limit_policy:
 approval_timestamp_utc:
 ```
