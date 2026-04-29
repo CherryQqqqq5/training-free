@@ -1065,6 +1065,176 @@ Checker expectations:
   checker eligibility because `candidate_generatable=false`, required accepted
   fields may be null, and/or `literal_source` is not one allowed accepted source.
 
+### R4 Offline Candidate-Pool Expansion
+
+R4 is the first source-expansion increment after R2/R3. It uses only existing
+offline BFCL dataset, baseline result, and baseline trace/source artifacts. It
+must not call a provider, run BFCL, invoke a scorer, read gold/reference fields,
+or lower the retention prior. The only accepted repair family remains
+`explicit_required_arg_literal_completion`.
+
+#### Source Search Plan
+
+The extractor should discover inputs in this order:
+
+1. Read the source collection manifest:
+   `outputs/artifacts/bfcl_ctspc_source_pool_v1/source_collection_manifest.json`.
+2. For each `category_status[]` entry, collect `existing_source_roots[]` when
+   present. If `existing_source_roots[]` is absent but
+   `source_artifacts_available=true`, probe the category source root under the
+   manifest root as a fallback.
+3. Within each source root, search for baseline result JSONL files:
+   - `bfcl/result/**/BFCL_v4_{category}_result.json`
+   - `**/BFCL_v4_{category}_result.json`
+4. Within the same source root, search for trace/request artifacts only when
+   they are baseline-side artifacts. Trace files may provide request messages,
+   parsed tool calls, validation issues, and prior observations before the
+   selected call. They must not provide scorer output or gold/reference calls.
+5. Load BFCL dataset records for the same category from the local BFCL dataset
+   loader or an explicit `--dataset-json` fixture. Use only `id`, prompt/messages,
+   function name, function parameter properties, and required args.
+
+R4 category expansion order:
+
+1. `multi_turn_miss_func`
+2. `multi_turn_long_context`
+3. `multi_turn_base`
+4. `parallel_multiple`
+5. `multiple`
+
+Do not include memory categories in the 35+ pool. Memory-heavy records may be
+reported in audit counts only.
+
+#### Accepted Candidate Taxonomy
+
+R4 may accept only these explicit-literal candidate source types:
+
+- `current_request_unique_required_literal`
+  - one emitted tool call maps uniquely to one schema function;
+  - exactly one required arg is missing;
+  - `current_request` contains exactly one schema-compatible literal for that
+    arg;
+  - no conflicting compatible literal exists in prior observations.
+- `current_observation_unique_required_literal`
+  - one emitted tool call maps uniquely to one schema function;
+  - exactly one required arg is missing;
+  - `current_request` contains zero compatible literals;
+  - prior observations before the selected call contain exactly one compatible
+    literal;
+  - no later observation is used.
+- `current_request_preferred_same_literal`
+  - `current_request` and prior observation each contain exactly one compatible
+    literal;
+  - their normalized typed values are equal;
+  - accepted record uses `literal_source="current_request"` and the request
+    span/hash.
+
+All accepted R4 records must keep:
+
+- `candidate_rules_type="explicit_required_arg_literal_completion"`;
+- `rule_type="explicit_required_arg_literal_completion"`;
+- `candidate_generatable=true`;
+- `retention_prior.retain_eligibility="demote_candidate"`;
+- `retention_prior.intervention_scope="argument_only"`;
+- `retention_prior.tool_choice_mutation=false`;
+- `retention_prior.trajectory_mutation=false`;
+- `retention_prior.exact_tool_choice=false`;
+- `used_gold_fields=false`;
+- `used_score_fields=false`;
+- `used_candidate_output=false`;
+- non-empty `literal_source_span`;
+- non-empty `literal_source_text_hash`.
+
+No accepted R4 record may depend on `source_result_only`,
+`source_result_tool_args`, scorer output, candidate output, hidden state, or a
+postcondition.
+
+#### Rejected Candidate Taxonomy
+
+R4 should emit rejected diagnostics for source-expansion accounting, but rejected
+records must not enter `candidate_rules.jsonl` or count toward 35+.
+
+Canonical R4 rejection reasons:
+
+- `missing_source_result`
+  - no result file, empty result file, no matching result row, or invalid result
+    layout for a source root/category.
+- `missing_dataset_record`
+  - result row has a case id that cannot be found in the local BFCL dataset
+    record source.
+- `missing_emitted_tool_call`
+  - result row exists but no emitted tool call can be parsed.
+- `no_matching_emitted_tool`
+  - emitted tool names do not map to the dataset function schema.
+- `parallel_call_mapping_not_unique`
+  - R3 parallel ambiguity: more than one plausible selected call/schema mapping.
+- `missing_schema_properties`
+  - function schema lacks usable `parameters.properties` or `required`.
+- `required_args_already_present`
+  - emitted args already contain all required args.
+- `multiple_missing_required_args`
+  - more than one required arg is absent.
+- `no_observable_literal`
+  - neither current request nor prior observation contains a compatible literal.
+- `ambiguous_observable_literal`
+  - any allowed source has multiple compatible literals, or request and
+    observation contain different compatible literals for the same missing arg.
+- `schema_type_mismatch`
+  - a visible literal is present but cannot normalize to the missing arg schema.
+- `source_result_only`
+  - the literal is only recoverable from emitted result/tool args or non-visible
+    source-result fields.
+- `gold_or_scorer_dependency_detected`
+  - extraction would require denied gold/scorer/reference/provenance fields.
+- `candidate_output_dependency_detected`
+  - extraction would require candidate/patched output.
+
+Rejected records must include `rejection_reason`, category, case id when known,
+source root when known, leakage flags set to false unless the reason itself is a
+detected dependency, and optional diagnostic fields such as `tool_call_count`,
+`matched_tool_call_count`, `missing_required_args`, `literal_candidates`, and
+`literal_candidate_count`.
+
+#### Leakage Guard
+
+R4 must prove each accepted literal is model-visible before the repaired call:
+
+- `literal_source` must be exactly `current_request` or `current_observation`;
+- `literal_source_span.text` must be a slice from the selected source;
+- `literal_source_text_hash` must be computed from the exact span text;
+- observation spans must have turn/call metadata proving they precede the
+  selected emitted call;
+- field names, path fragments, and string payloads used for accepted candidates
+  must not contain denied provenance tokens:
+  `gold`, `answer`, `expected`, `ground_truth`, `oracle`, `checker`,
+  `reference`, `possible_answer`, `score`, `valid`, `scorer`,
+  `candidate_output`, `patched_output`, `holdout_feedback`;
+- dev/holdout scorer feedback must not be read or used for ordering.
+
+If a literal cannot be reproduced from a prompt/observation span, reject it. Do
+not fill from emitted tool args, source result args, scorer labels, or expected
+calls.
+
+#### Target Metrics
+
+R4 target is candidate-pool expansion without lowering the theory prior:
+
+- at least 35 deduplicated, leakage-clean, demote-eligible accepted records;
+- target 40+ accepted records before formal dev/holdout split so dev20 and
+  holdout20 can be disjoint;
+- at least 20 accepted records from `current_request` when available, with
+  observation candidates used only after request-unique cases are exhausted;
+- zero accepted records from memory categories;
+- zero accepted records with `source_result_only` or denied provenance;
+- zero duplicate accepted `case_id`s after deterministic sorting;
+- `reject_reason_counts` reported for every scanned category/source root;
+- no scorer/provider commands in build summary, audit, dev manifest, or holdout
+  manifest.
+
+The pool is still not a performance claim. It only authorizes the offline
+candidate-pool gate and a later acceptance-owner scorer authorization request
+when the existing checker passes.
+
 Minimum fixtures:
 
 - `dataset_record_one_missing_arg`

@@ -41,6 +41,45 @@
   ],
   "does_not_authorize_scorer": true,
   "does_not_call_bfcl_or_model": true,
+  "formal_stage1_blockers_after_r3": [
+    {
+      "blocker": "provider_green",
+      "required_to_clear": "provider_green_preflight_passed=true with approved credential, frozen provider profile, model route, BFCL alias, runtime config, and clean artifact boundary",
+      "current_status": "blocked"
+    },
+    {
+      "blocker": "source_manifests",
+      "required_to_clear": "provider-green source collection manifests signed for the frozen provider/model/protocol and compact artifact boundary",
+      "current_status": "blocked_until_provider_green"
+    },
+    {
+      "blocker": "35_plus_explicit_literal_pool",
+      "required_to_clear": "explicit_literal_candidate_pool_passed=true with at least 35 eligible explicit_required_arg_literal_completion candidates",
+      "current_status": "blocked"
+    },
+    {
+      "blocker": "dev_holdout_split",
+      "required_to_clear": "dev20 and holdout20 manifests ready, disjoint, integrity-checked, and not sourced from scorer/gold leakage",
+      "current_status": "blocked"
+    },
+    {
+      "blocker": "scorer_authorization",
+      "required_to_clear": "provider green, source manifests, no-leakage, dev/holdout split, SOTA/baseline freeze, and explicit literal pool gate all signed",
+      "current_status": "blocked"
+    },
+    {
+      "blocker": "paired_bfcl_scorer",
+      "required_to_clear": "same-protocol baseline and candidate BFCL scorer artifacts, run schemas, manifest alignment, regression report, cost/latency report, and paired comparison",
+      "current_status": "missing"
+    },
+    {
+      "blocker": "sota_3pp_claim",
+      "required_to_clear": "frozen comparator and absolute_delta_pp >= 3.0 with required_3pp_target_passed=true and performance_claim_allowed=true",
+      "current_status": "not_ready"
+    }
+  ],
+  "offline_pool_audit_allowed_without_acceptance_risk": true,
+  "offline_pool_audit_boundary": "Engineering may continue offline extractor, rejection taxonomy, and pool audit work as scaffold/diagnostic evidence only. It must not call provider, BFCL, model, or scorer; must not be counted as source collection evidence, scorer authorization, paired BFCL evidence, or SOTA/+3pp readiness; and accepted offline candidates cannot clear acceptance until provider green, signed source manifests, and pool/split gates pass.",
   "m28pre_offline": {
     "blockers": [
       "combined_theory_prior_holdout_not_ready",
