@@ -130,6 +130,7 @@ baseline_rules_dir:
 candidate_rules_dir:
 candidate_rules_snapshot_sha256:
 candidate_family: explicit_required_arg_literal_completion
+explicit_literal_candidate_pool_passed:
 candidate_generatable_count:
 retain_eligible_candidate_count:
 combined_retain_eligible_candidate_count:
@@ -156,6 +157,7 @@ Minimum approval conditions:
 - `m2_8pre_offline_passed=true`
 - `scorer_authorization_ready=true`
 - `candidate_family=explicit_required_arg_literal_completion`
+- `explicit_literal_candidate_pool_passed=true`
 - `candidate_generatable_count >= 35`
 - `retain_eligible_candidate_count >= 35`
 - `combined_retain_eligible_candidate_count >= 35`
@@ -164,6 +166,16 @@ Minimum approval conditions:
 - `dev_holdout_disjoint=true`
 - `manifest_case_integrity_passed=true`
 - SOTA or accepted baseline comparator is frozen before scorer execution
+
+Explicit-only route hard gate:
+
+- When the Stage-1 route is `explicit_required_arg_literal_completion`,
+  `explicit_literal_candidate_pool_passed=true` is required before scorer
+  authorization.
+- A failed explicit literal candidate pool gate blocks source-to-scorer promotion
+  even if provider green preflight has passed.
+- The gate must be evaluated before baseline/candidate scorer execution and
+  before any `+3pp` or SOTA claim.
 
 No-leakage requirements:
 
@@ -220,6 +232,7 @@ All items must be checked before any formal Huawei Stage-1 BFCL performance clai
 [ ] SOTA or accepted baseline is frozen before scorer execution.
 [ ] calculation_unit=absolute_pp and required_delta_pp=3.0.
 [ ] candidate_family=explicit_required_arg_literal_completion.
+[ ] explicit_literal_candidate_pool_passed=true.
 [ ] candidate_generatable_count >= 35.
 [ ] retain_eligible_candidate_count >= 35.
 [ ] combined_retain_eligible_candidate_count >= 35.

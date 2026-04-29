@@ -94,30 +94,41 @@ Accepted and rejected records should use the machine-readable schema draft at:
 outputs/artifacts/bfcl_explicit_required_arg_literal_v1/explicit_literal_candidate_schema.json
 ```
 
-Required accepted-candidate fields:
+Checker-required accepted-candidate fields. These must match
+`scripts/check_explicit_literal_candidate_pool.py::REQUIRED_CANDIDATE_FIELDS`:
 
 - `case_id`
 - `category`
-- `source_run_root`
+- `candidate_generatable`
+- `candidate_origin`
 - `candidate_rules_type`
 - `rule_type`
-- `candidate_origin`
+- `source_run_root`
 - `tool`
+- `schema_arg_name`
+- `selected_literal`
+- `literal_source`
+- `literal_source_span`
+- `literal_source_text_hash`
+- `used_gold_fields`
+- `used_score_fields`
+- `used_candidate_output`
+- `retention_prior`
+
+Extractor-recommended audit fields. These are not required by the current
+checker, but should be emitted when available because they make candidate
+review, source expansion, and scorer authorization auditable:
+
 - `emitted_tool_name`
 - `required_arg`
-- `schema_arg_name`
 - `required_args`
 - `missing_required_args`
 - `emitted_tool_args`
 - `schema_type`
 - `literal_value`
-- `selected_literal`
 - `unique_literal_value`
 - `literal_candidates`
 - `literal_candidate_count`
-- `literal_source`
-- `literal_source_span`
-- `literal_source_text_hash`
 - `literal_source_observed_as`
 - `literal_source_rank`
 - `disambiguation_cue`
@@ -128,11 +139,24 @@ Required accepted-candidate fields:
 - `trajectory_mutation`
 - `tool_choice_mutation`
 - `gold_value_mutation`
+- `rejection_reason`
+
+The current checker specifically consumes the following no-leakage / grounding
+fields and fails closed when they are missing or invalid:
+
+- `literal_source_span`
+- `literal_source_text_hash`
 - `used_gold_fields`
 - `used_score_fields`
 - `used_candidate_output`
-- `candidate_generatable`
-- `rejection_reason`
+
+Accepted-candidate identity fields:
+
+- `candidate_rules_type`
+- `rule_type`
+- `schema_arg_name`
+- `selected_literal`
+- `literal_source`
 - `retention_prior`
 
 Required accepted-candidate values:
@@ -341,4 +365,3 @@ Dev pass branch:
 Holdout pass is required before any expansion to 100-case or full-suite
 performance validation. Full first-stage performance acceptance still requires
 the Huawei-approved +3pp comparison under the frozen protocol.
-

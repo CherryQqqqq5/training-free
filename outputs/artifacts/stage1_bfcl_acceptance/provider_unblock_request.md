@@ -62,6 +62,15 @@ full-suite BFCL evaluation
 category or holdout scorer used for external claim
 ```
 
+After provider green preflight passes, the acceptance sequence is:
+
+```text
+1. Sign provider unblock.
+2. Sign source collection scope and compact artifact boundary.
+3. Sign scorer authorization only after no-leakage, dev/holdout disjointness,
+   SOTA/baseline freeze, and explicit_literal_candidate_pool_passed=true.
+```
+
 Do not claim:
 
 ```text

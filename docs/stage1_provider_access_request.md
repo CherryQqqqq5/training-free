@@ -144,10 +144,22 @@ Provider access approval allows engineering to run provider preflight only. It
 does not automatically authorize source collection, baseline scorer, candidate
 scorer, or full-suite scorer.
 
+Post-provider approval sequence:
+
+```text
+1. Provider unblock sign-off after provider_green_preflight_passed=true.
+2. Source collection sign-off after approved provider/model route is frozen and
+   compact source artifacts pass boundary checks.
+3. Scorer authorization sign-off after source collection evidence, no-leakage
+   checks, dev/holdout disjointness, SOTA/baseline freeze, and
+   explicit_literal_candidate_pool_passed=true are all recorded.
+```
+
 Scorer authorization requires a separate completed request in
 `docs/stage1_huawei_acceptance_approval_template.md` after provider green passes,
 SOTA/baseline freeze is complete, no-leakage checks pass, and dev/holdout
-manifests are disjoint.
+manifests are disjoint. For the explicit-only route, it also requires
+`explicit_literal_candidate_pool_passed=true`.
 
 ## 6. Commands Allowed After Credential Approval
 
