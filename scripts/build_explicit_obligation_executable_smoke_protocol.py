@@ -248,6 +248,9 @@ def evaluate(memory_audit_path: Path = DEFAULT_MEMORY_AUDIT, source_root: Path =
         "control_selection_rejections": control_rejections,
         "target_ids_by_category": target_ids_by_category,
         "generation_ids_by_category": generation_ids_by_category,
+        "bfcl_target_case_ids_to_generate": target_ids_by_category,
+        "bfcl_dependency_closure_case_ids_to_generate": generation_ids_by_category,
+        "bfcl_test_case_ids_to_generate": generation_ids_by_category,
         "selected_case_list_hash": _hash_payload(selected),
         "generation_case_list_hash": _hash_payload(generation_ids_by_category),
         "hard_constraints": {

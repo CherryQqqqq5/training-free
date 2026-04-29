@@ -40,6 +40,7 @@ DEFAULT_EXPLICIT_OBLIGATION_AUDIT = Path("outputs/artifacts/phase2/explicit_obli
 DEFAULT_EXPLICIT_OBLIGATION_PROTOCOL = Path("outputs/artifacts/phase2/explicit_obligation_observable_capability_v1/explicit_obligation_smoke_protocol.json")
 DEFAULT_EXPLICIT_OBLIGATION_EXECUTABILITY = Path("outputs/artifacts/phase2/explicit_obligation_observable_capability_v1/explicit_obligation_smoke_executability.json")
 DEFAULT_EXPLICIT_OBLIGATION_EXECUTABLE_PROTOCOL = Path("outputs/artifacts/phase2/explicit_obligation_observable_capability_v1/explicit_obligation_executable_smoke_protocol.json")
+DEFAULT_EXPLICIT_OBLIGATION_BASELINE_DRY_AUDIT = Path("outputs/artifacts/phase2/explicit_obligation_observable_capability_v1/explicit_obligation_baseline_dry_audit.json")
 DEFAULT_OUT = Path("outputs/artifacts/bfcl_explicit_required_arg_literal_v1/delivery_evidence_audit.json")
 DEFAULT_MD = Path("outputs/artifacts/bfcl_explicit_required_arg_literal_v1/delivery_evidence_audit.md")
 
@@ -362,11 +363,13 @@ def explicit_obligation_status(
     protocol_path: Path = DEFAULT_EXPLICIT_OBLIGATION_PROTOCOL,
     executability_path: Path = DEFAULT_EXPLICIT_OBLIGATION_EXECUTABILITY,
     executable_protocol_path: Path = DEFAULT_EXPLICIT_OBLIGATION_EXECUTABLE_PROTOCOL,
+    baseline_dry_audit_path: Path = DEFAULT_EXPLICIT_OBLIGATION_BASELINE_DRY_AUDIT,
 ) -> dict[str, Any]:
     report = _load_json(path, {}) or {}
     protocol = _load_json(protocol_path, {}) or {}
     executability = _load_json(executability_path, {}) or {}
     executable_protocol = _load_json(executable_protocol_path, {}) or {}
+    baseline_dry_audit = _load_json(baseline_dry_audit_path, {}) or {}
     executable_ready = bool(executable_protocol.get("bfcl_executable_manifest_ready") or executability.get("bfcl_executable_manifest_ready"))
     executable_count = int(executable_protocol.get("selected_case_count") or executability.get("executable_case_id_count") or 0)
     executable_record_count = int(executable_protocol.get("selected_case_count") or executability.get("record_count") or 0)
@@ -406,6 +409,14 @@ def explicit_obligation_status(
         "explicit_obligation_materialized_positive_case_count": int(executable_protocol.get("positive_case_count") or 0),
         "explicit_obligation_materialized_control_case_count": int(executable_protocol.get("control_case_count") or 0),
         "explicit_obligation_materialized_selected_case_hash": executable_protocol.get("selected_case_list_hash"),
+        "explicit_obligation_baseline_dry_audit_ready": bool(baseline_dry_audit.get("baseline_dry_audit_ready")),
+        "explicit_obligation_smoke_selection_ready_after_baseline_dry_audit": bool(baseline_dry_audit.get("smoke_selection_ready_after_baseline_dry_audit")),
+        "explicit_obligation_baseline_ceiling_risk": bool(baseline_dry_audit.get("baseline_ceiling_risk")),
+        "explicit_obligation_primary_positive_capability_miss_count": int(baseline_dry_audit.get("primary_positive_capability_miss_count") or 0),
+        "explicit_obligation_baseline_process_already_uses_memory_count": int(baseline_dry_audit.get("baseline_process_already_uses_memory_count") or 0),
+        "explicit_obligation_control_memory_activation_count": int(baseline_dry_audit.get("control_memory_activation_count") or 0),
+        "explicit_obligation_baseline_dry_audit_blockers": baseline_dry_audit.get("blockers") or [],
+        "explicit_obligation_baseline_dry_audit_next_required_action": baseline_dry_audit.get("next_required_action"),
     }
 
 def source_result_layout_status(low_risk_root: Path = DEFAULT_LOW_RISK) -> dict[str, Any]:
@@ -496,6 +507,8 @@ def evaluate(
         p0_blockers.append("memory_runtime_adapter_not_ready")
     if explicit_obligation.get("explicit_obligation_protocol_ready_for_review") and not explicit_obligation.get("explicit_obligation_bfcl_executable_manifest_ready"):
         p0_blockers.append("explicit_obligation_protocol_not_bfcl_executable")
+    if explicit_obligation.get("explicit_obligation_bfcl_executable_manifest_ready") and not explicit_obligation.get("explicit_obligation_smoke_selection_ready_after_baseline_dry_audit"):
+        p0_blockers.append("explicit_obligation_smoke_selection_not_ready_after_baseline_dry_audit")
     return {
         "report_scope": "first_stage_delivery_evidence_audit",
         "offline_only": True,
@@ -538,8 +551,8 @@ def evaluate(
         "source_result_layout": source_layout,
         "next_required_action": (
             "request_separate_memory_heavy_smoke_approval"
-            if explicit_obligation.get("explicit_obligation_bfcl_executable_manifest_ready")
-            else (explicit_obligation.get("explicit_obligation_executability_next_required_action") or "build_explicit_obligation_smoke_protocol_before_any_scorer")
+            if explicit_obligation.get("explicit_obligation_bfcl_executable_manifest_ready") and explicit_obligation.get("explicit_obligation_smoke_selection_ready_after_baseline_dry_audit")
+            else (explicit_obligation.get("explicit_obligation_baseline_dry_audit_next_required_action") or explicit_obligation.get("explicit_obligation_executability_next_required_action") or "build_explicit_obligation_smoke_protocol_before_any_scorer")
             if explicit_obligation.get("explicit_obligation_protocol_ready_for_review")
             else ("build_explicit_obligation_smoke_protocol_before_any_scorer" if explicit_obligation.get("explicit_obligation_smoke_ready") else "root_cause_audit_before_any_scorer")
         ),
@@ -676,6 +689,11 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Protocol executability blockers: `{report['explicit_obligation_observable_capability']['explicit_obligation_executability_blockers']}`",
         f"- Materialized executable protocol ready: `{report['explicit_obligation_observable_capability']['explicit_obligation_materialized_protocol_ready']}`",
         f"- Materialized positive / control cases: `{report['explicit_obligation_observable_capability']['explicit_obligation_materialized_positive_case_count']}` / `{report['explicit_obligation_observable_capability']['explicit_obligation_materialized_control_case_count']}`",
+        f"- Baseline dry audit ready: `{report['explicit_obligation_observable_capability']['explicit_obligation_baseline_dry_audit_ready']}`",
+        f"- Smoke selection ready after baseline dry audit: `{report['explicit_obligation_observable_capability']['explicit_obligation_smoke_selection_ready_after_baseline_dry_audit']}`",
+        f"- Baseline ceiling risk: `{report['explicit_obligation_observable_capability']['explicit_obligation_baseline_ceiling_risk']}`",
+        f"- Primary positive capability-miss count: `{report['explicit_obligation_observable_capability']['explicit_obligation_primary_positive_capability_miss_count']}`",
+        f"- Control memory activation count: `{report['explicit_obligation_observable_capability']['explicit_obligation_control_memory_activation_count']}`",
         f"- Blockers: `{report['explicit_obligation_observable_capability']['explicit_obligation_blockers']}`",
         f"- Next action: `{report['explicit_obligation_observable_capability']['explicit_obligation_next_required_action']}`",
         "",
@@ -784,6 +802,8 @@ def main() -> int:
             "explicit_obligation_bfcl_executable_manifest_ready": report["explicit_obligation_observable_capability"]["explicit_obligation_bfcl_executable_manifest_ready"],
             "explicit_obligation_missing_bfcl_case_id_count": report["explicit_obligation_observable_capability"]["explicit_obligation_missing_bfcl_case_id_count"],
             "explicit_obligation_materialized_protocol_ready": report["explicit_obligation_observable_capability"]["explicit_obligation_materialized_protocol_ready"],
+            "explicit_obligation_smoke_selection_ready_after_baseline_dry_audit": report["explicit_obligation_observable_capability"]["explicit_obligation_smoke_selection_ready_after_baseline_dry_audit"],
+            "explicit_obligation_baseline_ceiling_risk": report["explicit_obligation_observable_capability"]["explicit_obligation_baseline_ceiling_risk"],
             "memory_operation_candidate_count": report["memory_operation_obligation"]["memory_operation_candidate_count"],
             "memory_operation_runtime_enabled": report["memory_operation_obligation"]["memory_operation_runtime_enabled"],
             "memory_operation_negative_control_audit_passed": report["memory_operation_obligation"]["memory_operation_negative_control_audit_passed"],
