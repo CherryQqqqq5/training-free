@@ -140,8 +140,10 @@ out.write_text(
 )
 PY
 
+bash -lc 'set -euo pipefail; if [[ -n "${GRC_BFCL_DATASET_ROOT:-}" ]]; then input=(--dataset-root "$GRC_BFCL_DATASET_ROOT"); elif [[ -n "${GRC_BFCL_DATASET_FILE:-}" ]]; then input=(--dataset-file "$GRC_BFCL_DATASET_FILE"); else echo "GRC_BFCL_DATASET_ROOT or GRC_BFCL_DATASET_FILE required" >&2; exit 2; fi; PYTHONPATH=.:src .venv/bin/python scripts/export_explicit_literal_bfcl_dataset.py "${input[@]}" --categories multi_turn_miss_func,multi_turn_long_context,multi_turn_base,parallel_multiple,multiple --output /tmp/explicit_literal_pool/explicit_literal_dataset.json --report-output /tmp/explicit_literal_pool/dataset_export_report.json --markdown-output /tmp/explicit_literal_pool/dataset_export_report.md --compact --strict'
+
 PYTHONPATH=.:src .venv/bin/python scripts/check_explicit_literal_dataset.py \
-  --dataset-json <approved_bfcl_dataset_fixture_or_export.json> \
+  --dataset-json /tmp/explicit_literal_pool/explicit_literal_dataset.json \
   --categories multi_turn_miss_func,multi_turn_long_context,multi_turn_base,parallel_multiple,multiple \
   --output /tmp/explicit_literal_pool/dataset_schema_gate.json \
   --markdown-output /tmp/explicit_literal_pool/dataset_schema_gate.md \
@@ -149,7 +151,7 @@ PYTHONPATH=.:src .venv/bin/python scripts/check_explicit_literal_dataset.py \
 
 PYTHONPATH=.:src .venv/bin/python scripts/build_explicit_literal_candidate_pool.py \
   --source-manifest /tmp/explicit_literal_pool/source_collection_manifest_with_tmp_roots.json \
-  --dataset-json <approved_bfcl_dataset_fixture_or_export.json> \
+  --dataset-json /tmp/explicit_literal_pool/explicit_literal_dataset.json \
   --candidate-jsonl /tmp/explicit_literal_pool/candidate_rules.jsonl \
   --audit-json /tmp/explicit_literal_pool/audit.json \
   --dev-manifest /tmp/explicit_literal_pool/dev20_manifest.json \
@@ -169,12 +171,18 @@ Do not overwrite tracked/default `candidate_rules.jsonl`, dev manifest, or
 holdout manifest until the temporary builder outputs pass no-leakage,
 duplicate-case, and dev/holdout integrity gates.
 
-The dataset schema gate fails closed unless the approved dataset JSON contains
-records with `id`, `question` or `messages`, function schemas with
+The dataset export gate fails closed unless `GRC_BFCL_DATASET_ROOT` points at
+local `BFCL_v4_<category>.json` files or `GRC_BFCL_DATASET_FILE` points at an
+explicit approved dataset file. The exporter writes only `id`, `category`,
+`question`, `messages`, and `function` to
+`/tmp/explicit_literal_pool/explicit_literal_dataset.json`; it rejects
+gold/score/candidate-style input fields instead of silently dropping them.
+
+The dataset schema gate then fails closed unless the sanitized dataset JSON
+contains records with `id`, `question` or `messages`, function schemas with
 `parameters.properties`, and non-empty required arguments whose schemas are
-present. It also requires coverage for every priority category and rejects
-gold/score/candidate-style top-level fields. It does not require or consume
-gold answers, score outputs, or candidate outputs.
+present. It also requires coverage for every priority category. It does not
+require or consume gold answers, score outputs, or candidate outputs.
 
 ## Post-Collection Rebuild
 
@@ -183,8 +191,9 @@ After all priority categories finish and artifact boundary remains clean:
 ```bash
 PYTHONPATH=.:src .venv/bin/python scripts/build_m27t_source_pool_manifest.py
 mkdir -p /tmp/explicit_literal_pool && PYTHONPATH=.:src .venv/bin/python -c 'import json, pathlib; cats=["multi_turn_miss_func","multi_turn_long_context","multi_turn_base","parallel_multiple","multiple"]; root=pathlib.Path("/tmp/bfcl_source_collection"); out=pathlib.Path("/tmp/explicit_literal_pool/source_collection_manifest_with_tmp_roots.json"); out.write_text(json.dumps({"report_scope":"tmp_source_collection_manifest_with_raw_roots","source_collection_only":True,"category_status":[{"category":c,"source_artifacts_available":True,"existing_source_roots":[str(root/c/"baseline")]} for c in cats]}, indent=2, sort_keys=True)+"\n")'
-PYTHONPATH=.:src .venv/bin/python scripts/check_explicit_literal_dataset.py --dataset-json <approved_bfcl_dataset_fixture_or_export.json> --categories multi_turn_miss_func,multi_turn_long_context,multi_turn_base,parallel_multiple,multiple --output /tmp/explicit_literal_pool/dataset_schema_gate.json --markdown-output /tmp/explicit_literal_pool/dataset_schema_gate.md --compact --strict
-PYTHONPATH=.:src .venv/bin/python scripts/build_explicit_literal_candidate_pool.py --source-manifest /tmp/explicit_literal_pool/source_collection_manifest_with_tmp_roots.json --dataset-json <approved_bfcl_dataset_fixture_or_export.json> --candidate-jsonl /tmp/explicit_literal_pool/candidate_rules.jsonl --audit-json /tmp/explicit_literal_pool/audit.json --dev-manifest /tmp/explicit_literal_pool/dev20_manifest.json --holdout-manifest /tmp/explicit_literal_pool/holdout20_manifest.json --summary-output /tmp/explicit_literal_pool/summary.json --markdown-output /tmp/explicit_literal_pool/summary.md --compact --strict
+bash -lc 'set -euo pipefail; if [[ -n "${GRC_BFCL_DATASET_ROOT:-}" ]]; then input=(--dataset-root "$GRC_BFCL_DATASET_ROOT"); elif [[ -n "${GRC_BFCL_DATASET_FILE:-}" ]]; then input=(--dataset-file "$GRC_BFCL_DATASET_FILE"); else echo "GRC_BFCL_DATASET_ROOT or GRC_BFCL_DATASET_FILE required" >&2; exit 2; fi; PYTHONPATH=.:src .venv/bin/python scripts/export_explicit_literal_bfcl_dataset.py "${input[@]}" --categories multi_turn_miss_func,multi_turn_long_context,multi_turn_base,parallel_multiple,multiple --output /tmp/explicit_literal_pool/explicit_literal_dataset.json --report-output /tmp/explicit_literal_pool/dataset_export_report.json --markdown-output /tmp/explicit_literal_pool/dataset_export_report.md --compact --strict'
+PYTHONPATH=.:src .venv/bin/python scripts/check_explicit_literal_dataset.py --dataset-json /tmp/explicit_literal_pool/explicit_literal_dataset.json --categories multi_turn_miss_func,multi_turn_long_context,multi_turn_base,parallel_multiple,multiple --output /tmp/explicit_literal_pool/dataset_schema_gate.json --markdown-output /tmp/explicit_literal_pool/dataset_schema_gate.md --compact --strict
+PYTHONPATH=.:src .venv/bin/python scripts/build_explicit_literal_candidate_pool.py --source-manifest /tmp/explicit_literal_pool/source_collection_manifest_with_tmp_roots.json --dataset-json /tmp/explicit_literal_pool/explicit_literal_dataset.json --candidate-jsonl /tmp/explicit_literal_pool/candidate_rules.jsonl --audit-json /tmp/explicit_literal_pool/audit.json --dev-manifest /tmp/explicit_literal_pool/dev20_manifest.json --holdout-manifest /tmp/explicit_literal_pool/holdout20_manifest.json --summary-output /tmp/explicit_literal_pool/summary.json --markdown-output /tmp/explicit_literal_pool/summary.md --compact --strict
 PYTHONPATH=.:src .venv/bin/python scripts/check_explicit_literal_candidate_pool.py --candidate-jsonl /tmp/explicit_literal_pool/candidate_rules.jsonl --dev-manifest /tmp/explicit_literal_pool/dev20_manifest.json --holdout-manifest /tmp/explicit_literal_pool/holdout20_manifest.json --compact --strict
 PYTHONPATH=.:src .venv/bin/python scripts/check_m28pre_offline.py --compact --strict
 PYTHONPATH=.:src .venv/bin/python scripts/check_artifact_boundary.py

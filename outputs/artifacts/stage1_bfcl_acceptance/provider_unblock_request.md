@@ -102,8 +102,12 @@ After provider green preflight passes, the acceptance sequence is:
 
 ```text
 1. Sign provider unblock.
-2. Sign source collection scope and compact artifact boundary.
-3. Sign scorer authorization only after no-leakage, dev/holdout disjointness,
+2. Sign BFCL dataset fixture/export approval. The export must exclude gold,
+   expected/reference, score, candidate-output, hidden target, and raw scorer
+   feedback fields, and must match the BFCL version and scope planned for
+   scorer.
+3. Sign source collection scope and compact artifact boundary.
+4. Sign scorer authorization only after no-leakage, dev/holdout disjointness,
    SOTA/baseline freeze, and explicit_literal_candidate_pool_passed=true.
 ```
 

@@ -193,19 +193,97 @@ No-leakage requirements:
 Each gate requires a separate recorded approval. Passing an earlier gate does not
 authorize a later gate.
 
-### 4.1 Source Collection Authorization
+### 4.1 Provider Credential Approval
+
+Required before attempting provider green preflight:
+
+```text
+provider_profile:
+expected_api_key_env: env var name only, no secret value
+base_url:
+upstream_model_route:
+bfcl_model_alias:
+runtime_config_path:
+allowed_categories:
+allowed_splits: provider_preflight, source_collection
+allowed_full_suite: yes | no
+max_requests:
+max_input_tokens:
+max_output_tokens:
+request_timeout_seconds:
+overall_timeout_minutes:
+retry_policy:
+rate_limit_policy:
+provider_access_approval_owner:
+credential_owner:
+budget_owner:
+huawei_acceptance_owner:
+engineering_execution_owner:
+provider_approval_id:
+approval_timestamp_utc:
+```
+
+Provider credential approval permits provider green preflight only. It does not
+authorize dataset export, source collection, candidate pool promotion, scorer
+execution, or any performance claim.
+
+### 4.2 BFCL Dataset Fixture/Export Approval
+
+Required before exporting or using BFCL dataset fixtures for source collection
+or extractor work:
+
+```text
+dataset_export_approval_owner:
+huawei_acceptance_owner:
+engineering_execution_owner:
+bfcl_eval_version:
+bfcl_checkout:
+benchmark_scope: full_suite | category | dev20 | holdout20 | huawei_signed_scope
+test_category:
+dataset_source_path:
+export_output_path:
+export_record_count:
+case_id_hash:
+schema_hash:
+same_bfcl_version_as_scorer = true
+same_scope_as_scorer = true
+gold_fields_excluded = true
+score_fields_excluded = true
+candidate_output_fields_excluded = true
+hidden_target_fields_excluded = true
+raw_scorer_feedback_excluded = true
+artifact_boundary_passed = true
+approval_timestamp_utc:
+```
+
+Dataset export approval permits only the signed dataset fixture/export operation
+for the frozen BFCL version and scope. It must exclude gold, expected/reference,
+score, candidate-output, hidden target, and raw scorer feedback fields. The
+exported dataset fixture must use the same BFCL version and approved scope that
+will be used by scorer. Dataset export approval does not authorize provider
+calls, source collection, candidate pool promotion, scorer execution, or any
+performance claim.
+
+### 4.3 Source Collection Authorization
 
 Required before running source collection commands:
 
 ```text
 provider_green_preflight_passed = true
 provider_unblock_signed = true
+dataset_export_approval_signed = true
 provider_profile = frozen
 expected_api_key_env = frozen env var name only
 base_url = frozen sanitized value
 upstream_model_route = frozen
 bfcl_model_alias = frozen
 runtime_config_path = frozen
+bfcl_eval_version = frozen
+bfcl_checkout = frozen
+benchmark_scope = frozen
+test_category = frozen
+case_id_hash = signed dataset export value
+schema_hash = signed dataset export value
 allowed_categories = signed list
 allowed_splits = provider_preflight, source_collection
 budget_timeout_policy_present = true
@@ -221,7 +299,7 @@ Source collection authorization permits only the signed source collection
 commands. It does not authorize candidate pool promotion, dev scorer, holdout
 scorer, full BFCL scorer, paired comparison, or any performance claim.
 
-### 4.2 Candidate Pool Promotion Authorization
+### 4.4 Candidate Pool Promotion Authorization
 
 Required before promoting extractor outputs to acceptance candidate-pool
 evidence:
@@ -249,7 +327,7 @@ Candidate pool promotion does not authorize any scorer. Offline extractor
 candidates, rejection audits, and pool summaries remain diagnostic until this
 gate is signed.
 
-### 4.3 Dev Scorer Authorization
+### 4.5 Dev Scorer Authorization
 
 Required before running dev baseline/candidate scorer commands:
 
@@ -274,7 +352,7 @@ Dev scorer authorization permits only signed dev scorer commands. It does not
 authorize holdout scorer, full BFCL scorer, paired full-suite comparison, or any
 external performance claim.
 
-### 4.4 Holdout Scorer Authorization
+### 4.6 Holdout Scorer Authorization
 
 Required before running holdout baseline/candidate scorer commands:
 
@@ -299,7 +377,7 @@ Holdout scorer authorization permits only signed holdout scorer commands. It
 does not authorize full BFCL scorer or a full-suite claim. Holdout evidence may
 only support an interim or narrow claim if Huawei signs that scope explicitly.
 
-### 4.5 Full BFCL or Huawei Acceptance Scorer Authorization
+### 4.7 Full BFCL or Huawei Acceptance Scorer Authorization
 
 Required before running full BFCL or Huawei acceptance scorer commands:
 

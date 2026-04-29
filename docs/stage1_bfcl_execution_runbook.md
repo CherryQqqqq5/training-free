@@ -78,6 +78,15 @@ Mainline source collection priority after provider green:
 4. `parallel_multiple`
 5. `multiple`
 
+Dataset gates for this priority list are incremental and fail-closed. After
+Batch 1, require dataset/schema coverage only for `multi_turn_miss_func`; after
+Batch 2, require coverage for `multi_turn_miss_func`,
+`multi_turn_long_context`, and `multi_turn_base`; after Batch 3, add
+`multiple`; after Batch 4, add `parallel_multiple`. Candidate build may use only
+categories that have both collected source artifacts and passed dataset/schema
+coverage. Do not require all five categories upfront unless the collection has
+reached Batch 4 without hitting the 35+ explicit-literal pool target.
+
 Memory categories are not part of the first-stage deterministic
 explicit-literal mainline. `memory_kv`, `memory_rec_sum`, and `memory_vector`
 may remain diagnostic source-collection lanes, but they do not authorize the

@@ -1292,6 +1292,48 @@ Do not collect memory categories for the mainline pool. `memory_kv`,
 but they do not count toward 35+ because their improvement mechanism depends on
 memory state rather than deterministic argument literal completion.
 
+#### Dataset Gate Policy
+
+Dataset gates should run incrementally by collected batch, not require all five
+priority categories upfront. Requiring all five categories before the first
+candidate build conflicts with the R5 stop rule and can waste a provider-green
+window after Batch 1 or Batch 2 already provides enough clean explicit-literal
+candidates.
+
+Allowed fail-closed modes:
+
+- after Batch 1, the dataset gate must require complete dataset/schema coverage
+  for `multi_turn_miss_func` only;
+- after Batch 2, it must require complete coverage for
+  `multi_turn_miss_func`, `multi_turn_long_context`, and `multi_turn_base`;
+- after Batch 3, it must require complete coverage for Batch 1+2 plus
+  `multiple`;
+- after Batch 4, it must require complete coverage for all five priority
+  categories, including `parallel_multiple`.
+
+For each batch, candidate building may use only categories that have both:
+
+- source collection present in the source manifest; and
+- dataset/schema coverage passed for that same category.
+
+If any category in the current batch lacks dataset rows, function schemas,
+required args, or schema properties, the batch dataset gate fails closed and the
+candidate build for that batch must not run. Previously passed batches may remain
+auditable, but they must be rebuilt only from their own passed category set.
+
+The incremental dataset gate does not lower the target:
+
+- the 35+ deduplicated demote-candidate threshold is unchanged;
+- the 40+ target for disjoint dev20/holdout20 is unchanged;
+- missing later categories do not count as failures once the threshold is met by
+  earlier passed batches;
+- missing later categories must be reported as `not_collected` or
+  `dataset_gate_not_run`, not as accepted or rejected candidate evidence.
+
+Engineering should still run the all-five dataset gate before full R5 completion
+if earlier batches do not reach 35+. The all-five gate is required only when the
+source-collection sequence proceeds through Batch 4.
+
 #### Stop Criteria
 
 After each batch, run the extractor/checker offline. Stop source collection when
