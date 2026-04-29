@@ -98,6 +98,11 @@ artifact contains real candidate rows or selected dev/holdout cases, it is no
 longer treated as an empty/default scaffold artifact and must pass the later
 `candidate_pool_ready` gates before any acceptance claim can cite it.
 
+R1 rejected records, rejection taxonomy rows, extractor audit rows, and
+extractor summaries are scaffold diagnostic evidence only while the state is
+`provider_blocked`; they must not count toward the 35+ candidate pool, source
+collection evidence, scorer authorization, or any SOTA/`+3pp` claim.
+
 Prohibited claim:
 
 - Provider green.

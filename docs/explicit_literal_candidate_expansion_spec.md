@@ -756,6 +756,96 @@ R1 fixture acceptance criteria:
   holdout manifests;
 - no fixture introduces scorer/provider commands.
 
+### R2 Current-Observation Happy Path
+
+R2 should add exactly one accepted-candidate path beyond
+`happy_path_current_request`: a missing required argument whose unique literal
+is visible in a prior tool observation before the repaired tool call. Parallel
+rejection remains out of scope for this R2 slice.
+
+Fixture: `happy_path_current_observation`
+
+Dataset prompt/schema:
+
+- category: `multi_turn_long_context` or `multi_turn_miss_func`;
+- one BFCL record with tool `grep`;
+- function schema has required args `["pattern", "file_name"]`;
+- schema type for `file_name` is `string`;
+- current request asks to search the file from the previous result, but does
+  not itself contain the literal filename.
+
+Baseline result/trace:
+
+- prior visible tool observation before the selected tool call contains exactly
+  one schema-compatible literal, for example `The file is "archive.log".`;
+- baseline result emits `grep` with `{"pattern": "ERROR"}` and omits
+  `file_name`;
+- the observation must occur before the selected emitted tool call index;
+- no later observation or scorer/gold/candidate-output field may be used.
+
+Expected accepted candidate record:
+
+```json
+{
+  "case_id": "case_observation_1",
+  "category": "multi_turn_long_context",
+  "candidate_generatable": true,
+  "candidate_origin": "current_observation_explicit_literal_extractor",
+  "candidate_rules_type": "explicit_required_arg_literal_completion",
+  "rule_type": "explicit_required_arg_literal_completion",
+  "source_run_root": "/tmp/source/multi_turn_long_context/baseline",
+  "tool": "grep",
+  "schema_arg_name": "file_name",
+  "selected_literal": "archive.log",
+  "literal_source": "current_observation",
+  "literal_source_span": {
+    "source": "current_observation",
+    "turn_index": 0,
+    "start": 13,
+    "end": 24,
+    "text": "archive.log"
+  },
+  "literal_source_text_hash": "<sha256-of-exact-span-text>",
+  "used_gold_fields": false,
+  "used_score_fields": false,
+  "used_candidate_output": false,
+  "retention_prior": {
+    "rule_family": "explicit_required_arg_literal_completion",
+    "theory_class": "schema_constraint_completion",
+    "retain_eligibility": "demote_candidate",
+    "literal_source": "current_observation",
+    "precondition_observable": true,
+    "postcondition_local": true,
+    "intervention_scope": "argument_only",
+    "tool_choice_mutation": false,
+    "trajectory_mutation": false,
+    "exact_tool_choice": false
+  }
+}
+```
+
+Expected summary/audit fields:
+
+- `accepted_record_count=1`;
+- `rejected_record_count=0`;
+- `reject_reason_counts={}`;
+- `candidate_record_count=1`;
+- `eligible_count=1` when `min_pool_size` or `min_eligible` is set to `1` in
+  the fixture;
+- `planned_commands=[]`;
+- `candidate_commands=[]`.
+
+Checker expectations:
+
+- `scripts.check_explicit_literal_candidate_pool.evaluate` treats
+  `literal_source="current_observation"` as an allowed pool source;
+- the candidate fails closed if `literal_source_span` or
+  `literal_source_text_hash` is missing;
+- the candidate fails closed if any of `used_gold_fields`, `used_score_fields`,
+  or `used_candidate_output` is not exactly `false`;
+- the candidate must not enter dev/holdout unless it is unique by `case_id` and
+  the normal pool/split thresholds are satisfied.
+
 Minimum fixtures:
 
 - `dataset_record_one_missing_arg`

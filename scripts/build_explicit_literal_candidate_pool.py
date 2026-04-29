@@ -153,6 +153,25 @@ def _question_text(entry: dict[str, Any]) -> str:
     return "\n".join(chunks)
 
 
+def _observation_text(entry: dict[str, Any], row: dict[str, Any]) -> str:
+    chunks: list[str] = []
+
+    def walk(value: Any) -> None:
+        if isinstance(value, str):
+            chunks.append(value)
+        elif isinstance(value, list):
+            for item in value:
+                walk(item)
+        elif isinstance(value, dict):
+            for nested in value.values():
+                walk(nested)
+
+    for key in ("current_observation", "observation", "observations"):
+        walk(row.get(key))
+        walk(entry.get(key))
+    return "\n".join(chunks)
+
+
 def _function_map(entry: dict[str, Any]) -> dict[str, dict[str, Any]]:
     raw = entry.get("function") or entry.get("functions") or []
     if isinstance(raw, dict):
@@ -204,6 +223,18 @@ def _literal_spans(text: str) -> list[tuple[str, int, int]]:
     for literal, start, end in spans:
         by_literal.setdefault(literal, (literal, start, end))
     return list(by_literal.values())
+
+
+def _literal_source(entry: dict[str, Any], row: dict[str, Any]) -> tuple[str | None, tuple[str, int, int] | None, str | None]:
+    observation_spans = _literal_spans(_observation_text(entry, row))
+    if len(observation_spans) == 1:
+        return "current_observation", observation_spans[0], None
+    if len(observation_spans) > 1:
+        return None, None, "ambiguous_literal"
+    request_spans = _literal_spans(_question_text(entry))
+    if len(request_spans) == 1:
+        return "current_request", request_spans[0], None
+    return None, None, "ambiguous_literal"
 
 
 def _arg_schema(fn: dict[str, Any], arg: str) -> dict[str, Any]:
@@ -269,9 +300,9 @@ def _extract_candidates(
             if not case_id or not entry:
                 reject("dataset_record_missing", case_id=case_id, category=category)
                 continue
-            spans = _literal_spans(_question_text(entry))
-            if len(spans) != 1:
-                reject("ambiguous_literal", case_id=case_id, category=category, literal_count=len(spans))
+            literal_source, span, literal_error = _literal_source(entry, row)
+            if span is None:
+                reject(literal_error or "ambiguous_literal", case_id=case_id, category=category)
                 continue
             fns = _function_map(entry)
             emitted = False
@@ -282,7 +313,7 @@ def _extract_candidates(
                 missing = [arg for arg in _required_args(fn) if arg not in args]
                 if len(missing) != 1:
                     continue
-                literal, start, end = spans[0]
+                literal, start, end = span
                 required_arg = missing[0]
                 if not _literal_matches_schema(literal, _arg_schema(fn, required_arg)):
                     reject("schema_type_mismatch", case_id=case_id, category=category, required_arg=required_arg, literal=literal)
@@ -301,8 +332,8 @@ def _extract_candidates(
                     "schema_arg_name": required_arg,
                     "required_arg": required_arg,
                     "selected_literal": literal,
-                    "literal_source": "current_request",
-                    "literal_source_span": {"source": "current_request", "start": start, "end": end, "text": literal},
+                    "literal_source": literal_source,
+                    "literal_source_span": {"source": literal_source, "start": start, "end": end, "text": literal},
                     "literal_source_text_hash": span_hash,
                     "used_gold_fields": False,
                     "used_score_fields": False,
