@@ -34,8 +34,12 @@ Use strict delivery gates before any handoff:
 
 ```bash
 PATH="$PWD/.venv/bin:$PATH" .venv/bin/python -m pytest -q
-PYTHONPATH=.:src .venv/bin/python scripts/check_m28pre_offline.py --compact --strict
 PYTHONPATH=.:src .venv/bin/python scripts/check_artifact_boundary.py
+PYTHONPATH=.:src .venv/bin/python scripts/check_provider_green_preflight.py --compact --strict
+PYTHONPATH=.:src .venv/bin/python scripts/check_m28pre_offline.py --compact --strict
+PYTHONPATH=.:src .venv/bin/python scripts/check_bfcl_paired_comparison.py --acceptance-root outputs/artifacts/stage1_bfcl_acceptance --provider-status outputs/artifacts/bfcl_ctspc_source_pool_v1/current_provider_preflight_status.json --compact --strict
+PYTHONPATH=.:src .venv/bin/python scripts/check_stage1_bfcl_performance_ready.py --compact --strict
+PYTHONPATH=.:src .venv/bin/python scripts/check_first_stage_bfcl_ready.py --compact --strict
 ```
 
 ## 当前状态

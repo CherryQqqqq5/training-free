@@ -93,6 +93,8 @@ def test_explicit_required_arg_literal_compiler_builds_dev_holdout_without_comma
     assert report["planned_commands"] == []
     assert report["candidate_commands"] == []
     assert len(set(report["dev_manifest"]["selected_case_ids"]) & set(report["holdout_manifest"]["selected_case_ids"])) == 0
+    assert report["dev_manifest"]["unique_selected_case_count"] == 20
+    assert report["dev_manifest"]["duplicate_selected_case_ids"] == []
     assert all(rule["literal_source"] == "current_request" for rule in report["candidate_rules"])
     assert all(rule["retention_prior"]["retain_eligibility"] == "demote_candidate" for rule in report["candidate_rules"])
     assert report["retention_prior_distribution"]["demote_candidate"] == 40
@@ -137,7 +139,34 @@ def test_m28pre_offline_requires_freeze_repair_compiler_holdout_coverage_and_no_
     _wj(low / "explicit_required_arg_literal_holdout20_manifest.json", {"selected_case_ids": ["d0"], "planned_commands": []})
     report = evaluate_m28pre(subset, low)
     assert report["dev_holdout_disjoint"] is False
+    assert report["manifest_case_integrity_passed"] is False
+    assert "explicit_required_arg_literal_dev_holdout_overlap_present" in report["blockers"]
     assert report["m2_8pre_offline_passed"] is False
+
+
+def test_m28pre_offline_blocks_duplicate_case_ids_inside_manifest(tmp_path: Path) -> None:
+    subset = tmp_path / "subset"
+    low = tmp_path / "low"
+    _wj(subset / "m27ae_ctspc_v0_status.json", {"ctspc_v0_frozen": True, "scorer_default": "off", "retain": 0, "dev_rerun_authorized": False, "holdout_authorized": False})
+    _wj(subset / "repair_stack_contribution.json", {"repair_stack_split_ready": True})
+    _wj(low / "compiler_summary.json", {"compiler_ready": True, "explicit_holdout_ready": True, "combined_theory_prior_holdout_ready": True, "ctspc_v0_action_rules_enabled": False, "ctspc_v0_file_path_multi_turn_enabled": False, "repair_stack_default": "disabled", "candidate_rules_type": "explicit_required_arg_literal_completion", "no_next_tool_intervention": True, "exact_tool_choice": False, "retention_prior_required": True, "retain_eligible_candidate_count": 35, "combined_retain_eligible_candidate_count": 35, "required_explicit_candidate_generatable": 35, "planned_commands": [], "candidate_commands": []})
+    _wj(low / "explicit_required_arg_literal_dev20_manifest.json", {"selected_case_ids": ["dup", "dup", *[f"d{i}" for i in range(18)]], "planned_commands": []})
+    _wj(low / "explicit_required_arg_literal_holdout20_manifest.json", {"selected_case_ids": [f"h{i}" for i in range(20)], "planned_commands": []})
+    _wj(low / "theory_prior_low_risk_dev20_manifest.json", {"selected_case_ids": ["dup", "dup", *[f"d{i}" for i in range(18)]], "planned_commands": []})
+    _wj(low / "theory_prior_low_risk_holdout20_manifest.json", {"selected_case_ids": [f"h{i}" for i in range(20)], "planned_commands": []})
+    _wj(low / "retention_prior_coverage_audit.json", {"m28pre_retention_prior_coverage_audit_ready": True, "explicit_prior_family_coverage_zero": False, "current_context_anchored_literal_candidate_count": 35, "candidate_commands": [], "planned_commands": []})
+    _wj(low / "raw_bfcl_literal_coverage_audit.json", {"m28pre_raw_bfcl_literal_coverage_audit_ready": True, "source_result_literals_prompt_anchored_count": 35, "source_result_literals_prompt_coverage_zero": False, "candidate_commands": [], "planned_commands": []})
+    _wj(low / "m28pre_source_result_availability_audit.json", {"source_result_availability_audit_ready": True, "source_result_availability_ready": True, "hard_issue_counts": {}, "issue_counts": {}, "candidate_commands": [], "planned_commands": []})
+    _wj(low / "wrong_arg_key_alias_coverage_audit.json", {"wrong_arg_key_alias_coverage_audit_ready": True, "wrong_arg_key_alias_family_coverage_zero": False, "wrong_arg_key_alias_demote_candidate_count": 0, "candidate_commands": [], "planned_commands": []})
+    _wj(low / "deterministic_schema_local_coverage_audit.json", {"deterministic_schema_local_coverage_audit_ready": True, "deterministic_schema_local_family_coverage_zero": False, "deterministic_schema_local_demote_candidate_count": 0, "candidate_commands": [], "planned_commands": []})
+
+    report = evaluate_m28pre(subset, low)
+
+    assert report["manifest_case_integrity_passed"] is False
+    assert report["manifest_case_integrity"]["explicit_required_arg_literal"]["dev_duplicate_selected_case_ids"] == ["dup"]
+    assert "explicit_required_arg_literal_dev_duplicate_case_ids_present" in report["blockers"]
+    assert "combined_theory_prior_dev_duplicate_case_ids_present" in report["blockers"]
+    assert report["scorer_authorization_ready"] is False
 
 
 
@@ -668,3 +697,62 @@ def test_source_result_availability_scans_collected_cases_only(tmp_path, monkeyp
     assert root["source_result_case_count_scanned"] == 1
     assert report["issue_counts"].get("source_result_case_not_collected") == 1
     assert report["hard_issue_counts"] == {}
+
+
+def test_source_result_availability_uses_selected_run_ids_scope(tmp_path, monkeypatch):
+    import scripts.build_m28pre_explicit_required_arg_literal as build
+
+    source_root = tmp_path / "cat" / "baseline"
+    result_dir = source_root / "bfcl" / "result"
+    result_dir.mkdir(parents=True)
+    _wj(source_root / "bfcl" / "test_case_ids_to_generate.json", {"cat": ["case_a"]})
+    (result_dir / "BFCL_v4_cat_result.json").write_text('{"id": "case_a", "result": {"tool": "{}"}}\n')
+    manifest = {"category_status": [{"category": "cat", "source_artifacts_available": True, "existing_source_roots": [str(source_root)]}]}
+    manifest_path = tmp_path / "manifest.json"
+    manifest_path.write_text(json.dumps(manifest))
+    monkeypatch.setattr(build, "_load_dataset_records", lambda category: {
+        "case_a": {"id": "case_a", "function": [{"name": "tool", "parameters": {"properties": {}, "required": []}}]},
+        "case_b": {"id": "case_b", "function": [{"name": "tool", "parameters": {"properties": {}, "required": []}}]},
+    })
+
+    report = build._source_result_availability_audit(manifest_path)
+
+    root = report["category_reports"][0]["root_reports"][0]
+    assert root["audit_scope"] == "selected_test_case_ids"
+    assert root["expected_case_count"] == 1
+    assert root["source_result_case_count_scanned"] == 1
+    assert "source_result_case_not_collected" not in report["issue_counts"]
+    assert report["hard_issue_counts"] == {}
+
+
+def test_combined_pool_counts_wrong_arg_key_alias_candidates(tmp_path: Path, monkeypatch) -> None:
+    source_manifest = tmp_path / "source_manifest.json"
+    status = tmp_path / "status.json"
+    low = tmp_path / "low.json"
+    _wj(source_manifest, {"category_status": []})
+    _wj(status, {"ctspc_v0_frozen": True, "scorer_default": "off", "retain": 0, "dev_rerun_authorized": False, "holdout_authorized": False})
+    _wj(low, {"slice_cases": {}})
+
+    alias_rows = [
+        {
+            "case_id": f"alias_{i}",
+            "category": "simple_python",
+            "candidate_generatable": True,
+            "candidate_rules_type": "wrong_arg_key_alias_repair",
+            "rule_type": "wrong_arg_key_alias_repair",
+            "retention_prior": {"retain_eligibility": "demote_candidate"},
+        }
+        for i in range(40)
+    ]
+    monkeypatch.setattr(explicit_builder, "_load_prior_aware_candidates", lambda *_args, **_kwargs: ([], [], {"prior_aware_scan_enabled": True}))
+    monkeypatch.setattr(explicit_builder, "_load_wrong_arg_key_alias_candidates", lambda *_args, **_kwargs: (alias_rows, [], {"wrong_arg_key_alias_scan_enabled": True}))
+    monkeypatch.setattr(explicit_builder, "_load_deterministic_schema_local_candidates", lambda *_args, **_kwargs: ([], [], {"deterministic_schema_local_scan_enabled": True}))
+    monkeypatch.setattr(explicit_builder, "_source_result_availability_audit", lambda *_args, **_kwargs: {"source_result_availability_ready": True})
+
+    report = build(low, status, source_manifest_path=source_manifest)
+
+    assert report["wrong_arg_key_alias_demote_candidate_count"] == 40
+    assert report["combined_retain_eligible_candidate_count"] == 40
+    assert report["combined_theory_prior_holdout_ready"] is True
+    assert report["combined_dev_manifest"]["selected_case_ids"][0] == "alias_0"
+    assert report["combined_holdout_manifest"]["selected_case_ids"][0] == "alias_20"

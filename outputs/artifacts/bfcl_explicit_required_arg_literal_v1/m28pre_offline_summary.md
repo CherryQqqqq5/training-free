@@ -26,5 +26,6 @@
 | `deterministic_schema_local_family_coverage_zero` | `True` |
 | `no_scorer_commands` | `True` |
 | `runtime_manifest_safeguards_passed` | `True` |
+| `manifest_case_integrity_passed` | `True` |
 
 Offline readiness only. No scorer command is emitted by this artifact.

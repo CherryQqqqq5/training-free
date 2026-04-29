@@ -142,7 +142,10 @@ mkdir -p "${BFCL_ROOT}" "${TRACE_DIR}" "${ARTIFACT_DIR}"
 mkdir -p "${RULES_DIR}"
 
 if [[ "${GRC_ALLOW_DIRTY_BASELINE_RULES:-0}" != "1" ]]; then
-  mapfile -t BASELINE_RULE_FILES < <(find "${RULES_DIR}" -maxdepth 1 -type f -name '*.yaml' | sort)
+  BASELINE_RULE_FILES=()
+  while IFS= read -r rule_file; do
+    BASELINE_RULE_FILES+=("${rule_file}")
+  done < <(find "${RULES_DIR}" -maxdepth 1 -type f -name '*.yaml' | sort)
   if [[ "${#BASELINE_RULE_FILES[@]}" -gt 0 ]]; then
     echo "baseline rules dir must be empty of YAML patches: ${RULES_DIR}" >&2
     printf 'found baseline rule files:\n' >&2

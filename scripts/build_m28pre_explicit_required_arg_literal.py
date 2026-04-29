@@ -402,7 +402,7 @@ def _load_wrong_arg_key_alias_candidates(source_manifest_path: Path, existing_ca
         scanned_categories.append(category)
         for root in roots:
             results = _load_result_records(root, category)
-            for case_id, entry in entries.items():
+            for case_id, entry in _scoped_entries(entries, root, category).items():
                 if case_id in existing_case_ids:
                     continue
                 compiled_rows = _compile_wrong_arg_key_alias_records(entry, results.get(case_id), root, category)
@@ -639,7 +639,7 @@ def _load_deterministic_schema_local_candidates(source_manifest_path: Path, exis
         scanned_categories.append(category)
         for root in roots:
             results = _load_result_records(root, category)
-            for case_id, entry in entries.items():
+            for case_id, entry in _scoped_entries(entries, root, category).items():
                 if case_id in existing_case_ids:
                     continue
                 compiled_rows = _compile_deterministic_schema_local_records(entry, results.get(case_id), root, category)
@@ -806,24 +806,35 @@ def _source_result_availability_audit(source_manifest_path: Path) -> dict[str, A
             continue
         for root in roots:
             records, stats = _load_result_record_stats(root, category)
+            scoped_entries = _scoped_entries(entries, root, category)
+            expected_count = len(scoped_entries) or len(entries) or 1
+            selected_case_ids = _selected_case_ids_for_root(root, category)
             issue_counts: Counter[str] = Counter()
             if not stats["result_file_exists"]:
-                issue_counts["result_file_missing"] += len(entries) or 1
-                hard_issue_counts["result_file_missing"] += len(entries) or 1
+                issue_counts["result_file_missing"] += expected_count
+                hard_issue_counts["result_file_missing"] += expected_count
             elif stats["result_layout_unrecognized"]:
-                issue_counts["result_layout_unrecognized"] += len(entries) or 1
-                hard_issue_counts["result_layout_unrecognized"] += len(entries) or 1
+                issue_counts["result_layout_unrecognized"] += expected_count
+                hard_issue_counts["result_layout_unrecognized"] += expected_count
             else:
-                collected_ids = [case_id for case_id in records if case_id in entries]
+                expected_entries = scoped_entries or entries
+                collected_ids = [case_id for case_id in records if case_id in expected_entries]
                 for case_id in collected_ids:
-                    classified = _classify_source_result_case(entries[case_id], records.get(case_id))
+                    classified = _classify_source_result_case(expected_entries[case_id], records.get(case_id))
                     issue_counts[str(classified["availability_reason"])] += 1
-                uncollected_count = max(len(entries) - len(collected_ids), 0)
+                uncollected_count = max(len(expected_entries) - len(collected_ids), 0)
                 if uncollected_count:
                     issue_counts["source_result_case_not_collected"] += uncollected_count
             total_issue_counts.update(issue_counts)
-            collected_ids_count = len([case_id for case_id in records if case_id in entries]) if records else 0
-            category_report["root_reports"].append({**stats, "source_result_case_count_scanned": collected_ids_count, "issue_counts": dict(sorted(issue_counts.items()))})
+            collected_ids_count = len([case_id for case_id in records if case_id in (scoped_entries or entries)]) if records else 0
+            category_report["root_reports"].append({
+                **stats,
+                "source_result_case_count_scanned": collected_ids_count,
+                "expected_case_count": expected_count,
+                "selected_case_id_count": len(selected_case_ids),
+                "audit_scope": "selected_test_case_ids" if selected_case_ids else "full_dataset",
+                "issue_counts": dict(sorted(issue_counts.items())),
+            })
         combined: Counter[str] = Counter()
         for root_report in category_report["root_reports"]:
             combined.update(root_report.get("issue_counts") or {})
@@ -841,6 +852,22 @@ def _source_result_availability_audit(source_manifest_path: Path) -> dict[str, A
         "issue_counts": dict(sorted(total_issue_counts.items())),
         "category_reports": category_reports,
     }
+
+
+def _selected_case_ids_for_root(root: Path, category: str) -> list[str]:
+    path = root / "bfcl" / "test_case_ids_to_generate.json"
+    data = _read_json(path, {}) or {}
+    values = data.get(category) if isinstance(data, dict) else None
+    if not isinstance(values, list):
+        return []
+    return [str(item) for item in values if str(item)]
+
+
+def _scoped_entries(entries: dict[str, dict[str, Any]], root: Path, category: str) -> dict[str, dict[str, Any]]:
+    selected = _selected_case_ids_for_root(root, category)
+    if not selected:
+        return entries
+    return {case_id: entries[case_id] for case_id in selected if case_id in entries}
 
 
 def _prior_scan_category_coverage(rows: list[dict[str, Any]]) -> dict[str, Any]:
@@ -893,7 +920,7 @@ def _load_prior_aware_candidates(source_manifest_path: Path, existing_case_ids: 
         scanned_categories.append(category)
         for root in roots:
             results = _load_result_records(root, category)
-            for case_id, entry in entries.items():
+            for case_id, entry in _scoped_entries(entries, root, category).items():
                 if case_id in existing_case_ids:
                     continue
                 compiled = _compile_prior_aware_record(entry, results.get(case_id), root, category)
@@ -1049,10 +1076,14 @@ def _manifest(
     candidate_rules_type: str = "explicit_required_arg_literal_completion",
     selection_criteria: str | None = None,
 ) -> dict[str, Any]:
+    selected_case_ids = [str(row.get("case_id")) for row in rows]
+    duplicate_selected_case_ids = sorted({case_id for case_id in selected_case_ids if selected_case_ids.count(case_id) > 1})
     return {
         "manifest_name": name,
         "selected_case_count": len(rows),
-        "selected_case_ids": [str(row.get("case_id")) for row in rows],
+        "selected_case_ids": selected_case_ids,
+        "unique_selected_case_count": len(set(selected_case_ids)),
+        "duplicate_selected_case_ids": duplicate_selected_case_ids,
         "selection_criteria": selection_criteria or "theory-prior explicit required-arg literal completion; no CTSPC-v0 next-tool intervention",
         "slice_name": slice_name,
         "planned_commands": [],
@@ -1156,7 +1187,7 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
     retain_eligible = [row for row in explicit_generatable if row.get("retention_prior", {}).get("retain_eligibility") == DEMOTE_CANDIDATE]
     alias_retain_eligible = [row for row in alias_generatable if row.get("retention_prior", {}).get("retain_eligibility") == DEMOTE_CANDIDATE]
     deterministic_retain_eligible = [row for row in deterministic_generatable if row.get("retention_prior", {}).get("retain_eligibility") == DEMOTE_CANDIDATE]
-    combined_retain_eligible = retain_eligible + deterministic_retain_eligible
+    combined_retain_eligible = retain_eligible + alias_retain_eligible + deterministic_retain_eligible
     stratified_retain_eligible = [row for row in stratified_generatable if row.get("retention_prior", {}).get("retain_eligibility") == DEMOTE_CANDIDATE]
     disambiguation_records = [
         {
@@ -1256,7 +1287,7 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
         "ctspc_v0_frozen": ctspc_off,
         "repair_stack_default": "disabled",
         "candidate_rules_type": "theory_prior_low_risk_combined",
-        "authorized_theory_prior_families": ["explicit_required_arg_literal_completion", "deterministic_schema_local_non_live_repair"],
+        "authorized_theory_prior_families": ["explicit_required_arg_literal_completion", "wrong_arg_key_alias_repair", "deterministic_schema_local_non_live_repair"],
         "no_next_tool_intervention": True,
         "exact_tool_choice": False,
         "retention_prior_required": True,
@@ -1281,7 +1312,7 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
         "retention_prior_distribution": explicit_prior_distribution,
         "wrong_arg_key_alias_retention_prior_distribution": summarize_retention_priors(alias_generatable),
         "deterministic_schema_local_retention_prior_distribution": summarize_retention_priors(deterministic_generatable),
-        "combined_retention_prior_distribution": summarize_retention_priors(explicit_generatable + deterministic_generatable),
+        "combined_retention_prior_distribution": summarize_retention_priors(explicit_generatable + alias_generatable + deterministic_generatable),
         "stratified_retention_prior_distribution": stratified_prior_distribution,
         "retain_eligible_candidate_count": len(retain_eligible),
         "wrong_arg_key_alias_candidate_count": len(alias_generatable),
@@ -1304,7 +1335,7 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
         "candidate_rules": explicit_generatable,
         "wrong_arg_key_alias_candidate_rules": alias_generatable,
         "deterministic_schema_local_candidate_rules": deterministic_generatable,
-        "combined_candidate_rules": explicit_generatable + deterministic_generatable,
+        "combined_candidate_rules": explicit_generatable + alias_generatable + deterministic_generatable,
         "rejected_candidates": [item for item in explicit_compiled if not item.get("candidate_generatable")],
         "wrong_arg_key_alias_rejected_candidates": [item for item in alias_compiled if not item.get("candidate_generatable")],
         "deterministic_schema_local_rejected_candidates": [item for item in deterministic_compiled if not item.get("candidate_generatable")],
@@ -1314,8 +1345,8 @@ def build(low_risk_path: Path = DEFAULT_LOW_RISK, status_path: Path = DEFAULT_ST
         "wrong_arg_key_alias_holdout_manifest": _manifest("wrong_arg_key_alias_holdout20", alias_holdout, ready=alias_holdout_ready, slice_name="wrong_arg_key_alias_repair", candidate_rules_type="wrong_arg_key_alias_repair", selection_criteria="theory-prior schema-local wrong-arg-key alias repair; value/tool/trajectory unchanged"),
         "deterministic_schema_local_dev_manifest": _manifest("deterministic_schema_local_dev20", deterministic_dev, ready=len(deterministic_dev) >= dev_size, slice_name="deterministic_schema_local_non_live_repair", candidate_rules_type="deterministic_schema_local_non_live_repair", selection_criteria="theory-prior deterministic schema-local non-live repair; value is normalized from emitted args only"),
         "deterministic_schema_local_holdout_manifest": _manifest("deterministic_schema_local_holdout20", deterministic_holdout, ready=deterministic_holdout_ready, slice_name="deterministic_schema_local_non_live_repair", candidate_rules_type="deterministic_schema_local_non_live_repair", selection_criteria="theory-prior deterministic schema-local non-live repair; value is normalized from emitted args only"),
-        "combined_dev_manifest": _manifest("theory_prior_low_risk_dev20", combined_dev, ready=len(combined_dev) >= dev_size, slice_name="theory_prior_low_risk_combined", candidate_rules_type="theory_prior_low_risk_combined", selection_criteria="combined theory-prior pool: explicit required-arg literal completion plus deterministic schema-local non-live repair"),
-        "combined_holdout_manifest": _manifest("theory_prior_low_risk_holdout20", combined_holdout, ready=combined_holdout_ready, slice_name="theory_prior_low_risk_combined", candidate_rules_type="theory_prior_low_risk_combined", selection_criteria="combined theory-prior pool: explicit required-arg literal completion plus deterministic schema-local non-live repair"),
+        "combined_dev_manifest": _manifest("theory_prior_low_risk_dev20", combined_dev, ready=len(combined_dev) >= dev_size, slice_name="theory_prior_low_risk_combined", candidate_rules_type="theory_prior_low_risk_combined", selection_criteria="combined theory-prior pool: explicit required-arg literal completion plus wrong-key alias and deterministic schema-local non-live repair"),
+        "combined_holdout_manifest": _manifest("theory_prior_low_risk_holdout20", combined_holdout, ready=combined_holdout_ready, slice_name="theory_prior_low_risk_combined", candidate_rules_type="theory_prior_low_risk_combined", selection_criteria="combined theory-prior pool: explicit required-arg literal completion plus wrong-key alias and deterministic schema-local non-live repair"),
         "stratified_candidate_rules": stratified_generatable,
         "stratified_counts": dict(sorted(stratified_counts.items())),
         "stratified_selected_case_count": len(stratified_generatable),

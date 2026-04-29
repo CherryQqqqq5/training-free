@@ -1,0 +1,31 @@
+{
+  "report_scope": "current_provider_preflight_status",
+  "offline_only": true,
+  "does_not_authorize_scorer": true,
+  "source_collection_rerun_ready": false,
+  "candidate_evaluation_ready": false,
+  "attempted_category": "multi_turn_long_context",
+  "attempted_command_scope": "baseline_source_collection_preflight_only",
+  "attempted_provider_profiles": [
+    {
+      "provider_profile": "openrouter",
+      "expected_api_key_env": "OPENROUTER_API_KEY",
+      "result": "blocked",
+      "http_status": 401,
+      "failure_class": "missing_authentication_header"
+    },
+    {
+      "provider_profile": "novacode",
+      "expected_api_key_env": "NOVACODE_API_KEY",
+      "result": "blocked",
+      "http_status": 401,
+      "failure_class": "invalid_api_key"
+    }
+  ],
+  "local_proxy_preflight_started": true,
+  "bfcl_or_model_run_completed": false,
+  "raw_trace_score_result_artifacts_committed": false,
+  "raw_artifacts_cleaned_after_attempt": true,
+  "blocking_condition": "valid_provider_credential_required_before_source_collection_or_scorer",
+  "next_required_action": "configure_valid_approved_provider_credentials_then_run_planned_baseline_source_collection_commands"
+}
