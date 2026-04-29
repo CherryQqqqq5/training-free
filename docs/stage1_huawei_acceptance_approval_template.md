@@ -188,7 +188,148 @@ No-leakage requirements:
 - Candidate rules must not change provider, model, evaluator, BFCL tool schema,
   trajectory order, or tool choice unless separately approved.
 
-## 4. Dev, Holdout, and Full-Suite Relationship
+## 4. Authorization Gate Sequence
+
+Each gate requires a separate recorded approval. Passing an earlier gate does not
+authorize a later gate.
+
+### 4.1 Source Collection Authorization
+
+Required before running source collection commands:
+
+```text
+provider_green_preflight_passed = true
+provider_unblock_signed = true
+provider_profile = frozen
+expected_api_key_env = frozen env var name only
+base_url = frozen sanitized value
+upstream_model_route = frozen
+bfcl_model_alias = frozen
+runtime_config_path = frozen
+allowed_categories = signed list
+allowed_splits = provider_preflight, source_collection
+budget_timeout_policy_present = true
+raw_diagnostics_storage_outside_deliverable_artifacts = true
+compact_artifact_output_location = signed
+source_collection_approval_owner:
+huawei_acceptance_owner:
+engineering_execution_owner:
+approval_timestamp_utc:
+```
+
+Source collection authorization permits only the signed source collection
+commands. It does not authorize candidate pool promotion, dev scorer, holdout
+scorer, full BFCL scorer, paired comparison, or any performance claim.
+
+### 4.2 Candidate Pool Promotion Authorization
+
+Required before promoting extractor outputs to acceptance candidate-pool
+evidence:
+
+```text
+source_collection_completed = true
+source_manifests_signed = true
+artifact_boundary_passed = true
+candidate_family = explicit_required_arg_literal_completion
+explicit_literal_candidate_pool_passed = true
+candidate_generatable_count >= 35
+retain_eligible_candidate_count >= 35
+explicit_ambiguous_literal_present = false
+no_leakage_check_passed = true
+dev20_manifest_ready = true
+holdout20_manifest_ready = true
+dev_holdout_disjoint = true
+manifest_case_integrity_passed = true
+candidate_pool_approval_owner:
+huawei_acceptance_owner:
+approval_timestamp_utc:
+```
+
+Candidate pool promotion does not authorize any scorer. Offline extractor
+candidates, rejection audits, and pool summaries remain diagnostic until this
+gate is signed.
+
+### 4.3 Dev Scorer Authorization
+
+Required before running dev baseline/candidate scorer commands:
+
+```text
+provider_green_preflight_passed = true
+candidate_pool_promotion_signed = true
+m2_8pre_offline_passed = true
+sota_or_acceptance_baseline_frozen_before_scorer = true
+dev20_manifest_ready = true
+dev_holdout_disjoint = true
+planned_dev_baseline_command:
+planned_dev_candidate_command:
+raw_artifact_storage_location:
+compact_artifact_output_location:
+dev_scorer_approval_owner:
+huawei_acceptance_owner:
+engineering_execution_owner:
+approval_timestamp_utc:
+```
+
+Dev scorer authorization permits only signed dev scorer commands. It does not
+authorize holdout scorer, full BFCL scorer, paired full-suite comparison, or any
+external performance claim.
+
+### 4.4 Holdout Scorer Authorization
+
+Required before running holdout baseline/candidate scorer commands:
+
+```text
+dev_scorer_completed = true
+dev_artifact_schema_passed = true
+dev_stop_loss_passed = true
+provider_green_preflight_passed = true
+holdout20_manifest_ready = true
+dev_holdout_disjoint = true
+planned_holdout_baseline_command:
+planned_holdout_candidate_command:
+raw_artifact_storage_location:
+compact_artifact_output_location:
+holdout_scorer_approval_owner:
+huawei_acceptance_owner:
+engineering_execution_owner:
+approval_timestamp_utc:
+```
+
+Holdout scorer authorization permits only signed holdout scorer commands. It
+does not authorize full BFCL scorer or a full-suite claim. Holdout evidence may
+only support an interim or narrow claim if Huawei signs that scope explicitly.
+
+### 4.5 Full BFCL or Huawei Acceptance Scorer Authorization
+
+Required before running full BFCL or Huawei acceptance scorer commands:
+
+```text
+holdout_scorer_completed = true
+holdout_artifact_schema_passed = true
+holdout_stop_loss_passed = true
+provider_green_preflight_passed = true
+sota_or_acceptance_baseline_frozen_before_scorer = true
+benchmark_scope = full_suite | huawei_signed_scope
+test_category = "" unless Huawei signs a narrower scope
+GRC_BFCL_USE_RUN_IDS = 0 unless Huawei signs a narrower scope
+GRC_BFCL_PARTIAL_EVAL = 0 unless Huawei signs a narrower scope
+planned_full_baseline_command:
+planned_full_candidate_command:
+planned_paired_comparison_command:
+raw_artifact_storage_location:
+compact_artifact_output_location:
+full_or_huawei_scorer_approval_owner:
+huawei_acceptance_owner:
+engineering_execution_owner:
+approval_timestamp_utc:
+```
+
+Only this gate may produce formal BFCL performance evidence. A SOTA or `+3pp`
+claim is still prohibited until paired scorer artifacts, run schemas, manifest
+alignment, regression report, cost/latency report, acceptance decision, and
+`absolute_delta_pp >= 3.0` all pass.
+
+## 5. Dev, Holdout, and Full-Suite Relationship
 
 Default Huawei performance acceptance scope is full BFCL unless Huawei explicitly
 approves another scope in writing.
@@ -221,7 +362,7 @@ baseline/candidate manifest alignment = pass
 unacceptable_regression_present = false
 ```
 
-## 5. Final Sign-Off Checklist
+## 6. Final Sign-Off Checklist
 
 All items must be checked before any formal Huawei Stage-1 BFCL performance claim.
 
@@ -260,7 +401,7 @@ All items must be checked before any formal Huawei Stage-1 BFCL performance clai
 [ ] scripts/check_first_stage_bfcl_ready.py --strict passes.
 ```
 
-## 6. Prohibited Claims Until Sign-Off
+## 7. Prohibited Claims Until Sign-Off
 
 Do not claim any of the following while a hard gate is false:
 

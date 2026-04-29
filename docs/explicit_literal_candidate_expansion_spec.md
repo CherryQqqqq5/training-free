@@ -1374,6 +1374,147 @@ deterministic argument/tool-use repair only, and any later performance result
 can be attributed to `explicit_required_arg_literal_completion` rather than a
 mixed repair stack.
 
+### R6 Post-35+ Scorer and Claim Path
+
+R6 starts only after the explicit-literal candidate-pool gate passes with at
+least 35 deduplicated, leakage-clean, demote-eligible candidates. It defines how
+the pool becomes frozen rules, how dev/holdout scoring is authorized, and what
+evidence is required before a `+3pp` claim. R6 does not add memory,
+postcondition, CTSPC, wrong-key alias, schema-local, or structured-retry
+families.
+
+#### Retention and Selection Gate
+
+Freeze the pool only when every selected record satisfies:
+
+- `candidate_rules_type="explicit_required_arg_literal_completion"`;
+- `rule_type="explicit_required_arg_literal_completion"`;
+- `candidate_generatable=true`;
+- `retention_prior.retain_eligibility="demote_candidate"`;
+- `retention_prior.intervention_scope="argument_only"`;
+- `retention_prior.tool_choice_mutation=false`;
+- `retention_prior.trajectory_mutation=false`;
+- `retention_prior.exact_tool_choice=false`;
+- `literal_source in {current_request, current_observation}`;
+- non-empty `literal_source_span` and `literal_source_text_hash`;
+- `used_gold_fields=false`;
+- `used_score_fields=false`;
+- `used_candidate_output=false`.
+
+Selection rules:
+
+1. Sort with the existing 35+ pool ordering.
+2. Deduplicate by `case_id`.
+3. Build `dev20` by category round-robin from the sorted pool.
+4. Build `holdout20` from remaining cases only.
+5. Require zero dev/holdout overlap.
+6. Preserve a frozen candidate-rule bundle, candidate manifest, selected-case
+   hashes, tool-schema hash, runtime-config hash, provider route id, and
+   protocol id before any scorer run.
+
+If fewer than 40 clean candidates exist, dev-only diagnostic scoring may be
+requested only with explicit acceptance-owner approval. It cannot authorize
+holdout or performance claims.
+
+#### Pool to Rules
+
+Rules generated from the frozen pool must be argument-only:
+
+- match on `case_id`, tool name, schema arg name, and missing required arg;
+- fill exactly one missing argument with the grounded `selected_literal`;
+- preserve the emitted tool choice and call order;
+- never add a tool call, remove a tool call, retry a call, or change existing
+  emitted arg values;
+- disable any record whose source span/hash cannot be reproduced from the
+  frozen manifest.
+
+The rule bundle must contain no memory/postcondition/CTSPC records and no
+non-explicit repair family. Mixed-family bundles invalidate attribution.
+
+#### Dev Scorer Gate
+
+Dev scorer may run only after provider green, artifact-boundary pass, frozen
+rules, and complete dev20 manifest. Baseline and candidate runs must use the
+same protocol id, model alias, provider profile, runtime config, category/case
+ids, tool schemas, and scorer configuration.
+
+Dev pass requires all of:
+
+- candidate accuracy greater than baseline accuracy;
+- `absolute_delta_pp >= 3.0` on the registered dev20 comparison;
+- fixed cases greater than regressed cases;
+- no leakage or artifact-boundary blocker;
+- no manifest drift across baseline/candidate;
+- cost and latency within registered bounds;
+- candidate activation report shows only explicit missing-argument literal fills.
+
+Dev stop-loss:
+
+- if candidate accuracy is not greater than baseline, stop;
+- if `absolute_delta_pp < 3.0`, stop;
+- if regressions are greater than or equal to fixes, stop;
+- if activation is zero or activation includes non-explicit mutations, stop;
+- if any leakage, protocol drift, schema drift, or artifact-boundary failure is
+  detected, invalidate the run;
+- do not run holdout, do not retain rules, and do not claim performance.
+
+Dev pass authorizes only holdout execution. It is not a full performance claim.
+
+#### Attribution Ablation
+
+To attribute any gain to deterministic explicit-literal repair, run or report
+the following paired ablations under the same selected cases and frozen
+protocol:
+
+- `baseline`: no candidate rules;
+- `explicit_literal_only`: frozen
+  `explicit_required_arg_literal_completion` rules enabled;
+- `noop_rules_control`: same runtime hook enabled but no argument fill, or a
+  rule bundle filtered to zero active rules.
+
+Required attribution evidence:
+
+- `explicit_literal_only` improves over `baseline`;
+- `noop_rules_control` does not reproduce the gain;
+- activated fixes correspond to cases with missing required args and grounded
+  prompt/observation literals;
+- no memory/postcondition/CTSPC/wrong-key/schema-local/structured-retry record
+  is active in the candidate run;
+- regression report separates fixed, unchanged, and regressed cases.
+
+If the noop control improves similarly, the gain cannot be attributed to the
+explicit-literal rules and the claim must be withheld.
+
+#### Holdout and +3pp Claim Gate
+
+Holdout may run only after dev pass and with the pre-frozen holdout20 manifest.
+Do not reorder holdout by dev feedback. Holdout baseline/candidate must reuse the
+same protocol, provider route, runtime config, tool schemas, and frozen rule
+bundle.
+
+A `+3pp` explicit-literal contribution claim is allowed only when:
+
+- dev pass criteria are met;
+- holdout candidate accuracy is greater than holdout baseline accuracy;
+- holdout `absolute_delta_pp >= 3.0` under the registered comparison;
+- paired comparison, regression, cost/latency, artifact-boundary, and manifest
+  gates pass;
+- attribution ablation supports explicit-literal-only causality;
+- acceptance owner confirms scorer authorization and comparison protocol.
+
+Allowed wording after the gate passes:
+
+```text
+Under the frozen BFCL dev/holdout protocol, deterministic
+explicit_required_arg_literal_completion rules improved the selected BFCL slice
+by at least +3 percentage points over the matched baseline. The evidence is
+limited to argument-only missing-required-literal repair and does not claim
+memory, postcondition, CTSPC, or full-suite improvement.
+```
+
+Before the gate passes, write only that the pool/checker/scorer path is prepared
+or blocked. Do not claim `+3pp`, retained performance, SOTA, or full-suite gain.
+
 Minimum fixtures:
 
 - `dataset_record_one_missing_arg`
