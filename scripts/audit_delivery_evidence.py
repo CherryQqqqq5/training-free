@@ -38,6 +38,7 @@ DEFAULT_OUTPUT_CONTRACT_BROADER_AUDIT = Path("outputs/artifacts/phase2/output_co
 DEFAULT_OUTPUT_CONTRACT_PAIR_INVENTORY = Path("outputs/artifacts/phase2/output_contract_preservation_v1/observable_output_contract_pair_inventory.json")
 DEFAULT_EXPLICIT_OBLIGATION_AUDIT = Path("outputs/artifacts/phase2/explicit_obligation_observable_capability_v1/explicit_obligation_observable_capability_audit.json")
 DEFAULT_EXPLICIT_OBLIGATION_PROTOCOL = Path("outputs/artifacts/phase2/explicit_obligation_observable_capability_v1/explicit_obligation_smoke_protocol.json")
+DEFAULT_EXPLICIT_OBLIGATION_EXECUTABILITY = Path("outputs/artifacts/phase2/explicit_obligation_observable_capability_v1/explicit_obligation_smoke_executability.json")
 DEFAULT_OUT = Path("outputs/artifacts/bfcl_explicit_required_arg_literal_v1/delivery_evidence_audit.json")
 DEFAULT_MD = Path("outputs/artifacts/bfcl_explicit_required_arg_literal_v1/delivery_evidence_audit.md")
 
@@ -358,9 +359,11 @@ def output_contract_status(
 def explicit_obligation_status(
     path: Path = DEFAULT_EXPLICIT_OBLIGATION_AUDIT,
     protocol_path: Path = DEFAULT_EXPLICIT_OBLIGATION_PROTOCOL,
+    executability_path: Path = DEFAULT_EXPLICIT_OBLIGATION_EXECUTABILITY,
 ) -> dict[str, Any]:
     report = _load_json(path, {}) or {}
     protocol = _load_json(protocol_path, {}) or {}
+    executability = _load_json(executability_path, {}) or {}
     return {
         "explicit_obligation_audit_ready": bool(report.get("report_scope") == "explicit_obligation_observable_capability_audit"),
         "explicit_obligation_retain_prior_coverage_ready": bool(report.get("retain_prior_coverage_ready")),
@@ -382,6 +385,13 @@ def explicit_obligation_status(
         "explicit_obligation_protocol_candidate_set_frozen": bool(protocol.get("candidate_set_frozen")),
         "explicit_obligation_protocol_frozen_candidate_hash": protocol.get("frozen_candidate_hash"),
         "explicit_obligation_protocol_allowed_provider_profiles": protocol.get("allowed_provider_profiles") or [],
+        "explicit_obligation_bfcl_executable_manifest_ready": bool(executability.get("bfcl_executable_manifest_ready")),
+        "explicit_obligation_executable_case_id_count": int(executability.get("executable_case_id_count") or 0),
+        "explicit_obligation_executable_record_count": int(executability.get("record_count") or 0),
+        "explicit_obligation_missing_bfcl_case_id_count": int(executability.get("missing_bfcl_case_id_count") or 0),
+        "explicit_obligation_dependency_not_ready_count": int(executability.get("dependency_not_ready_count") or 0),
+        "explicit_obligation_executability_blockers": executability.get("blockers") or [],
+        "explicit_obligation_executability_next_required_action": executability.get("next_required_action"),
     }
 
 def source_result_layout_status(low_risk_root: Path = DEFAULT_LOW_RISK) -> dict[str, Any]:
@@ -470,6 +480,8 @@ def evaluate(
         p0_blockers.append("low_risk_unmet_postcondition_pool_too_small")
     if memory_activation.get("memory_activation_simulation_passed") and not memory_runtime_smoke.get("memory_runtime_adapter_ready"):
         p0_blockers.append("memory_runtime_adapter_not_ready")
+    if explicit_obligation.get("explicit_obligation_protocol_ready_for_review") and not explicit_obligation.get("explicit_obligation_bfcl_executable_manifest_ready"):
+        p0_blockers.append("explicit_obligation_protocol_not_bfcl_executable")
     return {
         "report_scope": "first_stage_delivery_evidence_audit",
         "offline_only": True,
@@ -510,7 +522,13 @@ def evaluate(
         "memory_activation_simulation": memory_activation,
         "memory_runtime_smoke": memory_runtime_smoke,
         "source_result_layout": source_layout,
-        "next_required_action": "request_separate_memory_heavy_smoke_approval" if explicit_obligation.get("explicit_obligation_protocol_ready_for_review") else ("build_explicit_obligation_smoke_protocol_before_any_scorer" if explicit_obligation.get("explicit_obligation_smoke_ready") else "root_cause_audit_before_any_scorer"),
+        "next_required_action": (
+            "request_separate_memory_heavy_smoke_approval"
+            if explicit_obligation.get("explicit_obligation_bfcl_executable_manifest_ready")
+            else (explicit_obligation.get("explicit_obligation_executability_next_required_action") or "build_explicit_obligation_smoke_protocol_before_any_scorer")
+            if explicit_obligation.get("explicit_obligation_protocol_ready_for_review")
+            else ("build_explicit_obligation_smoke_protocol_before_any_scorer" if explicit_obligation.get("explicit_obligation_smoke_ready") else "root_cause_audit_before_any_scorer")
+        ),
     }
 
 
@@ -638,6 +656,10 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Protocol approval/execution: `{report['explicit_obligation_observable_capability']['explicit_obligation_protocol_approval_status']}` / `{report['explicit_obligation_observable_capability']['explicit_obligation_protocol_execution_allowed']}`",
         f"- Protocol candidate frozen/hash: `{report['explicit_obligation_observable_capability']['explicit_obligation_protocol_candidate_set_frozen']}` / `{report['explicit_obligation_observable_capability']['explicit_obligation_protocol_frozen_candidate_hash']}`",
         f"- Protocol allowed providers: `{report['explicit_obligation_observable_capability']['explicit_obligation_protocol_allowed_provider_profiles']}`",
+        f"- Protocol BFCL executable ready: `{report['explicit_obligation_observable_capability']['explicit_obligation_bfcl_executable_manifest_ready']}`",
+        f"- Protocol executable ids: `{report['explicit_obligation_observable_capability']['explicit_obligation_executable_case_id_count']}` / `{report['explicit_obligation_observable_capability']['explicit_obligation_executable_record_count']}`",
+        f"- Protocol missing BFCL ids: `{report['explicit_obligation_observable_capability']['explicit_obligation_missing_bfcl_case_id_count']}`",
+        f"- Protocol executability blockers: `{report['explicit_obligation_observable_capability']['explicit_obligation_executability_blockers']}`",
         f"- Blockers: `{report['explicit_obligation_observable_capability']['explicit_obligation_blockers']}`",
         f"- Next action: `{report['explicit_obligation_observable_capability']['explicit_obligation_next_required_action']}`",
         "",
@@ -743,6 +765,8 @@ def main() -> int:
             "explicit_obligation_protocol_memory_heavy": report["explicit_obligation_observable_capability"]["explicit_obligation_protocol_memory_heavy"],
             "explicit_obligation_protocol_execution_allowed": report["explicit_obligation_observable_capability"]["explicit_obligation_protocol_execution_allowed"],
             "explicit_obligation_protocol_approval_status": report["explicit_obligation_observable_capability"]["explicit_obligation_protocol_approval_status"],
+            "explicit_obligation_bfcl_executable_manifest_ready": report["explicit_obligation_observable_capability"]["explicit_obligation_bfcl_executable_manifest_ready"],
+            "explicit_obligation_missing_bfcl_case_id_count": report["explicit_obligation_observable_capability"]["explicit_obligation_missing_bfcl_case_id_count"],
             "memory_operation_candidate_count": report["memory_operation_obligation"]["memory_operation_candidate_count"],
             "memory_operation_runtime_enabled": report["memory_operation_obligation"]["memory_operation_runtime_enabled"],
             "memory_operation_negative_control_audit_passed": report["memory_operation_obligation"]["memory_operation_negative_control_audit_passed"],

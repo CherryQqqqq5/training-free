@@ -3,7 +3,7 @@
 - Claim status: `scaffold_and_diagnostic_package_only`
 - SOTA +3pp claim ready: `False`
 - Offline only: `True`
-- P0 blockers: `['artifact_boundary_not_clean', 'm2_8pre_offline_not_passed', 'scorer_authorization_not_ready', 'policy_conversion_not_observed_in_existing_traces', 'runtime_dry_run_compiler_not_ready', 'postcondition_dev_smoke_stop_loss_failed', 'postcondition_candidate_mining_gap_filter_not_passed', 'postcondition_smoke_protocol_not_ready', 'low_risk_unmet_postcondition_pool_too_small']`
+- P0 blockers: `['artifact_boundary_not_clean', 'm2_8pre_offline_not_passed', 'scorer_authorization_not_ready', 'policy_conversion_not_observed_in_existing_traces', 'runtime_dry_run_compiler_not_ready', 'postcondition_dev_smoke_stop_loss_failed', 'postcondition_candidate_mining_gap_filter_not_passed', 'postcondition_smoke_protocol_not_ready', 'low_risk_unmet_postcondition_pool_too_small', 'explicit_obligation_protocol_not_bfcl_executable']`
 
 ## Gate Snapshot
 
@@ -117,6 +117,10 @@
 - Protocol approval/execution: `pending` / `False`
 - Protocol candidate frozen/hash: `True` / `72aeb6ac7d57031c777037f208f3910f3214c255af2d3ec7ffdff8ed522caff8`
 - Protocol allowed providers: `['novacode']`
+- Protocol BFCL executable ready: `False`
+- Protocol executable ids: `0` / `20`
+- Protocol missing BFCL ids: `20`
+- Protocol executability blockers: `['explicit_protocol_not_bfcl_executable', 'protocol_case_ids_include_audit_ids']`
 - Blockers: `[]`
 - Next action: `build_multi_family_smoke_protocol`
 
