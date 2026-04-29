@@ -226,14 +226,18 @@ def _literal_spans(text: str) -> list[tuple[str, int, int]]:
 
 
 def _literal_source(entry: dict[str, Any], row: dict[str, Any]) -> tuple[str | None, tuple[str, int, int] | None, str | None]:
+    request_spans = _literal_spans(_question_text(entry))
     observation_spans = _literal_spans(_observation_text(entry, row))
-    if len(observation_spans) == 1:
-        return "current_observation", observation_spans[0], None
     if len(observation_spans) > 1:
         return None, None, "ambiguous_literal"
-    request_spans = _literal_spans(_question_text(entry))
+    if len(request_spans) > 1:
+        return None, None, "ambiguous_literal"
     if len(request_spans) == 1:
+        if len(observation_spans) == 1 and observation_spans[0][0] != request_spans[0][0]:
+            return None, None, "ambiguous_observable_literal"
         return "current_request", request_spans[0], None
+    if len(observation_spans) == 1:
+        return "current_observation", observation_spans[0], None
     return None, None, "ambiguous_literal"
 
 
@@ -305,8 +309,12 @@ def _extract_candidates(
                 reject(literal_error or "ambiguous_literal", case_id=case_id, category=category)
                 continue
             fns = _function_map(entry)
+            calls = _tool_calls(row.get("result"))
+            if len(calls) != 1:
+                reject("parallel_call_mapping_not_unique", case_id=case_id, category=category, tool_call_count=len(calls))
+                continue
             emitted = False
-            for tool, args in _tool_calls(row.get("result")):
+            for tool, args in calls:
                 fn = fns.get(tool)
                 if not fn:
                     continue

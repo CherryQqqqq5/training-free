@@ -103,6 +103,22 @@ extractor summaries are scaffold diagnostic evidence only while the state is
 `provider_blocked`; they must not count toward the 35+ candidate pool, source
 collection evidence, scorer authorization, or any SOTA/`+3pp` claim.
 
+R2 `current_observation` candidates are still offline extractor candidates while
+the state is `provider_blocked`. They must not count toward source collection
+evidence, the 35+ candidate pool, scorer authorization, BFCL performance
+evidence, or any SOTA/`+3pp` claim until provider green preflight has passed,
+source manifests are signed, and the later pool/split gates pass. Acceptance-safe
+`literal_source_span` wording is: the span must identify the visible source
+(`current_request` or `current_observation`), exact start/end offsets, and exact
+span text used for `literal_source_text_hash`; `turn_index` is optional unless
+the extractor consumes a trace format that preserves turn indices.
+
+R3 parallel/priority rejected records remain diagnostic-only in
+`provider_blocked`. Accepted offline extractor candidates from R3 still do not
+count toward source collection evidence, scorer authorization, BFCL performance
+evidence, or any SOTA/`+3pp` claim until provider green preflight has passed and
+the later pool/split gates pass.
+
 Prohibited claim:
 
 - Provider green.

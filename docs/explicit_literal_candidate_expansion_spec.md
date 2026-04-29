@@ -846,6 +846,225 @@ Checker expectations:
 - the candidate must not enter dev/holdout unless it is unique by `case_id` and
   the normal pool/split thresholds are satisfied.
 
+### R3 Parallel Rejection and Source Priority
+
+R3 is a bounded quality increment. It should not add provider/scorer execution,
+new repair families, memory/postcondition behavior, or broad parser support. It
+adds one fail-closed parallel rejection and one deterministic source-priority
+rule so later source expansion does not admit unstable candidates.
+
+R3 scope:
+
+- reject ambiguous parallel tool-call mappings with
+  `parallel_call_mapping_not_unique`;
+- apply deterministic source priority when both request and prior observation
+  contain literals;
+- keep `candidate_rules.jsonl` accepted-only;
+- write rejected records only under
+  `explicit_literal_extractor_audit.json.rejections`;
+- preserve the checker-required accepted fields unchanged.
+
+#### Parallel Mapping Rejection
+
+Rejection reason:
+
+```text
+parallel_call_mapping_not_unique
+```
+
+Use this rejection when a result row has multiple emitted tool calls and the
+extractor cannot prove a single selected call maps to exactly one dataset
+function and exactly one missing required argument. Do not guess by call order
+when two calls have the same normalized tool name, when two schema functions
+normalize to the same emitted name, or when two candidate calls would generate
+different missing-arg repairs for the same case.
+
+Fixture: `r3_parallel_call_mapping_not_unique`
+
+Dataset prompt/schema:
+
+- category: `parallel_multiple`;
+- one case with request text containing exactly one visible literal, for
+  example `"audit.log"`;
+- function schema has tool `grep` with required args
+  `["pattern", "file_name"]`.
+
+Baseline result/trace:
+
+- result row contains two emitted `grep` calls for the same case;
+- each call maps to the same schema function;
+- each call omits `file_name`;
+- both calls are plausible repair targets and no trace metadata identifies one
+  as the selected repaired call.
+
+Expected rejected audit record:
+
+```json
+{
+  "case_id": "case_parallel_r3",
+  "category": "parallel_multiple",
+  "source_run_root": "/tmp/source/parallel_multiple/baseline",
+  "candidate_generatable": false,
+  "candidate_rules_type": "explicit_required_arg_literal_completion",
+  "rule_type": "explicit_required_arg_literal_completion",
+  "rejection_reason": "parallel_call_mapping_not_unique",
+  "tool": "grep",
+  "schema_arg_name": "file_name",
+  "literal_source": null,
+  "used_gold_fields": false,
+  "used_score_fields": false,
+  "used_candidate_output": false,
+  "tool_call_count": 2,
+  "matched_tool_call_count": 2,
+  "missing_required_args": ["file_name"]
+}
+```
+
+Expected summary/audit fields:
+
+- `accepted_record_count=0`;
+- `rejected_record_count=1`;
+- `reject_reason_counts={"parallel_call_mapping_not_unique": 1}`;
+- `candidate_record_count=0`;
+- `eligible_count=0`;
+- `planned_commands=[]`;
+- `candidate_commands=[]`.
+
+No-leakage constraints:
+
+- the rejection must be derivable from dataset schema plus baseline result/trace
+  structure only;
+- the extractor must not inspect scorer/gold/expected/reference/candidate-output
+  fields to choose between parallel calls;
+- all rejected records must keep `used_gold_fields=false`,
+  `used_score_fields=false`, and `used_candidate_output=false`;
+- rejected parallel records must never be written to runtime candidate JSONL.
+
+BFCL validity protection:
+
+- prevents a rule from filling an argument on the wrong tool call in BFCL
+  parallel categories;
+- prevents inflated candidate counts from duplicated same-case calls;
+- preserves exact tool-choice and argument-only intervention assumptions for
+  accepted explicit-literal candidates.
+
+#### Request/Observation Priority Rules
+
+When both `current_request` and prior `current_observation` are available, R3
+must choose candidates by deterministic priority rather than merging all
+literals into one ambiguous bag.
+
+Implementation-safe decision order:
+
+1. Build schema-compatible literal sets separately for `current_request` and
+   prior `current_observation`; do not merge them before counting.
+2. Reject with `ambiguous_observable_literal` when either source has more than
+   one compatible literal for the missing arg.
+3. When both sources have one compatible literal:
+   - if their normalized typed values are equal, accept the request literal and
+     set `literal_source="current_request"`;
+   - if their normalized typed values differ, reject with
+     `ambiguous_observable_literal`.
+4. When only `current_request` has one compatible literal, accept it and set
+   `literal_source="current_request"`.
+5. When only prior `current_observation` has one compatible literal, accept it
+   and set `literal_source="current_observation"`.
+6. Ignore observations after the selected emitted tool call; using them is a
+   leakage failure, not a candidate.
+
+This order is intentionally request-preferred only for the same-literal case.
+It does not allow a request literal to silently override a different prior
+observation literal.
+
+Fixture: `r3_request_preferred_over_observation_same_literal`
+
+Dataset prompt/schema:
+
+- category: `multi_turn_long_context`;
+- tool `grep`, missing required arg `file_name`;
+- request contains exactly one literal: `"archive.log"`;
+- prior observation before the call also contains `"archive.log"`.
+
+Expected accepted candidate differences from R2:
+
+```json
+{
+  "case_id": "case_priority_same_literal",
+  "category": "multi_turn_long_context",
+  "candidate_generatable": true,
+  "candidate_origin": "current_request_explicit_literal_extractor",
+  "candidate_rules_type": "explicit_required_arg_literal_completion",
+  "rule_type": "explicit_required_arg_literal_completion",
+  "tool": "grep",
+  "schema_arg_name": "file_name",
+  "selected_literal": "archive.log",
+  "literal_source": "current_request",
+  "literal_source_span": {
+    "source": "current_request",
+    "text": "archive.log"
+  },
+  "literal_source_text_hash": "<sha256-of-request-span-text>",
+  "used_gold_fields": false,
+  "used_score_fields": false,
+  "used_candidate_output": false,
+  "retention_prior": {
+    "retain_eligibility": "demote_candidate",
+    "literal_source": "current_request",
+    "intervention_scope": "argument_only",
+    "tool_choice_mutation": false,
+    "trajectory_mutation": false,
+    "exact_tool_choice": false
+  }
+}
+```
+
+Fixture: `r3_request_observation_conflict_rejected`
+
+Dataset prompt/schema:
+
+- category: `multi_turn_long_context`;
+- tool `grep`, missing required arg `file_name`;
+- request contains exactly one compatible literal: `"request.log"`;
+- prior observation before the call contains a different compatible literal:
+  `"observed.log"`.
+
+Expected rejected audit record:
+
+```json
+{
+  "case_id": "case_priority_conflict",
+  "category": "multi_turn_long_context",
+  "source_run_root": "/tmp/source/multi_turn_long_context/baseline",
+  "candidate_generatable": false,
+  "candidate_rules_type": "explicit_required_arg_literal_completion",
+  "rule_type": "explicit_required_arg_literal_completion",
+  "rejection_reason": "ambiguous_observable_literal",
+  "tool": "grep",
+  "schema_arg_name": "file_name",
+  "literal_source": null,
+  "literal_sources": ["current_request", "current_observation"],
+  "used_gold_fields": false,
+  "used_score_fields": false,
+  "used_candidate_output": false,
+  "literal_candidates": ["request.log", "observed.log"],
+  "literal_candidate_count": 2,
+  "schema_type": "string"
+}
+```
+
+Checker expectations:
+
+- accepted request-priority records pass the existing checker because
+  `literal_source="current_request"` is allowed and all 17 required fields are
+  present;
+- accepted observation records from R2 remain checker-eligible because
+  `literal_source="current_observation"` is allowed;
+- rejected priority-conflict and parallel records do not enter
+  `candidate_rules.jsonl`, so they cannot count toward 35+ or dev/holdout;
+- if a rejected record is accidentally written to candidate JSONL, it must fail
+  checker eligibility because `candidate_generatable=false`, required accepted
+  fields may be null, and/or `literal_source` is not one allowed accepted source.
+
 Minimum fixtures:
 
 - `dataset_record_one_missing_arg`
