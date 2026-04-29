@@ -559,6 +559,203 @@ Extractor fixture matrix:
 | `schema_mismatch` | Prompt contains a visible literal whose surface is incompatible with the missing arg schema, for example `"five"` when schema type is integer or a string outside enum. | Result emits matching tool with that required arg missing. | Reject with `rejection_reason="schema_type_mismatch"`; no accepted record. | Does not count toward pool; validates type normalization is fail-closed. |
 | `dev_holdout_split_40_cases` | Forty accepted synthetic records spanning the priority categories and at least several tools; each record has unique `case_id`, allowed literal source, span/hash, and demote retention prior. | Result/trace fixtures are already converted into accepted candidate records or generated through the extractor path. | `candidate_rules.jsonl` has at least 40 accepted records; dev manifest has 20 unique ids; holdout manifest has 20 unique ids; both include distributions, no commands, and zero overlap. | `scripts.check_explicit_literal_candidate_pool.evaluate` passes; then perturb duplicates/overlap/missing hash to confirm fail-closed blockers. |
 
+### R1 Rejection Taxonomy Increment
+
+After the current-request happy path, the next real extractor increment is a
+single rejection-taxonomy pass. It must not add scorer execution, observation
+grounding, holdout selection changes, or non-explicit repair families. Its goal
+is to make failure accounting stable before broad source expansion.
+
+R1 scope:
+
+- keep accepted-candidate behavior unchanged for `happy_path_current_request`;
+- emit rejected records into `explicit_literal_extractor_audit.json.rejections`;
+- keep `candidate_rules.jsonl` accepted-only;
+- report canonical counts in
+  `explicit_literal_extractor_audit.json.reject_reason_counts` and
+  `explicit_literal_candidate_pool_build_summary.json.reject_reason_counts`;
+- use canonical `rejection_reason` on every rejected record. A temporary
+  backward-compatible `reason` alias is allowed during migration, but
+  `rejection_reason` is the field downstream code must consume.
+
+Canonical R1 reject reasons:
+
+- `missing_source_result`
+- `parallel_call_mapping_not_unique`
+- `ambiguous_observable_literal`
+- `schema_type_mismatch`
+
+R1 must retire provisional reason names from build outputs:
+
+- `result_jsonl_missing_or_empty` -> `missing_source_result`
+- `current_request_literal_not_unique` -> `ambiguous_observable_literal`
+- `no_single_missing_required_arg` remains diagnostic-only outside R1 unless
+  engineering narrows it to one of the canonical reasons with evidence.
+
+Rejected audit records must preserve enough context for source expansion
+debugging while remaining leakage-safe. Required rejected-record fields:
+
+- `case_id`: string, or `null` only when no result row exists for a category;
+- `category`: BFCL category;
+- `source_run_root`: source artifact root, when known;
+- `candidate_generatable`: `false`;
+- `candidate_rules_type`: `explicit_required_arg_literal_completion`;
+- `rule_type`: `explicit_required_arg_literal_completion`;
+- `rejection_reason`: one canonical R1 reason;
+- `tool`: emitted tool name when known, otherwise `null`;
+- `schema_arg_name`: missing required arg when known, otherwise `null`;
+- `literal_source`: `current_request` when rejection is about prompt grounding,
+  otherwise `null`;
+- `used_gold_fields`: `false`;
+- `used_score_fields`: `false`;
+- `used_candidate_output`: `false`.
+
+Optional rejected-record audit fields:
+
+- `source_result_path`
+- `result_row_count`
+- `tool_call_count`
+- `matched_tool_call_count`
+- `missing_required_args`
+- `literal_candidates`
+- `literal_candidate_count`
+- `schema_type`
+- `literal_source_span`
+- `literal_source_text_hash`
+
+Precise R1 fixture expectations:
+
+```json
+{
+  "fixture": "missing_source_result",
+  "candidate_rules_jsonl_rows": [],
+  "summary_patch": {
+    "accepted_record_count": 0,
+    "rejected_record_count": 1,
+    "reject_reason_counts": {"missing_source_result": 1}
+  },
+  "audit_rejection": {
+    "case_id": null,
+    "category": "multi_turn_miss_func",
+    "source_run_root": "/tmp/source/multi_turn_miss_func/baseline",
+    "candidate_generatable": false,
+    "candidate_rules_type": "explicit_required_arg_literal_completion",
+    "rule_type": "explicit_required_arg_literal_completion",
+    "rejection_reason": "missing_source_result",
+    "tool": null,
+    "schema_arg_name": null,
+    "literal_source": null,
+    "used_gold_fields": false,
+    "used_score_fields": false,
+    "used_candidate_output": false,
+    "source_result_path": null,
+    "result_row_count": 0
+  }
+}
+```
+
+```json
+{
+  "fixture": "parallel_call_mapping_not_unique",
+  "candidate_rules_jsonl_rows": [],
+  "summary_patch": {
+    "accepted_record_count": 0,
+    "rejected_record_count": 1,
+    "reject_reason_counts": {"parallel_call_mapping_not_unique": 1}
+  },
+  "audit_rejection": {
+    "case_id": "case_parallel_1",
+    "category": "parallel_multiple",
+    "source_run_root": "/tmp/source/parallel_multiple/baseline",
+    "candidate_generatable": false,
+    "candidate_rules_type": "explicit_required_arg_literal_completion",
+    "rule_type": "explicit_required_arg_literal_completion",
+    "rejection_reason": "parallel_call_mapping_not_unique",
+    "tool": "grep",
+    "schema_arg_name": "file_name",
+    "literal_source": null,
+    "used_gold_fields": false,
+    "used_score_fields": false,
+    "used_candidate_output": false,
+    "tool_call_count": 2,
+    "matched_tool_call_count": 2,
+    "missing_required_args": ["file_name"]
+  }
+}
+```
+
+```json
+{
+  "fixture": "ambiguous_observable_literal",
+  "candidate_rules_jsonl_rows": [],
+  "summary_patch": {
+    "accepted_record_count": 0,
+    "rejected_record_count": 1,
+    "reject_reason_counts": {"ambiguous_observable_literal": 1}
+  },
+  "audit_rejection": {
+    "case_id": "case_ambiguous_1",
+    "category": "multi_turn_miss_func",
+    "source_run_root": "/tmp/source/multi_turn_miss_func/baseline",
+    "candidate_generatable": false,
+    "candidate_rules_type": "explicit_required_arg_literal_completion",
+    "rule_type": "explicit_required_arg_literal_completion",
+    "rejection_reason": "ambiguous_observable_literal",
+    "tool": "grep",
+    "schema_arg_name": "file_name",
+    "literal_source": "current_request",
+    "used_gold_fields": false,
+    "used_score_fields": false,
+    "used_candidate_output": false,
+    "literal_candidates": ["a.txt", "b.txt"],
+    "literal_candidate_count": 2,
+    "schema_type": "string"
+  }
+}
+```
+
+```json
+{
+  "fixture": "schema_type_mismatch",
+  "candidate_rules_jsonl_rows": [],
+  "summary_patch": {
+    "accepted_record_count": 0,
+    "rejected_record_count": 1,
+    "reject_reason_counts": {"schema_type_mismatch": 1}
+  },
+  "audit_rejection": {
+    "case_id": "case_schema_mismatch_1",
+    "category": "multi_turn_miss_func",
+    "source_run_root": "/tmp/source/multi_turn_miss_func/baseline",
+    "candidate_generatable": false,
+    "candidate_rules_type": "explicit_required_arg_literal_completion",
+    "rule_type": "explicit_required_arg_literal_completion",
+    "rejection_reason": "schema_type_mismatch",
+    "tool": "calculate_area",
+    "schema_arg_name": "height",
+    "literal_source": "current_request",
+    "used_gold_fields": false,
+    "used_score_fields": false,
+    "used_candidate_output": false,
+    "literal_candidates": ["five"],
+    "literal_candidate_count": 1,
+    "schema_type": "integer"
+  }
+}
+```
+
+R1 fixture acceptance criteria:
+
+- each fixture writes zero accepted rows to `candidate_rules.jsonl`;
+- each fixture writes exactly one audit rejection unless the test intentionally
+  includes multiple cases;
+- `reject_reason_counts` contains only canonical R1 reason keys for these
+  cases;
+- no rejected record sets any leakage flag to true;
+- rejected records do not count toward `eligible_count`, dev manifests, or
+  holdout manifests;
+- no fixture introduces scorer/provider commands.
+
 Minimum fixtures:
 
 - `dataset_record_one_missing_arg`

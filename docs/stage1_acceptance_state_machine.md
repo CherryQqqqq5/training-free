@@ -70,6 +70,34 @@ Extractor skeleton and fixture-matrix implementation are allowed in
 - They must keep `does_not_call_provider=true`,
   `does_not_call_bfcl_or_model=true`, and `does_not_authorize_scorer=true`.
 
+Generated empty/default extractor artifacts are allowed in `provider_blocked`
+only as scaffold or fixture evidence. This includes empty `candidate_rules.jsonl`
+files, default dev/holdout manifests, fixture matrices, and skeleton build
+summaries. To avoid being mistaken for source collection or scorer evidence,
+each generated JSON/markdown summary or manifest must label the boundary with
+the equivalent of:
+
+```text
+acceptance_state = provider_blocked
+offline_only = true
+scaffold_evidence_only = true
+fixture_or_skeleton_output = true
+source_collection_evidence = false
+candidate_pool_ready = false
+scorer_authorization_ready = false
+performance_claim_ready = false
+does_not_call_provider = true
+does_not_call_bfcl_or_model = true
+does_not_authorize_scorer = true
+```
+
+Empty/default artifacts must not use names, headings, or `ready=true` fields
+that imply source collection completion, candidate pool readiness, dev/holdout
+approval, scorer authorization, or BFCL performance evidence. If a generated
+artifact contains real candidate rows or selected dev/holdout cases, it is no
+longer treated as an empty/default scaffold artifact and must pass the later
+`candidate_pool_ready` gates before any acceptance claim can cite it.
+
 Prohibited claim:
 
 - Provider green.

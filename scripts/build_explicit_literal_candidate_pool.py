@@ -206,6 +206,30 @@ def _literal_spans(text: str) -> list[tuple[str, int, int]]:
     return list(by_literal.values())
 
 
+def _arg_schema(fn: dict[str, Any], arg: str) -> dict[str, Any]:
+    params = fn.get("parameters") or {}
+    props = params.get("properties") or {}
+    schema = props.get(arg) if isinstance(props, dict) else None
+    return schema if isinstance(schema, dict) else {}
+
+
+def _literal_matches_schema(literal: str, schema: dict[str, Any]) -> bool:
+    expected = str(schema.get("type") or "string").lower()
+    if expected in {"", "string"}:
+        return True
+    if expected in {"integer", "number"}:
+        try:
+            float(literal)
+        except ValueError:
+            return False
+        if expected == "integer" and not re.fullmatch(r"-?\d+", literal):
+            return False
+        return True
+    if expected == "boolean":
+        return literal.lower() in {"true", "false"}
+    return False
+
+
 def _extract_candidates(
     *,
     source_root: Path,
@@ -231,9 +255,13 @@ def _extract_candidates(
         rejections.append({"reason": reason, **payload})
 
     for category, root in _source_roots(source, source_root, categories):
-        rows = _result_rows(_result_file(root, category))
+        result_path = _result_file(root, category)
+        rows = _result_rows(result_path)
+        if result_path is None:
+            reject("missing_source_result", category=category, source_run_root=str(root))
+            continue
         if not rows:
-            reject("result_jsonl_missing_or_empty", category=category, source_run_root=str(root))
+            reject("result_jsonl_empty", category=category, source_run_root=str(root), result_path=str(result_path))
             continue
         for row in rows:
             case_id = str(row.get("id") or row.get("case_id") or "")
@@ -243,7 +271,7 @@ def _extract_candidates(
                 continue
             spans = _literal_spans(_question_text(entry))
             if len(spans) != 1:
-                reject("current_request_literal_not_unique", case_id=case_id, category=category)
+                reject("ambiguous_literal", case_id=case_id, category=category, literal_count=len(spans))
                 continue
             fns = _function_map(entry)
             emitted = False
@@ -256,6 +284,10 @@ def _extract_candidates(
                     continue
                 literal, start, end = spans[0]
                 required_arg = missing[0]
+                if not _literal_matches_schema(literal, _arg_schema(fn, required_arg)):
+                    reject("schema_type_mismatch", case_id=case_id, category=category, required_arg=required_arg, literal=literal)
+                    emitted = True
+                    break
                 span_hash = hashlib.sha256(literal.encode("utf-8")).hexdigest()
                 candidates.append({
                     "case_id": case_id,

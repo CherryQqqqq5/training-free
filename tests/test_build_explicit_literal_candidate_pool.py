@@ -181,5 +181,69 @@ def test_build_explicit_literal_candidate_pool_rejects_non_unique_literal(tmp_pa
 
     assert report["candidate_pool_build_passed"] is False
     assert report["candidate_record_count"] == 0
-    assert report["reject_reason_counts"]["current_request_literal_not_unique"] == 1
+    assert report["reject_reason_counts"]["ambiguous_literal"] == 1
     assert "eligible_explicit_literal_candidates_below_minimum" in report["blockers"]
+
+
+def test_build_explicit_literal_candidate_pool_rejects_missing_source_result(tmp_path: Path) -> None:
+    source_root = tmp_path / "source" / "multi_turn_miss_func" / "baseline"
+    source_root.mkdir(parents=True)
+    source_manifest = tmp_path / "source_manifest.json"
+    _write_json(source_manifest, {"category_status": [{"category": "multi_turn_miss_func", "existing_source_roots": [str(source_root)]}]})
+    dataset = tmp_path / "dataset.json"
+    _write_json(dataset, [{"id": "case_1", "question": [[{"role": "user", "content": "Search 'notes.txt'."}]], "function": []}])
+
+    report = build(
+        source_manifest=source_manifest,
+        dataset_json=dataset,
+        out_candidates=tmp_path / "candidate_rules.jsonl",
+        dev_manifest=tmp_path / "dev20.json",
+        holdout_manifest=tmp_path / "holdout20.json",
+        summary_output=tmp_path / "summary.json",
+        markdown_output=tmp_path / "summary.md",
+        min_eligible=1,
+        dev_count=1,
+        holdout_count=0,
+    )
+
+    assert report["candidate_pool_build_passed"] is False
+    assert report["reject_reason_counts"]["missing_source_result"] == 1
+
+
+def test_build_explicit_literal_candidate_pool_rejects_schema_type_mismatch(tmp_path: Path) -> None:
+    source_root = tmp_path / "source" / "multi_turn_miss_func" / "baseline"
+    result_path = source_root / "bfcl" / "result" / "model" / "multi_turn" / "BFCL_v4_multi_turn_miss_func_result.json"
+    result_path.parent.mkdir(parents=True, exist_ok=True)
+    result_path.write_text(json.dumps({"id": "case_1", "result": [{"calc": json.dumps({"height": 7})}]}) + "\n", encoding="utf-8")
+    source_manifest = tmp_path / "source_manifest.json"
+    _write_json(source_manifest, {"category_status": [{"category": "multi_turn_miss_func", "existing_source_roots": [str(source_root)]}]})
+    dataset = tmp_path / "dataset.json"
+    _write_json(dataset, [{
+        "id": "case_1",
+        "question": [[{"role": "user", "content": "Use 'notes.txt' as the base."}]],
+        "function": [{
+            "name": "calc",
+            "parameters": {
+                "type": "object",
+                "properties": {"height": {"type": "integer"}, "base": {"type": "integer"}},
+                "required": ["height", "base"],
+            },
+        }],
+    }])
+
+    report = build(
+        source_manifest=source_manifest,
+        dataset_json=dataset,
+        out_candidates=tmp_path / "candidate_rules.jsonl",
+        dev_manifest=tmp_path / "dev20.json",
+        holdout_manifest=tmp_path / "holdout20.json",
+        summary_output=tmp_path / "summary.json",
+        markdown_output=tmp_path / "summary.md",
+        min_eligible=1,
+        dev_count=1,
+        holdout_count=0,
+    )
+
+    assert report["candidate_pool_build_passed"] is False
+    assert report["candidate_record_count"] == 0
+    assert report["reject_reason_counts"]["schema_type_mismatch"] == 1
