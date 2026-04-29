@@ -7,6 +7,9 @@
 - Primary positive capability-miss count: `0`
 - Baseline already uses memory count: `12`
 - Control memory activation count: `8`
+- Unique BFCL case ids: `20` / `20`
+- Unique trace paths: `20` / `20`
+- Unique audit ids: `20` / `20`
 - Positive buckets: `{'baseline_process_already_uses_memory': 12}`
 - Control buckets: `{'control_memory_activation_present': 8}`
 - Candidate commands: `[]`

@@ -3,7 +3,7 @@
 - Claim status: `scaffold_and_diagnostic_package_only`
 - SOTA +3pp claim ready: `False`
 - Offline only: `True`
-- P0 blockers: `['artifact_boundary_not_clean', 'm2_8pre_offline_not_passed', 'scorer_authorization_not_ready', 'policy_conversion_not_observed_in_existing_traces', 'runtime_dry_run_compiler_not_ready', 'postcondition_dev_smoke_stop_loss_failed', 'postcondition_candidate_mining_gap_filter_not_passed', 'postcondition_smoke_protocol_not_ready', 'low_risk_unmet_postcondition_pool_too_small', 'explicit_obligation_smoke_selection_not_ready_after_baseline_dry_audit']`
+- P0 blockers: `['artifact_boundary_not_clean', 'm2_8pre_offline_not_passed', 'scorer_authorization_not_ready', 'policy_conversion_not_observed_in_existing_traces', 'runtime_dry_run_compiler_not_ready', 'postcondition_dev_smoke_stop_loss_failed', 'postcondition_candidate_mining_gap_filter_not_passed', 'postcondition_smoke_protocol_not_ready', 'low_risk_unmet_postcondition_pool_too_small', 'explicit_obligation_smoke_selection_not_ready_after_baseline_dry_audit', 'explicit_obligation_selection_gate_not_passed', 'explicit_obligation_smoke_ready_gate_not_passed']`
 
 ## Gate Snapshot
 
@@ -104,7 +104,7 @@
 
 - Audit ready: `True`
 - Retain-prior coverage ready: `True`
-- Smoke ready: `True`
+- Smoke ready: `False`
 - Eligible candidates: `49`
 - Eligible by capability: `{'memory_retrieve': 48, 'read_content': 1}`
 - Negative-control activations: `0`
@@ -128,6 +128,10 @@
 - Baseline ceiling risk: `True`
 - Primary positive capability-miss count: `0`
 - Control memory activation count: `8`
+- Selection gate passed: `False`
+- Non-ceiling positives / true controls available: `30` / `1`
+- Activation counts source/materialized/selected: `0` / `14` / `0`
+- Unified smoke ready: `False`
 - Blockers: `[]`
 - Next action: `build_multi_family_smoke_protocol`
 

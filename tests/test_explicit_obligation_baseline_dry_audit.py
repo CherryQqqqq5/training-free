@@ -35,7 +35,7 @@ def test_dry_audit_marks_memory_call_as_ceiling_risk(tmp_path: Path) -> None:
 def test_dry_audit_marks_final_answer_without_memory_as_primary_positive(tmp_path: Path) -> None:
     source = tmp_path / "source"
     positives = []
-    for i in range(6):
+    for i in range(12):
         rel = f"memory_kv/baseline/traces/p{i}.json"
         _trace(source, rel, [{"type": "message", "content": "answer"}])
         positives.append({"audit_case_id": f"p{i}", "bfcl_case_id": f"memory_kv_{i}", "category": "memory_kv", "trace_relative_path": rel})
@@ -45,7 +45,7 @@ def test_dry_audit_marks_final_answer_without_memory_as_primary_positive(tmp_pat
         _trace(source, rel, [{"type": "message", "content": "answer"}])
         controls.append({"audit_case_id": f"c{i}", "bfcl_case_id": f"memory_kv_c{i}", "category": "memory_kv", "trace_relative_path": rel})
     protocol = tmp_path / "protocol.json"
-    _write(protocol, {"selected_positive_cases": positives + positives[:6], "selected_control_cases": controls})
+    _write(protocol, {"selected_positive_cases": positives, "selected_control_cases": controls})
 
     report = evaluate(protocol, source)
 

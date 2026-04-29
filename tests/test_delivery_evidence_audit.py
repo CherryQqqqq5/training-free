@@ -98,3 +98,41 @@ def test_source_result_layout_status_distinguishes_scope_mismatch_from_parser_bu
     assert status["route_recommendation"] == "align_audit_scope_with_source_collection_subset"
     assert status["source_scope_mismatch_count"] == 7
     assert status["audit_missing_source_result_count"] == 6
+
+
+
+def test_explicit_obligation_delivery_prefers_zero_selection_activation(tmp_path: Path) -> None:
+    audit_path = tmp_path / "audit.json"
+    protocol_path = tmp_path / "protocol.json"
+    executability_path = tmp_path / "executability.json"
+    executable_protocol_path = tmp_path / "executable_protocol.json"
+    dry_path = tmp_path / "dry.json"
+    selection_path = tmp_path / "selection.json"
+    ready_path = tmp_path / "ready.json"
+    _wj(audit_path, {"report_scope": "explicit_obligation_observable_capability_audit"})
+    _wj(protocol_path, {})
+    _wj(executability_path, {})
+    _wj(executable_protocol_path, {"bfcl_executable_manifest_ready": True})
+    _wj(dry_path, {"selected_smoke_baseline_control_activation_count": 8, "control_memory_activation_count": 8})
+    _wj(selection_path, {
+        "selection_gate_passed": False,
+        "selected_smoke_baseline_control_activation_count": 0,
+        "true_control_available_count": 1,
+        "materialized_protocol_negative_control_activation_count": 14,
+    })
+    _wj(ready_path, {"ready": False, "blockers": ["selection_gate_not_passed"]})
+
+    status = audit.explicit_obligation_status(
+        audit_path,
+        protocol_path,
+        executability_path,
+        executable_protocol_path,
+        dry_path,
+        selection_path,
+        ready_path,
+    )
+
+    assert status["explicit_obligation_selected_smoke_baseline_control_activation_count"] == 0
+    assert status["explicit_obligation_control_memory_activation_count"] == 8
+    assert status["explicit_obligation_materialized_protocol_negative_control_activation_count"] == 14
+    assert status["explicit_obligation_true_control_available_count"] == 1

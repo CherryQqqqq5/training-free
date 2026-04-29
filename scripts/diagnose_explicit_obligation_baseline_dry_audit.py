@@ -102,12 +102,21 @@ def evaluate(protocol_path: Path = DEFAULT_PROTOCOL, source_root: Path = DEFAULT
         pos_bucket_counts[item["baseline_dry_bucket"]] = pos_bucket_counts.get(item["baseline_dry_bucket"], 0) + 1
     for item in controls:
         control_bucket_counts[item["baseline_dry_bucket"]] = control_bucket_counts.get(item["baseline_dry_bucket"], 0) + 1
+    selected = positives + controls
+    unique_bfcl_case_id_count = len({str(item.get("bfcl_case_id") or "") for item in selected if item.get("bfcl_case_id")})
+    unique_trace_relative_path_count = len({str(item.get("trace_relative_path") or "") for item in selected if item.get("trace_relative_path")})
+    unique_audit_case_id_count = len({str(item.get("audit_case_id") or "") for item in selected if item.get("audit_case_id")})
+    duplicate_selected_case_or_trace = bool(selected) and (
+        unique_bfcl_case_id_count != len(selected)
+        or unique_trace_relative_path_count != len(selected)
+        or unique_audit_case_id_count != len(selected)
+    )
     primary_positive_count = pos_bucket_counts.get("baseline_capability_miss_candidate", 0)
     ceiling_count = pos_bucket_counts.get("baseline_process_already_uses_memory", 0)
     unknown_count = pos_bucket_counts.get("baseline_process_unknown", 0)
     control_activation_count = control_bucket_counts.get("control_memory_activation_present", 0)
     baseline_ceiling_risk = ceiling_count > 2 or primary_positive_count < 6
-    smoke_selection_ready = bool(len(positives) == 12 and len(controls) == 8 and not baseline_ceiling_risk and control_activation_count == 0)
+    smoke_selection_ready = bool(len(positives) == 12 and len(controls) == 8 and not baseline_ceiling_risk and control_activation_count == 0 and not duplicate_selected_case_or_trace)
     blockers: list[str] = []
     if len(positives) < 12:
         blockers.append("positive_case_count_below_12")
@@ -119,6 +128,12 @@ def evaluate(protocol_path: Path = DEFAULT_PROTOCOL, source_root: Path = DEFAULT
         blockers.append("baseline_ceiling_positive_count_above_2")
     if control_activation_count:
         blockers.append("control_memory_activation_present")
+    if unique_bfcl_case_id_count != len(positives) + len(controls):
+        blockers.append("duplicate_bfcl_case_id_present")
+    if unique_trace_relative_path_count != len(positives) + len(controls):
+        blockers.append("duplicate_trace_path_present")
+    if unique_audit_case_id_count != len(positives) + len(controls):
+        blockers.append("duplicate_audit_case_id_present")
     return {
         "report_scope": "explicit_obligation_baseline_dry_audit",
         "offline_only": True,
@@ -137,6 +152,11 @@ def evaluate(protocol_path: Path = DEFAULT_PROTOCOL, source_root: Path = DEFAULT
         "baseline_process_already_uses_memory_count": ceiling_count,
         "baseline_process_unknown_count": unknown_count,
         "control_memory_activation_count": control_activation_count,
+        "selected_smoke_baseline_control_activation_count": control_activation_count,
+        "unique_bfcl_case_id_count": unique_bfcl_case_id_count,
+        "unique_trace_relative_path_count": unique_trace_relative_path_count,
+        "unique_audit_case_id_count": unique_audit_case_id_count,
+        "duplicate_selected_case_or_trace": duplicate_selected_case_or_trace,
         "positive_bucket_counts": pos_bucket_counts,
         "control_bucket_counts": control_bucket_counts,
         "records": positives + controls,
@@ -156,6 +176,9 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Primary positive capability-miss count: `{report['primary_positive_capability_miss_count']}`",
         f"- Baseline already uses memory count: `{report['baseline_process_already_uses_memory_count']}`",
         f"- Control memory activation count: `{report['control_memory_activation_count']}`",
+        f"- Unique BFCL case ids: `{report['unique_bfcl_case_id_count']}` / `{report['positive_case_count'] + report['control_case_count']}`",
+        f"- Unique trace paths: `{report['unique_trace_relative_path_count']}` / `{report['positive_case_count'] + report['control_case_count']}`",
+        f"- Unique audit ids: `{report['unique_audit_case_id_count']}` / `{report['positive_case_count'] + report['control_case_count']}`",
         f"- Positive buckets: `{report['positive_bucket_counts']}`",
         f"- Control buckets: `{report['control_bucket_counts']}`",
         f"- Candidate commands: `{report['candidate_commands']}`",
@@ -190,6 +213,11 @@ def main() -> int:
             "primary_positive_capability_miss_count",
             "baseline_process_already_uses_memory_count",
             "control_memory_activation_count",
+            "selected_smoke_baseline_control_activation_count",
+            "unique_bfcl_case_id_count",
+            "unique_trace_relative_path_count",
+            "unique_audit_case_id_count",
+            "duplicate_selected_case_or_trace",
             "positive_bucket_counts",
             "control_bucket_counts",
             "candidate_commands",
