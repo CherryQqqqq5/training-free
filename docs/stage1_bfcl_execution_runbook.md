@@ -113,6 +113,13 @@ authorization thresholds.
 Rebuild the deterministic argument/tool-use repair pool after source collection
 has refreshed the raw source availability.
 
+The explicit-literal extractor/checker contract is specified in
+`docs/explicit_literal_candidate_expansion_spec.md`. The machine-readable schema
+draft is
+`outputs/artifacts/bfcl_explicit_required_arg_literal_v1/explicit_literal_candidate_schema.json`.
+Those files are normative for candidate fields, no-leakage checks, 35+ pool
+selection, and dev20/holdout20 split behavior.
+
 ```bash
 PYTHONPATH=.:src .venv/bin/python scripts/build_m27t_source_pool_manifest.py
 PYTHONPATH=.:src .venv/bin/python scripts/build_m28pre_explicit_required_arg_literal.py

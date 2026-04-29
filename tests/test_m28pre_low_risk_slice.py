@@ -20,6 +20,28 @@ def _wjl(path: Path, rows: list[dict]) -> None:
     path.write_text("".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
 
 
+def _explicit_literal_candidate(case_id: str) -> dict:
+    return {
+        "case_id": case_id,
+        "category": "multi_turn_miss_func",
+        "candidate_generatable": True,
+        "candidate_origin": "test_fixture",
+        "candidate_rules_type": "explicit_required_arg_literal_completion",
+        "rule_type": "explicit_required_arg_literal_completion",
+        "source_run_root": "outputs/source",
+        "tool": "grep",
+        "schema_arg_name": "file_name",
+        "selected_literal": f"{case_id}.txt",
+        "literal_source": "current_request",
+        "literal_source_span": f"{case_id}.txt",
+        "literal_source_text_hash": f"hash-{case_id}",
+        "used_gold_fields": False,
+        "used_score_fields": False,
+        "used_candidate_output": False,
+        "retention_prior": {"retain_eligibility": "demote_candidate"},
+    }
+
+
 def _result(root: Path, category: str, rows: list[dict]) -> None:
     path = root / "bfcl" / "result" / "model" / "multi_turn" / f"BFCL_v4_{category}_result.json"
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -132,6 +154,7 @@ def test_m28pre_offline_requires_freeze_repair_compiler_holdout_coverage_and_no_
     _wj(low / "m28pre_source_result_availability_audit.json", {"source_result_availability_audit_ready": True, "source_result_availability_ready": True, "hard_issue_counts": {}, "issue_counts": {}, "candidate_commands": [], "planned_commands": []})
     _wj(low / "wrong_arg_key_alias_coverage_audit.json", {"wrong_arg_key_alias_coverage_audit_ready": True, "wrong_arg_key_alias_family_coverage_zero": False, "wrong_arg_key_alias_demote_candidate_count": 0, "candidate_commands": [], "planned_commands": []})
     _wj(low / "deterministic_schema_local_coverage_audit.json", {"deterministic_schema_local_coverage_audit_ready": True, "deterministic_schema_local_family_coverage_zero": False, "deterministic_schema_local_demote_candidate_count": 0, "candidate_commands": [], "planned_commands": []})
+    _wjl(low / "candidate_rules.jsonl", [_explicit_literal_candidate(f"d{i}") for i in range(20)] + [_explicit_literal_candidate(f"h{i}") for i in range(20)])
 
     report = evaluate_m28pre(subset, low)
 

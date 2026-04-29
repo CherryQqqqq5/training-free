@@ -8,6 +8,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from scripts.check_explicit_literal_candidate_pool import evaluate as evaluate_explicit_literal_pool
+
 DEFAULT_SUBSET = Path("outputs/artifacts/bfcl_ctspc_subset30_v1")
 DEFAULT_LOW_RISK = Path("outputs/artifacts/bfcl_explicit_required_arg_literal_v1")
 OUT = DEFAULT_LOW_RISK / "m28pre_offline_summary.json"
@@ -76,6 +78,11 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
     combined_holdout = _j(low_risk_root / "theory_prior_low_risk_holdout20_manifest.json", {}) or {}
     strat_dev = _j(low_risk_root / "stratified_low_risk_dev20_manifest.json", {}) or {}
     strat_holdout = _j(low_risk_root / "stratified_low_risk_holdout20_manifest.json", {}) or {}
+    explicit_literal_pool = evaluate_explicit_literal_pool(
+        low_risk_root / "candidate_rules.jsonl",
+        low_risk_root / "explicit_required_arg_literal_dev20_manifest.json",
+        low_risk_root / "explicit_required_arg_literal_holdout20_manifest.json",
+    )
 
     freeze = bool(
         status.get("ctspc_v0_frozen")
@@ -198,6 +205,7 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         "deterministic_schema_local_family_coverage_zero": deterministic_family_coverage_zero,
         "explicit_family_scorer_authorization_ready": explicit_family_ready,
         "combined_theory_prior_scorer_authorization_ready": combined_family_ready,
+        "explicit_literal_candidate_pool_passed": bool(explicit_literal_pool.get("explicit_literal_candidate_pool_passed")),
     }
     blockers: list[str] = []
     if not checks["ctspc_v0_frozen"]:
@@ -234,6 +242,8 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         blockers.append("deterministic_schema_local_family_coverage_zero")
     if combined_retain_count < required_generatable:
         blockers.append("combined_demote_candidate_below_35")
+    if not checks["explicit_literal_candidate_pool_passed"]:
+        blockers.append("explicit_literal_candidate_pool_gate_not_passed")
     for name, integrity in manifest_integrity.items():
         if integrity["dev_duplicate_selected_case_ids"]:
             blockers.append(f"{name}_dev_duplicate_case_ids_present")
@@ -255,6 +265,7 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         checks["source_result_availability_ready"],
         checks["wrong_arg_key_alias_coverage_audit_ready"],
         checks["deterministic_schema_local_coverage_audit_ready"],
+        checks["explicit_literal_candidate_pool_passed"],
         checks["combined_theory_prior_scorer_authorization_ready"],
         checks["manifest_case_integrity_passed"],
     ])
@@ -293,6 +304,7 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         "scorer_authorization_ready": scorer_authorization_ready,
         "m2_8pre_offline_passed": scorer_authorization_ready,
         "blockers": blockers,
+        "explicit_literal_candidate_pool_gate": explicit_literal_pool,
         "compiler": {key: compiler.get(key) for key in [
             "selected_case_count",
             "candidate_generatable_count",
@@ -418,6 +430,7 @@ def render_markdown(report: dict[str, Any]) -> str:
         "no_scorer_commands",
         "runtime_manifest_safeguards_passed",
         "manifest_case_integrity_passed",
+        "explicit_literal_candidate_pool_passed",
     ]:
         lines.append(f"| `{key}` | `{report[key]}` |")
     lines.extend(["", "Offline readiness only. No scorer command is emitted by this artifact.", ""])

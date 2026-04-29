@@ -14,6 +14,13 @@ Current repository state is fail-closed:
 - Paired BFCL score chain: `not present`
 - Allowed claim today: scaffold and diagnostic evidence package only
 
+Related provider unblock documents:
+
+```text
+docs/stage1_provider_access_request.md
+outputs/artifacts/stage1_bfcl_acceptance/provider_unblock_request.md
+```
+
 ## 1. Provider Green Artifact
 
 The approval package must archive compact provider evidence before any source
@@ -25,8 +32,8 @@ Required artifacts:
 outputs/artifacts/bfcl_ctspc_source_pool_v1/current_provider_preflight_status.json
 outputs/artifacts/bfcl_ctspc_source_pool_v1/current_provider_preflight_status.md
 <baseline_or_candidate_run>/artifacts/preflight_report.json
-scripts/check_provider_green_preflight.py --compact --strict output
-scripts/check_artifact_boundary.py output
+scripts/check_provider_green_preflight.py --compact --strict
+scripts/check_artifact_boundary.py
 ```
 
 Required provider fields:
