@@ -1,0 +1,270 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RASHE v0 Offline Evolution Loop",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "rashe_evolution_loop_v0"
+    },
+    "loop_id": {
+      "type": "string",
+      "pattern": "^loop_[a-z0-9_:-]+$"
+    },
+    "loop_stage": {
+      "const": "trace_buffer_summary_to_skill_metadata_patch_plan"
+    },
+    "source_scope": {
+      "enum": [
+        "synthetic",
+        "approved_compact"
+      ]
+    },
+    "trace_buffer_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "trace_fixture_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "accepted_trace_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rejected_trace_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "forbidden_field_rejected_count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "trace_fixture_count",
+        "accepted_trace_count",
+        "rejected_trace_count",
+        "forbidden_field_rejected_count"
+      ]
+    },
+    "router_decision_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "router_decision_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "selected_skill_id": {
+          "enum": [
+            "bfcl_current_turn_focus",
+            "bfcl_schema_reading",
+            "bfcl_tool_call_format_guard",
+            "bfcl_memory_web_search_discipline"
+          ]
+        },
+        "decision_status": {
+          "enum": [
+            "selected",
+            "ambiguous_reject",
+            "no_match_reject",
+            "input_reject",
+            "authorization_reject",
+            "conflict_reject",
+            "requirement_reject",
+            "metadata_reject"
+          ]
+        }
+      },
+      "required": [
+        "router_decision_count",
+        "selected_skill_id",
+        "decision_status"
+      ]
+    },
+    "proposal_draft": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "proposal_id": {
+          "type": "string"
+        },
+        "proposal_kind": {
+          "enum": [
+            "skill_metadata_refinement_draft",
+            "progressive_disclosure_policy_draft",
+            "router_policy_refinement_draft"
+          ]
+        },
+        "source_trace_hashes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^sha256:"
+          },
+          "minItems": 1
+        },
+        "blocked_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "proposal_id",
+        "proposal_kind",
+        "source_trace_hashes",
+        "blocked_reason"
+      ]
+    },
+    "human_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "review_status": {
+          "enum": [
+            "pending",
+            "approved_for_inert_metadata_patch",
+            "rejected"
+          ]
+        },
+        "reviewer_role": {
+          "type": "string"
+        },
+        "gold_or_expected_used": {
+          "const": false
+        },
+        "scorer_diff_used": {
+          "const": false
+        }
+      },
+      "required": [
+        "review_status",
+        "reviewer_role",
+        "gold_or_expected_used",
+        "scorer_diff_used"
+      ]
+    },
+    "skill_metadata_patch_plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "patch_plan_kind": {
+          "enum": [
+            "inert_docs_metadata_patch_plan"
+          ]
+        },
+        "target_skill_id": {
+          "enum": [
+            "bfcl_current_turn_focus",
+            "bfcl_schema_reading",
+            "bfcl_tool_call_format_guard",
+            "bfcl_memory_web_search_discipline"
+          ]
+        },
+        "metadata_fields": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "scope",
+              "trigger_priority",
+              "max_injection_tokens",
+              "conflicts_with",
+              "requires_schema",
+              "requires_current_turn",
+              "forbidden_sources",
+              "evaluation_status"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "contains_prompt_injection_text": {
+          "const": false
+        },
+        "contains_retry_policy": {
+          "const": false
+        },
+        "contains_candidate_jsonl": {
+          "const": false
+        },
+        "contains_dev_holdout_manifest": {
+          "const": false
+        }
+      },
+      "required": [
+        "patch_plan_kind",
+        "target_skill_id",
+        "metadata_fields",
+        "contains_prompt_injection_text",
+        "contains_retry_policy",
+        "contains_candidate_jsonl",
+        "contains_dev_holdout_manifest"
+      ]
+    },
+    "blocked_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "offline_only": {
+      "const": true
+    },
+    "enabled": {
+      "const": false
+    },
+    "runtime_behavior_authorized": {
+      "const": false
+    },
+    "prompt_injection_authorized": {
+      "const": false
+    },
+    "retry_authorized": {
+      "const": false
+    },
+    "candidate_generation_authorized": {
+      "const": false
+    },
+    "scorer_authorized": {
+      "const": false
+    },
+    "performance_evidence": {
+      "const": false
+    },
+    "provider_call_count": {
+      "const": 0
+    },
+    "scorer_call_count": {
+      "const": 0
+    },
+    "source_collection_call_count": {
+      "const": 0
+    }
+  },
+  "required": [
+    "schema_version",
+    "loop_id",
+    "loop_stage",
+    "source_scope",
+    "trace_buffer_summary",
+    "router_decision_summary",
+    "proposal_draft",
+    "human_review",
+    "skill_metadata_patch_plan",
+    "blocked_reason",
+    "offline_only",
+    "enabled",
+    "runtime_behavior_authorized",
+    "prompt_injection_authorized",
+    "retry_authorized",
+    "candidate_generation_authorized",
+    "scorer_authorized",
+    "performance_evidence",
+    "provider_call_count",
+    "scorer_call_count",
+    "source_collection_call_count"
+  ]
+}
