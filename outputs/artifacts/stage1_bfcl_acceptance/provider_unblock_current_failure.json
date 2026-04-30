@@ -1,0 +1,99 @@
+{
+  "allowed_while_blocked": [
+    "offline_dataset_export_if_approved_dataset_root_exists",
+    "extractor_fixture_tests",
+    "artifact_boundary_checks",
+    "approval_packet_updates"
+  ],
+  "blocked_operations": [
+    "provider_green",
+    "source_collection",
+    "candidate_pool_promotion",
+    "dev_scorer",
+    "holdout_scorer",
+    "full_or_huawei_acceptance_scorer",
+    "bfcl_3pp_claim"
+  ],
+  "checks": [
+    {
+      "http_status": 401,
+      "name": "chat_tool_call",
+      "passed": false,
+      "reason": "http 401: {'error': {'message': 'User not found.', 'code': 401}}",
+      "request_path": "/v1/chat/completions"
+    },
+    {
+      "http_status": 401,
+      "name": "responses_tool_call",
+      "passed": false,
+      "reason": "http 401: {'error': {'message': 'User not found.', 'code': 401}}",
+      "request_path": "/v1/responses"
+    },
+    {
+      "http_status": 401,
+      "name": "chat_text_response",
+      "passed": false,
+      "reason": "http 401: {'error': {'message': 'User not found.', 'code': 401}}",
+      "request_path": "/v1/chat/completions"
+    },
+    {
+      "http_status": null,
+      "name": "trace_emission",
+      "passed": true,
+      "reason": "ok",
+      "request_path": null
+    }
+  ],
+  "created_at_utc": "2026-04-30T03:38:08Z",
+  "credential_sources": {
+    "OPENROUTER_API_KEY": {
+      "present": true,
+      "sha256_prefix": "ec073ba9c94d"
+    },
+    "chuangzhi-apikey": {
+      "note": "invalid shell identifier; treat as legacy credential source only",
+      "present": true,
+      "sha256_prefix": "395cc27c3968"
+    }
+  },
+  "environment_check": {
+    "expected_api_key_env": "OPENROUTER_API_KEY",
+    "is_set": true,
+    "reason": "ok"
+  },
+  "forbidden_while_blocked": [
+    "formal_source_collection",
+    "formal_candidate_pool_promotion",
+    "dev_or_holdout_scorer",
+    "performance_claim"
+  ],
+  "git_branch": "stage1-bfcl-performance-sprint",
+  "git_head": "28b78b9e9504a4d0382538e65bc5227f804b1625",
+  "needed_action": [
+    "issue_valid_approved_provider_key",
+    "confirm_account_exists_and_billing_or_project_access",
+    "confirm_model_route_access",
+    "confirm_chat_completions_and_tool_call_support",
+    "rerun_provider_green_preflight_before_source_collection"
+  ],
+  "observed_failures": [
+    {
+      "failure_class": "provider_auth_401",
+      "http_status": 401,
+      "probe": "direct_chat_completions_multi_route",
+      "provider": "openrouter",
+      "sanitized_message": "User not found"
+    },
+    {
+      "failure_class": "invalid_api_key",
+      "http_status": 401,
+      "probe": "direct_chat_completions",
+      "provider": "novacode_or_chuangzhi",
+      "sanitized_message": "INVALID_API_KEY"
+    }
+  ],
+  "provider_green_preflight_passed": false,
+  "report_scope": "stage1_provider_unblock_current_failure",
+  "secret_values_recorded": false,
+  "server": "10.220.5.159:/cephfs/qiuyn/training-free"
+}
