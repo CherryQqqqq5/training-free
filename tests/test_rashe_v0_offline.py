@@ -136,3 +136,69 @@ def test_compact_report_keeps_fail_closed_flags():
     assert summary["provider_call_count"] == 0
     assert summary["scorer_call_count"] == 0
     assert summary["source_collection_call_count"] == 0
+
+
+
+def test_default_fixture_expansion_counters_cover_all_seed_skills():
+    result = run_checker()
+    assert result.returncode == 0, result.stdout + result.stderr
+    summary = json.loads(result.stdout)
+    assert summary["skillbank_manifest_present"] is True
+    assert summary["fixture_count"] == 10
+    assert summary["positive_fixture_count"] == 5
+    assert summary["reject_fixture_count"] == 4
+    assert summary["router_decision_count"] == 9
+    assert summary["selected_skill_counts"] == {
+        "bfcl_current_turn_focus": 2,
+        "bfcl_memory_web_search_discipline": 1,
+        "bfcl_schema_reading": 1,
+        "bfcl_tool_call_format_guard": 1,
+    }
+    assert summary["reject_reason_counts"] == {
+        "ambiguous_skill_match": 1,
+        "forbidden_field": 1,
+        "path_indicator": 1,
+        "raw_case_id": 1,
+    }
+    assert summary["case_hash_allowed_count"] == 5
+    assert summary["raw_case_id_rejected_count"] == 1
+    assert summary["forbidden_field_violation_count"] == 0
+
+
+def test_skillbank_manifest_must_match_seed_skills(tmp_path):
+    root = tmp_path / "rashe_v0"
+    subprocess.run(["cp", "-R", str(ROOT), str(root)], check=True)
+    manifest = root / "skillbank_manifest.json"
+    data = json.loads(manifest.read_text())
+    data["skills"] = data["skills"][:-1]
+    manifest.write_text(json.dumps(data))
+    result = run_checker("--root", root)
+    assert result.returncode == 1
+    summary = json.loads(result.stdout)
+    assert "skillbank_manifest_skill_ids_mismatch" in summary["blockers"]
+
+
+def test_default_fixture_raw_case_id_is_expected_reject_not_violation():
+    result = run_checker()
+    assert result.returncode == 0
+    summary = json.loads(result.stdout)
+    assert summary["raw_case_id_rejected_count"] == 1
+    assert summary["forbidden_field_violation_count"] == 0
+
+
+def test_external_raw_case_id_trace_still_fails(tmp_path):
+    path = write_json(tmp_path / "trace.json", trace(["current_turn"], case_id="raw-case"))
+    result = run_checker("--no-default-fixtures", "--trace", path)
+    assert result.returncode == 1
+    summary = json.loads(result.stdout)
+    assert any("trace_forbidden_fields" in b for b in summary["blockers"])
+
+
+def test_aggregate_verifier_fixture_is_validated_by_default():
+    result = run_checker()
+    assert result.returncode == 0
+    summary = json.loads(result.stdout)
+    assert summary["fixture_count"] == 10
+    assert summary["provider_call_count"] == 0
+    assert summary["scorer_call_count"] == 0
+    assert summary["source_collection_call_count"] == 0
