@@ -105,3 +105,51 @@ def test_selected_call_structural_unparseable_arguments_reject(tmp_path: Path) -
     assert report["selected_call_structural_failure_attribution_passed"] is False
     assert report["counters"]["rows_with_unparseable_arguments"] == 1
     assert report["counters"]["reject_reason_counts"]["unparseable_arguments"] == 1
+
+
+def test_selected_call_structural_reads_raw_capture_records(tmp_path: Path) -> None:
+    category = "multi_turn_miss_func"
+    capture_dir = tmp_path / "capture" / category / "baseline"
+    capture_dir.mkdir(parents=True)
+    capture_path = capture_dir / "raw_response_capture_records.jsonl"
+    capture_path.write_text(json.dumps({
+        "case_id": "case_1",
+        "category": category,
+        "provider_route": "Chuangzhi/Novacode",
+        "model_id": "gpt-5.2",
+        "raw_response": "Done. grep({\"file_name\":\"a.txt\",\"pattern\":\"x\"})",
+        "raw_response_text": "Done. grep({\"file_name\":\"a.txt\",\"pattern\":\"x\"})",
+        "baseline_parsed_result": ["Done."],
+    }) + "\n", encoding="utf-8")
+    dataset = tmp_path / "dataset.json"
+    _write_json(dataset, [{
+        "id": "case_1",
+        "question": [[{"role": "user", "content": "Use grep."}]],
+        "function": [{
+            "name": "grep",
+            "parameters": {
+                "type": "object",
+                "properties": {"file_name": {"type": "string"}, "pattern": {"type": "string"}},
+                "required": ["file_name", "pattern"],
+            },
+        }],
+    }])
+
+    report = build_report(
+        dataset_json=dataset,
+        raw_capture_root=tmp_path / "capture",
+        categories=category,
+        output_json=tmp_path / "out.json",
+        markdown_output=tmp_path / "out.md",
+    )
+
+    assert report["input_mode"] == "raw_response_capture_records"
+    assert report["counters"]["result_jsonl_rows"] == 1
+    assert report["counters"]["raw_response_present_count"] == 1
+    assert report["counters"]["raw_response_text_present_count"] == 1
+    assert report["counters"]["rows_with_final_text_and_tool_like_payload"] == 1
+    assert report["counters"]["final_before_tool_guard_eligible_count"] == 1
+    assert report["counters"]["schema_matched_raw_payload_count"] == 1
+    assert report["counters"]["schema_valid_raw_payload_count"] == 1
+    assert report["provider_route_counts"] == {"Chuangzhi/Novacode": 1}
+    assert report["model_id_counts"] == {"gpt-5.2": 1}

@@ -55,3 +55,7 @@ This is compact source-collection evidence only. It is not scorer, candidate-poo
 ## Sample Hashes
 
 Raw content is not included; see JSON for compact hashes.
+
+## BFCL Path Alias Note
+
+BFCL directory/model path names such as `gpt-4o-mini-2024-07-18-FC` are non-authoritative runner/path aliases only. The authoritative provider/model are Chuangzhi/Novacode and `gpt-5.2`, as recorded in provider/model counts.

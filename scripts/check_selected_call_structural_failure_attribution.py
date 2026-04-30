@@ -188,6 +188,34 @@ def _empty_category(category: str) -> dict[str, Any]:
     return {"category": category, "result_jsonl_rows": 0, "selected_call_count": 0, "reject_reason_counts": {}}
 
 
+def _read_jsonl(path: Path) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    if not path.exists():
+        return rows
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        try:
+            item = json.loads(line)
+        except Exception:
+            continue
+        if isinstance(item, dict):
+            rows.append(item)
+    return rows
+
+
+def _raw_capture_files(raw_capture_root: Path | None, raw_capture_glob: str | None) -> list[Path]:
+    if raw_capture_glob:
+        return sorted(Path().glob(raw_capture_glob))
+    if raw_capture_root:
+        return sorted(raw_capture_root.glob("*/baseline/raw_response_capture_records.jsonl"))
+    return []
+
+
+def _baseline_row_from_capture(row: dict[str, Any]) -> dict[str, Any]:
+    return {"id": row.get("case_id"), "result": row.get("baseline_parsed_result")}
+
+
 def build_report(
     *,
     dataset_json: Path = DEFAULT_DATASET_JSON,
@@ -197,6 +225,8 @@ def build_report(
     output_json: Path = DEFAULT_OUTPUT_JSON,
     markdown_output: Path = DEFAULT_OUTPUT_MD,
     compact: bool = False,
+    raw_capture_root: Path | None = None,
+    raw_capture_glob: str | None = None,
 ) -> dict[str, Any]:
     requested_categories = _parse_categories(categories) or ["multi_turn_miss_func", "multi_turn_base", "multi_turn_long_context"]
     source = _read_json(source_manifest, {}) if source_manifest else _default_source_manifest()
@@ -215,7 +245,14 @@ def build_report(
         "rows_with_multiple_tool_like_payloads": 0,
         "malformed_tool_call_repair_eligible_count": 0,
         "final_before_tool_guard_eligible_count": 0,
+        "raw_response_text_present_count": 0,
+        "schema_matched_raw_payload_count": 0,
+        "schema_valid_raw_payload_count": 0,
+        "bad_jsonl_rows": 0,
+        "forbidden_field_violation_count": 0,
     }
+    provider_route_counts: dict[str, int] = {}
+    model_id_counts: dict[str, int] = {}
     reject_reason_counts: dict[str, int] = {}
     blockers: list[str] = []
     records: list[dict[str, Any]] = []
@@ -232,78 +269,163 @@ def build_report(
     if source_manifest and not source_manifest.exists():
         blockers.append("source_manifest_missing")
 
-    for category, root in _source_roots(source or {}, source_root, requested_categories):
-        bucket = category_rows.setdefault(category, _empty_category(category))
-        result_path = _result_file(root, category)
-        rows = _result_rows(result_path)
-        counters["result_jsonl_rows"] += len(rows)
-        bucket["result_jsonl_rows"] += len(rows)
-        if result_path is None:
-            reject("missing_source_result", category)
-            continue
-        for row in rows:
-            case_id = str(row.get("id") or row.get("case_id") or "")
-            entry = dataset.get(case_id)
-            if not entry:
-                reject("dataset_record_missing", category)
-                continue
-            metadata = {key: value for key, value in row.items() if key not in {"result", *RAW_RESPONSE_KEYS}}
-            if _contains_forbidden_key(entry) or _contains_forbidden_key(metadata):
-                reject("forbidden_leakage_field_present", category)
-                continue
-            calls = _tool_call_records(row.get("result"))
-            _historical, selected = _selected_turn_calls(calls)
-            counters["selected_call_count"] += len(selected)
-            bucket["selected_call_count"] += len(selected)
-            for call in selected:
-                fn, status, _reason, _names = _schema_match(entry, str(call.get("tool") or ""))
-                if status == "matched" and fn:
-                    counters["schema_matched_selected_call_count"] += 1
-                    if _schema_valid_args(fn, call.get("args") or {}):
-                        counters["schema_valid_required_args_present_count"] += 1
-            raw = _raw_response(row)
-            if raw is None:
-                reject("raw_response_missing_for_structural_attribution", category)
-                continue
-            counters["raw_response_present_count"] += 1
-            payloads, malformed, final_text = _extract_tool_like_payloads(raw)
-            if malformed:
-                counters["rows_with_malformed_tool_call_json"] += 1
-            if not payloads:
-                counters["rows_with_no_tool_call"] += 1
-                if final_text or isinstance(raw, str):
-                    counters["rows_with_final_text_only"] += 1
-                reject("no_tool_like_payload", category)
-                continue
-            if len(payloads) > 1:
-                counters["rows_with_multiple_tool_like_payloads"] += 1
-                reject("multiple_tool_like_payloads", category)
-                continue
-            payload = payloads[0]
-            if payload.get("malformed"):
-                counters["rows_with_unparseable_arguments"] += 1
-                reject("unparseable_arguments", category)
-                continue
-            fn, status, _reason, _names = _schema_match(entry, payload["tool"])
-            if status != "matched" or not fn:
-                reject("raw_payload_schema_not_matched", category)
-                continue
-            if not _schema_valid_args(fn, payload.get("args") or {}):
-                reject("raw_payload_args_not_schema_valid", category)
-                continue
-            selected_tools = [str(call.get("tool")) for call in selected]
-            if malformed:
-                counters["malformed_tool_call_repair_eligible_count"] += 1
-                records.append({"case_id": case_id, "category": category, "diagnostic": "malformed_tool_call_serialization", "tool": payload["tool"], "diagnostic_only": True})
-            elif final_text:
-                counters["rows_with_final_text_and_tool_like_payload"] += 1
-                if not selected_tools:
-                    counters["final_before_tool_guard_eligible_count"] += 1
-                    records.append({"case_id": case_id, "category": category, "diagnostic": "final_before_tool_guard", "tool": payload["tool"], "diagnostic_only": True})
+    capture_files = _raw_capture_files(raw_capture_root, raw_capture_glob)
+    if capture_files:
+        for capture_file in capture_files:
+            capture_rows = _read_jsonl(capture_file)
+            for cap in capture_rows:
+                category = str(cap.get("category") or "")
+                if requested_categories and category not in requested_categories:
+                    continue
+                bucket = category_rows.setdefault(category, _empty_category(category))
+                bucket["result_jsonl_rows"] += 1
+                counters["result_jsonl_rows"] += 1
+                raw = cap.get("raw_response") if cap.get("raw_response") is not None else cap.get("raw_response_text")
+                if raw is not None:
+                    counters["raw_response_present_count"] += 1
+                if cap.get("raw_response_text"):
+                    counters["raw_response_text_present_count"] += 1
+                provider = str(cap.get("provider_route") or "unknown")
+                model = str(cap.get("model_id") or "unknown")
+                provider_route_counts[provider] = provider_route_counts.get(provider, 0) + 1
+                model_id_counts[model] = model_id_counts.get(model, 0) + 1
+                forbidden = _contains_forbidden_key({k: v for k, v in cap.items() if k not in {"raw_response", "raw_response_text", "baseline_parsed_result"}})
+                if forbidden:
+                    counters["forbidden_field_violation_count"] += 1
+                    reject("forbidden_field_violation", category)
+                    continue
+                case_id = str(cap.get("case_id") or "")
+                entry = dataset.get(case_id)
+                if not entry:
+                    reject("dataset_record_missing", category)
+                    continue
+                row = _baseline_row_from_capture(cap)
+                calls = _tool_call_records(row.get("result"))
+                _historical, selected = _selected_turn_calls(calls)
+                counters["selected_call_count"] += len(selected)
+                bucket["selected_call_count"] += len(selected)
+                for call in selected:
+                    fn, status, _reason, _names = _schema_match(entry, str(call.get("tool") or ""))
+                    if status == "matched" and fn:
+                        counters["schema_matched_selected_call_count"] += 1
+                        if _schema_valid_args(fn, call.get("args") or {}):
+                            counters["schema_valid_required_args_present_count"] += 1
+                if raw is None:
+                    reject("raw_response_missing_for_structural_attribution", category)
+                    continue
+                payloads, malformed, final_text = _extract_tool_like_payloads(raw)
+                if malformed:
+                    counters["rows_with_malformed_tool_call_json"] += 1
+                if not payloads:
+                    counters["rows_with_no_tool_call"] += 1
+                    if final_text or isinstance(raw, str):
+                        counters["rows_with_final_text_only"] += 1
+                    reject("no_tool_like_payload", category)
+                    continue
+                if len(payloads) > 1:
+                    counters["rows_with_multiple_tool_like_payloads"] += 1
+                    reject("multiple_tool_like_payloads", category)
+                    continue
+                payload = payloads[0]
+                if payload.get("malformed"):
+                    counters["rows_with_unparseable_arguments"] += 1
+                    reject("unparseable_arguments", category)
+                    continue
+                fn, status, _reason, _names = _schema_match(entry, payload["tool"])
+                if status != "matched" or not fn:
+                    reject("raw_payload_schema_not_matched", category)
+                    continue
+                if not _schema_valid_args(fn, payload.get("args") or {}):
+                    reject("raw_payload_args_not_schema_valid", category)
+                    continue
+                counters["schema_matched_raw_payload_count"] += 1
+                counters["schema_valid_raw_payload_count"] += 1
+                selected_tools = [str(call.get("tool")) for call in selected]
+                if malformed:
+                    counters["malformed_tool_call_repair_eligible_count"] += 1
+                    records.append({"case_id": case_id, "category": category, "diagnostic": "malformed_tool_call_serialization", "tool": payload["tool"], "diagnostic_only": True})
+                elif final_text:
+                    counters["rows_with_final_text_and_tool_like_payload"] += 1
+                    if not selected_tools:
+                        counters["final_before_tool_guard_eligible_count"] += 1
+                        records.append({"case_id": case_id, "category": category, "diagnostic": "final_before_tool_guard", "tool": payload["tool"], "diagnostic_only": True})
+                    else:
+                        reject("selected_adapter_already_took_tool_call", category)
                 else:
-                    reject("selected_adapter_already_took_tool_call", category)
-            else:
-                reject("raw_payload_valid_no_structural_failure", category)
+                    reject("raw_payload_valid_no_structural_failure", category)
+    else:
+        for category, root in _source_roots(source or {}, source_root, requested_categories):
+            bucket = category_rows.setdefault(category, _empty_category(category))
+            result_path = _result_file(root, category)
+            rows = _result_rows(result_path)
+            counters["result_jsonl_rows"] += len(rows)
+            bucket["result_jsonl_rows"] += len(rows)
+            if result_path is None:
+                reject("missing_source_result", category)
+                continue
+            for row in rows:
+                case_id = str(row.get("id") or row.get("case_id") or "")
+                entry = dataset.get(case_id)
+                if not entry:
+                    reject("dataset_record_missing", category)
+                    continue
+                metadata = {key: value for key, value in row.items() if key not in {"result", *RAW_RESPONSE_KEYS}}
+                if _contains_forbidden_key(entry) or _contains_forbidden_key(metadata):
+                    reject("forbidden_leakage_field_present", category)
+                    continue
+                calls = _tool_call_records(row.get("result"))
+                _historical, selected = _selected_turn_calls(calls)
+                counters["selected_call_count"] += len(selected)
+                bucket["selected_call_count"] += len(selected)
+                for call in selected:
+                    fn, status, _reason, _names = _schema_match(entry, str(call.get("tool") or ""))
+                    if status == "matched" and fn:
+                        counters["schema_matched_selected_call_count"] += 1
+                        if _schema_valid_args(fn, call.get("args") or {}):
+                            counters["schema_valid_required_args_present_count"] += 1
+                raw = _raw_response(row)
+                if raw is None:
+                    reject("raw_response_missing_for_structural_attribution", category)
+                    continue
+                counters["raw_response_present_count"] += 1
+                payloads, malformed, final_text = _extract_tool_like_payloads(raw)
+                if malformed:
+                    counters["rows_with_malformed_tool_call_json"] += 1
+                if not payloads:
+                    counters["rows_with_no_tool_call"] += 1
+                    if final_text or isinstance(raw, str):
+                        counters["rows_with_final_text_only"] += 1
+                    reject("no_tool_like_payload", category)
+                    continue
+                if len(payloads) > 1:
+                    counters["rows_with_multiple_tool_like_payloads"] += 1
+                    reject("multiple_tool_like_payloads", category)
+                    continue
+                payload = payloads[0]
+                if payload.get("malformed"):
+                    counters["rows_with_unparseable_arguments"] += 1
+                    reject("unparseable_arguments", category)
+                    continue
+                fn, status, _reason, _names = _schema_match(entry, payload["tool"])
+                if status != "matched" or not fn:
+                    reject("raw_payload_schema_not_matched", category)
+                    continue
+                if not _schema_valid_args(fn, payload.get("args") or {}):
+                    reject("raw_payload_args_not_schema_valid", category)
+                    continue
+                selected_tools = [str(call.get("tool")) for call in selected]
+                if malformed:
+                    counters["malformed_tool_call_repair_eligible_count"] += 1
+                    records.append({"case_id": case_id, "category": category, "diagnostic": "malformed_tool_call_serialization", "tool": payload["tool"], "diagnostic_only": True})
+                elif final_text:
+                    counters["rows_with_final_text_and_tool_like_payload"] += 1
+                    if not selected_tools:
+                        counters["final_before_tool_guard_eligible_count"] += 1
+                        records.append({"case_id": case_id, "category": category, "diagnostic": "final_before_tool_guard", "tool": payload["tool"], "diagnostic_only": True})
+                    else:
+                        reject("selected_adapter_already_took_tool_call", category)
+                else:
+                    reject("raw_payload_valid_no_structural_failure", category)
 
     if counters["raw_response_present_count"] == 0:
         blockers.append("raw_response_field_missing_for_structural_attribution")
@@ -329,18 +451,33 @@ def build_report(
         "dataset_json": str(dataset_json),
         "source_manifest": str(source_manifest) if source_manifest else "default_tmp_batch1_batch2_roots",
         "requested_categories": requested_categories,
-        "counters": {**counters, "reject_reason_counts": reject_reason_counts},
+        "input_mode": "raw_response_capture_records" if capture_files else "bfcl_result_jsonl",
+        "raw_capture_files": [str(path) for path in capture_files],
+        "provider_route_counts": provider_route_counts,
+        "model_id_counts": model_id_counts,
+        "counters": {**counters, "provider_route_counts": provider_route_counts, "model_id_counts": model_id_counts, "reject_reason_counts": reject_reason_counts},
         "category_summaries": list(category_rows.values()),
         "eligible_structural_records": records[:25] if compact else records,
         "eligible_structural_record_count": len(records),
         "blockers": blockers,
         "selected_call_structural_failure_attribution_passed": passed,
-        "next_required_action": "research_review_required_missing_raw_response_field" if counters["raw_response_present_count"] == 0 else "research_review_required_do_not_lower_standards",
+        "next_required_action": _next_required_action(counters),
     }
     _write_json(output_json, report)
     markdown_output.parent.mkdir(parents=True, exist_ok=True)
     markdown_output.write_text(_markdown(report), encoding="utf-8")
     return report
+
+
+def _next_required_action(counters: dict[str, int]) -> str:
+    eligible = counters.get("malformed_tool_call_repair_eligible_count", 0) + counters.get("final_before_tool_guard_eligible_count", 0)
+    if counters.get("raw_response_present_count", 0) == 0:
+        return "research_review_required_missing_raw_response_field"
+    if eligible >= 3:
+        return "review_for_expansion_to_20_per_category"
+    if eligible >= 1:
+        return "compact_redacted_evidence_review"
+    return "research_review_required_do_not_expand"
 
 
 def _markdown(report: dict[str, Any]) -> str:
@@ -359,6 +496,11 @@ def _markdown(report: dict[str, Any]) -> str:
         "rows_with_multiple_tool_like_payloads",
         "malformed_tool_call_repair_eligible_count",
         "final_before_tool_guard_eligible_count",
+        "schema_matched_raw_payload_count",
+        "schema_valid_raw_payload_count",
+        "raw_response_text_present_count",
+        "bad_jsonl_rows",
+        "forbidden_field_violation_count",
     ]
     lines = [
         "# Selected-Call Structural Failure Attribution",
@@ -397,6 +539,8 @@ def main() -> int:
     parser.add_argument("--categories", default="multi_turn_miss_func,multi_turn_base,multi_turn_long_context")
     parser.add_argument("--output", "--output-json", dest="output_json", type=Path, default=DEFAULT_OUTPUT_JSON)
     parser.add_argument("--markdown-output", type=Path, default=DEFAULT_OUTPUT_MD)
+    parser.add_argument("--raw-capture-root", type=Path)
+    parser.add_argument("--raw-capture-glob")
     parser.add_argument("--compact", action="store_true")
     parser.add_argument("--strict", action="store_true")
     args = parser.parse_args()
@@ -408,6 +552,8 @@ def main() -> int:
         output_json=args.output_json,
         markdown_output=args.markdown_output,
         compact=args.compact,
+        raw_capture_root=args.raw_capture_root,
+        raw_capture_glob=args.raw_capture_glob,
     )
     if args.compact:
         print(json.dumps({"passed": report["selected_call_structural_failure_attribution_passed"], "counters": report["counters"], "blockers": report["blockers"]}, sort_keys=True))

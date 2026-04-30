@@ -1,0 +1,137 @@
+{
+  "bfcl_runner_path_alias_note": {
+    "authoritative_counts_source": "provider_route_counts and model_id_counts",
+    "authoritative_model": "gpt-5.2",
+    "authoritative_provider_route": "Chuangzhi/Novacode",
+    "meaning": "BFCL directory/model path names are runner/path aliases only.",
+    "non_authoritative_path_alias_examples": [
+      "gpt-4o-mini-2024-07-18-FC"
+    ]
+  },
+  "blockers": [
+    "structural_repair_eligible_count_zero"
+  ],
+  "candidate_pool_authorized": false,
+  "category_summaries": [
+    {
+      "category": "multi_turn_base",
+      "reject_reason_counts": {
+        "multiple_tool_like_payloads": 10
+      },
+      "result_jsonl_rows": 10,
+      "selected_call_count": 26
+    },
+    {
+      "category": "multi_turn_long_context",
+      "reject_reason_counts": {
+        "multiple_tool_like_payloads": 10
+      },
+      "result_jsonl_rows": 10,
+      "selected_call_count": 24
+    },
+    {
+      "category": "multi_turn_miss_func",
+      "reject_reason_counts": {
+        "multiple_tool_like_payloads": 10
+      },
+      "result_jsonl_rows": 10,
+      "selected_call_count": 29
+    }
+  ],
+  "counters": {
+    "bad_jsonl_rows": 0,
+    "final_before_tool_guard_eligible_count": 0,
+    "forbidden_field_violation_count": 0,
+    "malformed_tool_call_repair_eligible_count": 0,
+    "model_id_counts": {
+      "gpt-5.2": 30
+    },
+    "provider_route_counts": {
+      "Chuangzhi/Novacode": 30
+    },
+    "raw_response_present_count": 30,
+    "raw_response_text_present_count": 30,
+    "reject_reason_counts": {
+      "multiple_tool_like_payloads": 30
+    },
+    "result_jsonl_rows": 30,
+    "rows_with_final_text_and_tool_like_payload": 0,
+    "rows_with_final_text_only": 0,
+    "rows_with_malformed_tool_call_json": 0,
+    "rows_with_multiple_tool_like_payloads": 30,
+    "rows_with_no_tool_call": 0,
+    "rows_with_unparseable_arguments": 0,
+    "schema_matched_raw_payload_count": 0,
+    "schema_matched_selected_call_count": 45,
+    "schema_valid_raw_payload_count": 0,
+    "schema_valid_required_args_present_count": 45,
+    "selected_call_count": 79
+  },
+  "dataset_json": "/tmp/explicit_literal_pool/explicit_literal_dataset.json",
+  "decision_gate": {
+    "eligible_structural_count": 0,
+    "expand_to_20_per_category_authorized": false,
+    "recommendation": "research_review_do_not_expand"
+  },
+  "diagnostic_only": true,
+  "does_not_call_bfcl_or_model": true,
+  "does_not_call_provider": true,
+  "does_not_call_scorer": true,
+  "does_not_invent_tool_function_arg_or_value": true,
+  "eligible_structural_record_count": 0,
+  "eligible_structural_records": [],
+  "forbidden_fields_not_used": [
+    "answer",
+    "candidate",
+    "checker",
+    "expected",
+    "gold",
+    "ground_truth",
+    "oracle",
+    "possible_answer",
+    "reference",
+    "repair",
+    "score"
+  ],
+  "generated_at_utc": "2026-04-30T08:50:23Z",
+  "huawei_acceptance_ready": false,
+  "input_health": {
+    "bad_jsonl_rows": 0,
+    "forbidden_field_violation_count": 0,
+    "model_id_counts": {
+      "gpt-5.2": 30
+    },
+    "provider_route_counts": {
+      "Chuangzhi/Novacode": 30
+    },
+    "raw_response_present_count": 30,
+    "raw_response_present_ratio": 1.0,
+    "result_jsonl_rows": 30
+  },
+  "input_mode": "raw_response_capture_records",
+  "model_id_counts": {
+    "gpt-5.2": 30
+  },
+  "next_required_action": "research_review_required_do_not_expand",
+  "offline_only": true,
+  "performance_evidence": false,
+  "provider_route_counts": {
+    "Chuangzhi/Novacode": 30
+  },
+  "raw_capture_files": [
+    "/tmp/bfcl_source_collection_raw_response_capture/multi_turn_base/baseline/raw_response_capture_records.jsonl",
+    "/tmp/bfcl_source_collection_raw_response_capture/multi_turn_long_context/baseline/raw_response_capture_records.jsonl",
+    "/tmp/bfcl_source_collection_raw_response_capture/multi_turn_miss_func/baseline/raw_response_capture_records.jsonl"
+  ],
+  "raw_traces_remain_untracked": true,
+  "report_scope": "selected_call_structural_failure_attribution",
+  "requested_categories": [
+    "multi_turn_miss_func",
+    "multi_turn_base",
+    "multi_turn_long_context"
+  ],
+  "scorer_authorized": false,
+  "selected_call_structural_failure_attribution_passed": false,
+  "sota_3pp_claim_ready": false,
+  "source_manifest": "default_tmp_batch1_batch2_roots"
+}
