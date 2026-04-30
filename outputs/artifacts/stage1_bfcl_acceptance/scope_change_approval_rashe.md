@@ -1,6 +1,6 @@
 # RASHE Scope-Change Approval Packet
 
-Status: `approved` as a scope-change route only. Default-disabled inert runtime skeleton implementation is separately approved by `rashe_runtime_implementation_authorization`; this scope-change packet does not itself authorize importing, enabling, or connecting runtime behavior, source collection, candidate generation, scorer execution, paired comparison, SOTA/+3pp, or Huawei acceptance claims.
+Status: `approved` as a scope-change route, not an active acceptance path. Default-disabled inert runtime skeleton implementation is separately approved by `rashe_runtime_implementation_authorization`; runtime behavior, source collection, candidate generation, scorer execution, paired comparison, SOTA/+3pp, and Huawei acceptance claims remain unauthorized.
 
 ## Route
 
@@ -90,4 +90,4 @@ Provider technical preflight is green, but provider green is not scorer authoriz
 
 ## Decision Boundary
 
-RASHE is approved as the selected scope-change route. Default-disabled inert runtime skeleton implementation is approved by the separate `rashe_runtime_implementation_authorization` packet. A separate execution approval is still required before any runtime path is imported, enabled, or connected to prompt injection, retry, provider/source/scorer/candidate flows, source collection, scorer, or performance claims.
+RASHE is approved as the selected scope-change route, not an active acceptance path. Default-disabled inert runtime skeleton implementation is approved by the separate `rashe_runtime_implementation_authorization` packet. Runtime behavior, source collection, scorer, candidate generation, dev/holdout/full BFCL, and performance claims require separate execution approval.
