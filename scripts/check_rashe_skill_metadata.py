@@ -115,6 +115,7 @@ def check(manifest: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
     step_trace_v0_2_route_checked = 0
     step_trace_source_scope_reject_count = 0
     call_count_nonzero_reject_count = 0
+    rejected_call_count_fields_seen: set[str] = set()
 
     decision = SkillRouter(skill_metadata=metadata).route({"signals": ["current_turn", "memory_tool_visible"]})
     if decision.decision_status == "selected" and decision.selected_skill_id == "bfcl_current_turn_focus":
@@ -170,8 +171,9 @@ def check(manifest: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
 
     for field in ["provider_call_count", "scorer_call_count", "source_collection_call_count"]:
         decision = SkillRouter(skill_metadata=metadata).route({**step_trace, field: 1})
-        if decision.decision_status == "input_reject" and decision.reject_reason == "call_count_nonzero":
+        if decision.decision_status == "input_reject" and decision.reject_reason == "call_count_nonzero" and decision.rejected_call_count_fields == (field,):
             call_count_nonzero_reject_count += 1
+            rejected_call_count_fields_seen.update(decision.rejected_call_count_fields)
         else:
             blockers.append(f"call_count_nonzero_not_rejected:{field}:{decision.decision_status}:{decision.reject_reason}")
 
@@ -196,6 +198,7 @@ def check(manifest: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
         "step_trace_source_scope_reject_count": step_trace_source_scope_reject_count,
         "call_count_nonzero_reject_count": call_count_nonzero_reject_count,
         "step_trace_call_count_reject_count": call_count_nonzero_reject_count,
+        "rejected_call_count_fields_seen": sorted(rejected_call_count_fields_seen),
         "provider_call_count": 0,
         "scorer_call_count": 0,
         "source_collection_call_count": 0,

@@ -120,6 +120,9 @@ def test_router_rejects_nonzero_call_counts_before_route():
         assert decision.provider_call_count == 0
         assert decision.scorer_call_count == 0
         assert decision.source_collection_call_count == 0
+        assert decision.rejected_call_count_fields == (field,)
+        decision_payload = decision.to_dict()
+        assert decision_payload["rejected_call_count_fields"] == [field]
 
 
 def test_router_rejects_raw_case_id_raw_trace_and_provider_payload_indicators():
@@ -196,6 +199,7 @@ def test_skill_metadata_checker_compact_report_passes():
     assert summary["step_trace_source_scope_reject_count"] == 2
     assert summary["call_count_nonzero_reject_count"] == 3
     assert summary["step_trace_call_count_reject_count"] == 3
+    assert summary["rejected_call_count_fields_seen"] == ["provider_call_count", "scorer_call_count", "source_collection_call_count"]
     assert summary["provider_call_count"] == 0
     assert summary["scorer_call_count"] == 0
     assert summary["source_collection_call_count"] == 0

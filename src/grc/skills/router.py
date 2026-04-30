@@ -52,6 +52,9 @@ class SkillRouter:
     def route(self, trace: dict[str, Any]) -> RouterDecision:
         if self.enabled or self.runtime_behavior_authorized or self.prompt_injection_authorized:
             return RouterDecision(None, "authorization_reject", "runtime_behavior_not_authorized")
+        call_count_fields = _call_count_reject_fields(trace)
+        if call_count_fields:
+            return RouterDecision(None, "input_reject", "call_count_nonzero", rejected_call_count_fields=tuple(call_count_fields))
         preflight_reject = _preflight_reject(trace)
         if preflight_reject is not None:
             return RouterDecision(None, "input_reject", preflight_reject)
@@ -86,10 +89,11 @@ class SkillRouter:
         return RouterDecision(ranked[0], "selected", None)
 
 
+def _call_count_reject_fields(trace: dict[str, Any]) -> list[str]:
+    return [field for field in CALL_COUNT_FIELDS if field in trace and trace.get(field) != 0]
+
+
 def _preflight_reject(trace: dict[str, Any]) -> str | None:
-    for field in CALL_COUNT_FIELDS:
-        if field in trace and trace.get(field) != 0:
-            return "call_count_nonzero"
     source_scope = trace.get("source_scope")
     if source_scope is not None:
         if source_scope in REJECTED_SOURCE_SCOPES:

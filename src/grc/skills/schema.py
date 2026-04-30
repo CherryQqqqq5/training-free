@@ -87,6 +87,8 @@ class RouterDecision:
     scorer_call_count: int = 0
     source_collection_call_count: int = 0
 
+    rejected_call_count_fields: tuple[str, ...] = ()
+
     def to_dict(self) -> dict[str, Any]:
         return {
             "schema_version": "rashe_router_decision_v0",
@@ -99,6 +101,7 @@ class RouterDecision:
             "provider_call_count": self.provider_call_count,
             "scorer_call_count": self.scorer_call_count,
             "source_collection_call_count": self.source_collection_call_count,
+            "rejected_call_count_fields": list(self.rejected_call_count_fields),
         }
 
 
