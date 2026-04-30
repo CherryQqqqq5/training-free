@@ -49,6 +49,14 @@ class Skill:
     allowed_triggers: tuple[str, ...]
     forbidden_triggers: tuple[str, ...]
     actions: tuple[str, ...]
+    scope: str = ""
+    trigger_priority: int = 9999
+    max_injection_tokens: int = 0
+    conflicts_with: tuple[str, ...] = ()
+    requires_schema: bool = False
+    requires_current_turn: bool = False
+    forbidden_sources: tuple[str, ...] = ()
+    evaluation_status: str = "offline_seed_validated"
     enabled: bool = False
     offline_only: bool = True
     runtime_authorized: bool = False

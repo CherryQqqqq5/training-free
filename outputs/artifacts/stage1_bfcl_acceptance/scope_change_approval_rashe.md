@@ -36,13 +36,14 @@ Provider technical preflight is green, but provider green is not scorer authoriz
 - approved_before_source_collection: `false`
 - approved_before_candidate_generation: `false`
 - approved_before_scorer: `false`
+- execution_authorized: `false`
 - candidate_pool_ready: `false`
 - scorer_authorization: `false`
 - performance_evidence: `false`
 - sota_3pp_claim_ready: `false`
 - huawei_acceptance_ready: `false`
 
-## Proposed-Only Allowed Changes
+## Scope-Only Allowed Changes
 
 - skill packages / SkillBank
 - deterministic skill router

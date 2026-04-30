@@ -28,12 +28,12 @@ REQUIRED_FALSE_FIELDS = [
     "candidate_generation_authorized",
     "scorer_authorized",
     "active_acceptance_path",
+    "execution_authorized",
 ]
 
 REQUIRED_TRUE_FIELDS = [
     "training_free_claim",
     "same_model_same_provider_required",
-    "proposed_only",
 ]
 
 REQUIRED_NO_LEAKAGE_FALSE = [
@@ -124,7 +124,7 @@ def validate(data: dict[str, Any]) -> list[str]:
         for key in REQUIRED_GATE_TRUE:
             if gates.get(key) is not True:
                 blockers.append(f"gate_{key}_not_true")
-    for key in ["allowed_changes_proposed_only", "forbidden_changes"]:
+    for key in ["allowed_changes_scope_only", "forbidden_changes"]:
         if not isinstance(data.get(key), list) or not data.get(key):
             blockers.append(f"{key}_missing")
     return blockers

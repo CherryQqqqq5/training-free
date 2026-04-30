@@ -8,14 +8,27 @@
     "external_search_not_required",
     "tool_scope_boundary_present"
   ],
+  "conflicts_with": [],
   "display_name": "BFCL memory and web search discipline",
   "enabled": false,
+  "evaluation_status": "offline_seed_validated",
+  "forbidden_sources": [
+    "gold",
+    "expected",
+    "reference",
+    "possible_answer",
+    "score",
+    "scorer_diff",
+    "candidate_output",
+    "holdout_feedback"
+  ],
   "forbidden_triggers": [
     "use_hidden_memory",
     "perform_web_search",
     "provider_side_lookup",
     "gold_reference"
   ],
+  "max_injection_tokens": 0,
   "no_leakage_policy": {
     "candidate_output_used": false,
     "case_specific_content_allowed": false,
@@ -26,6 +39,8 @@
     "scorer_diff_used": false
   },
   "offline_only": true,
+  "requires_current_turn": false,
+  "requires_schema": false,
   "rollback_policy": {
     "disable_by_default": true,
     "rollback_action": "remove skill from router allowlist before any runtime authorization",
@@ -33,6 +48,7 @@
   },
   "runtime_authorized": false,
   "schema_version": "rashe_skill_v0",
+  "scope": "bfcl_offline_skeleton_seed",
   "skill_id": "bfcl_memory_web_search_discipline",
   "source_boundary": {
     "allowed_sources": [
@@ -52,5 +68,6 @@
       "holdout_feedback"
     ]
   },
-  "training_free": true
+  "training_free": true,
+  "trigger_priority": 40
 }

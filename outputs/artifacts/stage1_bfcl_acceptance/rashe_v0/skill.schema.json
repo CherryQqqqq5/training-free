@@ -16,11 +16,27 @@
       "minItems": 1,
       "type": "array"
     },
+    "conflicts_with": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
     "display_name": {
       "type": "string"
     },
     "enabled": {
       "const": false
+    },
+    "evaluation_status": {
+      "const": "offline_seed_validated"
+    },
+    "forbidden_sources": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
     },
     "forbidden_triggers": {
       "items": {
@@ -29,11 +45,20 @@
       "minItems": 1,
       "type": "array"
     },
+    "max_injection_tokens": {
+      "const": 0
+    },
     "no_leakage_policy": {
       "type": "object"
     },
     "offline_only": {
       "const": true
+    },
+    "requires_current_turn": {
+      "type": "boolean"
+    },
+    "requires_schema": {
+      "type": "boolean"
     },
     "rollback_policy": {
       "type": "object"
@@ -44,6 +69,9 @@
     "schema_version": {
       "const": "rashe_skill_v0"
     },
+    "scope": {
+      "type": "string"
+    },
     "skill_id": {
       "pattern": "^[a-z0-9_]+$",
       "type": "string"
@@ -53,6 +81,10 @@
     },
     "training_free": {
       "const": true
+    },
+    "trigger_priority": {
+      "minimum": 0,
+      "type": "integer"
     }
   },
   "required": [
@@ -68,7 +100,15 @@
     "no_leakage_policy",
     "rollback_policy",
     "actions",
-    "source_boundary"
+    "source_boundary",
+    "scope",
+    "trigger_priority",
+    "max_injection_tokens",
+    "conflicts_with",
+    "requires_schema",
+    "requires_current_turn",
+    "forbidden_sources",
+    "evaluation_status"
   ],
   "title": "RASHE v0 Skill",
   "type": "object"
