@@ -175,10 +175,11 @@ def build_report(
     counters: dict[str, Any] = {
         "audited_case_count": len(audited_case_ids),
         "scored_case_count": aggregate_total or len(scored_case_ids),
-        "source_score_case_overlap_count": len(source_score_overlap),
+        "failure_detail_source_overlap_count": len(source_score_overlap),
         "missing_score_count": max(0, len(audited_case_ids) - (aggregate_total or len(scored_case_ids))),
+        "unmatched_or_unverified_score_case_count": max(0, len(audited_case_ids) - (aggregate_total or len(scored_case_ids))),
         "bad_score_rows": bad_score_rows,
-        "route_model_matched_count": 0,
+        "failure_detail_route_model_matched_count": 0,
         "forbidden_field_violation_count": 0,
         "baseline_success_count": 0,
         "baseline_failure_count": 0,
@@ -214,12 +215,25 @@ def build_report(
         bucket = _classify_failure(entry=dataset.get(cid), capture=capture, result_row=results.get(cid), score_row=row)
         counters[bucket] += 1
         failure_bucket_hashes.setdefault(bucket, []).append(_hash_text(cid))
-    counters["route_model_matched_count"] = len(route_model_matched_ids)
+    counters["failure_detail_route_model_matched_count"] = len(route_model_matched_ids)
     counters["baseline_failure_count"] = failures
     counters["baseline_success_count"] = max(0, int(counters["scored_case_count"]) - failures)
     if counters["scored_case_count"]:
         counters["baseline_success_rate"] = round(counters["baseline_success_count"] / counters["scored_case_count"], 6)
         counters["baseline_failure_rate"] = round(counters["baseline_failure_count"] / counters["scored_case_count"], 6)
+    counters["taxonomy_bucket_denominator"] = counters["baseline_failure_count"]
+
+    coverage_semantics = {
+        "coverage_statement": "full aggregate score coverage with failure-detail taxonomy",
+        "aggregate_score_coverage_denominator": "audited_case_count",
+        "aggregate_scored_case_count_source": "score-file aggregate total_count rows",
+        "taxonomy_bucket_denominator": "baseline_failure_count",
+        "taxonomy_bucket_denominator_value": counters["baseline_failure_count"],
+        "failure_detail_source_overlap_count": counters["failure_detail_source_overlap_count"],
+        "failure_detail_route_model_matched_count": counters["failure_detail_route_model_matched_count"],
+        "unmatched_or_unverified_score_case_count": counters["unmatched_or_unverified_score_case_count"],
+        "note": "scored_case_count=30 and missing_score_count=0 describe aggregate score coverage; failure-detail taxonomy buckets are denominated by the 22 detailed failure rows, not by all 30 audited cases.",
+    }
 
     report = {
         "report_scope": "baseline_only_scored_failure_taxonomy_audit",
@@ -252,6 +266,7 @@ def build_report(
         "score_file_hashes": [_hash_text(path) for path in score_files],
         "current_route_model_scope": {"provider_route": CURRENT_PROVIDER_ROUTE, "model": CURRENT_MODEL_ID},
         "raw_score_gold_bearing_rows_read_count": raw_score_gold_bearing_rows_read_count,
+        "coverage_semantics": coverage_semantics,
         "counters": counters,
         "aggregate_bucket_sample_hashes": {key: values[:5] for key, values in sorted(failure_bucket_hashes.items()) if values},
         "decision": {
@@ -275,8 +290,9 @@ def _write_json(path: Path, payload: dict[str, Any]) -> None:
 def _markdown(report: dict[str, Any]) -> str:
     c = report["counters"]
     keys = [
-        "audited_case_count", "scored_case_count", "source_score_case_overlap_count", "missing_score_count",
-        "bad_score_rows", "route_model_matched_count", "forbidden_field_violation_count",
+        "audited_case_count", "scored_case_count", "missing_score_count", "unmatched_or_unverified_score_case_count",
+        "failure_detail_source_overlap_count", "failure_detail_route_model_matched_count", "taxonomy_bucket_denominator",
+        "bad_score_rows", "forbidden_field_violation_count",
         "baseline_success_count", "baseline_failure_count", "baseline_success_rate", "baseline_failure_rate",
         "failure_with_no_tool_like_payload", "failure_with_raw_payload_schema_not_matched",
         "failure_with_selected_schema_not_matched", "failure_with_schema_valid_selected_calls",
@@ -287,6 +303,7 @@ def _markdown(report: dict[str, Any]) -> str:
     lines = [
         "# Baseline-Only Scored Failure Taxonomy Audit", "",
         "This is scorer-output taxonomy only. It is not performance evidence and does not authorize candidate extraction, candidate pool promotion, paired comparison, dev/holdout/full scoring, or provider/model generation.", "",
+        "Coverage semantics: full aggregate score coverage with failure-detail taxonomy. `scored_case_count` and `missing_score_count` come from aggregate score totals; taxonomy buckets are denominated by `baseline_failure_count`, not by all audited cases.", "",
         "## Flags", "",
         f"- audit_only: `{str(report['audit_only']).lower()}`",
         f"- baseline_only: `{str(report['baseline_only']).lower()}`",
@@ -304,6 +321,8 @@ def _markdown(report: dict[str, Any]) -> str:
     lines += [
         "", "## Notes", "",
         f"- score_file_count: `{report.get('score_file_count')}`",
+        f"- coverage_statement: `{report.get('coverage_semantics', {}).get('coverage_statement')}`",
+        f"- taxonomy_bucket_denominator: `{report.get('coverage_semantics', {}).get('taxonomy_bucket_denominator')}` = `{report.get('coverage_semantics', {}).get('taxonomy_bucket_denominator_value')}`",
         f"- raw_score_gold_bearing_rows_read_count: `{report.get('raw_score_gold_bearing_rows_read_count')}`; raw scorer rows were read only under aggregate-taxonomy authorization and no gold/expected content was emitted.",
         "- aggregate_bucket_sample_hashes contain case-id hashes only, not case text, gold, expected values, scorer diffs, or repair recommendations.",
         f"- next_action: `{report['decision']['next_action']}`",

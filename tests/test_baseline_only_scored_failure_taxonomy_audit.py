@@ -75,13 +75,17 @@ def test_baseline_only_scored_failure_taxonomy_compact_no_gold_emission(tmp_path
     counters = report["counters"]
     assert counters["audited_case_count"] == 2
     assert counters["scored_case_count"] == 2
-    assert counters["source_score_case_overlap_count"] == 1
+    assert counters["failure_detail_source_overlap_count"] == 1
     assert counters["missing_score_count"] == 0
-    assert counters["route_model_matched_count"] == 1
+    assert counters["unmatched_or_unverified_score_case_count"] == 0
+    assert counters["failure_detail_route_model_matched_count"] == 1
+    assert counters["taxonomy_bucket_denominator"] == 1
     assert counters["forbidden_field_violation_count"] == 0
     assert counters["baseline_success_count"] == 1
     assert counters["baseline_failure_count"] == 1
     assert counters["failure_with_schema_valid_selected_calls"] == 1
+    assert report["coverage_semantics"]["coverage_statement"] == "full aggregate score coverage with failure-detail taxonomy"
+    assert report["coverage_semantics"]["taxonomy_bucket_denominator"] == "baseline_failure_count"
     assert report["raw_score_gold_bearing_rows_read_count"] == 1
     serialized = json.dumps(report, sort_keys=True)
     assert "must not be emitted" not in serialized
