@@ -1,0 +1,73 @@
+{
+  "audit_only": true,
+  "branch": "stage1-bfcl-performance-sprint",
+  "candidate_extraction_authorized": false,
+  "candidate_pool_authorized": false,
+  "case_hash_samples": {
+    "ambiguous_rerank_reject": [
+      "ab816ec9713b5909",
+      "bb854b3faf566064",
+      "d6ad3fc2322214ff",
+      "f94f8b2144fe434d"
+    ],
+    "single_schema_high_margin": []
+  },
+  "counters": {
+    "all_schema_scores_tied_or_low_margin_count": 10,
+    "ambiguous_rerank_reject_count": 4,
+    "audited_bucket_case_count": 10,
+    "class_or_path_terms_support_top_schema_count": 0,
+    "dataset_schema_present_count": 10,
+    "forbidden_field_violation_count": 0,
+    "multiple_high_margin_schema_candidates_count": 4,
+    "no_retrievable_schema_signal_count": 0,
+    "parameter_terms_support_top_schema_count": 4,
+    "prompt_or_current_turn_present_count": 10,
+    "prompt_terms_support_top_schema_count": 10,
+    "raw_emitted_tool_name_supports_top_schema_count": 1,
+    "raw_response_present_count": 10,
+    "schema_option_count_total": 59,
+    "single_schema_high_margin_count": 0,
+    "top1_schema_margin_ge_threshold_count": 0,
+    "top3_schema_non_ambiguous_count": 3,
+    "uses_gold_argument_value_count": 0,
+    "uses_gold_tool_identity_count": 0,
+    "uses_scorer_diff_count": 0,
+    "would_change_arguments_count": 0,
+    "would_change_call_count": 0,
+    "would_change_call_order_count": 0
+  },
+  "dataset_json": "/tmp/explicit_literal_pool/explicit_literal_dataset.json",
+  "decision": {
+    "candidate_generation_authorized": false,
+    "performance_evidence": false,
+    "recommendation": "stop_no_yield_research_review"
+  },
+  "does_not_use_embeddings_llm_provider_or_gold_target": true,
+  "expected_values_emitted": false,
+  "generated_at_utc": "2026-04-30T10:06:06Z",
+  "gold_text_emitted": false,
+  "huawei_acceptance_ready": false,
+  "input_bucket": "raw_payload_schema_not_matched",
+  "input_case_count": 10,
+  "no_leakage_to_candidate_pool": true,
+  "offline_only": true,
+  "paired_scoring_authorized": false,
+  "per_case_repair_recommendations_emitted": false,
+  "performance_evidence": false,
+  "raw_root": "/tmp/bfcl_source_collection_raw_response_capture",
+  "report_scope": "schema_retrieval_rerank_feasibility_diagnostic",
+  "rerank_method": "deterministic_lexical_schema_overlap_only",
+  "scorer_authorization": false,
+  "server_path": "/cephfs/qiuyn/training-free",
+  "sota_3pp_claim_ready": false,
+  "stop_gates": {
+    "ambiguous_or_low_margin_stop_threshold": "at_least_6_of_10",
+    "passed": false,
+    "single_schema_high_margin_threshold": "at_least_3_of_10",
+    "stop_reasons": [
+      "single_schema_high_margin_below_3_of_10",
+      "ambiguous_or_low_margin_at_least_6_of_10"
+    ]
+  }
+}
