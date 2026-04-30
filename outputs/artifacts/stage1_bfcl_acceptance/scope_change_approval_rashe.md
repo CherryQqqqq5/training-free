@@ -12,6 +12,20 @@ Status: `proposed`, not approved. This artifact does not authorize runtime imple
 
 Provider technical preflight is green, but provider green is not scorer authorization. Deterministic Stage-1 family search is exhausted under current approved gates.
 
+
+## Acceptance Fields
+
+- provider_route: `Chuangzhi/Novacode`
+- bfcl_eval_version: `bfcl-eval==2025.12.17`
+- bfcl_protocol_id: `TBD_requires_approval`
+- baseline_comparator_kind: `same_model_same_provider_baseline`
+- hidden_model_calls_allowed: `false`
+- suite_scope: `full_suite_or_signed_subset`
+- subset_approval_id: `null` until signed
+- dev_split_manifest: `null` until approved
+- holdout_split_manifest: `null` until approved
+- dev_holdout_disjoint: `false` while proposed
+
 ## Fail-Closed Flags
 
 - approved_before_implementation: `false`

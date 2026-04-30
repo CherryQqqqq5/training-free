@@ -21,8 +21,18 @@ def _base_packet():
         "bfcl_evaluator_modified": False,
         "same_model_same_provider_required": True,
         "provider": "Chuangzhi/Novacode",
+        "provider_route": "Chuangzhi/Novacode",
         "provider_profile": "novacode",
         "model": "gpt-5.2",
+        "bfcl_eval_version": "bfcl-eval==2025.12.17",
+        "bfcl_protocol_id": "TBD_requires_approval",
+        "baseline_comparator_kind": "same_model_same_provider_baseline",
+        "hidden_model_calls_allowed": False,
+        "suite_scope": "full_suite_or_signed_subset",
+        "subset_approval_id": None,
+        "dev_split_manifest": None,
+        "holdout_split_manifest": None,
+        "dev_holdout_disjoint": False,
         "candidate_pool_ready": False,
         "scorer_authorization": False,
         "performance_evidence": False,
@@ -95,3 +105,22 @@ def test_leakage_counter_fails_closed(tmp_path):
     assert result.returncode == 1
     summary = json.loads(result.stdout)
     assert "no_leakage_gold_used_not_false" in summary["blockers"]
+
+
+def test_acceptance_fields_fail_closed_while_proposed(tmp_path):
+    packet = _base_packet()
+    packet["hidden_model_calls_allowed"] = True
+    packet["subset_approval_id"] = "subset-approval"
+    packet["dev_split_manifest"] = "dev.json"
+    packet["holdout_split_manifest"] = "holdout.json"
+    packet["dev_holdout_disjoint"] = True
+    packet.pop("bfcl_protocol_id")
+    result = _run(tmp_path, packet)
+    assert result.returncode == 1
+    summary = json.loads(result.stdout)
+    assert "hidden_model_calls_allowed_not_false" in summary["blockers"]
+    assert "subset_approval_id_not_null" in summary["blockers"]
+    assert "dev_split_manifest_not_null" in summary["blockers"]
+    assert "holdout_split_manifest_not_null" in summary["blockers"]
+    assert "dev_holdout_disjoint_not_false" in summary["blockers"]
+    assert "bfcl_protocol_id_invalid" in summary["blockers"]

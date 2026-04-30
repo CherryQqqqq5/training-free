@@ -72,8 +72,13 @@ def validate(data: dict[str, Any]) -> list[str]:
         "short_name": "RASHE",
         "approval_status": "proposed",
         "provider": "Chuangzhi/Novacode",
+        "provider_route": "Chuangzhi/Novacode",
         "provider_profile": "novacode",
         "model": "gpt-5.2",
+        "bfcl_eval_version": "bfcl-eval==2025.12.17",
+        "bfcl_protocol_id": "TBD_requires_approval",
+        "baseline_comparator_kind": "same_model_same_provider_baseline",
+        "suite_scope": "full_suite_or_signed_subset",
     }
     for key, value in expected.items():
         if data.get(key) != value:
@@ -84,6 +89,15 @@ def validate(data: dict[str, Any]) -> list[str]:
     for key in REQUIRED_FALSE_FIELDS:
         if data.get(key) is not False:
             blockers.append(f"{key}_not_false")
+    if data.get("hidden_model_calls_allowed") is not False:
+        blockers.append("hidden_model_calls_allowed_not_false")
+    for key in ["subset_approval_id", "dev_split_manifest", "holdout_split_manifest"]:
+        if key not in data:
+            blockers.append(f"{key}_missing")
+        elif data.get(key) is not None:
+            blockers.append(f"{key}_not_null")
+    if data.get("dev_holdout_disjoint") is not False:
+        blockers.append("dev_holdout_disjoint_not_false")
     no_leakage = data.get("no_leakage")
     if not isinstance(no_leakage, dict):
         blockers.append("no_leakage_missing")
@@ -125,6 +139,8 @@ def main(argv: list[str] | None = None) -> int:
         "candidate_pool_ready": data.get("candidate_pool_ready"),
         "scorer_authorization": data.get("scorer_authorization"),
         "performance_evidence": data.get("performance_evidence"),
+        "suite_scope": data.get("suite_scope"),
+        "hidden_model_calls_allowed": data.get("hidden_model_calls_allowed"),
     }
     if args.compact:
         print(json.dumps(summary, sort_keys=True))
