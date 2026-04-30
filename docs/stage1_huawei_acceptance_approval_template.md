@@ -171,7 +171,7 @@ Minimum approval conditions:
 - `scope_change_approval_owner` is recorded
 - `scope_change_approved_before_execution=true`
 - `deterministic_family_search_exhausted=true` is acknowledged
-- `candidate_pool_ready=true` only after a newly approved scope-change candidate pool passes its own gate
+- candidate pool readiness may be true only after a newly approved scope-change candidate pool passes its own gate
 - `scorer_authorization_ready=true` only after candidate pool, split, no-leakage, and protocol gates pass
 - `performance_evidence=false` until paired baseline/candidate scorer artifacts exist
 - `m2_8pre_offline_passed=true` or a replacement scope-change offline gate is explicitly approved
@@ -541,7 +541,7 @@ All items must be checked before any formal Huawei Stage-1 BFCL performance clai
 [ ] scope_change_approval_id is recorded.
 [ ] scope_change_approved_before_execution=true.
 [ ] deterministic_family_search_exhausted=true is acknowledged.
-[ ] candidate_pool_ready=true only after the newly approved route passes its own gate.
+[ ] candidate pool readiness may be true only after the newly approved route passes its own gate.
 [ ] explicit_ambiguous_literal_present=false.
 [ ] no_leakage_check_passed=true.
 [ ] dev20_manifest_ready=true.

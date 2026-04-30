@@ -159,7 +159,7 @@ Dependency order: `offline scaffold ready -> runtime/source approvals (separate)
 - authorized: `false`
 
 ### Prerequisites
-- candidate_proposer_execution_approval approved and candidate_pool_ready=true
+- candidate_proposer_execution_approval approved and candidate pool readiness established by its gate
 - source_real_trace_approval approved if source-derived inputs are used
 - same provider/model/protocol comparator frozen
 - dev/holdout disjoint manifests signed
