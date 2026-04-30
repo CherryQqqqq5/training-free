@@ -1,31 +1,67 @@
 {
-  "report_scope": "current_provider_preflight_status",
-  "offline_only": true,
-  "does_not_authorize_scorer": true,
-  "source_collection_rerun_ready": false,
-  "candidate_evaluation_ready": false,
-  "attempted_category": "multi_turn_long_context",
-  "attempted_command_scope": "baseline_source_collection_preflight_only",
-  "attempted_provider_profiles": [
+  "base_url": "http://127.0.0.1:8101",
+  "config_path": "configs/runtime_bfcl_structured.yaml",
+  "trace_dir": "/tmp/stage1_provider_green_preflight/traces",
+  "expected_api_key_env": "OPENROUTER_API_KEY",
+  "environment_check": {
+    "expected_api_key_env": "OPENROUTER_API_KEY",
+    "is_set": true,
+    "reason": "ok"
+  },
+  "checks": [
     {
-      "provider_profile": "openrouter",
-      "expected_api_key_env": "OPENROUTER_API_KEY",
-      "result": "blocked",
+      "name": "chat_tool_call",
+      "request_path": "/v1/chat/completions",
       "http_status": 401,
-      "failure_class": "missing_authentication_header"
+      "passed": false,
+      "reason": "http 401: {'error': {'message': 'User not found.', 'code': 401}}",
+      "response": {
+        "error": {
+          "message": "User not found.",
+          "code": 401
+        }
+      }
     },
     {
-      "provider_profile": "novacode",
-      "expected_api_key_env": "NOVACODE_API_KEY",
-      "result": "blocked",
+      "name": "responses_tool_call",
+      "request_path": "/v1/responses",
       "http_status": 401,
-      "failure_class": "invalid_api_key"
+      "passed": false,
+      "reason": "http 401: {'error': {'message': 'User not found.', 'code': 401}}",
+      "response": {
+        "error": {
+          "message": "User not found.",
+          "code": 401
+        }
+      }
+    },
+    {
+      "name": "chat_text_response",
+      "request_path": "/v1/chat/completions",
+      "http_status": 401,
+      "passed": false,
+      "reason": "http 401: {'error': {'message': 'User not found.', 'code': 401}}",
+      "response": {
+        "error": {
+          "message": "User not found.",
+          "code": 401
+        }
+      }
+    },
+    {
+      "name": "trace_emission",
+      "request_path": null,
+      "http_status": null,
+      "passed": true,
+      "reason": "ok",
+      "response": {
+        "new_traces": [
+          "6b49ba5b-39ab-435a-b006-b3d26b99d5b6.json",
+          "dbc922dc-0b5d-40cb-8acb-22439e566b6c.json",
+          "e7c609a3-f1fb-46c4-b0fa-c83ebf30f2fe.json"
+        ]
+      }
     }
   ],
-  "local_proxy_preflight_started": true,
-  "bfcl_or_model_run_completed": false,
-  "raw_trace_score_result_artifacts_committed": false,
-  "raw_artifacts_cleaned_after_attempt": true,
-  "blocking_condition": "valid_provider_credential_required_before_source_collection_or_scorer",
-  "next_required_action": "configure_valid_approved_provider_credentials_then_run_planned_baseline_source_collection_commands"
+  "passed": false
 }

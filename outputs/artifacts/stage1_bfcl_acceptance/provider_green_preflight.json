@@ -1,14 +1,21 @@
 {
   "blockers": [
+    "chat_text_response_preflight_failed",
+    "chat_tool_call_preflight_failed",
     "provider_auth_401",
-    "provider_required_fields_not_green"
+    "provider_preflight_checks_not_green",
+    "responses_tool_call_preflight_failed"
   ],
-  "blocking_condition": "valid_provider_credential_required_before_source_collection_or_scorer",
+  "blocking_condition": null,
   "does_not_authorize_scorer": true,
   "does_not_call_bfcl_or_model": true,
-  "environment_check": {},
-  "expected_api_key_env": null,
-  "next_required_action": "configure_valid_approved_provider_credentials_then_run_planned_baseline_source_collection_commands",
+  "environment_check": {
+    "expected_api_key_env": "OPENROUTER_API_KEY",
+    "is_set": true,
+    "reason": "ok"
+  },
+  "expected_api_key_env": "OPENROUTER_API_KEY",
+  "next_required_action": null,
   "offline_only": true,
   "path": "outputs/artifacts/bfcl_ctspc_source_pool_v1/current_provider_preflight_status.json",
   "present": true,
@@ -18,7 +25,7 @@
     "chat_text_response": false,
     "chat_tool_call": false,
     "responses_tool_call": false,
-    "trace_emission": false
+    "trace_emission": true
   },
   "required_fields": {
     "bfcl_compatible_response": false,
