@@ -172,33 +172,97 @@ def _observation_text(entry: dict[str, Any], row: dict[str, Any]) -> str:
     return "\n".join(chunks)
 
 
-def _function_map(entry: dict[str, Any]) -> dict[str, dict[str, Any]]:
+def _normalize_identifier(value: str) -> str:
+    return re.sub(r"[^a-z0-9]", "", value.lower())
+
+
+def _function_aliases(name: str) -> set[str]:
+    suffix = name.rsplit(".", 1)[-1]
+    return {name, suffix, _normalize_identifier(name), _normalize_identifier(suffix)}
+
+
+def _schema_functions(entry: dict[str, Any]) -> list[tuple[int, dict[str, Any]]]:
     raw = entry.get("function") or entry.get("functions") or []
     if isinstance(raw, dict):
         raw = [raw]
-    funcs = [fn for fn in raw if isinstance(fn, dict) and fn.get("name")]
-    out = {str(fn["name"]): fn for fn in funcs}
-    suffixes: dict[str, list[dict[str, Any]]] = {}
-    for fn in funcs:
+    return [(index, fn) for index, fn in enumerate(raw if isinstance(raw, list) else []) if isinstance(fn, dict) and fn.get("name")]
+
+
+def _schema_index(entry: dict[str, Any]) -> tuple[dict[str, dict[str, Any]], set[str], dict[str, list[str]]]:
+    aliases: dict[str, list[dict[str, Any]]] = {}
+    names_by_alias: dict[str, list[str]] = {}
+    for index, fn in _schema_functions(entry):
         name = str(fn["name"])
-        suffixes.setdefault(name.rsplit(".", 1)[-1], []).append(fn)
-    for suffix, matches in suffixes.items():
-        if len(matches) == 1 and suffix not in out:
-            out[suffix] = matches[0]
-    return out
+        fn.setdefault("_schema_source_path", f"function[{index}]")
+        for alias in _function_aliases(name):
+            aliases.setdefault(alias, []).append(fn)
+            names_by_alias.setdefault(alias, []).append(name)
+    lookup = {alias: matches[0] for alias, matches in aliases.items() if len({str(fn.get("name")) for fn in matches}) == 1}
+    conflicts = {alias for alias, matches in aliases.items() if len({str(fn.get("name")) for fn in matches}) > 1}
+    return lookup, conflicts, names_by_alias
+
+
+def _function_map(entry: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    lookup, _conflicts, _names_by_alias = _schema_index(entry)
+    return lookup
 
 
 def _ambiguous_function_aliases(entry: dict[str, Any]) -> set[str]:
-    raw = entry.get("function") or entry.get("functions") or []
-    if isinstance(raw, dict):
-        raw = [raw]
-    suffixes: dict[str, set[str]] = {}
-    for fn in raw if isinstance(raw, list) else []:
-        if not isinstance(fn, dict) or not fn.get("name"):
+    _lookup, conflicts, _names_by_alias = _schema_index(entry)
+    return conflicts
+
+
+def _candidate_schema_names(entry: dict[str, Any]) -> list[str]:
+    return [str(fn.get("name")) for _index, fn in _schema_functions(entry)]
+
+
+def _schema_match(entry: dict[str, Any], emitted_tool: str) -> tuple[dict[str, Any] | None, str, str, list[str]]:
+    lookup, conflicts, names_by_alias = _schema_index(entry)
+    aliases = [emitted_tool, _normalize_identifier(emitted_tool)]
+    candidate_names = _candidate_schema_names(entry)
+    for alias in aliases:
+        if alias in conflicts:
+            return None, "schema_function_alias_not_unique", f"alias {alias!r} matches multiple schema functions", candidate_names
+        if alias in lookup:
+            return lookup[alias], "matched", "matched_by_exact_or_normalized_alias", candidate_names
+    return None, "unmatched", "no exact/suffix/normalized schema alias matched emitted tool", candidate_names
+
+
+def _properties(fn: dict[str, Any]) -> dict[str, Any]:
+    params = fn.get("parameters") or {}
+    props = params.get("properties") or {}
+    return props if isinstance(props, dict) else {}
+
+
+def _normalized_arg_keys(args: dict[str, Any]) -> dict[str, list[str]]:
+    out: dict[str, list[str]] = {}
+    for key in args:
+        out.setdefault(_normalize_identifier(str(key)), []).append(str(key))
+    return out
+
+
+def _present_schema_args(fn: dict[str, Any], args: dict[str, Any]) -> tuple[set[str], list[str]]:
+    props = _properties(fn)
+    normalized_args = _normalized_arg_keys(args)
+    present: set[str] = set()
+    conflicts: list[str] = []
+    for prop in props:
+        if prop in args:
+            present.add(str(prop))
             continue
-        name = str(fn["name"])
-        suffixes.setdefault(name.rsplit(".", 1)[-1], set()).add(name)
-    return {suffix for suffix, names in suffixes.items() if len(names) > 1}
+        normalized = _normalize_identifier(str(prop))
+        raw_matches = normalized_args.get(normalized, [])
+        if len(raw_matches) == 1:
+            present.add(str(prop))
+        elif len(raw_matches) > 1:
+            conflicts.append(str(prop))
+    return present, conflicts
+
+
+def _missing_required_args(fn: dict[str, Any], args: dict[str, Any]) -> tuple[list[str], list[str], set[str]]:
+    present, conflicts = _present_schema_args(fn, args)
+    missing = [arg for arg in _required_args(fn) if arg not in present]
+    return missing, conflicts, present
 
 
 def _required_args(fn: dict[str, Any]) -> list[str]:
@@ -343,12 +407,62 @@ def _extract_candidates(
         "rows_with_exactly_one_missing_required_arg": 0,
         "rows_with_multiple_missing_required_args": 0,
         "schema_function_alias_not_unique": 0,
+        "schema_match_samples": [],
+        "schema_match_status_counts": {},
+        "emitted_arg_key_conflicts": 0,
+        "schema_functions_with_empty_properties": 0,
+        "schema_functions_with_empty_required": 0,
+        "matched_calls_with_empty_properties": 0,
+        "matched_calls_with_empty_required": 0,
         "missing_required_samples": [],
     }
 
     def reject(reason: str, **payload: Any) -> None:
         reject_counts[reason] = reject_counts.get(reason, 0) + 1
         rejections.append({"reason": reason, **payload})
+
+    def add_schema_match_sample(
+        case_id: str,
+        category: str,
+        call: dict[str, Any],
+        fn: dict[str, Any] | None,
+        status: str,
+        reason: str,
+        candidate_names: list[str],
+        missing: list[str] | None = None,
+        present_schema_args: set[str] | None = None,
+        arg_conflicts: list[str] | None = None,
+    ) -> None:
+        counts = diagnostics["schema_match_status_counts"]
+        counts[status] = counts.get(status, 0) + 1
+        samples = diagnostics["schema_match_samples"]
+        if len(samples) >= 100:
+            return
+        props = _properties(fn or {})
+        required = _required_args(fn or {})
+        samples.append({
+            "case_id": case_id,
+            "category": category,
+            "emitted_raw_name": call["tool"],
+            "emitted_normalized_name": _normalize_identifier(call["tool"]),
+            "candidate_schema_names": candidate_names,
+            "candidate_schema_names_normalized": [_normalize_identifier(name.rsplit(".", 1)[-1]) for name in candidate_names],
+            "match_status": status,
+            "match_reason": reason,
+            "matched_function": str(fn.get("name")) if fn else None,
+            "schema_source": "dataset:function" if fn else None,
+            "schema_path": str(fn.get("_schema_source_path")) if fn and fn.get("_schema_source_path") else None,
+            "properties_keys": sorted(props.keys()),
+            "required_args": required,
+            "emitted_arg_keys": sorted(call["args"].keys()),
+            "normalized_emitted_arg_keys": sorted({_normalize_identifier(str(key)) for key in call["args"].keys()}),
+            "present_schema_args": sorted(present_schema_args or set()),
+            "missing_args": missing or [],
+            "arg_key_conflicts": arg_conflicts or [],
+            "turn_index": call.get("turn_index"),
+            "step_index": call.get("step_index"),
+            "call_index": call.get("call_index"),
+        })
 
     def add_missing_sample(case_id: str, category: str, call: dict[str, Any], fn: dict[str, Any], missing: list[str]) -> None:
         samples = diagnostics["missing_required_samples"]
@@ -384,17 +498,13 @@ def _extract_candidates(
             if not case_id or not entry:
                 reject("dataset_record_missing", case_id=case_id, category=category)
                 continue
-            literal_source, span, literal_error = _literal_source(entry, row)
-            if literal_source == "current_request":
-                diagnostics["current_request_literal_rows"] += 1
-            if literal_source == "current_observation":
-                diagnostics["current_observation_literal_rows"] += 1
-            if span is None:
-                reject(literal_error or "ambiguous_literal", case_id=case_id, category=category)
-                continue
 
-            fns = _function_map(entry)
-            ambiguous_aliases = _ambiguous_function_aliases(entry)
+            for _schema_index_value, schema_fn in _schema_functions(entry):
+                if not _properties(schema_fn):
+                    diagnostics["schema_functions_with_empty_properties"] += 1
+                if not _required_args(schema_fn):
+                    diagnostics["schema_functions_with_empty_required"] += 1
+
             calls = _tool_call_records(row.get("result"))
             diagnostics["parsed_emitted_calls"] += len(calls)
             if len(calls) == 1:
@@ -407,16 +517,26 @@ def _extract_candidates(
             row_missing_counts: list[int] = []
             alias_conflict_tools: list[str] = []
             for call in calls:
-                tool = call["tool"]
-                if tool in ambiguous_aliases:
-                    alias_conflict_tools.append(tool)
+                fn, match_status, match_reason, candidate_names = _schema_match(entry, call["tool"])
+                if match_status == "schema_function_alias_not_unique":
+                    alias_conflict_tools.append(call["tool"])
+                    add_schema_match_sample(case_id, category, call, None, match_status, match_reason, candidate_names)
                     continue
-                fn = fns.get(tool)
                 if not fn:
+                    add_schema_match_sample(case_id, category, call, None, match_status, match_reason, candidate_names)
                     continue
                 row_has_schema = True
                 diagnostics["calls_with_function_schema"] += 1
-                missing = [arg for arg in _required_args(fn) if arg not in call["args"]]
+                props = _properties(fn)
+                required = _required_args(fn)
+                if not props:
+                    diagnostics["matched_calls_with_empty_properties"] += 1
+                if not required:
+                    diagnostics["matched_calls_with_empty_required"] += 1
+                missing, arg_conflicts, present_schema_args = _missing_required_args(fn, call["args"])
+                if arg_conflicts:
+                    diagnostics["emitted_arg_key_conflicts"] += 1
+                add_schema_match_sample(case_id, category, call, fn, match_status, match_reason, candidate_names, missing, present_schema_args, arg_conflicts)
                 row_missing_counts.append(len(missing))
                 if missing:
                     diagnostics["calls_with_missing_required_arg"] += 1
@@ -438,6 +558,15 @@ def _extract_candidates(
                 diagnostics["rows_with_exactly_one_missing_required_arg"] += 1
             if any(count > 1 for count in row_missing_counts):
                 diagnostics["rows_with_multiple_missing_required_args"] += 1
+
+            literal_source, span, literal_error = _literal_source(entry, row)
+            if literal_source == "current_request":
+                diagnostics["current_request_literal_rows"] += 1
+            if literal_source == "current_observation":
+                diagnostics["current_observation_literal_rows"] += 1
+            if span is None:
+                reject(literal_error or "ambiguous_literal", case_id=case_id, category=category)
+                continue
 
             if len(eligible_calls) != 1:
                 reason = "parallel_call_mapping_not_unique" if len(eligible_calls) > 1 else "no_single_missing_required_arg"
