@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "decision_status": {
+      "enum": [
+        "selected",
+        "ambiguous_reject",
+        "no_match_reject"
+      ]
+    },
+    "enabled": {
+      "const": false
+    },
+    "offline_only": {
+      "const": true
+    },
+    "provider_call_count": {
+      "const": 0
+    },
+    "reject_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "runtime_authorized": {
+      "const": false
+    },
+    "schema_version": {
+      "const": "rashe_router_decision_v0"
+    },
+    "scorer_call_count": {
+      "const": 0
+    },
+    "selected_skill_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source_collection_call_count": {
+      "const": 0
+    }
+  },
+  "required": [
+    "schema_version",
+    "offline_only",
+    "enabled",
+    "runtime_authorized",
+    "selected_skill_id",
+    "decision_status",
+    "provider_call_count",
+    "scorer_call_count",
+    "source_collection_call_count"
+  ],
+  "title": "RASHE v0 Router Decision",
+  "type": "object"
+}

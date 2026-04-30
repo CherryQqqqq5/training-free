@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "offline_only": {
+      "const": true
+    },
+    "provider_call_count": {
+      "const": 0
+    },
+    "schema_version": {
+      "const": "rashe_step_trace_v0"
+    },
+    "scorer_call_count": {
+      "const": 0
+    },
+    "signals": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "source_collection_call_count": {
+      "const": 0
+    },
+    "synthetic_fixture": {
+      "const": true
+    },
+    "text_hash": {
+      "type": "string"
+    },
+    "trace_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "trace_id",
+    "offline_only",
+    "synthetic_fixture",
+    "signals",
+    "provider_call_count",
+    "scorer_call_count",
+    "source_collection_call_count"
+  ],
+  "title": "RASHE v0 Synthetic Step Trace",
+  "type": "object"
+}
