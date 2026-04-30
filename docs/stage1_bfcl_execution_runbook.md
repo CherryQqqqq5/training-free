@@ -10,7 +10,7 @@ holdout, or full-suite commands while provider preflight is red.
 Run from the repository root:
 
 ```bash
-cd /Users/cherry/mnt/training-free/main-worktree
+cd /cephfs/qiuyn/training-free
 export PYTHONPATH=.:src
 export PATH="$PWD/.venv/bin:$PATH"
 ```

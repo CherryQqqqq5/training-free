@@ -97,9 +97,11 @@ Latest conclusion: `deterministic_argument_structural_and_tool_name_paths_zero_y
 
 ## Delivery Risk
 
-- latest_branch_head_observed: `61611b98`
+- latest_branch_head_observed: `f8dcaae5`
 
-Current work is on `stage1-bfcl-performance-sprint`; main merge decision is pending. This is delivery-risk tracking, not an acceptance claim. Index provenance: latest_branch_head_observed `61611b98`; current_branch_head_at_review `61611b98`; index_artifact_commit `61611b98`; previous_latest_branch_head_observed `5131ce88`; previous_current_branch_head_at_review `ebf1f20f`; previous_index_artifact_commit `bd546fb3`; hygiene_patch_commit `27e36c25`; latest_hygiene_source_head `b94855e0`; source_base_head `6e3a1e63`; Batch2 source_collection_code_head `fa4156d0`; baseline taxonomy code head `d48e6211`; raw schema subtyping code head `d1047b14`; schema_retrieval_rerank_code_head `a19f74c4`; schema_retrieval_rerank_artifact_commit `a19f74c4`.
+Current work is on `stage1-bfcl-performance-sprint`; main merge decision is pending. This is delivery-risk tracking, not an acceptance claim. Index provenance: latest_branch_head_observed `f8dcaae5`; current_branch_head_at_review `f8dcaae5`; index_artifact_commit `f8dcaae5`; previous_latest_branch_head_observed `61611b98`; previous_current_branch_head_at_review `61611b98`; previous_index_artifact_commit `61611b98`; hygiene_patch_commit `27e36c25`; latest_hygiene_source_head `b94855e0`; source_base_head `6e3a1e63`; Batch2 source_collection_code_head `fa4156d0`; baseline taxonomy code head `d48e6211`; raw schema subtyping code head `d1047b14`; schema_retrieval_rerank_code_head `a19f74c4`; schema_retrieval_rerank_artifact_commit `a19f74c4`.
+
+Provider artifact commits such as `d39a954d` are original evidence creation commits only, not the current branch checkpoint.
 
 Provenance note: single ambiguous `head` field is intentionally not used; current index artifact commit is recorded separately from previous index values and earlier diagnostic/source heads.
 
