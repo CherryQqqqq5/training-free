@@ -22,7 +22,7 @@ This index is the current active-evidence pointer for Stage-1 BFCL. It is not a 
 ## Current Blocker
 
 `deterministic_argument_structural_and_tool_name_paths_zero_yield`.
-Provider and dataset are not the current blocker. Explicit literal, wrong-key alias, schema-local, refined structural raw-response, and raw schema-not-matched tool-name/schema normalization paths are all zero-yield under current gates. `next_action=stop_no_yield_research_review`. No source expansion, scorer run, candidate promotion, performance claim, SOTA claim, or Huawei acceptance claim is authorized.
+Provider and dataset are not the current blocker. Explicit literal, wrong-key alias, schema-local, refined structural raw-response, and raw schema-not-matched tool-name/schema normalization paths are all zero-yield under current gates. `next_action=negative_evidence_report_or_scope_change_review`. No source expansion, scorer run, candidate promotion, performance claim, SOTA claim, or Huawei acceptance claim is authorized.
 
 ## Active Evidence Paths
 
@@ -40,6 +40,8 @@ Provider and dataset are not the current blocker. Explicit literal, wrong-key al
 - baseline_only_scored_failure_taxonomy_audit_md: `outputs/artifacts/stage1_bfcl_acceptance/baseline_only_scored_failure_taxonomy_audit.md`
 - raw_payload_schema_not_matched_subtyping_audit_json: `outputs/artifacts/stage1_bfcl_acceptance/raw_payload_schema_not_matched_subtyping_audit.json`
 - raw_payload_schema_not_matched_subtyping_audit_md: `outputs/artifacts/stage1_bfcl_acceptance/raw_payload_schema_not_matched_subtyping_audit.md`
+- schema_retrieval_rerank_feasibility_diagnostic_json: `outputs/artifacts/stage1_bfcl_acceptance/schema_retrieval_rerank_feasibility_diagnostic.json`
+- schema_retrieval_rerank_feasibility_diagnostic_md: `outputs/artifacts/stage1_bfcl_acceptance/schema_retrieval_rerank_feasibility_diagnostic.md`
 - candidate_pool_status: `candidate_pool_not_ready`
 
 ## Uniform Counter Table
@@ -75,8 +77,9 @@ All checked deterministic argument, structural, scored-taxonomy, and tool-name/s
 - `structural_raw_response_attribution_malformed_final_before_tool`: refined raw-response attribution; `parser_refined=true`, `raw_candidate_tool_call_count=25`, `raw_schema_matched_tool_call_count=14`, `eligible_structural_count=0`.
 - `baseline_only_scored_failure_taxonomy_audit`: completed as aggregate taxonomy only, not performance evidence. `scored_case_count=30`, `baseline_failure_count=22`, and taxonomy buckets are denominated by 22 failure detail rows, not by an overlap gap.
 - `raw_payload_schema_not_matched_tool_name_schema_normalization`: raw schema-not-matched bucket 10/10 has no schema-name candidate and `deterministic_source_schema_only_possible_count=0`; deterministic tool-name/schema normalization family is not authorized.
+- `schema_retrieval_rerank_feasibility`: zero-yield; `single_schema_high_margin_count=0`; recommendation `stop_no_yield_research_review`.
 
-Latest conclusion: `deterministic_argument_structural_and_tool_name_paths_zero_yield=true`; `next_action=stop_no_yield_research_review`; `candidate_pool_ready=false`; `scorer_authorized=false`; `performance_evidence=false`; `sota_3pp_claim_ready=false`; `huawei_acceptance_ready=false`.
+Latest conclusion: `deterministic_argument_structural_and_tool_name_paths_zero_yield=true`; `next_action=negative_evidence_report_or_scope_change_review`; `candidate_pool_ready=false`; `scorer_authorized=false`; `performance_evidence=false`; `sota_3pp_claim_ready=false`; `huawei_acceptance_ready=false`.
 
 ## Provenance Table
 
@@ -89,9 +92,10 @@ Latest conclusion: `deterministic_argument_structural_and_tool_name_paths_zero_y
 | `outputs/artifacts/stage1_bfcl_acceptance/batch2_source_collection_pilot_snapshot.json` | Batch2 source collection diagnostic only | `fa4156d0` | `6e3a1e63` | Chuangzhi/Novacode gpt-5.2; BFCL path aliases non-authoritative | active |
 | `outputs/artifacts/stage1_bfcl_acceptance/baseline_only_scored_failure_taxonomy_audit.json` | aggregate scored failure taxonomy; not performance evidence | `f1fa5507/d48e6211` | `d48e6211` | Chuangzhi/Novacode gpt-5.2 source metadata | active |
 | `outputs/artifacts/stage1_bfcl_acceptance/raw_payload_schema_not_matched_subtyping_audit.json` | raw schema-not-matched subtyping; zero-yield | `d1047b14` | `d1047b14` | Chuangzhi/Novacode gpt-5.2 source metadata | active |
+| `outputs/artifacts/stage1_bfcl_acceptance/schema_retrieval_rerank_feasibility_diagnostic.json` | schema retrieval rerank feasibility; zero-yield | `a19f74c4` | `a19f74c4` | offline existing raw pilot only; no provider/scorer | active |
 
 ## Delivery Risk
 
-Current work is on `stage1-bfcl-performance-sprint`; main merge decision is pending. This is delivery-risk tracking, not an acceptance claim. Index provenance: index_artifact_commit `ebf1f20f`; hygiene_patch_commit `27e36c25`; current_branch_head_at_review `ebf1f20f`; latest_hygiene_source_head `b94855e0`; source_base_head `6e3a1e63`; Batch2 source_collection_code_head `fa4156d0`; baseline taxonomy code head `d48e6211`; raw schema subtyping code head `d1047b14`.
+Current work is on `stage1-bfcl-performance-sprint`; main merge decision is pending. This is delivery-risk tracking, not an acceptance claim. Index provenance: index_artifact_commit `pending_after_schema_rerank_closure_patch`; hygiene_patch_commit `27e36c25`; current_branch_head_at_review `ebf1f20f`; latest_hygiene_source_head `b94855e0`; source_base_head `6e3a1e63`; Batch2 source_collection_code_head `fa4156d0`; baseline taxonomy code head `d48e6211`; raw schema subtyping code head `d1047b14`; schema_retrieval_rerank_code_head `a19f74c4`; schema_retrieval_rerank_artifact_commit `a19f74c4`.
 
 Provenance note: single ambiguous `head` field is intentionally not used; index artifact commit is recorded separately from earlier diagnostic/source heads.

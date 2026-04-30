@@ -22,6 +22,8 @@
     "raw_payload_schema_not_matched_subtyping_audit_json": "outputs/artifacts/stage1_bfcl_acceptance/raw_payload_schema_not_matched_subtyping_audit.json",
     "raw_payload_schema_not_matched_subtyping_audit_md": "outputs/artifacts/stage1_bfcl_acceptance/raw_payload_schema_not_matched_subtyping_audit.md",
     "schema_local_non_live_repair_diagnostic": "outputs/artifacts/stage1_bfcl_acceptance/schema_local_non_live_repair_diagnostic.json",
+    "schema_retrieval_rerank_feasibility_diagnostic_json": "outputs/artifacts/stage1_bfcl_acceptance/schema_retrieval_rerank_feasibility_diagnostic.json",
+    "schema_retrieval_rerank_feasibility_diagnostic_md": "outputs/artifacts/stage1_bfcl_acceptance/schema_retrieval_rerank_feasibility_diagnostic.md",
     "scored_failure_taxonomy_audit_approval": "outputs/artifacts/stage1_bfcl_acceptance/scored_failure_taxonomy_audit_approval.json",
     "selected_call_structural_failure_attribution": "outputs/artifacts/stage1_bfcl_acceptance/selected_call_structural_failure_attribution.json",
     "selected_call_structural_failure_attribution_raw_pilot": "outputs/artifacts/stage1_bfcl_acceptance/selected_call_structural_failure_attribution_raw_pilot.json",
@@ -59,10 +61,10 @@
     "sota_3pp_claim_ready": false
   },
   "current_blocker": {
-    "blocker": "deterministic_argument_structural_and_tool_name_paths_zero_yield",
+    "blocker": "deterministic_stage1_family_search_exhausted",
     "dataset_is_current_blocker": false,
     "provider_is_current_blocker": false,
-    "summary": "Explicit literal, wrong-key alias, schema-local, refined structural raw-response, and raw schema-not-matched tool-name/schema normalization paths are all zero-yield under current gates; next_action=stop_no_yield_research_review."
+    "summary": "All approved deterministic Stage-1 BFCL family diagnostics are zero-yield, including schema retrieval/rerank feasibility; next_action=negative_evidence_report_or_scope_change_review."
   },
   "current_branch_head_at_review": "ebf1f20f",
   "default_branch_delivery_risk": {
@@ -71,11 +73,13 @@
     "note": "Delivery-risk tracking only; not a Huawei acceptance claim."
   },
   "deterministic_argument_structural_and_tool_name_paths_zero_yield": true,
+  "deterministic_stage1_family_search_exhausted": true,
   "diagnostic_source_heads": {
     "active_index_hygiene_head_before_patch": "b94855e0",
     "baseline_only_scored_failure_taxonomy_audit_code_head": "d48e6211",
     "batch2_source_collection_code_head": "fa4156d0",
     "raw_payload_schema_not_matched_subtyping_audit_code_head": "d1047b14",
+    "schema_retrieval_rerank_code_head": "a19f74c4",
     "source_base_head": "6e3a1e63"
   },
   "excluded_or_superseded_evidence_paths": [
@@ -128,22 +132,23 @@
       "reason": "superseded by Chuangzhi/Novacode gpt-5.2 green route and excluded from active Stage-1 claim"
     }
   ],
-  "generated_at_utc": "2026-04-30T09:46:23Z",
+  "generated_at_utc": "2026-04-30T10:11:23Z",
   "huawei_acceptance_ready": false,
   "hygiene_patch_commit": "27e36c25",
-  "index_artifact_commit": "ebf1f20f",
+  "index_artifact_commit": "pending_after_schema_rerank_closure_patch",
   "index_artifact_commit_note": "This field records the active-index artifact commit at strict review; hygiene_patch_commit preserves the earlier acceptance hygiene patch commit separately from diagnostic/source heads.",
   "index_source_head": "b94855e0",
   "latest_conclusion": {
     "deterministic_schema_local_non_live_repair": "zero_yield",
     "explicit_required_arg_literal_completion": "zero_yield",
-    "next_action": "stop_no_yield_research_review",
+    "next_action": "negative_evidence_report_or_scope_change_review",
     "raw_payload_schema_not_matched_tool_name_schema_normalization": "zero_yield",
     "refined_structural_raw_response_attribution": "zero_yield",
+    "schema_retrieval_rerank_feasibility": "zero_yield",
     "wrong_arg_key_alias_repair": "zero_yield"
   },
   "latest_hygiene_source_head": "b94855e0",
-  "next_action": "stop_no_yield_research_review",
+  "next_action": "negative_evidence_report_or_scope_change_review",
   "optional_diagnostic_counter_fields": [
     "selected_calls_with_schema_properties",
     "selected_calls_with_empty_required"
@@ -207,6 +212,18 @@
         "scorer_authorized": false,
         "selected_call_diagnostic": "raw schema-not-matched bucket 10/10 has no schema-name candidate; deterministic_source_schema_only_possible_count=0",
         "status": "zero_yield_not_scorer_authorized"
+      },
+      {
+        "candidate_pool_authorized": false,
+        "evidence_paths": [
+          "outputs/artifacts/stage1_bfcl_acceptance/schema_retrieval_rerank_feasibility_diagnostic.json",
+          "outputs/artifacts/stage1_bfcl_acceptance/schema_retrieval_rerank_feasibility_diagnostic.md"
+        ],
+        "family": "schema_retrieval_rerank_feasibility",
+        "performance_claim": false,
+        "scorer_authorized": false,
+        "selected_call_diagnostic": "single_schema_high_margin_count=0; recommendation=stop_no_yield_research_review",
+        "status": "zero_yield_not_candidate_authorized"
       }
     ],
     "forbidden_until_approved": [
@@ -220,7 +237,7 @@
     "mechanical_explicit_literal_source_expansion_stopped": true,
     "next_research_direction_authorized": false,
     "next_research_direction_implemented": true,
-    "next_research_direction_pending_only": "none_stop_no_yield_research_review",
+    "next_research_direction_pending_only": "none_negative_evidence_report_or_scope_change_review",
     "next_research_direction_performance_claim": false,
     "pending_research_review_item": {
       "audit_only": true,
@@ -243,6 +260,19 @@
       "performance_claim": false,
       "raw_payload_schema_not_matched_failure_count": 10,
       "status": "completed_zero_yield_not_candidate_authorized"
+    },
+    "schema_retrieval_rerank_feasibility": {
+      "all_schema_scores_tied_or_low_margin_count": 10,
+      "candidate_pool_authorized": false,
+      "evidence_paths": [
+        "outputs/artifacts/stage1_bfcl_acceptance/schema_retrieval_rerank_feasibility_diagnostic.json",
+        "outputs/artifacts/stage1_bfcl_acceptance/schema_retrieval_rerank_feasibility_diagnostic.md"
+      ],
+      "multiple_high_margin_schema_candidates_count": 4,
+      "performance_claim": false,
+      "recommendation": "stop_no_yield_research_review",
+      "single_schema_high_margin_count": 0,
+      "status": "zero_yield_not_candidate_authorized"
     },
     "scored_failure_taxonomy_audit": {
       "baseline_failure_count": 22,
@@ -351,9 +381,32 @@
       "route_model": "Chuangzhi/Novacode gpt-5.2 source metadata",
       "source_code_head": "d1047b14",
       "status": "active"
+    },
+    {
+      "artifact_commit": "a19f74c4",
+      "artifact_path": "outputs/artifacts/stage1_bfcl_acceptance/schema_retrieval_rerank_feasibility_diagnostic.json",
+      "evidence_role": "schema retrieval rerank feasibility; zero-yield",
+      "route_model": "offline existing raw pilot only; no provider/scorer",
+      "source_code_head": "a19f74c4",
+      "status": "active"
     }
   ],
   "report_scope": "stage1_bfcl_active_evidence_index",
+  "schema_retrieval_rerank_artifact_commit": "a19f74c4",
+  "schema_retrieval_rerank_code_head": "a19f74c4",
+  "schema_retrieval_rerank_summary": {
+    "all_schema_scores_tied_or_low_margin_count": 10,
+    "candidate_pool_authorized": false,
+    "evidence_paths": [
+      "outputs/artifacts/stage1_bfcl_acceptance/schema_retrieval_rerank_feasibility_diagnostic.json",
+      "outputs/artifacts/stage1_bfcl_acceptance/schema_retrieval_rerank_feasibility_diagnostic.md"
+    ],
+    "multiple_high_margin_schema_candidates_count": 4,
+    "performance_claim": false,
+    "recommendation": "stop_no_yield_research_review",
+    "single_schema_high_margin_count": 0,
+    "status": "zero_yield_not_candidate_authorized"
+  },
   "scored_taxonomy_summary": {
     "baseline_failure_count": 22,
     "scored_case_count": 30,
