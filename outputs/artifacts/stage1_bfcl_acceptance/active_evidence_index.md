@@ -97,12 +97,22 @@ Latest conclusion: `deterministic_argument_structural_and_tool_name_paths_zero_y
 
 ## Delivery Risk
 
-- latest_branch_head_observed: `f8dcaae5`
+Current work is on `stage1-bfcl-performance-sprint`; main merge decision is pending. This is delivery-risk tracking, not an acceptance claim.
 
-Current work is on `stage1-bfcl-performance-sprint`; main merge decision is pending. This is delivery-risk tracking, not an acceptance claim. Index provenance: latest_branch_head_observed `f8dcaae5`; current_branch_head_at_review `f8dcaae5`; index_artifact_commit `f8dcaae5`; previous_latest_branch_head_observed `61611b98`; previous_current_branch_head_at_review `61611b98`; previous_index_artifact_commit `61611b98`; hygiene_patch_commit `27e36c25`; latest_hygiene_source_head `b94855e0`; source_base_head `6e3a1e63`; Batch2 source_collection_code_head `fa4156d0`; baseline taxonomy code head `d48e6211`; raw schema subtyping code head `d1047b14`; schema_retrieval_rerank_code_head `a19f74c4`; schema_retrieval_rerank_artifact_commit `a19f74c4`.
+## Non-Self-Referential Provenance
+
+- index_schema_version: `stage1_active_evidence_v2`
+- non_self_referential_provenance: `true`
+- source_branch: `stage1-bfcl-performance-sprint`
+- index_updated_for_evidence_through_commit: `61611b98`
+- evidence-through note: `61611b98` is the latest referenced evidence/documentation commit indexed here because it added the negative evidence report and aligned performance readiness. Later provenance-only commits are intentionally not recorded as current index commits to avoid self-referential churn.
+
+This index intentionally does not record the commit that contains itself. Use git history or the final handoff memo for the containing commit; this artifact records evidence input/source commits and claim state only.
+
+Historical self-referential fields are deprecated and not current assertions: previous `latest_branch_head_observed=f8dcaae5`, previous `current_branch_head_at_review=f8dcaae5`, previous `index_artifact_commit=f8dcaae5`, older previous values `61611b98`.
 
 Provider artifact commits such as `d39a954d` are original evidence creation commits only, not the current branch checkpoint.
 
-Provenance note: single ambiguous `head` field is intentionally not used; current index artifact commit is recorded separately from previous index values and earlier diagnostic/source heads.
+Evidence creation / diagnostic commits: hygiene_patch_commit `27e36c25`; latest_hygiene_source_head `b94855e0`; source_base_head `6e3a1e63`; Batch2 source_collection_code_head `fa4156d0`; baseline taxonomy code head `d48e6211`; raw schema subtyping code head `d1047b14`; schema_retrieval_rerank_code_head `a19f74c4`; schema_retrieval_rerank_artifact_commit `a19f74c4`.
 
 Negative evidence report: `docs/stage1_bfcl_negative_evidence_report.md`.

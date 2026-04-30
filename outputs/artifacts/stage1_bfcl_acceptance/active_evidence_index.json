@@ -67,7 +67,6 @@
     "provider_is_current_blocker": false,
     "summary": "Deterministic Stage-1 family search is exhausted under current gates; next_action=negative_evidence_report_or_scope_change_review."
   },
-  "current_branch_head_at_review": "f8dcaae5",
   "default_branch_delivery_risk": {
     "current_branch": "stage1-bfcl-performance-sprint",
     "main_merge_decision_pending": true,
@@ -134,12 +133,21 @@
     }
   ],
   "generated_at_utc": "2026-04-30T10:11:23Z",
+  "historical_self_referential_fields": {
+    "current_branch_head_at_review": "f8dcaae5",
+    "index_artifact_commit": "f8dcaae5",
+    "index_artifact_commit_note": "This field records the latest active-index artifact commit reviewed before this handoff provenance patch; older hygiene, provider evidence, and diagnostic/source heads are preserved separately as previous/historical fields.",
+    "latest_branch_head_observed": "f8dcaae5",
+    "previous_current_branch_head_at_review": "61611b98",
+    "previous_index_artifact_commit": "61611b98",
+    "previous_latest_branch_head_observed": "61611b98"
+  },
   "huawei_acceptance_ready": false,
   "hygiene_patch_commit": "27e36c25",
-  "index_artifact_commit": "f8dcaae5",
-  "index_artifact_commit_note": "This field records the latest active-index artifact commit reviewed before this handoff provenance patch; older hygiene, provider evidence, and diagnostic/source heads are preserved separately as previous/historical fields.",
+  "index_schema_version": "stage1_active_evidence_v2",
   "index_source_head": "b94855e0",
-  "latest_branch_head_observed": "f8dcaae5",
+  "index_updated_for_evidence_through_commit": "61611b98",
+  "index_updated_for_evidence_through_commit_note": "61611b98 is the latest referenced evidence/documentation commit indexed here: it added the negative evidence report and aligned performance readiness. Later provenance-only commits are intentionally not recorded as current index commits to avoid self-referential churn.",
   "latest_conclusion": {
     "deterministic_schema_local_non_live_repair": "zero_yield",
     "explicit_required_arg_literal_completion": "zero_yield",
@@ -152,6 +160,7 @@
   "latest_hygiene_source_head": "b94855e0",
   "negative_evidence_report": "docs/stage1_bfcl_negative_evidence_report.md",
   "next_action": "negative_evidence_report_or_scope_change_review",
+  "non_self_referential_provenance": true,
   "optional_diagnostic_counter_fields": [
     "selected_calls_with_schema_properties",
     "selected_calls_with_empty_required"
@@ -328,9 +337,7 @@
     },
     "structural_expansion_to_20_per_category_authorized": false
   },
-  "previous_current_branch_head_at_review": "61611b98",
-  "previous_index_artifact_commit": "61611b98",
-  "previous_latest_branch_head_observed": "61611b98",
+  "provenance_rule": "This index intentionally does not record the commit that contains itself. Use git history or the final handoff memo for the containing commit; this artifact records evidence input/source commits and claim state only.",
   "provenance_table": [
     {
       "artifact_commit": "d39a954d",
@@ -424,6 +431,7 @@
   "server_path": "/cephfs/qiuyn/training-free",
   "sota_3pp_claim_ready": false,
   "source_base_head": "6e3a1e63",
+  "source_branch": "stage1-bfcl-performance-sprint",
   "uniform_counter_fields": [
     "result_jsonl_rows",
     "parsed_emitted_calls",
