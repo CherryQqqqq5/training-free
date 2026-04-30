@@ -59,7 +59,7 @@ then expand only after positive net gain and bounded cost/latency.
 ## Provider and Model Boundary
 
 The repo currently documents OpenAI-compatible BFCL proxy execution with
-`openrouter` as the default relay profile and `novacode` as an allowed override.
+`novacode` / 创智 as the only approved Stage-1 BFCL relay profile; OpenRouter is not used for this sprint.
 Acceptance runs must freeze the provider before execution.
 
 Required manifest fields:

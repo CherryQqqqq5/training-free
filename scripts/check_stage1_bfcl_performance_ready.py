@@ -104,7 +104,11 @@ def evaluate(
         "next_required_action": (
             "handoff_formal_bfcl_performance_delivery"
             if ready
-            else "fix_provider_then_generate_same_protocol_baseline_candidate_bfcl_scores"
+            else (
+                "fix_provider_then_generate_same_protocol_baseline_candidate_bfcl_scores"
+                if not provider.get("provider_green_preflight_passed")
+                else "run_provider_green_source_collection_then_rebuild_candidate_pool_and_generate_paired_scores"
+            )
         ),
     }
 

@@ -33,7 +33,7 @@ Until the scorer evidence exists, the repository status remains:
 
 - Valid provider credentials are required before source collection or scorer
   execution.
-- The current provider preflight is red: OpenRouter and Novacode attempts are
+- The current provider preflight is red: Novacode/创智 attempts are
   blocked by HTTP 401 class failures.
 - M2.8-pre offline gate must pass before scorer authorization.
 - Baseline and candidate run manifests must align on BFCL version, model,

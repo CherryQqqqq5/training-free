@@ -73,18 +73,18 @@ def _function_errors(row: dict[str, Any]) -> list[str]:
             errors.append("function_parameters_missing")
             continue
         props = params.get("properties")
-        if not isinstance(props, dict) or not props:
+        if not isinstance(props, dict):
             errors.append("function_properties_missing")
+            props = {}
         required = params.get("required")
         if not isinstance(required, list) or not all(isinstance(item, str) and item for item in required):
             errors.append("required_args_missing")
             continue
-        has_required_arg = True
+        if required:
+            has_required_arg = True
         for arg in required:
-            if not isinstance(props, dict) or arg not in props or not isinstance(props.get(arg), dict):
+            if arg not in props or not isinstance(props.get(arg), dict):
                 errors.append("required_arg_property_schema_missing")
-    if not has_required_arg:
-        errors.append("no_required_args")
     return sorted(set(errors))
 
 

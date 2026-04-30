@@ -13,17 +13,17 @@ These values are pinned in [`configs/bfcl_v4_phase1.env`](/Users/cherry/Document
 ## Fixed Upstream Configuration
 
 - upstream protocol: OpenAI-compatible `v1/chat/completions`
-- default upstream relay profile: `openrouter` (override with `GRC_UPSTREAM_PROFILE=novacode` if needed)
+- default upstream relay profile: `novacode` / 创智; OpenRouter is not used for this sprint
 - default BFCL evaluator alias: `gpt-4o-mini-2024-07-18-FC`
-- default OpenRouter upstream route: `x-ai/grok-3-beta`
+- OpenRouter upstream routes are disabled for this sprint
 - default BFCL runtime config: [`configs/runtime_bfcl_structured.yaml`](/Users/cherry/.codex/worktrees/3253/training-free/configs/runtime_bfcl_structured.yaml)
 - generic runtime config: [`configs/runtime.yaml`](/Users/cherry/.codex/worktrees/3253/training-free/configs/runtime.yaml)
 - recommended override path: `GRC_UPSTREAM_BASE_URL`
 
 `base_url` and API key env var are operator supplied, but Phase-1 runs must keep evaluator version, BFCL alias, upstream route, and endpoint protocol fixed across baseline and candidate runs. The proxy now accepts relay profiles:
 
-- `novacode`: default `gpt-5.4`
-- `openrouter`: default `x-ai/grok-3-beta`
+- `novacode` / 创智: default `gpt-5.2`
+- OpenRouter is disabled for this Stage-1 BFCL sprint
 
 `GRC_BFCL_MODEL` is passed to `bfcl --model`. `GRC_UPSTREAM_MODEL` is the real provider model sent by `grc serve`; do not set it to a BFCL `*-FC` alias.
 

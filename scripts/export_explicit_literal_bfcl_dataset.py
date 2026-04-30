@@ -10,6 +10,14 @@ from scripts.check_explicit_literal_dataset import DEFAULT_PRIORITY_CATEGORIES, 
 
 
 ALLOWED_OUTPUT_FIELDS = ("id", "category", "question", "messages", "function")
+MULTI_TURN_FUNCTION_ALIASES = {
+    "MessageAPI.view_messages_received": "search_messages",
+    "TradingBot.add_stock_to_watchlist": "add_to_watchlist",
+    "TradingBot.make_transaction": "place_order",
+    "TradingBot.update_market_status": "get_stock_info",
+    "TravelAPI.authenticate": "authenticate_travel",
+}
+
 
 
 def _parse_categories(raw: str | None) -> list[str]:
@@ -20,6 +28,10 @@ def _parse_categories(raw: str | None) -> list[str]:
 
 def _read_rows(path: Path) -> list[dict[str, Any]]:
     text = path.read_text(encoding="utf-8")
+    return _rows_from_text(text)
+
+
+def _rows_from_text(text: str) -> list[dict[str, Any]]:
     try:
         payload = json.loads(text)
     except json.JSONDecodeError:
@@ -73,15 +85,60 @@ def _forbidden_fields(row: dict[str, Any]) -> list[str]:
     return sorted(found)
 
 
-def _function_payload(row: dict[str, Any]) -> Any:
+def _load_function_docs(dataset_file: Path) -> dict[str, dict[str, Any]]:
+    doc_root = dataset_file.parent / "multi_turn_func_doc"
+    if not doc_root.exists():
+        return {}
+    docs: dict[str, dict[str, Any]] = {}
+    for doc_path in sorted(doc_root.glob("*.json")):
+        try:
+            rows = _rows_from_text(doc_path.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        for row in rows:
+            name = row.get("name")
+            if isinstance(name, str) and name:
+                docs[name] = row
+    return docs
+
+
+def _function_doc_for_path(raw_name: str, docs: dict[str, dict[str, Any]]) -> dict[str, Any] | None:
+    method = raw_name.rsplit(".", 1)[-1]
+    source = docs.get(method)
+    if source is None:
+        alias = MULTI_TURN_FUNCTION_ALIASES.get(raw_name) or MULTI_TURN_FUNCTION_ALIASES.get(method)
+        source = docs.get(alias) if alias else None
+    if source is None:
+        return None
+    copied = json.loads(json.dumps(source))
+    # Keep the BFCL path-qualified function name so source result tool calls can
+    # map back to this schema deterministically during candidate extraction.
+    copied["name"] = raw_name
+    return copied
+
+
+def _function_payload(row: dict[str, Any], docs: dict[str, dict[str, Any]] | None = None) -> Any:
     if "function" in row:
         return row["function"]
     if "functions" in row:
         return row["functions"]
+    path = row.get("path")
+    if isinstance(path, list) and docs:
+        functions: list[dict[str, Any]] = []
+        seen: set[str] = set()
+        for item in path:
+            if not isinstance(item, str) or not item or item in seen:
+                continue
+            seen.add(item)
+            fn = _function_doc_for_path(item, docs)
+            if fn is not None:
+                functions.append(fn)
+        if functions:
+            return functions
     return None
 
 
-def _sanitize(row: dict[str, Any], category: str) -> dict[str, Any]:
+def _sanitize(row: dict[str, Any], category: str, docs: dict[str, dict[str, Any]] | None = None) -> dict[str, Any]:
     out: dict[str, Any] = {
         "id": row.get("id") or row.get("case_id"),
         "category": category,
@@ -90,7 +147,7 @@ def _sanitize(row: dict[str, Any], category: str) -> dict[str, Any]:
         out["question"] = row["question"]
     if "messages" in row:
         out["messages"] = row["messages"]
-    fn = _function_payload(row)
+    fn = _function_payload(row, docs)
     if fn is not None:
         out["function"] = fn
     return {key: out[key] for key in ALLOWED_OUTPUT_FIELDS if key in out}
@@ -133,6 +190,7 @@ def export_dataset(
     seen_ids: set[str] = set()
     duplicate_ids: set[str] = set()
     category_counts = {category: 0 for category in categories}
+    function_doc_cache: dict[Path, dict[str, dict[str, Any]]] = {}
 
     for path, fallback_category in files:
         try:
@@ -166,7 +224,9 @@ def export_dataset(
                 rejected.append({"path": str(path), "row_index": index, "case_id": case_id, "errors": ["duplicate_id"]})
                 continue
             seen_ids.add(case_id)
-            record = _sanitize(row, category)  # type: ignore[arg-type]
+            if path.parent not in function_doc_cache:
+                function_doc_cache[path.parent] = _load_function_docs(path)
+            record = _sanitize(row, category, function_doc_cache[path.parent])  # type: ignore[arg-type]
             sanitized.append(record)
             category_counts[category] += 1
 
@@ -201,6 +261,7 @@ def export_dataset(
         "blockers": sorted(set(blockers)),
         "dataset_export_passed": not blockers,
         "output_fields": list(ALLOWED_OUTPUT_FIELDS),
+        "multi_turn_function_doc_dirs": sorted(str(root) for root in function_doc_cache if function_doc_cache[root]),
     }
 
 

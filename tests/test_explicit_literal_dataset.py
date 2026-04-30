@@ -57,11 +57,7 @@ def test_explicit_literal_dataset_gate_blocks_missing_schema_parts(tmp_path: Pat
 
     assert report["explicit_literal_dataset_gate_passed"] is False
     assert "dataset_records_malformed" in report["blockers"]
-    assert report["malformed_records"][0]["errors"] == [
-        "function_properties_missing",
-        "no_required_args",
-        "required_args_missing",
-    ]
+    assert report["malformed_records"][0]["errors"] == ["required_args_missing"]
 
 
 def test_explicit_literal_dataset_gate_blocks_forbidden_gold_score_candidate_fields(tmp_path: Path) -> None:
@@ -96,3 +92,22 @@ def test_explicit_literal_dataset_gate_blocks_duplicate_ids(tmp_path: Path) -> N
     assert report["explicit_literal_dataset_gate_passed"] is False
     assert "dataset_duplicate_ids_present" in report["blockers"]
     assert report["duplicate_ids"] == ["multi_turn_miss_func_0"]
+
+
+
+def test_explicit_literal_dataset_gate_accepts_no_arg_function_schema(tmp_path: Path) -> None:
+    dataset = tmp_path / "dataset.json"
+    _write_json(dataset, [{
+        "id": "multi_turn_miss_func_0",
+        "category": "multi_turn_miss_func",
+        "messages": [{"role": "user", "content": "Check status."}],
+        "function": [{
+            "name": "VehicleControlAPI.check_tire_pressure",
+            "parameters": {"type": "dict", "properties": {}, "required": []},
+        }],
+    }])
+
+    report = evaluate(dataset, ["multi_turn_miss_func"])
+
+    assert report["explicit_literal_dataset_gate_passed"] is True
+    assert report["blockers"] == []

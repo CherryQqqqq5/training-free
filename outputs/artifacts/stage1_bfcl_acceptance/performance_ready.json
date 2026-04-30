@@ -4,18 +4,12 @@
     "forbidden_outputs": []
   },
   "blockers": [
-    "provider_green_preflight_not_passed",
     "paired_bfcl_score_chain_not_ready",
     "baseline_candidate_manifest_alignment_not_passed",
     "required_3pp_target_not_passed",
     "performance_claim_not_allowed",
     "m2_8pre_offline_not_passed",
     "scorer_authorization_not_ready",
-    "chat_text_response_preflight_failed",
-    "chat_tool_call_preflight_failed",
-    "provider_auth_401",
-    "provider_preflight_checks_not_green",
-    "responses_tool_call_preflight_failed",
     "paired_comparison_missing",
     "acceptance_decision_missing",
     "regression_report_missing",
@@ -65,7 +59,7 @@
     "remaining_gap_to_35_demote_candidates": 18,
     "scorer_authorization_ready": false
   },
-  "next_required_action": "fix_provider_then_generate_same_protocol_baseline_candidate_bfcl_scores",
+  "next_required_action": "run_provider_green_source_collection_then_rebuild_candidate_pool_and_generate_paired_scores",
   "offline_only": true,
   "paired_bfcl_score_chain": {
     "absolute_delta_pp": null,
@@ -84,7 +78,6 @@
       "baseline_run_kind_invalid",
       "candidate_run_kind_invalid",
       "baseline_candidate_manifest_alignment_not_passed",
-      "provider_green_preflight_not_passed",
       "absolute_delta_missing",
       "paired_accuracy_missing",
       "acceptance_decision_3pp_not_passed",
@@ -134,41 +127,39 @@
     "paired_comparison_ready": false,
     "performance_claim_allowed": false,
     "provider": {
-      "blockers": [
-        "chat_text_response_preflight_failed",
-        "chat_tool_call_preflight_failed",
-        "provider_auth_401",
-        "provider_preflight_checks_not_green",
-        "responses_tool_call_preflight_failed"
-      ],
+      "blockers": [],
       "blocking_condition": null,
       "does_not_authorize_scorer": true,
       "does_not_call_bfcl_or_model": true,
       "environment_check": {
-        "expected_api_key_env": "OPENROUTER_API_KEY",
+        "expected_api_key_env": "NOVACODE_API_KEY",
         "is_set": true,
         "reason": "ok"
       },
-      "expected_api_key_env": "OPENROUTER_API_KEY",
-      "next_required_action": null,
+      "expected_api_key_env": "NOVACODE_API_KEY",
+      "next_required_action": "provider_green_run_source_collection_when_scope_approved",
       "offline_only": true,
       "path": "outputs/artifacts/bfcl_ctspc_source_pool_v1/current_provider_preflight_status.json",
       "present": true,
-      "provider_green_preflight_passed": false,
+      "provider_green_preflight_passed": true,
+      "provider_profile": "novacode",
+      "provider_route_policy": "chuangzhi_novacode_only_openrouter_disabled",
       "report_scope": "provider_green_preflight",
       "required_checks": {
-        "chat_text_response": false,
-        "chat_tool_call": false,
-        "responses_tool_call": false,
+        "chat_text_response": true,
+        "chat_tool_call": true,
+        "responses_tool_call": true,
         "trace_emission": true
       },
       "required_fields": {
-        "bfcl_compatible_response": false,
-        "candidate_evaluation_ready": false,
-        "model_route_available": false,
-        "source_collection_rerun_ready": false,
-        "upstream_auth_passed": false
-      }
+        "bfcl_compatible_response": true,
+        "candidate_evaluation_ready": true,
+        "model_route_available": true,
+        "source_collection_rerun_ready": true,
+        "upstream_auth_passed": true
+      },
+      "upstream_base_url_sanitized": "https://apicz.boyuerichdata.com/v1",
+      "upstream_model": "gpt-5.2"
     },
     "regression_report_present": false,
     "report_scope": "bfcl_paired_comparison",
@@ -178,41 +169,39 @@
   },
   "performance_sprint_doc_present": true,
   "provider": {
-    "blockers": [
-      "chat_text_response_preflight_failed",
-      "chat_tool_call_preflight_failed",
-      "provider_auth_401",
-      "provider_preflight_checks_not_green",
-      "responses_tool_call_preflight_failed"
-    ],
+    "blockers": [],
     "blocking_condition": null,
     "does_not_authorize_scorer": true,
     "does_not_call_bfcl_or_model": true,
     "environment_check": {
-      "expected_api_key_env": "OPENROUTER_API_KEY",
+      "expected_api_key_env": "NOVACODE_API_KEY",
       "is_set": true,
       "reason": "ok"
     },
-    "expected_api_key_env": "OPENROUTER_API_KEY",
-    "next_required_action": null,
+    "expected_api_key_env": "NOVACODE_API_KEY",
+    "next_required_action": "provider_green_run_source_collection_when_scope_approved",
     "offline_only": true,
     "path": "outputs/artifacts/bfcl_ctspc_source_pool_v1/current_provider_preflight_status.json",
     "present": true,
-    "provider_green_preflight_passed": false,
+    "provider_green_preflight_passed": true,
+    "provider_profile": "novacode",
+    "provider_route_policy": "chuangzhi_novacode_only_openrouter_disabled",
     "report_scope": "provider_green_preflight",
     "required_checks": {
-      "chat_text_response": false,
-      "chat_tool_call": false,
-      "responses_tool_call": false,
+      "chat_text_response": true,
+      "chat_tool_call": true,
+      "responses_tool_call": true,
       "trace_emission": true
     },
     "required_fields": {
-      "bfcl_compatible_response": false,
-      "candidate_evaluation_ready": false,
-      "model_route_available": false,
-      "source_collection_rerun_ready": false,
-      "upstream_auth_passed": false
-    }
+      "bfcl_compatible_response": true,
+      "candidate_evaluation_ready": true,
+      "model_route_available": true,
+      "source_collection_rerun_ready": true,
+      "upstream_auth_passed": true
+    },
+    "upstream_base_url_sanitized": "https://apicz.boyuerichdata.com/v1",
+    "upstream_model": "gpt-5.2"
   },
   "ready_for_formal_bfcl_performance_acceptance": false,
   "report_scope": "stage1_bfcl_performance_ready",

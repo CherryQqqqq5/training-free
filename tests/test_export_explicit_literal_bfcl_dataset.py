@@ -91,3 +91,34 @@ def test_export_explicit_literal_bfcl_dataset_cli_help() -> None:
     assert "--dataset-root" in result.stdout
     assert "--dataset-file" in result.stdout
     assert "--output" in result.stdout
+
+
+
+def test_export_explicit_literal_bfcl_dataset_hydrates_multi_turn_function_docs(tmp_path: Path) -> None:
+    root = tmp_path / "bfcl_data"
+    _write_json(root / "BFCL_v4_multi_turn_base.json", [{
+        "id": "multi_turn_base_0",
+        "question": [[{"role": "user", "content": "Show 'notes.txt'."}]],
+        "path": ["GorillaFileSystem.cat"],
+        "involved_classes": ["GorillaFileSystem"],
+        "initial_config": {"ignored": True},
+    }])
+    _write_json(root / "multi_turn_func_doc" / "gorilla_file_system.json", [{
+        "name": "cat",
+        "description": "Display a file.",
+        "parameters": {
+            "type": "dict",
+            "properties": {"file_name": {"type": "string"}},
+            "required": ["file_name"],
+        },
+    }])
+
+    output = tmp_path / "sanitized.json"
+    report = export_dataset(output=output, dataset_root=root, categories=["multi_turn_base"])
+
+    assert report["dataset_export_passed"] is True
+    rows = json.loads(output.read_text(encoding="utf-8"))
+    assert set(rows[0]) == {"category", "function", "id", "question"}
+    assert rows[0]["function"][0]["name"] == "GorillaFileSystem.cat"
+    assert rows[0]["function"][0]["parameters"]["required"] == ["file_name"]
+    assert "initial_config" not in rows[0]
