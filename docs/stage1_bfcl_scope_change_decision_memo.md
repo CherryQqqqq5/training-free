@@ -221,7 +221,7 @@ Stop gate:
 
 ### Option E: Retrieval-Augmented Skill Harness Evolution (RASHE)
 
-Status: proposed only, not authorized. See
+Status: selected and approved as the scope-change route only; runtime/source/candidate/scorer remain unauthorized until separate `rashe_runtime_implementation_authorization`. See
 `docs/stage1_rashe_scope_change_approval.md` and
 `outputs/artifacts/stage1_bfcl_acceptance/scope_change_approval_rashe.json`.
 
@@ -259,9 +259,9 @@ Stop gate:
 
 ## Decision Requested
 
-Project lead and Huawei acceptance owner must choose one of the following before engineering proceeds:
+Project lead selected RASHE as the scope-change route. Engineering still must wait for a separate `rashe_runtime_implementation_authorization` before implementation. Remaining decision choices:
 
-1. Approve exactly one scope-change path above with a bounded approval packet.
+1. Authorize a bounded RASHE runtime implementation packet, or keep runtime blocked.
 2. Request a revised scope-change option with explicit evidence, leakage, cost, scorer, and stop-gate rules.
 3. Stop the Stage-1 BFCL performance sprint and preserve the current diagnostic/negative-evidence handoff as final Stage-1 evidence.
 

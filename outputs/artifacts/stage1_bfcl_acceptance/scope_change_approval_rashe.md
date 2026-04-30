@@ -1,13 +1,17 @@
 # RASHE Scope-Change Approval Packet
 
-Status: `proposed`, not approved. This artifact does not authorize runtime implementation, source collection, candidate generation, scorer execution, paired comparison, SOTA/+3pp, or Huawei acceptance claims.
+Status: `approved` as a scope-change route only. This artifact does not authorize runtime implementation, source collection, candidate generation, scorer execution, paired comparison, SOTA/+3pp, or Huawei acceptance claims.
 
 ## Route
 
 - report_scope: `scope_change_approval_rashe`
 - scope_change_route: `retrieval_augmented_skill_harness_evolution`
 - short_name: `RASHE`
-- approval_status: `proposed`
+- approval_status: `approved`
+- scope_change_approved: `true`
+- scope_change_approval_id: `user_approved_rashe_2026-04-30`
+- scope_change_approval_owner: `project_lead_user`
+- scope_change_approval_timestamp_utc: `2026-04-30T12:30:13Z`
 - provider/profile/model: Chuangzhi/Novacode / `novacode` / `gpt-5.2`
 
 Provider technical preflight is green, but provider green is not scorer authorization. Deterministic Stage-1 family search is exhausted under current approved gates.
@@ -24,7 +28,7 @@ Provider technical preflight is green, but provider green is not scorer authoriz
 - subset_approval_id: `null` until signed
 - dev_split_manifest: `null` until approved
 - holdout_split_manifest: `null` until approved
-- dev_holdout_disjoint: `false` while proposed
+- dev_holdout_disjoint: `false` while runtime/candidate/scorer authorization remains absent
 
 ## Fail-Closed Flags
 
@@ -79,4 +83,4 @@ Provider technical preflight is green, but provider green is not scorer authoriz
 
 ## Decision Boundary
 
-RASHE is a proposed scope-change packet only. Project lead and Huawei acceptance owner must explicitly approve it before any implementation, source collection, candidate generation, scorer, or performance claim.
+RASHE is approved as the selected scope-change route only. A separate `rashe_runtime_implementation_authorization` is still required before any implementation, source collection, candidate generation, scorer, or performance claim.

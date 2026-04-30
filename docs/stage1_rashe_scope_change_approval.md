@@ -1,6 +1,6 @@
 # Stage-1 RASHE Scope-Change Approval
 
-RASHE (`retrieval_augmented_skill_harness_evolution`) is proposed as a possible Stage-1 BFCL scope-change route. It is not approved, not the active acceptance path, and not runtime behavior.
+RASHE (`retrieval_augmented_skill_harness_evolution`) is approved as the selected Stage-1 BFCL scope-change route. It is not the active acceptance path and does not authorize runtime behavior.
 
 Current branch state remains diagnostic/negative-evidence handoff only:
 
@@ -25,7 +25,7 @@ RASHE would explore retrieval-augmented skill and harness evolution while preser
 - retrieval over sanitized step traces
 - harness code under GRC runtime
 
-These are proposed-only allowed change classes. No runtime implementation is authorized by this packet.
+These are selected scope-change change classes, but no runtime implementation is authorized by this packet. A separate `rashe_runtime_implementation_authorization` is required before implementation.
 
 
 ## Acceptance Fields
@@ -39,7 +39,7 @@ These are proposed-only allowed change classes. No runtime implementation is aut
 - subset_approval_id: `null` until signed
 - dev_split_manifest: `null` until approved
 - holdout_split_manifest: `null` until approved
-- dev_holdout_disjoint: `false` while proposed
+- dev_holdout_disjoint: `false` while runtime/candidate/scorer authorization remains absent
 
 ## Required Invariants
 
@@ -82,4 +82,11 @@ Before any scorer can be requested, a separate approval must define:
 
 ## Approval State
 
-The corresponding compact artifact is `outputs/artifacts/stage1_bfcl_acceptance/scope_change_approval_rashe.json`. Its required status is `approval_status=proposed`; any future change to approved must be a separate signed decision and must not be inferred from this document.
+- approval_status: `approved`
+- scope_change_approved: `true`
+- scope_change_approval_id: `user_approved_rashe_2026-04-30`
+- scope_change_approval_owner: `project_lead_user`
+- scope_change_approval_timestamp_utc: `2026-04-30T12:30:13Z`
+
+
+The corresponding compact artifact is `outputs/artifacts/stage1_bfcl_acceptance/scope_change_approval_rashe.json`. Its status is `approval_status=approved` for the scope-change route only. Runtime implementation, source collection, candidate generation, scorer, and performance claims remain unauthorized until a separate `rashe_runtime_implementation_authorization` is signed.

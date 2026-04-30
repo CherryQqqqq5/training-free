@@ -11,7 +11,11 @@ def _base_packet():
         "report_scope": "scope_change_approval_rashe",
         "scope_change_route": "retrieval_augmented_skill_harness_evolution",
         "short_name": "RASHE",
-        "approval_status": "proposed",
+        "approval_status": "approved",
+        "scope_change_approved": True,
+        "scope_change_approval_id": "user_approved_rashe_2026-04-30",
+        "scope_change_approval_owner": "project_lead_user",
+        "scope_change_approval_timestamp_utc": "2026-04-30T00:00:00Z",
         "approved_before_implementation": False,
         "approved_before_source_collection": False,
         "approved_before_candidate_generation": False,
@@ -79,23 +83,25 @@ def _run(tmp_path, packet):
     )
 
 
-def test_proposed_fail_closed_packet_passes(tmp_path):
+def test_approved_scope_change_fail_closed_packet_passes(tmp_path):
     result = _run(tmp_path, _base_packet())
     assert result.returncode == 0, result.stdout + result.stderr
     summary = json.loads(result.stdout)
     assert summary["rashe_scope_approval_passed"] is True
-    assert summary["approval_status"] == "proposed"
+    assert summary["approval_status"] == "approved"
+    assert summary["scope_change_approved"] is True
+    assert summary["scope_change_approval_id"] == "user_approved_rashe_2026-04-30"
 
 
-def test_approved_packet_fails_closed(tmp_path):
+def test_runtime_authorization_fails_closed(tmp_path):
     packet = _base_packet()
-    packet["approval_status"] = "approved"
     packet["approved_before_implementation"] = True
+    packet["runtime_implementation_authorized"] = True
     result = _run(tmp_path, packet)
     assert result.returncode == 1
     summary = json.loads(result.stdout)
-    assert "approval_status_invalid" in summary["blockers"]
     assert "approved_before_implementation_not_false" in summary["blockers"]
+    assert "runtime_implementation_authorized_not_false" in summary["blockers"]
 
 
 def test_leakage_counter_fails_closed(tmp_path):
@@ -124,3 +130,19 @@ def test_acceptance_fields_fail_closed_while_proposed(tmp_path):
     assert "holdout_split_manifest_not_null" in summary["blockers"]
     assert "dev_holdout_disjoint_not_false" in summary["blockers"]
     assert "bfcl_protocol_id_invalid" in summary["blockers"]
+
+
+def test_approval_metadata_required(tmp_path):
+    packet = _base_packet()
+    packet["scope_change_approved"] = False
+    packet["scope_change_approval_id"] = "wrong"
+    packet["scope_change_approval_owner"] = ""
+    packet.pop("scope_change_approval_timestamp_utc")
+    result = _run(tmp_path, packet)
+    assert result.returncode == 1
+    summary = json.loads(result.stdout)
+    assert "scope_change_approved_not_true" in summary["blockers"]
+    assert "scope_change_approval_id_invalid" in summary["blockers"]
+    assert "scope_change_approval_owner_missing" in summary["blockers"]
+    assert "scope_change_approval_owner_invalid" in summary["blockers"]
+    assert "scope_change_approval_timestamp_utc_missing" in summary["blockers"]

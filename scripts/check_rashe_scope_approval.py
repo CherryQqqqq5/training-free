@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail-closed validator for the proposed RASHE scope-change packet."""
+"""Fail-closed validator for the approved RASHE scope-change packet."""
 
 from __future__ import annotations
 
@@ -70,7 +70,7 @@ def validate(data: dict[str, Any]) -> list[str]:
         "report_scope": "scope_change_approval_rashe",
         "scope_change_route": "retrieval_augmented_skill_harness_evolution",
         "short_name": "RASHE",
-        "approval_status": "proposed",
+        "approval_status": "approved",
         "provider": "Chuangzhi/Novacode",
         "provider_route": "Chuangzhi/Novacode",
         "provider_profile": "novacode",
@@ -86,6 +86,16 @@ def validate(data: dict[str, Any]) -> list[str]:
     for key in REQUIRED_TRUE_FIELDS:
         if data.get(key) is not True:
             blockers.append(f"{key}_not_true")
+    if data.get("scope_change_approved") is not True:
+        blockers.append("scope_change_approved_not_true")
+    for key in ["scope_change_approval_id", "scope_change_approval_owner", "scope_change_approval_timestamp_utc"]:
+        value = data.get(key)
+        if not isinstance(value, str) or not value:
+            blockers.append(f"{key}_missing")
+    if data.get("scope_change_approval_id") != "user_approved_rashe_2026-04-30":
+        blockers.append("scope_change_approval_id_invalid")
+    if data.get("scope_change_approval_owner") != "project_lead_user":
+        blockers.append("scope_change_approval_owner_invalid")
     for key in REQUIRED_FALSE_FIELDS:
         if data.get(key) is not False:
             blockers.append(f"{key}_not_false")
@@ -135,6 +145,8 @@ def main(argv: list[str] | None = None) -> int:
         "rashe_scope_approval_passed": not blockers,
         "blockers": blockers,
         "approval_status": data.get("approval_status"),
+        "scope_change_approved": data.get("scope_change_approved"),
+        "scope_change_approval_id": data.get("scope_change_approval_id"),
         "scope_change_route": data.get("scope_change_route"),
         "candidate_pool_ready": data.get("candidate_pool_ready"),
         "scorer_authorization": data.get("scorer_authorization"),
