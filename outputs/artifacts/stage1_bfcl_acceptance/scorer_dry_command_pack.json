@@ -1,0 +1,149 @@
+{
+  "report_scope": "stage1_bfcl_scorer_dry_command_pack",
+  "offline_only": true,
+  "does_not_call_provider": true,
+  "does_not_call_bfcl_or_model": true,
+  "does_not_authorize_scorer": true,
+  "not_performance_evidence": true,
+  "execution_mode": "dry_approval_gated_templates_only",
+  "approval_gate": {
+    "required_environment": {
+      "GRC_CANDIDATE_POOL_PROMOTED": "1",
+      "GRC_SCORER_AUTHORIZED": "1"
+    },
+    "purpose": "commands must fail closed until candidate pool promotion and explicit scorer authorization are both recorded"
+  },
+  "required_runtime_environment": [
+    "GRC_BFCL_MODEL",
+    "GRC_BFCL_DEV_CATEGORY",
+    "GRC_BFCL_HOLDOUT_CATEGORY",
+    "GRC_EXPLICIT_LITERAL_RULES_DIR",
+    "GRC_NOOP_CONTROL_RULES_DIR"
+  ],
+  "raw_run_root_policy": "BFCL result, score, traces, locks, logs, and diagnostics/repairs.jsonl stay under /tmp/stage1_bfcl_scorer and are never committed or delivered as acceptance artifacts",
+  "compact_artifact_policy": "only preflight_report.json, metrics.json, failure_summary.json, run_manifest.json, sanitized trace summary, paired comparison summaries, and checker reports may live under outputs/artifacts",
+  "command_prefix": "test \"${GRC_CANDIDATE_POOL_PROMOTED:-0}\" = \"1\" || { echo 'candidate pool promotion required'; exit 2; }; test \"${GRC_SCORER_AUTHORIZED:-0}\" = \"1\" || { echo 'scorer authorization required'; exit 2; };",
+  "runs": [
+    {
+      "split": "dev",
+      "variant": "baseline",
+      "kind": "baseline",
+      "port": 8111,
+      "raw_run_root": "/tmp/stage1_bfcl_scorer/dev/baseline",
+      "compact_run_root": "outputs/artifacts/stage1_bfcl_acceptance/scorer/dev/baseline",
+      "command_template": "test \"${GRC_CANDIDATE_POOL_PROMOTED:-0}\" = \"1\" || { echo 'candidate pool promotion required'; exit 2; }; test \"${GRC_SCORER_AUTHORIZED:-0}\" = \"1\" || { echo 'scorer authorization required'; exit 2; }; bash scripts/run_bfcl_v4_baseline.sh \"${GRC_BFCL_MODEL}\" /tmp/stage1_bfcl_scorer/dev/baseline 8111 \"${GRC_BFCL_DEV_CATEGORY}\" configs/runtime_bfcl_structured.yaml rules/baseline_empty /tmp/stage1_bfcl_scorer/dev/baseline/traces outputs/artifacts/stage1_bfcl_acceptance/scorer/dev/baseline/artifacts"
+    },
+    {
+      "split": "dev",
+      "variant": "explicit_literal_only",
+      "kind": "candidate",
+      "port": 8112,
+      "raw_run_root": "/tmp/stage1_bfcl_scorer/dev/explicit_literal_only",
+      "compact_run_root": "outputs/artifacts/stage1_bfcl_acceptance/scorer/dev/explicit_literal_only",
+      "command_template": "test \"${GRC_CANDIDATE_POOL_PROMOTED:-0}\" = \"1\" || { echo 'candidate pool promotion required'; exit 2; }; test \"${GRC_SCORER_AUTHORIZED:-0}\" = \"1\" || { echo 'scorer authorization required'; exit 2; }; bash scripts/run_bfcl_v4_patch.sh \"${GRC_BFCL_MODEL}\" /tmp/stage1_bfcl_scorer/dev/explicit_literal_only 8112 \"${GRC_BFCL_DEV_CATEGORY}\" configs/runtime_bfcl_structured.yaml \"${GRC_EXPLICIT_LITERAL_RULES_DIR}\" /tmp/stage1_bfcl_scorer/dev/explicit_literal_only/traces outputs/artifacts/stage1_bfcl_acceptance/scorer/dev/explicit_literal_only/artifacts outputs/artifacts/stage1_bfcl_acceptance/scorer/dev/baseline/artifacts/metrics.json"
+    },
+    {
+      "split": "dev",
+      "variant": "noop_control",
+      "kind": "candidate",
+      "port": 8113,
+      "raw_run_root": "/tmp/stage1_bfcl_scorer/dev/noop_control",
+      "compact_run_root": "outputs/artifacts/stage1_bfcl_acceptance/scorer/dev/noop_control",
+      "command_template": "test \"${GRC_CANDIDATE_POOL_PROMOTED:-0}\" = \"1\" || { echo 'candidate pool promotion required'; exit 2; }; test \"${GRC_SCORER_AUTHORIZED:-0}\" = \"1\" || { echo 'scorer authorization required'; exit 2; }; bash scripts/run_bfcl_v4_patch.sh \"${GRC_BFCL_MODEL}\" /tmp/stage1_bfcl_scorer/dev/noop_control 8113 \"${GRC_BFCL_DEV_CATEGORY}\" configs/runtime_bfcl_structured.yaml \"${GRC_NOOP_CONTROL_RULES_DIR}\" /tmp/stage1_bfcl_scorer/dev/noop_control/traces outputs/artifacts/stage1_bfcl_acceptance/scorer/dev/noop_control/artifacts outputs/artifacts/stage1_bfcl_acceptance/scorer/dev/baseline/artifacts/metrics.json"
+    },
+    {
+      "split": "holdout",
+      "variant": "baseline",
+      "kind": "baseline",
+      "port": 8121,
+      "raw_run_root": "/tmp/stage1_bfcl_scorer/holdout/baseline",
+      "compact_run_root": "outputs/artifacts/stage1_bfcl_acceptance/scorer/holdout/baseline",
+      "command_template": "test \"${GRC_CANDIDATE_POOL_PROMOTED:-0}\" = \"1\" || { echo 'candidate pool promotion required'; exit 2; }; test \"${GRC_SCORER_AUTHORIZED:-0}\" = \"1\" || { echo 'scorer authorization required'; exit 2; }; bash scripts/run_bfcl_v4_baseline.sh \"${GRC_BFCL_MODEL}\" /tmp/stage1_bfcl_scorer/holdout/baseline 8121 \"${GRC_BFCL_HOLDOUT_CATEGORY}\" configs/runtime_bfcl_structured.yaml rules/baseline_empty /tmp/stage1_bfcl_scorer/holdout/baseline/traces outputs/artifacts/stage1_bfcl_acceptance/scorer/holdout/baseline/artifacts"
+    },
+    {
+      "split": "holdout",
+      "variant": "explicit_literal_only",
+      "kind": "candidate",
+      "port": 8122,
+      "raw_run_root": "/tmp/stage1_bfcl_scorer/holdout/explicit_literal_only",
+      "compact_run_root": "outputs/artifacts/stage1_bfcl_acceptance/scorer/holdout/explicit_literal_only",
+      "command_template": "test \"${GRC_CANDIDATE_POOL_PROMOTED:-0}\" = \"1\" || { echo 'candidate pool promotion required'; exit 2; }; test \"${GRC_SCORER_AUTHORIZED:-0}\" = \"1\" || { echo 'scorer authorization required'; exit 2; }; bash scripts/run_bfcl_v4_patch.sh \"${GRC_BFCL_MODEL}\" /tmp/stage1_bfcl_scorer/holdout/explicit_literal_only 8122 \"${GRC_BFCL_HOLDOUT_CATEGORY}\" configs/runtime_bfcl_structured.yaml \"${GRC_EXPLICIT_LITERAL_RULES_DIR}\" /tmp/stage1_bfcl_scorer/holdout/explicit_literal_only/traces outputs/artifacts/stage1_bfcl_acceptance/scorer/holdout/explicit_literal_only/artifacts outputs/artifacts/stage1_bfcl_acceptance/scorer/holdout/baseline/artifacts/metrics.json"
+    },
+    {
+      "split": "holdout",
+      "variant": "noop_control",
+      "kind": "candidate",
+      "port": 8123,
+      "raw_run_root": "/tmp/stage1_bfcl_scorer/holdout/noop_control",
+      "compact_run_root": "outputs/artifacts/stage1_bfcl_acceptance/scorer/holdout/noop_control",
+      "command_template": "test \"${GRC_CANDIDATE_POOL_PROMOTED:-0}\" = \"1\" || { echo 'candidate pool promotion required'; exit 2; }; test \"${GRC_SCORER_AUTHORIZED:-0}\" = \"1\" || { echo 'scorer authorization required'; exit 2; }; bash scripts/run_bfcl_v4_patch.sh \"${GRC_BFCL_MODEL}\" /tmp/stage1_bfcl_scorer/holdout/noop_control 8123 \"${GRC_BFCL_HOLDOUT_CATEGORY}\" configs/runtime_bfcl_structured.yaml \"${GRC_NOOP_CONTROL_RULES_DIR}\" /tmp/stage1_bfcl_scorer/holdout/noop_control/traces outputs/artifacts/stage1_bfcl_acceptance/scorer/holdout/noop_control/artifacts outputs/artifacts/stage1_bfcl_acceptance/scorer/holdout/baseline/artifacts/metrics.json"
+    }
+  ],
+  "run_schema_gates": [
+    "PYTHONPATH=.:src .venv/bin/python scripts/check_bfcl_run_artifact_schema.py outputs/artifacts/stage1_bfcl_acceptance/scorer/dev/baseline --compact --strict",
+    "PYTHONPATH=.:src .venv/bin/python scripts/check_bfcl_run_artifact_schema.py outputs/artifacts/stage1_bfcl_acceptance/scorer/dev/explicit_literal_only --compact --strict",
+    "PYTHONPATH=.:src .venv/bin/python scripts/check_bfcl_run_artifact_schema.py outputs/artifacts/stage1_bfcl_acceptance/scorer/dev/noop_control --compact --strict",
+    "PYTHONPATH=.:src .venv/bin/python scripts/check_bfcl_run_artifact_schema.py outputs/artifacts/stage1_bfcl_acceptance/scorer/holdout/baseline --compact --strict",
+    "PYTHONPATH=.:src .venv/bin/python scripts/check_bfcl_run_artifact_schema.py outputs/artifacts/stage1_bfcl_acceptance/scorer/holdout/explicit_literal_only --compact --strict",
+    "PYTHONPATH=.:src .venv/bin/python scripts/check_bfcl_run_artifact_schema.py outputs/artifacts/stage1_bfcl_acceptance/scorer/holdout/noop_control --compact --strict"
+  ],
+  "paired_artifact_sets": [
+    {
+      "name": "dev_explicit_literal",
+      "acceptance_root": "outputs/artifacts/stage1_bfcl_acceptance/paired/dev_explicit_literal",
+      "baseline_run_root": "outputs/artifacts/stage1_bfcl_acceptance/scorer/dev/baseline",
+      "candidate_run_root": "outputs/artifacts/stage1_bfcl_acceptance/scorer/dev/explicit_literal_only",
+      "required_files": [
+        "paired_comparison.json",
+        "acceptance_decision.json",
+        "regression_report.json",
+        "cost_latency_report.json"
+      ],
+      "check_command": "PYTHONPATH=.:src .venv/bin/python scripts/check_bfcl_paired_comparison.py --acceptance-root outputs/artifacts/stage1_bfcl_acceptance/paired/dev_explicit_literal --provider-status outputs/artifacts/bfcl_ctspc_source_pool_v1/current_provider_preflight_status.json --compact --strict"
+    },
+    {
+      "name": "dev_noop_control",
+      "acceptance_root": "outputs/artifacts/stage1_bfcl_acceptance/paired/dev_noop_control",
+      "baseline_run_root": "outputs/artifacts/stage1_bfcl_acceptance/scorer/dev/baseline",
+      "candidate_run_root": "outputs/artifacts/stage1_bfcl_acceptance/scorer/dev/noop_control",
+      "required_files": [
+        "paired_comparison.json",
+        "acceptance_decision.json",
+        "regression_report.json",
+        "cost_latency_report.json"
+      ],
+      "check_command": "PYTHONPATH=.:src .venv/bin/python scripts/check_bfcl_paired_comparison.py --acceptance-root outputs/artifacts/stage1_bfcl_acceptance/paired/dev_noop_control --provider-status outputs/artifacts/bfcl_ctspc_source_pool_v1/current_provider_preflight_status.json --compact --strict"
+    },
+    {
+      "name": "holdout_explicit_literal",
+      "acceptance_root": "outputs/artifacts/stage1_bfcl_acceptance/paired/holdout_explicit_literal",
+      "baseline_run_root": "outputs/artifacts/stage1_bfcl_acceptance/scorer/holdout/baseline",
+      "candidate_run_root": "outputs/artifacts/stage1_bfcl_acceptance/scorer/holdout/explicit_literal_only",
+      "required_files": [
+        "paired_comparison.json",
+        "acceptance_decision.json",
+        "regression_report.json",
+        "cost_latency_report.json"
+      ],
+      "check_command": "PYTHONPATH=.:src .venv/bin/python scripts/check_bfcl_paired_comparison.py --acceptance-root outputs/artifacts/stage1_bfcl_acceptance/paired/holdout_explicit_literal --provider-status outputs/artifacts/bfcl_ctspc_source_pool_v1/current_provider_preflight_status.json --compact --strict"
+    },
+    {
+      "name": "holdout_noop_control",
+      "acceptance_root": "outputs/artifacts/stage1_bfcl_acceptance/paired/holdout_noop_control",
+      "baseline_run_root": "outputs/artifacts/stage1_bfcl_acceptance/scorer/holdout/baseline",
+      "candidate_run_root": "outputs/artifacts/stage1_bfcl_acceptance/scorer/holdout/noop_control",
+      "required_files": [
+        "paired_comparison.json",
+        "acceptance_decision.json",
+        "regression_report.json",
+        "cost_latency_report.json"
+      ],
+      "check_command": "PYTHONPATH=.:src .venv/bin/python scripts/check_bfcl_paired_comparison.py --acceptance-root outputs/artifacts/stage1_bfcl_acceptance/paired/holdout_noop_control --provider-status outputs/artifacts/bfcl_ctspc_source_pool_v1/current_provider_preflight_status.json --compact --strict"
+    }
+  ],
+  "global_gates": [
+    "PYTHONPATH=.:src .venv/bin/python scripts/check_artifact_boundary.py",
+    "PYTHONPATH=.:src .venv/bin/python scripts/check_stage1_bfcl_performance_ready.py --compact --strict"
+  ],
+  "current_expected_status": "blocked_until_candidate_pool_promotion_and_scorer_authorization"
+}

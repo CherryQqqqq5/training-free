@@ -193,6 +193,20 @@ No-leakage requirements:
 Each gate requires a separate recorded approval. Passing an earlier gate does not
 authorize a later gate.
 
+Command packs are separated into three classes:
+
+```text
+provider_source_collection_command_pack:
+  allowed only after provider credential, dataset export, and source collection
+  approvals; never authorizes scorer.
+dev_holdout_scorer_command_pack:
+  allowed only after source collection, candidate pool promotion, and the
+  relevant dev/holdout gate; never authorizes full BFCL or Huawei acceptance.
+full_huawei_scorer_command_pack:
+  allowed only after holdout passes and Huawei signs the full or narrowed
+  acceptance scope.
+```
+
 ### 4.1 Provider Credential Approval
 
 Required before attempting provider green preflight:
@@ -333,6 +347,8 @@ Required before running dev baseline/candidate scorer commands:
 
 ```text
 provider_green_preflight_passed = true
+source_collection_completed = true
+source_manifests_signed = true
 candidate_pool_promotion_signed = true
 m2_8pre_offline_passed = true
 sota_or_acceptance_baseline_frozen_before_scorer = true

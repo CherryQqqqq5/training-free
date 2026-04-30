@@ -1539,6 +1539,106 @@ Ablation artifact boundary:
 - artifact-boundary gates must pass for `baseline`, `explicit_literal_only`, and
   `noop_rules_control` before any attribution statement is accepted.
 
+#### R9 Scorer Comparison Matrix
+
+For both `dev20` and `holdout20`, scorer comparison must use the same selected
+case ids, protocol id, provider route, model alias, runtime config, tool schema
+hash, scorer config, and artifact-boundary policy across all arms:
+
+- `baseline`: no candidate rules and no runtime argument-fill activation;
+- `explicit_literal_only`: frozen
+  `explicit_required_arg_literal_completion` rules enabled;
+- `noop_control`: same runtime hook path as `explicit_literal_only`, but with
+  zero argument fills. This may be implemented by an empty active rule bundle or
+  by an explicit noop mode that records activation attempts without mutating
+  tool calls.
+
+The noop arm is an attribution control, not an alternate repair family. It must
+not enable memory, postcondition, CTSPC, wrong-key alias, schema-local repair,
+structured retry, or any non-explicit mutation.
+
+Required comparison metrics for each scope and arm:
+
+- `scope`: `dev20` or `holdout20`;
+- `arm`: `baseline`, `explicit_literal_only`, or `noop_control`;
+- `protocol_id`;
+- `provider_route_id`;
+- `model_alias`;
+- `runtime_config_hash`;
+- `tool_schema_hash`;
+- `selected_case_ids_hash`;
+- `selected_case_count`;
+- `accuracy`;
+- `correct_count`;
+- `incorrect_count`;
+- `total_count`;
+- `activation_count`;
+- `argument_fill_count`;
+- `non_explicit_mutation_count`;
+- `memory_postcondition_ctspc_activation_count`;
+- `cost_total`;
+- `latency_p50`;
+- `latency_p95`;
+- `artifact_boundary_passed`;
+- `leakage_audit_passed`;
+- `planned_commands`;
+- `candidate_commands`.
+
+Required paired metrics:
+
+- `explicit_vs_baseline_absolute_delta_pp`;
+- `noop_vs_baseline_absolute_delta_pp`;
+- `explicit_minus_noop_absolute_delta_pp`;
+- `fixed_case_ids`;
+- `regressed_case_ids`;
+- `unchanged_case_ids`;
+- `fixed_count`;
+- `regressed_count`;
+- `unchanged_count`;
+- `activation_fixed_case_ids`;
+- `activation_regressed_case_ids`;
+- `cost_delta_explicit_vs_baseline`;
+- `latency_p95_delta_explicit_vs_baseline`.
+
+Dev pass thresholds:
+
+- `explicit_literal_only.accuracy > baseline.accuracy`;
+- `explicit_vs_baseline_absolute_delta_pp >= 3.0`;
+- `fixed_count > regressed_count`;
+- `explicit_literal_only.activation_count > 0`;
+- `explicit_literal_only.argument_fill_count == explicit_literal_only.activation_count`;
+- `explicit_literal_only.non_explicit_mutation_count == 0`;
+- `explicit_literal_only.memory_postcondition_ctspc_activation_count == 0`;
+- `noop_vs_baseline_absolute_delta_pp < 3.0`;
+- `explicit_minus_noop_absolute_delta_pp >= 3.0`;
+- artifact-boundary and leakage gates pass for all three arms;
+- cost and latency deltas remain within registered bounds.
+
+If dev fails any threshold, stop. Do not run holdout, do not retain rules, and do
+not claim `+3pp`.
+
+Holdout pass thresholds:
+
+- dev pass thresholds were already met under the frozen dev protocol;
+- holdout uses the pre-frozen holdout case ids and does not reorder by dev
+  feedback;
+- `explicit_literal_only.accuracy > baseline.accuracy`;
+- `explicit_vs_baseline_absolute_delta_pp >= 3.0`;
+- `fixed_count > regressed_count`;
+- `noop_vs_baseline_absolute_delta_pp < 3.0`;
+- `explicit_minus_noop_absolute_delta_pp >= 3.0`;
+- no non-explicit mutation, memory/postcondition/CTSPC activation, leakage,
+  artifact-boundary failure, or manifest drift.
+
+Attribution rule:
+
+The `+3pp` claim may be attributed to deterministic explicit-literal repair only
+when both dev and holdout pass, the noop arm does not meet the `+3pp` threshold,
+and the explicit-minus-noop delta is at least `+3pp` on the registered
+comparison. If noop reaches `+3pp`, if explicit-minus-noop is below `+3pp`, or if
+any non-explicit mutation is active, the result may be reported only as
+diagnostic and must not be claimed as an explicit-literal contribution.
+
 #### Holdout and +3pp Claim Gate
 
 Holdout may run only after dev pass and with the pre-frozen holdout20 manifest.
