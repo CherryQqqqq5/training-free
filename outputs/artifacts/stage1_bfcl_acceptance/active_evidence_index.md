@@ -35,6 +35,8 @@ Provider and dataset are not the current blocker. Batch1 and Batch2 diagnostics 
 - batch2_pilot_diagnostic: `outputs/artifacts/stage1_bfcl_acceptance/batch2_source_collection_pilot_snapshot.json`
 - batch2_source_compact_artifacts: `["outputs/artifacts/bfcl_ctspc_source_pool_v1/multi_turn_base/baseline/artifacts/", "outputs/artifacts/bfcl_ctspc_source_pool_v1/multi_turn_long_context/baseline/artifacts/"]`
 - candidate_pool_status: `candidate_pool_not_ready`
+- wrong_arg_key_alias_repair_diagnostic: `outputs/artifacts/stage1_bfcl_acceptance/wrong_arg_key_alias_repair_diagnostic.json`
+- schema_local_non_live_repair_diagnostic: `outputs/artifacts/stage1_bfcl_acceptance/schema_local_non_live_repair_diagnostic.json`
 
 ## Uniform Counter Table
 
@@ -60,8 +62,16 @@ Provider and dataset are not the current blocker. Batch1 and Batch2 diagnostics 
 
 ## Pivot / Research Review
 
-Mechanical explicit-literal source expansion is stopped. Candidate pivot families are `wrong_arg_key_alias_repair` and `deterministic_schema_local_non_live_repair`; both are pending approval and no-leakage gates and are not performance claims.
+All three checked deterministic argument families are zero-yield and not scorer-authorized:
+
+- `explicit_required_arg_literal_completion`: zero accepted; selected-call diagnostics show `selected_calls_with_missing_required=0` and `selected_calls_with_exactly_one_missing_required_arg=0` across active Batch1/Batch2 diagnostics.
+- `wrong_arg_key_alias_repair`: offline diagnostic run; `alias_repair_eligible_count=0`.
+- `deterministic_schema_local_non_live_repair`: offline diagnostic run; `schema_local_repair_eligible_count=0`.
+
+Mechanical explicit-literal source expansion remains stopped. None of these families is candidate-pool-authorized, scorer-authorized, or a performance claim.
+
+Next research direction is pending only: `selected_call_structural_failure_attribution_diagnostic`. It is not implemented, not authorized, and not a performance claim.
 
 ## Delivery Risk
 
-Current work is on `stage1-bfcl-performance-sprint`; main merge decision is pending. This is delivery-risk tracking, not an acceptance claim. Index provenance: source_base_head `6e3a1e63`, index_commit `39de0e9c`.
+Current work is on `stage1-bfcl-performance-sprint`; main merge decision is pending. This is delivery-risk tracking, not an acceptance claim. Index provenance: source_base_head `6e3a1e63`, index_commit `3b75a8dd`.
