@@ -23,6 +23,18 @@ REQUIRED_METADATA_FIELDS = (
     "forbidden_sources",
     "evaluation_status",
 )
+REQUIRED_FORBIDDEN_SOURCE_LABELS = {
+    "raw_case_identifier",
+    "raw_trace_text",
+    "raw_provider_payload",
+    "gold",
+    "expected",
+    "scorer_diff",
+    "candidate_output",
+    "repair_output",
+    "holdout_feedback",
+    "full_suite_feedback",
+}
 
 
 def _metadata_from_store(store: SkillStore) -> dict[str, dict[str, Any]]:
@@ -64,6 +76,8 @@ def _metadata_blockers(metadata: dict[str, dict[str, Any]]) -> tuple[list[str], 
             blockers.append(f"skill_requires_current_turn_invalid:{skill_id}")
         if not isinstance(fields["forbidden_sources"], list) or not fields["forbidden_sources"]:
             blockers.append(f"skill_forbidden_sources_invalid:{skill_id}")
+        elif set(fields["forbidden_sources"]) != REQUIRED_FORBIDDEN_SOURCE_LABELS:
+            blockers.append(f"skill_forbidden_sources_taxonomy_invalid:{skill_id}")
         if fields["evaluation_status"] != "offline_seed_validated":
             blockers.append(f"skill_evaluation_status_invalid:{skill_id}")
         if len(blockers) == before:
@@ -98,6 +112,8 @@ def check(manifest: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
     schema_requirement_reject_count = 0
     current_turn_requirement_reject_count = 0
     ambiguity_reject_count = 0
+    step_trace_v0_2_route_checked = 0
+    step_trace_source_scope_reject_count = 0
 
     decision = SkillRouter(skill_metadata=metadata).route({"signals": ["current_turn", "memory_tool_visible"]})
     if decision.decision_status == "selected" and decision.selected_skill_id == "bfcl_current_turn_focus":
@@ -131,6 +147,26 @@ def check(manifest: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
     else:
         blockers.append(f"current_turn_requirement_not_rejected:{decision.decision_status}:{decision.reject_reason}")
 
+    step_trace = {
+        "skill_tags": ["bfcl_current_turn_focus"],
+        "action_shape": "tool_call_boundary",
+        "source_scope": "synthetic",
+        "state_signature": "state:current-turn",
+        "category": "synthetic_router_v0_2",
+    }
+    decision = SkillRouter(skill_metadata=metadata).route(step_trace)
+    if decision.decision_status == "selected" and decision.selected_skill_id == "bfcl_current_turn_focus":
+        step_trace_v0_2_route_checked += 1
+    else:
+        blockers.append(f"step_trace_v0_2_route_failed:{decision.decision_status}:{decision.reject_reason}")
+
+    for source_scope, reason in [("dev_only_future", "dev_only_future_scope_disabled"), ("raw_live_trace", "source_scope_not_allowed")]:
+        decision = SkillRouter(skill_metadata=metadata).route({**step_trace, "source_scope": source_scope})
+        if decision.decision_status == "input_reject" and decision.reject_reason == reason:
+            step_trace_source_scope_reject_count += 1
+        else:
+            blockers.append(f"step_trace_source_scope_not_rejected:{source_scope}:{decision.decision_status}:{decision.reject_reason}")
+
     summary = {
         "report_scope": "rashe_skill_metadata_check",
         "offline_only": True,
@@ -147,6 +183,9 @@ def check(manifest: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
         "schema_requirement_reject_count": schema_requirement_reject_count,
         "current_turn_requirement_reject_count": current_turn_requirement_reject_count,
         "ambiguity_reject_count": ambiguity_reject_count,
+        "forbidden_source_taxonomy_label_count": len(REQUIRED_FORBIDDEN_SOURCE_LABELS),
+        "step_trace_v0_2_route_checked": step_trace_v0_2_route_checked,
+        "step_trace_source_scope_reject_count": step_trace_source_scope_reject_count,
         "provider_call_count": 0,
         "scorer_call_count": 0,
         "source_collection_call_count": 0,

@@ -5,8 +5,21 @@ from pathlib import Path
 
 from grc.skills.router import SkillRouter
 from grc.skills.store import SkillStore
+from grc.skills.trace_buffer import find_path_indicators
 
 SCRIPT = Path("scripts/check_rashe_skill_metadata.py")
+REQUIRED_FORBIDDEN_SOURCE_LABELS = {
+    "raw_case_identifier",
+    "raw_trace_text",
+    "raw_provider_payload",
+    "gold",
+    "expected",
+    "scorer_diff",
+    "candidate_output",
+    "repair_output",
+    "holdout_feedback",
+    "full_suite_feedback",
+}
 
 
 def metadata():
@@ -27,6 +40,18 @@ def metadata():
     }
 
 
+def step_trace_v0_2(**overrides):
+    trace = {
+        "skill_tags": ["bfcl_current_turn_focus"],
+        "action_shape": "tool_call_boundary",
+        "source_scope": "synthetic",
+        "state_signature": "state:current-turn",
+        "category": "synthetic_router_v0_2",
+    }
+    trace.update(overrides)
+    return trace
+
+
 def test_seed_skill_metadata_fields_complete_and_disabled():
     store = SkillStore.load_manifest()
     assert len(store.skills) == 4
@@ -37,7 +62,8 @@ def test_seed_skill_metadata_fields_complete_and_disabled():
         assert isinstance(skill.conflicts_with, tuple)
         assert isinstance(skill.requires_schema, bool)
         assert isinstance(skill.requires_current_turn, bool)
-        assert skill.forbidden_sources
+        assert set(skill.forbidden_sources) == REQUIRED_FORBIDDEN_SOURCE_LABELS
+        assert find_path_indicators({"forbidden_sources": list(skill.forbidden_sources)}) == []
         assert skill.evaluation_status == "offline_seed_validated"
         assert skill.enabled is False
         assert skill.runtime_authorized is False
@@ -51,6 +77,50 @@ def test_priority_ordering_selects_single_eligible_skill_fail_closed():
     assert decision.provider_call_count == 0
     assert decision.scorer_call_count == 0
     assert decision.source_collection_call_count == 0
+
+
+def test_router_accepts_step_trace_v0_2_without_signals():
+    decision = SkillRouter(skill_metadata=metadata()).route(step_trace_v0_2())
+    assert decision.decision_status == "selected"
+    assert decision.selected_skill_id == "bfcl_current_turn_focus"
+    assert decision.runtime_authorized is False
+    assert decision.provider_call_count == 0
+    assert decision.scorer_call_count == 0
+    assert decision.source_collection_call_count == 0
+
+
+def test_router_accepts_approved_compact_step_trace_v0_2_without_signals():
+    decision = SkillRouter(skill_metadata=metadata()).route(
+        step_trace_v0_2(
+            skill_tags=["bfcl_schema_reading"],
+            action_shape="schema_lookup_boundary",
+            source_scope="approved_compact",
+            state_signature="state:schema-present",
+            category="synthetic_schema_router_v0_2",
+        )
+    )
+    assert decision.decision_status == "selected"
+    assert decision.selected_skill_id == "bfcl_schema_reading"
+
+
+def test_router_rejects_disabled_or_unknown_source_scope_before_route():
+    for source_scope, reason in [("dev_only_future", "dev_only_future_scope_disabled"), ("raw_live_trace", "source_scope_not_allowed")]:
+        decision = SkillRouter(skill_metadata=metadata()).route(step_trace_v0_2(source_scope=source_scope))
+        assert decision.decision_status == "input_reject"
+        assert decision.reject_reason == reason
+        assert decision.selected_skill_id is None
+
+
+def test_router_rejects_raw_case_id_raw_trace_and_provider_payload_indicators():
+    cases = [
+        ({"case_id": "raw-case"}, "raw_case_id"),
+        ({"diagnostic_path": "raw_trace://not-allowed"}, "path_indicator"),
+        ({"provider_payload_path": "provider://not-called"}, "path_indicator"),
+    ]
+    for extra, reason in cases:
+        decision = SkillRouter(skill_metadata=metadata()).route(step_trace_v0_2(**extra))
+        assert decision.decision_status == "input_reject"
+        assert decision.reject_reason == reason
 
 
 def test_same_priority_ambiguity_rejects():
@@ -110,6 +180,9 @@ def test_skill_metadata_checker_compact_report_passes():
     assert summary["schema_requirement_reject_count"] == 1
     assert summary["current_turn_requirement_reject_count"] == 1
     assert summary["ambiguity_reject_count"] == 1
+    assert summary["forbidden_source_taxonomy_label_count"] == 10
+    assert summary["step_trace_v0_2_route_checked"] == 1
+    assert summary["step_trace_source_scope_reject_count"] == 2
     assert summary["provider_call_count"] == 0
     assert summary["scorer_call_count"] == 0
     assert summary["source_collection_call_count"] == 0

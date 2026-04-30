@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from typing import Any, Iterable, Mapping
 
-from .schema import RouterDecision
+from .schema import RouterDecision, find_forbidden_fields
+from .trace_buffer import find_path_indicators
 
 SIGNAL_TO_SKILL_GROUPS: tuple[tuple[set[str], str], ...] = (
     ({"multi_turn", "current_turn"}, "bfcl_current_turn_focus"),
@@ -15,6 +16,20 @@ SIGNAL_TO_SKILL_GROUPS: tuple[tuple[set[str], str], ...] = (
 
 SCHEMA_SIGNALS = {"schema_present", "required_properties"}
 CURRENT_TURN_SIGNALS = {"current_turn", "multi_turn"}
+ALLOWED_SOURCE_SCOPES = {"synthetic", "approved_compact"}
+REJECTED_SOURCE_SCOPES = {"dev_only_future"}
+SKILL_TAG_TO_SIGNAL = {
+    "bfcl_current_turn_focus": "current_turn",
+    "bfcl_schema_reading": "schema_present",
+    "bfcl_tool_call_format_guard": "tool_like_payload",
+    "bfcl_memory_web_search_discipline": "memory_tool_visible",
+}
+ACTION_SHAPE_TO_SIGNAL = {
+    "tool_call_boundary": "current_turn",
+    "schema_lookup_boundary": "schema_present",
+    "tool_call_format_guard": "tool_like_payload",
+    "memory_web_search_boundary": "memory_tool_visible",
+}
 
 
 class SkillRouter:
@@ -36,9 +51,12 @@ class SkillRouter:
     def route(self, trace: dict[str, Any]) -> RouterDecision:
         if self.enabled or self.runtime_behavior_authorized or self.prompt_injection_authorized:
             return RouterDecision(None, "authorization_reject", "runtime_behavior_not_authorized")
+        preflight_reject = _preflight_reject(trace)
+        if preflight_reject is not None:
+            return RouterDecision(None, "input_reject", preflight_reject)
         if trace.get("ambiguous") is True:
             return RouterDecision(None, "ambiguous_reject", "ambiguous_skill_match")
-        signals = _signals(trace.get("signals") or [])
+        signals = _trace_signals(trace)
         matches = _matching_skills(signals)
         if self.skill_metadata is None:
             return _legacy_route(matches)
@@ -65,6 +83,41 @@ class SkillRouter:
         if len(top) > 1:
             return RouterDecision(None, "ambiguous_reject", "same_priority_skill_match")
         return RouterDecision(ranked[0], "selected", None)
+
+
+def _preflight_reject(trace: dict[str, Any]) -> str | None:
+    source_scope = trace.get("source_scope")
+    if source_scope is not None:
+        if source_scope in REJECTED_SOURCE_SCOPES:
+            return "dev_only_future_scope_disabled"
+        if source_scope not in ALLOWED_SOURCE_SCOPES:
+            return "source_scope_not_allowed"
+    forbidden = find_forbidden_fields(trace)
+    if any(hit.endswith("case_id") or hit == "case_id" for hit in forbidden):
+        return "raw_case_id"
+    if find_path_indicators(trace):
+        return "path_indicator"
+    if forbidden:
+        return "forbidden_field"
+    return None
+
+
+def _trace_signals(trace: dict[str, Any]) -> set[str]:
+    signals = _signals(trace.get("signals") or [])
+    for tag in trace.get("skill_tags") or []:
+        signal = SKILL_TAG_TO_SIGNAL.get(str(tag))
+        if signal:
+            signals.add(signal)
+    action_signal = ACTION_SHAPE_TO_SIGNAL.get(str(trace.get("action_shape") or ""))
+    if action_signal:
+        signals.add(action_signal)
+    state_signature = str(trace.get("state_signature") or "")
+    category = str(trace.get("category") or "")
+    if "schema" in state_signature or "schema" in category:
+        signals.add("schema_present")
+    if "current" in state_signature or "current" in category:
+        signals.add("current_turn")
+    return signals
 
 
 def _matching_skills(signals: set[str]) -> list[str]:

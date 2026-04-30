@@ -40,6 +40,8 @@ def load_json(path: Path) -> Any:
 
 def walk_forbidden(obj: Any, path: str = "") -> list[str]:
     hits: list[str] = []
+    if path == "forbidden_sources" or path.endswith(".forbidden_sources") or ".forbidden_sources[" in path:
+        return hits
     if isinstance(obj, dict):
         for key, value in obj.items():
             key_l = str(key).lower()

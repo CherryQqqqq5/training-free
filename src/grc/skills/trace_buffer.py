@@ -161,6 +161,8 @@ def missing_v0_2_fields(trace: dict[str, Any]) -> list[str]:
 
 def find_path_indicators(obj: Any, path: str = "") -> list[str]:
     hits: list[str] = []
+    if path == "forbidden_sources" or path.endswith(".forbidden_sources") or ".forbidden_sources[" in path:
+        return hits
     if isinstance(obj, dict):
         for key, value in obj.items():
             next_path = f"{path}.{key}" if path else str(key)

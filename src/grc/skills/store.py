@@ -75,7 +75,7 @@ def load_skill(path: Path) -> tuple[Skill | None, list[str]]:
     _require(data, "enabled", False, blockers, path.stem)
     _require(data, "runtime_authorized", False, blockers, path.stem)
     _require(data, "training_free", True, blockers, path.stem)
-    forbidden = find_forbidden_fields(data)
+    forbidden = [hit for hit in find_forbidden_fields(data) if ".forbidden_sources" not in hit and not hit.startswith("forbidden_sources")]
     if forbidden:
         blockers.append("skill_forbidden_fields:" + ",".join(forbidden))
     skill_id = data.get("skill_id")

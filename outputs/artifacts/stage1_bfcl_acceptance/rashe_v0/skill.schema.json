@@ -33,10 +33,22 @@
     },
     "forbidden_sources": {
       "items": {
-        "type": "string"
+        "enum": [
+          "raw_case_identifier",
+          "raw_trace_text",
+          "raw_provider_payload",
+          "gold",
+          "expected",
+          "scorer_diff",
+          "candidate_output",
+          "repair_output",
+          "holdout_feedback",
+          "full_suite_feedback"
+        ]
       },
-      "minItems": 1,
-      "type": "array"
+      "minItems": 10,
+      "type": "array",
+      "uniqueItems": true
     },
     "forbidden_triggers": {
       "items": {
