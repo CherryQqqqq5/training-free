@@ -1,0 +1,75 @@
+{
+  "allowed_if_approved": [
+    "formal performance evidence publication after paired gate",
+    "SOTA/+3pp claim after signed acceptance review",
+    "Huawei readiness artifact after owner approval"
+  ],
+  "approval_packet_kind": "performance_3pp_huawei_acceptance",
+  "approval_status": "pending",
+  "authorized": false,
+  "bfcl_performance_ready": false,
+  "candidate_generation_authorized": false,
+  "candidate_jsonl_authorized": false,
+  "candidate_pool_ready": false,
+  "dev_holdout_authorized": false,
+  "execution_started": false,
+  "forbidden_until_approved": [
+    "performance evidence",
+    "SOTA/+3pp claim",
+    "Huawei acceptance readiness claim",
+    "claim from unpaired or partial score",
+    "claim from provider/model drift",
+    "claim before no-leakage and regression gates"
+  ],
+  "huawei_acceptance_ready": false,
+  "no_leakage_required": {
+    "candidate_output_used": false,
+    "case_id_specific_rules_allowed": false,
+    "expected_used": false,
+    "full_suite_feedback_used": false,
+    "gold_used": false,
+    "holdout_feedback_used": false,
+    "raw_trace_committed": false,
+    "scorer_diff_used": false
+  },
+  "notes": [
+    "Fail-closed approval skeleton only.",
+    "This packet does not authorize execution, provider calls, source collection, candidate generation, scorer use, performance evidence, SOTA claims, or Huawei acceptance readiness."
+  ],
+  "offline_only_packet": true,
+  "paired_bfcl_3pp_evidence_required_if_approved": true,
+  "paired_comparison_authorized": false,
+  "performance_evidence": false,
+  "prerequisites": [
+    "paired BFCL baseline/candidate comparison passed",
+    "+3pp delta evidence present",
+    "no regression gate passed",
+    "cost/latency gates passed",
+    "artifact boundary and run schema gates passed",
+    "Huawei acceptance owner signoff requested"
+  ],
+  "prompt_injection_authorized": false,
+  "proposer_execution_authorized": false,
+  "provider_calls_authorized": false,
+  "purpose": "Future approval boundary for BFCL +3pp/SOTA/Huawei readiness claims after paired evidence exists.",
+  "raw_payload_capture_authorized": false,
+  "raw_trace_authorized": false,
+  "report_scope": "rashe_performance_3pp_huawei_acceptance_approval_packet",
+  "retry_authorized": false,
+  "rollback_stop_gates": [
+    "+3pp threshold miss stops claim",
+    "any paired regression stops claim",
+    "cost/latency bound failure stops claim",
+    "artifact boundary failure stops claim",
+    "Huawei owner rejection stops claim"
+  ],
+  "runtime_behavior_authorized": false,
+  "schema_version": "rashe_approval_packet_v0",
+  "scope_change_route": "retrieval_augmented_skill_harness_evolution",
+  "scorer_authorized": false,
+  "short_name": "RASHE",
+  "sota_3pp_claim_ready": false,
+  "source_collection_authorized": false,
+  "title": "RASHE performance +3pp Huawei acceptance approval packet",
+  "tool_path_mutation_authorized": false
+}

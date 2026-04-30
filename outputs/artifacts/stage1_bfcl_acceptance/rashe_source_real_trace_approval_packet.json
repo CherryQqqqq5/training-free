@@ -1,0 +1,75 @@
+{
+  "allowed_if_approved": [
+    "bounded source collection for approved categories only",
+    "raw payload capture under approved raw root only",
+    "compact sanitized counters and hashes",
+    "artifact-boundary-checked manifests"
+  ],
+  "approval_packet_kind": "source_real_trace",
+  "approval_status": "pending",
+  "artifact_boundary_required_if_approved": true,
+  "authorized": false,
+  "bfcl_performance_ready": false,
+  "candidate_generation_authorized": false,
+  "candidate_jsonl_authorized": false,
+  "candidate_pool_ready": false,
+  "dev_holdout_authorized": false,
+  "execution_started": false,
+  "forbidden_until_approved": [
+    "raw trace collection",
+    "source collection",
+    "raw payload committed to tracked artifacts",
+    "gold/expected/scorer/candidate fields",
+    "candidate generation",
+    "scorer execution",
+    "performance claim"
+  ],
+  "huawei_acceptance_ready": false,
+  "no_leakage_required": {
+    "candidate_output_used": false,
+    "case_id_specific_rules_allowed": false,
+    "expected_used": false,
+    "full_suite_feedback_used": false,
+    "gold_used": false,
+    "holdout_feedback_used": false,
+    "raw_trace_committed": false,
+    "scorer_diff_used": false
+  },
+  "notes": [
+    "Fail-closed approval skeleton only.",
+    "This packet does not authorize execution, provider calls, source collection, candidate generation, scorer use, performance evidence, SOTA claims, or Huawei acceptance readiness."
+  ],
+  "offline_only_packet": true,
+  "paired_comparison_authorized": false,
+  "performance_evidence": false,
+  "prerequisites": [
+    "runtime/source approval signed separately",
+    "raw payload handling plan reviewed",
+    "sanitization policy reviewed",
+    "forbidden field denylist enforced",
+    "artifact boundary pass required"
+  ],
+  "prompt_injection_authorized": false,
+  "proposer_execution_authorized": false,
+  "provider_calls_authorized": false,
+  "purpose": "Future approval boundary for real trace/source collection inputs to RASHE.",
+  "raw_payload_capture_authorized": false,
+  "raw_trace_authorized": false,
+  "report_scope": "rashe_source_real_trace_approval_packet",
+  "retry_authorized": false,
+  "rollback_stop_gates": [
+    "forbidden field violation stops collection",
+    "artifact boundary failure stops publication",
+    "raw path leak stops promotion",
+    "provider/model drift stops run"
+  ],
+  "runtime_behavior_authorized": false,
+  "schema_version": "rashe_approval_packet_v0",
+  "scope_change_route": "retrieval_augmented_skill_harness_evolution",
+  "scorer_authorized": false,
+  "short_name": "RASHE",
+  "sota_3pp_claim_ready": false,
+  "source_collection_authorized": false,
+  "title": "RASHE source real-trace approval packet",
+  "tool_path_mutation_authorized": false
+}

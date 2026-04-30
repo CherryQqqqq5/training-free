@@ -1,0 +1,79 @@
+{
+  "allowed_if_approved": [
+    "default-disabled runtime behavior wiring",
+    "bounded skill router invocation in reviewed path",
+    "compact verifier counters",
+    "rollbackable config toggle"
+  ],
+  "approval_packet_kind": "runtime_behavior",
+  "approval_status": "pending",
+  "authorized": false,
+  "bfcl_performance_ready": false,
+  "candidate_generation_authorized": false,
+  "candidate_jsonl_authorized": false,
+  "candidate_pool_ready": false,
+  "cost_latency_regression_gates_required": true,
+  "default_enabled_required_if_approved": false,
+  "dev_holdout_authorized": false,
+  "execution_started": false,
+  "forbidden_until_approved": [
+    "prompt injection",
+    "retry",
+    "tool path mutation",
+    "RuleEngine/proxy active path import",
+    "provider side effects",
+    "scorer side effects",
+    "source collection",
+    "candidate generation",
+    "dev/holdout/full BFCL"
+  ],
+  "huawei_acceptance_ready": false,
+  "no_leakage_required": {
+    "candidate_output_used": false,
+    "case_id_specific_rules_allowed": false,
+    "expected_used": false,
+    "full_suite_feedback_used": false,
+    "gold_used": false,
+    "holdout_feedback_used": false,
+    "raw_trace_committed": false,
+    "scorer_diff_used": false
+  },
+  "notes": [
+    "Fail-closed approval skeleton only.",
+    "This packet does not authorize execution, provider calls, source collection, candidate generation, scorer use, performance evidence, SOTA claims, or Huawei acceptance readiness."
+  ],
+  "offline_only_packet": true,
+  "paired_comparison_authorized": false,
+  "performance_evidence": false,
+  "prerequisites": [
+    "rashe_offline_scaffold_ready=true",
+    "runtime skeleton remains default disabled",
+    "rollback plan reviewed",
+    "cost latency regression gates defined",
+    "no provider/scorer side effect proof reviewed"
+  ],
+  "prompt_injection_authorized": false,
+  "proposer_execution_authorized": false,
+  "provider_calls_authorized": false,
+  "provider_scorer_side_effects_allowed": false,
+  "purpose": "Future approval boundary for default-disabled RASHE runtime behavior.",
+  "raw_payload_capture_authorized": false,
+  "raw_trace_authorized": false,
+  "report_scope": "rashe_runtime_behavior_approval_packet",
+  "retry_authorized": false,
+  "rollback_stop_gates": [
+    "default_enabled must remain false until separate enable approval",
+    "any provider/scorer/source side effect stops execution",
+    "cost/latency/regression gate failure stops execution",
+    "ambiguous router decision fail-closed"
+  ],
+  "runtime_behavior_authorized": false,
+  "schema_version": "rashe_approval_packet_v0",
+  "scope_change_route": "retrieval_augmented_skill_harness_evolution",
+  "scorer_authorized": false,
+  "short_name": "RASHE",
+  "sota_3pp_claim_ready": false,
+  "source_collection_authorized": false,
+  "title": "RASHE runtime behavior approval packet",
+  "tool_path_mutation_authorized": false
+}
