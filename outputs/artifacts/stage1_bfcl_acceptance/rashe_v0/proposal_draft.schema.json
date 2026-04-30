@@ -1,0 +1,175 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RASHE v0 Offline Proposal Draft",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "rashe_proposal_draft_v0"
+    },
+    "proposal_id": {
+      "type": "string",
+      "pattern": "^proposal_[a-z0-9_:-]+$"
+    },
+    "proposal_kind": {
+      "enum": [
+        "skill_metadata_refinement_draft",
+        "progressive_disclosure_policy_draft",
+        "router_policy_refinement_draft"
+      ]
+    },
+    "source_trace_hashes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^sha256:[A-Za-z0-9_.:-]+$"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "source_scope": {
+      "enum": [
+        "synthetic",
+        "approved_compact"
+      ]
+    },
+    "selected_skill_id": {
+      "enum": [
+        "bfcl_current_turn_focus",
+        "bfcl_schema_reading",
+        "bfcl_tool_call_format_guard",
+        "bfcl_memory_web_search_discipline"
+      ]
+    },
+    "router_decision_status": {
+      "enum": [
+        "selected",
+        "ambiguous_reject",
+        "no_match_reject",
+        "input_reject",
+        "authorization_reject",
+        "conflict_reject",
+        "requirement_reject",
+        "metadata_reject"
+      ]
+    },
+    "rationale_tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "blocked_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "no_leakage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "gold_used": {
+          "const": false
+        },
+        "expected_used": {
+          "const": false
+        },
+        "scorer_diff_used": {
+          "const": false
+        },
+        "candidate_output_used": {
+          "const": false
+        },
+        "repair_output_used": {
+          "const": false
+        },
+        "holdout_feedback_used": {
+          "const": false
+        },
+        "full_suite_feedback_used": {
+          "const": false
+        },
+        "raw_trace_used": {
+          "const": false
+        },
+        "raw_provider_payload_used": {
+          "const": false
+        },
+        "raw_case_identifier_used": {
+          "const": false
+        }
+      },
+      "required": [
+        "gold_used",
+        "expected_used",
+        "scorer_diff_used",
+        "candidate_output_used",
+        "repair_output_used",
+        "holdout_feedback_used",
+        "full_suite_feedback_used",
+        "raw_trace_used",
+        "raw_provider_payload_used",
+        "raw_case_identifier_used"
+      ]
+    },
+    "offline_only": {
+      "const": true
+    },
+    "enabled": {
+      "const": false
+    },
+    "runtime_behavior_authorized": {
+      "const": false
+    },
+    "prompt_injection_authorized": {
+      "const": false
+    },
+    "retry_authorized": {
+      "const": false
+    },
+    "candidate_generation_authorized": {
+      "const": false
+    },
+    "scorer_authorized": {
+      "const": false
+    },
+    "performance_evidence": {
+      "const": false
+    },
+    "provider_call_count": {
+      "const": 0
+    },
+    "scorer_call_count": {
+      "const": 0
+    },
+    "source_collection_call_count": {
+      "const": 0
+    }
+  },
+  "required": [
+    "schema_version",
+    "proposal_id",
+    "proposal_kind",
+    "source_trace_hashes",
+    "source_scope",
+    "selected_skill_id",
+    "router_decision_status",
+    "rationale_tags",
+    "blocked_reason",
+    "no_leakage",
+    "offline_only",
+    "enabled",
+    "runtime_behavior_authorized",
+    "prompt_injection_authorized",
+    "retry_authorized",
+    "candidate_generation_authorized",
+    "scorer_authorized",
+    "performance_evidence",
+    "provider_call_count",
+    "scorer_call_count",
+    "source_collection_call_count"
+  ]
+}
