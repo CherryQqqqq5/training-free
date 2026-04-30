@@ -94,6 +94,12 @@ def check(active_index_path: Path = DEFAULT_ACTIVE_INDEX, scope_approval_path: P
             blockers.append(f"active_index_{key}_true")
     if active.get("formal_bfcl_performance_ready") is True:
         blockers.append("active_index_formal_bfcl_performance_ready_true")
+    deterministic_stage1_family_search_exhausted = active.get("deterministic_stage1_family_search_exhausted") is True
+    deterministic_paths_zero_yield = active.get("deterministic_argument_structural_and_tool_name_paths_zero_yield") is True
+    if not deterministic_stage1_family_search_exhausted:
+        blockers.append("active_index_deterministic_stage1_family_search_exhausted_missing")
+    if not deterministic_paths_zero_yield:
+        blockers.append("active_index_deterministic_argument_paths_zero_yield_missing")
     if active.get("no_bfcl_3pp_evidence_yet") is not True:
         blockers.append("active_index_no_bfcl_3pp_evidence_missing")
 
@@ -158,6 +164,8 @@ def check(active_index_path: Path = DEFAULT_ACTIVE_INDEX, scope_approval_path: P
         "report_scope": "rashe_offline_scaffold_readiness_check",
         "not_bfcl_performance_readiness": True,
         "rashe_route_approved": scope.get("approval_status") == "approved" and scope.get("scope_change_approved") is True and active.get("rashe_route_approved") is True,
+        "deterministic_stage1_family_search_exhausted": deterministic_stage1_family_search_exhausted,
+        "deterministic_argument_structural_and_tool_name_paths_zero_yield": deterministic_paths_zero_yield,
         "rashe_runtime_skeleton_passed": runtime_skeleton_passed,
         "rashe_step_trace_buffer_offline_passed": step_trace_passed,
         "rashe_skill_metadata_passed": skill_metadata_passed,

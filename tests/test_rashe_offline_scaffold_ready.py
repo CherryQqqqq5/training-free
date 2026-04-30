@@ -81,3 +81,17 @@ def test_fails_if_runtime_authorization_enables_behavior(tmp_path):
     summary = check(ACTIVE, SCOPE, path)
     assert summary["rashe_offline_scaffold_ready"] is False
     assert "runtime_authorization_runtime_behavior_authorized_true" in summary["blockers"]
+
+
+
+def test_fails_if_deterministic_negative_evidence_missing_or_false(tmp_path):
+    active = json.loads(ACTIVE.read_text())
+    active["deterministic_stage1_family_search_exhausted"] = False
+    active.pop("deterministic_argument_structural_and_tool_name_paths_zero_yield", None)
+    path = write_json(tmp_path / "active.json", active)
+    summary = check(path, SCOPE, RUNTIME)
+    assert summary["rashe_offline_scaffold_ready"] is False
+    assert summary["deterministic_stage1_family_search_exhausted"] is False
+    assert summary["deterministic_argument_structural_and_tool_name_paths_zero_yield"] is False
+    assert "active_index_deterministic_stage1_family_search_exhausted_missing" in summary["blockers"]
+    assert "active_index_deterministic_argument_paths_zero_yield_missing" in summary["blockers"]
