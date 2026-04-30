@@ -1,3 +1,7 @@
+> **SUPERSEDED - DO NOT USE AS ACTIVE EVIDENCE**
+>
+> This markdown documents an old blocked preflight with 401/OpenRouter-era wording. Active provider evidence is `outputs/artifacts/stage1_bfcl_acceptance/provider_green_preflight.json`, `outputs/artifacts/stage1_bfcl_acceptance/provider_green_preflight.md`, and `outputs/artifacts/bfcl_ctspc_source_pool_v1/current_provider_preflight_status.json`. Provider green is technical preflight only and does not authorize scorer, candidate, paired-comparison, SOTA, or Huawei claims.
+
 # Current Provider Preflight Status
 
 - Source collection rerun ready: `false`

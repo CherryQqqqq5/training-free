@@ -2,7 +2,7 @@
 
 This is scorer-output taxonomy only. It is not performance evidence and does not authorize candidate extraction, candidate pool promotion, paired comparison, dev/holdout/full scoring, or provider/model generation.
 
-Coverage semantics: full aggregate score coverage with failure-detail taxonomy. `scored_case_count` and `missing_score_count` come from aggregate score totals; taxonomy buckets are denominated by `baseline_failure_count`, not by all audited cases.
+Coverage semantics: full aggregate score coverage with failure-detail taxonomy. `requested_case_count=30`, `scored_summary_case_count=30`, and `missing_score_count=0` describe aggregate score coverage; taxonomy buckets are over `taxonomy_failure_denominator=22` failure detail rows and are not performance evidence.
 
 ## Flags
 
@@ -20,12 +20,16 @@ Coverage semantics: full aggregate score coverage with failure-detail taxonomy. 
 | counter | value |
 | --- | ---: |
 | audited_case_count | 30 |
+| requested_case_count | 30 |
 | scored_case_count | 30 |
+| scored_summary_case_count | 30 |
 | missing_score_count | 0 |
 | unmatched_or_unverified_score_case_count | 0 |
 | failure_detail_source_overlap_count | 22 |
 | failure_detail_route_model_matched_count | 22 |
+| route_model_matched_failure_detail_count | 22 |
 | taxonomy_bucket_denominator | 22 |
+| taxonomy_failure_denominator | 22 |
 | bad_score_rows | 0 |
 | forbidden_field_violation_count | 0 |
 | baseline_success_count | 8 |
@@ -47,7 +51,7 @@ Coverage semantics: full aggregate score coverage with failure-detail taxonomy. 
 
 - score_file_count: `3`
 - coverage_statement: `full aggregate score coverage with failure-detail taxonomy`
-- taxonomy_bucket_denominator: `baseline_failure_count` = `22`
+- taxonomy_failure_denominator: `22` failure detail rows; taxonomy buckets are not performance evidence.
 - raw_score_gold_bearing_rows_read_count: `22`; raw scorer rows were read only under aggregate-taxonomy authorization and no gold/expected content was emitted.
 - aggregate_bucket_sample_hashes contain case-id hashes only, not case text, gold, expected values, scorer diffs, or repair recommendations.
 - next_action: `research_review_only_do_not_expand_or_promote_candidate_pool`
