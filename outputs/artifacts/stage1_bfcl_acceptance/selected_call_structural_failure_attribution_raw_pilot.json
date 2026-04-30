@@ -16,7 +16,8 @@
     {
       "category": "multi_turn_base",
       "reject_reason_counts": {
-        "multiple_tool_like_payloads": 10
+        "raw_payload_schema_not_matched": 3,
+        "raw_payload_valid_no_structural_failure": 7
       },
       "result_jsonl_rows": 10,
       "selected_call_count": 26
@@ -24,7 +25,9 @@
     {
       "category": "multi_turn_long_context",
       "reject_reason_counts": {
-        "multiple_tool_like_payloads": 10
+        "no_tool_like_payload": 2,
+        "raw_payload_schema_not_matched": 3,
+        "raw_payload_valid_no_structural_failure": 5
       },
       "result_jsonl_rows": 10,
       "selected_call_count": 24
@@ -32,38 +35,48 @@
     {
       "category": "multi_turn_miss_func",
       "reject_reason_counts": {
-        "multiple_tool_like_payloads": 10
+        "no_tool_like_payload": 3,
+        "raw_payload_schema_not_matched": 5,
+        "raw_payload_valid_no_structural_failure": 2
       },
       "result_jsonl_rows": 10,
       "selected_call_count": 29
     }
   ],
   "counters": {
+    "ambiguous_multiple_schema_matched_payloads": 0,
     "bad_jsonl_rows": 0,
     "final_before_tool_guard_eligible_count": 0,
     "forbidden_field_violation_count": 0,
+    "legitimate_multi_tool_sequence_count": 0,
     "malformed_tool_call_repair_eligible_count": 0,
+    "metadata_or_envelope_ignored_count": 240,
     "model_id_counts": {
       "gpt-5.2": 30
     },
     "provider_route_counts": {
       "Chuangzhi/Novacode": 30
     },
+    "raw_candidate_tool_call_count": 25,
+    "raw_envelope_payload_count": 30,
     "raw_response_present_count": 30,
     "raw_response_text_present_count": 30,
+    "raw_schema_matched_tool_call_count": 14,
     "reject_reason_counts": {
-      "multiple_tool_like_payloads": 30
+      "no_tool_like_payload": 5,
+      "raw_payload_schema_not_matched": 11,
+      "raw_payload_valid_no_structural_failure": 14
     },
     "result_jsonl_rows": 30,
     "rows_with_final_text_and_tool_like_payload": 0,
-    "rows_with_final_text_only": 0,
+    "rows_with_final_text_only": 4,
     "rows_with_malformed_tool_call_json": 0,
-    "rows_with_multiple_tool_like_payloads": 30,
-    "rows_with_no_tool_call": 0,
+    "rows_with_multiple_tool_like_payloads": 0,
+    "rows_with_no_tool_call": 5,
     "rows_with_unparseable_arguments": 0,
-    "schema_matched_raw_payload_count": 0,
+    "schema_matched_raw_payload_count": 14,
     "schema_matched_selected_call_count": 45,
-    "schema_valid_raw_payload_count": 0,
+    "schema_valid_raw_payload_count": 14,
     "schema_valid_required_args_present_count": 45,
     "selected_call_count": 79
   },
@@ -93,7 +106,7 @@
     "repair",
     "score"
   ],
-  "generated_at_utc": "2026-04-30T08:50:23Z",
+  "generated_at_utc": "2026-04-30T09:02:16Z",
   "huawei_acceptance_ready": false,
   "input_health": {
     "bad_jsonl_rows": 0,
@@ -114,7 +127,16 @@
   },
   "next_required_action": "research_review_required_do_not_expand",
   "offline_only": true,
+  "parser_refined": true,
+  "parser_refinement_scope": "standard response tool-call paths only; provider envelope and metadata ignored",
   "performance_evidence": false,
+  "prior_parser_failure_mode": {
+    "commit": "7f9a7955",
+    "reject_reason_counts": {
+      "multiple_tool_like_payloads": 30
+    },
+    "suspected_artifact": "broad raw-response payload extraction counted provider envelope or metadata as tool-like payloads"
+  },
   "provider_route_counts": {
     "Chuangzhi/Novacode": 30
   },

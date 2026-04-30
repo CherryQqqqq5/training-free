@@ -108,72 +108,112 @@ def _schema_valid_args(fn: dict[str, Any], args: dict[str, Any]) -> bool:
     return True
 
 
-def _walk_tool_payloads(value: Any) -> list[dict[str, Any]]:
+def _tool_payload(tool: str, args: Any, *, malformed: bool = False) -> dict[str, Any]:
+    parse_failed = False
+    if isinstance(args, str):
+        try:
+            parsed_raw = json.loads(args)
+            parse_failed = not isinstance(parsed_raw, dict)
+        except Exception:
+            parse_failed = True
+    parsed = _parse_call_args(args)
+    return {"tool": tool, "args": parsed, "malformed": malformed or parse_failed or not isinstance(parsed, dict)}
+
+
+def _standard_tool_payloads(value: Any) -> tuple[list[dict[str, Any]], dict[str, int]]:
+    """Extract only standard response tool-call paths, never arbitrary envelope keys."""
     payloads: list[dict[str, Any]] = []
+    meta = {"raw_envelope_payload_count": 0, "metadata_or_envelope_ignored_count": 0, "final_text_present": 0}
 
-    def add(tool: str, args: Any, malformed: bool = False) -> None:
-        parse_failed = False
-        if isinstance(args, str):
-            try:
-                parsed_raw = json.loads(args)
-                parse_failed = not isinstance(parsed_raw, dict)
-            except Exception:
-                parse_failed = True
-        parsed = _parse_call_args(args)
-        payloads.append({"tool": tool, "args": parsed, "malformed": malformed or parse_failed or not isinstance(parsed, dict)})
-
-    def walk(item: Any) -> None:
-        if isinstance(item, list):
-            for nested in item:
-                walk(nested)
+    def add_from_tool_calls(tool_calls: Any) -> None:
+        if not isinstance(tool_calls, list):
             return
-        if not isinstance(item, dict):
+        for item in tool_calls:
+            if not isinstance(item, dict):
+                continue
+            fn = item.get("function") if isinstance(item.get("function"), dict) else None
+            if fn and fn.get("name") and "arguments" in fn:
+                payloads.append(_tool_payload(str(fn["name"]), fn.get("arguments")))
+            elif item.get("name") and ("arguments" in item or "args" in item):
+                payloads.append(_tool_payload(str(item["name"]), item.get("arguments", item.get("args"))))
+
+    def add_from_output(output: Any) -> None:
+        if not isinstance(output, list):
             return
-        if item.get("name") and ("arguments" in item or "args" in item):
-            add(str(item["name"]), item.get("arguments", item.get("args")))
-            return
-        if item.get("function") and isinstance(item["function"], dict):
-            fn = item["function"]
-            if fn.get("name") and "arguments" in fn:
-                add(str(fn["name"]), fn.get("arguments"))
-                return
-        for key, raw_args in item.items():
-            if isinstance(raw_args, (dict, str)):
-                add(str(key), raw_args)
-    walk(value)
-    return payloads
+        for item in output:
+            if not isinstance(item, dict):
+                continue
+            typ = str(item.get("type") or "")
+            if typ in {"function_call", "tool_call"} and item.get("name") and "arguments" in item:
+                payloads.append(_tool_payload(str(item["name"]), item.get("arguments")))
+            elif typ == "message" and isinstance(item.get("content"), list):
+                # Responses API message content can contain typed parts; ignore text parts.
+                for part in item.get("content") or []:
+                    if isinstance(part, dict) and part.get("type") in {"output_text", "text"} and str(part.get("text") or part.get("content") or "").strip():
+                        meta["final_text_present"] = 1
+                    else:
+                        meta["metadata_or_envelope_ignored_count"] += 1
+
+    if isinstance(value, dict):
+        meta["raw_envelope_payload_count"] = 1
+        ignored_keys = set(value.keys()) - {"choices", "message", "output", "tool_calls", "function", "name", "arguments", "args", "type"}
+        meta["metadata_or_envelope_ignored_count"] += len(ignored_keys)
+        choices = value.get("choices")
+        if isinstance(choices, list):
+            for choice in choices:
+                if not isinstance(choice, dict):
+                    continue
+                message = choice.get("message") if isinstance(choice.get("message"), dict) else {}
+                add_from_tool_calls(message.get("tool_calls"))
+                content = message.get("content")
+                if isinstance(content, str) and content.strip():
+                    meta["final_text_present"] = 1
+        message = value.get("message") if isinstance(value.get("message"), dict) else None
+        if message:
+            add_from_tool_calls(message.get("tool_calls"))
+            content = message.get("content")
+            if isinstance(content, str) and content.strip():
+                meta["final_text_present"] = 1
+        add_from_tool_calls(value.get("tool_calls"))
+        add_from_output(value.get("output"))
+        if value.get("type") in {"function_call", "tool_call"} and value.get("name") and "arguments" in value:
+            payloads.append(_tool_payload(str(value["name"]), value.get("arguments")))
+        return payloads, meta
+    if isinstance(value, list):
+        meta["raw_envelope_payload_count"] = 1
+        add_from_output(value)
+        add_from_tool_calls(value)
+        return payloads, meta
+    return payloads, meta
 
 
-def _extract_tool_like_payloads(raw: Any) -> tuple[list[dict[str, Any]], bool, bool]:
-    """Return payloads, malformed_json_seen, final_text_present."""
+def _extract_tool_like_payloads(raw: Any) -> tuple[list[dict[str, Any]], bool, bool, dict[str, int]]:
+    """Return payloads, malformed_json_seen, final_text_present, parser counters."""
     malformed = False
     final_text = False
     if isinstance(raw, (dict, list)):
-        return _walk_tool_payloads(raw), False, False
+        payloads, meta = _standard_tool_payloads(raw)
+        meta["raw_candidate_tool_call_count"] = len(payloads)
+        return payloads, False, bool(meta.get("final_text_present")), meta
     if not isinstance(raw, str):
-        return [], False, False
+        return [], False, False, {"raw_envelope_payload_count": 0, "raw_candidate_tool_call_count": 0, "metadata_or_envelope_ignored_count": 0, "final_text_present": 0}
     text = raw.strip()
     if not text:
-        return [], False, False
+        return [], False, False, {"raw_envelope_payload_count": 0, "raw_candidate_tool_call_count": 0, "metadata_or_envelope_ignored_count": 0, "final_text_present": 0}
     try:
         parsed = json.loads(text)
-        return _walk_tool_payloads(parsed), False, False
+        payloads, meta = _standard_tool_payloads(parsed)
+        meta["raw_candidate_tool_call_count"] = len(payloads)
+        return payloads, False, bool(meta.get("final_text_present")), meta
     except Exception:
         pass
     payloads: list[dict[str, Any]] = []
     spans: list[tuple[int, int]] = []
-    # Deterministic function-name(JSON-object) extraction. This is deliberately
-    # narrow and not semantic/fuzzy.
     pattern = re.compile(r"\b([A-Za-z_][A-Za-z0-9_\.]*)\s*\(\s*(\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\})\s*\)")
     for match in pattern.finditer(text):
         tool = match.group(1)
         raw_args = match.group(2)
-        try:
-            args = json.loads(raw_args)
-        except Exception:
-            malformed = True
-            args = {}
-        payloads.append({"tool": tool, "args": args if isinstance(args, dict) else {}, "malformed": not isinstance(args, dict)})
+        payloads.append(_tool_payload(tool, raw_args))
         spans.append(match.span())
     if not payloads and ("{" in text or "}" in text or "tool" in text.lower() or "arguments" in text.lower()):
         malformed = True
@@ -181,7 +221,18 @@ def _extract_tool_like_payloads(raw: Any) -> tuple[list[dict[str, Any]], bool, b
     for start, end in reversed(spans):
         remainder = remainder[:start] + remainder[end:]
     final_text = bool(re.sub(r"[\s`.,;:!-]", "", remainder))
-    return payloads, malformed, final_text
+    return payloads, malformed, final_text, {"raw_envelope_payload_count": 0, "raw_candidate_tool_call_count": len(payloads), "metadata_or_envelope_ignored_count": 0, "final_text_present": int(final_text)}
+
+
+def _schema_matched_payloads(entry: dict[str, Any], payloads: list[dict[str, Any]]) -> list[tuple[dict[str, Any], dict[str, Any]]]:
+    matched: list[tuple[dict[str, Any], dict[str, Any]]] = []
+    for payload in payloads:
+        if payload.get("malformed"):
+            continue
+        fn, status, _reason, _names = _schema_match(entry, payload.get("tool", ""))
+        if status == "matched" and fn:
+            matched.append((payload, fn))
+    return matched
 
 
 def _empty_category(category: str) -> dict[str, Any]:
@@ -245,6 +296,12 @@ def build_report(
         "rows_with_multiple_tool_like_payloads": 0,
         "malformed_tool_call_repair_eligible_count": 0,
         "final_before_tool_guard_eligible_count": 0,
+        "raw_envelope_payload_count": 0,
+        "raw_candidate_tool_call_count": 0,
+        "raw_schema_matched_tool_call_count": 0,
+        "legitimate_multi_tool_sequence_count": 0,
+        "ambiguous_multiple_schema_matched_payloads": 0,
+        "metadata_or_envelope_ignored_count": 0,
         "raw_response_text_present_count": 0,
         "schema_matched_raw_payload_count": 0,
         "schema_valid_raw_payload_count": 0,
@@ -313,7 +370,10 @@ def build_report(
                 if raw is None:
                     reject("raw_response_missing_for_structural_attribution", category)
                     continue
-                payloads, malformed, final_text = _extract_tool_like_payloads(raw)
+                payloads, malformed, final_text, parser_meta = _extract_tool_like_payloads(raw)
+                counters["raw_envelope_payload_count"] += parser_meta.get("raw_envelope_payload_count", 0)
+                counters["raw_candidate_tool_call_count"] += parser_meta.get("raw_candidate_tool_call_count", 0)
+                counters["metadata_or_envelope_ignored_count"] += parser_meta.get("metadata_or_envelope_ignored_count", 0)
                 if malformed:
                     counters["rows_with_malformed_tool_call_json"] += 1
                 if not payloads:
@@ -322,19 +382,28 @@ def build_report(
                         counters["rows_with_final_text_only"] += 1
                     reject("no_tool_like_payload", category)
                     continue
-                if len(payloads) > 1:
-                    counters["rows_with_multiple_tool_like_payloads"] += 1
-                    reject("multiple_tool_like_payloads", category)
-                    continue
-                payload = payloads[0]
-                if payload.get("malformed"):
+                if any(payload.get("malformed") for payload in payloads):
                     counters["rows_with_unparseable_arguments"] += 1
                     reject("unparseable_arguments", category)
                     continue
-                fn, status, _reason, _names = _schema_match(entry, payload["tool"])
-                if status != "matched" or not fn:
+                matched_payloads = _schema_matched_payloads(entry, payloads)
+                counters["raw_schema_matched_tool_call_count"] += len(matched_payloads)
+                if len(payloads) > 1:
+                    counters["rows_with_multiple_tool_like_payloads"] += 1
+                    if len(matched_payloads) > 1:
+                        counters["ambiguous_multiple_schema_matched_payloads"] += 1
+                        if final_text or malformed:
+                            reject("ambiguous_multiple_schema_matched_payloads", category)
+                        else:
+                            counters["legitimate_multi_tool_sequence_count"] += 1
+                            reject("legitimate_multi_tool_sequence", category)
+                    else:
+                        reject("multiple_tool_like_payloads", category)
+                    continue
+                if len(matched_payloads) != 1:
                     reject("raw_payload_schema_not_matched", category)
                     continue
+                payload, fn = matched_payloads[0]
                 if not _schema_valid_args(fn, payload.get("args") or {}):
                     reject("raw_payload_args_not_schema_valid", category)
                     continue
@@ -388,7 +457,10 @@ def build_report(
                     reject("raw_response_missing_for_structural_attribution", category)
                     continue
                 counters["raw_response_present_count"] += 1
-                payloads, malformed, final_text = _extract_tool_like_payloads(raw)
+                payloads, malformed, final_text, parser_meta = _extract_tool_like_payloads(raw)
+                counters["raw_envelope_payload_count"] += parser_meta.get("raw_envelope_payload_count", 0)
+                counters["raw_candidate_tool_call_count"] += parser_meta.get("raw_candidate_tool_call_count", 0)
+                counters["metadata_or_envelope_ignored_count"] += parser_meta.get("metadata_or_envelope_ignored_count", 0)
                 if malformed:
                     counters["rows_with_malformed_tool_call_json"] += 1
                 if not payloads:
@@ -397,22 +469,33 @@ def build_report(
                         counters["rows_with_final_text_only"] += 1
                     reject("no_tool_like_payload", category)
                     continue
-                if len(payloads) > 1:
-                    counters["rows_with_multiple_tool_like_payloads"] += 1
-                    reject("multiple_tool_like_payloads", category)
-                    continue
-                payload = payloads[0]
-                if payload.get("malformed"):
+                if any(payload.get("malformed") for payload in payloads):
                     counters["rows_with_unparseable_arguments"] += 1
                     reject("unparseable_arguments", category)
                     continue
-                fn, status, _reason, _names = _schema_match(entry, payload["tool"])
-                if status != "matched" or not fn:
+                matched_payloads = _schema_matched_payloads(entry, payloads)
+                counters["raw_schema_matched_tool_call_count"] += len(matched_payloads)
+                if len(payloads) > 1:
+                    counters["rows_with_multiple_tool_like_payloads"] += 1
+                    if len(matched_payloads) > 1:
+                        counters["ambiguous_multiple_schema_matched_payloads"] += 1
+                        if final_text or malformed:
+                            reject("ambiguous_multiple_schema_matched_payloads", category)
+                        else:
+                            counters["legitimate_multi_tool_sequence_count"] += 1
+                            reject("legitimate_multi_tool_sequence", category)
+                    else:
+                        reject("multiple_tool_like_payloads", category)
+                    continue
+                if len(matched_payloads) != 1:
                     reject("raw_payload_schema_not_matched", category)
                     continue
+                payload, fn = matched_payloads[0]
                 if not _schema_valid_args(fn, payload.get("args") or {}):
                     reject("raw_payload_args_not_schema_valid", category)
                     continue
+                counters["schema_matched_raw_payload_count"] += 1
+                counters["schema_valid_raw_payload_count"] += 1
                 selected_tools = [str(call.get("tool")) for call in selected]
                 if malformed:
                     counters["malformed_tool_call_repair_eligible_count"] += 1
@@ -432,9 +515,32 @@ def build_report(
     if not records:
         blockers.append("structural_repair_eligible_count_zero")
     passed = bool(records) and not blockers
+    eligible_count = counters.get("malformed_tool_call_repair_eligible_count", 0) + counters.get("final_before_tool_guard_eligible_count", 0)
+    result_rows = counters.get("result_jsonl_rows", 0)
+    raw_present = counters.get("raw_response_present_count", 0)
+    if eligible_count >= 3:
+        recommendation = "review_for_expansion_to_20_per_category"
+    elif eligible_count >= 1:
+        recommendation = "compact_redacted_evidence_review"
+    else:
+        recommendation = "research_review_do_not_expand"
     report = {
         "report_scope": "selected_call_structural_failure_attribution",
         "generated_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "parser_refined": True,
+        "parser_refinement_scope": "standard response tool-call paths only; provider envelope and metadata ignored",
+        "prior_parser_failure_mode": {
+            "commit": "7f9a7955",
+            "reject_reason_counts": {"multiple_tool_like_payloads": 30},
+            "suspected_artifact": "broad raw-response payload extraction counted provider envelope or metadata as tool-like payloads",
+        },
+        "bfcl_runner_path_alias_note": {
+            "meaning": "BFCL directory/model path names are runner/path aliases only.",
+            "authoritative_counts_source": "provider_route_counts and model_id_counts",
+            "authoritative_provider_route": "Chuangzhi/Novacode",
+            "authoritative_model": "gpt-5.2",
+            "non_authoritative_path_alias_examples": ["gpt-4o-mini-2024-07-18-FC"],
+        },
         "offline_only": True,
         "diagnostic_only": True,
         "does_not_call_provider": True,
@@ -455,6 +561,20 @@ def build_report(
         "raw_capture_files": [str(path) for path in capture_files],
         "provider_route_counts": provider_route_counts,
         "model_id_counts": model_id_counts,
+        "input_health": {
+            "result_jsonl_rows": result_rows,
+            "raw_response_present_count": raw_present,
+            "raw_response_present_ratio": (raw_present / result_rows) if result_rows else 0.0,
+            "bad_jsonl_rows": counters.get("bad_jsonl_rows", 0),
+            "forbidden_field_violation_count": counters.get("forbidden_field_violation_count", 0),
+            "provider_route_counts": provider_route_counts,
+            "model_id_counts": model_id_counts,
+        },
+        "decision_gate": {
+            "eligible_structural_count": eligible_count,
+            "recommendation": recommendation,
+            "expand_to_20_per_category_authorized": False,
+        },
         "counters": {**counters, "provider_route_counts": provider_route_counts, "model_id_counts": model_id_counts, "reject_reason_counts": reject_reason_counts},
         "category_summaries": list(category_rows.values()),
         "eligible_structural_records": records[:25] if compact else records,
@@ -496,6 +616,12 @@ def _markdown(report: dict[str, Any]) -> str:
         "rows_with_multiple_tool_like_payloads",
         "malformed_tool_call_repair_eligible_count",
         "final_before_tool_guard_eligible_count",
+        "raw_envelope_payload_count",
+        "raw_candidate_tool_call_count",
+        "raw_schema_matched_tool_call_count",
+        "legitimate_multi_tool_sequence_count",
+        "ambiguous_multiple_schema_matched_payloads",
+        "metadata_or_envelope_ignored_count",
         "schema_matched_raw_payload_count",
         "schema_valid_raw_payload_count",
         "raw_response_text_present_count",
@@ -506,6 +632,10 @@ def _markdown(report: dict[str, Any]) -> str:
         "# Selected-Call Structural Failure Attribution",
         "",
         "This is an offline diagnostic artifact only. It is not candidate-pool, scorer, performance, SOTA, or Huawei acceptance evidence.",
+        "",
+        f"- parser_refined: `{str(report.get('parser_refined', False)).lower()}`",
+        f"- parser_refinement_scope: `{report.get('parser_refinement_scope', '')}`",
+        f"- prior_parser_failure_mode: `{json.dumps(report.get('prior_parser_failure_mode', {}), sort_keys=True)}`",
         "",
         f"- diagnostic_only: `{str(report['diagnostic_only']).lower()}`",
         f"- candidate_pool_authorized: `{str(report['candidate_pool_authorized']).lower()}`",

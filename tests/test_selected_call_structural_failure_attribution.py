@@ -91,20 +91,75 @@ def test_selected_call_structural_final_before_tool_guard_eligible(tmp_path: Pat
     assert report["performance_evidence"] is False
 
 
-def test_selected_call_structural_multiple_payloads_reject(tmp_path: Path) -> None:
-    raw = 'grep({"file_name":"a.txt","pattern":"x"}) grep({"file_name":"b.txt","pattern":"y"})'
+def test_selected_call_structural_multiple_schema_matched_payloads_reject(tmp_path: Path) -> None:
+    raw = 'Done. grep({"file_name":"a.txt","pattern":"x"}) grep({"file_name":"b.txt","pattern":"y"})'
     report = _run(tmp_path, row_extra={"raw_response": raw}, result=["Done."])
     assert report["selected_call_structural_failure_attribution_passed"] is False
     assert report["counters"]["rows_with_multiple_tool_like_payloads"] == 1
-    assert report["counters"]["reject_reason_counts"]["multiple_tool_like_payloads"] == 1
+    assert report["counters"]["ambiguous_multiple_schema_matched_payloads"] == 1
+    assert report["counters"]["reject_reason_counts"]["ambiguous_multiple_schema_matched_payloads"] == 1
 
 
 def test_selected_call_structural_unparseable_arguments_reject(tmp_path: Path) -> None:
-    raw = {"name": "grep", "arguments": "{not-json"}
+    raw = {"type": "function_call", "name": "grep", "arguments": "{not-json"}
     report = _run(tmp_path, row_extra={"raw_response": raw}, result=["Done."])
     assert report["selected_call_structural_failure_attribution_passed"] is False
     assert report["counters"]["rows_with_unparseable_arguments"] == 1
     assert report["counters"]["reject_reason_counts"]["unparseable_arguments"] == 1
+
+
+def test_selected_call_structural_openai_tool_call_single_payload(tmp_path: Path) -> None:
+    raw = {
+        "id": "resp_1",
+        "model": "gpt-5.2",
+        "usage": {"total_tokens": 12},
+        "choices": [{"message": {"tool_calls": [{"function": {"name": "grep", "arguments": "{\"file_name\":\"a.txt\",\"pattern\":\"x\"}"}}]}}],
+    }
+    report = _run(tmp_path, row_extra={"raw_response": raw}, result=[{"grep": json.dumps({"file_name": "a.txt", "pattern": "x"})}])
+    counters = report["counters"]
+    assert counters["raw_envelope_payload_count"] == 1
+    assert counters["raw_candidate_tool_call_count"] == 1
+    assert counters["raw_schema_matched_tool_call_count"] == 1
+    assert counters["metadata_or_envelope_ignored_count"] >= 3
+    assert counters["schema_valid_raw_payload_count"] == 1
+
+
+def test_selected_call_structural_envelope_fields_ignored(tmp_path: Path) -> None:
+    raw = {"id": "resp_1", "model": "gpt-5.2", "usage": {"completion_tokens": 1}, "choices": [{"message": {"content": "plain final"}}]}
+    report = _run(tmp_path, row_extra={"raw_response": raw}, result=["plain final"])
+    counters = report["counters"]
+    assert counters["raw_candidate_tool_call_count"] == 0
+    assert counters["metadata_or_envelope_ignored_count"] >= 3
+    assert counters["reject_reason_counts"]["no_tool_like_payload"] == 1
+
+
+def test_selected_call_structural_two_real_tool_calls_are_sequence_not_eligible(tmp_path: Path) -> None:
+    raw = {
+        "choices": [{"message": {"tool_calls": [
+            {"function": {"name": "grep", "arguments": "{\"file_name\":\"a.txt\",\"pattern\":\"x\"}"}},
+            {"function": {"name": "grep", "arguments": "{\"file_name\":\"b.txt\",\"pattern\":\"y\"}"}},
+        ]}}]
+    }
+    report = _run(tmp_path, row_extra={"raw_response": raw}, result=["Done."])
+    counters = report["counters"]
+    assert report["selected_call_structural_failure_attribution_passed"] is False
+    assert counters["raw_candidate_tool_call_count"] == 2
+    assert counters["raw_schema_matched_tool_call_count"] == 2
+    assert counters["legitimate_multi_tool_sequence_count"] == 1
+    assert counters["final_before_tool_guard_eligible_count"] == 0
+    assert counters["reject_reason_counts"]["legitimate_multi_tool_sequence"] == 1
+
+
+def test_selected_call_structural_final_text_plus_unique_standard_tool_payload_eligible(tmp_path: Path) -> None:
+    raw = {
+        "choices": [{"message": {"content": "Done.", "tool_calls": [{"function": {"name": "grep", "arguments": "{\"file_name\":\"a.txt\",\"pattern\":\"x\"}"}}]}}]
+    }
+    report = _run(tmp_path, row_extra={"raw_response": raw}, result=["Done."])
+    counters = report["counters"]
+    assert report["selected_call_structural_failure_attribution_passed"] is True
+    assert counters["raw_candidate_tool_call_count"] == 1
+    assert counters["rows_with_final_text_and_tool_like_payload"] == 1
+    assert counters["final_before_tool_guard_eligible_count"] == 1
 
 
 def test_selected_call_structural_reads_raw_capture_records(tmp_path: Path) -> None:
