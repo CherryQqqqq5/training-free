@@ -1527,6 +1527,18 @@ Required attribution evidence:
 If the noop control improves similarly, the gain cannot be attributed to the
 explicit-literal rules and the claim must be withheld.
 
+Ablation artifact boundary:
+
+- ablation runs may write only compact manifests, activation summaries,
+  paired-comparison summaries, regression summaries, cost/latency summaries, and
+  rule-bundle hashes under deliverable artifact directories;
+- noop controls must not emit raw repairs, raw traces, raw provider payloads, or
+  `repairs.jsonl` under `outputs/artifacts/` or acceptance artifact directories;
+- raw ablation diagnostics, if needed for debugging, must stay under
+  non-deliverable run roots excluded by `scripts/check_artifact_boundary.py`;
+- artifact-boundary gates must pass for `baseline`, `explicit_literal_only`, and
+  `noop_rules_control` before any attribution statement is accepted.
+
 #### Holdout and +3pp Claim Gate
 
 Holdout may run only after dev pass and with the pre-frozen holdout20 manifest.

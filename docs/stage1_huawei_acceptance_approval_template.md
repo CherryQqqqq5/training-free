@@ -342,6 +342,11 @@ planned_dev_baseline_command:
 planned_dev_candidate_command:
 raw_artifact_storage_location:
 compact_artifact_output_location:
+baseline_compact_artifact_dir_clean = true
+candidate_compact_artifact_dir_clean = true
+repairs_jsonl_excluded_from_baseline_compact_dir = true
+repairs_jsonl_excluded_from_candidate_compact_dir = true
+raw_diagnostics_excluded_from_baseline_and_candidate_compact_dirs = true
 dev_scorer_approval_owner:
 huawei_acceptance_owner:
 engineering_execution_owner:
@@ -367,6 +372,11 @@ planned_holdout_baseline_command:
 planned_holdout_candidate_command:
 raw_artifact_storage_location:
 compact_artifact_output_location:
+baseline_compact_artifact_dir_clean = true
+candidate_compact_artifact_dir_clean = true
+repairs_jsonl_excluded_from_baseline_compact_dir = true
+repairs_jsonl_excluded_from_candidate_compact_dir = true
+raw_diagnostics_excluded_from_baseline_and_candidate_compact_dirs = true
 holdout_scorer_approval_owner:
 huawei_acceptance_owner:
 engineering_execution_owner:
@@ -396,6 +406,11 @@ planned_full_candidate_command:
 planned_paired_comparison_command:
 raw_artifact_storage_location:
 compact_artifact_output_location:
+baseline_compact_artifact_dir_clean = true
+candidate_compact_artifact_dir_clean = true
+repairs_jsonl_excluded_from_baseline_compact_dir = true
+repairs_jsonl_excluded_from_candidate_compact_dir = true
+raw_diagnostics_excluded_from_baseline_and_candidate_compact_dirs = true
 full_or_huawei_scorer_approval_owner:
 huawei_acceptance_owner:
 engineering_execution_owner:
@@ -406,6 +421,11 @@ Only this gate may produce formal BFCL performance evidence. A SOTA or `+3pp`
 claim is still prohibited until paired scorer artifacts, run schemas, manifest
 alignment, regression report, cost/latency report, acceptance decision, and
 `absolute_delta_pp >= 3.0` all pass.
+
+For every scorer gate, both baseline and candidate compact artifact directories
+must exclude `repairs.jsonl`, `*_repair_records.jsonl`, logs, raw traces, raw
+BFCL result/score trees, and other raw diagnostics. Raw diagnostics must stay in
+the signed raw artifact storage location outside deliverable compact artifacts.
 
 ## 5. Dev, Holdout, and Full-Suite Relationship
 
@@ -465,6 +485,8 @@ All items must be checked before any formal Huawei Stage-1 BFCL performance clai
 [ ] m2_8pre_offline_passed=true.
 [ ] scorer_authorization_ready=true.
 [ ] scorer execution approval_id is recorded.
+[ ] baseline compact artifact dir excludes repairs.jsonl and raw diagnostics.
+[ ] candidate compact artifact dir excludes repairs.jsonl and raw diagnostics.
 [ ] baseline run artifact schema passed.
 [ ] candidate run artifact schema passed.
 [ ] baseline/candidate manifest alignment passed.
