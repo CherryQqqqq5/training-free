@@ -41,3 +41,9 @@ This artifact is compact progress evidence only. It is not candidate-pool, score
 - required_args_already_present_count: 41
 - reject_reason_counts: `{"ambiguous_literal": 18, "no_single_missing_required_arg": 2}`
 - unmatched_schema_reason_counts: `{"no exact/suffix/normalized schema alias matched emitted tool": 50}`
+
+## Provenance
+
+- source_collection_code_head: `fa4156d0`
+- artifact_commit: `6e3a1e63`
+- note: generation code head and compact artifact commit may differ. This provenance is not a readiness claim and does not authorize candidate-pool use, scorer, paired comparison, performance, SOTA, or Huawei acceptance claims.

@@ -1,5 +1,7 @@
 {
   "active_evidence_paths": {
+    "baseline_only_scored_failure_taxonomy_audit_json": "outputs/artifacts/stage1_bfcl_acceptance/baseline_only_scored_failure_taxonomy_audit.json",
+    "baseline_only_scored_failure_taxonomy_audit_md": "outputs/artifacts/stage1_bfcl_acceptance/baseline_only_scored_failure_taxonomy_audit.md",
     "batch1_full50_diagnostic": "outputs/artifacts/stage1_bfcl_acceptance/batch1_full50_extractor_yield_diagnostic.json",
     "batch1_source_compact_artifacts": "outputs/artifacts/bfcl_ctspc_source_pool_v1/multi_turn_miss_func/baseline/artifacts/",
     "batch2_pilot_diagnostic": "outputs/artifacts/stage1_bfcl_acceptance/batch2_source_collection_pilot_snapshot.json",
@@ -15,7 +17,10 @@
     },
     "candidate_pool_status": "candidate_pool_not_ready",
     "provider_canonical_status": "outputs/artifacts/bfcl_ctspc_source_pool_v1/current_provider_preflight_status.json",
-    "provider_green_preflight": "outputs/artifacts/stage1_bfcl_acceptance/provider_green_preflight.json",
+    "provider_green_preflight_json": "outputs/artifacts/stage1_bfcl_acceptance/provider_green_preflight.json",
+    "provider_green_preflight_md": "outputs/artifacts/stage1_bfcl_acceptance/provider_green_preflight.md",
+    "raw_payload_schema_not_matched_subtyping_audit_json": "outputs/artifacts/stage1_bfcl_acceptance/raw_payload_schema_not_matched_subtyping_audit.json",
+    "raw_payload_schema_not_matched_subtyping_audit_md": "outputs/artifacts/stage1_bfcl_acceptance/raw_payload_schema_not_matched_subtyping_audit.md",
     "schema_local_non_live_repair_diagnostic": "outputs/artifacts/stage1_bfcl_acceptance/schema_local_non_live_repair_diagnostic.json",
     "scored_failure_taxonomy_audit_approval": "outputs/artifacts/stage1_bfcl_acceptance/scored_failure_taxonomy_audit_approval.json",
     "selected_call_structural_failure_attribution": "outputs/artifacts/stage1_bfcl_acceptance/selected_call_structural_failure_attribution.json",
@@ -23,16 +28,29 @@
     "wrong_arg_key_alias_repair_diagnostic": "outputs/artifacts/stage1_bfcl_acceptance/wrong_arg_key_alias_repair_diagnostic.json"
   },
   "active_provider": {
+    "active_provider_evidence_only": [
+      "outputs/artifacts/stage1_bfcl_acceptance/provider_green_preflight.json",
+      "outputs/artifacts/stage1_bfcl_acceptance/provider_green_preflight.md",
+      "outputs/artifacts/bfcl_ctspc_source_pool_v1/current_provider_preflight_status.json"
+    ],
     "base_url_sanitized": "https://apicz.boyuerichdata.com/v1",
+    "does_not_authorize_scorer_candidate_paired_sota_huawei_claims": true,
     "expected_env": "NOVACODE_API_KEY",
     "model": "gpt-5.2",
     "openrouter_allowed": false,
     "profile": "novacode",
     "provider": "Chuangzhi/Novacode",
     "provider_green_preflight_passed": true,
-    "provider_route_policy": "chuangzhi_novacode_only_openrouter_disabled"
+    "provider_route_policy": "chuangzhi_novacode_only_openrouter_disabled",
+    "technical_preflight_only": true
+  },
+  "batch2_provenance": {
+    "artifact_commit": "6e3a1e63",
+    "note": "Generation code head and compact artifact commit may differ and are not readiness claims.",
+    "source_collection_code_head": "fa4156d0"
   },
   "branch": "stage1-bfcl-performance-sprint",
+  "candidate_pool_ready": false,
   "claim_readiness": {
     "candidate_pool_ready": false,
     "huawei_acceptance_ready": false,
@@ -41,17 +59,22 @@
     "sota_3pp_claim_ready": false
   },
   "current_blocker": {
-    "blocker": "deterministic_argument_and_structural_paths_zero_yield_research_review_triggered",
+    "blocker": "deterministic_argument_structural_and_tool_name_paths_zero_yield",
     "dataset_is_current_blocker": false,
     "provider_is_current_blocker": false,
-    "summary": "Explicit literal, wrong-key alias, schema-local normalization, and refined structural raw-response attribution are all zero-yield under current offline diagnostics; no scorer/source expansion/candidate promotion is authorized."
+    "summary": "Explicit literal, wrong-key alias, schema-local, refined structural raw-response, and raw schema-not-matched tool-name/schema normalization paths are all zero-yield under current gates; next_action=stop_no_yield_research_review."
   },
   "default_branch_delivery_risk": {
     "current_branch": "stage1-bfcl-performance-sprint",
     "main_merge_decision_pending": true,
     "note": "Delivery-risk tracking only; not a Huawei acceptance claim."
   },
+  "deterministic_argument_structural_and_tool_name_paths_zero_yield": true,
   "excluded_or_superseded_evidence_paths": [
+    {
+      "path": "outputs/artifacts/bfcl_ctspc_source_pool_v1/current_provider_preflight_status.md",
+      "reason": "superseded markdown contains old 401/OpenRouter/source_collection_rerun_ready=false wording; active provider evidence is provider_green_preflight.{json,md} plus current_provider_preflight_status.json only"
+    },
     {
       "path": "outputs/artifacts/stage1_bfcl_acceptance/provider_unblock_current_failure.json",
       "reason": "historical provider failure before Chuangzhi/Novacode gpt-5.2 green; excluded from active Stage-1 claim"
@@ -97,13 +120,24 @@
       "reason": "superseded by Chuangzhi/Novacode gpt-5.2 green route and excluded from active Stage-1 claim"
     }
   ],
-  "generated_at_utc": "2026-04-30T09:09:24Z",
-  "head": "d2b23d44",
-  "index_source_head": "d2b23d44",
+  "generated_at_utc": "2026-04-30T09:40:26Z",
+  "head": "d1047b14",
+  "huawei_acceptance_ready": false,
+  "index_source_head": "d1047b14",
+  "latest_conclusion": {
+    "deterministic_schema_local_non_live_repair": "zero_yield",
+    "explicit_required_arg_literal_completion": "zero_yield",
+    "next_action": "stop_no_yield_research_review",
+    "raw_payload_schema_not_matched_tool_name_schema_normalization": "zero_yield",
+    "refined_structural_raw_response_attribution": "zero_yield",
+    "wrong_arg_key_alias_repair": "zero_yield"
+  },
+  "next_action": "stop_no_yield_research_review",
   "optional_diagnostic_counter_fields": [
     "selected_calls_with_schema_properties",
     "selected_calls_with_empty_required"
   ],
+  "performance_evidence": false,
   "pivot_research_review": {
     "deterministic_argument_families": [
       {
@@ -150,6 +184,18 @@
         "scorer_authorized": false,
         "selected_call_diagnostic": "refined raw-response attribution; parser_refined=true; raw_candidate_tool_call_count=25; raw_schema_matched_tool_call_count=14; eligible_structural_count=0",
         "status": "zero_yield_not_scorer_authorized"
+      },
+      {
+        "candidate_pool_authorized": false,
+        "evidence_paths": [
+          "outputs/artifacts/stage1_bfcl_acceptance/raw_payload_schema_not_matched_subtyping_audit.json",
+          "outputs/artifacts/stage1_bfcl_acceptance/raw_payload_schema_not_matched_subtyping_audit.md"
+        ],
+        "family": "raw_payload_schema_not_matched_tool_name_schema_normalization",
+        "performance_claim": false,
+        "scorer_authorized": false,
+        "selected_call_diagnostic": "raw schema-not-matched bucket 10/10 has no schema-name candidate; deterministic_source_schema_only_possible_count=0",
+        "status": "zero_yield_not_scorer_authorized"
       }
     ],
     "forbidden_until_approved": [
@@ -158,12 +204,12 @@
       "source expansion beyond approved boundary",
       "SOTA/+3pp claim",
       "performance/Huawei acceptance claim",
-      "scored failure/outcome audit"
+      "deterministic tool-name/schema normalization family"
     ],
     "mechanical_explicit_literal_source_expansion_stopped": true,
-    "next_research_direction_authorized": true,
-    "next_research_direction_implemented": false,
-    "next_research_direction_pending_only": "scored_failure_taxonomy_audit",
+    "next_research_direction_authorized": false,
+    "next_research_direction_implemented": true,
+    "next_research_direction_pending_only": "none_stop_no_yield_research_review",
     "next_research_direction_performance_claim": false,
     "pending_research_review_item": {
       "audit_only": true,
@@ -173,6 +219,33 @@
       "name": "scored_failure_taxonomy_audit",
       "performance_claim": false,
       "scorer_or_gold_audit_started": false
+    },
+    "raw_payload_schema_not_matched_subtyping_audit": {
+      "candidate_pool_authorized": false,
+      "deterministic_source_schema_only_possible_count": 0,
+      "deterministic_tool_name_schema_normalization_family_authorized": false,
+      "evidence_paths": [
+        "outputs/artifacts/stage1_bfcl_acceptance/raw_payload_schema_not_matched_subtyping_audit.json",
+        "outputs/artifacts/stage1_bfcl_acceptance/raw_payload_schema_not_matched_subtyping_audit.md"
+      ],
+      "no_schema_name_candidate_count": 10,
+      "performance_claim": false,
+      "raw_payload_schema_not_matched_failure_count": 10,
+      "status": "completed_zero_yield_not_candidate_authorized"
+    },
+    "scored_failure_taxonomy_audit": {
+      "baseline_failure_count": 22,
+      "candidate_pool_authorized": false,
+      "evidence_paths": [
+        "outputs/artifacts/stage1_bfcl_acceptance/baseline_only_scored_failure_taxonomy_audit.json",
+        "outputs/artifacts/stage1_bfcl_acceptance/baseline_only_scored_failure_taxonomy_audit.md"
+      ],
+      "performance_claim": false,
+      "scored_case_count": 30,
+      "scorer_authorized": false,
+      "status": "completed_aggregate_taxonomy_not_performance_evidence",
+      "taxonomy_bucket_denominator": 22,
+      "taxonomy_bucket_denominator_note": "taxonomy buckets are denominated by 22 failure detail rows, not by a source/score overlap gap"
     },
     "scored_failure_taxonomy_audit_approval": {
       "audit_only": true,
@@ -211,8 +284,74 @@
     },
     "structural_expansion_to_20_per_category_authorized": false
   },
+  "provenance_table": [
+    {
+      "artifact_commit": "d39a954d",
+      "artifact_path": "outputs/artifacts/stage1_bfcl_acceptance/provider_green_preflight.json",
+      "evidence_role": "technical provider preflight green only",
+      "route_model": "Chuangzhi/Novacode gpt-5.2",
+      "source_code_head": "d39a954d",
+      "status": "active"
+    },
+    {
+      "artifact_commit": "d39a954d",
+      "artifact_path": "outputs/artifacts/stage1_bfcl_acceptance/provider_green_preflight.md",
+      "evidence_role": "technical provider preflight green only",
+      "route_model": "Chuangzhi/Novacode gpt-5.2",
+      "source_code_head": "d39a954d",
+      "status": "active"
+    },
+    {
+      "artifact_commit": "d39a954d",
+      "artifact_path": "outputs/artifacts/bfcl_ctspc_source_pool_v1/current_provider_preflight_status.json",
+      "evidence_role": "canonical provider preflight status JSON",
+      "route_model": "Chuangzhi/Novacode gpt-5.2",
+      "source_code_head": "d39a954d",
+      "status": "active"
+    },
+    {
+      "artifact_commit": "unknown_historical",
+      "artifact_path": "outputs/artifacts/bfcl_ctspc_source_pool_v1/current_provider_preflight_status.md",
+      "evidence_role": "old provider markdown with 401/OpenRouter wording",
+      "route_model": "OpenRouter/old Novacode failure wording",
+      "source_code_head": "unknown_historical",
+      "status": "superseded"
+    },
+    {
+      "artifact_commit": "6e3a1e63",
+      "artifact_path": "outputs/artifacts/stage1_bfcl_acceptance/batch2_source_collection_pilot_snapshot.json",
+      "evidence_role": "Batch2 source collection diagnostic only",
+      "route_model": "Chuangzhi/Novacode gpt-5.2 via source collection route; BFCL path aliases non-authoritative",
+      "source_code_head": "fa4156d0",
+      "status": "active"
+    },
+    {
+      "artifact_commit": "d48e6211",
+      "artifact_path": "outputs/artifacts/stage1_bfcl_acceptance/baseline_only_scored_failure_taxonomy_audit.json",
+      "evidence_role": "aggregate scored failure taxonomy audit; not performance evidence",
+      "route_model": "Chuangzhi/Novacode gpt-5.2 source metadata; BFCL scorer path alias non-authoritative",
+      "source_code_head": "f1fa5507/d48e6211",
+      "status": "active"
+    },
+    {
+      "artifact_commit": "d1047b14",
+      "artifact_path": "outputs/artifacts/stage1_bfcl_acceptance/raw_payload_schema_not_matched_subtyping_audit.json",
+      "evidence_role": "raw schema-not-matched subtyping audit; zero-yield",
+      "route_model": "Chuangzhi/Novacode gpt-5.2 source metadata",
+      "source_code_head": "d1047b14",
+      "status": "active"
+    }
+  ],
   "report_scope": "stage1_bfcl_active_evidence_index",
+  "scored_taxonomy_summary": {
+    "baseline_failure_count": 22,
+    "scored_case_count": 30,
+    "taxonomy_bucket_denominator": 22,
+    "taxonomy_bucket_denominator_note": "taxonomy bucket denominator is 22 failure detail rows, not a source/score overlap gap"
+  },
+  "scorer_authorized": false,
   "server_path": "/cephfs/qiuyn/training-free",
+  "sota_3pp_claim_ready": false,
   "source_base_head": "6e3a1e63",
   "uniform_counter_fields": [
     "result_jsonl_rows",
