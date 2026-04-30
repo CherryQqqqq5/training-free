@@ -5,9 +5,9 @@ This index is the active evidence entrypoint for Stage-1 BFCL. It records curren
 ## Current Checkpoint
 
 - source branch: `stage1-bfcl-performance-sprint`
-- current_head: `e7679431`
-- artifact_commit: `e7679431`
-- provenance note: these fields record the latest pushed evidence commit available at refresh start. The containing refresh commit is available from git history/final handoff; the index does not make a recursive hash claim.
+- current_head: `199c79fd`
+- artifact_commit: `199c79fd`
+- provenance note: these fields point to the RASHE active-index refresh content commit. The containing provenance patch commit is available from git history/final handoff; this avoids recursive hash churn.
 - active route: `retrieval_augmented_skill_harness_evolution` (RASHE)
 - RASHE route approved: true
 - active route status: `rashe_offline_scaffold_complete_fail_closed`
@@ -106,9 +106,9 @@ These negative diagnostics explain why the active route moved to RASHE offline s
 | --- | --- | --- | --- | --- | --- |
 | `outputs/artifacts/stage1_bfcl_acceptance/provider_green_preflight.json` | technical provider preflight green only | `d39a954d` | `d39a954d` | Chuangzhi/Novacode gpt-5.2 | active |
 | `outputs/artifacts/bfcl_ctspc_source_pool_v1/current_provider_preflight_status.json` | canonical provider preflight status JSON | `d39a954d` | `d39a954d` | Chuangzhi/Novacode gpt-5.2 | active |
-| `outputs/artifacts/stage1_bfcl_acceptance/rashe_v0/skillbank_manifest.json` | RASHE seed skillbank manifest; offline scaffold only | `a101b74a/b32be30b/ebd842eb` | `e7679431` | offline synthetic only; no provider/scorer | active |
-| `outputs/artifacts/stage1_bfcl_acceptance/rashe_v0/step_trace.schema.json` | RASHE StepTrace v0.2 schema; offline only | `b32be30b` | `e7679431` | offline synthetic/approved_compact only | active |
-| `outputs/artifacts/stage1_bfcl_acceptance/rashe_v0/proposal_draft.schema.json` | RASHE inert proposal draft schema; no candidate generation | `ce7960dd` | `e7679431` | offline synthetic only | active |
-| `outputs/artifacts/stage1_bfcl_acceptance/rashe_v0/evolution_loop.schema.json` | RASHE offline evolution loop schema; inert metadata patch planning only | `e7679431` | `e7679431` | offline synthetic only | active |
+| `outputs/artifacts/stage1_bfcl_acceptance/rashe_v0/skillbank_manifest.json` | RASHE seed skillbank manifest; offline scaffold only | `a101b74a/b32be30b/ebd842eb` | `199c79fd` | offline synthetic only; no provider/scorer | active |
+| `outputs/artifacts/stage1_bfcl_acceptance/rashe_v0/step_trace.schema.json` | RASHE StepTrace v0.2 schema; offline only | `b32be30b` | `199c79fd` | offline synthetic/approved_compact only | active |
+| `outputs/artifacts/stage1_bfcl_acceptance/rashe_v0/proposal_draft.schema.json` | RASHE inert proposal draft schema; no candidate generation | `ce7960dd` | `199c79fd` | offline synthetic only | active |
+| `outputs/artifacts/stage1_bfcl_acceptance/rashe_v0/evolution_loop.schema.json` | RASHE offline evolution loop schema; inert metadata patch planning only | `e7679431` | `199c79fd` | offline synthetic only | active |
 | `outputs/artifacts/stage1_bfcl_acceptance/baseline_only_scored_failure_taxonomy_audit.json` | aggregate scored failure taxonomy; not performance evidence | `f1fa5507/d48e6211` | `d48e6211` | Chuangzhi/Novacode gpt-5.2 source metadata | background |
 | `outputs/artifacts/stage1_bfcl_acceptance/schema_retrieval_rerank_feasibility_diagnostic.json` | schema retrieval/rerank feasibility; zero-yield | `a19f74c4` | `a19f74c4` | offline existing raw pilot only; no provider/scorer | background |
