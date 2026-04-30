@@ -1,5 +1,14 @@
 # Theory Priors for First Stage
 
+> Status: superseded as active execution authorization. This document records
+> historical rationale for deterministic Stage-1 families. It is not the active
+> mainline authorization, not a candidate-pool authorization, and not a
+> performance claim. Current evidence shows zero-yield for explicit required-arg
+> literal, wrong-key alias, schema-local non-live, structural
+> malformed/final-before-tool, raw tool-name/schema normalization, and schema
+> retrieval/rerank feasibility. Future work requires scope-change approval; do
+> not continue the deterministic candidate-pool sprint under the current gates.
+
 The first-stage research prior is BFCL-first deterministic repair. The goal is
 to improve tool-call correctness without training model weights, changing BFCL
 evaluator internals, adding hidden model calls, or inventing missing arguments.
@@ -10,7 +19,7 @@ gate controls execution.
 
 ## Priority 1: Deterministic Argument and Tool-Use Repair
 
-This is the only current first-stage performance mainline.
+This was the historical first-stage deterministic repair prior. It is no longer active mainline authorization after the zero-yield diagnostics.
 
 Allowed families:
 
@@ -38,23 +47,25 @@ Retention prior:
 
 Current blocker:
 
-- Combined retain-eligible candidates are below the required threshold.
-- Wrong-key alias and deterministic schema-local families currently have zero
-  demote coverage.
-- Source-result availability/layout mismatch must be root-caused before scorer
-  planning.
+- Deterministic Stage-1 family search is exhausted under current gates.
+- Explicit required-arg literal, wrong-key alias, schema-local non-live,
+  structural malformed/final-before-tool, raw tool-name/schema normalization,
+  and schema retrieval/rerank feasibility all returned zero-yield or stop-gate
+  outcomes.
+- Candidate pool, scorer, performance, SOTA/+3pp, and Huawei acceptance claims
+  remain unauthorized.
 
-Current shortest route to 35+ candidates:
+Current route status:
 
-1. Expand source collection for `multi_turn_miss_func` and
-   `multi_turn_long_context` after provider preflight is green.
-2. Keep `explicit_required_arg_literal_completion` as the lead family because it
-   is the only non-zero retain-prior family today.
-3. Add observation grounding only when the missing value is uniquely present in
-   the current request or prior tool observation.
-4. Use `wrong_arg_key_alias_repair` and
-   `deterministic_schema_local_non_live_repair` only after offline audits show
-   non-zero, unique, schema-local candidates.
+1. Do not continue mechanical source expansion or candidate-pool hunting under
+   this deterministic-family plan.
+2. `explicit_required_arg_literal_completion` is not a non-zero active family;
+   selected-call diagnostics show no missing-required yield.
+3. `wrong_arg_key_alias_repair` and
+   `deterministic_schema_local_non_live_repair` both returned zero eligible
+   candidates in offline diagnostics.
+4. Any future route must be approved as a scope change before source expansion,
+   scorer execution, candidate generation, or performance claims.
 
 Family-specific constraints:
 
@@ -151,10 +162,9 @@ only after positive scorer evidence.
 
 ## Engineering Implications
 
-The engineer should not lower retention priors to create apparent coverage. The
-next valid move is to determine whether zero coverage is caused by parser/source
-layout, source collection scope, or a true theory-family mismatch.
-
-If parser or source-layout is wrong, fix the extractor and rerun offline audits.
-If the family is mismatched to current BFCL evidence, escalate to research review
-before changing the compiler or scorer plan.
+The engineer should not lower retention priors to create apparent coverage.
+Current evidence has already driven parser/source-layout, structural, scored
+taxonomy, tool-name normalization, and schema retrieval/rerank diagnostics to
+zero-yield stop gates. The next valid move is negative-evidence reporting or a
+separately approved scope-change review, not continued deterministic candidate
+pool expansion.

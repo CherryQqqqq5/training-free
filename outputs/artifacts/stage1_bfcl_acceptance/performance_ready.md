@@ -9,7 +9,7 @@
 - Candidate pool ready: `False`
 - SOTA +3pp claim ready: `False`
 - Huawei acceptance ready: `False`
-- Current blocker: `deterministic_argument_structural_and_tool_name_paths_zero_yield`
+- Current blocker: `deterministic_stage1_family_search_exhausted`
 - Next action: `negative_evidence_report_or_scope_change_review`
 
 This checker remains fail-closed. The active evidence index supersedes historical 401/OpenRouter/gpt-5.4/dev20/candidate artifacts for current Stage-1 claim scope.
@@ -19,3 +19,5 @@ This checker is offline-only. It verifies performance evidence artifacts but doe
 Fail-closed frontier: candidate_pool_ready=false; scorer_authorized=false; performance_evidence=false; sota_3pp_claim_ready=false; huawei_acceptance_ready=false.
 
 Schema retrieval/rerank feasibility diagnostic: zero-yield; `single_schema_high_margin_count=0`; recommendation `stop_no_yield_research_review`. Readiness remains fail-closed.
+
+Negative evidence report: `docs/stage1_bfcl_negative_evidence_report.md`.

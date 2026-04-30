@@ -43,6 +43,7 @@ Provider and dataset are not the current blocker. Explicit literal, wrong-key al
 - schema_retrieval_rerank_feasibility_diagnostic_json: `outputs/artifacts/stage1_bfcl_acceptance/schema_retrieval_rerank_feasibility_diagnostic.json`
 - schema_retrieval_rerank_feasibility_diagnostic_md: `outputs/artifacts/stage1_bfcl_acceptance/schema_retrieval_rerank_feasibility_diagnostic.md`
 - candidate_pool_status: `candidate_pool_not_ready`
+- negative_evidence_report_md: `docs/stage1_bfcl_negative_evidence_report.md`
 
 ## Uniform Counter Table
 
@@ -96,6 +97,10 @@ Latest conclusion: `deterministic_argument_structural_and_tool_name_paths_zero_y
 
 ## Delivery Risk
 
-Current work is on `stage1-bfcl-performance-sprint`; main merge decision is pending. This is delivery-risk tracking, not an acceptance claim. Index provenance: index_artifact_commit `bd546fb3`; hygiene_patch_commit `27e36c25`; current_branch_head_at_review `ebf1f20f`; latest_hygiene_source_head `b94855e0`; source_base_head `6e3a1e63`; Batch2 source_collection_code_head `fa4156d0`; baseline taxonomy code head `d48e6211`; raw schema subtyping code head `d1047b14`; schema_retrieval_rerank_code_head `a19f74c4`; schema_retrieval_rerank_artifact_commit `a19f74c4`.
+- latest_branch_head_observed: `5131ce88`
+
+Current work is on `stage1-bfcl-performance-sprint`; main merge decision is pending. This is delivery-risk tracking, not an acceptance claim. Index provenance: latest_branch_head_observed `5131ce88`; index_artifact_commit `bd546fb3`; hygiene_patch_commit `27e36c25`; current_branch_head_at_review `ebf1f20f`; latest_hygiene_source_head `b94855e0`; source_base_head `6e3a1e63`; Batch2 source_collection_code_head `fa4156d0`; baseline taxonomy code head `d48e6211`; raw schema subtyping code head `d1047b14`; schema_retrieval_rerank_code_head `a19f74c4`; schema_retrieval_rerank_artifact_commit `a19f74c4`.
 
 Provenance note: single ambiguous `head` field is intentionally not used; index artifact commit is recorded separately from earlier diagnostic/source heads.
+
+Negative evidence report: `docs/stage1_bfcl_negative_evidence_report.md`.
