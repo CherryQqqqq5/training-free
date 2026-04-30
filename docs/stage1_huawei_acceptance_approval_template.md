@@ -37,12 +37,15 @@ collection or scorer run.
 Required artifacts:
 
 ```text
+outputs/artifacts/stage1_bfcl_acceptance/provider_green_preflight.json
+outputs/artifacts/stage1_bfcl_acceptance/provider_green_preflight.md
 outputs/artifacts/bfcl_ctspc_source_pool_v1/current_provider_preflight_status.json
-outputs/artifacts/bfcl_ctspc_source_pool_v1/current_provider_preflight_status.md
 <baseline_or_candidate_run>/artifacts/preflight_report.json
 scripts/check_provider_green_preflight.py --compact --strict
 scripts/check_artifact_boundary.py
 ```
+
+The old `outputs/artifacts/bfcl_ctspc_source_pool_v1/current_provider_preflight_status.md` is superseded unless regenerated from current green evidence; it is not active required provider evidence.
 
 Required provider fields:
 
@@ -137,19 +140,20 @@ selected_case_ids_sha256:
 baseline_rules_dir:
 candidate_rules_dir:
 candidate_rules_snapshot_sha256:
-candidate_family: explicit_required_arg_literal_completion
-explicit_literal_candidate_pool_passed:
-candidate_generatable_count:
-retain_eligible_candidate_count:
-combined_retain_eligible_candidate_count:
-explicit_ambiguous_literal_present:
+scope_change_route: none | schema_parser_feedback_retry | verifier_test_time_repair | prompt_context_canonicalization | training_data_route
+scope_change_approval_id:
+scope_change_approval_owner:
+scope_change_approved_before_execution: false
+deterministic_family_search_exhausted: true
+candidate_pool_ready: false
+scorer_authorization_ready: false
+performance_evidence: false
 no_leakage_check_passed:
 dev20_manifest_ready:
 holdout20_manifest_ready:
 dev_holdout_disjoint:
 manifest_case_integrity_passed:
 m2_8pre_offline_passed:
-scorer_authorization_ready:
 sota_or_acceptance_baseline_frozen_before_scorer:
 planned_baseline_command:
 planned_candidate_command:
@@ -162,28 +166,30 @@ Minimum approval conditions:
 
 - `provider_green_preflight_passed=true`
 - `artifact_boundary_passed=true`
-- `m2_8pre_offline_passed=true`
-- `scorer_authorization_ready=true`
-- `candidate_family=explicit_required_arg_literal_completion`
-- `explicit_literal_candidate_pool_passed=true`
-- `candidate_generatable_count >= 35`
-- `retain_eligible_candidate_count >= 35`
-- `combined_retain_eligible_candidate_count >= 35`
-- `explicit_ambiguous_literal_present=false`
+- `scope_change_route != none`
+- `scope_change_approval_id` is recorded
+- `scope_change_approval_owner` is recorded
+- `scope_change_approved_before_execution=true`
+- `deterministic_family_search_exhausted=true` is acknowledged
+- `candidate_pool_ready=true` only after a newly approved scope-change candidate pool passes its own gate
+- `scorer_authorization_ready=true` only after candidate pool, split, no-leakage, and protocol gates pass
+- `performance_evidence=false` until paired baseline/candidate scorer artifacts exist
+- `m2_8pre_offline_passed=true` or a replacement scope-change offline gate is explicitly approved
 - `no_leakage_check_passed=true`
 - `dev_holdout_disjoint=true`
 - `manifest_case_integrity_passed=true`
 - SOTA or accepted baseline comparator is frozen before scorer execution
 
-Explicit-only route hard gate:
+Historical / unauthorized explicit-literal route:
 
-- When the Stage-1 route is `explicit_required_arg_literal_completion`,
-  `explicit_literal_candidate_pool_passed=true` is required before scorer
-  authorization.
-- A failed explicit literal candidate pool gate blocks source-to-scorer promotion
-  even if provider green preflight has passed.
-- The gate must be evaluated before baseline/candidate scorer execution and
-  before any `+3pp` or SOTA claim.
+- `candidate_family=explicit_required_arg_literal_completion` and
+  `explicit_literal_candidate_pool_passed=true` were historical route-specific
+  approval fields.
+- This route is now zero-yield under approved gates and is not the active current
+  approval path.
+- Do not require or cite explicit-literal-specific candidate counts as current
+  scorer authorization fields unless a new scope-change approval explicitly
+  reselects that route.
 
 No-leakage requirements:
 
@@ -320,6 +326,39 @@ Source collection authorization permits only the signed source collection
 commands. It does not authorize candidate pool promotion, dev scorer, holdout
 scorer, full BFCL scorer, paired comparison, or any performance claim.
 
+### 4.3.1 Option A Scope-Change Approval Packet Fields
+
+Required only if project lead and Huawei acceptance owner choose
+`schema_parser_feedback_retry`. This packet does not authorize scorer execution
+by itself.
+
+```text
+scope_change_route = schema_parser_feedback_retry
+scope_change_approval_id:
+scope_change_approval_owner:
+scope_change_approved_before_execution: false
+retry_trigger_policy_path:
+feedback_template_hash:
+allowed_trigger_classes:
+gold_or_expected_used: false
+scorer_diff_used: false
+provider_call_delta_bound:
+latency_delta_bound:
+regression_gate_required: true
+candidate_pool_ready: false
+scorer_authorization_ready: false
+performance_evidence: false
+```
+
+Hard fail rules:
+
+- Any gold, expected, reference, possible-answer, scorer-diff, candidate-output,
+  or repair-output field is used as trigger, value, or argument source.
+- Trigger classes are fuzzy, semantic, model-generated, or tuned to the same
+  pilot without a separate anti-overfitting approval.
+- Provider calls, latency, or regression bounds are undefined before scorer
+  authorization is requested.
+
 ### 4.4 Candidate Pool Promotion Authorization
 
 Required before promoting extractor outputs to acceptance candidate-pool
@@ -329,11 +368,15 @@ evidence:
 source_collection_completed = true
 source_manifests_signed = true
 artifact_boundary_passed = true
-candidate_family = explicit_required_arg_literal_completion
-explicit_literal_candidate_pool_passed = true
-candidate_generatable_count >= 35
-retain_eligible_candidate_count >= 35
-explicit_ambiguous_literal_present = false
+scope_change_route = none | schema_parser_feedback_retry | verifier_test_time_repair | prompt_context_canonicalization | training_data_route
+scope_change_approval_id:
+scope_change_approval_owner:
+scope_change_approved_before_execution = false
+deterministic_family_search_exhausted = true
+candidate_pool_ready = false
+scorer_authorization_ready = false
+performance_evidence = false
+new_route_candidate_pool_gate_passed = false
 no_leakage_check_passed = true
 dev20_manifest_ready = true
 holdout20_manifest_ready = true
@@ -494,11 +537,11 @@ All items must be checked before any formal Huawei Stage-1 BFCL performance clai
 [ ] stage1_sota_comparison has no TBD blocking fields.
 [ ] SOTA or accepted baseline is frozen before scorer execution.
 [ ] calculation_unit=absolute_pp and required_delta_pp=3.0.
-[ ] candidate_family=explicit_required_arg_literal_completion.
-[ ] explicit_literal_candidate_pool_passed=true.
-[ ] candidate_generatable_count >= 35.
-[ ] retain_eligible_candidate_count >= 35.
-[ ] combined_retain_eligible_candidate_count >= 35.
+[ ] scope_change_route is approved and not `none`.
+[ ] scope_change_approval_id is recorded.
+[ ] scope_change_approved_before_execution=true.
+[ ] deterministic_family_search_exhausted=true is acknowledged.
+[ ] candidate_pool_ready=true only after the newly approved route passes its own gate.
 [ ] explicit_ambiguous_literal_present=false.
 [ ] no_leakage_check_passed=true.
 [ ] dev20_manifest_ready=true.
