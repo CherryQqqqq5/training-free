@@ -540,3 +540,61 @@ def test_build_explicit_literal_candidate_pool_rejects_ambiguous_short_schema_al
     assert report["reject_reason_counts"]["schema_function_alias_not_unique"] == 1
     assert report["extraction_diagnostics"]["schema_function_alias_not_unique"] == 1
     assert (tmp_path / "candidate_rules.jsonl").read_text(encoding="utf-8") == ""
+
+
+
+def test_build_explicit_literal_candidate_pool_ignores_historical_missing_required_for_candidate(tmp_path: Path) -> None:
+    source_root = tmp_path / "source" / "multi_turn_miss_func" / "baseline"
+    result_path = source_root / "bfcl" / "result" / "model" / "multi_turn" / "BFCL_v4_multi_turn_miss_func_result.json"
+    result_path.parent.mkdir(parents=True, exist_ok=True)
+    result_path.write_text(
+        json.dumps({
+            "id": "case_1",
+            "result": [
+                [[{"grep": json.dumps({"pattern": "urgent"})}]],
+                [[{"grep": json.dumps({"pattern": "urgent", "file_name": "done.txt"})}]],
+            ],
+        }) + "\n",
+        encoding="utf-8",
+    )
+    source_manifest = tmp_path / "source_manifest.json"
+    _write_json(source_manifest, {"category_status": [{"category": "multi_turn_miss_func", "existing_source_roots": [str(source_root)]}]})
+    dataset = tmp_path / "dataset.json"
+    _write_json(dataset, [{
+        "id": "case_1",
+        "question": [[{"role": "user", "content": "Search 'notes.txt' for urgent lines."}]],
+        "function": [{
+            "name": "GorillaFileSystem.grep",
+            "parameters": {
+                "type": "object",
+                "properties": {"pattern": {"type": "string"}, "file_name": {"type": "string"}},
+                "required": ["pattern", "file_name"],
+            },
+        }],
+    }])
+
+    report = build(
+        source_manifest=source_manifest,
+        dataset_json=dataset,
+        out_candidates=tmp_path / "candidate_rules.jsonl",
+        dev_manifest=tmp_path / "dev20.json",
+        holdout_manifest=tmp_path / "holdout20.json",
+        summary_output=tmp_path / "summary.json",
+        markdown_output=tmp_path / "summary.md",
+        min_eligible=1,
+        dev_count=1,
+        holdout_count=0,
+    )
+
+    assert report["candidate_pool_build_passed"] is False
+    assert report["candidate_record_count"] == 0
+    diagnostics = report["extraction_diagnostics"]
+    assert diagnostics["historical_call_count"] == 1
+    assert diagnostics["selected_turn_call_count"] == 1
+    assert diagnostics["selected_call_count"] == 1
+    assert diagnostics["calls_with_function_schema"] == 2
+    assert diagnostics["selected_calls_with_function_schema"] == 1
+    assert diagnostics["selected_calls_with_missing_required"] == 0
+    assert diagnostics["required_args_already_present_count"] == 2
+    assert report["reject_reason_counts"]["no_single_missing_required_arg"] == 1
+    assert (tmp_path / "candidate_rules.jsonl").read_text(encoding="utf-8") == ""

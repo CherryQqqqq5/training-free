@@ -319,6 +319,23 @@ def _call_record(tool: str, args: dict[str, Any], path: list[int]) -> dict[str, 
     }
 
 
+def _selected_turn_calls(calls: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    if not calls:
+        return [], []
+    # A flat fixture/result list like [{"grep": ...}, {"cat": ...}] is one
+    # selected model turn, not two historical turns. BFCL multi-turn rows have
+    # deeper paths: turn -> step -> call.
+    if all(len(call.get("path") or []) <= 1 for call in calls):
+        return [], calls
+    turn_values = [call.get("turn_index") for call in calls if call.get("turn_index") is not None]
+    if not turn_values:
+        return [], calls
+    selected_turn = max(int(turn) for turn in turn_values)
+    historical = [call for call in calls if call.get("turn_index") != selected_turn]
+    selected = [call for call in calls if call.get("turn_index") == selected_turn]
+    return historical, selected
+
+
 def _literal_spans(text: str) -> list[tuple[str, int, int]]:
     spans: list[tuple[str, int, int]] = []
     for pattern in (r"'([^']+)'", r'"([^"]+)"', r"\b[A-Za-z0-9_.-]+\.(?:txt|csv|json|pdf|md|log)\b"):
@@ -394,6 +411,9 @@ def _extract_candidates(
     diagnostics: dict[str, Any] = {
         "result_jsonl_rows": 0,
         "parsed_emitted_calls": 0,
+        "historical_call_count": 0,
+        "selected_turn_call_count": 0,
+        "selected_call_count": 0,
         "calls_with_function_schema": 0,
         "calls_with_missing_required_arg": 0,
         "calls_with_exactly_one_missing_required_arg": 0,
@@ -414,6 +434,17 @@ def _extract_candidates(
         "schema_functions_with_empty_required": 0,
         "matched_calls_with_empty_properties": 0,
         "matched_calls_with_empty_required": 0,
+        "selected_calls_with_function_schema": 0,
+        "selected_calls_with_schema_properties": 0,
+        "selected_calls_with_required_args": 0,
+        "selected_calls_with_empty_required": 0,
+        "selected_calls_with_missing_required": 0,
+        "selected_calls_with_exactly_one_missing_required_arg": 0,
+        "required_source_counts": {},
+        "required_empty_reason_counts": {},
+        "required_args_already_present_count": 0,
+        "multiple_missing_required_args_count": 0,
+        "no_matching_selected_call_count": 0,
         "missing_required_samples": [],
     }
 
@@ -506,7 +537,11 @@ def _extract_candidates(
                     diagnostics["schema_functions_with_empty_required"] += 1
 
             calls = _tool_call_records(row.get("result"))
+            historical_calls, selected_calls = _selected_turn_calls(calls)
             diagnostics["parsed_emitted_calls"] += len(calls)
+            diagnostics["historical_call_count"] += len(historical_calls)
+            diagnostics["selected_turn_call_count"] += len(selected_calls)
+            diagnostics["selected_call_count"] += len(selected_calls)
             if len(calls) == 1:
                 diagnostics["rows_with_single_call"] += 1
             else:
@@ -514,9 +549,12 @@ def _extract_candidates(
 
             eligible_calls: list[tuple[dict[str, Any], dict[str, Any], list[str]]] = []
             row_has_schema = False
+            selected_has_schema = False
             row_missing_counts: list[int] = []
             alias_conflict_tools: list[str] = []
+            selected_ids = {id(call) for call in selected_calls}
             for call in calls:
+                is_selected = id(call) in selected_ids
                 fn, match_status, match_reason, candidate_names = _schema_match(entry, call["tool"])
                 if match_status == "schema_function_alias_not_unique":
                     alias_conflict_tools.append(call["tool"])
@@ -526,6 +564,8 @@ def _extract_candidates(
                     add_schema_match_sample(case_id, category, call, None, match_status, match_reason, candidate_names)
                     continue
                 row_has_schema = True
+                if is_selected:
+                    selected_has_schema = True
                 diagnostics["calls_with_function_schema"] += 1
                 props = _properties(fn)
                 required = _required_args(fn)
@@ -537,21 +577,40 @@ def _extract_candidates(
                 if arg_conflicts:
                     diagnostics["emitted_arg_key_conflicts"] += 1
                 add_schema_match_sample(case_id, category, call, fn, match_status, match_reason, candidate_names, missing, present_schema_args, arg_conflicts)
+                if not is_selected:
+                    continue
+
+                diagnostics["selected_calls_with_function_schema"] += 1
+                if props:
+                    diagnostics["selected_calls_with_schema_properties"] += 1
+                if required:
+                    diagnostics["selected_calls_with_required_args"] += 1
+                    diagnostics["required_source_counts"]["schema_required"] = diagnostics["required_source_counts"].get("schema_required", 0) + len(required)
+                else:
+                    diagnostics["selected_calls_with_empty_required"] += 1
+                    diagnostics["required_empty_reason_counts"]["schema_required_empty"] = diagnostics["required_empty_reason_counts"].get("schema_required_empty", 0) + 1
+                diagnostics["required_args_already_present_count"] += len([arg for arg in required if arg in present_schema_args])
                 row_missing_counts.append(len(missing))
                 if missing:
                     diagnostics["calls_with_missing_required_arg"] += 1
+                    diagnostics["selected_calls_with_missing_required"] += 1
                     add_missing_sample(case_id, category, call, fn, missing)
                 if len(missing) == 1:
                     diagnostics["calls_with_exactly_one_missing_required_arg"] += 1
+                    diagnostics["selected_calls_with_exactly_one_missing_required_arg"] += 1
                     eligible_calls.append((call, fn, missing))
                 elif len(missing) > 1:
                     diagnostics["calls_with_multiple_missing_required_args"] += 1
+                    diagnostics["multiple_missing_required_args_count"] += 1
             if alias_conflict_tools:
                 diagnostics["schema_function_alias_not_unique"] += 1
                 reject("schema_function_alias_not_unique", case_id=case_id, category=category, emitted_tools=sorted(set(alias_conflict_tools)))
                 continue
             if row_has_schema:
                 diagnostics["rows_with_function_schema"] += 1
+            if selected_calls and not selected_has_schema:
+                diagnostics["no_matching_selected_call_count"] += 1
+                diagnostics["required_empty_reason_counts"]["no_matching_selected_call"] = diagnostics["required_empty_reason_counts"].get("no_matching_selected_call", 0) + 1
             if any(count > 0 for count in row_missing_counts):
                 diagnostics["rows_with_any_missing_required_arg"] += 1
             if sum(1 for count in row_missing_counts if count == 1) == 1:
