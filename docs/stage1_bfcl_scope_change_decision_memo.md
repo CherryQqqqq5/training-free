@@ -37,6 +37,14 @@ Fail-closed state:
 
 All options below are not yet authorized. Each requires a separate approval packet before implementation, source collection, candidate generation, or scoring.
 
+
+Raman recommendation: if leadership insists on continuing Stage-1 BFCL work,
+Option A `schema/parser feedback retry` is the preferred first scope-change
+path. Option C `verifier/test-time repair` is secondary. All options remain not
+yet authorized until project lead and Huawei acceptance owner choose and sign one
+bounded approval packet.
+
+
 ### Option A: Schema / Parser Feedback Retry
 
 Allowed evidence:
@@ -63,6 +71,74 @@ Stop gate:
 
 - Stop if deterministic parser/schema attribution cannot identify at least a review-approved candidate family without scorer/gold leakage.
 - Stop if candidate pool remains below threshold or cannot be split into clean dev/holdout manifests.
+
+
+Option A approval-packet details required before implementation:
+
+Allowed trigger classes:
+
+- deterministic parser failure class with raw response present and sanitized
+  parser status recorded
+- schema-name attribution failure with dataset/tool schema available
+- adapter serialization mismatch where no tool/function/argument/value is
+  invented
+- current-turn/schema mismatch class supported by compact hashes/counters, not
+  gold labels
+
+Forbidden triggers:
+
+- scorer gold, expected values, references, possible answers, or per-case scorer
+  diffs
+- candidate output, repair output, hidden labels, or post-hoc pass/fail as a
+  trigger source
+- semantic/fuzzy tool selection, prompt tuning, model/provider tuning, or hidden
+  LLM reranking
+- same-pilot family hunting after a stop gate fails
+
+Allowed feedback wording:
+
+- parser/schema status such as `malformed_tool_call_json`,
+  `schema_name_not_matched`, `arguments_unparseable`, or
+  `selected_call_missing_after_adapter`
+- schema-local normalization labels that do not expose gold tool identity or
+  expected argument values
+- aggregate bucket and hash references only
+
+Required counters:
+
+- audited_case_count
+- raw_response_present_count
+- dataset_schema_present_count
+- parser_failure_class_counts
+- schema_match_status_counts
+- deterministic_retry_candidate_count
+- leakage_counter_gold_or_expected
+- scorer_diff_used_count
+- ambiguous_retry_reject_count
+- candidate_pool_authorized
+- scorer_authorized
+- cost_latency_risk_class
+- regression_risk_class
+
+Stop gates:
+
+- stop on any nonzero gold/expected/scorer-diff leakage counter
+- stop if deterministic retry candidates are fewer than the approved threshold
+  for a clean dev/holdout split
+- stop if ambiguous retry rejects dominate the reviewed bucket
+- stop if cost/latency risk cannot be bounded before scorer authorization
+- stop if the route requires changing provider/model/evaluator or BFCL tool
+  schema
+
+Cost/latency/regression requirements:
+
+- approval packet must state whether the retry is local-only or introduces an
+  additional model call
+- candidate scorer authorization, if later requested, must include cost and
+  latency bounds and a regression report
+- no full-suite, SOTA/+3pp, or Huawei acceptance claim is allowed until paired
+  baseline/candidate artifacts prove the required gain without unacceptable
+  regression
 
 ### Option B: Prompt / Current-Turn Context Canonicalization
 

@@ -4,6 +4,21 @@ This file is the required comparison template for a formal Stage-1 performance
 claim. It is intentionally incomplete until Huawei freezes the exact acceptance
 baseline and BFCL protocol.
 
+
+## Current Fail-Closed Status
+
+This template is not the immediate next action. The current blocker is
+`deterministic_stage1_family_search_exhausted`, and the active next action is
+`negative_evidence_report_or_scope_change_review`. Provider technical preflight
+is green for Chuangzhi/Novacode `gpt-5.2`, but provider green is not scorer
+authorization. See `docs/stage1_bfcl_negative_evidence_report.md`,
+`docs/stage1_bfcl_scope_change_decision_memo.md`,
+`outputs/artifacts/stage1_bfcl_acceptance/active_evidence_index.json`, and
+`outputs/artifacts/stage1_bfcl_acceptance/performance_ready.json`.
+
+No source expansion, scorer, candidate pool, dev/holdout, full-suite,
+SOTA/+3pp, or Huawei acceptance claim is authorized.
+
 ## Frozen Acceptance Definition
 
 | Field | Value | Status |

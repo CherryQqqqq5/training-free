@@ -7,12 +7,19 @@ scorer execution by itself.
 Current repository state is fail-closed:
 
 - Formal BFCL performance acceptance: `not ready`
-- Provider green preflight: `not passed`
-- Current provider blocker: HTTP `401` class failures for attempted provider
-  profiles
-- M2.8-pre scorer authorization: `not ready`
-- Paired BFCL score chain: `not present`
-- Allowed claim today: scaffold and diagnostic evidence package only
+- Provider technical preflight: green for Chuangzhi/Novacode `gpt-5.2`
+- Provider green is not scorer authorization
+- Current blocker: `deterministic_stage1_family_search_exhausted`
+- Next action: `negative_evidence_report_or_scope_change_review`
+- Candidate pool ready: `false`
+- Scorer authorized: `false`
+- Performance evidence: `false`
+- Huawei acceptance ready: `false`
+- Allowed claim today: diagnostic/negative-evidence handoff only
+
+Historical note: earlier provider HTTP `401` / provider-green-not-passed wording is
+superseded by the Chuangzhi/Novacode technical preflight. It remains relevant
+only as a generic hard-fail condition if it recurs.
 
 Related provider unblock documents:
 
@@ -534,7 +541,8 @@ Allowed current claim while fail-closed:
 
 ```text
 The repository is ready as a scaffold and diagnostic evidence package, but formal
-Huawei Stage-1 BFCL performance acceptance remains blocked until provider green
-preflight, scorer authorization, paired BFCL scorer evidence, and +3pp absolute
+Huawei Stage-1 BFCL performance acceptance remains blocked because deterministic
+Stage-1 family search is exhausted and no candidate pool, scorer authorization,
+paired BFCL scorer evidence, or +3pp absolute
 improvement all pass.
 ```

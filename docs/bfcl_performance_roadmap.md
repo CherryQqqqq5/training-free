@@ -1,10 +1,22 @@
 # BFCL Performance Proof Roadmap
 
+> Current status: superseded as the active Stage-1 execution route. CTSPC,
+> M2.7, and subset30 paths are historical roadmap material, not the current
+> Stage-1 performance proof. The current branch is diagnostic/negative-evidence
+> handoff only. Provider technical preflight is green for Chuangzhi/Novacode
+> `gpt-5.2`, but provider green is not scorer authorization. Deterministic
+> Stage-1 family search is exhausted under current approved gates; the next
+> action is `negative_evidence_report_or_scope_change_review`. No source
+> expansion, scorer, candidate pool, dev/holdout, full-suite, SOTA/+3pp, or
+> Huawei acceptance claim is authorized. See
+> `docs/stage1_bfcl_negative_evidence_report.md`,
+> `docs/stage1_bfcl_scope_change_decision_memo.md`, and
+> `outputs/artifacts/stage1_bfcl_acceptance/active_evidence_index.json`.
+
+
 ## Summary
 
-The next phase is a BFCL performance proof, not another smoke-test loop. The main claim is same-base-model improvement: with the same evaluator alias, upstream route, runtime config, and budget constraints, CTSPC must show at least `+3pp` absolute improvement over a clean baseline before any full-suite or SOTA claim.
-
-Current Phase-2 evidence shows the system can diagnose and activate next-action policy, but BFCL scorer-level gain is not proven. M2.7d found `34` `multi_turn_miss_param` cases with file/path tools, but overlap with the current wrong-stop target families is `0`; near-term experiments must therefore be framed as schema-local CTSPC performance subsets, not failure-family repair claims.
+This roadmap is historical planning material for a BFCL performance proof. It does not describe the current authorized Stage-1 execution route. Current evidence supports only diagnostic/negative-evidence handoff and a scope-change decision. CTSPC/M2.7/subset paths must not be cited as the current Stage-1 performance proof or as immediate scorer/SOTA work.
 
 ## Stage Gates
 

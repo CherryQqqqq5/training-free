@@ -4,7 +4,30 @@ This document defines the fail-closed state machine for formal Stage-1 BFCL
 performance acceptance. It is an approval contract, not evidence that any state
 has already passed.
 
-Current state: `provider_blocked`.
+Current state: `negative_evidence_handoff` / `scope_change_review_blocked`.
+
+
+## Current Active State Override
+
+The historical state machine below remains the formal fail-closed ordering, but
+current Stage-1 evidence is past provider unblock and is blocked at scope-change
+review:
+
+- Provider technical preflight is green for Chuangzhi/Novacode `gpt-5.2`.
+- Provider green is not scorer authorization.
+- Deterministic Stage-1 family search is exhausted under current approved gates.
+- Current blocker: `deterministic_stage1_family_search_exhausted`.
+- Next action: `negative_evidence_report_or_scope_change_review`.
+- Current branch is diagnostic/negative-evidence handoff only.
+- No source expansion, scorer, candidate pool, dev/holdout, full-suite,
+  SOTA/+3pp, or Huawei acceptance claim is authorized.
+
+Active references:
+
+- `docs/stage1_bfcl_negative_evidence_report.md`
+- `docs/stage1_bfcl_scope_change_decision_memo.md`
+- `outputs/artifacts/stage1_bfcl_acceptance/active_evidence_index.json`
+- `outputs/artifacts/stage1_bfcl_acceptance/performance_ready.json`
 
 ## State Order
 
@@ -28,7 +51,7 @@ fails or if provider/model/protocol drift is detected.
 Enter criteria:
 
 - Provider access is missing or failing.
-- Current blocker includes HTTP `401` or `403`.
+- A provider access blocker includes HTTP `401` or `403`.
 - `provider_green_preflight_passed=false`.
 
 Exit criteria:
@@ -53,7 +76,7 @@ tests/test_build_explicit_literal_candidate_pool.py
 The dry command pack is an offline planning artifact. It must not call the
 provider, BFCL, a model, or a scorer. Provider preflight is only the approved
 transition gate after a valid credential is installed; source collection and
-scorer commands remain prohibited while the current state is `provider_blocked`.
+scorer commands remain prohibited while the active state is `provider_blocked`.
 
 Extractor skeleton and fixture-matrix implementation are allowed in
 `provider_blocked` only when they remain offline-only and fail-closed:

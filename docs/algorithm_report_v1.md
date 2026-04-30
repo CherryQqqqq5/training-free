@@ -11,6 +11,18 @@ Companion documents:
 - `docs/theory_family_retention_ranking.md`
 - `docs/bfcl_performance_roadmap.md`
 
+
+## Current Status Note
+
+Deterministic argument/tool-use repair was the historical Stage-1 mainline, but
+it is now exhausted / zero-yield under the approved gates. Provider technical
+preflight is green for Chuangzhi/Novacode `gpt-5.2`, but provider green is not
+scorer authorization. The direct next step is scope-change decision, not
+expanding deterministic argument repair coverage. Current branch status is
+diagnostic/negative-evidence handoff only: no source expansion, scorer,
+candidate pool, dev/holdout, full-suite, SOTA/+3pp, or Huawei acceptance claim
+is authorized.
+
 ## Problem
 
 The project targets tool-use failures in agent benchmarks, with BFCL as the
@@ -57,10 +69,10 @@ For first-stage BFCL delivery, useful rules must be:
 - measurable through BFCL metrics
 - blocked from retention unless their prior and evidence gates pass
 
-The strongest first-stage IR families are deterministic argument/tool-use repair
-families, because they map directly to BFCL tool-call correctness. This is a
-research and engineering priority, not a claim that every family already has
-non-zero scorer-ready coverage.
+The historical first-stage IR priority was deterministic argument/tool-use
+repair because it maps directly to BFCL tool-call correctness. Current evidence
+shows that approved deterministic families are exhausted / zero-yield, so this
+priority is not an active performance route without scope-change approval.
 
 ## Runtime Hook
 
@@ -76,8 +88,9 @@ Patch sites include:
 - policy/runtime guidance adapter
 - fallback or verification hook
 
-First-stage acceptance should prefer deterministic sanitizer/adapter hooks over
-soft guidance when both are available.
+Historically, first-stage acceptance preferred deterministic sanitizer/adapter
+hooks over soft guidance when both were available. Current execution requires a
+scope-change decision before any new hook family is implemented or scored.
 
 ## Retention and Pareto Gate
 
@@ -99,14 +112,13 @@ retention prior after the fact.
 
 ## First-Stage Mainline
 
-The first-stage performance mainline is deterministic argument/tool-use repair:
+Historical note: deterministic argument/tool-use repair was the first-stage performance mainline, but it is now exhausted / zero-yield under approved gates:
 
 - `explicit_required_arg_literal_completion`
 - `wrong_arg_key_alias_repair`
 - `deterministic_schema_local_non_live_repair`
 
-This route is closest to BFCL scoring, attribution-clean, and compatible with
-the training-free constraint.
+This route remains useful historical rationale, but it is not currently authorized for performance candidate expansion without a scope-change decision.
 
 ## Evidence Boundary
 
@@ -175,7 +187,4 @@ Potential patentable directions:
 
 ## Current Conclusion
 
-The shortest path to first-stage acceptance is not another memory-heavy smoke. It
-is to clean delivery artifacts, expand deterministic argument-repair coverage,
-repair source-result layout issues, and run protocol-aligned BFCL dev/holdout
-before any full-suite claim.
+The shortest current path is no longer deterministic argument-repair coverage expansion. The valid next step is the scope-change decision memo: either approve one bounded new route or stop the Stage-1 BFCL performance sprint with the diagnostic/negative-evidence handoff.

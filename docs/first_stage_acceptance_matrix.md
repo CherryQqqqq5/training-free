@@ -14,6 +14,19 @@ gates. It is an execution contract, not a performance claim.
   `docs/bfcl_performance_roadmap.md`, `docs/theory_family_retention_ranking.md`,
   and `docs/memory_operation_dev_scorer_application.md`.
 
+
+## Current Active Status
+
+Provider technical preflight is green for Chuangzhi/Novacode `gpt-5.2`, but
+provider green is not scorer authorization. Deterministic Stage-1 family search
+is exhausted under current approved gates. Current branch status is
+diagnostic/negative-evidence handoff only: no source expansion, scorer,
+candidate pool, dev/holdout, full-suite, SOTA/+3pp, or Huawei acceptance claim
+is authorized. See `docs/stage1_bfcl_negative_evidence_report.md`,
+`docs/stage1_bfcl_scope_change_decision_memo.md`,
+`outputs/artifacts/stage1_bfcl_acceptance/active_evidence_index.json`, and
+`outputs/artifacts/stage1_bfcl_acceptance/performance_ready.json`.
+
 ## Fixed BFCL Protocol
 
 Use `docs/experiment_protocol_bfcl_v4.md` as the protocol source of truth.
@@ -82,13 +95,18 @@ Huawei explicitly freezes that provider for acceptance.
 
 ## Authorized First-Stage Performance Route
 
-The first-stage performance route is deterministic argument/tool-use repair.
+No candidate family is currently authorized for performance. Deterministic
+argument/tool-use families were approved diagnostics and are now zero-yield under
+current gates.
 
-Authorized candidate families:
+Previously diagnosed families:
 
 - `explicit_required_arg_literal_completion`
 - `wrong_arg_key_alias_repair`
 - `deterministic_schema_local_non_live_repair`
+- structural malformed/final-before-tool
+- emitted tool-name/schema normalization
+- schema retrieval/rerank feasibility
 
 Disallowed as first-stage performance main claims:
 
@@ -115,7 +133,7 @@ PYTHONPATH=.:src .venv/bin/python scripts/check_first_stage_bfcl_ready.py --comp
 `check_explicit_obligation_smoke_ready.py --compact` is a secondary diagnostic
 gate for the memory-heavy explicit-obligation lane. It is expected to remain
 fail-closed unless that lane is explicitly reselected and approved; it does not
-block the deterministic BFCL repair mainline scaffold handoff.
+block the current diagnostic/negative-evidence handoff.
 
 Expected current behavior is fail-closed for first-stage performance acceptance.
 `check_first_stage_bfcl_ready.py --strict` should exit non-zero until a clean
