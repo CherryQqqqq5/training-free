@@ -37,6 +37,7 @@ Provider and dataset are not the current blocker. Batch1 and Batch2 diagnostics 
 - candidate_pool_status: `candidate_pool_not_ready`
 - wrong_arg_key_alias_repair_diagnostic: `outputs/artifacts/stage1_bfcl_acceptance/wrong_arg_key_alias_repair_diagnostic.json`
 - schema_local_non_live_repair_diagnostic: `outputs/artifacts/stage1_bfcl_acceptance/schema_local_non_live_repair_diagnostic.json`
+- selected_call_structural_failure_attribution: `outputs/artifacts/stage1_bfcl_acceptance/selected_call_structural_failure_attribution.json`
 
 ## Uniform Counter Table
 
@@ -68,10 +69,10 @@ All three checked deterministic argument families are zero-yield and not scorer-
 - `wrong_arg_key_alias_repair`: offline diagnostic run; `alias_repair_eligible_count=0`.
 - `deterministic_schema_local_non_live_repair`: offline diagnostic run; `schema_local_repair_eligible_count=0`.
 
-Mechanical explicit-literal source expansion remains stopped. None of these families is candidate-pool-authorized, scorer-authorized, or a performance claim.
+Structural attribution diagnostic is approved as active negative evidence with blocker `raw_response_field_missing_for_structural_attribution`.
 
-Next research direction is pending only: `selected_call_structural_failure_attribution_diagnostic`. It is not implemented, not authorized, and not a performance claim.
+A raw-response capture source-collection rerun is authorized as a boundary only, pending explicit run task. It is raw-response capture only, with no scorer, no candidate pool, and no performance/SOTA/Huawei claim.
 
 ## Delivery Risk
 
-Current work is on `stage1-bfcl-performance-sprint`; main merge decision is pending. This is delivery-risk tracking, not an acceptance claim. Index provenance: source_base_head `6e3a1e63`, index_commit `3b75a8dd`.
+Current work is on `stage1-bfcl-performance-sprint`; main merge decision is pending. This is delivery-risk tracking, not an acceptance claim. Index provenance: source_base_head `6e3a1e63`, index_commit `31834c66`.
