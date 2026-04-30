@@ -39,6 +39,7 @@ Provider and dataset are not the current blocker. Explicit literal, wrong-key al
 - schema_local_non_live_repair_diagnostic: `outputs/artifacts/stage1_bfcl_acceptance/schema_local_non_live_repair_diagnostic.json`
 - selected_call_structural_failure_attribution: `outputs/artifacts/stage1_bfcl_acceptance/selected_call_structural_failure_attribution.json`
 - selected_call_structural_failure_attribution_raw_pilot: `outputs/artifacts/stage1_bfcl_acceptance/selected_call_structural_failure_attribution_raw_pilot.json`
+- scored_failure_taxonomy_audit_approval: `outputs/artifacts/stage1_bfcl_acceptance/scored_failure_taxonomy_audit_approval.json`
 
 ## Uniform Counter Table
 
@@ -73,8 +74,27 @@ All checked deterministic argument and structural families are zero-yield and no
 
 Structural expansion to 20/category is unauthorized. Scorer, candidate pool promotion, +3pp/SOTA claim, and Huawei acceptance claim remain unauthorized.
 
-Pending research-review item only: `scored_failure_attribution_outcome_surface_audit`. It is not authorized yet, not implemented, not candidate extraction, not a scorer/gold/outcome audit started here, and not a performance claim.
+Pending-approved research-review item: `scored_failure_taxonomy_audit`. It is aggregate-only and not run yet. It may use scorer/gold only for taxonomy counters, but it is not candidate extraction, not candidate pool authorization, not scorer authorization for performance, and not a performance/SOTA/Huawei claim.
+
+### Scored Failure Taxonomy Audit Approval
+
+- approval packet: `outputs/artifacts/stage1_bfcl_acceptance/scored_failure_taxonomy_audit_approval.json`
+- audit_only: `true`
+- uses_scorer_or_gold: `true` for aggregate taxonomy only
+- candidate_extraction_authorized: `false`
+- candidate_pool_authorized: `false`
+- scorer_authorization_for_performance: `false`
+- performance_evidence: `false`
+- sota_3pp_claim_ready: `false`
+- huawei_acceptance_ready: `false`
+- provider_run_authorized: `false`
+- candidate_run_authorized: `false`
+- paired_comparison_authorized: `false`
+- gold_text_emitted: `false`
+- expected_values_emitted: `false`
+- per_case_repair_recommendations_emitted: `false`
+- no_leakage_to_candidate_pool: `true`
 
 ## Delivery Risk
 
-Current work is on `stage1-bfcl-performance-sprint`; main merge decision is pending. This is delivery-risk tracking, not an acceptance claim. Index provenance: source_base_head `6e3a1e63`, index_source_head `15f611d7`.
+Current work is on `stage1-bfcl-performance-sprint`; main merge decision is pending. This is delivery-risk tracking, not an acceptance claim. Index provenance: source_base_head `6e3a1e63`, index_source_head `d2b23d44`.
