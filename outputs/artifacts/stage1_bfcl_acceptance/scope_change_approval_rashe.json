@@ -1,0 +1,73 @@
+{
+  "active_acceptance_path": false,
+  "allowed_changes_proposed_only": [
+    "skill packages / SkillBank",
+    "deterministic skill router",
+    "prompt/context injection",
+    "local parser adapter",
+    "bounded retry",
+    "verification hook",
+    "retrieval over sanitized step traces",
+    "harness code under GRC runtime"
+  ],
+  "approval_status": "proposed",
+  "approved_before_candidate_generation": false,
+  "approved_before_implementation": false,
+  "approved_before_scorer": false,
+  "approved_before_source_collection": false,
+  "bfcl_evaluator_modified": false,
+  "candidate_generation_authorized": false,
+  "candidate_pool_ready": false,
+  "decision_required": "Project lead and Huawei acceptance owner must explicitly approve RASHE before implementation, source collection, candidate generation, scorer, or performance claims.",
+  "forbidden_changes": [
+    "model weight updates",
+    "BFCL evaluator modifications",
+    "hidden gold/expected/reference use",
+    "scorer diff used for skill generation",
+    "holdout/full-suite feedback used for skill generation or thresholds",
+    "provider/model drift between baseline and candidate",
+    "case-id-specific rules or answer memorization",
+    "candidate/scorer/performance claim before gates pass"
+  ],
+  "gate_fields": {
+    "candidate_pool_gate_required": true,
+    "cost_gate_required": true,
+    "dev_holdout_disjoint_required_before_scorer": true,
+    "latency_gate_required": true,
+    "paired_comparison_required": true,
+    "regression_gate_required": true,
+    "subset_approval_id_required_if_not_full_suite": true,
+    "suite_scope": "full_suite_or_signed_subset"
+  },
+  "huawei_acceptance_ready": false,
+  "model": "gpt-5.2",
+  "model_weights_changed": false,
+  "no_leakage": {
+    "candidate_output_used_for_skill": false,
+    "expected_used": false,
+    "gold_used": false,
+    "holdout_used_for_skill": false,
+    "raw_trace_committed": false,
+    "scorer_diff_used_for_skill": false
+  },
+  "notes": [
+    "RASHE is proposed scope-change only, not active acceptance path.",
+    "No runtime implementation is authorized by this packet.",
+    "Provider technical preflight is green, but provider green is not scorer authorization.",
+    "Deterministic Stage-1 family search is exhausted under current approved gates."
+  ],
+  "performance_evidence": false,
+  "proposed_only": true,
+  "provider": "Chuangzhi/Novacode",
+  "provider_profile": "novacode",
+  "report_scope": "scope_change_approval_rashe",
+  "runtime_implementation_authorized": false,
+  "same_model_same_provider_required": true,
+  "scope_change_route": "retrieval_augmented_skill_harness_evolution",
+  "scorer_authorization": false,
+  "scorer_authorized": false,
+  "short_name": "RASHE",
+  "sota_3pp_claim_ready": false,
+  "source_collection_authorized": false,
+  "training_free_claim": true
+}

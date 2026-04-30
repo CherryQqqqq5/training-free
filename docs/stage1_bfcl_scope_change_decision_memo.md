@@ -218,6 +218,45 @@ Stop gate:
 - Stop if data governance, split integrity, or no-leakage guarantees cannot be established.
 - Stop if the route conflicts with the project requirement for training-free Stage-1 delivery.
 
+
+### Option E: Retrieval-Augmented Skill Harness Evolution (RASHE)
+
+Status: proposed only, not authorized. See
+`docs/stage1_rashe_scope_change_approval.md` and
+`outputs/artifacts/stage1_bfcl_acceptance/scope_change_approval_rashe.json`.
+
+Allowed evidence:
+
+- sanitized step traces and compact parser/schema diagnostics
+- SkillBank package metadata and deterministic router decisions
+- local parser adapter, bounded retry, and verification-hook counters
+
+Forbidden leakage:
+
+- gold, expected, reference, possible-answer, scorer diff, candidate output, or
+  repair output used for skill generation
+- holdout/full-suite feedback used for skill generation or thresholds
+- case-id-specific rules or answer memorization
+
+Expected BFCL bucket:
+
+- structural, parser/schema, and tool-use failures where a training-free harness
+  or skill-routing change can be tested under the same provider/model/evaluator
+
+Cost/scorer implications:
+
+- may affect prompt/context length, local retry cost, verifier latency, and
+  regression risk
+- requires explicit cost, latency, regression, candidate-pool, and paired
+  comparison gates before any scorer/performance claim
+
+Stop gate:
+
+- stop on any leakage counter nonzero
+- stop if provider/model/evaluator drift is required
+- stop if the route cannot produce a clean candidate pool and dev/holdout split
+- stop if cost/latency/regression gates are undefined
+
 ## Decision Requested
 
 Project lead and Huawei acceptance owner must choose one of the following before engineering proceeds:

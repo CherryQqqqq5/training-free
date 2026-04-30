@@ -140,7 +140,7 @@ selected_case_ids_sha256:
 baseline_rules_dir:
 candidate_rules_dir:
 candidate_rules_snapshot_sha256:
-scope_change_route: none | schema_parser_feedback_retry | verifier_test_time_repair | prompt_context_canonicalization | training_data_route
+scope_change_route: none | schema_parser_feedback_retry | verifier_test_time_repair | prompt_context_canonicalization | training_data_route | retrieval_augmented_skill_harness_evolution
 scope_change_approval_id:
 scope_change_approval_owner:
 scope_change_approved_before_execution: false
@@ -368,7 +368,7 @@ evidence:
 source_collection_completed = true
 source_manifests_signed = true
 artifact_boundary_passed = true
-scope_change_route = none | schema_parser_feedback_retry | verifier_test_time_repair | prompt_context_canonicalization | training_data_route
+scope_change_route = none | schema_parser_feedback_retry | verifier_test_time_repair | prompt_context_canonicalization | training_data_route | retrieval_augmented_skill_harness_evolution
 scope_change_approval_id:
 scope_change_approval_owner:
 scope_change_approved_before_execution = false
