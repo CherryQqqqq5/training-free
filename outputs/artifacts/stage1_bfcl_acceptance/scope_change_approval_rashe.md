@@ -1,6 +1,6 @@
 # RASHE Scope-Change Approval Packet
 
-Status: `approved` as a scope-change route only. This artifact does not authorize runtime implementation, source collection, candidate generation, scorer execution, paired comparison, SOTA/+3pp, or Huawei acceptance claims.
+Status: `approved` as a scope-change route only. Default-disabled inert runtime skeleton implementation is separately approved by `rashe_runtime_implementation_authorization`; this scope-change packet does not itself authorize importing, enabling, or connecting runtime behavior, source collection, candidate generation, scorer execution, paired comparison, SOTA/+3pp, or Huawei acceptance claims.
 
 ## Route
 
@@ -32,7 +32,7 @@ Provider technical preflight is green, but provider green is not scorer authoriz
 
 ## Fail-Closed Flags
 
-- approved_before_implementation: `false`
+- approved_before_implementation: `false` for this scope-change packet
 - approved_before_source_collection: `false`
 - approved_before_candidate_generation: `false`
 - approved_before_scorer: `false`
@@ -81,6 +81,13 @@ Provider technical preflight is green, but provider green is not scorer authoriz
 - paired comparison required
 - cost, latency, and regression gates required
 
+## Runtime Skeleton Boundary
+
+- runtime_implementation_authorized_by_this_packet: `false`
+- separate_runtime_implementation_authorization: `rashe_runtime_implementation_authorization` approves default-disabled inert skeleton only
+- runtime_behavior_authorized: `false`
+- default_enabled: `false`
+
 ## Decision Boundary
 
-RASHE is approved as the selected scope-change route only. A separate `rashe_runtime_implementation_authorization` is still required before any implementation, source collection, candidate generation, scorer, or performance claim.
+RASHE is approved as the selected scope-change route. Default-disabled inert runtime skeleton implementation is approved by the separate `rashe_runtime_implementation_authorization` packet. A separate execution approval is still required before any runtime path is imported, enabled, or connected to prompt injection, retry, provider/source/scorer/candidate flows, source collection, scorer, or performance claims.
