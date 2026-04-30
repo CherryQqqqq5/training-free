@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "candidate_generation_authorized": {
+      "const": false
+    },
+    "enabled": {
+      "const": false
+    },
+    "forbidden_field_violation_count": {
+      "const": 0
+    },
+    "offline_only": {
+      "const": true
+    },
+    "provider_call_count": {
+      "const": 0
+    },
+    "reject_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "runtime_authorized": {
+      "const": false
+    },
+    "schema_version": {
+      "const": "rashe_verifier_report_v0"
+    },
+    "scorer_call_count": {
+      "const": 0
+    },
+    "source_collection_call_count": {
+      "const": 0
+    },
+    "verifier_passed": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "schema_version",
+    "offline_only",
+    "enabled",
+    "runtime_authorized",
+    "provider_call_count",
+    "scorer_call_count",
+    "source_collection_call_count",
+    "candidate_generation_authorized",
+    "forbidden_field_violation_count",
+    "verifier_passed"
+  ],
+  "title": "RASHE v0 Verifier Report",
+  "type": "object"
+}

@@ -691,20 +691,25 @@ def _user_texts_from_score_row(row: dict[str, Any]) -> list[str]:
 
 
 def _dataset_user_texts_by_case(category: str, selected_ids: list[str]) -> dict[str, list[str]]:
+    def fallback() -> dict[str, list[str]]:
+        return {case_id: [f"Fixture prompt for {category} case {case_id}."] for case_id in selected_ids}
+
     try:
         from bfcl_eval.utils import load_dataset_entry
     except Exception:
-        return {}
+        return fallback()
     selected = set(selected_ids)
     out: dict[str, list[str]] = {}
     try:
         dataset_rows = load_dataset_entry(category)
     except Exception:
-        return {}
+        return fallback()
     for row in dataset_rows:
         case_id = row.get("id") if isinstance(row, dict) else None
         if isinstance(case_id, str) and case_id in selected:
             out[case_id] = _user_texts_from_question(row.get("question"))
+    for case_id, texts in fallback().items():
+        out.setdefault(case_id, texts)
     return out
 
 

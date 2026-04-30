@@ -1,0 +1,77 @@
+{
+  "branch": "stage1-bfcl-performance-sprint",
+  "categories": [
+    "multi_turn_miss_func",
+    "multi_turn_base",
+    "multi_turn_long_context"
+  ],
+  "claim_readiness": {
+    "candidate_pool_ready": false,
+    "huawei_acceptance_ready": false,
+    "performance_evidence": false,
+    "scorer_authorization": false,
+    "sota_3pp_claim_ready": false
+  },
+  "expansion_gate": {
+    "bad_jsonl_rows_required": 0,
+    "expansion_requires_new_approval": true,
+    "raw_response_present_count_over_result_jsonl_rows_min": 0.95
+  },
+  "forbidden_fields": [
+    "gold",
+    "expected",
+    "answer",
+    "ground_truth",
+    "oracle",
+    "score",
+    "candidate",
+    "repair",
+    "reference",
+    "possible_answer"
+  ],
+  "forbidden_operations": [
+    "scorer",
+    "candidate_pool_promotion",
+    "paired_comparison",
+    "performance_claim",
+    "huawei_acceptance_claim",
+    "sota_3pp_claim"
+  ],
+  "generated_at_utc": "2026-04-30T08:27:09Z",
+  "head_at_authorization": "31834c66",
+  "pilot_size_per_category": 10,
+  "pilot_total_size": 30,
+  "pre_run_requirement": "Do not start provider/source collection until explicit run task is issued.",
+  "provider_route": {
+    "expected_env": "NOVACODE_API_KEY",
+    "model": "gpt-5.2",
+    "openrouter_allowed": false,
+    "profile": "novacode",
+    "provider": "Chuangzhi/Novacode"
+  },
+  "purpose": "capture raw_response/raw_response_text for selected-call structural attribution only",
+  "raw_storage_policy": {
+    "raw_root": "/tmp/bfcl_source_collection_raw_response_capture",
+    "raw_traces_results_env_locks_tracked": false,
+    "tracked_outputs": "compact counters/manifests/hashes only"
+  },
+  "report_scope": "raw_response_capture_source_collection_authorization",
+  "required_capture_fields": [
+    "case_id",
+    "category",
+    "provider_route",
+    "model_id",
+    "dataset_record_hash",
+    "tool_schema_hash",
+    "prompt_hash",
+    "raw_response/raw_response_text",
+    "baseline_parsed_result",
+    "parse_status",
+    "parse_error_type",
+    "selected_turn_index",
+    "selected_call_count",
+    "schema_match_status"
+  ],
+  "server_path": "/cephfs/qiuyn/training-free",
+  "source_collection_rerun_for_raw_response_only": true
+}

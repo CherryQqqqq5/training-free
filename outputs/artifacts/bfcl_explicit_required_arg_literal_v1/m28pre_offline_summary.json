@@ -584,6 +584,7 @@
     "wrong_arg_key_alias_family_coverage_zero",
     "deterministic_schema_local_family_coverage_zero",
     "combined_demote_candidate_below_35",
+    "explicit_literal_candidate_pool_gate_not_passed",
     "explicit_total_below_40",
     "explicit_demote_candidate_below_35",
     "wrong_arg_key_alias_demote_below_20",
@@ -599,6 +600,7 @@
       "explicit_required_arg_literal_completion"
     ],
     "candidate_rules_type": "theory_prior_low_risk_combined",
+    "duplicate_selected_case_ids": null,
     "exact_tool_choice": false,
     "manifest_name": "theory_prior_low_risk_dev20",
     "no_next_tool_intervention": true,
@@ -622,17 +624,20 @@
       "multi_turn_miss_func_12",
       "multi_turn_miss_func_25",
       "multi_turn_miss_func_15"
-    ]
+    ],
+    "unique_selected_case_count": null
   },
   "combined_holdout_manifest": {
     "authorized_theory_prior_families": [],
     "candidate_rules_type": "theory_prior_low_risk_combined",
+    "duplicate_selected_case_ids": null,
     "exact_tool_choice": false,
     "manifest_name": "theory_prior_low_risk_holdout20",
     "no_next_tool_intervention": true,
     "planned_commands": [],
     "selected_case_count": 0,
-    "selected_case_ids": []
+    "selected_case_ids": [],
+    "unique_selected_case_count": null
   },
   "combined_theory_prior_holdout_ready": false,
   "combined_theory_prior_scorer_authorization_ready": false,
@@ -1386,23 +1391,27 @@
   "deterministic_schema_local_dev_manifest": {
     "authorized_theory_prior_families": [],
     "candidate_rules_type": "deterministic_schema_local_non_live_repair",
+    "duplicate_selected_case_ids": null,
     "exact_tool_choice": false,
     "manifest_name": "deterministic_schema_local_dev20",
     "no_next_tool_intervention": true,
     "planned_commands": [],
     "selected_case_count": 0,
-    "selected_case_ids": []
+    "selected_case_ids": [],
+    "unique_selected_case_count": null
   },
   "deterministic_schema_local_family_coverage_zero": true,
   "deterministic_schema_local_holdout_manifest": {
     "authorized_theory_prior_families": [],
     "candidate_rules_type": "deterministic_schema_local_non_live_repair",
+    "duplicate_selected_case_ids": null,
     "exact_tool_choice": false,
     "manifest_name": "deterministic_schema_local_holdout20",
     "no_next_tool_intervention": true,
     "planned_commands": [],
     "selected_case_count": 0,
-    "selected_case_ids": []
+    "selected_case_ids": [],
+    "unique_selected_case_count": null
   },
   "deterministic_schema_local_holdout_ready": false,
   "dev_holdout_disjoint": true,
@@ -1411,6 +1420,7 @@
       "explicit_required_arg_literal_completion"
     ],
     "candidate_rules_type": "explicit_required_arg_literal_completion",
+    "duplicate_selected_case_ids": null,
     "exact_tool_choice": false,
     "manifest_name": "explicit_required_arg_literal_dev20",
     "no_next_tool_intervention": true,
@@ -1434,7 +1444,8 @@
       "multi_turn_miss_func_12",
       "multi_turn_miss_func_25",
       "multi_turn_miss_func_15"
-    ]
+    ],
+    "unique_selected_case_count": null
   },
   "diagnostic": {
     "bfcl_score_cannot_create_retain_rule": true,
@@ -1446,19 +1457,494 @@
   },
   "explicit_family_scorer_authorization_ready": false,
   "explicit_holdout_ready": false,
+  "explicit_literal_candidate_pool_gate": {
+    "bad_literal_source_case_ids": [
+      "multi_turn_long_context_24",
+      "multi_turn_long_context_26",
+      "multi_turn_long_context_4",
+      "multi_turn_miss_func_1",
+      "multi_turn_miss_func_24",
+      "multi_turn_miss_func_26",
+      "multi_turn_miss_func_4",
+      "multi_turn_miss_func_5"
+    ],
+    "blockers": [
+      "eligible_explicit_literal_candidates_below_35",
+      "candidate_required_fields_missing",
+      "candidate_literal_source_not_current_context",
+      "source_result_only_candidates_are_diagnostic_only",
+      "literal_span_or_hash_missing",
+      "dev20_count_not_met",
+      "holdout20_count_not_met"
+    ],
+    "candidate_jsonl": "outputs/artifacts/bfcl_explicit_required_arg_literal_v1/candidate_rules.jsonl",
+    "candidate_record_count": 25,
+    "dev_duplicate_case_ids": [],
+    "dev_holdout_overlap_case_ids": [],
+    "dev_manifest": "outputs/artifacts/bfcl_explicit_required_arg_literal_v1/explicit_required_arg_literal_dev20_manifest.json",
+    "dev_selected_case_count": 17,
+    "does_not_authorize_scorer": true,
+    "does_not_call_bfcl_or_model": true,
+    "duplicate_candidate_case_ids": [],
+    "eligible_case_ids": [],
+    "eligible_count": 0,
+    "explicit_literal_candidate_pool_passed": false,
+    "forbidden_gold_leakage_case_ids": [],
+    "holdout_duplicate_case_ids": [],
+    "holdout_manifest": "outputs/artifacts/bfcl_explicit_required_arg_literal_v1/explicit_required_arg_literal_holdout20_manifest.json",
+    "holdout_selected_case_count": 0,
+    "min_eligible": 35,
+    "missing_fields_by_case": [
+      {
+        "case_id": "multi_turn_long_context_4",
+        "missing": [
+          "literal_source_span",
+          "literal_source_text_hash",
+          "selected_literal",
+          "used_candidate_output",
+          "used_candidate_output=false",
+          "used_gold_fields",
+          "used_gold_fields=false",
+          "used_score_fields",
+          "used_score_fields=false"
+        ]
+      },
+      {
+        "case_id": "multi_turn_long_context_8",
+        "missing": [
+          "literal_source_span",
+          "literal_source_text_hash",
+          "used_candidate_output",
+          "used_candidate_output=false",
+          "used_gold_fields",
+          "used_gold_fields=false",
+          "used_score_fields",
+          "used_score_fields=false"
+        ]
+      },
+      {
+        "case_id": "multi_turn_long_context_25",
+        "missing": [
+          "literal_source_span",
+          "literal_source_text_hash",
+          "used_candidate_output",
+          "used_candidate_output=false",
+          "used_gold_fields",
+          "used_gold_fields=false",
+          "used_score_fields",
+          "used_score_fields=false"
+        ]
+      },
+      {
+        "case_id": "multi_turn_long_context_26",
+        "missing": [
+          "literal_source_span",
+          "literal_source_text_hash",
+          "selected_literal",
+          "used_candidate_output",
+          "used_candidate_output=false",
+          "used_gold_fields",
+          "used_gold_fields=false",
+          "used_score_fields",
+          "used_score_fields=false"
+        ]
+      },
+      {
+        "case_id": "multi_turn_long_context_24",
+        "missing": [
+          "literal_source_span",
+          "literal_source_text_hash",
+          "selected_literal",
+          "used_candidate_output",
+          "used_candidate_output=false",
+          "used_gold_fields",
+          "used_gold_fields=false",
+          "used_score_fields",
+          "used_score_fields=false"
+        ]
+      },
+      {
+        "case_id": "multi_turn_miss_func_19",
+        "missing": [
+          "literal_source_span",
+          "literal_source_text_hash",
+          "used_candidate_output",
+          "used_candidate_output=false",
+          "used_gold_fields",
+          "used_gold_fields=false",
+          "used_score_fields",
+          "used_score_fields=false"
+        ]
+      },
+      {
+        "case_id": "multi_turn_miss_func_5",
+        "missing": [
+          "literal_source_span",
+          "literal_source_text_hash",
+          "selected_literal",
+          "used_candidate_output",
+          "used_candidate_output=false",
+          "used_gold_fields",
+          "used_gold_fields=false",
+          "used_score_fields",
+          "used_score_fields=false"
+        ]
+      },
+      {
+        "case_id": "multi_turn_miss_func_7",
+        "missing": [
+          "literal_source_span",
+          "literal_source_text_hash",
+          "used_candidate_output",
+          "used_candidate_output=false",
+          "used_gold_fields",
+          "used_gold_fields=false",
+          "used_score_fields",
+          "used_score_fields=false"
+        ]
+      },
+      {
+        "case_id": "multi_turn_miss_func_16",
+        "missing": [
+          "literal_source_span",
+          "literal_source_text_hash",
+          "used_candidate_output",
+          "used_candidate_output=false",
+          "used_gold_fields",
+          "used_gold_fields=false",
+          "used_score_fields",
+          "used_score_fields=false"
+        ]
+      },
+      {
+        "case_id": "multi_turn_miss_func_2",
+        "missing": [
+          "literal_source_span",
+          "literal_source_text_hash",
+          "used_candidate_output",
+          "used_candidate_output=false",
+          "used_gold_fields",
+          "used_gold_fields=false",
+          "used_score_fields",
+          "used_score_fields=false"
+        ]
+      },
+      {
+        "case_id": "multi_turn_miss_func_6",
+        "missing": [
+          "literal_source_span",
+          "literal_source_text_hash",
+          "used_candidate_output",
+          "used_candidate_output=false",
+          "used_gold_fields",
+          "used_gold_fields=false",
+          "used_score_fields",
+          "used_score_fields=false"
+        ]
+      },
+      {
+        "case_id": "multi_turn_miss_func_9",
+        "missing": [
+          "literal_source_span",
+          "literal_source_text_hash",
+          "used_candidate_output",
+          "used_candidate_output=false",
+          "used_gold_fields",
+          "used_gold_fields=false",
+          "used_score_fields",
+          "used_score_fields=false"
+        ]
+      },
+      {
+        "case_id": "multi_turn_miss_func_10",
+        "missing": [
+          "literal_source_span",
+          "literal_source_text_hash",
+          "used_candidate_output",
+          "used_candidate_output=false",
+          "used_gold_fields",
+          "used_gold_fields=false",
+          "used_score_fields",
+          "used_score_fields=false"
+        ]
+      },
+      {
+        "case_id": "multi_turn_miss_func_18",
+        "missing": [
+          "literal_source_span",
+          "literal_source_text_hash",
+          "used_candidate_output",
+          "used_candidate_output=false",
+          "used_gold_fields",
+          "used_gold_fields=false",
+          "used_score_fields",
+          "used_score_fields=false"
+        ]
+      },
+      {
+        "case_id": "multi_turn_miss_func_21",
+        "missing": [
+          "literal_source_span",
+          "literal_source_text_hash",
+          "used_candidate_output",
+          "used_candidate_output=false",
+          "used_gold_fields",
+          "used_gold_fields=false",
+          "used_score_fields",
+          "used_score_fields=false"
+        ]
+      },
+      {
+        "case_id": "multi_turn_miss_func_28",
+        "missing": [
+          "literal_source_span",
+          "literal_source_text_hash",
+          "used_candidate_output",
+          "used_candidate_output=false",
+          "used_gold_fields",
+          "used_gold_fields=false",
+          "used_score_fields",
+          "used_score_fields=false"
+        ]
+      },
+      {
+        "case_id": "multi_turn_miss_func_0",
+        "missing": [
+          "literal_source_span",
+          "literal_source_text_hash",
+          "used_candidate_output",
+          "used_candidate_output=false",
+          "used_gold_fields",
+          "used_gold_fields=false",
+          "used_score_fields",
+          "used_score_fields=false"
+        ]
+      },
+      {
+        "case_id": "multi_turn_miss_func_1",
+        "missing": [
+          "literal_source_span",
+          "literal_source_text_hash",
+          "selected_literal",
+          "used_candidate_output",
+          "used_candidate_output=false",
+          "used_gold_fields",
+          "used_gold_fields=false",
+          "used_score_fields",
+          "used_score_fields=false"
+        ]
+      },
+      {
+        "case_id": "multi_turn_miss_func_4",
+        "missing": [
+          "literal_source_span",
+          "literal_source_text_hash",
+          "selected_literal",
+          "used_candidate_output",
+          "used_candidate_output=false",
+          "used_gold_fields",
+          "used_gold_fields=false",
+          "used_score_fields",
+          "used_score_fields=false"
+        ]
+      },
+      {
+        "case_id": "multi_turn_miss_func_8",
+        "missing": [
+          "literal_source_span",
+          "literal_source_text_hash",
+          "used_candidate_output",
+          "used_candidate_output=false",
+          "used_gold_fields",
+          "used_gold_fields=false",
+          "used_score_fields",
+          "used_score_fields=false"
+        ]
+      },
+      {
+        "case_id": "multi_turn_miss_func_12",
+        "missing": [
+          "literal_source_span",
+          "literal_source_text_hash",
+          "used_candidate_output",
+          "used_candidate_output=false",
+          "used_gold_fields",
+          "used_gold_fields=false",
+          "used_score_fields",
+          "used_score_fields=false"
+        ]
+      },
+      {
+        "case_id": "multi_turn_miss_func_25",
+        "missing": [
+          "literal_source_span",
+          "literal_source_text_hash",
+          "used_candidate_output",
+          "used_candidate_output=false",
+          "used_gold_fields",
+          "used_gold_fields=false",
+          "used_score_fields",
+          "used_score_fields=false"
+        ]
+      },
+      {
+        "case_id": "multi_turn_miss_func_26",
+        "missing": [
+          "literal_source_span",
+          "literal_source_text_hash",
+          "selected_literal",
+          "used_candidate_output",
+          "used_candidate_output=false",
+          "used_gold_fields",
+          "used_gold_fields=false",
+          "used_score_fields",
+          "used_score_fields=false"
+        ]
+      },
+      {
+        "case_id": "multi_turn_miss_func_15",
+        "missing": [
+          "literal_source_span",
+          "literal_source_text_hash",
+          "used_candidate_output",
+          "used_candidate_output=false",
+          "used_gold_fields",
+          "used_gold_fields=false",
+          "used_score_fields",
+          "used_score_fields=false"
+        ]
+      },
+      {
+        "case_id": "multi_turn_miss_func_24",
+        "missing": [
+          "literal_source_span",
+          "literal_source_text_hash",
+          "selected_literal",
+          "used_candidate_output",
+          "used_candidate_output=false",
+          "used_gold_fields",
+          "used_gold_fields=false",
+          "used_score_fields",
+          "used_score_fields=false"
+        ]
+      }
+    ],
+    "missing_literal_span_or_hash_case_ids": [
+      "multi_turn_long_context_24",
+      "multi_turn_long_context_25",
+      "multi_turn_long_context_26",
+      "multi_turn_long_context_4",
+      "multi_turn_long_context_8",
+      "multi_turn_miss_func_0",
+      "multi_turn_miss_func_1",
+      "multi_turn_miss_func_10",
+      "multi_turn_miss_func_12",
+      "multi_turn_miss_func_15",
+      "multi_turn_miss_func_16",
+      "multi_turn_miss_func_18",
+      "multi_turn_miss_func_19",
+      "multi_turn_miss_func_2",
+      "multi_turn_miss_func_21",
+      "multi_turn_miss_func_24",
+      "multi_turn_miss_func_25",
+      "multi_turn_miss_func_26",
+      "multi_turn_miss_func_28",
+      "multi_turn_miss_func_4",
+      "multi_turn_miss_func_5",
+      "multi_turn_miss_func_6",
+      "multi_turn_miss_func_7",
+      "multi_turn_miss_func_8",
+      "multi_turn_miss_func_9"
+    ],
+    "offline_only": true,
+    "report_scope": "explicit_literal_candidate_pool_gate",
+    "required_dev_count": 20,
+    "required_holdout_count": 20,
+    "source_result_only_diagnostic_case_ids": [
+      "multi_turn_long_context_24",
+      "multi_turn_long_context_26",
+      "multi_turn_long_context_4",
+      "multi_turn_miss_func_1",
+      "multi_turn_miss_func_24",
+      "multi_turn_miss_func_26",
+      "multi_turn_miss_func_4",
+      "multi_turn_miss_func_5"
+    ]
+  },
+  "explicit_literal_candidate_pool_passed": false,
   "explicit_prior_family_coverage_zero": false,
   "explicit_prior_family_raw_prompt_coverage_zero": false,
   "holdout_manifest": {
     "authorized_theory_prior_families": [],
     "candidate_rules_type": "explicit_required_arg_literal_completion",
+    "duplicate_selected_case_ids": null,
     "exact_tool_choice": false,
     "manifest_name": "explicit_required_arg_literal_holdout20",
     "no_next_tool_intervention": true,
     "planned_commands": [],
     "selected_case_count": 0,
-    "selected_case_ids": []
+    "selected_case_ids": [],
+    "unique_selected_case_count": null
   },
   "m2_8pre_offline_passed": false,
+  "manifest_case_integrity": {
+    "combined_theory_prior": {
+      "dev_duplicate_selected_case_ids": [],
+      "dev_holdout_overlap_case_ids": [],
+      "dev_selected_case_count": 17,
+      "dev_unique_selected_case_count": 17,
+      "holdout_duplicate_selected_case_ids": [],
+      "holdout_selected_case_count": 0,
+      "holdout_unique_selected_case_count": 0,
+      "name": "combined_theory_prior",
+      "passed": true
+    },
+    "deterministic_schema_local": {
+      "dev_duplicate_selected_case_ids": [],
+      "dev_holdout_overlap_case_ids": [],
+      "dev_selected_case_count": 0,
+      "dev_unique_selected_case_count": 0,
+      "holdout_duplicate_selected_case_ids": [],
+      "holdout_selected_case_count": 0,
+      "holdout_unique_selected_case_count": 0,
+      "name": "deterministic_schema_local",
+      "passed": true
+    },
+    "explicit_required_arg_literal": {
+      "dev_duplicate_selected_case_ids": [],
+      "dev_holdout_overlap_case_ids": [],
+      "dev_selected_case_count": 17,
+      "dev_unique_selected_case_count": 17,
+      "holdout_duplicate_selected_case_ids": [],
+      "holdout_selected_case_count": 0,
+      "holdout_unique_selected_case_count": 0,
+      "name": "explicit_required_arg_literal",
+      "passed": true
+    },
+    "stratified_low_risk": {
+      "dev_duplicate_selected_case_ids": [],
+      "dev_holdout_overlap_case_ids": [],
+      "dev_selected_case_count": 17,
+      "dev_unique_selected_case_count": 17,
+      "holdout_duplicate_selected_case_ids": [],
+      "holdout_selected_case_count": 0,
+      "holdout_unique_selected_case_count": 0,
+      "name": "stratified_low_risk",
+      "passed": true
+    },
+    "wrong_arg_key_alias": {
+      "dev_duplicate_selected_case_ids": [],
+      "dev_holdout_overlap_case_ids": [],
+      "dev_selected_case_count": 0,
+      "dev_unique_selected_case_count": 0,
+      "holdout_duplicate_selected_case_ids": [],
+      "holdout_selected_case_count": 0,
+      "holdout_unique_selected_case_count": 0,
+      "name": "wrong_arg_key_alias",
+      "passed": true
+    }
+  },
+  "manifest_case_integrity_passed": true,
   "no_scorer_commands": true,
   "prior_scan_category_coverage": {
     "irrelevance": {
@@ -1774,6 +2260,7 @@
   "stratified_dev_holdout_disjoint": true,
   "stratified_dev_manifest": {
     "candidate_rules_type": "explicit_required_arg_literal_completion",
+    "duplicate_selected_case_ids": null,
     "exact_tool_choice": false,
     "manifest_name": "stratified_low_risk_dev20",
     "no_next_tool_intervention": true,
@@ -1797,16 +2284,19 @@
       "multi_turn_miss_func_12",
       "multi_turn_miss_func_25",
       "multi_turn_miss_func_15"
-    ]
+    ],
+    "unique_selected_case_count": null
   },
   "stratified_holdout_manifest": {
     "candidate_rules_type": "explicit_required_arg_literal_completion",
+    "duplicate_selected_case_ids": null,
     "exact_tool_choice": false,
     "manifest_name": "stratified_low_risk_holdout20",
     "no_next_tool_intervention": true,
     "planned_commands": [],
     "selected_case_count": 0,
-    "selected_case_ids": []
+    "selected_case_ids": [],
+    "unique_selected_case_count": null
   },
   "stratified_holdout_ready": false,
   "wrong_arg_key_alias_coverage_audit": {
@@ -1834,23 +2324,27 @@
   "wrong_arg_key_alias_dev_manifest": {
     "authorized_theory_prior_families": [],
     "candidate_rules_type": "wrong_arg_key_alias_repair",
+    "duplicate_selected_case_ids": null,
     "exact_tool_choice": false,
     "manifest_name": "wrong_arg_key_alias_dev20",
     "no_next_tool_intervention": true,
     "planned_commands": [],
     "selected_case_count": 0,
-    "selected_case_ids": []
+    "selected_case_ids": [],
+    "unique_selected_case_count": null
   },
   "wrong_arg_key_alias_family_coverage_zero": true,
   "wrong_arg_key_alias_holdout_manifest": {
     "authorized_theory_prior_families": [],
     "candidate_rules_type": "wrong_arg_key_alias_repair",
+    "duplicate_selected_case_ids": null,
     "exact_tool_choice": false,
     "manifest_name": "wrong_arg_key_alias_holdout20",
     "no_next_tool_intervention": true,
     "planned_commands": [],
     "selected_case_count": 0,
-    "selected_case_ids": []
+    "selected_case_ids": [],
+    "unique_selected_case_count": null
   },
   "wrong_arg_key_alias_holdout_ready": false
 }

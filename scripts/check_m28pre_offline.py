@@ -8,6 +8,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from scripts.check_explicit_literal_candidate_pool import evaluate as evaluate_explicit_literal_pool
+
 DEFAULT_SUBSET = Path("outputs/artifacts/bfcl_ctspc_subset30_v1")
 DEFAULT_LOW_RISK = Path("outputs/artifacts/bfcl_explicit_required_arg_literal_v1")
 OUT = DEFAULT_LOW_RISK / "m28pre_offline_summary.json"
@@ -29,6 +31,34 @@ def _no_commands(*items: dict[str, Any]) -> bool:
     return not any(item.get("planned_commands") or item.get("candidate_commands") for item in items)
 
 
+def _case_ids(manifest: dict[str, Any]) -> list[str]:
+    return [str(x) for x in manifest.get("selected_case_ids") or []]
+
+
+def _duplicate_ids(ids: list[str]) -> list[str]:
+    counts: dict[str, int] = {}
+    for case_id in ids:
+        counts[case_id] = counts.get(case_id, 0) + 1
+    return sorted(case_id for case_id, count in counts.items() if count > 1)
+
+
+def _manifest_integrity(name: str, dev_ids: list[str], holdout_ids: list[str]) -> dict[str, Any]:
+    dev_duplicates = _duplicate_ids(dev_ids)
+    holdout_duplicates = _duplicate_ids(holdout_ids)
+    overlap = sorted(set(dev_ids) & set(holdout_ids))
+    return {
+        "name": name,
+        "dev_selected_case_count": len(dev_ids),
+        "dev_unique_selected_case_count": len(set(dev_ids)),
+        "dev_duplicate_selected_case_ids": dev_duplicates,
+        "holdout_selected_case_count": len(holdout_ids),
+        "holdout_unique_selected_case_count": len(set(holdout_ids)),
+        "holdout_duplicate_selected_case_ids": holdout_duplicates,
+        "dev_holdout_overlap_case_ids": overlap,
+        "passed": not dev_duplicates and not holdout_duplicates and not overlap,
+    }
+
+
 def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_LOW_RISK) -> dict[str, Any]:
     status = _j(subset_root / "m27ae_ctspc_v0_status.json", {}) or {}
     repair = _j(subset_root / "repair_stack_contribution.json", {}) or {}
@@ -48,6 +78,11 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
     combined_holdout = _j(low_risk_root / "theory_prior_low_risk_holdout20_manifest.json", {}) or {}
     strat_dev = _j(low_risk_root / "stratified_low_risk_dev20_manifest.json", {}) or {}
     strat_holdout = _j(low_risk_root / "stratified_low_risk_holdout20_manifest.json", {}) or {}
+    explicit_literal_pool = evaluate_explicit_literal_pool(
+        low_risk_root / "candidate_rules.jsonl",
+        low_risk_root / "explicit_required_arg_literal_dev20_manifest.json",
+        low_risk_root / "explicit_required_arg_literal_holdout20_manifest.json",
+    )
 
     freeze = bool(
         status.get("ctspc_v0_frozen")
@@ -56,21 +91,29 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         and status.get("dev_rerun_authorized") is False
         and status.get("holdout_authorized") is False
     )
-    dev_ids = set(str(x) for x in dev.get("selected_case_ids") or [])
-    holdout_ids = set(str(x) for x in holdout.get("selected_case_ids") or [])
-    alias_dev_ids = set(str(x) for x in alias_dev.get("selected_case_ids") or [])
-    alias_holdout_ids = set(str(x) for x in alias_holdout.get("selected_case_ids") or [])
-    deterministic_dev_ids = set(str(x) for x in deterministic_dev.get("selected_case_ids") or [])
-    deterministic_holdout_ids = set(str(x) for x in deterministic_holdout.get("selected_case_ids") or [])
-    combined_dev_ids = set(str(x) for x in combined_dev.get("selected_case_ids") or []) or dev_ids
-    combined_holdout_ids = set(str(x) for x in combined_holdout.get("selected_case_ids") or []) or holdout_ids
-    strat_dev_ids = set(str(x) for x in strat_dev.get("selected_case_ids") or [])
-    strat_holdout_ids = set(str(x) for x in strat_holdout.get("selected_case_ids") or [])
-    explicit_disjoint = not (dev_ids & holdout_ids)
-    alias_disjoint = not (alias_dev_ids & alias_holdout_ids)
-    deterministic_disjoint = not (deterministic_dev_ids & deterministic_holdout_ids)
-    combined_disjoint = not (combined_dev_ids & combined_holdout_ids)
-    stratified_disjoint = not (strat_dev_ids & strat_holdout_ids)
+    dev_id_list = _case_ids(dev)
+    holdout_id_list = _case_ids(holdout)
+    alias_dev_id_list = _case_ids(alias_dev)
+    alias_holdout_id_list = _case_ids(alias_holdout)
+    deterministic_dev_id_list = _case_ids(deterministic_dev)
+    deterministic_holdout_id_list = _case_ids(deterministic_holdout)
+    combined_dev_id_list = _case_ids(combined_dev) or dev_id_list
+    combined_holdout_id_list = _case_ids(combined_holdout) or holdout_id_list
+    strat_dev_id_list = _case_ids(strat_dev)
+    strat_holdout_id_list = _case_ids(strat_holdout)
+    manifest_integrity = {
+        "explicit_required_arg_literal": _manifest_integrity("explicit_required_arg_literal", dev_id_list, holdout_id_list),
+        "wrong_arg_key_alias": _manifest_integrity("wrong_arg_key_alias", alias_dev_id_list, alias_holdout_id_list),
+        "deterministic_schema_local": _manifest_integrity("deterministic_schema_local", deterministic_dev_id_list, deterministic_holdout_id_list),
+        "combined_theory_prior": _manifest_integrity("combined_theory_prior", combined_dev_id_list, combined_holdout_id_list),
+        "stratified_low_risk": _manifest_integrity("stratified_low_risk", strat_dev_id_list, strat_holdout_id_list),
+    }
+    explicit_disjoint = not manifest_integrity["explicit_required_arg_literal"]["dev_holdout_overlap_case_ids"]
+    alias_disjoint = not manifest_integrity["wrong_arg_key_alias"]["dev_holdout_overlap_case_ids"]
+    deterministic_disjoint = not manifest_integrity["deterministic_schema_local"]["dev_holdout_overlap_case_ids"]
+    combined_disjoint = not manifest_integrity["combined_theory_prior"]["dev_holdout_overlap_case_ids"]
+    stratified_disjoint = not manifest_integrity["stratified_low_risk"]["dev_holdout_overlap_case_ids"]
+    all_manifests_unique = all(item["passed"] for item in manifest_integrity.values())
 
     compiler_ready = bool(compiler.get("compiler_ready") or compiler.get("m28pre_explicit_required_arg_literal_compiler_passed"))
     explicit_holdout_ready = bool(compiler.get("explicit_holdout_ready") or compiler.get("m28pre_explicit_required_arg_literal_holdout_ready")) and explicit_disjoint
@@ -147,6 +190,7 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         "deterministic_schema_local_dev_holdout_disjoint": deterministic_disjoint,
         "combined_dev_holdout_disjoint": combined_disjoint,
         "stratified_dev_holdout_disjoint": stratified_disjoint,
+        "manifest_case_integrity_passed": all_manifests_unique,
         "no_scorer_commands": no_scorer_commands,
         "runtime_manifest_safeguards_passed": safeguards,
         "retention_prior_coverage_audit_ready": coverage_ready,
@@ -161,6 +205,7 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         "deterministic_schema_local_family_coverage_zero": deterministic_family_coverage_zero,
         "explicit_family_scorer_authorization_ready": explicit_family_ready,
         "combined_theory_prior_scorer_authorization_ready": combined_family_ready,
+        "explicit_literal_candidate_pool_passed": bool(explicit_literal_pool.get("explicit_literal_candidate_pool_passed")),
     }
     blockers: list[str] = []
     if not checks["ctspc_v0_frozen"]:
@@ -197,6 +242,15 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         blockers.append("deterministic_schema_local_family_coverage_zero")
     if combined_retain_count < required_generatable:
         blockers.append("combined_demote_candidate_below_35")
+    if not checks["explicit_literal_candidate_pool_passed"]:
+        blockers.append("explicit_literal_candidate_pool_gate_not_passed")
+    for name, integrity in manifest_integrity.items():
+        if integrity["dev_duplicate_selected_case_ids"]:
+            blockers.append(f"{name}_dev_duplicate_case_ids_present")
+        if integrity["holdout_duplicate_selected_case_ids"]:
+            blockers.append(f"{name}_holdout_duplicate_case_ids_present")
+        if integrity["dev_holdout_overlap_case_ids"]:
+            blockers.append(f"{name}_dev_holdout_overlap_present")
     compiler_blockers = compiler.get("blockers") or []
     for blocker in compiler_blockers if isinstance(compiler_blockers, list) else []:
         if blocker not in blockers:
@@ -211,7 +265,9 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
         checks["source_result_availability_ready"],
         checks["wrong_arg_key_alias_coverage_audit_ready"],
         checks["deterministic_schema_local_coverage_audit_ready"],
+        checks["explicit_literal_candidate_pool_passed"],
         checks["combined_theory_prior_scorer_authorization_ready"],
+        checks["manifest_case_integrity_passed"],
     ])
     return {
         "report_scope": "m2_8pre_offline_summary",
@@ -244,9 +300,11 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
             "planned_commands",
         ]},
         "route_recommendation": route_recommendation,
+        "manifest_case_integrity": manifest_integrity,
         "scorer_authorization_ready": scorer_authorization_ready,
         "m2_8pre_offline_passed": scorer_authorization_ready,
         "blockers": blockers,
+        "explicit_literal_candidate_pool_gate": explicit_literal_pool,
         "compiler": {key: compiler.get(key) for key in [
             "selected_case_count",
             "candidate_generatable_count",
@@ -319,16 +377,16 @@ def evaluate(subset_root: Path = DEFAULT_SUBSET, low_risk_root: Path = DEFAULT_L
             "candidate_commands",
             "planned_commands",
         ]},
-        "dev_manifest": {key: dev.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "authorized_theory_prior_families", "no_next_tool_intervention", "exact_tool_choice"]},
-        "holdout_manifest": {key: holdout.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "authorized_theory_prior_families", "no_next_tool_intervention", "exact_tool_choice"]},
-        "wrong_arg_key_alias_dev_manifest": {key: alias_dev.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "authorized_theory_prior_families", "no_next_tool_intervention", "exact_tool_choice"]},
-        "wrong_arg_key_alias_holdout_manifest": {key: alias_holdout.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "authorized_theory_prior_families", "no_next_tool_intervention", "exact_tool_choice"]},
-        "deterministic_schema_local_dev_manifest": {key: deterministic_dev.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "authorized_theory_prior_families", "no_next_tool_intervention", "exact_tool_choice"]},
-        "deterministic_schema_local_holdout_manifest": {key: deterministic_holdout.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "authorized_theory_prior_families", "no_next_tool_intervention", "exact_tool_choice"]},
-        "combined_dev_manifest": {key: combined_dev.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "authorized_theory_prior_families", "no_next_tool_intervention", "exact_tool_choice"]},
-        "combined_holdout_manifest": {key: combined_holdout.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "authorized_theory_prior_families", "no_next_tool_intervention", "exact_tool_choice"]},
-        "stratified_dev_manifest": {key: strat_dev.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "no_next_tool_intervention", "exact_tool_choice"]},
-        "stratified_holdout_manifest": {key: strat_holdout.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "planned_commands", "candidate_rules_type", "no_next_tool_intervention", "exact_tool_choice"]},
+        "dev_manifest": {key: dev.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "unique_selected_case_count", "duplicate_selected_case_ids", "planned_commands", "candidate_rules_type", "authorized_theory_prior_families", "no_next_tool_intervention", "exact_tool_choice"]},
+        "holdout_manifest": {key: holdout.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "unique_selected_case_count", "duplicate_selected_case_ids", "planned_commands", "candidate_rules_type", "authorized_theory_prior_families", "no_next_tool_intervention", "exact_tool_choice"]},
+        "wrong_arg_key_alias_dev_manifest": {key: alias_dev.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "unique_selected_case_count", "duplicate_selected_case_ids", "planned_commands", "candidate_rules_type", "authorized_theory_prior_families", "no_next_tool_intervention", "exact_tool_choice"]},
+        "wrong_arg_key_alias_holdout_manifest": {key: alias_holdout.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "unique_selected_case_count", "duplicate_selected_case_ids", "planned_commands", "candidate_rules_type", "authorized_theory_prior_families", "no_next_tool_intervention", "exact_tool_choice"]},
+        "deterministic_schema_local_dev_manifest": {key: deterministic_dev.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "unique_selected_case_count", "duplicate_selected_case_ids", "planned_commands", "candidate_rules_type", "authorized_theory_prior_families", "no_next_tool_intervention", "exact_tool_choice"]},
+        "deterministic_schema_local_holdout_manifest": {key: deterministic_holdout.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "unique_selected_case_count", "duplicate_selected_case_ids", "planned_commands", "candidate_rules_type", "authorized_theory_prior_families", "no_next_tool_intervention", "exact_tool_choice"]},
+        "combined_dev_manifest": {key: combined_dev.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "unique_selected_case_count", "duplicate_selected_case_ids", "planned_commands", "candidate_rules_type", "authorized_theory_prior_families", "no_next_tool_intervention", "exact_tool_choice"]},
+        "combined_holdout_manifest": {key: combined_holdout.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "unique_selected_case_count", "duplicate_selected_case_ids", "planned_commands", "candidate_rules_type", "authorized_theory_prior_families", "no_next_tool_intervention", "exact_tool_choice"]},
+        "stratified_dev_manifest": {key: strat_dev.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "unique_selected_case_count", "duplicate_selected_case_ids", "planned_commands", "candidate_rules_type", "no_next_tool_intervention", "exact_tool_choice"]},
+        "stratified_holdout_manifest": {key: strat_holdout.get(key) for key in ["manifest_name", "selected_case_count", "selected_case_ids", "unique_selected_case_count", "duplicate_selected_case_ids", "planned_commands", "candidate_rules_type", "no_next_tool_intervention", "exact_tool_choice"]},
         "diagnostic": {
             "offline_readiness_only": True,
             "does_not_authorize_scorer_without_separate_request": True,
@@ -371,6 +429,8 @@ def render_markdown(report: dict[str, Any]) -> str:
         "deterministic_schema_local_family_coverage_zero",
         "no_scorer_commands",
         "runtime_manifest_safeguards_passed",
+        "manifest_case_integrity_passed",
+        "explicit_literal_candidate_pool_passed",
     ]:
         lines.append(f"| `{key}` | `{report[key]}` |")
     lines.extend(["", "Offline readiness only. No scorer command is emitted by this artifact.", ""])

@@ -1,6 +1,6 @@
-# Conda + OpenRouter 环境配置（按顺序执行）
+# Deprecated OpenRouter Notes
 
-适用于：已创建 conda 环境 `tf`、服务器无法访问 OpenAI、仅能通过 [OpenRouter](https://openrouter.ai/) 访问模型。
+Deprecated for the Stage-1 BFCL sprint: use `novacode` / 创智 via `NOVACODE_API_KEY`; do not use OpenRouter.
 
 仓库根目录以下记为 `$REPO`（例如 `/cephfs/qiuyn/training-free`）。
 

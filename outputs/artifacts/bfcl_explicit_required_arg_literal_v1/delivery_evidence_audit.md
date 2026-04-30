@@ -3,27 +3,27 @@
 - Claim status: `scaffold_and_diagnostic_package_only`
 - SOTA +3pp claim ready: `False`
 - Offline only: `True`
-- P0 blockers: `['artifact_boundary_not_clean', 'm2_8pre_offline_not_passed', 'scorer_authorization_not_ready', 'policy_conversion_not_observed_in_existing_traces', 'runtime_dry_run_compiler_not_ready', 'postcondition_dev_smoke_stop_loss_failed', 'postcondition_candidate_mining_gap_filter_not_passed', 'postcondition_smoke_protocol_not_ready', 'low_risk_unmet_postcondition_pool_too_small', 'explicit_obligation_smoke_selection_not_ready_after_baseline_dry_audit', 'explicit_obligation_selection_gate_not_passed', 'explicit_obligation_smoke_ready_gate_not_passed']`
+- P0 blockers: `['m2_8pre_offline_not_passed', 'scorer_authorization_not_ready', 'policy_conversion_not_observed_in_existing_traces', 'runtime_dry_run_compiler_not_ready', 'postcondition_dev_smoke_stop_loss_failed', 'postcondition_candidate_mining_gap_filter_not_passed', 'postcondition_smoke_protocol_not_ready', 'low_risk_unmet_postcondition_pool_too_small', 'explicit_obligation_smoke_selection_not_ready_after_baseline_dry_audit', 'explicit_obligation_selection_gate_not_passed', 'explicit_obligation_smoke_ready_gate_not_passed']`
 
 ## Gate Snapshot
 
-- Artifact boundary passed: `False`
-- Forbidden artifact count: `16903`
+- Artifact boundary passed: `True`
+- Forbidden artifact count: `0`
 - M2.8-pre passed: `False`
 - Scorer authorization ready: `False`
 - Remaining gap to 35 demote candidates: `18`
 
 ## Policy Conversion Evidence
 
-- Trace files scanned: `5000`
-- Rule hits: `388`
+- Trace files scanned: `0`
+- Rule hits: `0`
 - Policy hits: `0`
 - Recommended tools: `0`
 - Selected next tool: `0`
 - Next tool emitted: `0`
 - Policy conversion observed: `False`
-- Rule hits without policy hits: `388`
-- Policy conversion absent reason: `policy_artifact_or_runtime_candidate_missing`
+- Rule hits without policy hits: `0`
+- Policy conversion absent reason: `None`
 
 ## Policy Opportunity Evidence
 

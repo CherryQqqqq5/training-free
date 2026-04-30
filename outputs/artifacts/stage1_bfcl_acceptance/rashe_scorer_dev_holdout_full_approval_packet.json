@@ -1,0 +1,76 @@
+{
+  "allowed_if_approved": [
+    "baseline dev scorer command",
+    "candidate dev scorer command",
+    "holdout scorer command after dev pass",
+    "paired baseline/candidate comparison artifacts",
+    "compact run schema artifacts"
+  ],
+  "approval_packet_kind": "scorer_dev_holdout_full",
+  "approval_status": "pending",
+  "authorized": false,
+  "bfcl_performance_ready": false,
+  "candidate_generation_authorized": false,
+  "candidate_jsonl_authorized": false,
+  "candidate_pool_ready": false,
+  "dev_holdout_authorized": false,
+  "execution_started": false,
+  "forbidden_until_approved": [
+    "BFCL scorer",
+    "candidate run",
+    "paired comparison",
+    "dev/holdout/full-suite scoring",
+    "provider/model/protocol drift",
+    "gold leakage into candidate path",
+    "performance claim before paired gate"
+  ],
+  "huawei_acceptance_ready": false,
+  "no_leakage_required": {
+    "candidate_output_used": false,
+    "case_id_specific_rules_allowed": false,
+    "expected_used": false,
+    "full_suite_feedback_used": false,
+    "gold_used": false,
+    "holdout_feedback_used": false,
+    "raw_trace_committed": false,
+    "scorer_diff_used": false
+  },
+  "notes": [
+    "Fail-closed approval skeleton only.",
+    "This packet does not authorize execution, provider calls, source collection, candidate generation, scorer use, performance evidence, SOTA claims, or Huawei acceptance readiness."
+  ],
+  "offline_only_packet": true,
+  "paired_comparison_authorized": false,
+  "performance_evidence": false,
+  "prerequisites": [
+    "same provider/model/protocol comparator frozen",
+    "candidate pool ready and no-leakage clean",
+    "dev/holdout disjoint manifests signed",
+    "baseline and candidate commands reviewed",
+    "paired comparison checker reviewed"
+  ],
+  "prompt_injection_authorized": false,
+  "proposer_execution_authorized": false,
+  "provider_calls_authorized": false,
+  "purpose": "Future approval boundary for scorer use after candidate pool and split gates pass.",
+  "raw_payload_capture_authorized": false,
+  "raw_trace_authorized": false,
+  "report_scope": "rashe_scorer_dev_holdout_full_approval_packet",
+  "retry_authorized": false,
+  "rollback_stop_gates": [
+    "same provider/model/protocol mismatch stops scoring",
+    "dev/holdout overlap stops scoring",
+    "paired comparison regression stops claim",
+    "run schema checker failure stops claim"
+  ],
+  "runtime_behavior_authorized": false,
+  "same_provider_model_protocol_required_if_approved": true,
+  "schema_version": "rashe_approval_packet_v0",
+  "scope_change_route": "retrieval_augmented_skill_harness_evolution",
+  "scorer_authorized": false,
+  "short_name": "RASHE",
+  "sota_3pp_claim_ready": false,
+  "source_collection_authorized": false,
+  "title": "RASHE scorer dev/holdout/full approval packet",
+  "tool_path_mutation_authorized": false
+}

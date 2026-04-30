@@ -1,0 +1,38 @@
+{
+  "report_scope": "explicit_literal_pool_existing_source_dry_audit",
+  "offline_only": true,
+  "does_not_call_provider": true,
+  "does_not_call_bfcl_or_model": true,
+  "does_not_authorize_scorer": true,
+  "does_not_overwrite_default_candidate_artifacts": true,
+  "source_manifest": "outputs/artifacts/bfcl_ctspc_source_pool_v1/source_collection_manifest.json",
+  "source_manifest_present": true,
+  "source_manifest_category_count": 14,
+  "source_artifacts_available_category_count": 0,
+  "bfcl_result_file_count_under_source_pool": 0,
+  "dataset_fixture_present": false,
+  "temp_builder_command_summary": {
+    "candidate_jsonl": "/tmp/explicit_literal_pool_audit.qJymXn/candidate_rules.jsonl",
+    "dev_manifest": "/tmp/explicit_literal_pool_audit.qJymXn/explicit_required_arg_literal_dev20_manifest.json",
+    "holdout_manifest": "/tmp/explicit_literal_pool_audit.qJymXn/explicit_required_arg_literal_holdout20_manifest.json",
+    "summary_output": "/tmp/explicit_literal_pool_audit.qJymXn/explicit_literal_candidate_pool_build_summary.json"
+  },
+  "candidate_record_count": 0,
+  "eligible_count": 0,
+  "accepted_record_count": 0,
+  "rejected_record_count": 0,
+  "reject_reason_counts": {},
+  "dev_selected_case_count": 0,
+  "holdout_selected_case_count": 0,
+  "candidate_pool_build_passed": false,
+  "blockers": [
+    "source_pool_has_no_bfcl_result_files",
+    "source_manifest_has_no_available_source_artifacts",
+    "dataset_json_missing",
+    "dataset_records_missing",
+    "eligible_explicit_literal_candidates_below_minimum",
+    "dev_count_not_met",
+    "holdout_count_not_met"
+  ],
+  "next_required_action": "get_provider_green_then_run_priority_source_collection_before_rebuilding_explicit_literal_pool"
+}

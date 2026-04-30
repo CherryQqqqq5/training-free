@@ -12,21 +12,13 @@ runtime_policy:
 
 upstream:
   # Matches GRC_UPSTREAM_PROFILE default; use novacode profile in YAML + env if needed.
-  active_profile: "openrouter"
+  active_profile: "novacode"
   base_url: "https://YOUR_UPSTREAM_OPENAI_COMPATIBLE_ENDPOINT/v1"
   api_key_env: "OPENAI_API_KEY"
-  model: "gpt-5.4"
+  model: "gpt-5.2"
   profiles:
     novacode:
       base_url_env: "NOVACODE_BASE_URL"
-      base_url: "https://ai.novacode.top/v1"
+      base_url: "https://apicz.boyuerichdata.com/v1"
       api_key_env: "NOVACODE_API_KEY"
-      model: "gpt-5.4"
-    openrouter:
-      base_url_env: "OPENROUTER_BASE_URL"
-      base_url: "https://openrouter.ai/api/v1"
-      api_key_env: "OPENROUTER_API_KEY"
-      model: "x-ai/grok-3-beta"
-      http_referer_env: "OPENROUTER_HTTP_REFERER"
-      title_env: "OPENROUTER_X_TITLE"
-      default_title: "golden-rule-compiler"
+      model: "gpt-5.2"

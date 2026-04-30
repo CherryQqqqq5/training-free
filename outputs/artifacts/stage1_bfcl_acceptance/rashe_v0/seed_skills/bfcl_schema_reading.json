@@ -1,0 +1,79 @@
+{
+  "actions": [
+    "read visible tool schema names",
+    "preserve schema-local argument names"
+  ],
+  "allowed_triggers": [
+    "tool_schema_present",
+    "argument_name_choice_needed",
+    "required_properties_visible"
+  ],
+  "conflicts_with": [
+    "bfcl_tool_call_format_guard"
+  ],
+  "display_name": "BFCL schema reading",
+  "enabled": false,
+  "evaluation_status": "offline_seed_validated",
+  "forbidden_sources": [
+    "raw_case_identifier",
+    "raw_trace_text",
+    "raw_provider_payload",
+    "gold",
+    "expected",
+    "scorer_diff",
+    "candidate_output",
+    "repair_output",
+    "holdout_feedback",
+    "full_suite_feedback"
+  ],
+  "forbidden_triggers": [
+    "gold_argument_key",
+    "reference_answer",
+    "scorer_diff",
+    "hidden_checker"
+  ],
+  "max_injection_tokens": 0,
+  "no_leakage_policy": {
+    "candidate_output_used": false,
+    "case_specific_content_allowed": false,
+    "expected_used": false,
+    "gold_used": false,
+    "holdout_used": false,
+    "raw_trace_committed": false,
+    "scorer_diff_used": false
+  },
+  "offline_only": true,
+  "requires_current_turn": false,
+  "requires_schema": true,
+  "rollback_policy": {
+    "disable_by_default": true,
+    "rollback_action": "remove skill from router allowlist before any runtime authorization",
+    "state_mutation": "none"
+  },
+  "runtime_authorized": false,
+  "schema_version": "rashe_skill_v0",
+  "scope": "bfcl_offline_skeleton_seed",
+  "skill_id": "bfcl_schema_reading",
+  "source_boundary": {
+    "allowed_sources": [
+      "sanitized_current_turn_text",
+      "tool_schema_text",
+      "sanitized_step_trace_hashes",
+      "local_parser_status"
+    ],
+    "forbidden_sources": [
+      "raw_case_identifier",
+      "raw_trace_text",
+      "raw_provider_payload",
+      "gold",
+      "expected",
+      "scorer_diff",
+      "candidate_output",
+      "repair_output",
+      "holdout_feedback",
+      "full_suite_feedback"
+    ]
+  },
+  "training_free": true,
+  "trigger_priority": 20
+}

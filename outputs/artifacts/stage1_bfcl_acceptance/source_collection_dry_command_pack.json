@@ -1,0 +1,141 @@
+{
+  "report_scope": "provider_green_source_collection_dry_command_pack",
+  "offline_only": true,
+  "does_not_call_provider": true,
+  "does_not_call_bfcl_or_model": true,
+  "does_not_authorize_scorer": true,
+  "not_performance_evidence": true,
+  "execution_mode": "dry_approval_gated_templates_only",
+  "requires_manual_approval_after_provider_green": true,
+  "approval_gate": {
+    "environment_variable": "GRC_SOURCE_COLLECTION_APPROVED",
+    "required_value": "1",
+    "purpose": "prevents accidental provider/BFCL execution when copying command templates"
+  },
+  "acceptance_state_boundary": {
+    "provider_blocked_allowed_activity": "review_or_maintain_this_dry_command_pack_only",
+    "provider_blocked_prohibited_commands": [
+      "source_collection_rerun",
+      "baseline_scorer",
+      "candidate_scorer",
+      "paired_comparison",
+      "full_suite_bfcl_evaluation"
+    ],
+    "provider_green_authorizes_source_collection_only_after_provider_unblock_and_scope_signoff": true,
+    "provider_green_does_not_authorize_scorer": true
+  },
+  "preconditions": [
+    "provider_green_preflight_passed",
+    "artifact_boundary_passed",
+    "approved_provider_profile_and_model_route_frozen",
+    "valid_provider_credential_configured"
+  ],
+  "preflight_gate": {
+    "command": "PYTHONPATH=.:src .venv/bin/python scripts/check_provider_green_preflight.py --provider-status outputs/artifacts/bfcl_ctspc_source_pool_v1/current_provider_preflight_status.json --compact --strict",
+    "fail_closed_if": [
+      "provider credential missing",
+      "HTTP 401/403/429",
+      "model unavailable",
+      "tool-call preflight failed",
+      "trace emission failed"
+    ]
+  },
+  "source_collection_priority": [
+    {
+      "priority": 1,
+      "category": "multi_turn_miss_func",
+      "port": 8076,
+      "raw_run_root": "/tmp/bfcl_source_collection/multi_turn_miss_func/baseline",
+      "compact_output_dir": "outputs/artifacts/bfcl_ctspc_source_pool_v1/multi_turn_miss_func/baseline",
+      "compact_artifact_dir": "outputs/artifacts/bfcl_ctspc_source_pool_v1/multi_turn_miss_func/baseline/artifacts",
+      "command_template": "test \"${GRC_SOURCE_COLLECTION_APPROVED:-0}\" = \"1\" || { echo 'source collection approval required'; exit 2; }; bash scripts/run_bfcl_v4_baseline.sh gpt-4o-mini-2024-07-18-FC /tmp/bfcl_source_collection/multi_turn_miss_func/baseline 8076 multi_turn_miss_func configs/runtime_bfcl_structured.yaml rules/baseline_empty /tmp/bfcl_source_collection/multi_turn_miss_func/baseline/traces outputs/artifacts/bfcl_ctspc_source_pool_v1/multi_turn_miss_func/baseline/artifacts"
+    },
+    {
+      "priority": 2,
+      "category": "multi_turn_long_context",
+      "port": 8075,
+      "raw_run_root": "/tmp/bfcl_source_collection/multi_turn_long_context/baseline",
+      "compact_output_dir": "outputs/artifacts/bfcl_ctspc_source_pool_v1/multi_turn_long_context/baseline",
+      "compact_artifact_dir": "outputs/artifacts/bfcl_ctspc_source_pool_v1/multi_turn_long_context/baseline/artifacts",
+      "command_template": "test \"${GRC_SOURCE_COLLECTION_APPROVED:-0}\" = \"1\" || { echo 'source collection approval required'; exit 2; }; bash scripts/run_bfcl_v4_baseline.sh gpt-4o-mini-2024-07-18-FC /tmp/bfcl_source_collection/multi_turn_long_context/baseline 8075 multi_turn_long_context configs/runtime_bfcl_structured.yaml rules/baseline_empty /tmp/bfcl_source_collection/multi_turn_long_context/baseline/traces outputs/artifacts/bfcl_ctspc_source_pool_v1/multi_turn_long_context/baseline/artifacts"
+    },
+    {
+      "priority": 3,
+      "category": "multi_turn_base",
+      "port": 8074,
+      "raw_run_root": "/tmp/bfcl_source_collection/multi_turn_base/baseline",
+      "compact_output_dir": "outputs/artifacts/bfcl_ctspc_source_pool_v1/multi_turn_base/baseline",
+      "compact_artifact_dir": "outputs/artifacts/bfcl_ctspc_source_pool_v1/multi_turn_base/baseline/artifacts",
+      "command_template": "test \"${GRC_SOURCE_COLLECTION_APPROVED:-0}\" = \"1\" || { echo 'source collection approval required'; exit 2; }; bash scripts/run_bfcl_v4_baseline.sh gpt-4o-mini-2024-07-18-FC /tmp/bfcl_source_collection/multi_turn_base/baseline 8074 multi_turn_base configs/runtime_bfcl_structured.yaml rules/baseline_empty /tmp/bfcl_source_collection/multi_turn_base/baseline/traces outputs/artifacts/bfcl_ctspc_source_pool_v1/multi_turn_base/baseline/artifacts"
+    },
+    {
+      "priority": 4,
+      "category": "parallel_multiple",
+      "port": 8080,
+      "raw_run_root": "/tmp/bfcl_source_collection/parallel_multiple/baseline",
+      "compact_output_dir": "outputs/artifacts/bfcl_ctspc_source_pool_v1/parallel_multiple/baseline",
+      "compact_artifact_dir": "outputs/artifacts/bfcl_ctspc_source_pool_v1/parallel_multiple/baseline/artifacts",
+      "command_template": "test \"${GRC_SOURCE_COLLECTION_APPROVED:-0}\" = \"1\" || { echo 'source collection approval required'; exit 2; }; bash scripts/run_bfcl_v4_baseline.sh gpt-4o-mini-2024-07-18-FC /tmp/bfcl_source_collection/parallel_multiple/baseline 8080 parallel_multiple configs/runtime_bfcl_structured.yaml rules/baseline_empty /tmp/bfcl_source_collection/parallel_multiple/baseline/traces outputs/artifacts/bfcl_ctspc_source_pool_v1/parallel_multiple/baseline/artifacts"
+    },
+    {
+      "priority": 5,
+      "category": "multiple",
+      "port": 8078,
+      "raw_run_root": "/tmp/bfcl_source_collection/multiple/baseline",
+      "compact_output_dir": "outputs/artifacts/bfcl_ctspc_source_pool_v1/multiple/baseline",
+      "compact_artifact_dir": "outputs/artifacts/bfcl_ctspc_source_pool_v1/multiple/baseline/artifacts",
+      "command_template": "test \"${GRC_SOURCE_COLLECTION_APPROVED:-0}\" = \"1\" || { echo 'source collection approval required'; exit 2; }; bash scripts/run_bfcl_v4_baseline.sh gpt-4o-mini-2024-07-18-FC /tmp/bfcl_source_collection/multiple/baseline 8078 multiple configs/runtime_bfcl_structured.yaml rules/baseline_empty /tmp/bfcl_source_collection/multiple/baseline/traces outputs/artifacts/bfcl_ctspc_source_pool_v1/multiple/baseline/artifacts"
+    }
+  ],
+  "excluded_from_mainline": [
+    "memory_kv",
+    "memory_rec_sum",
+    "memory_vector"
+  ],
+  "expected_compact_artifacts_per_category": [
+    "artifacts/preflight_report.json",
+    "artifacts/metrics.json",
+    "artifacts/failure_summary.json",
+    "artifacts/run_manifest.json"
+  ],
+  "raw_run_roots_are_temporary": true,
+  "raw_run_root_policy": "BFCL result, score, traces, locks, logs, and diagnostics/repairs.jsonl stay under /tmp/bfcl_source_collection and are never committed or delivered as acceptance artifacts",
+  "raw_artifacts_must_not_be_committed": [
+    "traces/",
+    "bfcl/result/",
+    "bfcl/score/",
+    "bfcl/.file_locks/",
+    "logs/",
+    ".env",
+    "repairs.jsonl",
+    "*_repair_records.jsonl",
+    "*.log"
+  ],
+  "per_step_fail_closed_gates": [
+    "PYTHONPATH=.:src .venv/bin/python scripts/check_artifact_boundary.py",
+    "verify the command output contains compact artifacts only",
+    "stop on missing preflight_report.json, metrics.json, failure_summary.json, or run_manifest.json",
+    "stop on any provider preflight failure",
+    "stop if any BFCL result, score, trace, lock, or log path appears under outputs/artifacts"
+  ],
+  "builder_feed_after_collection": {
+    "source_manifest_rebuild": "PYTHONPATH=.:src .venv/bin/python scripts/build_m27t_source_pool_manifest.py --out-root outputs/artifacts/bfcl_ctspc_source_pool_v1",
+    "temporary_raw_root_manifest": "mkdir -p /tmp/explicit_literal_pool && PYTHONPATH=.:src .venv/bin/python -c 'import json, pathlib; cats=[\"multi_turn_miss_func\",\"multi_turn_long_context\",\"multi_turn_base\",\"parallel_multiple\",\"multiple\"]; root=pathlib.Path(\"/tmp/bfcl_source_collection\"); out=pathlib.Path(\"/tmp/explicit_literal_pool/source_collection_manifest_with_tmp_roots.json\"); out.write_text(json.dumps({\"report_scope\":\"tmp_source_collection_manifest_with_raw_roots\",\"source_collection_only\":True,\"category_status\":[{\"category\":c,\"source_artifacts_available\":True,\"existing_source_roots\":[str(root/c/\"baseline\")]} for c in cats]}, indent=2, sort_keys=True)+\"\\n\")'",
+    "dataset_export_gate": "bash -lc 'set -euo pipefail; if [[ -n \"${GRC_BFCL_DATASET_ROOT:-}\" ]]; then input=(--dataset-root \"$GRC_BFCL_DATASET_ROOT\"); elif [[ -n \"${GRC_BFCL_DATASET_FILE:-}\" ]]; then input=(--dataset-file \"$GRC_BFCL_DATASET_FILE\"); else echo \"GRC_BFCL_DATASET_ROOT or GRC_BFCL_DATASET_FILE required\" >&2; exit 2; fi; PYTHONPATH=.:src .venv/bin/python scripts/export_explicit_literal_bfcl_dataset.py \"${input[@]}\" --categories multi_turn_miss_func,multi_turn_long_context,multi_turn_base,parallel_multiple,multiple --output /tmp/explicit_literal_pool/explicit_literal_dataset.json --report-output /tmp/explicit_literal_pool/dataset_export_report.json --markdown-output /tmp/explicit_literal_pool/dataset_export_report.md --compact --strict'",
+    "dataset_schema_gate": "PYTHONPATH=.:src .venv/bin/python scripts/check_explicit_literal_dataset.py --dataset-json /tmp/explicit_literal_pool/explicit_literal_dataset.json --categories multi_turn_miss_func,multi_turn_long_context,multi_turn_base,parallel_multiple,multiple --output /tmp/explicit_literal_pool/dataset_schema_gate.json --markdown-output /tmp/explicit_literal_pool/dataset_schema_gate.md --compact --strict",
+    "explicit_literal_builder_temp_command": "PYTHONPATH=.:src .venv/bin/python scripts/build_explicit_literal_candidate_pool.py --source-manifest /tmp/explicit_literal_pool/source_collection_manifest_with_tmp_roots.json --dataset-json /tmp/explicit_literal_pool/explicit_literal_dataset.json --candidate-jsonl /tmp/explicit_literal_pool/candidate_rules.jsonl --audit-json /tmp/explicit_literal_pool/audit.json --dev-manifest /tmp/explicit_literal_pool/dev20_manifest.json --holdout-manifest /tmp/explicit_literal_pool/holdout20_manifest.json --summary-output /tmp/explicit_literal_pool/summary.json --markdown-output /tmp/explicit_literal_pool/summary.md --compact --strict",
+    "candidate_pool_gate_temp_command": "PYTHONPATH=.:src .venv/bin/python scripts/check_explicit_literal_candidate_pool.py --candidate-jsonl /tmp/explicit_literal_pool/candidate_rules.jsonl --dev-manifest /tmp/explicit_literal_pool/dev20_manifest.json --holdout-manifest /tmp/explicit_literal_pool/holdout20_manifest.json --compact --strict",
+    "promotion_policy": "do not overwrite tracked/default candidate_rules, dev manifest, or holdout manifest until temp outputs pass no-leakage and dev/holdout integrity gates"
+  },
+  "post_collection_rebuild_and_gates": [
+    "PYTHONPATH=.:src .venv/bin/python scripts/build_m27t_source_pool_manifest.py",
+    "mkdir -p /tmp/explicit_literal_pool && PYTHONPATH=.:src .venv/bin/python -c 'import json, pathlib; cats=[\"multi_turn_miss_func\",\"multi_turn_long_context\",\"multi_turn_base\",\"parallel_multiple\",\"multiple\"]; root=pathlib.Path(\"/tmp/bfcl_source_collection\"); out=pathlib.Path(\"/tmp/explicit_literal_pool/source_collection_manifest_with_tmp_roots.json\"); out.write_text(json.dumps({\"report_scope\":\"tmp_source_collection_manifest_with_raw_roots\",\"source_collection_only\":True,\"category_status\":[{\"category\":c,\"source_artifacts_available\":True,\"existing_source_roots\":[str(root/c/\"baseline\")]} for c in cats]}, indent=2, sort_keys=True)+\"\\n\")'",
+    "bash -lc 'set -euo pipefail; if [[ -n \"${GRC_BFCL_DATASET_ROOT:-}\" ]]; then input=(--dataset-root \"$GRC_BFCL_DATASET_ROOT\"); elif [[ -n \"${GRC_BFCL_DATASET_FILE:-}\" ]]; then input=(--dataset-file \"$GRC_BFCL_DATASET_FILE\"); else echo \"GRC_BFCL_DATASET_ROOT or GRC_BFCL_DATASET_FILE required\" >&2; exit 2; fi; PYTHONPATH=.:src .venv/bin/python scripts/export_explicit_literal_bfcl_dataset.py \"${input[@]}\" --categories multi_turn_miss_func,multi_turn_long_context,multi_turn_base,parallel_multiple,multiple --output /tmp/explicit_literal_pool/explicit_literal_dataset.json --report-output /tmp/explicit_literal_pool/dataset_export_report.json --markdown-output /tmp/explicit_literal_pool/dataset_export_report.md --compact --strict'",
+    "PYTHONPATH=.:src .venv/bin/python scripts/check_explicit_literal_dataset.py --dataset-json /tmp/explicit_literal_pool/explicit_literal_dataset.json --categories multi_turn_miss_func,multi_turn_long_context,multi_turn_base,parallel_multiple,multiple --output /tmp/explicit_literal_pool/dataset_schema_gate.json --markdown-output /tmp/explicit_literal_pool/dataset_schema_gate.md --compact --strict",
+    "PYTHONPATH=.:src .venv/bin/python scripts/build_explicit_literal_candidate_pool.py --source-manifest /tmp/explicit_literal_pool/source_collection_manifest_with_tmp_roots.json --dataset-json /tmp/explicit_literal_pool/explicit_literal_dataset.json --candidate-jsonl /tmp/explicit_literal_pool/candidate_rules.jsonl --audit-json /tmp/explicit_literal_pool/audit.json --dev-manifest /tmp/explicit_literal_pool/dev20_manifest.json --holdout-manifest /tmp/explicit_literal_pool/holdout20_manifest.json --summary-output /tmp/explicit_literal_pool/summary.json --markdown-output /tmp/explicit_literal_pool/summary.md --compact --strict",
+    "PYTHONPATH=.:src .venv/bin/python scripts/check_explicit_literal_candidate_pool.py --candidate-jsonl /tmp/explicit_literal_pool/candidate_rules.jsonl --dev-manifest /tmp/explicit_literal_pool/dev20_manifest.json --holdout-manifest /tmp/explicit_literal_pool/holdout20_manifest.json --compact --strict",
+    "PYTHONPATH=.:src .venv/bin/python scripts/check_m28pre_offline.py --compact --strict",
+    "PYTHONPATH=.:src .venv/bin/python scripts/check_artifact_boundary.py"
+  ],
+  "current_expected_status": "blocked_until_provider_green_and_candidate_pool_gates_pass"
+}

@@ -1,0 +1,80 @@
+{
+  "active_acceptance_path": false,
+  "allowed_future_implementation_files_after_approval": [
+    "src/grc/skills/schema.py",
+    "src/grc/skills/store.py",
+    "src/grc/skills/router.py",
+    "src/grc/skills/verifier.py",
+    "configs/runtime_bfcl_skills.yaml",
+    "tests/test_rashe_runtime_*.py"
+  ],
+  "allowed_initial_tests_after_approval": "synthetic tests only initially",
+  "authorization_status": "approved",
+  "candidate_generation_authorized": false,
+  "candidate_pool_ready": false,
+  "decision_required": "Runtime implementation skeleton is approved only for default-disabled inert files; importing, enabling, or connecting runtime behavior requires separate execution approval.",
+  "default_enabled": false,
+  "design_constraints": [
+    "do not import RuleEngine/proxy active path",
+    "do not activate prompt injection",
+    "do not implement retry behavior",
+    "do not call provider/scorer/source collection",
+    "do not create candidate JSONL/dev/holdout manifests",
+    "do not use gold/expected/scorer diff",
+    "do not use raw case_id/raw trace",
+    "config must remain enabled=false by default"
+  ],
+  "forbidden_until_later_execution_approval": [
+    "RuleEngine/proxy behavior change",
+    "provider calls",
+    "BFCL scorer",
+    "source collection",
+    "candidate JSONL/dev/holdout manifests",
+    "skill extraction from BFCL eval cases",
+    "prompt injection active in BFCL runtime"
+  ],
+  "gates_before_runtime_implementation_authorized_true": {
+    "code_change_plan_reviewed": true,
+    "config_default_disabled": true,
+    "no_leakage_policy_passed": true,
+    "no_provider_scorer_source_paths_touched": true,
+    "router_ambiguity_fail_closed": true,
+    "seed_skills_validated": true,
+    "v0_offline_checker_passed": true
+  },
+  "huawei_acceptance_ready": false,
+  "no_leakage_required": {
+    "candidate_output_used": false,
+    "expected_used": false,
+    "gold_used": false,
+    "holdout_used": false,
+    "raw_trace_committed": false,
+    "scorer_diff_used": false
+  },
+  "offline_v0_checker_required": true,
+  "performance_evidence": false,
+  "prompt_injection_authorized": false,
+  "provider_calls_authorized": false,
+  "rashe_scope_approval_path": "outputs/artifacts/stage1_bfcl_acceptance/scope_change_approval_rashe.json",
+  "rashe_v0_offline_checker_path": "scripts/check_rashe_v0_offline.py",
+  "report_scope": "rashe_runtime_implementation_authorization",
+  "required_config_defaults_after_approval": {
+    "configs/runtime_bfcl_skills.yaml": {
+      "candidate_generation_authorized": false,
+      "enabled": false,
+      "provider_calls_authorized": false,
+      "scorer_authorized": false,
+      "source_collection_authorized": false
+    }
+  },
+  "retry_authorized": false,
+  "ruleengine_proxy_active_path_import_allowed": false,
+  "runtime_behavior_authorized": false,
+  "runtime_implementation_authorized": true,
+  "runtime_implementation_scope": "default_disabled_inert_skeleton_only",
+  "scope_change_route": "retrieval_augmented_skill_harness_evolution",
+  "scorer_authorized": false,
+  "short_name": "RASHE",
+  "sota_3pp_claim_ready": false,
+  "source_collection_authorized": false
+}

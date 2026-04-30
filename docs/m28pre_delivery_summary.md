@@ -136,7 +136,9 @@ P0 blockers before first-stage acceptance as a complete self-evolution system:
 - No BFCL scorer evidence for the memory-operation dry-run policy.
 - M2.8-pre argument-repair combined retain-eligible candidate count is below threshold.
 - Wrong-key alias and deterministic schema-local families have zero current coverage.
-- Server output tree contains raw/secret/repair artifacts that must remain outside the committed delivery package.
+- Artifact boundary is now clean in the current checkout; raw traces, BFCL
+  result/score trees, logs, `.env`, `repairs.jsonl`, and repair records must
+  remain outside the committed delivery package.
 
 ## Next Work
 

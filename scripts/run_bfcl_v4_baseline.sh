@@ -129,6 +129,7 @@ CONFIG_PATH="${5:-${BFCL_RUNTIME_CONFIG_DEFAULT}}"
 RULES_DIR="${6:-${REPO_ROOT}/rules/baseline_empty}"
 TRACE_DIR="${7:-${RUN_ROOT}/traces}"
 ARTIFACT_DIR="${8:-${RUN_ROOT}/artifacts}"
+REPAIRS_OUT="${GRC_BFCL_REPAIRS_OUT:-${RUN_ROOT}/diagnostics/repairs.jsonl}"
 BFCL_ROOT="${RUN_ROOT}/bfcl"
 BFCL_RESULT_DIR="${BFCL_ROOT}/result"
 BFCL_SCORE_DIR="${BFCL_ROOT}/score"
@@ -139,10 +140,14 @@ ensure_upstream_auth
 clean_run_state
 
 mkdir -p "${BFCL_ROOT}" "${TRACE_DIR}" "${ARTIFACT_DIR}"
+mkdir -p "$(dirname "${REPAIRS_OUT}")"
 mkdir -p "${RULES_DIR}"
 
 if [[ "${GRC_ALLOW_DIRTY_BASELINE_RULES:-0}" != "1" ]]; then
-  mapfile -t BASELINE_RULE_FILES < <(find "${RULES_DIR}" -maxdepth 1 -type f -name '*.yaml' | sort)
+  BASELINE_RULE_FILES=()
+  while IFS= read -r rule_file; do
+    BASELINE_RULE_FILES+=("${rule_file}")
+  done < <(find "${RULES_DIR}" -maxdepth 1 -type f -name '*.yaml' | sort)
   if [[ "${#BASELINE_RULE_FILES[@]}" -gt 0 ]]; then
     echo "baseline rules dir must be empty of YAML patches: ${RULES_DIR}" >&2
     printf 'found baseline rule files:\n' >&2
@@ -232,7 +237,7 @@ python "${REPO_ROOT}/scripts/aggregate_bfcl_metrics.py" \
   --bfcl-root "${BFCL_ROOT}" \
   --trace-dir "${TRACE_DIR}" \
   --out "${ARTIFACT_DIR}/metrics.json" \
-  --repairs-out "${ARTIFACT_DIR}/repairs.jsonl" \
+  --repairs-out "${REPAIRS_OUT}" \
   --failure-summary-out "${ARTIFACT_DIR}/failure_summary.json" \
   --label "baseline" \
   --protocol-id "${GRC_PROTOCOL_ID}" \

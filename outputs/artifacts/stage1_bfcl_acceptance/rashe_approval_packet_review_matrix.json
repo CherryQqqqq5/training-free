@@ -1,0 +1,289 @@
+{
+  "bfcl_performance_ready": false,
+  "candidate_generation_authorized": false,
+  "candidate_pool_ready": false,
+  "current_status": "review_matrix_only",
+  "dependency_order": [
+    "runtime_behavior_approval",
+    "source_real_trace_approval",
+    "candidate_proposer_execution_approval",
+    "scorer_dev_holdout_full_approval",
+    "performance_3pp_huawei_acceptance_approval"
+  ],
+  "dependency_order_text": "offline scaffold ready -> runtime/source approvals (separate) -> candidate/proposer execution -> scorer/dev/holdout/full -> performance/+3pp/Huawei acceptance",
+  "execution_authorized": false,
+  "huawei_acceptance_ready": false,
+  "lanes": [
+    {
+      "allowed_claims": [
+        "runtime behavior approval pending",
+        "offline scaffold remains fail-closed"
+      ],
+      "allowed_commands": [
+        "offline checker commands only until packet is approved",
+        "post-approval runtime skeleton tests with config enabled=false unless separate enable approval exists"
+      ],
+      "allowed_only_after_approval": [
+        "default-disabled runtime behavior wiring",
+        "bounded router invocation in reviewed path",
+        "compact verifier counters"
+      ],
+      "approval_packet_path": "outputs/artifacts/stage1_bfcl_acceptance/rashe_runtime_behavior_approval_packet.json",
+      "authorized": false,
+      "current_status": "pending",
+      "downstream_dependencies": [
+        "source_real_trace_approval",
+        "candidate_proposer_execution_approval"
+      ],
+      "forbidden_claims": [
+        "runtime enabled",
+        "provider authorized",
+        "candidate pool ready",
+        "performance evidence",
+        "Huawei acceptance ready"
+      ],
+      "forbidden_until_approved": [
+        "prompt injection",
+        "retry",
+        "tool path mutation",
+        "RuleEngine/proxy active path import",
+        "provider/source/scorer/candidate execution"
+      ],
+      "lane_id": "runtime_behavior_approval",
+      "lane_order": 1,
+      "owner_role": "RASHE runtime engineering owner + acceptance reviewer",
+      "prerequisites": [
+        "rashe_offline_scaffold_ready=true",
+        "scope_change_route=RASHE approved",
+        "runtime skeleton remains default disabled",
+        "rollback plan and cost/latency/regression gates reviewed"
+      ],
+      "stop_gates": [
+        "default_enabled=true without separate enable approval",
+        "provider/scorer/source side effect detected",
+        "ambiguous router decision does not fail closed"
+      ]
+    },
+    {
+      "allowed_claims": [
+        "source approval pending",
+        "no source execution authorized"
+      ],
+      "allowed_commands": [
+        "no source/provider commands while current_status=pending",
+        "post-approval bounded source command from signed packet only"
+      ],
+      "allowed_only_after_approval": [
+        "bounded source collection for approved categories only",
+        "raw payload capture under approved raw root only",
+        "compact sanitized counters and hashes"
+      ],
+      "approval_packet_path": "outputs/artifacts/stage1_bfcl_acceptance/rashe_source_real_trace_approval_packet.json",
+      "authorized": false,
+      "current_status": "pending",
+      "downstream_dependencies": [
+        "candidate_proposer_execution_approval",
+        "scorer_dev_holdout_full_approval"
+      ],
+      "forbidden_claims": [
+        "real trace approved",
+        "candidate pool ready",
+        "scorer authorized",
+        "performance evidence",
+        "Huawei acceptance ready"
+      ],
+      "forbidden_until_approved": [
+        "source collection",
+        "raw trace capture",
+        "raw payload committed to tracked artifacts",
+        "candidate generation",
+        "scorer execution",
+        "performance claim"
+      ],
+      "lane_id": "source_real_trace_approval",
+      "lane_order": 2,
+      "owner_role": "source collection owner + no-leakage reviewer",
+      "prerequisites": [
+        "rashe_offline_scaffold_ready=true",
+        "runtime/source approval signed separately",
+        "raw payload handling and sanitization policy reviewed",
+        "artifact boundary rules reviewed"
+      ],
+      "stop_gates": [
+        "forbidden field violation",
+        "raw path leak",
+        "artifact boundary failure",
+        "provider/model drift"
+      ]
+    },
+    {
+      "allowed_claims": [
+        "candidate/proposer approval pending",
+        "candidate generation unauthorized"
+      ],
+      "allowed_commands": [
+        "offline proposer schema checker only while current_status=pending",
+        "post-approval proposer execution command from signed packet only"
+      ],
+      "allowed_only_after_approval": [
+        "bounded proposer execution over approved sanitized inputs",
+        "candidate metadata draft generation after approval",
+        "candidate pool checker execution"
+      ],
+      "approval_packet_path": "outputs/artifacts/stage1_bfcl_acceptance/rashe_candidate_proposer_execution_approval_packet.json",
+      "authorized": false,
+      "current_status": "pending",
+      "downstream_dependencies": [
+        "scorer_dev_holdout_full_approval"
+      ],
+      "forbidden_claims": [
+        "candidate pool ready",
+        "scorer authorized",
+        "performance evidence",
+        "SOTA +3pp ready",
+        "Huawei acceptance ready"
+      ],
+      "forbidden_until_approved": [
+        "candidate/proposer execution",
+        "candidate JSONL",
+        "dev/holdout manifest creation",
+        "gold/expected/scorer diff use",
+        "holdout/full-suite feedback use"
+      ],
+      "lane_id": "candidate_proposer_execution_approval",
+      "lane_order": 3,
+      "owner_role": "candidate engineering owner + no-leakage reviewer",
+      "prerequisites": [
+        "runtime_behavior_approval reviewed if runtime behavior is needed",
+        "source_real_trace_approval reviewed if real traces are needed",
+        "approved sanitized source scope exists",
+        "proposal schema gate passed",
+        "no-leakage gate reviewed"
+      ],
+      "stop_gates": [
+        "any leakage counter nonzero",
+        "candidate checker failure",
+        "holdout/full-suite feedback in candidate path",
+        "ambiguous proposal source"
+      ]
+    },
+    {
+      "allowed_claims": [
+        "scorer approval pending",
+        "performance evidence unavailable"
+      ],
+      "allowed_commands": [
+        "no BFCL scorer command while current_status=pending",
+        "post-approval exact baseline/candidate scorer commands from signed packet only"
+      ],
+      "allowed_only_after_approval": [
+        "baseline dev scorer command",
+        "candidate dev scorer command",
+        "holdout scorer command after dev pass",
+        "paired baseline/candidate comparison artifacts"
+      ],
+      "approval_packet_path": "outputs/artifacts/stage1_bfcl_acceptance/rashe_scorer_dev_holdout_full_approval_packet.json",
+      "authorized": false,
+      "current_status": "pending",
+      "downstream_dependencies": [
+        "performance_3pp_huawei_acceptance_approval"
+      ],
+      "forbidden_claims": [
+        "scorer authorized",
+        "paired comparison passed",
+        "performance evidence",
+        "SOTA +3pp ready",
+        "Huawei acceptance ready"
+      ],
+      "forbidden_until_approved": [
+        "BFCL scorer",
+        "candidate run",
+        "paired comparison",
+        "dev/holdout/full-suite scoring",
+        "provider/model/protocol drift"
+      ],
+      "lane_id": "scorer_dev_holdout_full_approval",
+      "lane_order": 4,
+      "owner_role": "scorer owner + acceptance reviewer",
+      "prerequisites": [
+        "candidate_proposer_execution_approval approved and candidate_pool_ready=true",
+        "source_real_trace_approval approved if source-derived inputs are used",
+        "same provider/model/protocol comparator frozen",
+        "dev/holdout disjoint manifests signed",
+        "paired baseline/candidate command templates reviewed"
+      ],
+      "stop_gates": [
+        "same provider/model/protocol mismatch",
+        "dev/holdout overlap",
+        "paired comparison regression",
+        "run schema checker failure"
+      ]
+    },
+    {
+      "allowed_claims": [
+        "performance/Huawei approval pending",
+        "no BFCL +3pp evidence yet"
+      ],
+      "allowed_commands": [
+        "no performance claim command while current_status=pending",
+        "post-approval publication/check commands from signed acceptance packet only"
+      ],
+      "allowed_only_after_approval": [
+        "formal performance evidence publication",
+        "SOTA/+3pp claim after signed acceptance review",
+        "Huawei readiness artifact after owner approval"
+      ],
+      "approval_packet_path": "outputs/artifacts/stage1_bfcl_acceptance/rashe_performance_3pp_huawei_acceptance_approval_packet.json",
+      "authorized": false,
+      "current_status": "pending",
+      "downstream_dependencies": [
+        "terminal_no_downstream_lane"
+      ],
+      "forbidden_claims": [
+        "performance evidence",
+        "SOTA +3pp ready",
+        "Huawei acceptance ready",
+        "BFCL performance ready"
+      ],
+      "forbidden_until_approved": [
+        "performance evidence",
+        "SOTA/+3pp claim",
+        "Huawei acceptance readiness claim",
+        "claim from unpaired or partial score",
+        "claim before no-leakage and regression gates"
+      ],
+      "lane_id": "performance_3pp_huawei_acceptance_approval",
+      "lane_order": 5,
+      "owner_role": "Huawei acceptance owner + project lead",
+      "prerequisites": [
+        "scorer_dev_holdout_full_approval approved",
+        "paired BFCL baseline/candidate comparison passed",
+        "+3pp delta evidence present",
+        "no regression gate passed",
+        "cost/latency gates passed",
+        "artifact boundary and run schema gates passed"
+      ],
+      "stop_gates": [
+        "+3pp threshold miss",
+        "paired regression",
+        "cost/latency bound failure",
+        "artifact boundary failure",
+        "Huawei owner rejection"
+      ]
+    }
+  ],
+  "notes": [
+    "Review matrix only; it does not approve or authorize any lane.",
+    "Runtime and source approvals are separate lanes after offline scaffold readiness.",
+    "Performance/+3pp/Huawei acceptance must remain last and requires paired BFCL evidence."
+  ],
+  "performance_evidence": false,
+  "report_scope": "rashe_approval_packet_review_matrix",
+  "runtime_behavior_authorized": false,
+  "schema_version": "rashe_approval_packet_review_matrix_v0",
+  "scope_change_route": "retrieval_augmented_skill_harness_evolution",
+  "scorer_authorized": false,
+  "short_name": "RASHE",
+  "sota_3pp_claim_ready": false,
+  "source_collection_authorized": false
+}
