@@ -92,6 +92,6 @@ Latest conclusion: `deterministic_argument_structural_and_tool_name_paths_zero_y
 
 ## Delivery Risk
 
-Current work is on `stage1-bfcl-performance-sprint`; main merge decision is pending. This is delivery-risk tracking, not an acceptance claim. Index provenance: index_artifact_commit `27e36c25`; latest_hygiene_source_head `b94855e0`; source_base_head `6e3a1e63`; Batch2 source_collection_code_head `fa4156d0`; baseline taxonomy code head `d48e6211`; raw schema subtyping code head `d1047b14`.
+Current work is on `stage1-bfcl-performance-sprint`; main merge decision is pending. This is delivery-risk tracking, not an acceptance claim. Index provenance: index_artifact_commit `46e8e663`; hygiene_patch_commit `27e36c25`; current_branch_head_at_review `46e8e663`; latest_hygiene_source_head `b94855e0`; source_base_head `6e3a1e63`; Batch2 source_collection_code_head `fa4156d0`; baseline taxonomy code head `d48e6211`; raw schema subtyping code head `d1047b14`.
 
 Provenance note: single ambiguous `head` field is intentionally not used; index artifact commit is recorded separately from earlier diagnostic/source heads.
