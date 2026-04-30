@@ -3,6 +3,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+import scripts.check_rashe_main_merge_readiness as readiness
 from scripts.check_rashe_main_merge_readiness import check
 
 SCRIPT = Path("scripts/check_rashe_main_merge_readiness.py")
@@ -27,6 +28,8 @@ def test_rashe_main_merge_readiness_compact_passes_fail_closed():
     summary = json.loads(result.stdout)
     assert summary["rashe_main_merge_ready"] is True
     assert summary["main_merge_claim_scope"] == "offline_scaffold_only"
+    assert summary["target_branch"] in {"stage1-bfcl-performance-sprint", "main"}
+    assert summary["source_branch_provenance"] == "stage1-bfcl-performance-sprint"
     assert summary["not_bfcl_performance_readiness"] is True
     assert summary["rashe_offline_scaffold_ready"] is True
     assert summary["approval_packet_review_matrix_passed"] is True
@@ -75,3 +78,34 @@ def test_fails_if_report_sets_performance_ready(tmp_path):
     assert summary["rashe_main_merge_ready"] is False
     assert "report_forbidden_true:fail_closed_fields.performance_evidence" in summary["blockers"]
     assert "report_forbidden_true:fail_closed_fields.huawei_acceptance_ready" in summary["blockers"]
+
+
+def test_accepts_main_as_target_branch(monkeypatch):
+    real_git_value = readiness.git_value
+
+    def fake_git_value(args):
+        if args == ["rev-parse", "--abbrev-ref", "HEAD"]:
+            return "main"
+        return real_git_value(args)
+
+    monkeypatch.setattr(readiness, "git_value", fake_git_value)
+    summary = check(REPORT, ACTIVE)
+    assert summary["rashe_main_merge_ready"] is True
+    assert summary["target_branch"] == "main"
+    assert summary["source_branch_provenance"] == "stage1-bfcl-performance-sprint"
+    assert summary["performance_evidence"] is False
+    assert summary["huawei_acceptance_ready"] is False
+
+
+def test_fails_if_target_branch_unexpected(monkeypatch):
+    real_git_value = readiness.git_value
+
+    def fake_git_value(args):
+        if args == ["rev-parse", "--abbrev-ref", "HEAD"]:
+            return "feature/unreviewed"
+        return real_git_value(args)
+
+    monkeypatch.setattr(readiness, "git_value", fake_git_value)
+    summary = check(REPORT, ACTIVE)
+    assert summary["rashe_main_merge_ready"] is False
+    assert "unexpected_target_branch:feature/unreviewed" in summary["blockers"]

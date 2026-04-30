@@ -15,7 +15,8 @@ from typing import Any
 
 DEFAULT_REPORT = Path("outputs/artifacts/stage1_bfcl_acceptance/rashe_main_merge_readiness.json")
 DEFAULT_ACTIVE_INDEX = Path("outputs/artifacts/stage1_bfcl_acceptance/active_evidence_index.json")
-EXPECTED_BRANCH = "stage1-bfcl-performance-sprint"
+SOURCE_BRANCH_PROVENANCE = "stage1-bfcl-performance-sprint"
+ALLOWED_TARGET_BRANCHES = {"stage1-bfcl-performance-sprint", "main"}
 EXPECTED_ROUTE = "retrieval_augmented_skill_harness_evolution"
 FORBIDDEN_TRUE_FIELDS = (
     "runtime_behavior_authorized",
@@ -91,8 +92,8 @@ def check(report_path: Path = DEFAULT_REPORT, active_index_path: Path = DEFAULT_
     branch = git_value(["rev-parse", "--abbrev-ref", "HEAD"])
     head = git_value(["rev-parse", "--short", "HEAD"])
 
-    if branch != EXPECTED_BRANCH:
-        blockers.append(f"unexpected_branch:{branch}")
+    if branch not in ALLOWED_TARGET_BRANCHES:
+        blockers.append(f"unexpected_target_branch:{branch}")
     if report.get("main_merge_claim_scope") != "offline_scaffold_only":
         blockers.append("report_scope_not_offline_scaffold_only")
     if report.get("not_bfcl_performance_readiness") is not True:
@@ -150,7 +151,8 @@ def check(report_path: Path = DEFAULT_REPORT, active_index_path: Path = DEFAULT_
 
     summary = {
         "report_scope": "rashe_main_merge_readiness_check",
-        "source_branch": branch,
+        "target_branch": branch,
+        "source_branch_provenance": SOURCE_BRANCH_PROVENANCE,
         "head": head,
         "main_merge_claim_scope": "offline_scaffold_only",
         "not_bfcl_performance_readiness": True,
