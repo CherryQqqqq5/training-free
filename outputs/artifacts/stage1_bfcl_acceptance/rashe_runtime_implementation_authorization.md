@@ -53,7 +53,7 @@ Raman/Schrodinger conditions for this approval:
 - skill extraction from BFCL eval cases
 - prompt injection active in BFCL runtime
 
-## Gates Before Runtime Implementation Authorization Can Flip True
+## Gates Before Runtime Behavior Or Execution Authorization Can Flip True
 
 - v0 offline checker passed
 - no-leakage policy passed
@@ -63,4 +63,4 @@ Raman/Schrodinger conditions for this approval:
 - code change plan reviewed
 - no provider/scorer/source paths touched
 
-This packet is intentionally fail-closed for behavior. Runtime skeleton files may be implemented only as default-disabled and inert. A separate execution approval is required before any runtime path is imported, enabled, or connected to provider/source/scorer/candidate flows.
+This packet is intentionally fail-closed for behavior. Runtime skeleton files are approved only as default-disabled and inert. A separate execution approval is required before any runtime path is imported, enabled, or connected to provider/source/scorer/candidate flows.
