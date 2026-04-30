@@ -64,4 +64,4 @@ Mechanical explicit-literal source expansion is stopped. Candidate pivot familie
 
 ## Delivery Risk
 
-Current work is on `stage1-bfcl-performance-sprint`; main merge decision is pending. This is delivery-risk tracking, not an acceptance claim.
+Current work is on `stage1-bfcl-performance-sprint`; main merge decision is pending. This is delivery-risk tracking, not an acceptance claim. Index provenance: source_base_head `6e3a1e63`, index_commit `39de0e9c`.
