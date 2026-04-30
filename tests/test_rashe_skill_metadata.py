@@ -177,6 +177,39 @@ def test_authorized_runtime_or_prompt_injection_rejects():
         assert decision.reject_reason == "runtime_behavior_not_authorized"
 
 
+def test_router_decision_schema_status_enum_matches_router_surface():
+    schema = json.loads(Path("outputs/artifacts/stage1_bfcl_acceptance/rashe_v0/router_decision.schema.json").read_text())
+    schema_statuses = set(schema["properties"]["decision_status"]["enum"])
+    meta = metadata()
+    missing_meta = dict(meta)
+    missing_meta.pop("bfcl_current_turn_focus")
+    no_conflict_meta = {sid: {**fields, "conflicts_with": []} for sid, fields in meta.items()}
+    same_priority_meta = {sid: {**fields, "conflicts_with": []} for sid, fields in meta.items()}
+    same_priority_meta["bfcl_current_turn_focus"]["trigger_priority"] = 10
+    same_priority_meta["bfcl_memory_web_search_discipline"]["trigger_priority"] = 10
+    observed_statuses = {
+        SkillRouter(skill_metadata=meta).route(step_trace_v0_2()).decision_status,
+        SkillRouter(skill_metadata=meta).route(step_trace_v0_2(source_scope="raw_live_trace")).decision_status,
+        SkillRouter(enabled=True, skill_metadata=meta).route(step_trace_v0_2()).decision_status,
+        SkillRouter(skill_metadata=same_priority_meta).route({"signals": ["current_turn", "memory_tool_visible"]}).decision_status,
+        SkillRouter(skill_metadata=no_conflict_meta).route({"signals": ["unknown_signal"]}).decision_status,
+        SkillRouter(skill_metadata=meta).route({"signals": ["schema_present", "tool_like_payload"]}).decision_status,
+        SkillRouter(skill_metadata=meta).route({"signals": ["argument_name_choice"]}).decision_status,
+        SkillRouter(skill_metadata=missing_meta).route({"signals": ["current_turn"]}).decision_status,
+    }
+    assert observed_statuses == {
+        "selected",
+        "input_reject",
+        "authorization_reject",
+        "ambiguous_reject",
+        "no_match_reject",
+        "conflict_reject",
+        "requirement_reject",
+        "metadata_reject",
+    }
+    assert schema_statuses == observed_statuses
+
+
 def test_skill_metadata_checker_compact_report_passes():
     result = subprocess.run(
         [sys.executable, str(SCRIPT), "--compact", "--strict"],
