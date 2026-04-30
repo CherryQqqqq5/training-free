@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail-closed checker for proposed RASHE runtime implementation authorization."""
+"""Checker for approved default-disabled RASHE runtime skeleton authorization."""
 
 from __future__ import annotations
 
@@ -12,7 +12,10 @@ from typing import Any
 DEFAULT_AUTH = Path("outputs/artifacts/stage1_bfcl_acceptance/rashe_runtime_implementation_authorization.json")
 
 REQUIRED_FALSE = [
-    "runtime_implementation_authorized",
+    "runtime_behavior_authorized",
+    "ruleengine_proxy_active_path_import_allowed",
+    "prompt_injection_authorized",
+    "retry_authorized",
     "provider_calls_authorized",
     "source_collection_authorized",
     "scorer_authorized",
@@ -71,13 +74,17 @@ def validate(data: dict[str, Any]) -> list[str]:
     blockers: list[str] = []
     expected = {
         "report_scope": "rashe_runtime_implementation_authorization",
-        "authorization_status": "proposed",
+        "authorization_status": "approved",
         "scope_change_route": "retrieval_augmented_skill_harness_evolution",
         "short_name": "RASHE",
     }
     for key, value in expected.items():
         if data.get(key) != value:
             blockers.append(f"{key}_invalid")
+    if data.get("runtime_implementation_authorized") is not True:
+        blockers.append("runtime_implementation_authorized_not_true")
+    if data.get("runtime_implementation_scope") != "default_disabled_inert_skeleton_only":
+        blockers.append("runtime_implementation_scope_invalid")
     for key in REQUIRED_FALSE:
         if data.get(key) is not False:
             blockers.append(f"{key}_not_false")
@@ -116,6 +123,23 @@ def validate(data: dict[str, Any]) -> list[str]:
             for key in ["enabled", "provider_calls_authorized", "scorer_authorized", "source_collection_authorized", "candidate_generation_authorized"]:
                 if runtime_cfg.get(key) is not False:
                     blockers.append(f"runtime_config_{key}_not_false")
+    constraints = data.get("design_constraints")
+    required_constraints = {
+        "do not import RuleEngine/proxy active path",
+        "do not activate prompt injection",
+        "do not implement retry behavior",
+        "do not call provider/scorer/source collection",
+        "do not create candidate JSONL/dev/holdout manifests",
+        "do not use gold/expected/scorer diff",
+        "do not use raw case_id/raw trace",
+        "config must remain enabled=false by default",
+    }
+    if not isinstance(constraints, list):
+        blockers.append("design_constraints_missing")
+    else:
+        missing_constraints = required_constraints - set(constraints)
+        if missing_constraints:
+            blockers.append("design_constraints_missing:" + ",".join(sorted(missing_constraints)))
     return blockers
 
 
@@ -132,6 +156,8 @@ def main(argv: list[str] | None = None) -> int:
         "authorization": str(args.authorization),
         "authorization_status": data.get("authorization_status"),
         "runtime_implementation_authorized": data.get("runtime_implementation_authorized"),
+        "runtime_implementation_scope": data.get("runtime_implementation_scope"),
+        "runtime_behavior_authorized": data.get("runtime_behavior_authorized"),
         "provider_calls_authorized": data.get("provider_calls_authorized"),
         "source_collection_authorized": data.get("source_collection_authorized"),
         "scorer_authorized": data.get("scorer_authorized"),

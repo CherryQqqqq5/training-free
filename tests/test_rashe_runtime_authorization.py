@@ -9,10 +9,15 @@ SCRIPT = Path("scripts/check_rashe_runtime_authorization.py")
 def base_auth():
     return {
         "report_scope": "rashe_runtime_implementation_authorization",
-        "authorization_status": "proposed",
+        "authorization_status": "approved",
         "scope_change_route": "retrieval_augmented_skill_harness_evolution",
         "short_name": "RASHE",
-        "runtime_implementation_authorized": False,
+        "runtime_implementation_authorized": True,
+        "runtime_implementation_scope": "default_disabled_inert_skeleton_only",
+        "runtime_behavior_authorized": False,
+        "ruleengine_proxy_active_path_import_allowed": False,
+        "prompt_injection_authorized": False,
+        "retry_authorized": False,
         "provider_calls_authorized": False,
         "source_collection_authorized": False,
         "scorer_authorized": False,
@@ -59,6 +64,16 @@ def base_auth():
             "code_change_plan_reviewed": True,
             "no_provider_scorer_source_paths_touched": True,
         },
+        "design_constraints": [
+            "do not import RuleEngine/proxy active path",
+            "do not activate prompt injection",
+            "do not implement retry behavior",
+            "do not call provider/scorer/source collection",
+            "do not create candidate JSONL/dev/holdout manifests",
+            "do not use gold/expected/scorer diff",
+            "do not use raw case_id/raw trace",
+            "config must remain enabled=false by default",
+        ],
         "no_leakage_required": {
             "gold_used": False,
             "expected_used": False,
@@ -82,22 +97,24 @@ def run_checker(tmp_path, auth):
     )
 
 
-def test_proposed_runtime_authorization_passes_fail_closed(tmp_path):
+def test_approved_inert_runtime_skeleton_authorization_passes_fail_closed(tmp_path):
     result = run_checker(tmp_path, base_auth())
     assert result.returncode == 0, result.stdout + result.stderr
     summary = json.loads(result.stdout)
     assert summary["rashe_runtime_authorization_passed"] is True
-    assert summary["authorization_status"] == "proposed"
-    assert summary["runtime_implementation_authorized"] is False
+    assert summary["authorization_status"] == "approved"
+    assert summary["runtime_implementation_authorized"] is True
+    assert summary["runtime_implementation_scope"] == "default_disabled_inert_skeleton_only"
+    assert summary["runtime_behavior_authorized"] is False
 
 
-def test_runtime_true_fails_closed(tmp_path):
+def test_runtime_behavior_true_fails_closed(tmp_path):
     auth = base_auth()
-    auth["runtime_implementation_authorized"] = True
+    auth["runtime_behavior_authorized"] = True
     result = run_checker(tmp_path, auth)
     assert result.returncode == 1
     summary = json.loads(result.stdout)
-    assert "runtime_implementation_authorized_not_false" in summary["blockers"]
+    assert "runtime_behavior_authorized_not_false" in summary["blockers"]
 
 
 def test_provider_source_scorer_candidate_flags_fail_closed(tmp_path):
@@ -133,3 +150,27 @@ def test_no_leakage_and_default_disabled_required(tmp_path):
     summary = json.loads(result.stdout)
     assert "no_leakage_gold_used_not_false" in summary["blockers"]
     assert "runtime_config_enabled_not_false" in summary["blockers"]
+
+
+def test_scope_and_design_constraints_required(tmp_path):
+    auth = base_auth()
+    auth["runtime_implementation_scope"] = "active_runtime"
+    auth["design_constraints"] = []
+    result = run_checker(tmp_path, auth)
+    assert result.returncode == 1
+    summary = json.loads(result.stdout)
+    assert "runtime_implementation_scope_invalid" in summary["blockers"]
+    assert any(b.startswith("design_constraints_missing:") for b in summary["blockers"])
+
+
+def test_active_path_prompt_retry_flags_fail_closed(tmp_path):
+    auth = base_auth()
+    auth["ruleengine_proxy_active_path_import_allowed"] = True
+    auth["prompt_injection_authorized"] = True
+    auth["retry_authorized"] = True
+    result = run_checker(tmp_path, auth)
+    assert result.returncode == 1
+    summary = json.loads(result.stdout)
+    assert "ruleengine_proxy_active_path_import_allowed_not_false" in summary["blockers"]
+    assert "prompt_injection_authorized_not_false" in summary["blockers"]
+    assert "retry_authorized_not_false" in summary["blockers"]
