@@ -111,6 +111,17 @@ def test_router_rejects_disabled_or_unknown_source_scope_before_route():
         assert decision.selected_skill_id is None
 
 
+def test_router_rejects_nonzero_call_counts_before_route():
+    for field in ["provider_call_count", "scorer_call_count", "source_collection_call_count"]:
+        decision = SkillRouter(skill_metadata=metadata()).route(step_trace_v0_2(**{field: 1}))
+        assert decision.decision_status == "input_reject"
+        assert decision.reject_reason == "call_count_nonzero"
+        assert decision.selected_skill_id is None
+        assert decision.provider_call_count == 0
+        assert decision.scorer_call_count == 0
+        assert decision.source_collection_call_count == 0
+
+
 def test_router_rejects_raw_case_id_raw_trace_and_provider_payload_indicators():
     cases = [
         ({"case_id": "raw-case"}, "raw_case_id"),
@@ -183,6 +194,8 @@ def test_skill_metadata_checker_compact_report_passes():
     assert summary["forbidden_source_taxonomy_label_count"] == 10
     assert summary["step_trace_v0_2_route_checked"] == 1
     assert summary["step_trace_source_scope_reject_count"] == 2
+    assert summary["call_count_nonzero_reject_count"] == 3
+    assert summary["step_trace_call_count_reject_count"] == 3
     assert summary["provider_call_count"] == 0
     assert summary["scorer_call_count"] == 0
     assert summary["source_collection_call_count"] == 0
