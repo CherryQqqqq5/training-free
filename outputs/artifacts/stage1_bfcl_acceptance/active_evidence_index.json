@@ -1,0 +1,216 @@
+{
+  "active_evidence_paths": {
+    "batch1_full50_diagnostic": "outputs/artifacts/stage1_bfcl_acceptance/batch1_full50_extractor_yield_diagnostic.json",
+    "batch1_source_compact_artifacts": "outputs/artifacts/bfcl_ctspc_source_pool_v1/multi_turn_miss_func/baseline/artifacts/",
+    "batch2_pilot_diagnostic": "outputs/artifacts/stage1_bfcl_acceptance/batch2_source_collection_pilot_snapshot.json",
+    "batch2_source_compact_artifacts": [
+      "outputs/artifacts/bfcl_ctspc_source_pool_v1/multi_turn_base/baseline/artifacts/",
+      "outputs/artifacts/bfcl_ctspc_source_pool_v1/multi_turn_long_context/baseline/artifacts/"
+    ],
+    "bfcl_installed_dataset_export_gate": "outputs/artifacts/stage1_bfcl_acceptance/source_collection_authorization_batch1.json",
+    "bfcl_installed_dataset_export_gate_status": {
+      "dataset_export_signed": true,
+      "dataset_gate_passed": true,
+      "provider_green_signed": true
+    },
+    "candidate_pool_status": "candidate_pool_not_ready",
+    "provider_canonical_status": "outputs/artifacts/bfcl_ctspc_source_pool_v1/current_provider_preflight_status.json",
+    "provider_green_preflight": "outputs/artifacts/stage1_bfcl_acceptance/provider_green_preflight.json"
+  },
+  "active_provider": {
+    "base_url_sanitized": "https://apicz.boyuerichdata.com/v1",
+    "expected_env": "NOVACODE_API_KEY",
+    "model": "gpt-5.2",
+    "openrouter_allowed": false,
+    "profile": "novacode",
+    "provider": "Chuangzhi/Novacode",
+    "provider_green_preflight_passed": true,
+    "provider_route_policy": "chuangzhi_novacode_only_openrouter_disabled"
+  },
+  "branch": "stage1-bfcl-performance-sprint",
+  "claim_readiness": {
+    "candidate_pool_ready": false,
+    "huawei_acceptance_ready": false,
+    "performance_evidence": false,
+    "scorer_authorization": false,
+    "sota_3pp_claim_ready": false
+  },
+  "current_blocker": {
+    "blocker": "explicit_required_arg_literal_completion_low_yield_research_review_triggered",
+    "dataset_is_current_blocker": false,
+    "provider_is_current_blocker": false,
+    "summary": "Batch1 and Batch2 diagnostics found zero selected calls with missing required args and zero accepted candidates; stop mechanical explicit-literal source expansion pending research review/pivot decision."
+  },
+  "default_branch_delivery_risk": {
+    "current_branch": "stage1-bfcl-performance-sprint",
+    "main_merge_decision_pending": true,
+    "note": "Delivery-risk tracking only; not a Huawei acceptance claim."
+  },
+  "excluded_or_superseded_evidence_paths": [
+    {
+      "path": "outputs/artifacts/stage1_bfcl_acceptance/provider_unblock_current_failure.json",
+      "reason": "historical provider failure before Chuangzhi/Novacode gpt-5.2 green; excluded from active Stage-1 claim"
+    },
+    {
+      "path": "outputs/artifacts/stage1_bfcl_acceptance/provider_unblock_current_failure.md",
+      "reason": "historical provider failure before Chuangzhi/Novacode gpt-5.2 green; excluded from active Stage-1 claim"
+    },
+    {
+      "path": "outputs/artifacts/stage1_bfcl_acceptance/provider_unblock_request.md",
+      "reason": "historical provider unblock request; excluded from active Stage-1 claim"
+    },
+    {
+      "path": "outputs/artifacts/bfcl_ctspc_source_pool_v1/source_collection_execution_status.json",
+      "reason": "may describe earlier source status/defaults; active status is this index plus Batch1/Batch2 compact diagnostics"
+    },
+    {
+      "path": "outputs/artifacts/bfcl_ctspc_source_pool_v1/source_collection_execution_status.md",
+      "reason": "may describe earlier source status/defaults; active status is this index plus Batch1/Batch2 compact diagnostics"
+    },
+    {
+      "path": "outputs/artifacts/bfcl_ctspc_subset30_v1/",
+      "reason": "old CTSPC subset/candidate artifacts; not current Stage-1 active evidence"
+    },
+    {
+      "path": "outputs/artifacts/bfcl_explicit_required_arg_literal_v1/*dev20*",
+      "reason": "old dev20 manifests; current candidate pool is not ready and no dev/holdout split is authorized"
+    },
+    {
+      "path": "outputs/artifacts/bfcl_explicit_required_arg_literal_v1/*candidate_rules.jsonl",
+      "reason": "old candidate JSONL; current active candidate pool is not ready"
+    },
+    {
+      "path": "outputs/artifacts/bfcl_explicit_required_arg_literal_v1/rejected_candidates.jsonl",
+      "reason": "old candidate-family artifact; not active Stage-1 claim evidence"
+    },
+    {
+      "path": "outputs/artifacts/phase2/",
+      "reason": "memory/postcondition artifacts belong to Phase-2, not active Stage-1 BFCL +3pp evidence"
+    },
+    {
+      "path": "any OpenRouter, old 401, or gpt-5.4 provider/source status references",
+      "reason": "superseded by Chuangzhi/Novacode gpt-5.2 green route and excluded from active Stage-1 claim"
+    }
+  ],
+  "generated_at_utc": "2026-04-30T07:47:32Z",
+  "head": "6e3a1e63",
+  "optional_diagnostic_counter_fields": [
+    "selected_calls_with_schema_properties",
+    "selected_calls_with_empty_required"
+  ],
+  "pivot_research_review": {
+    "candidate_pivot_families": [
+      {
+        "family": "wrong_arg_key_alias_repair",
+        "performance_claim": false,
+        "status": "pending_approval_no_leakage_gates"
+      },
+      {
+        "family": "deterministic_schema_local_non_live_repair",
+        "performance_claim": false,
+        "status": "pending_approval_no_leakage_gates"
+      }
+    ],
+    "forbidden_until_approved": [
+      "new scorer run",
+      "new mechanical source batch",
+      "candidate pool promotion",
+      "SOTA/+3pp claim"
+    ],
+    "mechanical_explicit_literal_source_expansion_stopped": true,
+    "reason": "Batch1+Batch2 have selected_calls_with_missing_required=0, selected_calls_with_exactly_one_missing_required_arg=0, accepted_candidates=0."
+  },
+  "report_scope": "stage1_bfcl_active_evidence_index",
+  "server_path": "/cephfs/qiuyn/training-free",
+  "uniform_counter_fields": [
+    "result_jsonl_rows",
+    "parsed_emitted_calls",
+    "historical_call_count",
+    "selected_call_count",
+    "selected_calls_with_function_schema",
+    "selected_calls_with_required_args",
+    "selected_calls_with_missing_required",
+    "selected_calls_with_exactly_one_missing_required_arg",
+    "accepted_candidates",
+    "reject_reason_counts"
+  ],
+  "uniform_counter_table": [
+    {
+      "accepted_candidates": 0,
+      "batch": "Batch1",
+      "category": "multi_turn_miss_func",
+      "evidence_path": "outputs/artifacts/stage1_bfcl_acceptance/batch1_full50_extractor_yield_diagnostic.json",
+      "historical_call_count": 407,
+      "parsed_emitted_calls": 557,
+      "reject_reason_counts": {
+        "ambiguous_literal": 44,
+        "no_single_missing_required_arg": 6
+      },
+      "result_jsonl_rows": 50,
+      "selected_call_count": 150,
+      "selected_calls_with_empty_required": 5,
+      "selected_calls_with_exactly_one_missing_required_arg": 0,
+      "selected_calls_with_function_schema": 70,
+      "selected_calls_with_missing_required": 0,
+      "selected_calls_with_required_args": 65,
+      "selected_calls_with_schema_properties": 70,
+      "source_scope": "source_collection_completed_diagnostic"
+    },
+    {
+      "accepted_candidates": 0,
+      "batch": "Batch2",
+      "category": "multi_turn_base",
+      "evidence_path": "outputs/artifacts/stage1_bfcl_acceptance/batch2_source_collection_pilot_snapshot.json",
+      "historical_call_count": 160,
+      "parsed_emitted_calls": 207,
+      "reject_reason_counts": {
+        "ambiguous_literal": 18,
+        "no_single_missing_required_arg": 2
+      },
+      "result_jsonl_rows": 20,
+      "schema_match_status_counts": {
+        "matched": 107,
+        "unmatched": 100
+      },
+      "selected_call_count": 47,
+      "selected_calls_with_empty_required": null,
+      "selected_calls_with_exactly_one_missing_required_arg": 0,
+      "selected_calls_with_function_schema": 27,
+      "selected_calls_with_missing_required": 0,
+      "selected_calls_with_required_args": 25,
+      "selected_calls_with_schema_properties": null,
+      "source_scope": "source_collection_expansion_only_diagnostic",
+      "unmatched_schema_reason_counts": {
+        "no exact/suffix/normalized schema alias matched emitted tool": 48
+      }
+    },
+    {
+      "accepted_candidates": 0,
+      "batch": "Batch2",
+      "category": "multi_turn_long_context",
+      "evidence_path": "outputs/artifacts/stage1_bfcl_acceptance/batch2_source_collection_pilot_snapshot.json",
+      "historical_call_count": 139,
+      "parsed_emitted_calls": 191,
+      "reject_reason_counts": {
+        "ambiguous_literal": 18,
+        "no_single_missing_required_arg": 2
+      },
+      "result_jsonl_rows": 20,
+      "schema_match_status_counts": {
+        "matched": 106,
+        "unmatched": 85
+      },
+      "selected_call_count": 52,
+      "selected_calls_with_empty_required": null,
+      "selected_calls_with_exactly_one_missing_required_arg": 0,
+      "selected_calls_with_function_schema": 32,
+      "selected_calls_with_missing_required": 0,
+      "selected_calls_with_required_args": 30,
+      "selected_calls_with_schema_properties": null,
+      "source_scope": "source_collection_expansion_only_diagnostic",
+      "unmatched_schema_reason_counts": {
+        "no exact/suffix/normalized schema alias matched emitted tool": 50
+      }
+    }
+  ]
+}
