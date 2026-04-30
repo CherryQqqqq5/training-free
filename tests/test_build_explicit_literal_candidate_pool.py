@@ -449,3 +449,94 @@ def test_build_explicit_literal_candidate_pool_rejects_schema_type_mismatch(tmp_
     assert report["candidate_pool_build_passed"] is False
     assert report["candidate_record_count"] == 0
     assert report["reject_reason_counts"]["schema_type_mismatch"] == 1
+
+
+
+
+
+def test_build_explicit_literal_candidate_pool_extracts_nested_multiturn_with_qualified_schema(tmp_path: Path) -> None:
+    source_root = tmp_path / "source" / "multi_turn_miss_func" / "baseline"
+    result_path = source_root / "bfcl" / "result" / "model" / "multi_turn" / "BFCL_v4_multi_turn_miss_func_result.json"
+    result_path.parent.mkdir(parents=True, exist_ok=True)
+    result_path.write_text(
+        json.dumps({
+            "id": "case_1",
+            "result": [
+                [[{"ls": json.dumps({"a": False})}]],
+                [[{"grep": json.dumps({"pattern": "urgent"})}]],
+            ],
+        }) + "\n",
+        encoding="utf-8",
+    )
+    source_manifest = tmp_path / "source_manifest.json"
+    _write_json(source_manifest, {"category_status": [{"category": "multi_turn_miss_func", "existing_source_roots": [str(source_root)]}]})
+    dataset = tmp_path / "dataset.json"
+    _write_json(dataset, [{
+        "id": "case_1",
+        "question": [[{"role": "user", "content": "Search 'notes.txt' for urgent lines."}]],
+        "function": [
+            {"name": "GorillaFileSystem.ls", "parameters": {"type": "object", "properties": {"a": {"type": "boolean"}}, "required": []}},
+            {"name": "GorillaFileSystem.grep", "parameters": {"type": "object", "properties": {"pattern": {"type": "string"}, "file_name": {"type": "string"}}, "required": ["pattern", "file_name"]}},
+        ],
+    }])
+
+    report = build(
+        source_manifest=source_manifest,
+        dataset_json=dataset,
+        out_candidates=tmp_path / "candidate_rules.jsonl",
+        dev_manifest=tmp_path / "dev20.json",
+        holdout_manifest=tmp_path / "holdout20.json",
+        summary_output=tmp_path / "summary.json",
+        markdown_output=tmp_path / "summary.md",
+        min_eligible=1,
+        dev_count=1,
+        holdout_count=0,
+    )
+
+    assert report["candidate_pool_build_passed"] is True
+    assert report["extraction_diagnostics"]["parsed_emitted_calls"] == 2
+    assert report["extraction_diagnostics"]["calls_with_function_schema"] == 2
+    assert report["extraction_diagnostics"]["calls_with_exactly_one_missing_required_arg"] == 1
+    rows = [json.loads(line) for line in (tmp_path / "candidate_rules.jsonl").read_text(encoding="utf-8").splitlines()]
+    assert rows[0]["emitted_tool"] == "grep"
+    assert rows[0]["normalized_function"] == "GorillaFileSystem.grep"
+    assert rows[0]["turn_index"] == 1
+    assert rows[0]["step_index"] == 0
+    assert rows[0]["call_index"] == 0
+
+
+def test_build_explicit_literal_candidate_pool_rejects_ambiguous_short_schema_alias(tmp_path: Path) -> None:
+    source_root = tmp_path / "source" / "multi_turn_miss_func" / "baseline"
+    result_path = source_root / "bfcl" / "result" / "model" / "multi_turn" / "BFCL_v4_multi_turn_miss_func_result.json"
+    result_path.parent.mkdir(parents=True, exist_ok=True)
+    result_path.write_text(json.dumps({"id": "case_1", "result": [[[{"search": json.dumps({"query": "urgent"})}]]]}) + "\n", encoding="utf-8")
+    source_manifest = tmp_path / "source_manifest.json"
+    _write_json(source_manifest, {"category_status": [{"category": "multi_turn_miss_func", "existing_source_roots": [str(source_root)]}]})
+    dataset = tmp_path / "dataset.json"
+    _write_json(dataset, [{
+        "id": "case_1",
+        "question": [[{"role": "user", "content": "Search 'notes.txt' for urgent lines."}]],
+        "function": [
+            {"name": "Alpha.search", "parameters": {"type": "object", "properties": {"query": {"type": "string"}, "path": {"type": "string"}}, "required": ["query", "path"]}},
+            {"name": "Beta.search", "parameters": {"type": "object", "properties": {"query": {"type": "string"}, "file_name": {"type": "string"}}, "required": ["query", "file_name"]}},
+        ],
+    }])
+
+    report = build(
+        source_manifest=source_manifest,
+        dataset_json=dataset,
+        out_candidates=tmp_path / "candidate_rules.jsonl",
+        dev_manifest=tmp_path / "dev20.json",
+        holdout_manifest=tmp_path / "holdout20.json",
+        summary_output=tmp_path / "summary.json",
+        markdown_output=tmp_path / "summary.md",
+        min_eligible=1,
+        dev_count=1,
+        holdout_count=0,
+    )
+
+    assert report["candidate_pool_build_passed"] is False
+    assert report["candidate_record_count"] == 0
+    assert report["reject_reason_counts"]["schema_function_alias_not_unique"] == 1
+    assert report["extraction_diagnostics"]["schema_function_alias_not_unique"] == 1
+    assert (tmp_path / "candidate_rules.jsonl").read_text(encoding="utf-8") == ""

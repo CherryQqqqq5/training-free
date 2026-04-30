@@ -176,7 +176,29 @@ def _function_map(entry: dict[str, Any]) -> dict[str, dict[str, Any]]:
     raw = entry.get("function") or entry.get("functions") or []
     if isinstance(raw, dict):
         raw = [raw]
-    return {str(fn["name"]): fn for fn in raw if isinstance(fn, dict) and fn.get("name")}
+    funcs = [fn for fn in raw if isinstance(fn, dict) and fn.get("name")]
+    out = {str(fn["name"]): fn for fn in funcs}
+    suffixes: dict[str, list[dict[str, Any]]] = {}
+    for fn in funcs:
+        name = str(fn["name"])
+        suffixes.setdefault(name.rsplit(".", 1)[-1], []).append(fn)
+    for suffix, matches in suffixes.items():
+        if len(matches) == 1 and suffix not in out:
+            out[suffix] = matches[0]
+    return out
+
+
+def _ambiguous_function_aliases(entry: dict[str, Any]) -> set[str]:
+    raw = entry.get("function") or entry.get("functions") or []
+    if isinstance(raw, dict):
+        raw = [raw]
+    suffixes: dict[str, set[str]] = {}
+    for fn in raw if isinstance(raw, list) else []:
+        if not isinstance(fn, dict) or not fn.get("name"):
+            continue
+        name = str(fn["name"])
+        suffixes.setdefault(name.rsplit(".", 1)[-1], set()).add(name)
+    return {suffix for suffix, names in suffixes.items() if len(names) > 1}
 
 
 def _required_args(fn: dict[str, Any]) -> list[str]:
@@ -198,18 +220,39 @@ def _parse_call_args(value: Any) -> dict[str, Any]:
 
 
 def _tool_calls(value: Any) -> list[tuple[str, dict[str, Any]]]:
-    calls: list[tuple[str, dict[str, Any]]] = []
-    if isinstance(value, list):
-        for item in value:
-            calls.extend(_tool_calls(item))
-    elif isinstance(value, dict):
-        if value.get("name") and ("arguments" in value or "args" in value):
-            calls.append((str(value["name"]), _parse_call_args(value.get("arguments", value.get("args")))))
-        else:
-            for key, raw_args in value.items():
-                if isinstance(raw_args, (dict, str)):
-                    calls.append((str(key), _parse_call_args(raw_args)))
+    return [(call["tool"], call["args"]) for call in _tool_call_records(value)]
+
+
+def _tool_call_records(value: Any) -> list[dict[str, Any]]:
+    calls: list[dict[str, Any]] = []
+
+    def walk(item: Any, path: list[int]) -> None:
+        if isinstance(item, list):
+            for index, nested in enumerate(item):
+                walk(nested, [*path, index])
+            return
+        if not isinstance(item, dict):
+            return
+        if item.get("name") and ("arguments" in item or "args" in item):
+            calls.append(_call_record(str(item["name"]), _parse_call_args(item.get("arguments", item.get("args"))), path))
+            return
+        for key, raw_args in item.items():
+            if isinstance(raw_args, (dict, str)):
+                calls.append(_call_record(str(key), _parse_call_args(raw_args), path))
+
+    walk(value, [])
     return calls
+
+
+def _call_record(tool: str, args: dict[str, Any], path: list[int]) -> dict[str, Any]:
+    return {
+        "tool": tool,
+        "args": args,
+        "turn_index": path[0] if len(path) > 0 else None,
+        "step_index": path[1] if len(path) > 1 else None,
+        "call_index": path[2] if len(path) > 2 else (path[-1] if path else None),
+        "path": path,
+    }
 
 
 def _literal_spans(text: str) -> list[tuple[str, int, int]]:
@@ -271,7 +314,7 @@ def _extract_candidates(
     source_manifest: Path,
     dataset_json: Path,
     categories: list[str],
-) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, int], list[str]]:
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, int], list[str], dict[str, Any]]:
     source = _read_json(source_manifest, {}) or {}
     dataset = _dataset_records(dataset_json)
     blockers: list[str] = []
@@ -284,14 +327,51 @@ def _extract_candidates(
     candidates: list[dict[str, Any]] = []
     rejections: list[dict[str, Any]] = []
     reject_counts: dict[str, int] = {}
+    diagnostics: dict[str, Any] = {
+        "result_jsonl_rows": 0,
+        "parsed_emitted_calls": 0,
+        "calls_with_function_schema": 0,
+        "calls_with_missing_required_arg": 0,
+        "calls_with_exactly_one_missing_required_arg": 0,
+        "calls_with_multiple_missing_required_args": 0,
+        "current_request_literal_rows": 0,
+        "current_observation_literal_rows": 0,
+        "rows_with_single_call": 0,
+        "rows_with_non_unique_calls": 0,
+        "rows_with_function_schema": 0,
+        "rows_with_any_missing_required_arg": 0,
+        "rows_with_exactly_one_missing_required_arg": 0,
+        "rows_with_multiple_missing_required_args": 0,
+        "schema_function_alias_not_unique": 0,
+        "missing_required_samples": [],
+    }
 
     def reject(reason: str, **payload: Any) -> None:
         reject_counts[reason] = reject_counts.get(reason, 0) + 1
         rejections.append({"reason": reason, **payload})
 
+    def add_missing_sample(case_id: str, category: str, call: dict[str, Any], fn: dict[str, Any], missing: list[str]) -> None:
+        samples = diagnostics["missing_required_samples"]
+        if len(samples) >= 20:
+            return
+        samples.append({
+            "case_id": case_id,
+            "category": category,
+            "emitted_tool": call["tool"],
+            "normalized_function": str(fn.get("name") or call["tool"]),
+            "turn_index": call.get("turn_index"),
+            "step_index": call.get("step_index"),
+            "call_index": call.get("call_index"),
+            "required_args": _required_args(fn),
+            "present_args": sorted(call["args"].keys()),
+            "missing_required_args": missing,
+            "schema_types": {arg: str(_arg_schema(fn, arg).get("type") or "") for arg in missing},
+        })
+
     for category, root in _source_roots(source, source_root, categories):
         result_path = _result_file(root, category)
         rows = _result_rows(result_path)
+        diagnostics["result_jsonl_rows"] += len(rows)
         if result_path is None:
             reject("missing_source_result", category=category, source_run_root=str(root))
             continue
@@ -305,63 +385,107 @@ def _extract_candidates(
                 reject("dataset_record_missing", case_id=case_id, category=category)
                 continue
             literal_source, span, literal_error = _literal_source(entry, row)
+            if literal_source == "current_request":
+                diagnostics["current_request_literal_rows"] += 1
+            if literal_source == "current_observation":
+                diagnostics["current_observation_literal_rows"] += 1
             if span is None:
                 reject(literal_error or "ambiguous_literal", case_id=case_id, category=category)
                 continue
+
             fns = _function_map(entry)
-            calls = _tool_calls(row.get("result"))
-            if len(calls) != 1:
-                reject("parallel_call_mapping_not_unique", case_id=case_id, category=category, tool_call_count=len(calls))
-                continue
-            emitted = False
-            for tool, args in calls:
+            ambiguous_aliases = _ambiguous_function_aliases(entry)
+            calls = _tool_call_records(row.get("result"))
+            diagnostics["parsed_emitted_calls"] += len(calls)
+            if len(calls) == 1:
+                diagnostics["rows_with_single_call"] += 1
+            else:
+                diagnostics["rows_with_non_unique_calls"] += 1
+
+            eligible_calls: list[tuple[dict[str, Any], dict[str, Any], list[str]]] = []
+            row_has_schema = False
+            row_missing_counts: list[int] = []
+            alias_conflict_tools: list[str] = []
+            for call in calls:
+                tool = call["tool"]
+                if tool in ambiguous_aliases:
+                    alias_conflict_tools.append(tool)
+                    continue
                 fn = fns.get(tool)
                 if not fn:
                     continue
-                missing = [arg for arg in _required_args(fn) if arg not in args]
-                if len(missing) != 1:
-                    continue
-                literal, start, end = span
-                required_arg = missing[0]
-                if not _literal_matches_schema(literal, _arg_schema(fn, required_arg)):
-                    reject("schema_type_mismatch", case_id=case_id, category=category, required_arg=required_arg, literal=literal)
-                    emitted = True
-                    break
-                span_hash = hashlib.sha256(literal.encode("utf-8")).hexdigest()
-                candidates.append({
-                    "case_id": case_id,
-                    "category": category,
-                    "candidate_generatable": True,
-                    "candidate_origin": "current_request_explicit_literal_fixture_extractor",
-                    "candidate_rules_type": "explicit_required_arg_literal_completion",
-                    "rule_type": "explicit_required_arg_literal_completion",
-                    "source_run_root": str(root),
-                    "tool": tool,
-                    "schema_arg_name": required_arg,
-                    "required_arg": required_arg,
-                    "selected_literal": literal,
-                    "literal_source": literal_source,
-                    "literal_source_span": {"source": literal_source, "start": start, "end": end, "text": literal},
-                    "literal_source_text_hash": span_hash,
-                    "used_gold_fields": False,
-                    "used_score_fields": False,
-                    "used_candidate_output": False,
-                    "no_next_tool_intervention": True,
-                    "exact_tool_choice": False,
-                    "retention_prior": {
-                        "rule_family": "explicit_required_arg_literal_completion",
-                        "theory_class": "schema_constraint_completion",
-                        "retain_eligibility": "demote_candidate",
-                        "intervention_scope": "argument_only",
-                        "tool_choice_mutation": False,
-                        "trajectory_mutation": False,
-                    },
-                })
-                emitted = True
-                break
-            if not emitted:
-                reject("no_single_missing_required_arg", case_id=case_id, category=category)
-    return candidates, rejections, reject_counts, blockers
+                row_has_schema = True
+                diagnostics["calls_with_function_schema"] += 1
+                missing = [arg for arg in _required_args(fn) if arg not in call["args"]]
+                row_missing_counts.append(len(missing))
+                if missing:
+                    diagnostics["calls_with_missing_required_arg"] += 1
+                    add_missing_sample(case_id, category, call, fn, missing)
+                if len(missing) == 1:
+                    diagnostics["calls_with_exactly_one_missing_required_arg"] += 1
+                    eligible_calls.append((call, fn, missing))
+                elif len(missing) > 1:
+                    diagnostics["calls_with_multiple_missing_required_args"] += 1
+            if alias_conflict_tools:
+                diagnostics["schema_function_alias_not_unique"] += 1
+                reject("schema_function_alias_not_unique", case_id=case_id, category=category, emitted_tools=sorted(set(alias_conflict_tools)))
+                continue
+            if row_has_schema:
+                diagnostics["rows_with_function_schema"] += 1
+            if any(count > 0 for count in row_missing_counts):
+                diagnostics["rows_with_any_missing_required_arg"] += 1
+            if sum(1 for count in row_missing_counts if count == 1) == 1:
+                diagnostics["rows_with_exactly_one_missing_required_arg"] += 1
+            if any(count > 1 for count in row_missing_counts):
+                diagnostics["rows_with_multiple_missing_required_args"] += 1
+
+            if len(eligible_calls) != 1:
+                reason = "parallel_call_mapping_not_unique" if len(eligible_calls) > 1 else "no_single_missing_required_arg"
+                reject(reason, case_id=case_id, category=category, tool_call_count=len(calls), eligible_missing_required_call_count=len(eligible_calls))
+                continue
+
+            call, fn, missing = eligible_calls[0]
+            literal, start, end = span
+            required_arg = missing[0]
+            if not _literal_matches_schema(literal, _arg_schema(fn, required_arg)):
+                reject("schema_type_mismatch", case_id=case_id, category=category, required_arg=required_arg, literal=literal)
+                continue
+            span_hash = hashlib.sha256(literal.encode("utf-8")).hexdigest()
+            candidates.append({
+                "case_id": case_id,
+                "category": category,
+                "candidate_generatable": True,
+                "candidate_origin": "current_request_explicit_literal_fixture_extractor",
+                "candidate_rules_type": "explicit_required_arg_literal_completion",
+                "rule_type": "explicit_required_arg_literal_completion",
+                "source_run_root": str(root),
+                "tool": call["tool"],
+                "emitted_tool": call["tool"],
+                "normalized_function": str(fn.get("name") or call["tool"]),
+                "turn_index": call.get("turn_index"),
+                "step_index": call.get("step_index"),
+                "call_index": call.get("call_index"),
+                "schema_arg_name": required_arg,
+                "required_arg": required_arg,
+                "selected_literal": literal,
+                "literal_source": literal_source,
+                "literal_source_span": {"source": literal_source, "start": start, "end": end, "text": literal},
+                "literal_source_text_hash": span_hash,
+                "used_gold_fields": False,
+                "used_score_fields": False,
+                "used_candidate_output": False,
+                "no_next_tool_intervention": True,
+                "exact_tool_choice": False,
+                "retention_prior": {
+                    "rule_family": "explicit_required_arg_literal_completion",
+                    "theory_class": "schema_constraint_completion",
+                    "retain_eligibility": "demote_candidate",
+                    "intervention_scope": "argument_only",
+                    "tool_choice_mutation": False,
+                    "trajectory_mutation": False,
+                },
+            })
+    return candidates, rejections, reject_counts, blockers, diagnostics
 
 
 def build(
@@ -398,7 +522,7 @@ def build(
         if isinstance(item, dict) and item.get("category")
     ]
     requested_categories = _parse_categories(categories) or manifest_categories
-    candidates, rejections, reject_reason_counts, blockers = _extract_candidates(
+    candidates, rejections, reject_reason_counts, blockers, extraction_diagnostics = _extract_candidates(
         source_root=source_root,
         source_manifest=source_manifest,
         dataset_json=dataset_json,
@@ -430,6 +554,7 @@ def build(
         "accepted_record_count": len(candidates),
         "rejected_record_count": len(rejections),
         "reject_reason_counts": reject_reason_counts,
+        "extraction_diagnostics": extraction_diagnostics,
         "rejections": rejections,
         "planned_commands": [],
         "candidate_commands": [],
@@ -473,6 +598,7 @@ def build(
         "accepted_record_count": len(candidates),
         "rejected_record_count": len(rejections),
         "reject_reason_counts": reject_reason_counts,
+        "extraction_diagnostics": extraction_diagnostics,
         "candidate_jsonl_written": not dry_run,
         "audit_json_written": not dry_run,
         "manifests_written": not dry_run,
@@ -551,6 +677,7 @@ def main(argv: list[str] | None = None) -> int:
             "extractor_skeleton_only",
             "candidate_record_count",
             "eligible_count",
+            "extraction_diagnostics",
             "blockers",
             "next_required_action",
         ]}, indent=2, sort_keys=True))
