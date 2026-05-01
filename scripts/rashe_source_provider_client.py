@@ -160,11 +160,14 @@ def _provider_transport_approved() -> None:
         raise SourceProviderClientError("provider_transport_not_approved")
 
 
-def _execution_endpoint() -> str:
+def _execution_endpoint(audit: dict[str, bool]) -> str:
     for env_name in APPROVED_PROVIDER_ENDPOINT_ENV_VARS:
         value = os.environ.get(env_name)
         if value:
+            audit["endpoint_read"] = True
             lowered = value.lower()
+            if not lowered.startswith("https://"):
+                raise SourceProviderClientError("provider_endpoint_not_https")
             for indicator in RAW_VALUE_INDICATORS:
                 if indicator in lowered:
                     raise SourceProviderClientError("provider_endpoint_forbidden_raw_indicator")
@@ -220,7 +223,7 @@ def _build_env_only_provider_transport(audit: dict[str, bool]) -> ProviderTransp
             raise SourceProviderClientError("provider_transport_profile_not_signed")
         if request.get("model") != SIGNED_MODEL:
             raise SourceProviderClientError("provider_transport_model_not_signed")
-        endpoint = _execution_endpoint()
+        endpoint = _execution_endpoint(audit)
         api_key = _execution_env_key(audit)
         response = _http_post_json(
             endpoint,
@@ -366,7 +369,7 @@ def build_chuangzhi_novacode_source_provider_client(request: dict[str, Any]) -> 
         raise SourceProviderClientError(";".join(blockers))
     source_case_provider = _callable_from_request(request, SOURCE_CASE_PROVIDER_KEYS)
     provider_transport = _callable_from_request(request, PROVIDER_TRANSPORT_KEYS)
-    audit = {"api_key_read": False}
+    audit = {"api_key_read": False, "endpoint_read": False}
 
     def client(category_request: dict[str, Any]) -> dict[str, Any]:
         category = _validate_category_request(category_request)
@@ -408,6 +411,7 @@ def build_chuangzhi_novacode_source_provider_client(request: dict[str, Any]) -> 
                     aggregate[bucket] += count
         finally:
             client.api_key_read = audit["api_key_read"]  # type: ignore[attr-defined]
+            client.endpoint_read = audit["endpoint_read"]  # type: ignore[attr-defined]
         return {
             "category": category,
             "case_count": SIGNED_CASES_PER_CATEGORY,
@@ -421,4 +425,5 @@ def build_chuangzhi_novacode_source_provider_client(request: dict[str, Any]) -> 
         }
 
     client.api_key_read = False  # type: ignore[attr-defined]
+    client.endpoint_read = False  # type: ignore[attr-defined]
     return client

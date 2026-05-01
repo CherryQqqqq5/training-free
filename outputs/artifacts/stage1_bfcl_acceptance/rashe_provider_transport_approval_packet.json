@@ -28,6 +28,21 @@
   "candidate_pool_ready": false,
   "case_count_per_category": 20,
   "diagnostics_generated": false,
+  "endpoint_policy": {
+    "allowed_env_vars": [
+      "CHUANGZHI_NOVACODE_ENDPOINT",
+      "NOVACODE_ENDPOINT"
+    ],
+    "default_endpoint_configured": false,
+    "endpoint_artifact_write_authorized": false,
+    "endpoint_logging_authorized": false,
+    "env_only": true,
+    "execution_time_only": true,
+    "hardcoded_endpoint_authorized": false,
+    "https_required": true,
+    "profile_file_read_authorized": false,
+    "raw_path_indicator_allowed": false
+  },
   "execution_adapter": "scripts.rashe_source_diagnostic_compact_adapter:run_compact_source_diagnostic",
   "execution_performed_in_this_commit": false,
   "failure_buckets": [
@@ -80,11 +95,14 @@
   "no_leakage_required": {
     "api_key_logged_or_written": false,
     "candidate_output_used": false,
+    "endpoint_logged_or_written": false,
     "expected_used": false,
     "feedback_used": false,
     "full_suite_feedback_used": false,
     "gold_used": false,
+    "hardcoded_endpoint_used": false,
     "holdout_feedback_used": false,
+    "profile_file_endpoint_used": false,
     "provider_payload_committed": false,
     "raw_case_id_used": false,
     "raw_prompt_used": false,
@@ -96,7 +114,8 @@
   "notes": [
     "Provider transport is approved only for bounded compact diagnostics after gates pass.",
     "This packet does not authorize candidate generation, scorer execution, performance evidence, or Huawei readiness.",
-    "This commit prepares approval/checker/code only and does not run --execute-approved-source."
+    "This commit prepares approval/checker/code only and does not run --execute-approved-source.",
+    "Provider endpoint is signed by env var name only; endpoint value must never be written into commands, logs, or artifacts."
   ],
   "output_root": "outputs/artifacts/stage1_bfcl_acceptance/rashe_source_diagnostics_compact/",
   "performance_evidence": false,

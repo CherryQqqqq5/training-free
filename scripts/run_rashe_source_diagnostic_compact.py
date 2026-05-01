@@ -5,9 +5,9 @@ Dry-run/plan-only modes validate the signed runbook scope without executing
 source collection. The approved execution path is adapter-driven: it can only
 write compact schema artifacts after the approved-source and after-source matrix
 gates pass. The signed adapter and provider-client factory are importable;
-true execution injects the signed source-case provider boundary and still
-fails closed with ``provider_transport_missing`` until approved transport is
-injected into the signed request.
+true execution injects the signed source-case provider boundary and fails
+closed with ``provider_endpoint_missing`` until the signed endpoint env is
+configured during an approved execution. Dry-run and tests never read the endpoint.
 """
 
 from __future__ import annotations
@@ -461,8 +461,8 @@ def execute_approved_source(
         if message.startswith("source_case_provider_missing"):
             status = "source_case_provider_missing"
             blocker = message
-        elif message.startswith("provider_transport_missing"):
-            status = "provider_transport_missing"
+        elif message.startswith("provider_transport_legacy_missing"):
+            status = "provider_transport_legacy_missing"
             blocker = message
         elif message.startswith("provider_key_missing"):
             status = "provider_key_missing"
@@ -493,6 +493,7 @@ def execute_approved_source(
             "blockers": ["provider_client_factory_output_not_callable"],
         }
     api_key_read = bool(getattr(request["provider_client"], "api_key_read", False))
+    endpoint_read = bool(getattr(request["provider_client"], "endpoint_read", False))
     try:
         artifacts = adapter_func(request)
     except Exception as exc:  # pragma: no cover - adapter-specific failures vary.
@@ -512,8 +513,8 @@ def execute_approved_source(
         elif message.startswith("source_case_provider_data_missing"):
             status = "source_case_provider_data_missing"
             blocker = message
-        elif message.startswith("provider_transport_missing"):
-            status = "provider_transport_missing"
+        elif message.startswith("provider_transport_legacy_missing"):
+            status = "provider_transport_legacy_missing"
             blocker = message
         elif message.startswith("provider_key_missing"):
             status = "provider_key_missing"
@@ -534,10 +535,12 @@ def execute_approved_source(
             status = "failed"
             blocker = f"source_execution_adapter_failed:{message}"
         api_key_read = bool(getattr(request.get("provider_client"), "api_key_read", api_key_read))
+        endpoint_read = bool(getattr(request.get("provider_client"), "endpoint_read", endpoint_read))
         return {
             "execution_adapter_status": status,
             "provider_call_executed": False,
             "api_key_read": api_key_read,
+            "endpoint_read": endpoint_read,
             "diagnostic_written": False,
             "written_artifacts": [],
             "executed_artifacts": [],
@@ -561,10 +564,12 @@ def execute_approved_source(
                 blockers.append(f"artifact_boundary_failed:{boundary_error}")
     provider_call_executed = any(int(artifact.get("provider_call_count") or 0) > 0 for artifact in artifacts)
     api_key_read = bool(getattr(request.get("provider_client"), "api_key_read", api_key_read))
+    endpoint_read = bool(getattr(request.get("provider_client"), "endpoint_read", endpoint_read))
     return {
         "execution_adapter_status": adapter_status,
         "provider_call_executed": provider_call_executed,
         "api_key_read": api_key_read,
+        "endpoint_read": endpoint_read,
         "diagnostic_written": bool(written_artifacts),
         "written_artifacts": written_artifacts,
         "executed_artifacts": artifacts,
@@ -659,6 +664,7 @@ def check(args: argparse.Namespace) -> dict[str, Any]:
         "execute_requested": args.execute_approved_source,
         "provider_call_executed": execution["provider_call_executed"],
         "api_key_read": execution["api_key_read"],
+        "endpoint_read": execution.get("endpoint_read", False),
         "diagnostic_written": execution["diagnostic_written"],
         "execution_adapter_status": execution["execution_adapter_status"],
         "provider_client_factory_status": provider_client_factory_status,

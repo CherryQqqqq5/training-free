@@ -13,10 +13,12 @@ Approved scope:
 - Provider-client factory: `scripts.rashe_source_provider_client:build_chuangzhi_novacode_source_provider_client`
 - Source-case provider: `scripts.rashe_source_case_provider:build_signed_source_case_provider`
 
-Credential boundary:
+Credential and endpoint boundary:
 - API keys are env-only and execution-time-only.
-- This packet does not authorize reading profile files, logging keys, or writing keys into artifacts.
-- Missing key must fail closed as `provider_key_missing`.
+- Endpoint values are env-only and execution-time-only via signed env var names `CHUANGZHI_NOVACODE_ENDPOINT` or `NOVACODE_ENDPOINT`.
+- Endpoint values must be HTTPS and must not contain raw/path indicators.
+- This packet does not authorize reading profile files, hardcoded default endpoints, logging endpoint/key values, or writing endpoint/key values into artifacts.
+- Missing endpoint must fail closed as `provider_endpoint_missing`; missing key must fail closed as `provider_key_missing`.
 
 Output boundary:
 - Raw request, raw response, raw trace, provider payload, case IDs, prompts, gold, expected, reference, scorer diff, candidate output, repair output, and feedback are forbidden.

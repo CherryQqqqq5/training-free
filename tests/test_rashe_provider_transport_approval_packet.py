@@ -43,6 +43,8 @@ def test_provider_transport_packet_and_approved_checkers_pass_current_packet():
         assert summary["scorer_authorized"] is False
         assert summary["performance_evidence"] is False
         assert summary["huawei_acceptance_ready"] is False
+        assert summary["endpoint_allowed_env_vars"] == ["CHUANGZHI_NOVACODE_ENDPOINT", "NOVACODE_ENDPOINT"]
+        assert summary["endpoint_env_only"] is True
         if key == "rashe_provider_transport_approved_passed":
             assert summary["metadata_checker_passed"] is True
             assert summary["source_input_checker_passed"] is True
@@ -115,3 +117,36 @@ def test_packet_rejects_key_policy_raw_paths_and_forbidden_field_drift(tmp_path)
     assert "packet_transport_allowed_result_fields_invalid" in blockers
     assert "packet_forbidden_field_missing:case_id" in blockers
     assert "packet_no_leakage_field_not_false:api_key_logged_or_written" in blockers
+
+
+def test_packet_rejects_missing_or_unsigned_endpoint_policy(tmp_path):
+    packet_path = copy_packet(tmp_path)
+    packet = load_json(packet_path)
+    packet.pop("endpoint_policy")
+    write_json(packet_path, packet)
+    blockers = check(packet_path)["blockers"]
+    assert "packet_endpoint_policy_missing" in blockers
+    assert "packet_endpoint_env_only_not_true" in blockers
+
+    packet_path = copy_packet(tmp_path)
+    packet = load_json(packet_path)
+    packet["endpoint_policy"]["allowed_env_vars"] = ["UNSIGNED_ENDPOINT"]
+    packet["endpoint_policy"]["https_required"] = False
+    packet["endpoint_policy"]["profile_file_read_authorized"] = True
+    packet["endpoint_policy"]["hardcoded_endpoint_authorized"] = True
+    packet["endpoint_policy"]["endpoint_logging_authorized"] = True
+    packet["endpoint_policy"]["endpoint_artifact_write_authorized"] = True
+    packet["endpoint_policy"]["raw_path_indicator_allowed"] = True
+    packet["endpoint_policy"]["default_endpoint_configured"] = True
+    packet["no_leakage_required"]["endpoint_logged_or_written"] = True
+    write_json(packet_path, packet)
+    blockers = check(packet_path)["blockers"]
+    assert "packet_endpoint_allowed_env_vars_invalid" in blockers
+    assert "packet_endpoint_https_not_required" in blockers
+    assert "packet_endpoint_policy_not_false:profile_file_read_authorized" in blockers
+    assert "packet_endpoint_policy_not_false:hardcoded_endpoint_authorized" in blockers
+    assert "packet_endpoint_policy_not_false:endpoint_logging_authorized" in blockers
+    assert "packet_endpoint_policy_not_false:endpoint_artifact_write_authorized" in blockers
+    assert "packet_endpoint_policy_not_false:raw_path_indicator_allowed" in blockers
+    assert "packet_endpoint_policy_not_false:default_endpoint_configured" in blockers
+    assert "packet_no_leakage_field_not_false:endpoint_logged_or_written" in blockers

@@ -202,6 +202,7 @@ def test_signed_execute_adapter_boundary_reports_missing_endpoint_without_key_re
     assert execution["execution_adapter_status"] == "provider_endpoint_missing"
     assert execution["provider_call_executed"] is False
     assert execution["api_key_read"] is False
+    assert execution["endpoint_read"] is False
     assert execution["diagnostic_written"] is False
     assert "provider_endpoint_missing" in execution["blockers"]
     assert "execution_path_not_implemented_in_this_commit" not in execution["blockers"]
@@ -510,6 +511,7 @@ def test_execute_path_with_env_transport_mock_http_audits_key_without_writing(mo
     assert execution["execution_adapter_status"] == "loaded"
     assert execution["provider_call_executed"] is True
     assert execution["api_key_read"] is True
+    assert execution["endpoint_read"] is True
     assert execution["diagnostic_written"] is False
     assert "mock-secret-must-not-leak" not in str(execution)
     assert sum(item["provider_call_count"] for item in execution["executed_artifacts"]) == 160

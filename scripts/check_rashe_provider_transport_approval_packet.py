@@ -76,6 +76,9 @@ NO_LEAKAGE_FALSE = (
     "raw_trace_committed",
     "provider_payload_committed",
     "api_key_logged_or_written",
+    "endpoint_logged_or_written",
+    "profile_file_endpoint_used",
+    "hardcoded_endpoint_used",
 )
 RAW_INDICATORS = (
     "raw_trace",
@@ -188,6 +191,28 @@ def validate_packet(packet: dict[str, Any]) -> list[str]:
         if key_policy.get(key) is not False:
             blockers.append(f"packet_api_key_policy_not_false:{key}")
 
+    endpoint_policy = packet.get("endpoint_policy") if isinstance(packet.get("endpoint_policy"), dict) else {}
+    if not endpoint_policy:
+        blockers.append("packet_endpoint_policy_missing")
+    if endpoint_policy.get("env_only") is not True:
+        blockers.append("packet_endpoint_env_only_not_true")
+    if endpoint_policy.get("execution_time_only") is not True:
+        blockers.append("packet_endpoint_execution_time_only_not_true")
+    if endpoint_policy.get("allowed_env_vars") != ["CHUANGZHI_NOVACODE_ENDPOINT", "NOVACODE_ENDPOINT"]:
+        blockers.append("packet_endpoint_allowed_env_vars_invalid")
+    if endpoint_policy.get("https_required") is not True:
+        blockers.append("packet_endpoint_https_not_required")
+    for key in [
+        "profile_file_read_authorized",
+        "hardcoded_endpoint_authorized",
+        "endpoint_logging_authorized",
+        "endpoint_artifact_write_authorized",
+        "raw_path_indicator_allowed",
+        "default_endpoint_configured",
+    ]:
+        if endpoint_policy.get(key) is not False:
+            blockers.append(f"packet_endpoint_policy_not_false:{key}")
+
     output_policy = packet.get("transport_output_policy") if isinstance(packet.get("transport_output_policy"), dict) else {}
     if output_policy.get("sanitized_counters_only") is not True:
         blockers.append("packet_transport_sanitized_counters_only_not_true")
@@ -230,6 +255,8 @@ def check(packet_path: Path = DEFAULT_PACKET) -> dict[str, Any]:
         "performance_evidence": packet.get("performance_evidence"),
         "huawei_acceptance_ready": packet.get("huawei_acceptance_ready"),
         "diagnostics_generated": packet.get("diagnostics_generated"),
+        "endpoint_allowed_env_vars": (packet.get("endpoint_policy") or {}).get("allowed_env_vars") if isinstance(packet.get("endpoint_policy"), dict) else None,
+        "endpoint_env_only": (packet.get("endpoint_policy") or {}).get("env_only") if isinstance(packet.get("endpoint_policy"), dict) else None,
         "rashe_provider_transport_approval_packet_passed": not blockers,
         "blockers": blockers,
     }

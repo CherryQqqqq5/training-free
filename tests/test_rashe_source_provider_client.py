@@ -89,6 +89,7 @@ def test_client_without_provider_transport_requires_signed_endpoint_before_key_r
     with pytest.raises(provider_client.SourceProviderClientError, match="provider_endpoint_missing"):
         client(category_request())
     assert getattr(client, "api_key_read") is False
+    assert getattr(client, "endpoint_read") is False
 
 
 def test_default_transport_requires_provider_transport_approval(monkeypatch):
@@ -121,6 +122,7 @@ def test_env_transport_with_mock_http_reads_key_and_returns_signed_bucket(monkey
 
     assert len(http_calls) == 20
     assert getattr(client, "api_key_read") is True
+    assert getattr(client, "endpoint_read") is True
     assert record["failure_bucket_counts"]["wrong_first_tool"] == 20
     assert record["provider_call_count"] == 20
     assert "mock-secret-must-not-leak" not in str(record)
@@ -137,6 +139,7 @@ def test_env_transport_rejects_forbidden_raw_http_response(monkeypatch):
         client(category_request())
     assert "provider_transport_result_forbidden_field" in str(exc_info.value)
     assert getattr(client, "api_key_read") is True
+    assert getattr(client, "endpoint_read") is True
 
 
 def test_env_transport_rejects_unsigned_failure_bucket(monkeypatch):
