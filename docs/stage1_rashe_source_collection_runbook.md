@@ -53,6 +53,18 @@ Provider transport review is blocked until the metadata approval checker passes,
 
 The approved metadata root is `outputs/artifacts/stage1_bfcl_acceptance/approved_source_metadata_compact/`; the downstream manifest root is `outputs/artifacts/stage1_bfcl_acceptance/rashe_source_inputs_compact/`. Metadata records must use the signed coarse `source_family_id` taxonomy only: `agentic_web`, `agentic_memory`, `multi_turn_workflow`, or `abstention_safety`, with the fixed category mapping in the metadata approval packet. If the approved source metadata root is absent, the metadata checker and builder fail closed with `approved_bfcl_source_metadata_missing`. If the signed manifest root is absent, the checker fails closed with `approved_source_input_root_missing`. Do not use raw BFCL result roots, raw trace roots, or case-ID manifests as builder input. Source metadata preparation itself is a later step and must not commit nonce-to-raw-case mappings.
 
+
+## Provider Endpoint Preflight Gate
+
+Provider endpoint/model/tool-calling preflight is a Phase B prerequisite capability check, not Phase B execution. The packet is `outputs/artifacts/stage1_bfcl_acceptance/rashe_provider_endpoint_preflight_packet.json`, and it is checked with:
+
+```bash
+.venv/bin/python scripts/check_rashe_provider_endpoint_preflight_packet.py --compact --strict
+.venv/bin/python scripts/run_rashe_provider_endpoint_preflight.py --dry-run --compact --strict
+```
+
+This commit does not request the provider. The dry-run/plan-only runner may report whether signed endpoint/key env names are present, but it must not print or persist endpoint/key values. Any future synthetic provider preflight requires separate reviewer authorization and must use only a minimal toy chat/tool-calling request with no BFCL/source case, raw prompt, raw tool data, trace, gold/expected/reference, scorer diff, candidate output, feedback, or compact diagnostic payload. The signed primary model remains `gpt-5.2`; `gpt-5.4` may only be observed as optional capability. If only `gpt-5.4` is supported, the result is `route_update_required` and the signed model packet/checker/runbook/tests must be updated before source diagnostics may run. If the endpoint supports only standard chat completions, run an OpenAI-compatible chat adapter review before any Phase B execution.
+
 ## Signed Command Template
 
 Do not run source collection in this commit. Before any future execution, run metadata/source gates and stop if any fails:
