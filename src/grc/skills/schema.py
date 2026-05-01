@@ -23,9 +23,13 @@ FORBIDDEN_FIELD_NAMES = {
     "possible_answer",
     "score",
     "scorer_diff",
+    "feedback",
     "candidate",
     "candidate_output",
     "repair",
+    "repair_output",
+    "holdout_feedback",
+    "full_suite_feedback",
     "case_id",
 }
 
