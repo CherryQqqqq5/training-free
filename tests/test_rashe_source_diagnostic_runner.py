@@ -189,7 +189,7 @@ def test_rejects_raw_output_path_and_forbidden_publish_fields():
     assert "forbidden_publish_field:gold" in field_blockers
 
 
-def test_signed_execute_adapter_boundary_reports_unimplemented_provider_transport_without_key_read():
+def test_signed_execute_adapter_boundary_reports_missing_endpoint_without_key_read():
     args = signed_execute_args()
     schema = runner.load_json(args.schema)
     execution = runner.execute_approved_source(
@@ -199,11 +199,11 @@ def test_signed_execute_adapter_boundary_reports_unimplemented_provider_transpor
         schema,
         write_artifacts=False,
     )
-    assert execution["execution_adapter_status"] == "provider_transport_not_implemented"
+    assert execution["execution_adapter_status"] == "provider_endpoint_missing"
     assert execution["provider_call_executed"] is False
     assert execution["api_key_read"] is False
     assert execution["diagnostic_written"] is False
-    assert "provider_transport_not_implemented" in execution["blockers"]
+    assert "provider_endpoint_missing" in execution["blockers"]
     assert "execution_path_not_implemented_in_this_commit" not in execution["blockers"]
 
 
@@ -486,4 +486,30 @@ def test_execute_path_with_real_adapter_and_mock_provider_factory_no_write():
     assert execution["api_key_read"] is False
     assert execution["diagnostic_written"] is False
     assert len(execution["executed_artifacts"]) == 8
+    assert sum(item["provider_call_count"] for item in execution["executed_artifacts"]) == 160
+
+
+def test_execute_path_with_env_transport_mock_http_audits_key_without_writing(monkeypatch):
+    import scripts.rashe_source_provider_client as provider_client
+
+    args = signed_execute_args()
+    schema = runner.load_json(args.schema)
+    monkeypatch.setenv("CHUANGZHI_NOVACODE_ENDPOINT", "https://example.test/compact")
+    monkeypatch.setenv("CHUANGZHI_API_KEY", "mock-secret-must-not-leak")
+    monkeypatch.setattr(provider_client, "_http_post_json", lambda *_: {"failure_bucket": "answered_without_tool"})
+
+    execution = runner.execute_approved_source(
+        args,
+        list(APPROVED_CATEGORIES),
+        20,
+        schema,
+        write_artifacts=False,
+    )
+
+    assert execution["blockers"] == []
+    assert execution["execution_adapter_status"] == "loaded"
+    assert execution["provider_call_executed"] is True
+    assert execution["api_key_read"] is True
+    assert execution["diagnostic_written"] is False
+    assert "mock-secret-must-not-leak" not in str(execution)
     assert sum(item["provider_call_count"] for item in execution["executed_artifacts"]) == 160

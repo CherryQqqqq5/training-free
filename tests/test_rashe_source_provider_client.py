@@ -79,12 +79,14 @@ def test_client_without_source_case_provider_fails_precisely():
         client(category_request())
 
 
-def test_client_without_provider_transport_fails_precisely(monkeypatch):
+def test_client_without_provider_transport_requires_signed_endpoint_before_key_read(monkeypatch):
     monkeypatch.setenv("CHUANGZHI_API_KEY", "mock-secret-must-not-be-read")
+    monkeypatch.delenv("CHUANGZHI_NOVACODE_ENDPOINT", raising=False)
+    monkeypatch.delenv("NOVACODE_ENDPOINT", raising=False)
     request = signed_request(source_case_provider=lambda request: compact_cases(request["category"]))
     client = provider_client.build_chuangzhi_novacode_source_provider_client(request)
 
-    with pytest.raises(provider_client.SourceProviderClientError, match="provider_transport_not_implemented"):
+    with pytest.raises(provider_client.SourceProviderClientError, match="provider_endpoint_missing"):
         client(category_request())
     assert getattr(client, "api_key_read") is False
 
@@ -96,6 +98,57 @@ def test_default_transport_requires_provider_transport_approval(monkeypatch):
 
     with pytest.raises(provider_client.SourceProviderClientError, match="provider_transport_not_approved"):
         client(category_request())
+
+
+def test_env_transport_with_mock_http_reads_key_and_returns_signed_bucket(monkeypatch):
+    monkeypatch.setenv("CHUANGZHI_NOVACODE_ENDPOINT", "https://example.test/compact")
+    monkeypatch.setenv("CHUANGZHI_API_KEY", "mock-secret-must-not-leak")
+    http_calls = []
+
+    def fake_http_post_json(endpoint, api_key, payload):
+        http_calls.append((endpoint, api_key, payload))
+        assert endpoint == "https://example.test/compact"
+        assert api_key == "mock-secret-must-not-leak"
+        assert "mock-secret-must-not-leak" not in str(payload)
+        assert set(payload) == {"category", "ordinal", "provider_profile", "model", "compact_sanitized_only"}
+        return {"failure_bucket": "wrong_first_tool"}
+
+    monkeypatch.setattr(provider_client, "_http_post_json", fake_http_post_json)
+    request = signed_request(source_case_provider=lambda request: compact_cases(request["category"]))
+    client = provider_client.build_chuangzhi_novacode_source_provider_client(request)
+
+    record = client(category_request())
+
+    assert len(http_calls) == 20
+    assert getattr(client, "api_key_read") is True
+    assert record["failure_bucket_counts"]["wrong_first_tool"] == 20
+    assert record["provider_call_count"] == 20
+    assert "mock-secret-must-not-leak" not in str(record)
+
+
+def test_env_transport_rejects_forbidden_raw_http_response(monkeypatch):
+    monkeypatch.setenv("CHUANGZHI_NOVACODE_ENDPOINT", "https://example.test/compact")
+    monkeypatch.setenv("CHUANGZHI_API_KEY", "mock-secret-must-not-leak")
+    monkeypatch.setattr(provider_client, "_http_post_json", lambda *_: {"raw_payload": "raw-provider-payload"})
+    request = signed_request(source_case_provider=lambda request: compact_cases(request["category"]))
+    client = provider_client.build_chuangzhi_novacode_source_provider_client(request)
+
+    with pytest.raises(provider_client.SourceProviderClientError) as exc_info:
+        client(category_request())
+    assert "provider_transport_result_forbidden_field" in str(exc_info.value)
+    assert getattr(client, "api_key_read") is True
+
+
+def test_env_transport_rejects_unsigned_failure_bucket(monkeypatch):
+    monkeypatch.setenv("CHUANGZHI_NOVACODE_ENDPOINT", "https://example.test/compact")
+    monkeypatch.setenv("CHUANGZHI_API_KEY", "mock-secret-must-not-leak")
+    monkeypatch.setattr(provider_client, "_http_post_json", lambda *_: {"failure_bucket": "not_signed"})
+    request = signed_request(source_case_provider=lambda request: compact_cases(request["category"]))
+    client = provider_client.build_chuangzhi_novacode_source_provider_client(request)
+
+    with pytest.raises(provider_client.SourceProviderClientError, match="provider_transport_failure_bucket_not_signed:not_signed"):
+        client(category_request())
+    assert getattr(client, "api_key_read") is True
 
 
 def test_client_with_mock_source_and_transport_returns_compact_counter_only(monkeypatch):

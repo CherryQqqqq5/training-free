@@ -524,6 +524,12 @@ def execute_approved_source(
         elif message.startswith("provider_transport_not_implemented"):
             status = "provider_transport_not_implemented"
             blocker = message
+        elif message.startswith("provider_endpoint_missing"):
+            status = "provider_endpoint_missing"
+            blocker = message
+        elif message.startswith("provider_transport_configuration_missing"):
+            status = "provider_transport_configuration_missing"
+            blocker = message
         else:
             status = "failed"
             blocker = f"source_execution_adapter_failed:{message}"

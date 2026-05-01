@@ -5,14 +5,16 @@ The factory is importable and safe for dry-run validation. It does not read
 credentials on import or factory construction. Real execution must still provide
 an approved source-case provider and provider transport; otherwise the returned
 client fails closed with ``source_case_provider_missing`` or
-``provider_transport_not_implemented``.
+``provider_endpoint_missing`` until signed endpoint configuration is present.
 """
 
 from __future__ import annotations
 
+import json
 import os
 import subprocess
 import sys
+import urllib.request
 from pathlib import Path
 from typing import Any, Callable
 
@@ -51,6 +53,7 @@ SOURCE_CASE_PROVIDER_KEYS = ("source_case_provider", "case_provider")
 PROVIDER_TRANSPORT_KEYS = ("provider_transport", "source_provider_transport")
 PROVIDER_TRANSPORT_APPROVED_CHECKER = "scripts/check_rashe_provider_transport_approved.py"
 APPROVED_PROVIDER_KEY_ENV_VARS = ("CHUANGZHI_API_KEY", "NOVACODE_API_KEY")
+APPROVED_PROVIDER_ENDPOINT_ENV_VARS = ("CHUANGZHI_NOVACODE_ENDPOINT", "NOVACODE_ENDPOINT")
 FORBIDDEN_FIELD_NAMES = {
     "raw_case_id",
     "case_id",
@@ -157,17 +160,82 @@ def _provider_transport_approved() -> None:
         raise SourceProviderClientError("provider_transport_not_approved")
 
 
-def _execution_env_key() -> str:
+def _execution_endpoint() -> str:
+    for env_name in APPROVED_PROVIDER_ENDPOINT_ENV_VARS:
+        value = os.environ.get(env_name)
+        if value:
+            lowered = value.lower()
+            for indicator in RAW_VALUE_INDICATORS:
+                if indicator in lowered:
+                    raise SourceProviderClientError("provider_endpoint_forbidden_raw_indicator")
+            return value
+    raise SourceProviderClientError("provider_endpoint_missing")
+
+
+def _execution_env_key(audit: dict[str, bool]) -> str:
     for env_name in APPROVED_PROVIDER_KEY_ENV_VARS:
         value = os.environ.get(env_name)
         if value:
+            audit["api_key_read"] = True
             return value
     raise SourceProviderClientError("provider_key_missing")
 
 
-def _build_env_only_provider_transport() -> ProviderTransport:
+def _http_post_json(endpoint: str, api_key: str, payload: dict[str, Any]) -> dict[str, Any]:
+    body = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    request = urllib.request.Request(
+        endpoint,
+        data=body,
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        },
+        method="POST",
+    )
+    with urllib.request.urlopen(request, timeout=60) as response:  # nosec B310 - endpoint must be signed by environment.
+        data = response.read()
+    parsed = json.loads(data.decode("utf-8"))
+    if not isinstance(parsed, dict):
+        raise SourceProviderClientError("provider_transport_response_not_object")
+    return parsed
+
+
+def _build_env_only_provider_transport(audit: dict[str, bool]) -> ProviderTransport:
     _provider_transport_approved()
-    raise SourceProviderClientError("provider_transport_not_implemented")
+
+    def transport(request: dict[str, Any]) -> dict[str, Any]:
+        hits = _forbidden_hits(request)
+        if hits:
+            raise SourceProviderClientError("provider_transport_request_forbidden_field:" + ";".join(hits))
+        for flag in [
+            "raw_payload_capture_authorized",
+            "raw_trace_capture_authorized",
+            "candidate_generation_authorized",
+            "scorer_authorized",
+            "performance_evidence",
+        ]:
+            if request.get(flag) is not False:
+                raise SourceProviderClientError(f"provider_transport_{flag}_not_false")
+        if request.get("provider_profile") != SIGNED_PROVIDER_PROFILE:
+            raise SourceProviderClientError("provider_transport_profile_not_signed")
+        if request.get("model") != SIGNED_MODEL:
+            raise SourceProviderClientError("provider_transport_model_not_signed")
+        endpoint = _execution_endpoint()
+        api_key = _execution_env_key(audit)
+        response = _http_post_json(
+            endpoint,
+            api_key,
+            {
+                "category": request["category"],
+                "ordinal": request["ordinal"],
+                "provider_profile": SIGNED_PROVIDER_PROFILE,
+                "model": SIGNED_MODEL,
+                "compact_sanitized_only": True,
+            },
+        )
+        return response
+
+    return transport
 
 
 def validate_factory_request(request: dict[str, Any]) -> list[str]:
@@ -298,6 +366,7 @@ def build_chuangzhi_novacode_source_provider_client(request: dict[str, Any]) -> 
         raise SourceProviderClientError(";".join(blockers))
     source_case_provider = _callable_from_request(request, SOURCE_CASE_PROVIDER_KEYS)
     provider_transport = _callable_from_request(request, PROVIDER_TRANSPORT_KEYS)
+    audit = {"api_key_read": False}
 
     def client(category_request: dict[str, Any]) -> dict[str, Any]:
         category = _validate_category_request(category_request)
@@ -305,7 +374,7 @@ def build_chuangzhi_novacode_source_provider_client(request: dict[str, Any]) -> 
             raise SourceProviderClientError("source_case_provider_missing")
         active_provider_transport = provider_transport
         if active_provider_transport is None:
-            active_provider_transport = _build_env_only_provider_transport()
+            active_provider_transport = _build_env_only_provider_transport(audit)
         cases = _validate_cases(
             source_case_provider(
                 {
@@ -319,23 +388,26 @@ def build_chuangzhi_novacode_source_provider_client(request: dict[str, Any]) -> 
             category,
         )
         aggregate = {bucket: 0 for bucket in FAILURE_BUCKETS}
-        for case in cases:
-            result = active_provider_transport(
-                {
-                    "category": category,
-                    "ordinal": case["ordinal"],
-                    "provider_profile": SIGNED_PROVIDER_PROFILE,
-                    "model": SIGNED_MODEL,
-                    "compact_sanitized_only": True,
-                    "raw_payload_capture_authorized": False,
-                    "raw_trace_capture_authorized": False,
-                    "candidate_generation_authorized": False,
-                    "scorer_authorized": False,
-                    "performance_evidence": False,
-                }
-            )
-            for bucket, count in _transport_failure_buckets(result).items():
-                aggregate[bucket] += count
+        try:
+            for case in cases:
+                result = active_provider_transport(
+                    {
+                        "category": category,
+                        "ordinal": case["ordinal"],
+                        "provider_profile": SIGNED_PROVIDER_PROFILE,
+                        "model": SIGNED_MODEL,
+                        "compact_sanitized_only": True,
+                        "raw_payload_capture_authorized": False,
+                        "raw_trace_capture_authorized": False,
+                        "candidate_generation_authorized": False,
+                        "scorer_authorized": False,
+                        "performance_evidence": False,
+                    }
+                )
+                for bucket, count in _transport_failure_buckets(result).items():
+                    aggregate[bucket] += count
+        finally:
+            client.api_key_read = audit["api_key_read"]  # type: ignore[attr-defined]
         return {
             "category": category,
             "case_count": SIGNED_CASES_PER_CATEGORY,
