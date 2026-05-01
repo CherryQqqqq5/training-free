@@ -179,7 +179,7 @@ def test_rejects_raw_output_path_and_forbidden_publish_fields():
     assert "forbidden_publish_field:gold" in field_blockers
 
 
-def test_signed_execute_adapter_boundary_reports_missing_dependency_without_key_read():
+def test_signed_execute_adapter_boundary_reports_missing_provider_client_without_key_read():
     args = signed_execute_args()
     schema = runner.load_json(args.schema)
     execution = runner.execute_approved_source(
@@ -189,11 +189,11 @@ def test_signed_execute_adapter_boundary_reports_missing_dependency_without_key_
         schema,
         write_artifacts=False,
     )
-    assert execution["execution_adapter_status"] == "dependency_missing"
+    assert execution["execution_adapter_status"] == "provider_client_missing"
     assert execution["provider_call_executed"] is False
     assert execution["api_key_read"] is False
     assert execution["diagnostic_written"] is False
-    assert "source_execution_dependency_missing:grc.bfcl.source_diagnostic_collector.collect_compact_source_diagnostics" in execution["blockers"]
+    assert "source_provider_client_missing" in execution["blockers"]
     assert "execution_path_not_implemented_in_this_commit" not in execution["blockers"]
 
 

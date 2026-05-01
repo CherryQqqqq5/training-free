@@ -7,7 +7,9 @@ It validates the approved 8x20/160 request and converts sanitized source
 counter records into the compact diagnostic schema. It never writes artifacts,
 never logs credentials, and never returns raw trace/provider/case/scorer fields.
 If the concrete approved source collector dependency is unavailable, execution
-fails closed with ``source_execution_dependency_missing:...``.
+fails closed with ``source_execution_dependency_missing:...``; once present, the
+collector itself fails closed with ``source_provider_client_missing`` until a
+concrete approved provider client is injected.
 """
 
 from __future__ import annotations

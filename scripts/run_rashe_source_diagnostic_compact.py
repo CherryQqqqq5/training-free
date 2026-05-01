@@ -4,8 +4,9 @@
 Dry-run/plan-only modes validate the signed runbook scope without executing
 source collection. The approved execution path is adapter-driven: it can only
 write compact schema artifacts after the approved-source and after-source matrix
-gates pass, and it fails closed with ``source_execution_adapter_missing`` until
-a concrete source execution adapter is supplied.
+gates pass. The signed adapter is importable; true execution still fails closed
+with ``source_provider_client_missing`` until an approved provider client is
+injected.
 """
 
 from __future__ import annotations
@@ -343,6 +344,9 @@ def execute_approved_source(
         message = str(exc)
         if message.startswith("source_execution_dependency_missing:"):
             status = "dependency_missing"
+            blocker = message
+        elif message.startswith("source_provider_client_missing"):
+            status = "provider_client_missing"
             blocker = message
         else:
             status = "failed"

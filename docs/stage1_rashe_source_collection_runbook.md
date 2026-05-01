@@ -62,7 +62,7 @@ This commit verifies the signed runner entrypoint in dry-run mode and implements
   --strict
 ```
 
-The template intentionally contains no API key. In this commit it must not call a provider, write diagnostics, generate raw traces, raw provider payloads, candidate JSONL, scorer outputs, dev/holdout/full manifests, performance evidence, or Huawei readiness artifacts. A future execution command must replace `--dry-run` with `--execute-approved-source` while keeping the signed adapter above, and must pass the same 8x20/160 signed bounds before it may write compact artifacts. If the approved collector dependency is absent, the adapter fails closed with `source_execution_dependency_missing:grc.bfcl.source_diagnostic_collector.collect_compact_source_diagnostics`.
+The template intentionally contains no API key. In this commit it must not call a provider, write diagnostics, generate raw traces, raw provider payloads, candidate JSONL, scorer outputs, dev/holdout/full manifests, performance evidence, or Huawei readiness artifacts. A future execution command must replace `--dry-run` with `--execute-approved-source` while keeping the signed adapter above, and must pass the same 8x20/160 signed bounds before it may write compact artifacts. The collector dependency is present; if a future execution does not inject the approved provider client, it fails closed with `source_provider_client_missing`.
 
 ## Compact Artifact Schema
 
