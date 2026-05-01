@@ -50,6 +50,22 @@ CATEGORY_PROMPT_FAMILY = {
     "hallucination": "hallucination_abstention",
     "irrelevance": "irrelevance_abstention",
 }
+SOURCE_FAMILY_ID_TAXONOMY = (
+    "agentic_web",
+    "agentic_memory",
+    "multi_turn_workflow",
+    "abstention_safety",
+)
+CATEGORY_SOURCE_FAMILY_ID = {
+    "agentic_web_search": "agentic_web",
+    "agentic_memory": "agentic_memory",
+    "multi_turn_base": "multi_turn_workflow",
+    "multi_turn_long_context": "multi_turn_workflow",
+    "multi_turn_miss_param": "multi_turn_workflow",
+    "multi_turn_miss_func": "multi_turn_workflow",
+    "hallucination": "abstention_safety",
+    "irrelevance": "abstention_safety",
+}
 ALLOWED_METADATA_FIELDS = ("category", "ordinal", "prompt_family", "source_nonce", "source_family_id")
 OUTPUT_MANIFEST_FIELDS = ("category", "ordinal", "prompt_family", "compact_source_hash")
 FORBIDDEN_FIELDS = (
@@ -248,9 +264,19 @@ def validate_packet(packet: dict[str, Any]) -> list[str]:
         if nonce_policy.get("future_selector_may_use_mapping_only_in_memory") is not True:
             blockers.append("packet_source_nonce_future_selector_memory_only_not_true")
 
+    if packet.get("source_family_id_taxonomy") != list(SOURCE_FAMILY_ID_TAXONOMY):
+        blockers.append("packet_source_family_id_taxonomy_invalid")
+    if packet.get("category_source_family_id") != CATEGORY_SOURCE_FAMILY_ID:
+        blockers.append("packet_category_source_family_id_invalid")
     family_policy = packet.get("source_family_id_policy") or {}
     if family_policy.get("allowed_in_metadata") is not True:
         blockers.append("packet_source_family_id_not_allowed_in_metadata")
+    if family_policy.get("controlled_taxonomy_only") is not True:
+        blockers.append("packet_source_family_id_taxonomy_not_required")
+    if family_policy.get("taxonomy_values") != list(SOURCE_FAMILY_ID_TAXONOMY):
+        blockers.append("packet_source_family_id_policy_taxonomy_values_invalid")
+    if family_policy.get("category_mapping_required") is not True:
+        blockers.append("packet_source_family_id_category_mapping_not_required")
     for key in ["allowed_in_output_manifest", "case_specific_information_allowed", "raw_text_allowed"]:
         if family_policy.get(key) is not False:
             blockers.append(f"packet_source_family_id_policy_not_false:{key}")
@@ -293,8 +319,11 @@ def validate_schema(schema: dict[str, Any]) -> list[str]:
         blockers.append("schema_prompt_family_enum_invalid")
     if int(props.get("source_nonce", {}).get("minLength") or 0) < 32:
         blockers.append("schema_source_nonce_min_length_too_small")
-    if "source_family_id" not in props:
+    source_family = props.get("source_family_id", {})
+    if not source_family:
         blockers.append("schema_source_family_id_missing")
+    elif source_family.get("enum") != list(SOURCE_FAMILY_ID_TAXONOMY):
+        blockers.append("schema_source_family_id_enum_invalid")
     for field in props:
         if field not in ALLOWED_METADATA_FIELDS:
             blockers.append(f"schema_property_not_allowed:{field}")

@@ -33,6 +33,16 @@
     "multi_turn_miss_func": "multi_turn_missing_function",
     "multi_turn_miss_param": "multi_turn_missing_parameter"
   },
+  "category_source_family_id": {
+    "agentic_memory": "agentic_memory",
+    "agentic_web_search": "agentic_web",
+    "hallucination": "abstention_safety",
+    "irrelevance": "abstention_safety",
+    "multi_turn_base": "multi_turn_workflow",
+    "multi_turn_long_context": "multi_turn_workflow",
+    "multi_turn_miss_func": "multi_turn_workflow",
+    "multi_turn_miss_param": "multi_turn_workflow"
+  },
   "downstream_output_manifest_root": "outputs/artifacts/stage1_bfcl_acceptance/rashe_source_inputs_compact/",
   "forbidden_field_violation_count": 0,
   "forbidden_fields": [
@@ -66,7 +76,7 @@
   ],
   "future_sequence": [
     "metadata approval checker must pass",
-    "approved sanitized metadata root may be prepared in a separately authorized step",
+    "metadata root checker must pass after approved sanitized metadata is prepared",
     "source-input manifest builder/checker must pass",
     "provider transport review may proceed only after source-input manifest checker passes"
   ],
@@ -94,7 +104,8 @@
   "notes": [
     "This packet does not generate metadata or source-input manifests.",
     "This packet does not authorize provider transport, provider calls, scorer use, candidate generation, BFCL execution, diagnostics, performance evidence, or Huawei readiness.",
-    "Do not commit nonce-to-raw-case mappings; any future selector mapping must remain transient and separately approved."
+    "Do not commit nonce-to-raw-case mappings; any future selector mapping must remain transient and separately approved.",
+    "source_family_id is a coarse controlled taxonomy value and must not encode case identity, raw text, or tool parameters."
   ],
   "ordinal_policy": {
     "base": 0,
@@ -145,8 +156,22 @@
     "allowed_in_metadata": true,
     "allowed_in_output_manifest": false,
     "case_specific_information_allowed": false,
-    "raw_text_allowed": false
+    "category_mapping_required": true,
+    "controlled_taxonomy_only": true,
+    "raw_text_allowed": false,
+    "taxonomy_values": [
+      "agentic_web",
+      "agentic_memory",
+      "multi_turn_workflow",
+      "abstention_safety"
+    ]
   },
+  "source_family_id_taxonomy": [
+    "agentic_web",
+    "agentic_memory",
+    "multi_turn_workflow",
+    "abstention_safety"
+  ],
   "source_input_builder_path": "scripts/build_rashe_source_inputs_compact.py",
   "source_input_checker_path": "scripts/check_rashe_source_inputs_compact.py",
   "source_input_manifests_generated": false,

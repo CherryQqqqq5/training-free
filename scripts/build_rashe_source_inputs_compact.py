@@ -46,6 +46,22 @@ CATEGORY_PROMPT_FAMILY = {
     "hallucination": "hallucination_abstention",
     "irrelevance": "irrelevance_abstention",
 }
+SOURCE_FAMILY_ID_TAXONOMY = {
+    "agentic_web",
+    "agentic_memory",
+    "multi_turn_workflow",
+    "abstention_safety",
+}
+CATEGORY_SOURCE_FAMILY_ID = {
+    "agentic_web_search": "agentic_web",
+    "agentic_memory": "agentic_memory",
+    "multi_turn_base": "multi_turn_workflow",
+    "multi_turn_long_context": "multi_turn_workflow",
+    "multi_turn_miss_param": "multi_turn_workflow",
+    "multi_turn_miss_func": "multi_turn_workflow",
+    "hallucination": "abstention_safety",
+    "irrelevance": "abstention_safety",
+}
 SIGNED_CASES_PER_CATEGORY = 20
 SIGNED_OUTPUT_ROOT = Path("outputs/artifacts/stage1_bfcl_acceptance/rashe_source_inputs_compact/")
 ALLOWED_SOURCE_METADATA_FIELDS = {
@@ -179,8 +195,13 @@ def validate_metadata_record(record: dict[str, Any], category: str, ordinal: int
     prompt_family = record.get("prompt_family")
     if prompt_family != CATEGORY_PROMPT_FAMILY[category]:
         raise CompactSourceInputBuildError(f"approved_source_input_prompt_family_not_signed:{category}:{prompt_family!r}")
+    source_family_id = record.get("source_family_id")
+    if source_family_id != CATEGORY_SOURCE_FAMILY_ID[category]:
+        raise CompactSourceInputBuildError(f"approved_source_input_source_family_id_not_signed:{category}:{source_family_id!r}")
+    if source_family_id not in SOURCE_FAMILY_ID_TAXONOMY:
+        raise CompactSourceInputBuildError(f"approved_source_input_source_family_id_not_taxonomy:{category}:{source_family_id!r}")
     source_nonce = record.get("source_nonce")
-    if not isinstance(source_nonce, str) or len(source_nonce) < 16:
+    if not isinstance(source_nonce, str) or len(source_nonce) < 32:
         raise CompactSourceInputBuildError(f"approved_source_input_nonce_invalid:{category}:{ordinal}")
     if forbidden_hits({"source_nonce": source_nonce}):
         raise CompactSourceInputBuildError(f"approved_source_input_nonce_forbidden:{category}:{ordinal}")
@@ -224,7 +245,7 @@ def build_category_records(source_root: Path, category: str) -> list[dict[str, A
 
 def write_manifests(source_root: Path, output_root: Path) -> list[str]:
     if not source_root.exists():
-        raise CompactSourceInputBuildError(f"approved_source_input_root_missing:{source_root}")
+        raise CompactSourceInputBuildError(f"approved_bfcl_source_metadata_missing:{source_root}")
     output_root.mkdir(parents=True, exist_ok=True)
     written: list[str] = []
     for category in APPROVED_CATEGORIES:
@@ -238,7 +259,7 @@ def write_manifests(source_root: Path, output_root: Path) -> list[str]:
 def check_plan(source_root: Path) -> list[str]:
     blockers: list[str] = []
     if not source_root.exists():
-        return [f"approved_source_input_root_missing:{source_root}"]
+        return [f"approved_bfcl_source_metadata_missing:{source_root}"]
     for category in APPROVED_CATEGORIES:
         try:
             build_category_records(source_root, category)

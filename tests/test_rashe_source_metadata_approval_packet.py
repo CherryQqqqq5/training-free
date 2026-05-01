@@ -131,6 +131,11 @@ def test_fails_if_nonce_or_source_family_policy_weakens(tmp_path):
     nonce["nonce_to_raw_case_mapping_committed"] = True
     packet["source_family_id_policy"]["allowed_in_output_manifest"] = True
     packet["source_family_id_policy"]["case_specific_information_allowed"] = True
+    packet["source_family_id_policy"]["controlled_taxonomy_only"] = False
+    packet["source_family_id_policy"]["taxonomy_values"] = ["case_specific_family"]
+    packet["source_family_id_policy"]["category_mapping_required"] = False
+    packet["source_family_id_taxonomy"] = ["case_specific_family"]
+    packet["category_source_family_id"]["agentic_web_search"] = "case_specific_family"
     write_json(packet_path, packet)
 
     summary = check(packet_path, schema_path)
@@ -149,6 +154,11 @@ def test_fails_if_nonce_or_source_family_policy_weakens(tmp_path):
         assert f"packet_source_nonce_policy_not_false:{key}" in blockers
     assert "packet_source_family_id_policy_not_false:allowed_in_output_manifest" in blockers
     assert "packet_source_family_id_policy_not_false:case_specific_information_allowed" in blockers
+    assert "packet_source_family_id_taxonomy_not_required" in blockers
+    assert "packet_source_family_id_policy_taxonomy_values_invalid" in blockers
+    assert "packet_source_family_id_category_mapping_not_required" in blockers
+    assert "packet_source_family_id_taxonomy_invalid" in blockers
+    assert "packet_category_source_family_id_invalid" in blockers
 
 
 def test_fails_if_downstream_execution_or_counts_are_enabled(tmp_path):
@@ -202,6 +212,7 @@ def test_fails_if_schema_allows_extra_fields_or_weak_nonce(tmp_path):
     schema["properties"]["case_id"] = {"type": "string"}
     schema["required"].append("case_id")
     schema["properties"]["source_nonce"]["minLength"] = 8
+    schema["properties"]["source_family_id"].pop("enum", None)
     schema["properties"]["ordinal"]["minimum"] = 1
     schema["properties"]["ordinal"]["maximum"] = 20
     write_json(schema_path, schema)
@@ -214,4 +225,5 @@ def test_fails_if_schema_allows_extra_fields_or_weak_nonce(tmp_path):
     assert "schema_property_not_allowed:case_id" in blockers
     assert "schema_property_forbidden:case_id" in blockers
     assert "schema_source_nonce_min_length_too_small" in blockers
+    assert "schema_source_family_id_enum_invalid" in blockers
     assert "schema_ordinal_bounds_invalid" in blockers

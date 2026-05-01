@@ -20,7 +20,7 @@ def write_source_metadata(root: Path, *, raw_field=None, count=20):
                 "ordinal": ordinal,
                 "prompt_family": builder.CATEGORY_PROMPT_FAMILY[category],
                 "source_nonce": f"approved-compact-token-{category}-{ordinal:02d}-safe",
-                "source_family_id": f"family-{category}",
+                "source_family_id": builder.CATEGORY_SOURCE_FAMILY_ID[category],
             }
             if raw_field:
                 row[raw_field] = RAW_SECRET
@@ -59,7 +59,7 @@ def test_builder_missing_source_root_reports_precise_blocker(tmp_path):
 
     blockers = builder.check_plan(missing_root)
 
-    assert blockers == [f"approved_source_input_root_missing:{missing_root}"]
+    assert blockers == [f"approved_bfcl_source_metadata_missing:{missing_root}"]
 
 
 def test_checker_missing_manifest_root_reports_precise_blocker(tmp_path):
@@ -108,6 +108,19 @@ def test_builder_rejects_wrong_count_prompt_family_and_extra_fields(tmp_path):
     path.write_text("\n".join(json.dumps(row, sort_keys=True) for row in rows) + "\n")
     blockers = builder.check_plan(source_root)
     assert any("approved_source_input_extra_field:unexpected" in blocker for blocker in blockers)
+
+
+def test_builder_rejects_wrong_source_family_id(tmp_path):
+    source_root = tmp_path / "source_family"
+    write_source_metadata(source_root)
+    path = source_root / "agentic_web_search.jsonl"
+    rows = [json.loads(line) for line in path.read_text().splitlines()]
+    rows[0]["source_family_id"] = "agentic_web_case_0"
+    path.write_text("\n".join(json.dumps(row, sort_keys=True) for row in rows) + "\n")
+
+    blockers = builder.check_plan(source_root)
+
+    assert any("approved_source_input_source_family_id_not_signed" in blocker for blocker in blockers)
 
 
 def test_checker_rejects_manifest_extra_fields_bad_ordinals_and_raw_values(tmp_path):
@@ -160,4 +173,4 @@ def test_builder_cli_dry_run_missing_source_root_is_precise(tmp_path):
     summary = json.loads(result.stdout)
     assert summary["rashe_source_inputs_compact_builder_passed"] is False
     assert summary["written_manifests"] == []
-    assert any(blocker.startswith("approved_source_input_root_missing:") for blocker in summary["blockers"])
+    assert any(blocker.startswith("approved_bfcl_source_metadata_missing:") for blocker in summary["blockers"])

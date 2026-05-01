@@ -32,6 +32,10 @@ This approval signs only the sanitized compact metadata contract needed before `
 - `hallucination` -> `hallucination_abstention`
 - `irrelevance` -> `irrelevance_abstention`
 
+## Source Family Taxonomy
+
+`source_family_id` must be one of: `agentic_web`, `agentic_memory`, `multi_turn_workflow`, `abstention_safety`. Category mapping is fixed: web search -> `agentic_web`; memory -> `agentic_memory`; all multi-turn categories -> `multi_turn_workflow`; hallucination/irrelevance -> `abstention_safety`. It must not encode case identity, raw text, tool parameters, or any case-specific information.
+
 ## Source Nonce Policy
 
 `source_nonce` must be a high-entropy random nonce, minimum length 32, suitable for deriving an irreversible `compact_source_hash`. It must not be derived from raw case IDs, prompts, gold/expected/reference, trace paths, provider payloads, or scorer/candidate material. No nonce-to-raw-case mapping may be committed to the repo or artifacts.

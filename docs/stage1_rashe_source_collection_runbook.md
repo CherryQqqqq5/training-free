@@ -51,7 +51,7 @@ Provider transport review is blocked until the metadata approval checker passes,
   --strict
 ```
 
-The approved metadata root is `outputs/artifacts/stage1_bfcl_acceptance/approved_source_metadata_compact/`; the downstream manifest root is `outputs/artifacts/stage1_bfcl_acceptance/rashe_source_inputs_compact/`. If the approved source metadata root is absent, the builder fails closed with `approved_source_input_root_missing`. If the signed manifest root is absent, the checker fails closed with `approved_source_input_root_missing`. Do not use raw BFCL result roots, raw trace roots, or case-ID manifests as builder input. Source metadata preparation itself is a later step and must not commit nonce-to-raw-case mappings.
+The approved metadata root is `outputs/artifacts/stage1_bfcl_acceptance/approved_source_metadata_compact/`; the downstream manifest root is `outputs/artifacts/stage1_bfcl_acceptance/rashe_source_inputs_compact/`. Metadata records must use the signed coarse `source_family_id` taxonomy only: `agentic_web`, `agentic_memory`, `multi_turn_workflow`, or `abstention_safety`, with the fixed category mapping in the metadata approval packet. If the approved source metadata root is absent, the metadata checker and builder fail closed with `approved_bfcl_source_metadata_missing`. If the signed manifest root is absent, the checker fails closed with `approved_source_input_root_missing`. Do not use raw BFCL result roots, raw trace roots, or case-ID manifests as builder input. Source metadata preparation itself is a later step and must not commit nonce-to-raw-case mappings.
 
 ## Signed Command Template
 
