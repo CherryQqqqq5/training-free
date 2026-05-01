@@ -1,29 +1,35 @@
 {
-  "approval_packets_required_pending": true,
+  "approval_packets_required_pending": false,
   "approval_review_matrix_required": true,
   "artifact_boundary_required": true,
+  "base_handoff_commit": "eaafa624",
+  "current_post_runtime_gate": "scripts/check_rashe_main_merge_readiness_after_runtime_behavior.py",
   "deterministic_negative_evidence_required": true,
   "fail_closed_fields": {
     "bfcl_performance_ready": false,
     "candidate_generation_authorized": false,
     "candidate_pool_ready": false,
+    "formal_bfcl_performance_ready": false,
     "huawei_acceptance_ready": false,
     "performance_evidence": false,
-    "runtime_behavior_authorized": false,
     "scorer_authorized": false,
     "sota_3pp_claim_ready": false,
     "source_collection_authorized": false
   },
-  "main_merge_claim_scope": "offline_scaffold_only",
-  "merge_readiness_status": "checker_required",
+  "latest_committed_cleanup": "see git HEAD",
+  "legacy_pre_runtime_gate": "scripts/check_rashe_main_merge_readiness.py",
+  "main_merge_claim_scope": "post_runtime_l1_synthetic_default_disabled_only",
+  "merge_readiness_status": "post_runtime_checker_required",
   "merge_target": "main",
   "not_bfcl_performance_readiness": true,
   "notes": [
-    "This report prepares main merge readiness for the fail-closed RASHE offline scaffold branch only.",
-    "It does not merge main and does not claim BFCL +3pp, SOTA, or Huawei performance readiness."
+    "This report records post-runtime L1 consistency after synthetic/default-disabled runtime behavior approval.",
+    "The legacy pre-runtime main readiness checker remains intentionally fail-closed for approved runtime packets.",
+    "It does not claim BFCL +3pp, SOTA, or Huawei performance readiness."
   ],
+  "prior_post_runtime_cleanup_commit": "0ce63ba7d21620a39aa2eae8da8f4128c640e8aa",
   "rashe_route_expected": "retrieval_augmented_skill_harness_evolution",
-  "report_scope": "rashe_main_merge_readiness",
+  "report_scope": "rashe_main_merge_readiness_after_runtime_behavior",
   "required_artifacts": [
     "outputs/artifacts/stage1_bfcl_acceptance/active_evidence_index.json",
     "outputs/artifacts/stage1_bfcl_acceptance/rashe_approval_packet_review_matrix.json",
@@ -34,17 +40,26 @@
     "outputs/artifacts/stage1_bfcl_acceptance/rashe_performance_3pp_huawei_acceptance_approval_packet.json"
   ],
   "required_checks": [
-    "scripts/check_rashe_offline_scaffold_ready.py --compact --strict",
-    "scripts/check_rashe_approval_packets.py --compact --strict",
-    "scripts/check_rashe_approval_packet_review_matrix.py --compact --strict",
+    "scripts/check_rashe_runtime_behavior_approved.py --compact --strict",
+    "scripts/check_rashe_approval_packet_review_matrix_after_runtime_behavior.py --compact --strict",
+    "scripts/check_rashe_main_merge_readiness_after_runtime_behavior.py --compact --strict",
     "scripts/check_artifact_boundary.py"
   ],
   "required_docs": [
     "docs/stage1_bfcl_negative_evidence_report.md",
     "docs/stage1_bfcl_scope_change_decision_memo.md",
     "docs/stage1_rashe_approval_packet_review_matrix.md",
+    "docs/stage1_rashe_main_merge_readiness.md",
     "docs/stage1_rashe_v0_offline_skeleton_spec.md"
   ],
-  "schema_version": "rashe_main_merge_readiness_v0",
+  "runtime_behavior_approval_status": "approved",
+  "runtime_behavior_authorized": true,
+  "runtime_behavior_boundary": {
+    "config_default_enabled": false,
+    "l1_runtime_behavior_packet_authorizes": "synthetic_default_disabled_only",
+    "offline_scaffold_alone_authorized_runtime_behavior": false
+  },
+  "runtime_behavior_scope": "synthetic_default_disabled_only",
+  "schema_version": "rashe_main_merge_readiness_after_runtime_behavior_v0",
   "source_branch": "stage1-bfcl-performance-sprint"
 }

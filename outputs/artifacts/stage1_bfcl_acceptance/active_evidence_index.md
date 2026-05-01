@@ -5,16 +5,16 @@ This index is the active evidence entrypoint for Stage-1 BFCL. It records curren
 ## Current Checkpoint
 
 - branch: `main`
-- current_head: `eaafa624`
-- artifact_commit: `eaafa624`
-- handoff_commit: `eaafa624`
+- base_handoff_commit: `eaafa624`
+- prior_post_runtime_cleanup_commit: `0ce63ba7d21620a39aa2eae8da8f4128c640e8aa`
+- latest_committed_cleanup: `see git HEAD`
 - main_merge_completed: true
 - runtime_behavior_approval_status: `approved`
 - runtime_behavior_scope: `synthetic_default_disabled_only`
-- provenance note: default `main` and `stage1-bfcl-performance-sprint` were synchronized at `eaafa624`; L1 runtime behavior approval is synthetic/default-disabled only and is not BFCL performance readiness.
+- provenance note: commit fields above are non-self-referential anchors. The current cleanup commit is intentionally represented as `see git HEAD`.
 - active route: `retrieval_augmented_skill_harness_evolution` (RASHE)
 - RASHE route approved: true
-- active route status: `rashe_offline_scaffold_complete_fail_closed`
+- active route status: `rashe_offline_scaffold_complete_fail_closed_plus_l1_runtime_behavior_approved`
 - no BFCL +3pp evidence yet: true
 
 ## Active Provider And Dataset Gates
@@ -29,6 +29,18 @@ This index is the active evidence entrypoint for Stage-1 BFCL. It records curren
 
 Provider/dataset green status is technical preflight only. It does not authorize scorer, source collection, candidate generation, paired comparison, SOTA/+3pp, or Huawei acceptance claims.
 
+## Runtime Approval Boundary
+
+- offline_scaffold_alone_authorized_runtime_behavior: false
+- runtime_behavior_approval_status: `approved`
+- runtime_behavior_authorized: true
+- runtime_behavior_scope: `synthetic_default_disabled_only`
+- config default: `configs/runtime_bfcl_skills.yaml enabled=false`
+- current post-runtime gate: `scripts/check_rashe_main_merge_readiness_after_runtime_behavior.py --compact --strict`
+- legacy pre-runtime gate: `scripts/check_rashe_main_merge_readiness.py --compact --strict`
+
+The legacy pre-runtime gate intentionally rejects approved runtime packets. The current post-runtime gate validates the approved L1 synthetic/default-disabled runtime behavior packet and keeps downstream lanes fail-closed.
+
 ## RASHE Offline Scaffold Gates
 
 | gate | status | active evidence |
@@ -40,17 +52,7 @@ Provider/dataset green status is technical preflight only. It does not authorize
 | proposer schema | `rashe_proposer_schema_passed=true` | `scripts/check_rashe_proposer_schema.py --compact --strict` |
 | offline evolution loop | `rashe_offline_evolution_loop_passed=true` | `scripts/check_rashe_evolution_loop.py --compact --strict` |
 
-Active RASHE artifact paths:
-
-- `outputs/artifacts/stage1_bfcl_acceptance/rashe_v0/skill.schema.json`
-- `outputs/artifacts/stage1_bfcl_acceptance/rashe_v0/step_trace.schema.json`
-- `outputs/artifacts/stage1_bfcl_acceptance/rashe_v0/router_decision.schema.json`
-- `outputs/artifacts/stage1_bfcl_acceptance/rashe_v0/verifier_report.schema.json`
-- `outputs/artifacts/stage1_bfcl_acceptance/rashe_v0/proposal_draft.schema.json`
-- `outputs/artifacts/stage1_bfcl_acceptance/rashe_v0/evolution_loop.schema.json`
-- `outputs/artifacts/stage1_bfcl_acceptance/rashe_v0/skillbank_manifest.json`
-- `outputs/artifacts/stage1_bfcl_acceptance/rashe_v0/seed_skills/`
-- `outputs/artifacts/stage1_bfcl_acceptance/rashe_v0/fixtures/`
+Offline scaffold readiness remains evidence that the scaffold is present and fail-closed. It is not the source of runtime behavior authorization.
 
 Active RASHE docs:
 
@@ -65,10 +67,10 @@ Active RASHE docs:
 
 All formal BFCL performance gates remain fail-closed:
 
-- candidate_pool_ready: false
-- candidate_generation_authorized: false
 - runtime_behavior_authorized: true (`synthetic_default_disabled_only`; no real provider/source/scorer/candidate execution)
 - source_collection_authorized: false
+- candidate_generation_authorized: false
+- candidate_pool_ready: false
 - scorer_authorized: false
 - performance_evidence: false
 - sota_3pp_claim_ready: false
@@ -82,37 +84,3 @@ L1 runtime behavior approval does not authorize source expansion, BFCL scorer, c
 `prepare_downstream_approvals_before_source_candidate_scorer_performance`
 
 The current approval state allows only L1 synthetic/default-disabled runtime behavior checks. Source collection, candidate generation, scorer, performance evidence, SOTA/+3pp claims, and Huawei acceptance remain separate pending lanes.
-
-## Historical Background
-
-The prior deterministic Stage-1 family search remains background negative evidence:
-
-- explicit required-arg literal: zero accepted under selected-call diagnostics
-- wrong-key alias repair: zero eligible
-- schema-local non-live repair: zero eligible
-- structural malformed/final-before-tool attribution: zero eligible
-- raw tool-name/schema normalization: zero yield
-- schema retrieval/rerank feasibility: zero yield
-
-These negative diagnostics explain why the active route moved to RASHE offline scaffold. They are not performance evidence and do not authorize candidate promotion.
-
-## Excluded / Superseded Evidence
-
-- `outputs/artifacts/bfcl_ctspc_source_pool_v1/current_provider_preflight_status.md`: superseded markdown with old 401/OpenRouter wording; active provider evidence is `provider_green_preflight.{json,md}` plus `current_provider_preflight_status.json`.
-- historical provider unblock/failure artifacts: excluded from active claim.
-- old CTSPC subset/candidate/dev20 artifacts: excluded from active Stage-1 claim.
-- Phase-2 memory/postcondition artifacts: excluded from Stage-1 BFCL +3pp evidence.
-- any OpenRouter, old 401, or gpt-5.4 provider/source status references: superseded by Chuangzhi/Novacode gpt-5.2 route.
-
-## Provenance Table
-
-| artifact_path | evidence_role | source_code_head | artifact_commit | route/model | active/superseded |
-| --- | --- | --- | --- | --- | --- |
-| `outputs/artifacts/stage1_bfcl_acceptance/provider_green_preflight.json` | technical provider preflight green only | `d39a954d` | `d39a954d` | Chuangzhi/Novacode gpt-5.2 | active |
-| `outputs/artifacts/bfcl_ctspc_source_pool_v1/current_provider_preflight_status.json` | canonical provider preflight status JSON | `d39a954d` | `d39a954d` | Chuangzhi/Novacode gpt-5.2 | active |
-| `outputs/artifacts/stage1_bfcl_acceptance/rashe_v0/skillbank_manifest.json` | RASHE seed skillbank manifest; offline scaffold only | `a101b74a/b32be30b/ebd842eb` | `199c79fd` | offline synthetic only; no provider/scorer | active |
-| `outputs/artifacts/stage1_bfcl_acceptance/rashe_v0/step_trace.schema.json` | RASHE StepTrace v0.2 schema; offline only | `b32be30b` | `199c79fd` | offline synthetic/approved_compact only | active |
-| `outputs/artifacts/stage1_bfcl_acceptance/rashe_v0/proposal_draft.schema.json` | RASHE inert proposal draft schema; no candidate generation | `ce7960dd` | `199c79fd` | offline synthetic only | active |
-| `outputs/artifacts/stage1_bfcl_acceptance/rashe_v0/evolution_loop.schema.json` | RASHE offline evolution loop schema; inert metadata patch planning only | `e7679431` | `199c79fd` | offline synthetic only | active |
-| `outputs/artifacts/stage1_bfcl_acceptance/baseline_only_scored_failure_taxonomy_audit.json` | aggregate scored failure taxonomy; not performance evidence | `f1fa5507/d48e6211` | `d48e6211` | Chuangzhi/Novacode gpt-5.2 source metadata | background |
-| `outputs/artifacts/stage1_bfcl_acceptance/schema_retrieval_rerank_feasibility_diagnostic.json` | schema retrieval/rerank feasibility; zero-yield | `a19f74c4` | `a19f74c4` | offline existing raw pilot only; no provider/scorer | background |
