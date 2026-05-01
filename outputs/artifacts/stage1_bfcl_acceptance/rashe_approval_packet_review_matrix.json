@@ -68,6 +68,7 @@
     },
     {
       "allowed_claims": [
+        "source approval packet/checker prepared",
         "source approval pending",
         "no source execution authorized"
       ],
@@ -77,9 +78,11 @@
       ],
       "allowed_only_after_approval": [
         "bounded source collection for approved categories only",
-        "raw payload capture under approved raw root only",
-        "compact sanitized counters and hashes"
+        "raw payload capture under separately signed raw root only",
+        "compact sanitized counters and hashes only",
+        "artifact-boundary-checked sanitized manifests"
       ],
+      "approval_checker_path": "scripts/check_rashe_source_real_trace_approval_packet.py",
       "approval_packet_path": "outputs/artifacts/stage1_bfcl_acceptance/rashe_source_real_trace_approval_packet.json",
       "authorized": false,
       "current_status": "pending",
@@ -88,7 +91,9 @@
         "scorer_dev_holdout_full_approval"
       ],
       "forbidden_claims": [
+        "source collection approved",
         "real trace approved",
+        "provider calls authorized",
         "candidate pool ready",
         "scorer authorized",
         "performance evidence",
@@ -97,8 +102,9 @@
       "forbidden_until_approved": [
         "source collection",
         "raw trace capture",
+        "provider calls",
         "raw payload committed to tracked artifacts",
-        "candidate generation",
+        "candidate generation or candidate JSONL",
         "scorer execution",
         "performance claim"
       ],
@@ -106,16 +112,17 @@
       "lane_order": 2,
       "owner_role": "source collection owner + no-leakage reviewer",
       "prerequisites": [
-        "rashe_offline_scaffold_ready=true",
-        "runtime/source approval signed separately",
-        "raw payload handling and sanitization policy reviewed",
-        "artifact boundary rules reviewed"
+        "runtime_behavior_approval approved only for synthetic/default-disabled wiring",
+        "source_real_trace_approval packet/checker prepared but pending",
+        "bounded source scope must be signed before future source collection",
+        "signed raw root, raw payload handling, sanitization policy, and artifact boundary rules reviewed before future approval"
       ],
       "stop_gates": [
+        "source/provider/scorer/candidate count nonzero",
         "forbidden field violation",
-        "raw path leak",
+        "raw path leak or path denylist violation",
         "artifact boundary failure",
-        "provider/model drift"
+        "tracked raw payload artifact detected"
       ]
     },
     {
@@ -287,5 +294,8 @@
   "scorer_authorized": false,
   "short_name": "RASHE",
   "sota_3pp_claim_ready": false,
-  "source_collection_authorized": false
+  "source_collection_authorized": false,
+  "source_real_trace_approval_status": "pending",
+  "source_real_trace_authorized": false,
+  "source_real_trace_checker": "scripts/check_rashe_source_real_trace_approval_packet.py"
 }

@@ -65,43 +65,51 @@ Dependency order: `offline scaffold ready -> runtime/source approvals (separate)
 - owner_role: source collection owner + no-leakage reviewer
 - current_status: `pending`
 - approval_packet_path: `outputs/artifacts/stage1_bfcl_acceptance/rashe_source_real_trace_approval_packet.json`
+- approval_checker_path: `scripts/check_rashe_source_real_trace_approval_packet.py`
 - authorized: `false`
 
 ### Prerequisites
-- rashe_offline_scaffold_ready=true
-- runtime/source approval signed separately
-- raw payload handling and sanitization policy reviewed
-- artifact boundary rules reviewed
+- runtime_behavior_approval approved only for synthetic/default-disabled wiring
+- source_real_trace_approval packet/checker prepared but pending
+- bounded source scope must be signed before future source collection
+- signed raw root, raw payload handling, sanitization policy, and artifact boundary rules reviewed before future approval
 
 ### Allowed Only After Approval
 - bounded source collection for approved categories only
-- raw payload capture under approved raw root only
-- compact sanitized counters and hashes
+- raw payload capture under separately signed raw root only
+- compact sanitized counters and hashes only
+- artifact-boundary-checked sanitized manifests
 
 ### Allowed Commands
 - no source/provider commands while current_status=pending
+- source approval checker only validates the pending/fail-closed packet
 - post-approval bounded source command from signed packet only
 
 ### Forbidden Until Approved
 - source collection
 - raw trace capture
+- provider calls
 - raw payload committed to tracked artifacts
-- candidate generation
+- candidate generation or candidate JSONL
 - scorer execution
 - performance claim
 
 ### Stop Gates
+- source/provider/scorer/candidate count nonzero
 - forbidden field violation
-- raw path leak
+- raw path leak or path denylist violation
 - artifact boundary failure
-- provider/model drift
+- tracked raw payload artifact detected
 
 ### Allowed Claims
+- source approval packet/checker prepared
 - source approval pending
 - no source execution authorized
 
 ### Forbidden Claims
+- source collection approved
 - real trace approved
+- provider calls authorized
 - candidate pool ready
 - scorer authorized
 - performance evidence

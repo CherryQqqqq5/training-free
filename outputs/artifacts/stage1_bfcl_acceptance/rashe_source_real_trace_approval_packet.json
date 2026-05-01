@@ -1,75 +1,152 @@
 {
   "allowed_if_approved": [
     "bounded source collection for approved categories only",
-    "raw payload capture under approved raw root only",
+    "raw payload capture under separately signed raw root only",
     "compact sanitized counters and hashes",
     "artifact-boundary-checked manifests"
   ],
   "approval_packet_kind": "source_real_trace",
   "approval_status": "pending",
+  "artifact_boundary_failure_count": 0,
   "artifact_boundary_required_if_approved": true,
+  "artifact_boundary_rules": [
+    "scripts/check_artifact_boundary.py must pass before any source-derived artifact is promoted.",
+    "artifact_boundary_failure_count must remain 0.",
+    "tracked_raw_payload_count must remain 0."
+  ],
   "authorized": false,
   "bfcl_performance_ready": false,
+  "candidate_call_count": 0,
   "candidate_generation_authorized": false,
   "candidate_jsonl_authorized": false,
   "candidate_pool_ready": false,
   "dev_holdout_authorized": false,
   "execution_started": false,
+  "forbidden_field_violation_count": 0,
+  "forbidden_fields": [
+    "raw_case_id",
+    "raw_trace",
+    "raw_provider_payload",
+    "gold",
+    "expected",
+    "reference",
+    "scorer_diff",
+    "candidate_output",
+    "repair_output",
+    "feedback",
+    "holdout_feedback",
+    "full_suite_feedback"
+  ],
   "forbidden_until_approved": [
-    "raw trace collection",
     "source collection",
+    "raw trace collection or capture",
+    "provider calls",
     "raw payload committed to tracked artifacts",
-    "gold/expected/scorer/candidate fields",
-    "candidate generation",
-    "scorer execution",
-    "performance claim"
+    "raw case_id/raw trace/provider payload/gold/expected/reference/scorer diff/candidate output/repair output/feedback/holdout/full-suite feedback use",
+    "candidate generation or candidate JSONL",
+    "BFCL scorer execution",
+    "performance or Huawei acceptance claims"
+  ],
+  "future_approval_conditions": [
+    "bounded source scope signed by reviewer",
+    "signed raw root reviewed before any raw capture",
+    "raw payload handling plan approved",
+    "sanitization policy approved",
+    "artifact boundary and path denylist gates passing"
   ],
   "huawei_acceptance_ready": false,
   "no_leakage_required": {
     "candidate_output_used": false,
     "case_id_specific_rules_allowed": false,
     "expected_used": false,
+    "feedback_used": false,
     "full_suite_feedback_used": false,
     "gold_used": false,
     "holdout_feedback_used": false,
+    "provider_payload_used": false,
+    "raw_case_id_used": false,
+    "raw_payload_tracked": false,
     "raw_trace_committed": false,
+    "reference_used": false,
+    "repair_output_used": false,
     "scorer_diff_used": false
   },
   "notes": [
-    "Fail-closed approval skeleton only.",
-    "This packet does not authorize execution, provider calls, source collection, candidate generation, scorer use, performance evidence, SOTA claims, or Huawei acceptance readiness."
+    "Preparation-only packet/checker lane; approval_status remains pending and authorized remains false.",
+    "This does not authorize source collection, raw trace capture, provider calls, candidate generation, scorer use, performance evidence, SOTA claims, or Huawei acceptance readiness."
   ],
   "offline_only_packet": true,
   "paired_comparison_authorized": false,
+  "path_denylist": [
+    "provider://",
+    "scorer://",
+    "source_collection://",
+    "/provider/",
+    "/scorer/",
+    "/source_collection/",
+    "outputs/bfcl_runs",
+    "raw_trace",
+    "raw_response_capture"
+  ],
+  "path_denylist_violation_count": 0,
   "performance_evidence": false,
   "prerequisites": [
-    "runtime/source approval signed separately",
-    "raw payload handling plan reviewed",
-    "sanitization policy reviewed",
-    "forbidden field denylist enforced",
-    "artifact boundary pass required"
+    "L1 runtime behavior approved only for synthetic/default-disabled wiring",
+    "source_real_trace_approval remains pending and separate",
+    "raw payload handling plan reviewed before future approval",
+    "sanitization policy reviewed before future approval",
+    "artifact boundary and forbidden-field gates defined"
   ],
   "prompt_injection_authorized": false,
   "proposer_execution_authorized": false,
+  "provider_call_count": 0,
   "provider_calls_authorized": false,
-  "purpose": "Future approval boundary for real trace/source collection inputs to RASHE.",
+  "publication_rules": [
+    "hash/counter-only publication",
+    "sanitized compact artifacts only",
+    "no tracked raw payload paths",
+    "no candidate JSONL or dev/holdout/full manifests"
+  ],
+  "purpose": "Future approval boundary for real trace/source collection inputs to RASHE; this packet is preparation only and remains pending/fail-closed.",
+  "raw_path_leak_count": 0,
   "raw_payload_capture_authorized": false,
+  "raw_payload_capture_count": 0,
+  "raw_payload_handling_rules": [
+    "No source collection or raw payload capture is authorized while approval_status=pending.",
+    "Any future raw payload capture requires a separately signed raw root outside tracked artifacts.",
+    "No raw payload, raw trace, raw case ID, provider payload, or scorer output may be committed to tracked artifacts."
+  ],
   "raw_trace_authorized": false,
+  "raw_trace_capture_authorized": false,
+  "raw_trace_count": 0,
   "report_scope": "rashe_source_real_trace_approval_packet",
   "retry_authorized": false,
   "rollback_stop_gates": [
-    "forbidden field violation stops collection",
-    "artifact boundary failure stops publication",
-    "raw path leak stops promotion",
-    "provider/model drift stops run"
+    "source/provider/scorer/candidate count nonzero",
+    "forbidden field violation",
+    "path denylist or raw path leak",
+    "artifact boundary failure",
+    "tracked raw payload artifact detected"
   ],
   "runtime_behavior_authorized": false,
+  "sanitization_rules": [
+    "Publish only sanitized compact artifacts after separate approval.",
+    "Allowed publication shape is hashes, aggregate counters, source scope labels, and no-leakage audit booleans only.",
+    "Forbidden fields and path indicators must be rejected before artifact publication."
+  ],
+  "sanitized_compact_artifact_paths": [],
   "schema_version": "rashe_approval_packet_v0",
   "scope_change_route": "retrieval_augmented_skill_harness_evolution",
   "scorer_authorized": false,
+  "scorer_call_count": 0,
   "short_name": "RASHE",
+  "signed_raw_root": null,
   "sota_3pp_claim_ready": false,
   "source_collection_authorized": false,
+  "source_collection_call_count": 0,
+  "source_real_trace_checker": "scripts/check_rashe_source_real_trace_approval_packet.py",
   "title": "RASHE source real-trace approval packet",
-  "tool_path_mutation_authorized": false
+  "tool_path_mutation_authorized": false,
+  "tracked_raw_payload_count": 0,
+  "tracked_raw_payload_paths": []
 }
