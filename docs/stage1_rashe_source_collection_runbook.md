@@ -27,7 +27,27 @@ Provider profile name only: Chuangzhi/Novacode `gpt-5.2`. Do not place API keys 
 
 `outputs/artifacts/stage1_bfcl_acceptance/rashe_source_diagnostics_compact/`
 
-Only compact sanitized counters, hashes, category labels, and no-leakage audit booleans are allowed under this root. The signed source-input root for future compact manifests is `outputs/artifacts/stage1_bfcl_acceptance/rashe_source_inputs_compact/`; this commit does not create or populate that root.
+Only compact sanitized counters, hashes, category labels, and no-leakage audit booleans are allowed under this root. The signed source-input root for future compact manifests is `outputs/artifacts/stage1_bfcl_acceptance/rashe_source_inputs_compact/`; source-input manifests must pass `scripts/check_rashe_source_inputs_compact.py --compact --strict` before provider transport is reviewed.
+
+## Compact Source-Input Gate
+
+Provider transport review is blocked until compact source-input manifests exist and pass the checker. The builder accepts only approved sanitized source metadata and writes only `category`, `ordinal`, `prompt_family`, and `compact_source_hash`; it rejects raw case IDs, raw prompts, gold/expected/reference, traces, provider payloads, scorer diffs, candidate outputs, repair outputs, feedback, and performance material. This commit prepares the builder/checker; it does not run BFCL/provider/source diagnostics and does not create manifests from unavailable inputs.
+
+```bash
+.venv/bin/python scripts/build_rashe_source_inputs_compact.py \
+  --source-root <approved-compact-source-metadata-root> \
+  --output-root outputs/artifacts/stage1_bfcl_acceptance/rashe_source_inputs_compact/ \
+  --dry-run \
+  --compact \
+  --strict
+
+.venv/bin/python scripts/check_rashe_source_inputs_compact.py \
+  --root outputs/artifacts/stage1_bfcl_acceptance/rashe_source_inputs_compact/ \
+  --compact \
+  --strict
+```
+
+If the approved source metadata root is absent, the builder fails closed with `approved_source_input_root_missing`. If the signed manifest root is absent, the checker fails closed with `approved_source_input_root_missing`. Do not use raw BFCL result roots, raw trace roots, or case-ID manifests as builder input.
 
 ## Signed Command Template
 
