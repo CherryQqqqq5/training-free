@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "candidate_generation_authorized": {
+      "const": false
+    },
+    "case_count": {
+      "maximum": 50,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "category": {
+      "enum": [
+        "agentic_web_search",
+        "agentic_memory",
+        "multi_turn_base",
+        "multi_turn_long_context",
+        "multi_turn_miss_param",
+        "multi_turn_miss_func",
+        "hallucination",
+        "irrelevance"
+      ]
+    },
+    "failure_bucket_counts": {
+      "additionalProperties": false,
+      "properties": {
+        "answered_without_tool": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "fetch_missing_after_search": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "final_answer_before_tool": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "invalid_tool_call_format": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "irrelevant_tool_call": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "memory_not_retrieved": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "memory_update_when_should_search": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "multi_turn_state_lost": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "parser_schema_failure": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "search_query_too_broad": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "unsupported_hallucinated_answer": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "wrong_first_tool": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "answered_without_tool",
+        "wrong_first_tool",
+        "search_query_too_broad",
+        "fetch_missing_after_search",
+        "memory_not_retrieved",
+        "memory_update_when_should_search",
+        "multi_turn_state_lost",
+        "invalid_tool_call_format",
+        "parser_schema_failure",
+        "final_answer_before_tool",
+        "irrelevant_tool_call",
+        "unsupported_hallucinated_answer"
+      ],
+      "type": "object"
+    },
+    "forbidden_field_violation_count": {
+      "const": 0
+    },
+    "performance_evidence": {
+      "const": false
+    },
+    "provider_call_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "raw_payload_tracked_count": {
+      "const": 0
+    },
+    "schema_version": {
+      "const": "rashe_source_diagnostic_compact_v0"
+    },
+    "scorer_authorized": {
+      "const": false
+    }
+  },
+  "required": [
+    "schema_version",
+    "category",
+    "case_count",
+    "provider_call_count",
+    "raw_payload_tracked_count",
+    "forbidden_field_violation_count",
+    "failure_bucket_counts",
+    "candidate_generation_authorized",
+    "scorer_authorized",
+    "performance_evidence"
+  ],
+  "title": "RASHE Source Diagnostic Compact Artifact",
+  "type": "object"
+}

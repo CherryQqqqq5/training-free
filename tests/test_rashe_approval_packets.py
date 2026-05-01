@@ -19,12 +19,15 @@ def copy_packets(tmp_path: Path) -> Path:
 
 def copy_fail_closed_packets(tmp_path: Path) -> Path:
     base = copy_packets(tmp_path)
-    path = base / "rashe_runtime_behavior_approval_packet.json"
-    packet = json.loads(path.read_text())
-    packet["approval_status"] = "pending"
-    packet["authorized"] = False
-    packet["runtime_behavior_authorized"] = False
-    path.write_text(json.dumps(packet, indent=2, sort_keys=True) + "\n")
+    for stem in ["rashe_runtime_behavior_approval_packet", "rashe_source_real_trace_approval_packet"]:
+        path = base / f"{stem}.json"
+        packet = json.loads(path.read_text())
+        packet["approval_status"] = "pending"
+        packet["authorized"] = False
+        packet["runtime_behavior_authorized"] = False
+        packet["source_collection_authorized"] = False
+        packet["provider_calls_authorized"] = False
+        path.write_text(json.dumps(packet, indent=2, sort_keys=True) + "\n")
     return base
 
 

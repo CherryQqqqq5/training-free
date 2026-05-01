@@ -19,7 +19,7 @@ def load_matrix() -> dict:
     return json.loads(MATRIX.read_text())
 
 
-def test_after_runtime_behavior_matrix_checker_compact_passes_current_artifact():
+def test_legacy_after_runtime_matrix_checker_rejects_current_source_approved_artifact():
     result = subprocess.run(
         [sys.executable, str(SCRIPT), "--compact", "--strict"],
         stdout=subprocess.PIPE,
@@ -27,16 +27,16 @@ def test_after_runtime_behavior_matrix_checker_compact_passes_current_artifact()
         text=True,
         check=False,
     )
-    assert result.returncode == 0, result.stdout + result.stderr
+    assert result.returncode != 0
     summary = json.loads(result.stdout)
-    assert summary["rashe_approval_packet_review_matrix_after_runtime_behavior_passed"] is True
+    assert summary["rashe_approval_packet_review_matrix_after_runtime_behavior_passed"] is False
     assert summary["lane_ids"] == EXPECTED_LANES
     assert summary["runtime_behavior_authorized"] is True
-    assert summary["source_collection_authorized"] is False
-    assert summary["candidate_generation_authorized"] is False
-    assert summary["scorer_authorized"] is False
-    assert summary["performance_evidence"] is False
-    assert summary["huawei_acceptance_ready"] is False
+    assert summary["source_collection_authorized"] is True
+    assert "matrix_current_status_invalid" in summary["blockers"]
+    assert "matrix_forbidden_ready_field_true:source_collection_authorized" in summary["blockers"]
+    assert "downstream_lane_status_not_pending:source_real_trace_approval:approved" in summary["blockers"]
+    assert "downstream_lane_authorized_not_false:source_real_trace_approval" in summary["blockers"]
 
 
 def test_fails_if_first_lane_is_not_approved(tmp_path):

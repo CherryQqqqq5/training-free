@@ -34,9 +34,21 @@ def test_legacy_main_merge_readiness_rejects_current_post_runtime_artifacts():
     assert any("runtime_behavior" in blocker for blocker in summary["blockers"])
 
 
-def test_current_post_runtime_gate_is_separate_from_legacy_gate():
-    result = subprocess.run(
+def test_source_approved_successor_gate_is_separate_from_legacy_gate():
+    legacy = subprocess.run(
         [sys.executable, "scripts/check_rashe_main_merge_readiness_after_runtime_behavior.py", "--compact", "--strict"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        check=False,
+    )
+    assert legacy.returncode != 0
+    legacy_summary = json.loads(legacy.stdout)
+    assert legacy_summary["rashe_main_merge_after_runtime_behavior_ready"] is False
+    assert legacy_summary["after_runtime_matrix_passed"] is False
+
+    result = subprocess.run(
+        [sys.executable, "scripts/check_rashe_approval_packet_review_matrix_after_source_approval.py", "--compact", "--strict"],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,
@@ -44,10 +56,9 @@ def test_current_post_runtime_gate_is_separate_from_legacy_gate():
     )
     assert result.returncode == 0, result.stdout + result.stderr
     summary = json.loads(result.stdout)
-    assert summary["rashe_main_merge_after_runtime_behavior_ready"] is True
-    assert summary["runtime_behavior_approval_status"] == "approved"
-    assert summary["runtime_behavior_scope"] == "synthetic_default_disabled_only"
-    assert summary["source_collection_authorized"] is False
+    assert summary["rashe_approval_packet_review_matrix_after_source_approval_passed"] is True
+    assert summary["source_collection_authorized"] is True
+    assert summary["provider_calls_authorized"] is True
     assert summary["candidate_generation_authorized"] is False
     assert summary["scorer_authorized"] is False
     assert summary["performance_evidence"] is False

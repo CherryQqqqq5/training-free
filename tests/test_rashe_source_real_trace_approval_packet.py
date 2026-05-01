@@ -28,7 +28,7 @@ def load_json(path: Path) -> dict:
     return json.loads(path.read_text())
 
 
-def test_source_real_trace_approval_checker_compact_passes_pending_fail_closed_packet():
+def test_legacy_pending_source_checker_rejects_current_approved_packet():
     result = subprocess.run(
         [sys.executable, str(SCRIPT), "--compact", "--strict"],
         stdout=subprocess.PIPE,
@@ -36,22 +36,17 @@ def test_source_real_trace_approval_checker_compact_passes_pending_fail_closed_p
         text=True,
         check=False,
     )
-    assert result.returncode == 0, result.stdout + result.stderr
+    assert result.returncode != 0
     summary = json.loads(result.stdout)
-    assert summary["source_real_trace_approval_pending_fail_closed"] is True
-    assert summary["approval_status"] == "pending"
-    assert summary["authorized"] is False
-    assert summary["source_collection_authorized"] is False
-    assert summary["provider_calls_authorized"] is False
-    assert summary["raw_trace_capture_authorized"] is False
-    assert summary["raw_payload_capture_authorized"] is False
-    assert summary["candidate_generation_authorized"] is False
-    assert summary["candidate_pool_ready"] is False
-    assert summary["scorer_authorized"] is False
-    assert summary["performance_evidence"] is False
-    assert summary["huawei_acceptance_ready"] is False
-    assert summary["artifact_boundary_passed"] is True
-    assert summary["blockers"] == []
+    assert summary["source_real_trace_approval_pending_fail_closed"] is False
+    assert summary["approval_status"] == "approved"
+    assert summary["authorized"] is True
+    assert summary["source_collection_authorized"] is True
+    assert summary["provider_calls_authorized"] is True
+    assert "packet_approval_status_invalid:'approved'" in summary["blockers"]
+    assert "packet_authorized_invalid:True" in summary["blockers"]
+    assert "packet_source_collection_authorized_invalid:True" in summary["blockers"]
+    assert "packet_provider_calls_authorized_invalid:True" in summary["blockers"]
 
 
 def test_fails_if_source_lane_is_approved_or_authorized(tmp_path):

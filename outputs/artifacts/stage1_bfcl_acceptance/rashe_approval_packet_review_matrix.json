@@ -2,7 +2,8 @@
   "bfcl_performance_ready": false,
   "candidate_generation_authorized": false,
   "candidate_pool_ready": false,
-  "current_status": "runtime_behavior_l1_approved_downstream_pending",
+  "current_post_source_gate": "scripts/check_rashe_approval_packet_review_matrix_after_source_approval.py",
+  "current_status": "runtime_and_source_lanes_approved_downstream_pending",
   "dependency_order": [
     "runtime_behavior_approval",
     "source_real_trace_approval",
@@ -68,42 +69,37 @@
     },
     {
       "allowed_claims": [
-        "source approval packet/checker prepared",
-        "source approval pending",
-        "no source execution authorized"
+        "source approval signed for bounded source evidence collection",
+        "source execution requires approved-source checker and runbook",
+        "no candidate/scorer/performance/Huawei authorization"
       ],
       "allowed_commands": [
-        "no source/provider commands while current_status=pending",
-        "post-approval bounded source command from signed packet only"
+        "approved-source checker and runbook validation only before execution",
+        "post-review bounded source diagnostic command from runbook only"
       ],
       "allowed_only_after_approval": [
         "bounded source collection for approved categories only",
-        "raw payload capture under separately signed raw root only",
-        "compact sanitized counters and hashes only",
-        "artifact-boundary-checked sanitized manifests"
+        "provider calls through Chuangzhi/Novacode gpt-5.2 only within source collector boundary",
+        "compact sanitized counters/hashes/category labels/no-leakage audit only"
       ],
-      "approval_checker_path": "scripts/check_rashe_source_real_trace_approval_packet.py",
+      "approval_checker_path": "scripts/check_rashe_source_real_trace_approved.py",
       "approval_packet_path": "outputs/artifacts/stage1_bfcl_acceptance/rashe_source_real_trace_approval_packet.json",
-      "authorized": false,
-      "current_status": "pending",
+      "authorized": true,
+      "current_status": "approved",
       "downstream_dependencies": [
         "candidate_proposer_execution_approval",
         "scorer_dev_holdout_full_approval"
       ],
       "forbidden_claims": [
-        "source collection approved",
-        "real trace approved",
-        "provider calls authorized",
         "candidate pool ready",
         "scorer authorized",
-        "performance evidence",
-        "Huawei acceptance ready"
+        "BFCL +3pp ready",
+        "Huawei acceptance ready",
+        "performance evidence"
       ],
       "forbidden_until_approved": [
-        "source collection",
         "raw trace capture",
-        "provider calls",
-        "raw payload committed to tracked artifacts",
+        "raw payload capture or tracked raw payloads",
         "candidate generation or candidate JSONL",
         "scorer execution",
         "performance claim"
@@ -113,16 +109,17 @@
       "owner_role": "source collection owner + no-leakage reviewer",
       "prerequisites": [
         "runtime_behavior_approval approved only for synthetic/default-disabled wiring",
-        "source_real_trace_approval packet/checker prepared but pending",
-        "bounded source scope must be signed before future source collection",
-        "signed raw root, raw payload handling, sanitization policy, and artifact boundary rules reviewed before future approval"
+        "source_real_trace_approval packet signed for bounded source evidence collection",
+        "approved-source checker passes before execution",
+        "source collection runbook reviewed before execution"
       ],
       "stop_gates": [
-        "source/provider/scorer/candidate count nonzero",
-        "forbidden field violation",
-        "raw path leak or path denylist violation",
-        "artifact boundary failure",
-        "tracked raw payload artifact detected"
+        "raw trace tracked or raw payload tracked/committed",
+        "raw provider payload tracked/committed",
+        "forbidden field or path denylist hit",
+        "candidate JSONL created",
+        "scorer executed",
+        "artifact boundary failure"
       ]
     },
     {
@@ -287,6 +284,9 @@
     "Performance/+3pp/Huawei acceptance must remain last and requires paired BFCL evidence."
   ],
   "performance_evidence": false,
+  "provider_calls_authorized": true,
+  "raw_payload_capture_authorized": false,
+  "raw_trace_capture_authorized": false,
   "report_scope": "rashe_approval_packet_review_matrix",
   "runtime_behavior_authorized": true,
   "schema_version": "rashe_approval_packet_review_matrix_v0",
@@ -294,8 +294,8 @@
   "scorer_authorized": false,
   "short_name": "RASHE",
   "sota_3pp_claim_ready": false,
-  "source_collection_authorized": false,
-  "source_real_trace_approval_status": "pending",
-  "source_real_trace_authorized": false,
+  "source_collection_authorized": true,
+  "source_real_trace_approval_status": "approved",
+  "source_real_trace_authorized": true,
   "source_real_trace_checker": "scripts/check_rashe_source_real_trace_approval_packet.py"
 }

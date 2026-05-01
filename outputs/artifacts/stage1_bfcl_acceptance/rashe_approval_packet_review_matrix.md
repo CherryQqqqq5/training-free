@@ -7,7 +7,7 @@ Dependency order: `offline scaffold ready -> runtime/source approvals (separate)
 | Order | Lane | Owner | Status | Packet | Downstream | Forbidden Claims |
 |---:|---|---|---|---|---|---|
 | 1 | `runtime_behavior_approval` | RASHE runtime engineering owner + acceptance reviewer | `approved` | `outputs/artifacts/stage1_bfcl_acceptance/rashe_runtime_behavior_approval_packet.json` | source_real_trace_approval, candidate_proposer_execution_approval | runtime enabled, provider authorized, candidate pool ready, performance evidence, Huawei acceptance ready |
-| 2 | `source_real_trace_approval` | source collection owner + no-leakage reviewer | `pending` | `outputs/artifacts/stage1_bfcl_acceptance/rashe_source_real_trace_approval_packet.json` | candidate_proposer_execution_approval, scorer_dev_holdout_full_approval | real trace approved, candidate pool ready, scorer authorized, performance evidence, Huawei acceptance ready |
+| 2 | `source_real_trace_approval` | source collection owner + no-leakage reviewer | `approved` | `true` | packet: `outputs/artifacts/stage1_bfcl_acceptance/rashe_source_real_trace_approval_packet.json`; checker: `scripts/check_rashe_source_real_trace_approved.py` | candidate_proposer_execution_approval, scorer_dev_holdout_full_approval | candidate pool ready, scorer authorized, performance evidence, BFCL +3pp ready, Huawei acceptance ready |
 | 3 | `candidate_proposer_execution_approval` | candidate engineering owner + no-leakage reviewer | `pending` | `outputs/artifacts/stage1_bfcl_acceptance/rashe_candidate_proposer_execution_approval_packet.json` | scorer_dev_holdout_full_approval | candidate pool ready, scorer authorized, performance evidence, SOTA +3pp ready, Huawei acceptance ready |
 | 4 | `scorer_dev_holdout_full_approval` | scorer owner + acceptance reviewer | `pending` | `outputs/artifacts/stage1_bfcl_acceptance/rashe_scorer_dev_holdout_full_approval_packet.json` | performance_3pp_huawei_acceptance_approval | scorer authorized, paired comparison passed, performance evidence, SOTA +3pp ready, Huawei acceptance ready |
 | 5 | `performance_3pp_huawei_acceptance_approval` | Huawei acceptance owner + project lead | `pending` | `outputs/artifacts/stage1_bfcl_acceptance/rashe_performance_3pp_huawei_acceptance_approval_packet.json` | terminal_no_downstream_lane | performance evidence, SOTA +3pp ready, Huawei acceptance ready, BFCL performance ready |
@@ -63,57 +63,54 @@ Dependency order: `offline scaffold ready -> runtime/source approvals (separate)
 ## 2. source_real_trace_approval
 
 - owner_role: source collection owner + no-leakage reviewer
-- current_status: `pending`
+- current_status: `approved`
 - approval_packet_path: `outputs/artifacts/stage1_bfcl_acceptance/rashe_source_real_trace_approval_packet.json`
-- approval_checker_path: `scripts/check_rashe_source_real_trace_approval_packet.py`
-- authorized: `false`
+- approval_checker_path: `scripts/check_rashe_source_real_trace_approved.py`
+- authorized: `true`
+- provider_profile: Chuangzhi/Novacode `gpt-5.2`
+- approved_scope: bounded source evidence collection only
 
 ### Prerequisites
 - runtime_behavior_approval approved only for synthetic/default-disabled wiring
-- source_real_trace_approval packet/checker prepared but pending
-- bounded source scope must be signed before future source collection
-- signed raw root, raw payload handling, sanitization policy, and artifact boundary rules reviewed before future approval
+- source_real_trace_approval packet signed for bounded source evidence collection
+- approved-source checker passes before execution
+- source collection runbook reviewed before execution
 
 ### Allowed Only After Approval
 - bounded source collection for approved categories only
-- raw payload capture under separately signed raw root only
-- compact sanitized counters and hashes only
-- artifact-boundary-checked sanitized manifests
+- provider calls through Chuangzhi/Novacode `gpt-5.2` only within source collector boundary
+- compact sanitized counters/hashes/category labels/no-leakage audit only
 
 ### Allowed Commands
-- no source/provider commands while current_status=pending
-- source approval checker only validates the pending/fail-closed packet
-- post-approval bounded source command from signed packet only
+- approved-source checker and runbook validation only before execution
+- post-review bounded source diagnostic command from runbook only
 
-### Forbidden Until Approved
-- source collection
+### Forbidden Until Separate Downstream Approval
 - raw trace capture
-- provider calls
-- raw payload committed to tracked artifacts
+- raw payload capture or tracked raw payloads
 - candidate generation or candidate JSONL
 - scorer execution
 - performance claim
 
 ### Stop Gates
-- source/provider/scorer/candidate count nonzero
-- forbidden field violation
-- raw path leak or path denylist violation
+- raw trace tracked or raw payload tracked/committed
+- raw provider payload tracked/committed
+- forbidden field or path denylist hit
+- candidate JSONL created
+- scorer executed
 - artifact boundary failure
-- tracked raw payload artifact detected
 
 ### Allowed Claims
-- source approval packet/checker prepared
-- source approval pending
-- no source execution authorized
+- source approval signed for bounded source evidence collection
+- source execution requires approved-source checker and runbook
+- no candidate/scorer/performance/Huawei authorization
 
 ### Forbidden Claims
-- source collection approved
-- real trace approved
-- provider calls authorized
 - candidate pool ready
 - scorer authorized
-- performance evidence
+- BFCL +3pp ready
 - Huawei acceptance ready
+- performance evidence
 
 ## 3. candidate_proposer_execution_approval
 

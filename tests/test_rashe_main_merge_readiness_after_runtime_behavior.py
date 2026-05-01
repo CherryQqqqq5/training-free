@@ -15,7 +15,7 @@ def write_json(path: Path, payload: dict) -> Path:
     return path
 
 
-def test_post_runtime_main_readiness_checker_compact_passes():
+def test_legacy_post_runtime_main_readiness_checker_rejects_current_source_approved_matrix():
     result = subprocess.run(
         [sys.executable, str(SCRIPT), "--compact", "--strict"],
         stdout=subprocess.PIPE,
@@ -23,19 +23,29 @@ def test_post_runtime_main_readiness_checker_compact_passes():
         text=True,
         check=False,
     )
-    assert result.returncode == 0, result.stdout + result.stderr
+    assert result.returncode != 0
     summary = json.loads(result.stdout)
-    assert summary["rashe_main_merge_after_runtime_behavior_ready"] is True
+    assert summary["rashe_main_merge_after_runtime_behavior_ready"] is False
     assert summary["runtime_behavior_approval_status"] == "approved"
     assert summary["runtime_behavior_authorized"] is True
     assert summary["runtime_behavior_scope"] == "synthetic_default_disabled_only"
     assert summary["runtime_behavior_approved_passed"] is True
-    assert summary["after_runtime_matrix_passed"] is True
-    assert summary["source_collection_authorized"] is False
+    assert summary["after_runtime_matrix_passed"] is False
+    assert any("check_rashe_approval_packet_review_matrix_after_runtime_behavior.py" in blocker for blocker in summary["blockers"])
+    assert any("source_real_trace_approval:approved" in blocker for blocker in summary["blockers"])
     assert summary["candidate_generation_authorized"] is False
     assert summary["scorer_authorized"] is False
     assert summary["performance_evidence"] is False
     assert summary["huawei_acceptance_ready"] is False
+
+
+def test_source_approved_successor_gates_pass_current_artifacts():
+    for command in [
+        [sys.executable, "scripts/check_rashe_source_real_trace_approved.py", "--compact", "--strict"],
+        [sys.executable, "scripts/check_rashe_approval_packet_review_matrix_after_source_approval.py", "--compact", "--strict"],
+    ]:
+        result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=False)
+        assert result.returncode == 0, result.stdout + result.stderr
 
 
 def test_fails_if_runtime_status_is_pending(tmp_path):
