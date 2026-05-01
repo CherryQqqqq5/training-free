@@ -79,11 +79,22 @@ def test_client_without_source_case_provider_fails_precisely():
         client(category_request())
 
 
-def test_client_without_provider_transport_fails_precisely():
+def test_client_without_provider_transport_fails_precisely(monkeypatch):
+    monkeypatch.delenv("CHUANGZHI_API_KEY", raising=False)
+    monkeypatch.delenv("NOVACODE_API_KEY", raising=False)
     request = signed_request(source_case_provider=lambda request: compact_cases(request["category"]))
     client = provider_client.build_chuangzhi_novacode_source_provider_client(request)
 
-    with pytest.raises(provider_client.SourceProviderClientError, match="provider_transport_missing"):
+    with pytest.raises(provider_client.SourceProviderClientError, match="provider_key_missing"):
+        client(category_request())
+
+
+def test_default_transport_requires_provider_transport_approval(monkeypatch):
+    request = signed_request(source_case_provider=lambda request: compact_cases(request["category"]))
+    client = provider_client.build_chuangzhi_novacode_source_provider_client(request)
+    monkeypatch.setattr(provider_client, "_provider_transport_approved", lambda: (_ for _ in ()).throw(provider_client.SourceProviderClientError("provider_transport_not_approved")))
+
+    with pytest.raises(provider_client.SourceProviderClientError, match="provider_transport_not_approved"):
         client(category_request())
 
 

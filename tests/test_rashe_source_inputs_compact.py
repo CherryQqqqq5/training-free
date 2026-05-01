@@ -145,19 +145,20 @@ def test_checker_rejects_manifest_extra_fields_bad_ordinals_and_raw_values(tmp_p
     assert any("compact_source_input_hash_format_invalid:agentic_web_search:3" in blocker for blocker in blockers)
 
 
-def test_checker_cli_reports_missing_default_root_without_creating_manifests():
+def test_checker_cli_default_root_passes_after_manifest_preparation():
     result = subprocess.run(
-        [sys.executable, "scripts/check_rashe_source_inputs_compact.py", "--compact"],
+        [sys.executable, "scripts/check_rashe_source_inputs_compact.py", "--compact", "--strict"],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,
         check=False,
     )
 
-    assert result.returncode == 0
+    assert result.returncode == 0, result.stdout + result.stderr
     summary = json.loads(result.stdout)
-    assert summary["rashe_source_inputs_compact_passed"] is False
-    assert any(blocker.startswith("approved_source_input_root_missing:") for blocker in summary["blockers"])
+    assert summary["rashe_source_inputs_compact_passed"] is True
+    assert summary["total_cases"] == 160
+    assert summary["blockers"] == []
 
 
 def test_builder_cli_dry_run_missing_source_root_is_precise(tmp_path):

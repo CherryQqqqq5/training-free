@@ -132,16 +132,17 @@ def test_metadata_root_checker_cli_strict_passes_fixture(tmp_path):
     assert summary['source_family_id_taxonomy'] == sorted(checker.SOURCE_FAMILY_ID_TAXONOMY)
 
 
-def test_metadata_root_checker_cli_missing_default_root_is_precise():
+def test_metadata_root_checker_cli_default_root_passes_after_approval():
     result = subprocess.run(
-        [sys.executable, 'scripts/check_rashe_source_metadata_compact.py', '--compact'],
+        [sys.executable, 'scripts/check_rashe_source_metadata_compact.py', '--compact', '--strict'],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,
         check=False,
     )
 
-    assert result.returncode == 0
+    assert result.returncode == 0, result.stdout + result.stderr
     summary = json.loads(result.stdout)
-    assert summary['rashe_source_metadata_compact_passed'] is False
-    assert any(blocker.startswith('approved_bfcl_source_metadata_missing:') for blocker in summary['blockers'])
+    assert summary['rashe_source_metadata_compact_passed'] is True
+    assert summary['total_records'] == 160
+    assert summary['blockers'] == []

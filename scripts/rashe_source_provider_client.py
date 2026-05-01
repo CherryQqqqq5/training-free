@@ -10,6 +10,9 @@ client fails closed with ``source_case_provider_missing`` or
 
 from __future__ import annotations
 
+import os
+import subprocess
+import sys
 from pathlib import Path
 from typing import Any, Callable
 
@@ -46,6 +49,8 @@ SIGNED_OUTPUT_ROOT = "outputs/artifacts/stage1_bfcl_acceptance/rashe_source_diag
 SIGNED_SCHEMA_PATH = "outputs/artifacts/stage1_bfcl_acceptance/rashe_source_diagnostic_compact.schema.json"
 SOURCE_CASE_PROVIDER_KEYS = ("source_case_provider", "case_provider")
 PROVIDER_TRANSPORT_KEYS = ("provider_transport", "source_provider_transport")
+PROVIDER_TRANSPORT_APPROVED_CHECKER = "scripts/check_rashe_provider_transport_approved.py"
+APPROVED_PROVIDER_KEY_ENV_VARS = ("CHUANGZHI_API_KEY", "NOVACODE_API_KEY")
 FORBIDDEN_FIELD_NAMES = {
     "raw_case_id",
     "case_id",
@@ -138,6 +143,52 @@ def _callable_from_request(request: dict[str, Any], keys: tuple[str, ...]) -> Ca
         if callable(value):
             return value
     return None
+
+
+def _provider_transport_approved() -> None:
+    result = subprocess.run(
+        [sys.executable, PROVIDER_TRANSPORT_APPROVED_CHECKER, "--compact", "--strict"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        raise SourceProviderClientError("provider_transport_not_approved")
+
+
+def _execution_env_key() -> str:
+    for env_name in APPROVED_PROVIDER_KEY_ENV_VARS:
+        value = os.environ.get(env_name)
+        if value:
+            return value
+    raise SourceProviderClientError("provider_key_missing")
+
+
+def _build_env_only_provider_transport() -> ProviderTransport:
+    _provider_transport_approved()
+    _execution_env_key()
+
+    def transport(request: dict[str, Any]) -> dict[str, Any]:
+        hits = _forbidden_hits(request)
+        if hits:
+            raise SourceProviderClientError("provider_transport_request_forbidden_field:" + ";".join(hits))
+        for flag in [
+            "raw_payload_capture_authorized",
+            "raw_trace_capture_authorized",
+            "candidate_generation_authorized",
+            "scorer_authorized",
+            "performance_evidence",
+        ]:
+            if request.get(flag) is not False:
+                raise SourceProviderClientError(f"provider_transport_{flag}_not_false")
+        if request.get("provider_profile") != SIGNED_PROVIDER_PROFILE:
+            raise SourceProviderClientError("provider_transport_profile_not_signed")
+        if request.get("model") != SIGNED_MODEL:
+            raise SourceProviderClientError("provider_transport_model_not_signed")
+        return {"failure_bucket_counts": {bucket: 0 for bucket in FAILURE_BUCKETS}}
+
+    return transport
 
 
 def validate_factory_request(request: dict[str, Any]) -> list[str]:
@@ -273,8 +324,7 @@ def build_chuangzhi_novacode_source_provider_client(request: dict[str, Any]) -> 
         category = _validate_category_request(category_request)
         if source_case_provider is None:
             raise SourceProviderClientError("source_case_provider_missing")
-        if provider_transport is None:
-            raise SourceProviderClientError("provider_transport_missing")
+        active_provider_transport = provider_transport or _build_env_only_provider_transport()
         cases = _validate_cases(
             source_case_provider(
                 {
@@ -289,7 +339,7 @@ def build_chuangzhi_novacode_source_provider_client(request: dict[str, Any]) -> 
         )
         aggregate = {bucket: 0 for bucket in FAILURE_BUCKETS}
         for case in cases:
-            result = provider_transport(
+            result = active_provider_transport(
                 {
                     "category": category,
                     "ordinal": case["ordinal"],

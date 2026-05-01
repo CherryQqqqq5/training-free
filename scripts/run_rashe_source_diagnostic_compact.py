@@ -369,6 +369,19 @@ def execute_approved_source(
     write_artifacts: bool = True,
 ) -> dict[str, Any]:
     blockers: list[str] = []
+    provider_transport_checker_passed, provider_transport_error, _ = run_json_checker(
+        ["scripts/check_rashe_provider_transport_approved.py", "--compact", "--strict"]
+    )
+    if provider_transport_error:
+        return {
+            "execution_adapter_status": "provider_transport_not_approved",
+            "provider_call_executed": False,
+            "api_key_read": False,
+            "diagnostic_written": False,
+            "written_artifacts": [],
+            "executed_artifacts": [],
+            "blockers": ["provider_transport_not_approved"],
+        }
     adapter_status = "loaded"
     if adapter_func is None:
         adapter_func, adapter_error = load_execution_adapter(args.execution_adapter)
@@ -451,6 +464,12 @@ def execute_approved_source(
         elif message.startswith("provider_transport_missing"):
             status = "provider_transport_missing"
             blocker = message
+        elif message.startswith("provider_key_missing"):
+            status = "provider_key_missing"
+            blocker = message
+        elif message.startswith("provider_transport_not_approved"):
+            status = "provider_transport_not_approved"
+            blocker = message
         else:
             status = "provider_client_factory_failed"
             blocker = f"provider_client_factory_failed:{message}"
@@ -494,6 +513,12 @@ def execute_approved_source(
             blocker = message
         elif message.startswith("provider_transport_missing"):
             status = "provider_transport_missing"
+            blocker = message
+        elif message.startswith("provider_key_missing"):
+            status = "provider_key_missing"
+            blocker = message
+        elif message.startswith("provider_transport_not_approved"):
+            status = "provider_transport_not_approved"
             blocker = message
         else:
             status = "failed"
