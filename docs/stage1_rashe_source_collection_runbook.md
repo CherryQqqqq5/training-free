@@ -38,7 +38,7 @@ Do not run source collection in this commit. Before any future execution, run bo
 .venv/bin/python scripts/check_rashe_approval_packet_review_matrix_after_source_approval.py --compact --strict
 ```
 
-This commit verifies the signed runner entrypoint in dry-run mode and implements the adapter-driven execution path for review. The signed adapter is `scripts.rashe_source_diagnostic_compact_adapter:run_compact_source_diagnostic`. Do not remove `--dry-run` or use `--execute-approved-source` until a separate Phase B execution authorization confirms the command and the collector dependency.
+This commit verifies the signed runner entrypoint in dry-run mode and implements the adapter-driven execution path for review. The signed adapter is `scripts.rashe_source_diagnostic_compact_adapter:run_compact_source_diagnostic`; the signed provider-client factory is `scripts.rashe_source_provider_client:build_chuangzhi_novacode_source_provider_client`. Do not remove `--dry-run` or use `--execute-approved-source` until a separate Phase B execution authorization confirms the command, source-case provider, and provider transport.
 
 ```bash
 .venv/bin/python scripts/run_rashe_source_diagnostic_compact.py \
@@ -57,12 +57,13 @@ This commit verifies the signed runner entrypoint in dry-run mode and implements
   --no-candidate-jsonl \
   --no-scorer \
   --execution-adapter scripts.rashe_source_diagnostic_compact_adapter:run_compact_source_diagnostic \
+  --provider-client-factory scripts.rashe_source_provider_client:build_chuangzhi_novacode_source_provider_client \
   --dry-run \
   --compact \
   --strict
 ```
 
-The template intentionally contains no API key. In this commit it must not call a provider, write diagnostics, generate raw traces, raw provider payloads, candidate JSONL, scorer outputs, dev/holdout/full manifests, performance evidence, or Huawei readiness artifacts. A future execution command must replace `--dry-run` with `--execute-approved-source` while keeping the signed adapter above, and must pass the same 8x20/160 signed bounds before it may write compact artifacts. The collector dependency is present; if a future execution does not inject the approved provider client, it fails closed with `source_provider_client_missing`.
+The template intentionally contains no API key. In this commit it must not call a provider, write diagnostics, generate raw traces, raw provider payloads, candidate JSONL, scorer outputs, dev/holdout/full manifests, performance evidence, or Huawei readiness artifacts. A future execution command must replace `--dry-run` with `--execute-approved-source` while keeping the signed adapter and signed provider-client factory above, and must pass the same 8x20/160 signed bounds before it may write compact artifacts. The provider-client injection boundary is signed and importable. If a future execution lacks an approved source-case provider, it fails closed with `source_case_provider_missing`; if it has source cases but lacks the approved transport, it fails closed with `provider_transport_missing`. No real execution is authorized in this commit.
 
 ## Compact Artifact Schema
 

@@ -191,7 +191,9 @@ def _validate_failure_buckets(value: Any) -> dict[str, int]:
 
 
 def _extract_counter_record(category: str, provider_result: dict[str, Any] | None) -> dict[str, Any]:
-    result = provider_result or {}
+    if provider_result is None:
+        raise SourceDiagnosticCollectorError("collector_provider_result_missing")
+    result = provider_result
     if not isinstance(result, dict):
         raise SourceDiagnosticCollectorError("collector_provider_result_not_object")
     extra_forbidden = _forbidden_hits(result)

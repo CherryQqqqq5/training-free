@@ -38,6 +38,8 @@ SIGNED_ARGS = [
     "--no-scorer",
     "--execution-adapter",
     "scripts.rashe_source_diagnostic_compact_adapter:run_compact_source_diagnostic",
+    "--provider-client-factory",
+    "scripts.rashe_source_provider_client:build_chuangzhi_novacode_source_provider_client",
     "--dry-run",
     "--compact",
     "--strict",
@@ -95,6 +97,8 @@ def test_dry_run_signed_plan_does_not_call_provider_or_read_api_key():
     assert summary["api_key_read"] is False
     assert summary["diagnostic_written"] is False
     assert summary["execution_adapter_status"] == "loadable"
+    assert summary["provider_client_factory_status"] == "loadable"
+    assert summary["provider_client_injected"] is False
     assert summary["approved_source_checker_passed"] is True
     assert summary["after_source_matrix_checker_passed"] is True
     assert summary["categories"] == list(APPROVED_CATEGORIES)
@@ -179,7 +183,7 @@ def test_rejects_raw_output_path_and_forbidden_publish_fields():
     assert "forbidden_publish_field:gold" in field_blockers
 
 
-def test_signed_execute_adapter_boundary_reports_missing_provider_client_without_key_read():
+def test_signed_execute_adapter_boundary_reports_missing_source_case_provider_without_key_read():
     args = signed_execute_args()
     schema = runner.load_json(args.schema)
     execution = runner.execute_approved_source(
@@ -189,11 +193,11 @@ def test_signed_execute_adapter_boundary_reports_missing_provider_client_without
         schema,
         write_artifacts=False,
     )
-    assert execution["execution_adapter_status"] == "provider_client_missing"
+    assert execution["execution_adapter_status"] == "source_case_provider_missing"
     assert execution["provider_call_executed"] is False
     assert execution["api_key_read"] is False
     assert execution["diagnostic_written"] is False
-    assert "source_provider_client_missing" in execution["blockers"]
+    assert "source_case_provider_missing" in execution["blockers"]
     assert "execution_path_not_implemented_in_this_commit" not in execution["blockers"]
 
 
@@ -203,6 +207,14 @@ def test_invalid_execution_adapter_function_has_explicit_blocker():
     blockers = load_summary(result)["blockers"]
     assert "execution_adapter_not_signed:'scripts.rashe_source_diagnostic_compact_adapter:not_a_function'" in blockers
     assert "source_execution_adapter_callable_missing" in blockers
+
+
+def test_invalid_provider_client_factory_has_explicit_blocker():
+    result = run_runner(replace={"--provider-client-factory": "scripts.rashe_source_provider_client:not_a_factory"})
+    assert result.returncode != 0
+    blockers = load_summary(result)["blockers"]
+    assert "provider_client_factory_not_signed:'scripts.rashe_source_provider_client:not_a_factory'" in blockers
+    assert "provider_client_factory_callable_missing" in blockers
 
 
 def test_signed_adapter_builds_schema_bound_artifacts_from_sanitized_counters():
@@ -282,7 +294,8 @@ def test_execute_path_accepts_mock_adapter_without_real_provider_or_key_read():
 
     def fake_adapter(request: dict) -> list[dict]:
         calls.append(request)
-        assert "api_key" not in json.dumps(request).lower()
+        assert "provider_client" in request
+        assert "api_key" not in " ".join(str(key).lower() for key in request)
         assert request["case_count_per_category"] == 20
         assert request["max_total_cases"] == 160
         assert request["candidate_generation_authorized"] is False
@@ -366,3 +379,97 @@ def test_execute_path_rejects_adapter_category_and_count_mismatch():
     assert "compact_artifact_provider_call_count_invalid:21" in blockers
     assert "compact_artifact_category_not_signed:not_signed" in blockers
     assert execution["diagnostic_written"] is False
+
+
+def test_execute_path_with_mock_provider_factory_validates_and_writes_temp_compact_artifacts(tmp_path):
+    args = signed_execute_args()
+    args.output_root = tmp_path
+    schema = runner.load_json(args.schema)
+
+    def fake_adapter(request: dict) -> list[dict]:
+        assert callable(request["provider_client"])
+        return [compact_artifact(category, provider_call_count=20) for category in APPROVED_CATEGORIES]
+
+    def fake_factory(request: dict):
+        assert request["case_count_per_category"] == 20
+        assert request["max_total_cases"] == 160
+
+        def client(_: dict) -> dict:
+            raise AssertionError("fake adapter should not call provider client")
+
+        return client
+
+    execution = runner.execute_approved_source(
+        args,
+        list(APPROVED_CATEGORIES),
+        20,
+        schema,
+        adapter_func=fake_adapter,
+        provider_client_factory=fake_factory,
+        write_artifacts=True,
+    )
+    assert execution["blockers"] == []
+    assert execution["provider_call_executed"] is True
+    assert execution["api_key_read"] is False
+    assert execution["diagnostic_written"] is True
+    files = sorted(tmp_path.glob("*.json"))
+    assert len(files) == 8
+    secret = "mock-secret-must-not-leak"
+    for path in files:
+        text = path.read_text()
+        assert secret not in text
+        payload = json.loads(text)
+        assert set(payload) == {
+            "schema_version",
+            "category",
+            "case_count",
+            "provider_call_count",
+            "raw_payload_tracked_count",
+            "forbidden_field_violation_count",
+            "failure_bucket_counts",
+            "candidate_generation_authorized",
+            "scorer_authorized",
+            "performance_evidence",
+        }
+        assert payload["case_count"] == 20
+        assert payload["provider_call_count"] == 20
+        assert payload["raw_payload_tracked_count"] == 0
+        assert payload["candidate_generation_authorized"] is False
+        assert payload["scorer_authorized"] is False
+        assert payload["performance_evidence"] is False
+
+
+def test_execute_path_with_real_adapter_and_mock_provider_factory_no_write():
+    args = signed_execute_args()
+    schema = runner.load_json(args.schema)
+
+    def fake_factory(_: dict):
+        def client(category_request: dict) -> dict:
+            return {
+                "category": category_request["category"],
+                "case_count": 20,
+                "provider_call_count": 20,
+                "failure_bucket_counts": {bucket: 0 for bucket in FAILURE_BUCKETS},
+                "raw_payload_tracked_count": 0,
+                "forbidden_field_violation_count": 0,
+                "candidate_generation_authorized": False,
+                "scorer_authorized": False,
+                "performance_evidence": False,
+            }
+
+        return client
+
+    execution = runner.execute_approved_source(
+        args,
+        list(APPROVED_CATEGORIES),
+        20,
+        schema,
+        provider_client_factory=fake_factory,
+        write_artifacts=False,
+    )
+    assert execution["blockers"] == []
+    assert execution["provider_call_executed"] is True
+    assert execution["api_key_read"] is False
+    assert execution["diagnostic_written"] is False
+    assert len(execution["executed_artifacts"]) == 8
+    assert sum(item["provider_call_count"] for item in execution["executed_artifacts"]) == 160

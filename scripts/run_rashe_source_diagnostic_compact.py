@@ -4,9 +4,10 @@
 Dry-run/plan-only modes validate the signed runbook scope without executing
 source collection. The approved execution path is adapter-driven: it can only
 write compact schema artifacts after the approved-source and after-source matrix
-gates pass. The signed adapter is importable; true execution still fails closed
-with ``source_provider_client_missing`` until an approved provider client is
-injected.
+gates pass. The signed adapter and provider-client factory are importable;
+true execution still fails closed with ``source_case_provider_missing`` or
+``provider_transport_missing`` until approved source-case and transport
+callables are injected into the signed request.
 """
 
 from __future__ import annotations
@@ -30,6 +31,7 @@ SIGNED_TOTAL_CASES = 160
 SIGNED_OUTPUT_ROOT = Path("outputs/artifacts/stage1_bfcl_acceptance/rashe_source_diagnostics_compact/")
 SIGNED_SCHEMA = Path("outputs/artifacts/stage1_bfcl_acceptance/rashe_source_diagnostic_compact.schema.json")
 SIGNED_EXECUTION_ADAPTER = "scripts.rashe_source_diagnostic_compact_adapter:run_compact_source_diagnostic"
+SIGNED_PROVIDER_CLIENT_FACTORY = "scripts.rashe_source_provider_client:build_chuangzhi_novacode_source_provider_client"
 SIGNED_PUBLISH_FIELDS = (
     "category",
     "case_count",
@@ -89,6 +91,7 @@ RAW_PATH_INDICATORS = (
     "full-suite-feedback",
 )
 AdapterFunc = Callable[[dict[str, Any]], list[dict[str, Any]]]
+ProviderClientFactory = Callable[[dict[str, Any]], Callable[[dict[str, Any]], dict[str, Any]]]
 
 
 def split_csv(value: str) -> list[str]:
@@ -274,25 +277,47 @@ def validate_args(args: argparse.Namespace) -> tuple[list[str], list[str], list[
 
     if args.execution_adapter != SIGNED_EXECUTION_ADAPTER:
         blockers.append(f"execution_adapter_not_signed:{args.execution_adapter!r}")
+    if args.provider_client_factory != SIGNED_PROVIDER_CLIENT_FACTORY:
+        blockers.append(f"provider_client_factory_not_signed:{args.provider_client_factory!r}")
     if not (args.dry_run or args.plan_only or args.execute_approved_source):
         blockers.append("dry_run_or_plan_only_required_without_execution_approval")
     return blockers, categories, publish_fields, planned_case_count
 
 
-def load_execution_adapter(spec: str | None) -> tuple[AdapterFunc | None, str | None]:
+def load_callable(spec: str | None, *, missing: str, invalid: str, import_failed: str, callable_missing: str):
     if not spec:
-        return None, "source_execution_adapter_missing"
+        return None, missing
     if ":" not in spec:
-        return None, "source_execution_adapter_spec_invalid"
+        return None, invalid
     module_name, func_name = spec.split(":", 1)
     try:
         module = importlib.import_module(module_name)
     except Exception as exc:  # pragma: no cover - exact import errors are environment-specific.
-        return None, f"source_execution_adapter_import_failed:{exc}"
+        return None, f"{import_failed}:{exc}"
     func = getattr(module, func_name, None)
     if not callable(func):
-        return None, "source_execution_adapter_callable_missing"
+        return None, callable_missing
     return func, None
+
+
+def load_execution_adapter(spec: str | None) -> tuple[AdapterFunc | None, str | None]:
+    return load_callable(
+        spec,
+        missing="source_execution_adapter_missing",
+        invalid="source_execution_adapter_spec_invalid",
+        import_failed="source_execution_adapter_import_failed",
+        callable_missing="source_execution_adapter_callable_missing",
+    )
+
+
+def load_provider_client_factory(spec: str | None) -> tuple[ProviderClientFactory | None, str | None]:
+    return load_callable(
+        spec,
+        missing="source_provider_client_missing",
+        invalid="provider_client_factory_spec_invalid",
+        import_failed="provider_client_factory_import_failed",
+        callable_missing="provider_client_factory_callable_missing",
+    )
 
 
 def write_compact_artifacts(output_root: Path, artifacts: list[dict[str, Any]]) -> list[str]:
@@ -318,6 +343,7 @@ def execute_approved_source(
     schema: dict[str, Any],
     *,
     adapter_func: AdapterFunc | None = None,
+    provider_client_factory: ProviderClientFactory | None = None,
     write_artifacts: bool = True,
 ) -> dict[str, Any]:
     blockers: list[str] = []
@@ -338,6 +364,50 @@ def execute_approved_source(
             }
 
     request = build_adapter_request(args, categories, planned_case_count)
+    if provider_client_factory is None:
+        provider_client_factory, factory_error = load_provider_client_factory(args.provider_client_factory)
+        if factory_error:
+            return {
+                "execution_adapter_status": "provider_client_factory_invalid",
+                "provider_call_executed": False,
+                "api_key_read": False,
+                "diagnostic_written": False,
+                "written_artifacts": [],
+                "executed_artifacts": [],
+                "blockers": [factory_error],
+            }
+    try:
+        request["provider_client"] = provider_client_factory(request)
+    except Exception as exc:  # pragma: no cover - provider factory failures vary.
+        message = str(exc)
+        if message.startswith("source_case_provider_missing"):
+            status = "source_case_provider_missing"
+            blocker = message
+        elif message.startswith("provider_transport_missing"):
+            status = "provider_transport_missing"
+            blocker = message
+        else:
+            status = "provider_client_factory_failed"
+            blocker = f"provider_client_factory_failed:{message}"
+        return {
+            "execution_adapter_status": status,
+            "provider_call_executed": False,
+            "api_key_read": False,
+            "diagnostic_written": False,
+            "written_artifacts": [],
+            "executed_artifacts": [],
+            "blockers": [blocker],
+        }
+    if not callable(request["provider_client"]):
+        return {
+            "execution_adapter_status": "provider_client_factory_invalid",
+            "provider_call_executed": False,
+            "api_key_read": False,
+            "diagnostic_written": False,
+            "written_artifacts": [],
+            "executed_artifacts": [],
+            "blockers": ["provider_client_factory_output_not_callable"],
+        }
     try:
         artifacts = adapter_func(request)
     except Exception as exc:  # pragma: no cover - adapter-specific failures vary.
@@ -347,6 +417,12 @@ def execute_approved_source(
             blocker = message
         elif message.startswith("source_provider_client_missing"):
             status = "provider_client_missing"
+            blocker = message
+        elif message.startswith("source_case_provider_missing"):
+            status = "source_case_provider_missing"
+            blocker = message
+        elif message.startswith("provider_transport_missing"):
+            status = "provider_transport_missing"
             blocker = message
         else:
             status = "failed"
@@ -426,6 +502,14 @@ def check(args: argparse.Namespace) -> dict[str, Any]:
             blockers.append(adapter_error)
         else:
             adapter_load_status = "loadable"
+    provider_client_factory_status = "not_requested"
+    if args.provider_client_factory:
+        _, factory_error = load_provider_client_factory(args.provider_client_factory)
+        if factory_error:
+            provider_client_factory_status = "missing" if factory_error == "source_provider_client_missing" else "invalid"
+            blockers.append(factory_error)
+        else:
+            provider_client_factory_status = "loadable"
 
     execution = {
         "execution_adapter_status": adapter_load_status,
@@ -459,6 +543,8 @@ def check(args: argparse.Namespace) -> dict[str, Any]:
         "api_key_read": execution["api_key_read"],
         "diagnostic_written": execution["diagnostic_written"],
         "execution_adapter_status": execution["execution_adapter_status"],
+        "provider_client_factory_status": provider_client_factory_status,
+        "provider_client_injected": bool(args.execute_approved_source and not args.dry_run and not args.plan_only and not blockers),
         "written_artifacts": execution["written_artifacts"],
         "approved_source_checker_passed": approved_source_checker_passed,
         "after_source_matrix_checker_passed": after_source_matrix_checker_passed,
@@ -494,6 +580,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--plan-only", action="store_true")
     parser.add_argument("--execute-approved-source", action="store_true")
     parser.add_argument("--execution-adapter", default=SIGNED_EXECUTION_ADAPTER, help="Adapter entrypoint as module:function for approved execution.")
+    parser.add_argument("--provider-client-factory", default=SIGNED_PROVIDER_CLIENT_FACTORY, help="Signed provider client factory as module:function for approved execution.")
     parser.add_argument("--skip-preflight-checks", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--compact", action="store_true")
     parser.add_argument("--strict", action="store_true")
