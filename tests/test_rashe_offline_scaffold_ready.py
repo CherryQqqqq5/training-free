@@ -16,7 +16,7 @@ def write_json(path: Path, payload):
     return path
 
 
-def test_rashe_offline_scaffold_checker_compact_passes_fail_closed():
+def test_legacy_offline_scaffold_checker_rejects_current_post_runtime_artifacts():
     result = subprocess.run(
         [sys.executable, str(SCRIPT), "--compact", "--strict"],
         stdout=subprocess.PIPE,
@@ -24,9 +24,9 @@ def test_rashe_offline_scaffold_checker_compact_passes_fail_closed():
         text=True,
         check=False,
     )
-    assert result.returncode == 0, result.stdout + result.stderr
+    assert result.returncode != 0
     summary = json.loads(result.stdout)
-    assert summary["rashe_offline_scaffold_ready"] is True
+    assert summary["rashe_offline_scaffold_ready"] is False
     assert summary["not_bfcl_performance_readiness"] is True
     assert summary["rashe_route_approved"] is True
     assert summary["rashe_runtime_skeleton_passed"] is True
@@ -34,6 +34,7 @@ def test_rashe_offline_scaffold_checker_compact_passes_fail_closed():
     assert summary["rashe_skill_metadata_passed"] is True
     assert summary["rashe_proposer_schema_passed"] is True
     assert summary["rashe_offline_evolution_loop_passed"] is True
+    assert "active_index_runtime_behavior_authorized_true" in summary["blockers"]
     assert summary["runtime_behavior_authorized"] is False
     assert summary["source_collection_authorized"] is False
     assert summary["candidate_generation_authorized"] is False
