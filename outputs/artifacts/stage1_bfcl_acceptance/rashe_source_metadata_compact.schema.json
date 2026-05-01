@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "category": {
+      "enum": [
+        "agentic_web_search",
+        "agentic_memory",
+        "multi_turn_base",
+        "multi_turn_long_context",
+        "multi_turn_miss_param",
+        "multi_turn_miss_func",
+        "hallucination",
+        "irrelevance"
+      ],
+      "type": "string"
+    },
+    "ordinal": {
+      "maximum": 19,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "prompt_family": {
+      "enum": [
+        "hallucination_abstention",
+        "irrelevance_abstention",
+        "long_context_state_tracking",
+        "memory_retrieval_required",
+        "multi_turn_missing_function",
+        "multi_turn_missing_parameter",
+        "multi_turn_state_tracking",
+        "web_search_required"
+      ],
+      "type": "string"
+    },
+    "source_family_id": {
+      "description": "Controlled family label only; not case-specific and not emitted to source-input manifests.",
+      "minLength": 1,
+      "type": "string"
+    },
+    "source_nonce": {
+      "description": "High entropy random nonce; not derived from raw case IDs, prompts, gold/expected/reference, trace paths, or provider payloads.",
+      "minLength": 32,
+      "type": "string"
+    }
+  },
+  "required": [
+    "category",
+    "ordinal",
+    "prompt_family",
+    "source_nonce",
+    "source_family_id"
+  ],
+  "title": "RASHE Source Metadata Compact Record",
+  "type": "object"
+}

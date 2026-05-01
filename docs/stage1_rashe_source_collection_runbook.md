@@ -31,9 +31,13 @@ Only compact sanitized counters, hashes, category labels, and no-leakage audit b
 
 ## Compact Source-Input Gate
 
-Provider transport review is blocked until compact source-input manifests exist and pass the checker. The builder accepts only approved sanitized source metadata and writes only `category`, `ordinal`, `prompt_family`, and `compact_source_hash`; it rejects raw case IDs, raw prompts, gold/expected/reference, traces, provider payloads, scorer diffs, candidate outputs, repair outputs, feedback, and performance material. This commit prepares the builder/checker; it does not run BFCL/provider/source diagnostics and does not create manifests from unavailable inputs.
+Provider transport review is blocked until the metadata approval checker passes, approved sanitized metadata root is prepared, and compact source-input manifests exist and pass the checker. The builder accepts only approved sanitized source metadata and writes only `category`, `ordinal`, `prompt_family`, and `compact_source_hash`; it rejects raw case IDs, raw prompts, gold/expected/reference, traces, provider payloads, scorer diffs, candidate outputs, repair outputs, feedback, and performance material. This runbook signs the gate order; it does not run BFCL/provider/source diagnostics and does not create metadata or manifests from unavailable inputs.
 
 ```bash
+.venv/bin/python scripts/check_rashe_source_metadata_approval_packet.py \
+  --compact \
+  --strict
+
 .venv/bin/python scripts/build_rashe_source_inputs_compact.py \
   --source-root <approved-compact-source-metadata-root> \
   --output-root outputs/artifacts/stage1_bfcl_acceptance/rashe_source_inputs_compact/ \
@@ -47,15 +51,17 @@ Provider transport review is blocked until compact source-input manifests exist 
   --strict
 ```
 
-If the approved source metadata root is absent, the builder fails closed with `approved_source_input_root_missing`. If the signed manifest root is absent, the checker fails closed with `approved_source_input_root_missing`. Do not use raw BFCL result roots, raw trace roots, or case-ID manifests as builder input.
+The approved metadata root is `outputs/artifacts/stage1_bfcl_acceptance/approved_source_metadata_compact/`; the downstream manifest root is `outputs/artifacts/stage1_bfcl_acceptance/rashe_source_inputs_compact/`. If the approved source metadata root is absent, the builder fails closed with `approved_source_input_root_missing`. If the signed manifest root is absent, the checker fails closed with `approved_source_input_root_missing`. Do not use raw BFCL result roots, raw trace roots, or case-ID manifests as builder input. Source metadata preparation itself is a later step and must not commit nonce-to-raw-case mappings.
 
 ## Signed Command Template
 
-Do not run source collection in this commit. Before any future execution, run both gates and stop if either fails:
+Do not run source collection in this commit. Before any future execution, run metadata/source gates and stop if any fails:
 
 ```bash
 .venv/bin/python scripts/check_rashe_source_real_trace_approved.py --compact --strict
 .venv/bin/python scripts/check_rashe_approval_packet_review_matrix_after_source_approval.py --compact --strict
+.venv/bin/python scripts/check_rashe_source_metadata_approval_packet.py --compact --strict
+.venv/bin/python scripts/check_rashe_source_inputs_compact.py --compact --strict
 ```
 
 This commit verifies the signed runner entrypoint in dry-run mode and implements the adapter-driven execution path for review. The signed adapter is `scripts.rashe_source_diagnostic_compact_adapter:run_compact_source_diagnostic`; the signed provider-client factory is `scripts.rashe_source_provider_client:build_chuangzhi_novacode_source_provider_client`; the signed source-case provider is `scripts.rashe_source_case_provider:build_signed_source_case_provider`. Do not remove `--dry-run` or use `--execute-approved-source` until a separate Phase B execution authorization confirms the command and provider transport.
