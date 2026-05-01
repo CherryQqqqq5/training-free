@@ -1,15 +1,18 @@
 {
+  "actual_preflight_executed_in_this_commit": false,
+  "actual_preflight_request_path_implemented": true,
   "approval_packet_kind": "provider_endpoint_model_tool_calling_preflight",
   "approval_status": "approved",
   "authorized": true,
   "bfcl_case_or_source_prompt_allowed": false,
+  "bfcl_source_diagnostic_authorized": false,
   "candidate_generation_authorized": false,
   "compact_diagnostic_payload_allowed_for_preflight": false,
   "diagnostics_generated": false,
   "endpoint_artifact_write_authorized": false,
   "endpoint_env_presence_check_authorized": true,
   "endpoint_value_logging_authorized": false,
-  "endpoint_value_read_authorized": false,
+  "endpoint_value_read_authorized": true,
   "forbidden_probe_content": [
     "bfcl_case",
     "source_case",
@@ -41,12 +44,14 @@
   "key_artifact_write_authorized": false,
   "key_env_presence_check_authorized": true,
   "key_logging_authorized": false,
-  "key_value_read_authorized": false,
+  "key_value_read_authorized": true,
   "notes": [
     "This packet approves only the preflight mechanism and dry-run/plan-only runner in this commit.",
     "A future synthetic provider preflight requires separate reviewer authorization.",
     "Endpoint and key values must never be printed, logged, persisted, or committed.",
-    "If only gpt-5.4 is supported, route_update_required must be reported and the gpt-5.2 Phase B packet must not be used."
+    "If only gpt-5.4 is supported, route_update_required must be reported and the gpt-5.2 Phase B packet must not be used.",
+    "This packet signs the actual synthetic endpoint/model/tool-calling preflight request path, but this commit does not execute it.",
+    "Actual preflight may read signed endpoint/key env values only inside --execute-preflight after separate reviewer authorization."
   ],
   "optional_capability_observation_model": "gpt-5.4",
   "performance_evidence": false,
@@ -70,11 +75,15 @@
   ],
   "preflight_only": true,
   "provider_preflight_requires_second_review": true,
-  "provider_request_authorized_in_this_commit": false,
+  "provider_request_authorized": true,
+  "provider_request_authorized_in_this_commit": true,
+  "provider_request_scope": "synthetic_toy_endpoint_model_tool_calling_preflight_only",
+  "raw_payload_capture_authorized": false,
   "raw_payload_persisted": false,
   "raw_prompt_persisted": false,
   "raw_provider_response_persisted": false,
   "raw_tool_data_allowed": false,
+  "raw_trace_capture_authorized": false,
   "route_update_required_if_only_optional_model_supported": true,
   "scorer_authorized": false,
   "signed_endpoint_env_vars": [
@@ -89,5 +98,6 @@
   "sota_3pp_claim_ready": false,
   "source_diagnostic_execution_authorized": false,
   "standard_chat_adapter_review_required_if_only_chat_completions": true,
-  "synthetic_toy_probe_only": true
+  "synthetic_toy_probe_only": true,
+  "toy_probe_tool_name": "synthetic_preflight_ping"
 }

@@ -7,8 +7,8 @@ Status: approved for preflight mechanism preparation only. This packet does not 
 - Packet kind: `provider_endpoint_model_tool_calling_preflight`
 - Preflight only: `true`
 - Phase B execution authorized: `false`
-- Provider request authorized in this commit: `false`
-- Future synthetic provider preflight requires separate reviewer authorization.
+- Provider request path authorized: `true`, synthetic toy preflight only
+- The actual synthetic provider preflight request path is signed for review, but execution still requires separate reviewer authorization and was not run in this commit.
 
 ## Signed Environment Names
 
@@ -17,6 +17,11 @@ Endpoint env names may be checked for presence only: `CHUANGZHI_NOVACODE_ENDPOIN
 API key env names may be checked for presence only: `CHUANGZHI_API_KEY`, `NOVACODE_API_KEY`.
 
 The endpoint value and key value must not be printed, logged, written to artifacts, written to git, or included in commands. Future provider preflight must require HTTPS endpoint policy without recording the endpoint value.
+
+
+## Actual Preflight Request Path
+
+The packet signs a future `--execute-preflight` path for a minimal synthetic endpoint/model/tool-calling check. That path may read only signed endpoint/key env values during execution and must not print or persist those values. It may issue only synthetic toy chat/tool-calling requests, never BFCL/source cases or compact diagnostic payloads. This commit implements the path for review but records `actual_preflight_executed_in_this_commit=false`.
 
 ## Model Route
 

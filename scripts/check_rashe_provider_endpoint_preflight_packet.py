@@ -14,6 +14,7 @@ SIGNED_ENDPOINT_ENVS = ["CHUANGZHI_NOVACODE_ENDPOINT", "NOVACODE_ENDPOINT"]
 SIGNED_KEY_ENVS = ["CHUANGZHI_API_KEY", "NOVACODE_API_KEY"]
 PRIMARY_MODEL = "gpt-5.2"
 OPTIONAL_MODEL = "gpt-5.4"
+TOY_TOOL_NAME = "synthetic_preflight_ping"
 PLANNED_FIELDS = [
     "endpoint_present",
     "key_present",
@@ -37,6 +38,11 @@ REQUIRED_TRUE = (
     "provider_preflight_requires_second_review",
     "endpoint_env_presence_check_authorized",
     "key_env_presence_check_authorized",
+    "endpoint_value_read_authorized",
+    "key_value_read_authorized",
+    "provider_request_authorized",
+    "provider_request_authorized_in_this_commit",
+    "actual_preflight_request_path_implemented",
     "https_endpoint_required_for_future_preflight",
     "route_update_required_if_only_optional_model_supported",
     "synthetic_toy_probe_only",
@@ -44,9 +50,9 @@ REQUIRED_TRUE = (
 )
 REQUIRED_FALSE = (
     "phase_b_execution_authorized",
-    "provider_request_authorized_in_this_commit",
-    "endpoint_value_read_authorized",
-    "key_value_read_authorized",
+    "bfcl_source_diagnostic_authorized",
+    "source_diagnostic_execution_authorized",
+    "actual_preflight_executed_in_this_commit",
     "endpoint_value_logging_authorized",
     "key_logging_authorized",
     "endpoint_artifact_write_authorized",
@@ -56,13 +62,14 @@ REQUIRED_FALSE = (
     "raw_prompt_persisted",
     "raw_payload_persisted",
     "raw_provider_response_persisted",
+    "raw_payload_capture_authorized",
+    "raw_trace_capture_authorized",
     "compact_diagnostic_payload_allowed_for_preflight",
     "candidate_generation_authorized",
     "scorer_authorized",
     "performance_evidence",
     "sota_3pp_claim_ready",
     "huawei_acceptance_ready",
-    "source_diagnostic_execution_authorized",
     "diagnostics_generated",
 )
 FORBIDDEN_PROBE_CONTENT = {
@@ -133,6 +140,8 @@ def validate_packet(packet: dict[str, Any]) -> list[str]:
         "signed_key_env_vars": SIGNED_KEY_ENVS,
         "signed_primary_model": PRIMARY_MODEL,
         "optional_capability_observation_model": OPTIONAL_MODEL,
+        "provider_request_scope": "synthetic_toy_endpoint_model_tool_calling_preflight_only",
+        "toy_probe_tool_name": TOY_TOOL_NAME,
         "planned_compact_result_fields": PLANNED_FIELDS,
     }
     for key, expected in expected_values.items():
@@ -164,13 +173,19 @@ def check(packet_path: Path = DEFAULT_PACKET) -> dict[str, Any]:
         "approval_status": packet.get("approval_status"),
         "authorized": packet.get("authorized"),
         "preflight_only": packet.get("preflight_only"),
+        "provider_request_authorized": packet.get("provider_request_authorized"),
         "provider_request_authorized_in_this_commit": packet.get("provider_request_authorized_in_this_commit"),
         "provider_preflight_requires_second_review": packet.get("provider_preflight_requires_second_review"),
+        "actual_preflight_request_path_implemented": packet.get("actual_preflight_request_path_implemented"),
+        "actual_preflight_executed_in_this_commit": packet.get("actual_preflight_executed_in_this_commit"),
+        "endpoint_value_read_authorized": packet.get("endpoint_value_read_authorized"),
+        "key_value_read_authorized": packet.get("key_value_read_authorized"),
         "signed_endpoint_env_vars": packet.get("signed_endpoint_env_vars"),
         "signed_key_env_vars": packet.get("signed_key_env_vars"),
         "signed_primary_model": packet.get("signed_primary_model"),
         "optional_capability_observation_model": packet.get("optional_capability_observation_model"),
         "phase_b_execution_authorized": packet.get("phase_b_execution_authorized"),
+        "bfcl_source_diagnostic_authorized": packet.get("bfcl_source_diagnostic_authorized"),
         "candidate_generation_authorized": packet.get("candidate_generation_authorized"),
         "scorer_authorized": packet.get("scorer_authorized"),
         "performance_evidence": packet.get("performance_evidence"),
