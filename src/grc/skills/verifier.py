@@ -34,7 +34,7 @@ def verify_trace(trace: dict[str, Any]) -> VerifierReport:
     path_hits = [hit for hit in forbidden if not (hit.endswith("case_id") or hit == "case_id")]
     if forbidden:
         blockers.append("forbidden_fields_present")
-    for key in ["provider_call_count", "scorer_call_count", "source_collection_call_count"]:
+    for key in ["provider_call_count", "scorer_call_count", "source_collection_call_count", "candidate_call_count"]:
         if trace.get(key, 0) != 0:
             blockers.append(f"{key}_not_zero")
     return VerifierReport(
@@ -47,6 +47,7 @@ def verify_trace(trace: dict[str, Any]) -> VerifierReport:
         provider_call_count=int(trace.get("provider_call_count") or 0),
         scorer_call_count=int(trace.get("scorer_call_count") or 0),
         source_collection_call_count=int(trace.get("source_collection_call_count") or 0),
+        candidate_call_count=int(trace.get("candidate_call_count") or 0),
     )
 
 
@@ -71,6 +72,7 @@ def verify_runtime_config(config: dict[str, Any]) -> VerifierReport:
         provider_call_count=int(config.get("provider_call_count") or 0),
         scorer_call_count=int(config.get("scorer_call_count") or 0),
         source_collection_call_count=int(config.get("source_collection_call_count") or 0),
+        candidate_call_count=int(config.get("candidate_call_count") or 0),
         candidate_generation_authorized=bool(config.get("candidate_generation_authorized")),
     )
 

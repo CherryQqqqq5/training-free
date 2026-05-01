@@ -98,6 +98,7 @@ def test_runtime_config_default_disabled_and_zero_counters():
     assert report.provider_call_count == 0
     assert report.source_collection_call_count == 0
     assert report.scorer_call_count == 0
+    assert report.candidate_call_count == 0
     assert report.candidate_generation_authorized is False
 
 
@@ -114,6 +115,23 @@ def test_synthetic_default_disabled_router_emits_compact_decision_only():
     no_match = SkillRouter().route(_synthetic_trace(signals=[], skill_tags=[], action_shape="noop", state_signature="state:none"))
     assert no_match.decision_status == "no_match_reject"
     _assert_reject(no_match, "no_skill_match")
+
+
+def test_candidate_call_count_nonzero_fails_closed_across_router_and_verifier():
+    trace = _synthetic_trace(candidate_call_count=1)
+
+    decision = SkillRouter().route(trace)
+    assert decision.decision_status == "input_reject"
+    assert decision.rejected_call_count_fields == ("candidate_call_count",)
+    _assert_reject(decision, "call_count_nonzero")
+
+    report = verify_trace(trace)
+    assert report.verifier_passed is False
+    assert "candidate_call_count_not_zero" in report.blockers
+    assert report.provider_call_count == 0
+    assert report.source_collection_call_count == 0
+    assert report.scorer_call_count == 0
+    assert report.candidate_call_count == 1
 
 
 def test_ambiguous_routing_fails_closed_with_stable_reason():
@@ -160,6 +178,7 @@ def test_forbidden_leakage_fields_fail_closed(extra, reason):
     assert report.provider_call_count == 0
     assert report.source_collection_call_count == 0
     assert report.scorer_call_count == 0
+    assert report.candidate_call_count == 0
 
 
 def test_downstream_lanes_remain_pending_and_unauthorized():

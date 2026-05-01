@@ -169,7 +169,7 @@ def check(manifest: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
         else:
             blockers.append(f"step_trace_source_scope_not_rejected:{source_scope}:{decision.decision_status}:{decision.reject_reason}")
 
-    for field in ["provider_call_count", "scorer_call_count", "source_collection_call_count"]:
+    for field in ["provider_call_count", "scorer_call_count", "source_collection_call_count", "candidate_call_count"]:
         decision = SkillRouter(skill_metadata=metadata).route({**step_trace, field: 1})
         if decision.decision_status == "input_reject" and decision.reject_reason == "call_count_nonzero" and decision.rejected_call_count_fields == (field,):
             call_count_nonzero_reject_count += 1
@@ -202,6 +202,7 @@ def check(manifest: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
         "provider_call_count": 0,
         "scorer_call_count": 0,
         "source_collection_call_count": 0,
+        "candidate_call_count": 0,
         "rashe_skill_metadata_passed": not blockers,
         "blockers": blockers,
     }

@@ -67,6 +67,7 @@ def check(config_path: Path = DEFAULT_CONFIG, fixture_root: Path = DEFAULT_FIXTU
     provider_call_count = 0
     scorer_call_count = 0
     source_collection_call_count = 0
+    candidate_call_count = 0
 
     fixture_paths = sorted(p for p in fixture_root.glob("*.json") if p.name != "aggregate_verifier_report.json")
     if not fixture_paths:
@@ -80,6 +81,7 @@ def check(config_path: Path = DEFAULT_CONFIG, fixture_root: Path = DEFAULT_FIXTU
         provider_call_count += int(trace.get("provider_call_count") or 0)
         scorer_call_count += int(trace.get("scorer_call_count") or 0)
         source_collection_call_count += int(trace.get("source_collection_call_count") or 0)
+        candidate_call_count += int(trace.get("candidate_call_count") or 0)
         report = verify_trace(trace)
         decision = router.route(trace).to_dict()
         router_decision_count += 1
@@ -134,6 +136,7 @@ def check(config_path: Path = DEFAULT_CONFIG, fixture_root: Path = DEFAULT_FIXTU
         "provider_call_count": provider_call_count,
         "scorer_call_count": scorer_call_count,
         "source_collection_call_count": source_collection_call_count,
+        "candidate_call_count": candidate_call_count,
         "candidate_generation_authorized": config.get("candidate_generation_authorized"),
         "prompt_injection_authorized": config.get("prompt_injection_authorized"),
         "retry_authorized": config.get("retry_authorized"),

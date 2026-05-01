@@ -29,6 +29,7 @@ def test_runtime_config_default_disabled_and_inert():
     assert report.provider_call_count == 0
     assert report.scorer_call_count == 0
     assert report.source_collection_call_count == 0
+    assert report.candidate_call_count == 0
 
 
 def test_skill_store_loads_disabled_seed_skills_only():
@@ -113,6 +114,7 @@ def test_runtime_skeleton_checker_compact_report_passes_fail_closed():
     assert summary["provider_call_count"] == 0
     assert summary["scorer_call_count"] == 0
     assert summary["source_collection_call_count"] == 0
+    assert summary["candidate_call_count"] == 0
     assert summary["candidate_generation_authorized"] is False
     assert summary["ruleengine_proxy_active_path_imported"] is False
     assert summary["forbidden_field_violation_count"] == 0

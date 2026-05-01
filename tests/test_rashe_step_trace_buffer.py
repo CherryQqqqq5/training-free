@@ -32,6 +32,7 @@ def test_step_trace_buffer_accepts_case_hash_synthetic_trace_with_v0_2_contract(
     assert summary["provider_call_count"] == 0
     assert summary["scorer_call_count"] == 0
     assert summary["source_collection_call_count"] == 0
+    assert summary["candidate_call_count"] == 0
     assert summary["candidate_generation_authorized"] is False
     assert summary["performance_evidence"] is False
 
@@ -86,14 +87,16 @@ def test_step_trace_buffer_rejects_missing_v0_2_required_field():
     assert buffer.summary()["required_field_missing_rejected_count"] == 1
 
 
-def test_step_trace_buffer_rejects_provider_scorer_source_calls():
-    buffer = StepTraceBuffer()
-    trace = load_fixture("step_trace_accept_current_turn.json")
-    trace["provider_call_count"] = 1
-    record = buffer.append(trace)
-    assert record.rejected is True
-    assert record.reject_reason == "call_count_nonzero"
-    assert buffer.summary()["provider_call_count"] == 1
+def test_step_trace_buffer_rejects_provider_scorer_source_candidate_calls():
+    for field in ["provider_call_count", "scorer_call_count", "source_collection_call_count", "candidate_call_count"]:
+        buffer = StepTraceBuffer()
+        trace = load_fixture("step_trace_accept_current_turn.json")
+        trace[field] = 1
+        record = buffer.append(trace)
+        assert record.rejected is True
+        assert record.reject_reason == "call_count_nonzero"
+        assert getattr(record, field) == 1
+        assert buffer.summary()[field] == 1
 
 
 def test_step_trace_buffer_checker_compact_report_passes_fail_closed():
@@ -120,6 +123,7 @@ def test_step_trace_buffer_checker_compact_report_passes_fail_closed():
     assert summary["provider_call_count"] == 0
     assert summary["scorer_call_count"] == 0
     assert summary["source_collection_call_count"] == 0
+    assert summary["candidate_call_count"] == 0
     assert summary["candidate_generation_authorized"] is False
     assert summary["performance_evidence"] is False
     assert summary["required_v0_2_fields"] == list(REQUIRED_V0_2_TRACE_FIELDS)

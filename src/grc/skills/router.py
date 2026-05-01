@@ -18,7 +18,7 @@ SCHEMA_SIGNALS = {"schema_present", "required_properties"}
 CURRENT_TURN_SIGNALS = {"current_turn", "multi_turn"}
 ALLOWED_SOURCE_SCOPES = {"synthetic", "approved_compact"}
 REJECTED_SOURCE_SCOPES = {"dev_only_future"}
-CALL_COUNT_FIELDS = ("provider_call_count", "scorer_call_count", "source_collection_call_count")
+CALL_COUNT_FIELDS = ("provider_call_count", "scorer_call_count", "source_collection_call_count", "candidate_call_count")
 SKILL_TAG_TO_SIGNAL = {
     "bfcl_current_turn_focus": "current_turn",
     "bfcl_schema_reading": "schema_present",

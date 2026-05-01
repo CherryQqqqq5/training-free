@@ -77,6 +77,7 @@ class StepTrace:
     provider_call_count: int = 0
     scorer_call_count: int = 0
     source_collection_call_count: int = 0
+    candidate_call_count: int = 0
 
 
 @dataclass(frozen=True)
@@ -120,6 +121,7 @@ class VerifierReport:
     provider_call_count: int = 0
     scorer_call_count: int = 0
     source_collection_call_count: int = 0
+    candidate_call_count: int = 0
     candidate_generation_authorized: bool = False
     offline_only: bool = True
     enabled: bool = False
@@ -135,6 +137,7 @@ class VerifierReport:
             "provider_call_count": self.provider_call_count,
             "scorer_call_count": self.scorer_call_count,
             "source_collection_call_count": self.source_collection_call_count,
+            "candidate_call_count": self.candidate_call_count,
             "forbidden_field_violation_count": self.forbidden_field_violation_count,
             "path_indicator_violation_count": self.path_indicator_violation_count,
             "raw_case_id_rejected_count": self.raw_case_id_rejected_count,

@@ -11,6 +11,7 @@ REQUIRED_ZERO_TRACE_KEYS = (
     "provider_call_count",
     "scorer_call_count",
     "source_collection_call_count",
+    "candidate_call_count",
 )
 
 REQUIRED_V0_2_TRACE_FIELDS = (
@@ -46,6 +47,7 @@ class TraceBufferRecord:
     provider_call_count: int = 0
     scorer_call_count: int = 0
     source_collection_call_count: int = 0
+    candidate_call_count: int = 0
 
 
 @dataclass
@@ -69,6 +71,7 @@ class StepTraceBuffer:
     provider_call_count: int = 0
     scorer_call_count: int = 0
     source_collection_call_count: int = 0
+    candidate_call_count: int = 0
 
     def append(self, trace: dict[str, Any]) -> TraceBufferRecord:
         forbidden_hits = find_forbidden_fields(trace)
@@ -80,6 +83,7 @@ class StepTraceBuffer:
         self.provider_call_count += int(trace.get("provider_call_count") or 0)
         self.scorer_call_count += int(trace.get("scorer_call_count") or 0)
         self.source_collection_call_count += int(trace.get("source_collection_call_count") or 0)
+        self.candidate_call_count += int(trace.get("candidate_call_count") or 0)
 
         reject_reason = _reject_reason(trace, forbidden_hits, raw_case_id, path_hits, missing_required, source_scope, nonzero_call_keys)
         record = TraceBufferRecord(
@@ -99,6 +103,7 @@ class StepTraceBuffer:
             provider_call_count=int(trace.get("provider_call_count") or 0),
             scorer_call_count=int(trace.get("scorer_call_count") or 0),
             source_collection_call_count=int(trace.get("source_collection_call_count") or 0),
+            candidate_call_count=int(trace.get("candidate_call_count") or 0),
         )
         if reject_reason is None:
             self.records.append(record)
@@ -138,6 +143,7 @@ class StepTraceBuffer:
             "provider_call_count": self.provider_call_count,
             "scorer_call_count": self.scorer_call_count,
             "source_collection_call_count": self.source_collection_call_count,
+            "candidate_call_count": self.candidate_call_count,
             "candidate_generation_authorized": False,
             "performance_evidence": False,
             "required_v0_2_fields": list(REQUIRED_V0_2_TRACE_FIELDS),
