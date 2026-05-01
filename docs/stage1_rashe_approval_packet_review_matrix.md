@@ -9,7 +9,7 @@ Dependency order: `offline scaffold ready -> L1 runtime behavior approved synthe
 | Order | Lane | Owner | Status | Authorized | Packet / Scope | Downstream | Forbidden Claims |
 |---:|---|---|---|---|---|---|---|
 | 1 | `runtime_behavior_approval` | RASHE runtime engineering owner + acceptance reviewer | `approved` | `true` | `synthetic_default_disabled_only`; `outputs/artifacts/stage1_bfcl_acceptance/rashe_runtime_behavior_approval_packet.json` | source_real_trace_approval, candidate_proposer_execution_approval | runtime enabled by default, provider authorized, source collection authorized, candidate pool ready, scorer authorized, performance evidence, Huawei acceptance ready |
-| 2 | `source_real_trace_approval` | source collection owner + no-leakage reviewer | `pending` | `false` | `outputs/artifacts/stage1_bfcl_acceptance/rashe_source_real_trace_approval_packet.json` | candidate_proposer_execution_approval, scorer_dev_holdout_full_approval | real trace approved, candidate pool ready, scorer authorized, performance evidence, Huawei acceptance ready |
+| 2 | `source_real_trace_approval` | source collection owner + no-leakage reviewer | `pending` | `false` | packet: `outputs/artifacts/stage1_bfcl_acceptance/rashe_source_real_trace_approval_packet.json`; checker: `scripts/check_rashe_source_real_trace_approval_packet.py` | candidate_proposer_execution_approval, scorer_dev_holdout_full_approval | source collection approved, real trace approved, provider calls authorized, candidate pool ready, scorer authorized, performance evidence, Huawei acceptance ready |
 | 3 | `candidate_proposer_execution_approval` | candidate engineering owner + no-leakage reviewer | `pending` | `false` | `outputs/artifacts/stage1_bfcl_acceptance/rashe_candidate_proposer_execution_approval_packet.json` | scorer_dev_holdout_full_approval | candidate pool ready, scorer authorized, performance evidence, SOTA +3pp ready, Huawei acceptance ready |
 | 4 | `scorer_dev_holdout_full_approval` | scorer owner + acceptance reviewer | `pending` | `false` | `outputs/artifacts/stage1_bfcl_acceptance/rashe_scorer_dev_holdout_full_approval_packet.json` | performance_3pp_huawei_acceptance_approval | scorer authorized, paired comparison passed, performance evidence, SOTA +3pp ready, Huawei acceptance ready |
 | 5 | `performance_3pp_huawei_acceptance_approval` | Huawei acceptance owner + project lead | `pending` | `false` | `outputs/artifacts/stage1_bfcl_acceptance/rashe_performance_3pp_huawei_acceptance_approval_packet.json` | terminal_no_downstream_lane | performance evidence, SOTA +3pp ready, Huawei acceptance ready, BFCL performance ready |
@@ -67,43 +67,50 @@ Dependency order: `offline scaffold ready -> L1 runtime behavior approved synthe
 - owner_role: source collection owner + no-leakage reviewer
 - current_status: `pending`
 - approval_packet_path: `outputs/artifacts/stage1_bfcl_acceptance/rashe_source_real_trace_approval_packet.json`
+- approval_checker_path: `scripts/check_rashe_source_real_trace_approval_packet.py`
 - authorized: `false`
 
 ### Prerequisites
-- rashe_offline_scaffold_ready=true
-- runtime/source approval signed separately
-- raw payload handling and sanitization policy reviewed
-- artifact boundary rules reviewed
+- runtime_behavior_approval approved only for synthetic/default-disabled wiring
+- source_real_trace_approval packet/checker prepared but pending
+- bounded source scope must be signed before future source collection
+- signed raw root, raw payload handling, sanitization policy, and artifact boundary rules reviewed before future approval
 
 ### Allowed Only After Approval
 - bounded source collection for approved categories only
-- raw payload capture under approved raw root only
-- compact sanitized counters and hashes
+- raw payload capture under separately signed raw root only
+- compact sanitized counters and hashes only
+- artifact-boundary-checked sanitized manifests
 
 ### Allowed Commands
 - no source/provider commands while current_status=pending
+- source approval checker only validates the pending/fail-closed packet
 - post-approval bounded source command from signed packet only
 
 ### Forbidden Until Approved
 - source collection
 - raw trace capture
+- provider calls
 - raw payload committed to tracked artifacts
-- candidate generation
+- candidate generation or candidate JSONL
 - scorer execution
 - performance claim
 
 ### Stop Gates
+- source/provider/scorer/candidate count nonzero
 - forbidden field violation
-- raw path leak
+- raw path leak or path denylist violation
 - artifact boundary failure
-- provider/model drift
+- tracked raw payload artifact detected
 
 ### Allowed Claims
-- source approval pending
+- source approval packet/checker prepared
 - no source execution authorized
 
 ### Forbidden Claims
+- source collection approved
 - real trace approved
+- provider calls authorized
 - candidate pool ready
 - scorer authorized
 - performance evidence
