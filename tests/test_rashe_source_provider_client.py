@@ -80,13 +80,13 @@ def test_client_without_source_case_provider_fails_precisely():
 
 
 def test_client_without_provider_transport_fails_precisely(monkeypatch):
-    monkeypatch.delenv("CHUANGZHI_API_KEY", raising=False)
-    monkeypatch.delenv("NOVACODE_API_KEY", raising=False)
+    monkeypatch.setenv("CHUANGZHI_API_KEY", "mock-secret-must-not-be-read")
     request = signed_request(source_case_provider=lambda request: compact_cases(request["category"]))
     client = provider_client.build_chuangzhi_novacode_source_provider_client(request)
 
-    with pytest.raises(provider_client.SourceProviderClientError, match="provider_key_missing"):
+    with pytest.raises(provider_client.SourceProviderClientError, match="provider_transport_not_implemented"):
         client(category_request())
+    assert getattr(client, "api_key_read") is False
 
 
 def test_default_transport_requires_provider_transport_approval(monkeypatch):

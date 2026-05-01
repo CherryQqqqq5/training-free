@@ -43,6 +43,27 @@ def test_provider_transport_packet_and_approved_checkers_pass_current_packet():
         assert summary["scorer_authorized"] is False
         assert summary["performance_evidence"] is False
         assert summary["huawei_acceptance_ready"] is False
+        if key == "rashe_provider_transport_approved_passed":
+            assert summary["metadata_checker_passed"] is True
+            assert summary["source_input_checker_passed"] is True
+            assert summary["artifact_boundary_checker_passed"] is True
+            assert summary["signed_runner_dry_run_passed"] is True
+            command = summary["signed_runner_command"]
+            for token in [
+                "--provider-profile Chuangzhi/Novacode",
+                "--model gpt-5.2",
+                "--min-cases-per-category 20",
+                "--max-cases-per-category 20",
+                "--max-total-cases 160",
+                "--source-input-root outputs/artifacts/stage1_bfcl_acceptance/rashe_source_inputs_compact/",
+                "--output-root outputs/artifacts/stage1_bfcl_acceptance/rashe_source_diagnostics_compact/",
+                "--schema outputs/artifacts/stage1_bfcl_acceptance/rashe_source_diagnostic_compact.schema.json",
+                "--execution-adapter scripts.rashe_source_diagnostic_compact_adapter:run_compact_source_diagnostic",
+                "--provider-client-factory scripts.rashe_source_provider_client:build_chuangzhi_novacode_source_provider_client",
+                "--source-case-provider scripts.rashe_source_case_provider:build_signed_source_case_provider",
+                "--dry-run",
+            ]:
+                assert token in command
 
 
 def test_packet_rejects_unsigned_scope_and_downstream_flags(tmp_path):

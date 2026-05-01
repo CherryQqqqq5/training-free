@@ -5,7 +5,7 @@ The factory is importable and safe for dry-run validation. It does not read
 credentials on import or factory construction. Real execution must still provide
 an approved source-case provider and provider transport; otherwise the returned
 client fails closed with ``source_case_provider_missing`` or
-``provider_transport_missing``.
+``provider_transport_not_implemented``.
 """
 
 from __future__ import annotations
@@ -167,28 +167,7 @@ def _execution_env_key() -> str:
 
 def _build_env_only_provider_transport() -> ProviderTransport:
     _provider_transport_approved()
-    _execution_env_key()
-
-    def transport(request: dict[str, Any]) -> dict[str, Any]:
-        hits = _forbidden_hits(request)
-        if hits:
-            raise SourceProviderClientError("provider_transport_request_forbidden_field:" + ";".join(hits))
-        for flag in [
-            "raw_payload_capture_authorized",
-            "raw_trace_capture_authorized",
-            "candidate_generation_authorized",
-            "scorer_authorized",
-            "performance_evidence",
-        ]:
-            if request.get(flag) is not False:
-                raise SourceProviderClientError(f"provider_transport_{flag}_not_false")
-        if request.get("provider_profile") != SIGNED_PROVIDER_PROFILE:
-            raise SourceProviderClientError("provider_transport_profile_not_signed")
-        if request.get("model") != SIGNED_MODEL:
-            raise SourceProviderClientError("provider_transport_model_not_signed")
-        return {"failure_bucket_counts": {bucket: 0 for bucket in FAILURE_BUCKETS}}
-
-    return transport
+    raise SourceProviderClientError("provider_transport_not_implemented")
 
 
 def validate_factory_request(request: dict[str, Any]) -> list[str]:
@@ -324,7 +303,9 @@ def build_chuangzhi_novacode_source_provider_client(request: dict[str, Any]) -> 
         category = _validate_category_request(category_request)
         if source_case_provider is None:
             raise SourceProviderClientError("source_case_provider_missing")
-        active_provider_transport = provider_transport or _build_env_only_provider_transport()
+        active_provider_transport = provider_transport
+        if active_provider_transport is None:
+            active_provider_transport = _build_env_only_provider_transport()
         cases = _validate_cases(
             source_case_provider(
                 {
@@ -367,4 +348,5 @@ def build_chuangzhi_novacode_source_provider_client(request: dict[str, Any]) -> 
             "performance_evidence": False,
         }
 
+    client.api_key_read = False  # type: ignore[attr-defined]
     return client

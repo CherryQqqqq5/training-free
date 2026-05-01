@@ -189,7 +189,7 @@ def test_rejects_raw_output_path_and_forbidden_publish_fields():
     assert "forbidden_publish_field:gold" in field_blockers
 
 
-def test_signed_execute_adapter_boundary_reports_missing_provider_key_without_key_read():
+def test_signed_execute_adapter_boundary_reports_unimplemented_provider_transport_without_key_read():
     args = signed_execute_args()
     schema = runner.load_json(args.schema)
     execution = runner.execute_approved_source(
@@ -199,11 +199,11 @@ def test_signed_execute_adapter_boundary_reports_missing_provider_key_without_ke
         schema,
         write_artifacts=False,
     )
-    assert execution["execution_adapter_status"] == "provider_key_missing"
+    assert execution["execution_adapter_status"] == "provider_transport_not_implemented"
     assert execution["provider_call_executed"] is False
     assert execution["api_key_read"] is False
     assert execution["diagnostic_written"] is False
-    assert "provider_key_missing" in execution["blockers"]
+    assert "provider_transport_not_implemented" in execution["blockers"]
     assert "execution_path_not_implemented_in_this_commit" not in execution["blockers"]
 
 

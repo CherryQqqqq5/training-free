@@ -492,6 +492,7 @@ def execute_approved_source(
             "executed_artifacts": [],
             "blockers": ["provider_client_factory_output_not_callable"],
         }
+    api_key_read = bool(getattr(request["provider_client"], "api_key_read", False))
     try:
         artifacts = adapter_func(request)
     except Exception as exc:  # pragma: no cover - adapter-specific failures vary.
@@ -520,13 +521,17 @@ def execute_approved_source(
         elif message.startswith("provider_transport_not_approved"):
             status = "provider_transport_not_approved"
             blocker = message
+        elif message.startswith("provider_transport_not_implemented"):
+            status = "provider_transport_not_implemented"
+            blocker = message
         else:
             status = "failed"
             blocker = f"source_execution_adapter_failed:{message}"
+        api_key_read = bool(getattr(request.get("provider_client"), "api_key_read", api_key_read))
         return {
             "execution_adapter_status": status,
             "provider_call_executed": False,
-            "api_key_read": False,
+            "api_key_read": api_key_read,
             "diagnostic_written": False,
             "written_artifacts": [],
             "executed_artifacts": [],
@@ -549,10 +554,11 @@ def execute_approved_source(
             if boundary_error:
                 blockers.append(f"artifact_boundary_failed:{boundary_error}")
     provider_call_executed = any(int(artifact.get("provider_call_count") or 0) > 0 for artifact in artifacts)
+    api_key_read = bool(getattr(request.get("provider_client"), "api_key_read", api_key_read))
     return {
         "execution_adapter_status": adapter_status,
         "provider_call_executed": provider_call_executed,
-        "api_key_read": False,
+        "api_key_read": api_key_read,
         "diagnostic_written": bool(written_artifacts),
         "written_artifacts": written_artifacts,
         "executed_artifacts": artifacts,
