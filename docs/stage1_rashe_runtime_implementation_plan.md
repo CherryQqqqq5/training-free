@@ -1,15 +1,15 @@
 # Stage-1 RASHE Runtime Implementation Plan
 
-This is a proposed implementation plan, not authorization to implement runtime behavior. Current authorization status is recorded in `outputs/artifacts/stage1_bfcl_acceptance/rashe_runtime_implementation_authorization.json`.
+This plan records the approved default-disabled runtime implementation skeleton and the L1 synthetic/default-disabled runtime behavior boundary. It does not authorize provider calls, source collection, candidate generation, scorer execution, performance evidence, or Huawei acceptance claims.
 
 ## Current State
 
 - RASHE scope-change route is approved.
 - RASHE v0 offline skeleton is present and disabled.
-- Runtime implementation authorization is proposed, not approved.
-- No provider/scorer/source/candidate/dev-holdout/runtime behavior is authorized by this plan.
+- Runtime implementation skeleton is approved only for default-disabled inert files.
+- L1 runtime behavior is approved only for synthetic/default-disabled wiring.
 
-## Proposed Files After Approval
+## Implemented / Allowed Files Under Skeleton Approval
 
 - `src/grc/skills/schema.py`
 - `src/grc/skills/store.py`
@@ -18,7 +18,7 @@ This is a proposed implementation plan, not authorization to implement runtime b
 - `configs/runtime_bfcl_skills.yaml` with `enabled=false` by default
 - synthetic tests only initially
 
-## Forbidden Until Later Execution Approval
+## Still Forbidden Without Later Execution Approval
 
 - RuleEngine/proxy behavior change
 - provider calls
@@ -30,14 +30,12 @@ This is a proposed implementation plan, not authorization to implement runtime b
 
 ## Required Gates
 
-The runtime implementation authorization may flip true only after:
+Runtime implementation skeleton approval has already been granted for default-disabled inert files. L1 runtime behavior approval is synthetic/default-disabled only and still requires:
 
-- `scripts/check_rashe_v0_offline.py --compact --strict` passes
-- no-leakage policy passes
-- seed skills validate
-- router ambiguity fails closed
 - config defaults remain disabled
-- code change plan is reviewed
-- no provider/scorer/source paths are touched
+- router ambiguity fails closed
+- synthetic tests only
+- no provider/scorer/source/candidate paths are touched
+- no prompt injection or retry in real BFCL runtime
 
-Even after runtime implementation authorization, execution approvals for provider calls, source collection, candidate generation, scorer, and performance evidence remain separate gates.
+Source collection, provider calls, candidate generation, scorer execution, performance evidence, SOTA/+3pp claims, and Huawei acceptance remain pending and unauthorized separate gates.

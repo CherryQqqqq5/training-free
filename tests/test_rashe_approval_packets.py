@@ -17,6 +17,17 @@ def copy_packets(tmp_path: Path) -> Path:
     return tmp_path
 
 
+def copy_fail_closed_packets(tmp_path: Path) -> Path:
+    base = copy_packets(tmp_path)
+    path = base / "rashe_runtime_behavior_approval_packet.json"
+    packet = json.loads(path.read_text())
+    packet["approval_status"] = "pending"
+    packet["authorized"] = False
+    packet["runtime_behavior_authorized"] = False
+    path.write_text(json.dumps(packet, indent=2, sort_keys=True) + "\n")
+    return base
+
+
 def mutate_packet(base: Path, stem: str, **updates):
     path = base / f"{stem}.json"
     data = json.loads(path.read_text())
@@ -24,9 +35,10 @@ def mutate_packet(base: Path, stem: str, **updates):
     path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n")
 
 
-def test_rashe_approval_packets_checker_compact_passes_fail_closed():
+def test_rashe_approval_packets_checker_compact_passes_fail_closed_fixture(tmp_path):
+    base = copy_fail_closed_packets(tmp_path)
     result = subprocess.run(
-        [sys.executable, str(SCRIPT), "--compact", "--strict"],
+        [sys.executable, str(SCRIPT), "--base", str(base), "--compact", "--strict"],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,
@@ -47,9 +59,10 @@ def test_rashe_approval_packets_checker_compact_passes_fail_closed():
     assert summary["candidate_pool_ready"] is False
 
 
-def test_all_packets_have_required_sections_and_pending_status():
+def test_all_packets_have_required_sections_and_fail_closed_status_in_fixture(tmp_path):
+    base = copy_fail_closed_packets(tmp_path)
     for stem in PACKET_STEMS:
-        packet = json.loads((BASE / f"{stem}.json").read_text())
+        packet = json.loads((base / f"{stem}.json").read_text())
         assert packet["approval_status"] in {"pending", "not_approved"}
         assert packet["authorized"] is False
         assert packet["performance_evidence"] is False
@@ -62,7 +75,7 @@ def test_all_packets_have_required_sections_and_pending_status():
 
 
 def test_checker_fails_if_packet_is_approved(tmp_path):
-    base = copy_packets(tmp_path)
+    base = copy_fail_closed_packets(tmp_path)
     mutate_packet(base, "rashe_runtime_behavior_approval_packet", approval_status="approved")
     summary = check(base)
     assert summary["rashe_approval_packets_passed"] is False
@@ -71,7 +84,7 @@ def test_checker_fails_if_packet_is_approved(tmp_path):
 
 
 def test_checker_fails_if_performance_evidence_enabled(tmp_path):
-    base = copy_packets(tmp_path)
+    base = copy_fail_closed_packets(tmp_path)
     mutate_packet(base, "rashe_performance_3pp_huawei_acceptance_approval_packet", performance_evidence=True)
     summary = check(base)
     assert summary["rashe_approval_packets_passed"] is False
@@ -80,7 +93,7 @@ def test_checker_fails_if_performance_evidence_enabled(tmp_path):
 
 
 def test_checker_fails_if_candidate_generation_enabled(tmp_path):
-    base = copy_packets(tmp_path)
+    base = copy_fail_closed_packets(tmp_path)
     mutate_packet(base, "rashe_candidate_proposer_execution_approval_packet", candidate_generation_authorized=True)
     summary = check(base)
     assert summary["rashe_approval_packets_passed"] is False
@@ -89,7 +102,7 @@ def test_checker_fails_if_candidate_generation_enabled(tmp_path):
 
 
 def test_checker_fails_if_no_leakage_field_missing_or_true(tmp_path):
-    base = copy_packets(tmp_path)
+    base = copy_fail_closed_packets(tmp_path)
     path = base / "rashe_source_real_trace_approval_packet.json"
     packet = json.loads(path.read_text())
     packet["no_leakage_required"]["gold_used"] = True

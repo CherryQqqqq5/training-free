@@ -2,7 +2,7 @@
   "bfcl_performance_ready": false,
   "candidate_generation_authorized": false,
   "candidate_pool_ready": false,
-  "current_status": "review_matrix_only",
+  "current_status": "runtime_behavior_l1_approved_downstream_pending",
   "dependency_order": [
     "runtime_behavior_approval",
     "source_real_trace_approval",
@@ -16,8 +16,8 @@
   "lanes": [
     {
       "allowed_claims": [
-        "runtime behavior approval pending",
-        "offline scaffold remains fail-closed"
+        "runtime behavior L1 approved for synthetic/default-disabled tests",
+        "downstream lanes remain pending"
       ],
       "allowed_commands": [
         "offline checker commands only until packet is approved",
@@ -29,16 +29,18 @@
         "compact verifier counters"
       ],
       "approval_packet_path": "outputs/artifacts/stage1_bfcl_acceptance/rashe_runtime_behavior_approval_packet.json",
-      "authorized": false,
-      "current_status": "pending",
+      "authorized": true,
+      "current_status": "approved",
       "downstream_dependencies": [
         "source_real_trace_approval",
         "candidate_proposer_execution_approval"
       ],
       "forbidden_claims": [
-        "runtime enabled",
+        "runtime enabled by default",
         "provider authorized",
+        "source collection authorized",
         "candidate pool ready",
+        "scorer authorized",
         "performance evidence",
         "Huawei acceptance ready"
       ],
@@ -279,7 +281,7 @@
   ],
   "performance_evidence": false,
   "report_scope": "rashe_approval_packet_review_matrix",
-  "runtime_behavior_authorized": false,
+  "runtime_behavior_authorized": true,
   "schema_version": "rashe_approval_packet_review_matrix_v0",
   "scope_change_route": "retrieval_augmented_skill_harness_evolution",
   "scorer_authorized": false,

@@ -1,13 +1,13 @@
 {
   "allowed_if_approved": [
-    "default-disabled runtime behavior wiring",
-    "bounded skill router invocation in reviewed path",
-    "compact verifier counters",
-    "rollbackable config toggle"
+    "config-gated skill router call in synthetic tests",
+    "config-gated verifier counters in synthetic tests",
+    "router decision emission without provider/source/scorer side effects",
+    "rollbackable config toggle with enabled=false default"
   ],
   "approval_packet_kind": "runtime_behavior",
-  "approval_status": "pending",
-  "authorized": false,
+  "approval_status": "approved",
+  "authorized": true,
   "bfcl_performance_ready": false,
   "candidate_generation_authorized": false,
   "candidate_jsonl_authorized": false,
@@ -16,16 +16,22 @@
   "default_enabled_required_if_approved": false,
   "dev_holdout_authorized": false,
   "execution_started": false,
-  "forbidden_until_approved": [
-    "prompt injection",
-    "retry",
-    "tool path mutation",
-    "RuleEngine/proxy active path import",
-    "provider side effects",
-    "scorer side effects",
+  "forbidden_after_approval": [
+    "provider calls",
     "source collection",
+    "BFCL scorer",
+    "candidate JSONL",
+    "dev/holdout/full BFCL",
+    "performance or Huawei acceptance claims",
+    "raw trace/case_id/gold/expected/scorer diff use"
+  ],
+  "forbidden_until_approved": [
+    "real provider calls",
+    "source collection",
+    "BFCL scorer",
     "candidate generation",
-    "dev/holdout/full BFCL"
+    "dev/holdout/full BFCL",
+    "performance or Huawei acceptance claims"
   ],
   "huawei_acceptance_ready": false,
   "no_leakage_required": {
@@ -39,8 +45,8 @@
     "scorer_diff_used": false
   },
   "notes": [
-    "Fail-closed approval skeleton only.",
-    "This packet does not authorize execution, provider calls, source collection, candidate generation, scorer use, performance evidence, SOTA claims, or Huawei acceptance readiness."
+    "Approved L1 only: synthetic/default-disabled runtime behavior wiring.",
+    "This does not authorize real BFCL runtime execution, provider calls, source collection, candidate generation, scorer use, performance evidence, SOTA claims, or Huawei acceptance readiness."
   ],
   "offline_only_packet": true,
   "paired_comparison_authorized": false,
@@ -56,7 +62,7 @@
   "proposer_execution_authorized": false,
   "provider_calls_authorized": false,
   "provider_scorer_side_effects_allowed": false,
-  "purpose": "Future approval boundary for default-disabled RASHE runtime behavior.",
+  "purpose": "L1 approval for synthetic/default-disabled RASHE runtime behavior wiring only.",
   "raw_payload_capture_authorized": false,
   "raw_trace_authorized": false,
   "report_scope": "rashe_runtime_behavior_approval_packet",
@@ -67,7 +73,9 @@
     "cost/latency/regression gate failure stops execution",
     "ambiguous router decision fail-closed"
   ],
-  "runtime_behavior_authorized": false,
+  "ruleengine_proxy_active_path_import_allowed": "test_only_or_config_guarded",
+  "runtime_behavior_authorized": true,
+  "runtime_behavior_scope": "synthetic_default_disabled_only",
   "schema_version": "rashe_approval_packet_v0",
   "scope_change_route": "retrieval_augmented_skill_harness_evolution",
   "scorer_authorized": false,

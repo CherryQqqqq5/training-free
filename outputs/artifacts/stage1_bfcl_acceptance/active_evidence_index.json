@@ -69,13 +69,13 @@
   "active_route": "retrieval_augmented_skill_harness_evolution",
   "active_route_short_name": "RASHE",
   "active_route_status": "rashe_offline_scaffold_complete_fail_closed",
-  "artifact_commit": "199c79fd",
+  "artifact_commit": "eaafa624",
   "batch2_provenance": {
     "artifact_commit": "6e3a1e63",
     "note": "Generation code head and compact artifact commit may differ and are not readiness claims.",
     "source_collection_code_head": "fa4156d0"
   },
-  "branch": "stage1-bfcl-performance-sprint",
+  "branch": "main",
   "candidate_generation_authorized": false,
   "candidate_pool_ready": false,
   "claim_readiness": {
@@ -84,24 +84,26 @@
     "huawei_acceptance_ready": false,
     "no_bfcl_3pp_evidence_yet": true,
     "performance_evidence": false,
-    "runtime_behavior_authorized": false,
+    "runtime_behavior_approval_status": "approved",
+    "runtime_behavior_authorized": true,
     "scorer_authorization": false,
     "scorer_authorized": false,
     "sota_3pp_claim_ready": false,
     "source_collection_authorized": false
   },
   "current_blocker": {
-    "blocker": "rashe_runtime_source_candidate_scorer_not_authorized",
+    "blocker": "downstream_lanes_fail_closed",
     "dataset_is_current_blocker": false,
     "provider_is_current_blocker": false,
-    "summary": "RASHE is the active approved route and its offline scaffold gates pass, but runtime behavior, source collection, candidate generation, scorer, performance evidence, SOTA/+3pp, and Huawei acceptance remain fail-closed."
+    "summary": "RASHE route and L1 synthetic/default-disabled runtime behavior are approved; source collection, candidate generation, scorer, performance evidence, SOTA/+3pp, and Huawei acceptance remain pending/fail-closed."
   },
-  "current_head": "199c79fd",
-  "current_head_note": "This points to the RASHE active-index refresh content commit. The containing provenance patch commit is available from git history/final handoff; this avoids recursive hash churn.",
+  "current_head": "eaafa624",
+  "current_head_note": "Default main and stage1-bfcl-performance-sprint were synchronized at eaafa624; L1 runtime behavior approval is synthetic/default-disabled only.",
   "default_branch_delivery_risk": {
-    "current_branch": "stage1-bfcl-performance-sprint",
-    "main_merge_decision_pending": true,
-    "note": "Delivery-risk tracking only; not a Huawei acceptance claim."
+    "current_branch": "main",
+    "handoff_commit": "eaafa624",
+    "main_merge_completed": true,
+    "note": "Default branch contains RASHE offline scaffold handoff plus L1 synthetic/default-disabled runtime behavior approval; this is not BFCL performance readiness."
   },
   "deterministic_argument_structural_and_tool_name_paths_zero_yield": true,
   "deterministic_stage1_family_search_exhausted": true,
@@ -165,6 +167,7 @@
   ],
   "formal_bfcl_performance_ready": false,
   "generated_at_utc": "2026-04-30T16:52:36Z",
+  "handoff_commit": "eaafa624",
   "historical_self_referential_fields": {
     "current_branch_head_at_review": "f8dcaae5",
     "index_artifact_commit": "f8dcaae5",
@@ -195,14 +198,15 @@
     "rashe_runtime_skeleton_passed": true,
     "rashe_skill_metadata_passed": true,
     "rashe_step_trace_buffer_offline_passed": true,
-    "runtime_behavior_authorized": false,
+    "runtime_behavior_authorized": "synthetic_default_disabled_only",
     "scorer_authorized": false,
     "sota_3pp_claim_ready": false,
     "source_collection_authorized": false
   },
   "latest_hygiene_source_head": "b94855e0",
+  "main_merge_completed": true,
   "negative_evidence_report": "docs/stage1_bfcl_negative_evidence_report.md",
-  "next_action": "build_rashe_readiness_checker_or_prepare_separate_approvals_before_runtime_source_candidate_scorer",
+  "next_action": "prepare_downstream_approvals_before_source_candidate_scorer_performance",
   "no_bfcl_3pp_evidence_yet": true,
   "non_self_referential_provenance": true,
   "optional_diagnostic_counter_fields": [
@@ -525,7 +529,9 @@
   },
   "rashe_route_approved": true,
   "report_scope": "stage1_bfcl_active_evidence_index",
-  "runtime_behavior_authorized": false,
+  "runtime_behavior_approval_status": "approved",
+  "runtime_behavior_authorized": true,
+  "runtime_behavior_scope": "synthetic_default_disabled_only",
   "schema_retrieval_rerank_artifact_commit": "a19f74c4",
   "schema_retrieval_rerank_code_head": "a19f74c4",
   "schema_retrieval_rerank_summary": {

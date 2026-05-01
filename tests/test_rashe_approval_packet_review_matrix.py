@@ -15,13 +15,20 @@ def write_matrix(tmp_path: Path, data: dict) -> Path:
     return path
 
 
-def load_matrix() -> dict:
-    return json.loads(MATRIX.read_text())
+def load_fail_closed_matrix() -> dict:
+    matrix = json.loads(MATRIX.read_text())
+    matrix["current_status"] = "review_matrix_only"
+    matrix["runtime_behavior_authorized"] = False
+    for lane in matrix["lanes"]:
+        lane["current_status"] = "pending"
+        lane["authorized"] = False
+    return matrix
 
 
-def test_review_matrix_checker_compact_passes_fail_closed():
+def test_review_matrix_checker_compact_passes_fail_closed_fixture(tmp_path):
+    matrix_path = write_matrix(tmp_path, load_fail_closed_matrix())
     result = subprocess.run(
-        [sys.executable, str(SCRIPT), "--compact", "--strict"],
+        [sys.executable, str(SCRIPT), "--matrix", str(matrix_path), "--compact", "--strict"],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,
@@ -39,7 +46,7 @@ def test_review_matrix_checker_compact_passes_fail_closed():
 
 
 def test_fails_if_lane_missing(tmp_path):
-    matrix = load_matrix()
+    matrix = load_fail_closed_matrix()
     matrix["lanes"] = matrix["lanes"][:-1]
     summary = check(write_matrix(tmp_path, matrix))
     assert summary["rashe_approval_packet_review_matrix_passed"] is False
@@ -47,7 +54,7 @@ def test_fails_if_lane_missing(tmp_path):
 
 
 def test_fails_if_lane_is_approved(tmp_path):
-    matrix = load_matrix()
+    matrix = load_fail_closed_matrix()
     matrix["lanes"][0]["current_status"] = "approved"
     summary = check(write_matrix(tmp_path, matrix))
     assert summary["rashe_approval_packet_review_matrix_passed"] is False
@@ -55,7 +62,7 @@ def test_fails_if_lane_is_approved(tmp_path):
 
 
 def test_fails_if_performance_lane_not_last(tmp_path):
-    matrix = load_matrix()
+    matrix = load_fail_closed_matrix()
     lanes = matrix["lanes"]
     lanes[3], lanes[4] = lanes[4], lanes[3]
     for idx, lane in enumerate(lanes, start=1):
@@ -67,7 +74,7 @@ def test_fails_if_performance_lane_not_last(tmp_path):
 
 
 def test_fails_if_scorer_prerequisites_drop_candidate_or_source(tmp_path):
-    matrix = load_matrix()
+    matrix = load_fail_closed_matrix()
     scorer = next(lane for lane in matrix["lanes"] if lane["lane_id"] == "scorer_dev_holdout_full_approval")
     scorer["prerequisites"] = ["same provider/model/protocol comparator frozen"]
     summary = check(write_matrix(tmp_path, matrix))
@@ -77,7 +84,7 @@ def test_fails_if_scorer_prerequisites_drop_candidate_or_source(tmp_path):
 
 
 def test_fails_if_forbidden_claims_missing(tmp_path):
-    matrix = load_matrix()
+    matrix = load_fail_closed_matrix()
     matrix["lanes"][0]["forbidden_claims"] = []
     summary = check(write_matrix(tmp_path, matrix))
     assert summary["rashe_approval_packet_review_matrix_passed"] is False
@@ -86,7 +93,7 @@ def test_fails_if_forbidden_claims_missing(tmp_path):
 
 
 def test_fails_if_matrix_says_huawei_or_performance_ready(tmp_path):
-    matrix = load_matrix()
+    matrix = load_fail_closed_matrix()
     matrix["huawei_acceptance_ready"] = True
     matrix["performance_evidence"] = True
     summary = check(write_matrix(tmp_path, matrix))

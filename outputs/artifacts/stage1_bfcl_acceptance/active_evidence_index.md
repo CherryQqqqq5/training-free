@@ -4,10 +4,14 @@ This index is the active evidence entrypoint for Stage-1 BFCL. It records curren
 
 ## Current Checkpoint
 
-- source branch: `stage1-bfcl-performance-sprint`
-- current_head: `199c79fd`
-- artifact_commit: `199c79fd`
-- provenance note: these fields point to the RASHE active-index refresh content commit. The containing provenance patch commit is available from git history/final handoff; this avoids recursive hash churn.
+- branch: `main`
+- current_head: `eaafa624`
+- artifact_commit: `eaafa624`
+- handoff_commit: `eaafa624`
+- main_merge_completed: true
+- runtime_behavior_approval_status: `approved`
+- runtime_behavior_scope: `synthetic_default_disabled_only`
+- provenance note: default `main` and `stage1-bfcl-performance-sprint` were synchronized at `eaafa624`; L1 runtime behavior approval is synthetic/default-disabled only and is not BFCL performance readiness.
 - active route: `retrieval_augmented_skill_harness_evolution` (RASHE)
 - RASHE route approved: true
 - active route status: `rashe_offline_scaffold_complete_fail_closed`
@@ -63,7 +67,7 @@ All formal BFCL performance gates remain fail-closed:
 
 - candidate_pool_ready: false
 - candidate_generation_authorized: false
-- runtime_behavior_authorized: false
+- runtime_behavior_authorized: true (`synthetic_default_disabled_only`; no real provider/source/scorer/candidate execution)
 - source_collection_authorized: false
 - scorer_authorized: false
 - performance_evidence: false
@@ -71,13 +75,13 @@ All formal BFCL performance gates remain fail-closed:
 - huawei_acceptance_ready: false
 - formal_bfcl_performance_ready: false
 
-No source expansion, BFCL scorer, candidate pool, dev/holdout split, paired comparison, full-suite run, SOTA/+3pp claim, or Huawei acceptance claim is authorized by the RASHE offline scaffold.
+L1 runtime behavior approval does not authorize source expansion, BFCL scorer, candidate pool, dev/holdout split, paired comparison, full-suite run, SOTA/+3pp claim, or Huawei acceptance claim.
 
 ## Next Action
 
-`build_rashe_readiness_checker_or_prepare_separate_approvals_before_runtime_source_candidate_scorer`
+`prepare_downstream_approvals_before_source_candidate_scorer_performance`
 
-The next engineering step is a RASHE readiness checker or separate approval packets before any runtime behavior, source collection, candidate generation, scorer, or performance evidence path can start.
+The current approval state allows only L1 synthetic/default-disabled runtime behavior checks. Source collection, candidate generation, scorer, performance evidence, SOTA/+3pp claims, and Huawei acceptance remain separate pending lanes.
 
 ## Historical Background
 
