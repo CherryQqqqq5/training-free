@@ -28,6 +28,7 @@ SIGNED_CASES_PER_CATEGORY = 20
 SIGNED_TOTAL_CASES = 160
 SIGNED_OUTPUT_ROOT = Path("outputs/artifacts/stage1_bfcl_acceptance/rashe_source_diagnostics_compact/")
 SIGNED_SCHEMA = Path("outputs/artifacts/stage1_bfcl_acceptance/rashe_source_diagnostic_compact.schema.json")
+SIGNED_EXECUTION_ADAPTER = "scripts.rashe_source_diagnostic_compact_adapter:run_compact_source_diagnostic"
 SIGNED_PUBLISH_FIELDS = (
     "category",
     "case_count",
@@ -270,6 +271,8 @@ def validate_args(args: argparse.Namespace) -> tuple[list[str], list[str], list[
         if getattr(args, flag_name) is not True:
             blockers.append(f"{flag_name}_required")
 
+    if args.execution_adapter != SIGNED_EXECUTION_ADAPTER:
+        blockers.append(f"execution_adapter_not_signed:{args.execution_adapter!r}")
     if not (args.dry_run or args.plan_only or args.execute_approved_source):
         blockers.append("dry_run_or_plan_only_required_without_execution_approval")
     return blockers, categories, publish_fields, planned_case_count
@@ -337,14 +340,21 @@ def execute_approved_source(
     try:
         artifacts = adapter_func(request)
     except Exception as exc:  # pragma: no cover - adapter-specific failures vary.
+        message = str(exc)
+        if message.startswith("source_execution_dependency_missing:"):
+            status = "dependency_missing"
+            blocker = message
+        else:
+            status = "failed"
+            blocker = f"source_execution_adapter_failed:{message}"
         return {
-            "execution_adapter_status": "failed",
+            "execution_adapter_status": status,
             "provider_call_executed": False,
             "api_key_read": False,
             "diagnostic_written": False,
             "written_artifacts": [],
             "executed_artifacts": [],
-            "blockers": [f"source_execution_adapter_failed:{exc}"],
+            "blockers": [blocker],
         }
     if not isinstance(artifacts, list) or not all(isinstance(item, dict) for item in artifacts):
         blockers.append("source_execution_adapter_output_invalid")
@@ -404,8 +414,17 @@ def check(args: argparse.Namespace) -> dict[str, Any]:
         for artifact in compact_plans:
             blockers.extend(validate_schema_artifact(schema, artifact))
 
+    adapter_load_status = "not_requested"
+    if args.execution_adapter:
+        _, adapter_error = load_execution_adapter(args.execution_adapter)
+        if adapter_error:
+            adapter_load_status = "missing" if adapter_error == "source_execution_adapter_missing" else "invalid"
+            blockers.append(adapter_error)
+        else:
+            adapter_load_status = "loadable"
+
     execution = {
-        "execution_adapter_status": "not_requested",
+        "execution_adapter_status": adapter_load_status,
         "provider_call_executed": False,
         "api_key_read": False,
         "diagnostic_written": False,
@@ -470,7 +489,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--plan-only", action="store_true")
     parser.add_argument("--execute-approved-source", action="store_true")
-    parser.add_argument("--execution-adapter", help="Adapter entrypoint as module:function for approved execution.")
+    parser.add_argument("--execution-adapter", default=SIGNED_EXECUTION_ADAPTER, help="Adapter entrypoint as module:function for approved execution.")
     parser.add_argument("--skip-preflight-checks", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--compact", action="store_true")
     parser.add_argument("--strict", action="store_true")

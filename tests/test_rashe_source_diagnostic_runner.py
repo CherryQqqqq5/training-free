@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 import scripts.run_rashe_source_diagnostic_compact as runner
+import scripts.rashe_source_diagnostic_compact_adapter as signed_adapter
 from scripts.check_rashe_source_real_trace_approved import APPROVED_CATEGORIES, FAILURE_BUCKETS
 from scripts.run_rashe_source_diagnostic_compact import SIGNED_PUBLISH_FIELDS
 
@@ -35,6 +36,8 @@ SIGNED_ARGS = [
     "--no-raw-payload",
     "--no-candidate-jsonl",
     "--no-scorer",
+    "--execution-adapter",
+    "scripts.rashe_source_diagnostic_compact_adapter:run_compact_source_diagnostic",
     "--dry-run",
     "--compact",
     "--strict",
@@ -91,7 +94,7 @@ def test_dry_run_signed_plan_does_not_call_provider_or_read_api_key():
     assert summary["provider_call_executed"] is False
     assert summary["api_key_read"] is False
     assert summary["diagnostic_written"] is False
-    assert summary["execution_adapter_status"] == "not_requested"
+    assert summary["execution_adapter_status"] == "loadable"
     assert summary["approved_source_checker_passed"] is True
     assert summary["after_source_matrix_checker_passed"] is True
     assert summary["categories"] == list(APPROVED_CATEGORIES)
@@ -176,7 +179,7 @@ def test_rejects_raw_output_path_and_forbidden_publish_fields():
     assert "forbidden_publish_field:gold" in field_blockers
 
 
-def test_execute_boundary_without_adapter_is_auditable_and_no_key_read():
+def test_signed_execute_adapter_boundary_reports_missing_dependency_without_key_read():
     args = signed_execute_args()
     schema = runner.load_json(args.schema)
     execution = runner.execute_approved_source(
@@ -186,12 +189,90 @@ def test_execute_boundary_without_adapter_is_auditable_and_no_key_read():
         schema,
         write_artifacts=False,
     )
-    assert execution["execution_adapter_status"] == "missing"
+    assert execution["execution_adapter_status"] == "dependency_missing"
     assert execution["provider_call_executed"] is False
     assert execution["api_key_read"] is False
     assert execution["diagnostic_written"] is False
-    assert "source_execution_adapter_missing" in execution["blockers"]
+    assert "source_execution_dependency_missing:grc.bfcl.source_diagnostic_collector.collect_compact_source_diagnostics" in execution["blockers"]
     assert "execution_path_not_implemented_in_this_commit" not in execution["blockers"]
+
+
+def test_invalid_execution_adapter_function_has_explicit_blocker():
+    result = run_runner(replace={"--execution-adapter": "scripts.rashe_source_diagnostic_compact_adapter:not_a_function"})
+    assert result.returncode != 0
+    blockers = load_summary(result)["blockers"]
+    assert "execution_adapter_not_signed:'scripts.rashe_source_diagnostic_compact_adapter:not_a_function'" in blockers
+    assert "source_execution_adapter_callable_missing" in blockers
+
+
+def test_signed_adapter_builds_schema_bound_artifacts_from_sanitized_counters():
+    args = signed_execute_args()
+    request = runner.build_adapter_request(args, list(APPROVED_CATEGORIES), 20)
+    records = [
+        {
+            "category": category,
+            "case_count": 20,
+            "provider_call_count": 20,
+            "raw_payload_tracked_count": 0,
+            "forbidden_field_violation_count": 0,
+            "failure_bucket_counts": {bucket: 0 for bucket in FAILURE_BUCKETS},
+            "candidate_generation_authorized": False,
+            "scorer_authorized": False,
+            "performance_evidence": False,
+        }
+        for category in APPROVED_CATEGORIES
+    ]
+    artifacts = signed_adapter.build_compact_artifacts_from_sanitized_counters(records, request)
+    assert [artifact["category"] for artifact in artifacts] == list(APPROVED_CATEGORIES)
+    assert sum(artifact["case_count"] for artifact in artifacts) == 160
+    for artifact in artifacts:
+        assert set(artifact) == {
+            "schema_version",
+            "category",
+            "case_count",
+            "provider_call_count",
+            "raw_payload_tracked_count",
+            "forbidden_field_violation_count",
+            "failure_bucket_counts",
+            "candidate_generation_authorized",
+            "scorer_authorized",
+            "performance_evidence",
+        }
+        assert artifact["case_count"] == 20
+        assert artifact["provider_call_count"] == 20
+        assert artifact["raw_payload_tracked_count"] == 0
+        assert artifact["forbidden_field_violation_count"] == 0
+        assert artifact["candidate_generation_authorized"] is False
+        assert artifact["scorer_authorized"] is False
+        assert artifact["performance_evidence"] is False
+
+
+def test_signed_adapter_rejects_raw_or_forbidden_counter_fields():
+    args = signed_execute_args()
+    request = runner.build_adapter_request(args, list(APPROVED_CATEGORIES), 20)
+    records = [
+        {
+            "category": category,
+            "case_count": 20,
+            "provider_call_count": 20,
+            "raw_payload_tracked_count": 0,
+            "forbidden_field_violation_count": 0,
+            "failure_bucket_counts": {bucket: 0 for bucket in FAILURE_BUCKETS},
+            "candidate_generation_authorized": False,
+            "scorer_authorized": False,
+            "performance_evidence": False,
+        }
+        for category in APPROVED_CATEGORIES
+    ]
+    records[0]["case_id"] = "raw-case-id"
+    try:
+        signed_adapter.build_compact_artifacts_from_sanitized_counters(records, request)
+    except ValueError as exc:
+        message = str(exc)
+    else:
+        raise AssertionError("adapter accepted raw case_id")
+    assert "adapter_counter_extra_field:case_id" in message
+    assert "adapter_forbidden_counter_field:case_id" in message
 
 
 def test_execute_path_accepts_mock_adapter_without_real_provider_or_key_read():
