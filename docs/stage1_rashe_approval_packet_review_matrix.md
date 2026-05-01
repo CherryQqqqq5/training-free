@@ -1,10 +1,10 @@
 # Stage-1 RASHE Approval Packet Review Matrix
 
-This is the active post-runtime-approval review matrix. Runtime behavior lane L1 is approved only for synthetic/default-disabled wiring; source collection, candidate/proposer execution, scorer use, performance evidence, SOTA/+3pp claims, and Huawei acceptance readiness remain pending and unauthorized.
+This is the active post-source-approval review matrix. Runtime behavior lane L1 is approved only for synthetic/default-disabled wiring. The source lane is approved only for bounded compact source diagnostics through the signed runbook; candidate/proposer execution, scorer use, performance evidence, SOTA/+3pp claims, and Huawei acceptance readiness remain pending and unauthorized. Raw trace capture, raw payload tracking, candidate JSONL, scorer outputs, and performance/Huawei claims remain forbidden.
 
-Current gate: `scripts/check_rashe_approval_packet_review_matrix_after_runtime_behavior.py --compact --strict`. Legacy pre-runtime gate: `scripts/check_rashe_approval_packet_review_matrix.py --compact --strict`; it intentionally rejects approved runtime packets and should not be used as the current post-runtime gate.
+Current gate: `scripts/check_rashe_approval_packet_review_matrix_after_source_approval.py --compact --strict`. Legacy gates `scripts/check_rashe_approval_packet_review_matrix.py --compact --strict` and `scripts/check_rashe_approval_packet_review_matrix_after_runtime_behavior.py --compact --strict` intentionally reject approved runtime/source packets and should not be used as the current after-source gate.
 
-Dependency order: `offline scaffold ready -> L1 runtime behavior approved synthetic/default-disabled only -> source/candidate approvals -> scorer/dev/holdout/full -> performance/+3pp/Huawei acceptance`
+Dependency order: `offline scaffold ready -> L1 runtime behavior approved synthetic/default-disabled only -> bounded compact source diagnostics approved -> candidate/proposer execution pending -> scorer/dev/holdout/full pending -> performance/+3pp/Huawei acceptance pending`
 
 | Order | Lane | Owner | Status | Authorized | Packet / Scope | Downstream | Forbidden Claims |
 |---:|---|---|---|---|---|---|---|

@@ -29,6 +29,23 @@ Provider profile name only: Chuangzhi/Novacode `gpt-5.2`. Do not place API keys 
 
 Only compact sanitized counters, hashes, category labels, and no-leakage audit booleans are allowed under this root.
 
+## Signed Command Template
+
+Do not run this command in this commit. Before any future execution, run both gates and stop if either fails:
+
+```bash
+.venv/bin/python scripts/check_rashe_source_real_trace_approved.py --compact --strict
+.venv/bin/python scripts/check_rashe_approval_packet_review_matrix_after_source_approval.py --compact --strict
+```
+
+After reviewer approval for execution, the bounded source diagnostic command template is:
+
+```bash
+.venv/bin/python scripts/run_rashe_source_diagnostic_compact.py   --provider-profile "Chuangzhi/Novacode"   --model "gpt-5.2"   --categories agentic_web_search,agentic_memory,multi_turn_base,multi_turn_long_context,multi_turn_miss_param,multi_turn_miss_func,hallucination,irrelevance   --min-cases-per-category 20   --max-cases-per-category 50   --max-total-cases 200   --output-root outputs/artifacts/stage1_bfcl_acceptance/rashe_source_diagnostics_compact/   --schema outputs/artifacts/stage1_bfcl_acceptance/rashe_source_diagnostic_compact.schema.json   --compact-sanitized-only   --publish-fields category,case_count,provider_call_count,raw_payload_tracked_count,forbidden_field_violation_count,failure_bucket_counts,candidate_generation_authorized,scorer_authorized,performance_evidence   --no-raw-trace   --no-raw-payload   --no-candidate-jsonl   --no-scorer
+```
+
+The template intentionally contains no API key. It must not generate raw traces, raw provider payloads, candidate JSONL, scorer outputs, dev/holdout/full manifests, performance evidence, or Huawei readiness artifacts.
+
 ## Compact Artifact Schema
 
 Schema path: `outputs/artifacts/stage1_bfcl_acceptance/rashe_source_diagnostic_compact.schema.json`.
