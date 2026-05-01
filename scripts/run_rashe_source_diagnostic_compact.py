@@ -1,27 +1,31 @@
 #!/usr/bin/env python3
-"""Plan-only runner for bounded RASHE compact source diagnostics.
+"""Runner for bounded RASHE compact source diagnostics.
 
-This entrypoint makes the runbook command verifiable without executing source
-collection. It validates the approved source lane, the after-source matrix, and
-all signed run bounds. Dry-run/plan-only modes never call a provider, never read
-API keys, and never write diagnostics.
+Dry-run/plan-only modes validate the signed runbook scope without executing
+source collection. The approved execution path is adapter-driven: it can only
+write compact schema artifacts after the approved-source and after-source matrix
+gates pass, and it fails closed with ``source_execution_adapter_missing`` until
+a concrete source execution adapter is supplied.
 """
 
 from __future__ import annotations
 
 import argparse
+import importlib
 import json
 import subprocess
 import sys
 from pathlib import Path
+from typing import Any, Callable
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from typing import Any
 
 from scripts.check_rashe_source_real_trace_approved import APPROVED_CATEGORIES, FAILURE_BUCKETS
 
 SIGNED_PROVIDER_PROFILES = ("Chuangzhi/Novacode", "Chuangzhi/Novacode gpt-5.2")
 SIGNED_MODEL = "gpt-5.2"
+SIGNED_CASES_PER_CATEGORY = 20
+SIGNED_TOTAL_CASES = 160
 SIGNED_OUTPUT_ROOT = Path("outputs/artifacts/stage1_bfcl_acceptance/rashe_source_diagnostics_compact/")
 SIGNED_SCHEMA = Path("outputs/artifacts/stage1_bfcl_acceptance/rashe_source_diagnostic_compact.schema.json")
 SIGNED_PUBLISH_FIELDS = (
@@ -82,6 +86,7 @@ RAW_PATH_INDICATORS = (
     "full_suite_feedback",
     "full-suite-feedback",
 )
+AdapterFunc = Callable[[dict[str, Any]], list[dict[str, Any]]]
 
 
 def split_csv(value: str) -> list[str]:
@@ -105,6 +110,13 @@ def run_json_checker(args: list[str]) -> tuple[bool, str | None, dict[str, Any]]
     if not isinstance(data, dict):
         return False, f"checker_output_not_object:{args[0]}", {}
     return True, None, data
+
+
+def run_plain_command(args: list[str]) -> str | None:
+    result = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=False)
+    if result.returncode != 0:
+        return result.stdout.strip() or result.stderr.strip() or "command_failed"
+    return None
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -134,6 +146,46 @@ def build_compact_plan(category: str, case_count: int) -> dict[str, Any]:
     }
 
 
+def build_adapter_request(args: argparse.Namespace, categories: list[str], case_count: int) -> dict[str, Any]:
+    return {
+        "provider_profile": args.provider_profile,
+        "model": args.model,
+        "categories": categories,
+        "case_count_per_category": case_count,
+        "max_total_cases": args.max_total_cases,
+        "output_root": str(args.output_root),
+        "schema_path": str(args.schema),
+        "forbidden_fields": list(FORBIDDEN_FIELD_NAMES),
+        "failure_buckets": list(FAILURE_BUCKETS),
+        "candidate_generation_authorized": False,
+        "scorer_authorized": False,
+        "performance_evidence": False,
+        "raw_payload_capture_authorized": False,
+        "raw_trace_capture_authorized": False,
+        "compact_sanitized_only": True,
+    }
+
+
+def find_forbidden_artifact_fields(value: Any, prefix: str = "") -> list[str]:
+    hits: list[str] = []
+    if isinstance(value, dict):
+        for key, child in value.items():
+            normalized = normalize_field(str(key))
+            path = f"{prefix}.{key}" if prefix else str(key)
+            if normalized in FORBIDDEN_FIELD_NAMES:
+                hits.append(path)
+            hits.extend(find_forbidden_artifact_fields(child, path))
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            hits.extend(find_forbidden_artifact_fields(child, f"{prefix}[{index}]"))
+    elif isinstance(value, str):
+        lowered = value.lower()
+        for indicator in RAW_PATH_INDICATORS:
+            if indicator in lowered:
+                hits.append(f"{prefix}:raw_path_indicator:{indicator}")
+    return hits
+
+
 def validate_schema_artifact(schema: dict[str, Any], artifact: dict[str, Any]) -> list[str]:
     blockers: list[str] = []
     required = schema.get("required") if isinstance(schema.get("required"), list) else []
@@ -143,10 +195,11 @@ def validate_schema_artifact(schema: dict[str, Any], artifact: dict[str, Any]) -
     if artifact.get("category") not in allowed_categories:
         blockers.append(f"compact_artifact_category_not_signed:{artifact.get('category')}")
     case_count = artifact.get("case_count")
-    if not isinstance(case_count, int) or case_count < 0 or case_count > 50:
-        blockers.append(f"compact_artifact_case_count_invalid:{case_count!r}")
-    if artifact.get("provider_call_count") != 0:
-        blockers.append(f"compact_artifact_provider_call_count_not_zero:{artifact.get('provider_call_count')!r}")
+    if not isinstance(case_count, int) or case_count != SIGNED_CASES_PER_CATEGORY:
+        blockers.append(f"compact_artifact_case_count_not_signed:{case_count!r}")
+    provider_call_count = artifact.get("provider_call_count")
+    if not isinstance(provider_call_count, int) or provider_call_count < 0 or provider_call_count > SIGNED_CASES_PER_CATEGORY:
+        blockers.append(f"compact_artifact_provider_call_count_invalid:{provider_call_count!r}")
     for field in ["raw_payload_tracked_count", "forbidden_field_violation_count"]:
         if artifact.get(field) != 0:
             blockers.append(f"compact_artifact_{field}_not_zero:{artifact.get(field)!r}")
@@ -158,6 +211,9 @@ def validate_schema_artifact(schema: dict[str, Any], artifact: dict[str, Any]) -
         blockers.append("compact_artifact_failure_buckets_invalid")
     elif any((not isinstance(value, int) or value < 0) for value in buckets.values()):
         blockers.append("compact_artifact_failure_bucket_count_invalid")
+    forbidden_hits = find_forbidden_artifact_fields(artifact)
+    if forbidden_hits:
+        blockers.extend(f"forbidden_artifact_field:{hit}" for hit in forbidden_hits)
     if schema.get("additionalProperties") is not False:
         blockers.append("compact_schema_additional_properties_not_false")
     return blockers
@@ -173,8 +229,8 @@ def validate_args(args: argparse.Namespace) -> tuple[list[str], list[str], list[
     if args.model != SIGNED_MODEL:
         blockers.append(f"signed_model_invalid:{args.model!r}")
 
-    if not categories:
-        blockers.append("categories_missing")
+    if categories != list(APPROVED_CATEGORIES):
+        blockers.append("categories_do_not_match_signed_runbook")
     seen: set[str] = set()
     for category in categories:
         if category not in APPROVED_CATEGORIES:
@@ -183,22 +239,14 @@ def validate_args(args: argparse.Namespace) -> tuple[list[str], list[str], list[
             blockers.append(f"category_duplicate:{category}")
         seen.add(category)
 
-    if args.min_cases_per_category < 20 or args.min_cases_per_category > 50:
-        blockers.append(f"min_cases_per_category_out_of_bounds:{args.min_cases_per_category}")
-    if args.max_cases_per_category < 20 or args.max_cases_per_category > 50:
-        blockers.append(f"max_cases_per_category_out_of_bounds:{args.max_cases_per_category}")
-    if args.min_cases_per_category > args.max_cases_per_category:
-        blockers.append("case_count_min_exceeds_max")
-    if args.max_total_cases < 100 or args.max_total_cases > 200:
-        blockers.append(f"max_total_cases_out_of_bounds:{args.max_total_cases}")
-    if categories and len(categories) * args.min_cases_per_category > args.max_total_cases:
-        blockers.append("max_total_cases_below_signed_category_minimum")
+    if args.min_cases_per_category != SIGNED_CASES_PER_CATEGORY:
+        blockers.append(f"min_cases_per_category_not_signed:{args.min_cases_per_category}")
+    if args.max_cases_per_category != SIGNED_CASES_PER_CATEGORY:
+        blockers.append(f"max_cases_per_category_not_signed:{args.max_cases_per_category}")
+    if args.max_total_cases != SIGNED_TOTAL_CASES:
+        blockers.append(f"max_total_cases_not_signed:{args.max_total_cases}")
 
-    planned_case_count = 0
-    if categories:
-        planned_case_count = min(args.max_cases_per_category, args.max_total_cases // len(categories))
-        if planned_case_count < args.min_cases_per_category:
-            blockers.append("planned_case_count_below_category_minimum")
+    planned_case_count = SIGNED_CASES_PER_CATEGORY if categories == list(APPROVED_CATEGORIES) else 0
 
     if args.output_root != SIGNED_OUTPUT_ROOT:
         blockers.append(f"output_root_not_signed:{args.output_root}")
@@ -222,11 +270,108 @@ def validate_args(args: argparse.Namespace) -> tuple[list[str], list[str], list[
         if getattr(args, flag_name) is not True:
             blockers.append(f"{flag_name}_required")
 
-    if args.execute_approved_source and not (args.dry_run or args.plan_only):
-        blockers.append("execution_path_not_implemented_in_this_commit")
     if not (args.dry_run or args.plan_only or args.execute_approved_source):
         blockers.append("dry_run_or_plan_only_required_without_execution_approval")
     return blockers, categories, publish_fields, planned_case_count
+
+
+def load_execution_adapter(spec: str | None) -> tuple[AdapterFunc | None, str | None]:
+    if not spec:
+        return None, "source_execution_adapter_missing"
+    if ":" not in spec:
+        return None, "source_execution_adapter_spec_invalid"
+    module_name, func_name = spec.split(":", 1)
+    try:
+        module = importlib.import_module(module_name)
+    except Exception as exc:  # pragma: no cover - exact import errors are environment-specific.
+        return None, f"source_execution_adapter_import_failed:{exc}"
+    func = getattr(module, func_name, None)
+    if not callable(func):
+        return None, "source_execution_adapter_callable_missing"
+    return func, None
+
+
+def write_compact_artifacts(output_root: Path, artifacts: list[dict[str, Any]]) -> list[str]:
+    blockers: list[str] = []
+    output_root.mkdir(parents=True, exist_ok=True)
+    for artifact in artifacts:
+        category = artifact.get("category")
+        if category not in APPROVED_CATEGORIES:
+            blockers.append(f"write_category_not_signed:{category}")
+            continue
+        path = output_root / f"{category}.json"
+        if path.parent != output_root:
+            blockers.append(f"write_path_escape:{path}")
+            continue
+        path.write_text(json.dumps(artifact, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return blockers
+
+
+def execute_approved_source(
+    args: argparse.Namespace,
+    categories: list[str],
+    planned_case_count: int,
+    schema: dict[str, Any],
+    *,
+    adapter_func: AdapterFunc | None = None,
+    write_artifacts: bool = True,
+) -> dict[str, Any]:
+    blockers: list[str] = []
+    adapter_status = "loaded"
+    if adapter_func is None:
+        adapter_func, adapter_error = load_execution_adapter(args.execution_adapter)
+        if adapter_error:
+            adapter_status = "missing" if adapter_error == "source_execution_adapter_missing" else "invalid"
+            blockers.append(adapter_error)
+            return {
+                "execution_adapter_status": adapter_status,
+                "provider_call_executed": False,
+                "api_key_read": False,
+                "diagnostic_written": False,
+                "written_artifacts": [],
+                "executed_artifacts": [],
+                "blockers": blockers,
+            }
+
+    request = build_adapter_request(args, categories, planned_case_count)
+    try:
+        artifacts = adapter_func(request)
+    except Exception as exc:  # pragma: no cover - adapter-specific failures vary.
+        return {
+            "execution_adapter_status": "failed",
+            "provider_call_executed": False,
+            "api_key_read": False,
+            "diagnostic_written": False,
+            "written_artifacts": [],
+            "executed_artifacts": [],
+            "blockers": [f"source_execution_adapter_failed:{exc}"],
+        }
+    if not isinstance(artifacts, list) or not all(isinstance(item, dict) for item in artifacts):
+        blockers.append("source_execution_adapter_output_invalid")
+        artifacts = []
+    if [artifact.get("category") for artifact in artifacts] != categories:
+        blockers.append("source_execution_adapter_categories_mismatch")
+    for artifact in artifacts:
+        blockers.extend(validate_schema_artifact(schema, artifact))
+
+    written_artifacts: list[str] = []
+    if not blockers and write_artifacts:
+        blockers.extend(write_compact_artifacts(args.output_root, artifacts))
+        if not blockers:
+            written_artifacts = [str(args.output_root / f"{artifact['category']}.json") for artifact in artifacts]
+            boundary_error = run_plain_command([sys.executable, "scripts/check_artifact_boundary.py"])
+            if boundary_error:
+                blockers.append(f"artifact_boundary_failed:{boundary_error}")
+    provider_call_executed = any(int(artifact.get("provider_call_count") or 0) > 0 for artifact in artifacts)
+    return {
+        "execution_adapter_status": adapter_status,
+        "provider_call_executed": provider_call_executed,
+        "api_key_read": False,
+        "diagnostic_written": bool(written_artifacts),
+        "written_artifacts": written_artifacts,
+        "executed_artifacts": artifacts,
+        "blockers": blockers,
+    }
 
 
 def check(args: argparse.Namespace) -> dict[str, Any]:
@@ -259,6 +404,18 @@ def check(args: argparse.Namespace) -> dict[str, Any]:
         for artifact in compact_plans:
             blockers.extend(validate_schema_artifact(schema, artifact))
 
+    execution = {
+        "execution_adapter_status": "not_requested",
+        "provider_call_executed": False,
+        "api_key_read": False,
+        "diagnostic_written": False,
+        "written_artifacts": [],
+        "executed_artifacts": [],
+    }
+    if args.execute_approved_source and not args.dry_run and not args.plan_only and not blockers and schema:
+        execution = execute_approved_source(args, categories, planned_case_count, schema)
+        blockers.extend(execution.get("blockers", []))
+
     return {
         "report_scope": "rashe_source_diagnostic_compact_plan",
         "provider_profile": args.provider_profile,
@@ -267,6 +424,7 @@ def check(args: argparse.Namespace) -> dict[str, Any]:
         "min_cases_per_category": args.min_cases_per_category,
         "max_cases_per_category": args.max_cases_per_category,
         "planned_case_count_per_category": planned_case_count,
+        "planned_total_cases": len(categories) * planned_case_count if planned_case_count else 0,
         "max_total_cases": args.max_total_cases,
         "output_root": str(args.output_root),
         "schema_path": str(args.schema),
@@ -274,9 +432,11 @@ def check(args: argparse.Namespace) -> dict[str, Any]:
         "dry_run": args.dry_run,
         "plan_only": args.plan_only,
         "execute_requested": args.execute_approved_source,
-        "provider_call_executed": False,
-        "api_key_read": False,
-        "diagnostic_written": False,
+        "provider_call_executed": execution["provider_call_executed"],
+        "api_key_read": execution["api_key_read"],
+        "diagnostic_written": execution["diagnostic_written"],
+        "execution_adapter_status": execution["execution_adapter_status"],
+        "written_artifacts": execution["written_artifacts"],
         "approved_source_checker_passed": approved_source_checker_passed,
         "after_source_matrix_checker_passed": after_source_matrix_checker_passed,
         "raw_payload_tracked_count": 0,
@@ -285,6 +445,7 @@ def check(args: argparse.Namespace) -> dict[str, Any]:
         "scorer_authorized": False,
         "performance_evidence": False,
         "compact_artifact_plan": compact_plans,
+        "executed_artifacts": execution["executed_artifacts"],
         "rashe_source_diagnostic_compact_plan_passed": not blockers,
         "blockers": blockers,
     }
@@ -295,9 +456,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--provider-profile", default="Chuangzhi/Novacode")
     parser.add_argument("--model", default=SIGNED_MODEL)
     parser.add_argument("--categories", default=",".join(APPROVED_CATEGORIES))
-    parser.add_argument("--min-cases-per-category", type=int, default=20)
-    parser.add_argument("--max-cases-per-category", type=int, default=50)
-    parser.add_argument("--max-total-cases", type=int, default=200)
+    parser.add_argument("--min-cases-per-category", type=int, default=SIGNED_CASES_PER_CATEGORY)
+    parser.add_argument("--max-cases-per-category", type=int, default=SIGNED_CASES_PER_CATEGORY)
+    parser.add_argument("--max-total-cases", type=int, default=SIGNED_TOTAL_CASES)
     parser.add_argument("--output-root", type=Path, default=SIGNED_OUTPUT_ROOT)
     parser.add_argument("--schema", type=Path, default=SIGNED_SCHEMA)
     parser.add_argument("--compact-sanitized-only", action="store_true", default=True)
@@ -309,6 +470,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--plan-only", action="store_true")
     parser.add_argument("--execute-approved-source", action="store_true")
+    parser.add_argument("--execution-adapter", help="Adapter entrypoint as module:function for approved execution.")
     parser.add_argument("--skip-preflight-checks", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--compact", action="store_true")
     parser.add_argument("--strict", action="store_true")

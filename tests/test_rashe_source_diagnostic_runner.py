@@ -4,6 +4,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+import scripts.run_rashe_source_diagnostic_compact as runner
 from scripts.check_rashe_source_real_trace_approved import APPROVED_CATEGORIES, FAILURE_BUCKETS
 from scripts.run_rashe_source_diagnostic_compact import SIGNED_PUBLISH_FIELDS
 
@@ -20,9 +21,9 @@ SIGNED_ARGS = [
     "--min-cases-per-category",
     "20",
     "--max-cases-per-category",
-    "50",
+    "20",
     "--max-total-cases",
-    "200",
+    "160",
     "--output-root",
     "outputs/artifacts/stage1_bfcl_acceptance/rashe_source_diagnostics_compact/",
     "--schema",
@@ -58,6 +59,29 @@ def load_summary(result: subprocess.CompletedProcess[str]) -> dict:
     return json.loads(result.stdout)
 
 
+def signed_execute_args() -> object:
+    args = [item for item in SIGNED_ARGS if item not in {"--dry-run", "--compact", "--strict"}]
+    args.extend(["--execute-approved-source", "--skip-preflight-checks"])
+    return runner.build_parser().parse_args(args[2:])
+
+
+def compact_artifact(category: str, *, provider_call_count: int = 0, **overrides) -> dict:
+    artifact = {
+        "schema_version": "rashe_source_diagnostic_compact_v0",
+        "category": category,
+        "case_count": 20,
+        "provider_call_count": provider_call_count,
+        "raw_payload_tracked_count": 0,
+        "forbidden_field_violation_count": 0,
+        "failure_bucket_counts": {bucket: 0 for bucket in FAILURE_BUCKETS},
+        "candidate_generation_authorized": False,
+        "scorer_authorized": False,
+        "performance_evidence": False,
+    }
+    artifact.update(overrides)
+    return artifact
+
+
 def test_dry_run_signed_plan_does_not_call_provider_or_read_api_key():
     result = run_runner()
     assert result.returncode == 0, result.stdout + result.stderr
@@ -67,10 +91,12 @@ def test_dry_run_signed_plan_does_not_call_provider_or_read_api_key():
     assert summary["provider_call_executed"] is False
     assert summary["api_key_read"] is False
     assert summary["diagnostic_written"] is False
+    assert summary["execution_adapter_status"] == "not_requested"
     assert summary["approved_source_checker_passed"] is True
     assert summary["after_source_matrix_checker_passed"] is True
     assert summary["categories"] == list(APPROVED_CATEGORIES)
-    assert summary["planned_case_count_per_category"] == 25
+    assert summary["planned_case_count_per_category"] == 20
+    assert summary["planned_total_cases"] == 160
     assert len(summary["compact_artifact_plan"]) == len(APPROVED_CATEGORIES)
 
     for artifact in summary["compact_artifact_plan"]:
@@ -88,7 +114,7 @@ def test_dry_run_signed_plan_does_not_call_provider_or_read_api_key():
         }
         assert artifact["schema_version"] == "rashe_source_diagnostic_compact_v0"
         assert artifact["category"] in APPROVED_CATEGORIES
-        assert artifact["case_count"] == 25
+        assert artifact["case_count"] == 20
         assert artifact["provider_call_count"] == 0
         assert artifact["raw_payload_tracked_count"] == 0
         assert artifact["forbidden_field_violation_count"] == 0
@@ -113,21 +139,26 @@ def test_rejects_unsigned_provider_model_and_category():
     category_result = run_runner(replace={"--categories": "agentic_web_search,not_signed"})
     assert category_result.returncode != 0
     category_summary = load_summary(category_result)
+    assert "categories_do_not_match_signed_runbook" in category_summary["blockers"]
     assert "category_not_signed:not_signed" in category_summary["blockers"]
 
 
-def test_rejects_case_count_bounds_outside_signed_range():
+def test_rejects_counts_outside_signed_8x20_scope():
     min_result = run_runner(replace={"--min-cases-per-category": "19"})
     assert min_result.returncode != 0
-    assert "min_cases_per_category_out_of_bounds:19" in load_summary(min_result)["blockers"]
+    assert "min_cases_per_category_not_signed:19" in load_summary(min_result)["blockers"]
 
-    max_result = run_runner(replace={"--max-cases-per-category": "51"})
+    max_result = run_runner(replace={"--max-cases-per-category": "50"})
     assert max_result.returncode != 0
-    assert "max_cases_per_category_out_of_bounds:51" in load_summary(max_result)["blockers"]
+    assert "max_cases_per_category_not_signed:50" in load_summary(max_result)["blockers"]
 
-    total_result = run_runner(replace={"--max-total-cases": "99"})
+    twenty_five_result = run_runner(replace={"--max-cases-per-category": "25"})
+    assert twenty_five_result.returncode != 0
+    assert "max_cases_per_category_not_signed:25" in load_summary(twenty_five_result)["blockers"]
+
+    total_result = run_runner(replace={"--max-total-cases": "200"})
     assert total_result.returncode != 0
-    assert "max_total_cases_out_of_bounds:99" in load_summary(total_result)["blockers"]
+    assert "max_total_cases_not_signed:200" in load_summary(total_result)["blockers"]
 
 
 def test_rejects_raw_output_path_and_forbidden_publish_fields():
@@ -145,16 +176,112 @@ def test_rejects_raw_output_path_and_forbidden_publish_fields():
     assert "forbidden_publish_field:gold" in field_blockers
 
 
-def test_execute_switch_without_dry_run_still_refuses_execution():
-    args = [item for item in SIGNED_ARGS if item != "--dry-run"]
-    args.append("--execute-approved-source")
-    env = os.environ.copy()
-    env["CHUANGZHI_API_KEY"] = "must-not-be-read"
-    result = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=False, env=env)
-    assert result.returncode != 0
-    summary = load_summary(result)
-    assert summary["execute_requested"] is True
-    assert summary["provider_call_executed"] is False
-    assert summary["api_key_read"] is False
-    assert summary["diagnostic_written"] is False
-    assert "execution_path_not_implemented_in_this_commit" in summary["blockers"]
+def test_execute_boundary_without_adapter_is_auditable_and_no_key_read():
+    args = signed_execute_args()
+    schema = runner.load_json(args.schema)
+    execution = runner.execute_approved_source(
+        args,
+        list(APPROVED_CATEGORIES),
+        20,
+        schema,
+        write_artifacts=False,
+    )
+    assert execution["execution_adapter_status"] == "missing"
+    assert execution["provider_call_executed"] is False
+    assert execution["api_key_read"] is False
+    assert execution["diagnostic_written"] is False
+    assert "source_execution_adapter_missing" in execution["blockers"]
+    assert "execution_path_not_implemented_in_this_commit" not in execution["blockers"]
+
+
+def test_execute_path_accepts_mock_adapter_without_real_provider_or_key_read():
+    args = signed_execute_args()
+    schema = runner.load_json(args.schema)
+    calls = []
+
+    def fake_adapter(request: dict) -> list[dict]:
+        calls.append(request)
+        assert "api_key" not in json.dumps(request).lower()
+        assert request["case_count_per_category"] == 20
+        assert request["max_total_cases"] == 160
+        assert request["candidate_generation_authorized"] is False
+        assert request["scorer_authorized"] is False
+        assert request["performance_evidence"] is False
+        return [compact_artifact(category, provider_call_count=0) for category in APPROVED_CATEGORIES]
+
+    execution = runner.execute_approved_source(
+        args,
+        list(APPROVED_CATEGORIES),
+        20,
+        schema,
+        adapter_func=fake_adapter,
+        write_artifacts=False,
+    )
+    assert calls
+    assert execution["blockers"] == []
+    assert execution["execution_adapter_status"] == "loaded"
+    assert execution["provider_call_executed"] is False
+    assert execution["api_key_read"] is False
+    assert execution["diagnostic_written"] is False
+    assert execution["written_artifacts"] == []
+    assert len(execution["executed_artifacts"]) == len(APPROVED_CATEGORIES)
+
+
+def test_execute_path_rejects_forbidden_fields_and_true_downstream_flags():
+    args = signed_execute_args()
+    schema = runner.load_json(args.schema)
+
+    def bad_adapter(_: dict) -> list[dict]:
+        artifacts = [compact_artifact(category) for category in APPROVED_CATEGORIES]
+        artifacts[0]["gold"] = "raw forbidden answer"
+        artifacts[1]["candidate_generation_authorized"] = True
+        artifacts[2]["scorer_authorized"] = True
+        artifacts[3]["performance_evidence"] = True
+        artifacts[4]["raw_payload_tracked_count"] = 1
+        artifacts[5]["forbidden_field_violation_count"] = 1
+        return artifacts
+
+    execution = runner.execute_approved_source(
+        args,
+        list(APPROVED_CATEGORIES),
+        20,
+        schema,
+        adapter_func=bad_adapter,
+        write_artifacts=False,
+    )
+    blockers = execution["blockers"]
+    assert "compact_artifact_fields_do_not_match_schema_required" in blockers
+    assert "forbidden_artifact_field:gold" in blockers
+    assert "compact_artifact_candidate_generation_authorized_not_false:True" in blockers
+    assert "compact_artifact_scorer_authorized_not_false:True" in blockers
+    assert "compact_artifact_performance_evidence_not_false:True" in blockers
+    assert "compact_artifact_raw_payload_tracked_count_not_zero:1" in blockers
+    assert "compact_artifact_forbidden_field_violation_count_not_zero:1" in blockers
+    assert execution["diagnostic_written"] is False
+
+
+def test_execute_path_rejects_adapter_category_and_count_mismatch():
+    args = signed_execute_args()
+    schema = runner.load_json(args.schema)
+
+    def bad_adapter(_: dict) -> list[dict]:
+        artifacts = [compact_artifact(category) for category in APPROVED_CATEGORIES]
+        artifacts[0]["case_count"] = 25
+        artifacts[1]["provider_call_count"] = 21
+        artifacts[-1]["category"] = "not_signed"
+        return artifacts
+
+    execution = runner.execute_approved_source(
+        args,
+        list(APPROVED_CATEGORIES),
+        20,
+        schema,
+        adapter_func=bad_adapter,
+        write_artifacts=False,
+    )
+    blockers = execution["blockers"]
+    assert "source_execution_adapter_categories_mismatch" in blockers
+    assert "compact_artifact_case_count_not_signed:25" in blockers
+    assert "compact_artifact_provider_call_count_invalid:21" in blockers
+    assert "compact_artifact_category_not_signed:not_signed" in blockers
+    assert execution["diagnostic_written"] is False

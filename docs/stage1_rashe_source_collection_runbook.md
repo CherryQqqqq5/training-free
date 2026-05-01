@@ -1,6 +1,6 @@
 # Stage 1 RASHE Source Collection Runbook
 
-Status: approved-source preparation only. Execution requires passing `scripts/check_rashe_source_real_trace_approved.py --compact --strict`; this commit does not execute collection.
+Status: approved-source execution-path preparation only. Execution requires passing `scripts/check_rashe_source_real_trace_approved.py --compact --strict` and `scripts/check_rashe_approval_packet_review_matrix_after_source_approval.py --compact --strict`; this commit implements the bounded execution adapter boundary but does not execute collection.
 
 ## Approved Packet
 
@@ -17,7 +17,7 @@ Status: approved-source preparation only. Execution requires passing `scripts/ch
 - `hallucination`
 - `irrelevance`
 
-Case count: 20-50 per category, total 100-200 max.
+First approved diagnostic round: exactly 20 cases per category across 8 categories, total 160 cases. The broader packet limit remains 20-50 per category and 100-200 total, but this runbook signs only the 8x20/160 command below.
 
 ## Provider Profile
 
@@ -38,7 +38,7 @@ Do not run source collection in this commit. Before any future execution, run bo
 .venv/bin/python scripts/check_rashe_approval_packet_review_matrix_after_source_approval.py --compact --strict
 ```
 
-This commit verifies the signed runner entrypoint in dry-run mode only. Do not remove `--dry-run` or use `--execute-approved-source` until a separate Phase B execution authorization and implementation review.
+This commit verifies the signed runner entrypoint in dry-run mode and implements the adapter-driven execution path for review. Do not remove `--dry-run` or use `--execute-approved-source` until a separate Phase B execution authorization names a concrete `--execution-adapter` and confirms the command.
 
 ```bash
 .venv/bin/python scripts/run_rashe_source_diagnostic_compact.py \
@@ -46,8 +46,8 @@ This commit verifies the signed runner entrypoint in dry-run mode only. Do not r
   --model "gpt-5.2" \
   --categories agentic_web_search,agentic_memory,multi_turn_base,multi_turn_long_context,multi_turn_miss_param,multi_turn_miss_func,hallucination,irrelevance \
   --min-cases-per-category 20 \
-  --max-cases-per-category 50 \
-  --max-total-cases 200 \
+  --max-cases-per-category 20 \
+  --max-total-cases 160 \
   --output-root outputs/artifacts/stage1_bfcl_acceptance/rashe_source_diagnostics_compact/ \
   --schema outputs/artifacts/stage1_bfcl_acceptance/rashe_source_diagnostic_compact.schema.json \
   --compact-sanitized-only \
@@ -61,7 +61,7 @@ This commit verifies the signed runner entrypoint in dry-run mode only. Do not r
   --strict
 ```
 
-The template intentionally contains no API key. In this commit it must not call a provider, write diagnostics, generate raw traces, raw provider payloads, candidate JSONL, scorer outputs, dev/holdout/full manifests, performance evidence, or Huawei readiness artifacts.
+The template intentionally contains no API key. In this commit it must not call a provider, write diagnostics, generate raw traces, raw provider payloads, candidate JSONL, scorer outputs, dev/holdout/full manifests, performance evidence, or Huawei readiness artifacts. A future execution command must replace `--dry-run` with `--execute-approved-source --execution-adapter <module:function>` and must pass the same 8x20/160 signed bounds before it may write compact artifacts.
 
 ## Compact Artifact Schema
 
