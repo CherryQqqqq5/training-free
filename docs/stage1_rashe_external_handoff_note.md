@@ -1,13 +1,14 @@
 # Stage-1 RASHE External Handoff Note
 
-This note is the external-facing handoff scope for the current `main` branch after the Stage-1 RASHE merge. It is a fail-closed offline scaffold delivery, not a BFCL performance delivery.
+This note is the external-facing handoff scope for the current `main` branch after the Stage-1 RASHE merge and post-runtime L1 approval. It is not a BFCL performance delivery.
 
 ## Current Deliverable
 
 The current `main` branch can be reviewed as:
 
 - RASHE offline scaffold for Retrieval-Augmented Skill Harness Evolution.
-- Fail-closed approval framework separating runtime behavior, source/real-trace use, candidate/proposer execution, scorer execution, and performance/Huawei acceptance.
+- Runtime behavior L1 approved only for `synthetic_default_disabled_only` wiring with defaults disabled.
+- Fail-closed approval framework separating source/real-trace use, candidate/proposer execution, scorer execution, and performance/Huawei acceptance.
 - Deterministic negative-evidence handoff showing that the prior Stage-1 deterministic repair search should not continue as mechanical family hunting.
 
 ## Current Non-Claims
@@ -19,25 +20,29 @@ The current `main` branch must not be described as:
 - SOTA readiness or SOTA claim evidence.
 - Candidate pool readiness.
 - Scorer readiness or scorer authorization.
+- Source collection authorization.
+- Provider-call authorization.
 - BFCL performance readiness.
 
 ## Gates Passed
 
-The handoff is supported by these fail-closed gates:
+The handoff is supported by these post-runtime fail-closed gates:
 
-- Active evidence index route is RASHE offline scaffold.
-- RASHE offline scaffold readiness checker passes.
-- Approval packets remain pending and fail-closed.
-- Approval packet review matrix passes.
-- Main merge readiness checker passes for `offline_scaffold_only` scope.
+- Active evidence index route is RASHE.
+- Runtime behavior approved checker passes for `synthetic_default_disabled_only`.
+- After-runtime approval packet review matrix passes: runtime lane approved; four downstream lanes pending/fail-closed.
+- Post-runtime main readiness checker passes.
 - Artifact boundary checker passes.
+
+Legacy pre-runtime gates remain available as historical/offline-scaffold checks, but they intentionally reject approved runtime packets and are not the current post-runtime gate.
 
 ## Still Forbidden
 
-Until separate approval packets are reviewed and signed, the following remain forbidden:
+Until separate downstream approval packets are reviewed and signed, the following remain forbidden:
 
-- Runtime behavior enablement.
+- Runtime enabled by default.
 - Source collection or real-trace capture.
+- Provider calls.
 - Candidate/proposer execution.
 - Candidate pool generation.
 - BFCL scorer execution.
@@ -46,15 +51,14 @@ Until separate approval packets are reviewed and signed, the following remain fo
 
 ## Recommended Next-Stage Order
 
-If the project continues beyond the offline scaffold handoff, approvals should proceed in this order:
+The immediate next engineering step is synthetic/default-disabled runtime behavior tests only. After that, downstream approvals should proceed in this order if the project continues:
 
-1. `runtime_behavior_approval`
-2. `source_real_trace_approval`
-3. `candidate_proposer_execution_approval`
-4. `scorer_dev_holdout_full_approval`
-5. `performance_3pp_huawei_acceptance_approval`
+1. `source_real_trace_approval`
+2. `candidate_proposer_execution_approval`
+3. `scorer_dev_holdout_full_approval`
+4. `performance_3pp_huawei_acceptance_approval`
 
-Each lane must remain independently reviewed. Approval of an earlier lane does not authorize later lanes.
+Each lane must remain independently reviewed. Runtime L1 approval does not authorize any later lane.
 
 ## Files For External Review
 
@@ -69,4 +73,4 @@ When reviewers inspect the default `main` branch, use these files as the current
 - `docs/stage1_bfcl_negative_evidence_report.md`
 - `docs/stage1_bfcl_scope_change_decision_memo.md`
 
-This package is ready for offline scaffold review only. Any runtime, source, candidate, scorer, or performance work requires a separate approval packet before execution.
+This package is ready for offline scaffold review and L1 synthetic/default-disabled runtime behavior testing only. Any source, provider, candidate, scorer, or performance work requires a separate downstream approval packet before execution.

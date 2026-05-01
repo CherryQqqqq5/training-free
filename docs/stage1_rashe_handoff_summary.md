@@ -1,49 +1,55 @@
-# Stage-1 RASHE Offline Scaffold Handoff Summary
+# Stage-1 RASHE Handoff Summary
 
-This handoff summarizes the Stage-1 RASHE route at the current offline scaffold boundary. It is not a BFCL performance claim, not a SOTA/+3pp claim, and not a Huawei acceptance claim.
+This handoff summarizes the Stage-1 RASHE route after L1 runtime behavior approval. It is not a BFCL performance claim, not a SOTA/+3pp claim, and not a Huawei acceptance claim.
 
 ## Current State
 
-RASHE is the active approved Stage-1 scope-change route. The current deliverable is an offline, fail-closed scaffold for training-free skill-harness research.
+RASHE is the active approved Stage-1 scope-change route. The offline scaffold is present and fail-closed, and L1 runtime behavior is approved only for synthetic/default-disabled wiring.
 
 Current state:
 
 - RASHE offline scaffold is ready for handoff review.
+- Runtime L1 is approved only for `synthetic_default_disabled_only` checks.
+- `configs/runtime_bfcl_skills.yaml` remains `enabled=false` by default.
 - BFCL +3pp is not ready.
 - Candidate pool is not ready.
-- Runtime behavior is not authorized.
 - Source/real trace use is not authorized.
 - Candidate generation is not authorized.
 - Scorer/dev/holdout/full BFCL evaluation is not authorized.
 - Performance, SOTA, and Huawei acceptance claims are not authorized.
 
-The offline scaffold can validate schemas, fixtures, router decisions, proposal drafts, and evolution-loop metadata. It cannot affect prompts, retry behavior, tool execution, candidate generation, scorer execution, or BFCL result claims.
+The L1 runtime approval allows only synthetic/default-disabled runtime behavior tests. It does not authorize provider calls, source collection, candidate generation, scorer execution, dev/holdout/full BFCL, or performance claims.
 
-## Completed Offline Assets
+## Completed Assets
 
-The following assets are complete for the offline scaffold boundary:
+The following assets are complete for the current boundary:
 
 - RASHE scope approval packet.
 - Default-disabled inert runtime skeleton.
+- L1 runtime behavior approval packet for `synthetic_default_disabled_only`.
+- Post-runtime behavior approval checker.
+- Post-runtime approval review matrix checker.
+- Post-runtime main readiness checker.
 - StepTraceBuffer v0.2 schema and checker.
 - Seed SkillBank metadata and router gates.
 - Forbidden evidence taxonomy for seed skills and proposal drafts.
 - Router decision schema aligned with the observed decision surface.
 - Proposal draft schema for inert skill metadata, progressive disclosure, and router policy drafts.
 - Offline evolution loop design and checker.
-- Offline scaffold readiness checker.
-- Active evidence index refresh covering RASHE scaffold state and deterministic negative evidence.
+- Active evidence index refresh covering RASHE scaffold state, L1 runtime approval, and deterministic negative evidence.
 
-Core commands currently represented by the scaffold:
+Core commands represented by the current boundary:
 
+- `scripts/check_rashe_runtime_behavior_approved.py --compact --strict`
+- `scripts/check_rashe_approval_packet_review_matrix_after_runtime_behavior.py --compact --strict`
+- `scripts/check_rashe_main_merge_readiness_after_runtime_behavior.py --compact --strict`
 - `scripts/check_rashe_runtime_skeleton.py --compact --strict`
 - `scripts/check_rashe_step_trace_buffer.py --compact --strict`
 - `scripts/check_rashe_skill_metadata.py --compact --strict`
 - `scripts/check_rashe_proposer_schema.py --compact --strict`
 - `scripts/check_rashe_evolution_loop.py --compact --strict`
-- `scripts/check_rashe_offline_scaffold_ready.py --compact --strict`
 
-These commands check offline scaffold integrity only. Passing them does not imply BFCL performance readiness.
+These commands check post-runtime approval consistency and offline scaffold integrity only. Passing them does not imply BFCL performance readiness.
 
 ## Negative Deterministic Evidence
 
@@ -60,12 +66,13 @@ Mechanical source expansion and same-pilot family hunting should remain stopped.
 
 ## Current Prohibitions
 
-The following actions remain forbidden without separate approval:
+The following actions remain forbidden without separate downstream approval:
 
-- runtime behavior changes
-- prompt injection
-- retry behavior
+- runtime enabled by default
+- prompt injection into real BFCL requests
+- retry behavior on real BFCL responses
 - source collection or real-trace ingestion
+- provider calls
 - candidate generation
 - candidate pool promotion
 - candidate JSONL or repair rule emission
@@ -75,31 +82,21 @@ The following actions remain forbidden without separate approval:
 - full BFCL suite execution
 - performance, SOTA/+3pp, or Huawei acceptance claims
 
-The scaffold also forbids use of raw case identifiers, raw trace text, raw provider payloads, gold, expected answers, scorer diffs, candidate outputs, repair outputs, holdout feedback, or full-suite feedback for skill writing, proposal generation, routing thresholds, or metadata patch plans.
+The boundary also forbids use of raw case identifiers, raw trace text, raw provider payloads, gold, expected answers, scorer diffs, candidate outputs, repair outputs, holdout feedback, or full-suite feedback for skill writing, proposal generation, routing thresholds, or metadata patch plans.
 
-## Required Separate Approval Packets
+## Approval Lanes
 
-Any work beyond the offline scaffold needs a separate approval packet. The approval lanes must remain distinct:
+The runtime behavior lane is now L1 approved for `synthetic_default_disabled_only`. The four downstream lanes remain pending and fail-closed:
 
-1. Runtime behavior approval before any router decision, skill, proposal, or metadata patch can affect prompts, retries, tools, execution paths, or RuleEngine/proxy behavior.
-2. Source/real-trace approval before any real trace, provider payload, raw response, or non-synthetic compact record is collected, transformed, committed, or used.
-3. Candidate/proposer execution approval before any proposal is executed as a candidate, any candidate JSONL is emitted, or any repair rule/dev/holdout manifest is created.
-4. Scorer/dev/holdout/full approval before any BFCL baseline/candidate scoring, paired comparison, dev split, holdout split, or full-suite run.
-5. Performance/+3pp/Huawei acceptance approval before any SOTA, +3pp, formal BFCL performance, or Huawei acceptance claim is made.
+1. Source/real-trace approval before any real trace, provider payload, raw response, or non-synthetic compact record is collected, transformed, committed, or used.
+2. Candidate/proposer execution approval before any proposal is executed as a candidate, any candidate JSONL is emitted, or any repair rule/dev/holdout manifest is created.
+3. Scorer/dev/holdout/full approval before any BFCL baseline/candidate scoring, paired comparison, dev split, holdout split, or full-suite run.
+4. Performance/+3pp/Huawei acceptance approval before any SOTA, +3pp, formal BFCL performance, or Huawei acceptance claim is made.
 
-Each approval packet must restate no-leakage boundaries, allowed inputs, forbidden sources, stop conditions, counters, cost/latency/regression expectations when applicable, and rollback behavior.
+Each downstream approval packet must restate no-leakage boundaries, allowed inputs, forbidden sources, stop conditions, counters, cost/latency/regression expectations when applicable, and rollback behavior.
 
 ## Recommended Next Step
 
-The next recommended step is to prepare the relevant approval packet before running anything new.
+The next recommended engineering step is to write synthetic/default-disabled runtime behavior tests only. Do not start source collection, provider calls, candidate generation, scorer execution, dev/holdout construction, or full BFCL evaluation from this approval.
 
-Do not directly start runtime behavior, source collection, candidate generation, scorer execution, dev/holdout construction, or full BFCL evaluation from the offline scaffold. The scaffold is a readiness and handoff boundary, not an execution authorization.
-
-Recommended immediate path:
-
-1. Choose the next lane: runtime behavior, source/real trace, candidate/proposer execution, scorer protocol, or performance acceptance.
-2. Write a narrow approval packet for that lane.
-3. Review no-leakage, overfitting, cost/latency, regression, and rollback constraints.
-4. Only after explicit approval, implement the smallest corresponding executable increment.
-
-Until then, the correct claim is: RASHE offline scaffold ready; BFCL +3pp not ready.
+Until further downstream approvals, the correct claim is: RASHE offline scaffold ready; runtime L1 approved only for synthetic/default-disabled behavior checks; BFCL +3pp not ready.

@@ -16,7 +16,7 @@ def write_json(path: Path, payload: dict) -> Path:
     return path
 
 
-def test_rashe_main_merge_readiness_compact_passes_fail_closed():
+def test_legacy_main_merge_readiness_rejects_current_post_runtime_artifacts():
     result = subprocess.run(
         [sys.executable, str(SCRIPT), "--compact", "--strict"],
         stdout=subprocess.PIPE,
@@ -24,24 +24,34 @@ def test_rashe_main_merge_readiness_compact_passes_fail_closed():
         text=True,
         check=False,
     )
+    assert result.returncode != 0
+    summary = json.loads(result.stdout)
+    assert summary["rashe_main_merge_ready"] is False
+    assert summary["main_merge_claim_scope"] == "offline_scaffold_only"
+    assert summary["runtime_behavior_authorized"] is False
+    assert any("check_rashe_approval_packets.py" in blocker for blocker in summary["blockers"])
+    assert any("check_rashe_approval_packet_review_matrix.py" in blocker for blocker in summary["blockers"])
+    assert any("runtime_behavior" in blocker for blocker in summary["blockers"])
+
+
+def test_current_post_runtime_gate_is_separate_from_legacy_gate():
+    result = subprocess.run(
+        [sys.executable, "scripts/check_rashe_main_merge_readiness_after_runtime_behavior.py", "--compact", "--strict"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        check=False,
+    )
     assert result.returncode == 0, result.stdout + result.stderr
     summary = json.loads(result.stdout)
-    assert summary["rashe_main_merge_ready"] is True
-    assert summary["main_merge_claim_scope"] == "offline_scaffold_only"
-    assert summary["target_branch"] in {"stage1-bfcl-performance-sprint", "main"}
-    assert summary["source_branch_provenance"] == "stage1-bfcl-performance-sprint"
-    assert summary["not_bfcl_performance_readiness"] is True
-    assert summary["rashe_offline_scaffold_ready"] is True
-    assert summary["approval_packet_review_matrix_passed"] is True
-    assert summary["approval_packets_fail_closed"] is True
-    assert summary["artifact_boundary_passed"] is True
-    assert summary["deterministic_negative_evidence_present"] is True
-    assert summary["candidate_pool_ready"] is False
+    assert summary["rashe_main_merge_after_runtime_behavior_ready"] is True
+    assert summary["runtime_behavior_approval_status"] == "approved"
+    assert summary["runtime_behavior_scope"] == "synthetic_default_disabled_only"
+    assert summary["source_collection_authorized"] is False
+    assert summary["candidate_generation_authorized"] is False
     assert summary["scorer_authorized"] is False
     assert summary["performance_evidence"] is False
-    assert summary["sota_3pp_claim_ready"] is False
     assert summary["huawei_acceptance_ready"] is False
-    assert summary["bfcl_performance_ready"] is False
 
 
 def test_fails_if_report_scope_is_not_offline_scaffold(tmp_path):
@@ -80,7 +90,7 @@ def test_fails_if_report_sets_performance_ready(tmp_path):
     assert "report_forbidden_true:fail_closed_fields.huawei_acceptance_ready" in summary["blockers"]
 
 
-def test_accepts_main_as_target_branch(monkeypatch):
+def test_legacy_checker_accepts_main_branch_name_but_still_rejects_post_runtime_artifacts(monkeypatch):
     real_git_value = readiness.git_value
 
     def fake_git_value(args):
@@ -90,7 +100,7 @@ def test_accepts_main_as_target_branch(monkeypatch):
 
     monkeypatch.setattr(readiness, "git_value", fake_git_value)
     summary = check(REPORT, ACTIVE)
-    assert summary["rashe_main_merge_ready"] is True
+    assert summary["rashe_main_merge_ready"] is False
     assert summary["target_branch"] == "main"
     assert summary["source_branch_provenance"] == "stage1-bfcl-performance-sprint"
     assert summary["performance_evidence"] is False
