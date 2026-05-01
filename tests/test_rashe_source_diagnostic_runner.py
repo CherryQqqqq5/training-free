@@ -29,6 +29,8 @@ SIGNED_ARGS = [
     "outputs/artifacts/stage1_bfcl_acceptance/rashe_source_diagnostics_compact/",
     "--schema",
     "outputs/artifacts/stage1_bfcl_acceptance/rashe_source_diagnostic_compact.schema.json",
+    "--source-input-root",
+    "outputs/artifacts/stage1_bfcl_acceptance/rashe_source_inputs_compact/",
     "--compact-sanitized-only",
     "--publish-fields",
     ",".join(SIGNED_PUBLISH_FIELDS),
@@ -40,6 +42,8 @@ SIGNED_ARGS = [
     "scripts.rashe_source_diagnostic_compact_adapter:run_compact_source_diagnostic",
     "--provider-client-factory",
     "scripts.rashe_source_provider_client:build_chuangzhi_novacode_source_provider_client",
+    "--source-case-provider",
+    "scripts.rashe_source_case_provider:build_signed_source_case_provider",
     "--dry-run",
     "--compact",
     "--strict",
@@ -98,6 +102,8 @@ def test_dry_run_signed_plan_does_not_call_provider_or_read_api_key():
     assert summary["diagnostic_written"] is False
     assert summary["execution_adapter_status"] == "loadable"
     assert summary["provider_client_factory_status"] == "loadable"
+    assert summary["source_case_provider_status"] == "loadable"
+    assert summary["source_case_provider_injected"] is False
     assert summary["provider_client_injected"] is False
     assert summary["approved_source_checker_passed"] is True
     assert summary["after_source_matrix_checker_passed"] is True
@@ -183,7 +189,7 @@ def test_rejects_raw_output_path_and_forbidden_publish_fields():
     assert "forbidden_publish_field:gold" in field_blockers
 
 
-def test_signed_execute_adapter_boundary_reports_missing_source_case_provider_without_key_read():
+def test_signed_execute_adapter_boundary_reports_missing_provider_transport_without_key_read():
     args = signed_execute_args()
     schema = runner.load_json(args.schema)
     execution = runner.execute_approved_source(
@@ -193,11 +199,11 @@ def test_signed_execute_adapter_boundary_reports_missing_source_case_provider_wi
         schema,
         write_artifacts=False,
     )
-    assert execution["execution_adapter_status"] == "source_case_provider_missing"
+    assert execution["execution_adapter_status"] == "provider_transport_missing"
     assert execution["provider_call_executed"] is False
     assert execution["api_key_read"] is False
     assert execution["diagnostic_written"] is False
-    assert "source_case_provider_missing" in execution["blockers"]
+    assert "provider_transport_missing" in execution["blockers"]
     assert "execution_path_not_implemented_in_this_commit" not in execution["blockers"]
 
 
@@ -215,6 +221,14 @@ def test_invalid_provider_client_factory_has_explicit_blocker():
     blockers = load_summary(result)["blockers"]
     assert "provider_client_factory_not_signed:'scripts.rashe_source_provider_client:not_a_factory'" in blockers
     assert "provider_client_factory_callable_missing" in blockers
+
+
+def test_invalid_source_case_provider_has_explicit_blocker():
+    result = run_runner(replace={"--source-case-provider": "scripts.rashe_source_case_provider:not_a_provider"})
+    assert result.returncode != 0
+    blockers = load_summary(result)["blockers"]
+    assert "source_case_provider_not_signed:'scripts.rashe_source_case_provider:not_a_provider'" in blockers
+    assert "source_case_provider_callable_missing" in blockers
 
 
 def test_signed_adapter_builds_schema_bound_artifacts_from_sanitized_counters():

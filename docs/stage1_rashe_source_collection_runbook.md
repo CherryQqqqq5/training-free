@@ -27,7 +27,7 @@ Provider profile name only: Chuangzhi/Novacode `gpt-5.2`. Do not place API keys 
 
 `outputs/artifacts/stage1_bfcl_acceptance/rashe_source_diagnostics_compact/`
 
-Only compact sanitized counters, hashes, category labels, and no-leakage audit booleans are allowed under this root.
+Only compact sanitized counters, hashes, category labels, and no-leakage audit booleans are allowed under this root. The signed source-input root for future compact manifests is `outputs/artifacts/stage1_bfcl_acceptance/rashe_source_inputs_compact/`; this commit does not create or populate that root.
 
 ## Signed Command Template
 
@@ -38,7 +38,7 @@ Do not run source collection in this commit. Before any future execution, run bo
 .venv/bin/python scripts/check_rashe_approval_packet_review_matrix_after_source_approval.py --compact --strict
 ```
 
-This commit verifies the signed runner entrypoint in dry-run mode and implements the adapter-driven execution path for review. The signed adapter is `scripts.rashe_source_diagnostic_compact_adapter:run_compact_source_diagnostic`; the signed provider-client factory is `scripts.rashe_source_provider_client:build_chuangzhi_novacode_source_provider_client`. Do not remove `--dry-run` or use `--execute-approved-source` until a separate Phase B execution authorization confirms the command, source-case provider, and provider transport.
+This commit verifies the signed runner entrypoint in dry-run mode and implements the adapter-driven execution path for review. The signed adapter is `scripts.rashe_source_diagnostic_compact_adapter:run_compact_source_diagnostic`; the signed provider-client factory is `scripts.rashe_source_provider_client:build_chuangzhi_novacode_source_provider_client`; the signed source-case provider is `scripts.rashe_source_case_provider:build_signed_source_case_provider`. Do not remove `--dry-run` or use `--execute-approved-source` until a separate Phase B execution authorization confirms the command and provider transport.
 
 ```bash
 .venv/bin/python scripts/run_rashe_source_diagnostic_compact.py \
@@ -50,6 +50,7 @@ This commit verifies the signed runner entrypoint in dry-run mode and implements
   --max-total-cases 160 \
   --output-root outputs/artifacts/stage1_bfcl_acceptance/rashe_source_diagnostics_compact/ \
   --schema outputs/artifacts/stage1_bfcl_acceptance/rashe_source_diagnostic_compact.schema.json \
+  --source-input-root outputs/artifacts/stage1_bfcl_acceptance/rashe_source_inputs_compact/ \
   --compact-sanitized-only \
   --publish-fields category,case_count,provider_call_count,raw_payload_tracked_count,forbidden_field_violation_count,failure_bucket_counts,candidate_generation_authorized,scorer_authorized,performance_evidence \
   --no-raw-trace \
@@ -58,12 +59,13 @@ This commit verifies the signed runner entrypoint in dry-run mode and implements
   --no-scorer \
   --execution-adapter scripts.rashe_source_diagnostic_compact_adapter:run_compact_source_diagnostic \
   --provider-client-factory scripts.rashe_source_provider_client:build_chuangzhi_novacode_source_provider_client \
+  --source-case-provider scripts.rashe_source_case_provider:build_signed_source_case_provider \
   --dry-run \
   --compact \
   --strict
 ```
 
-The template intentionally contains no API key. In this commit it must not call a provider, write diagnostics, generate raw traces, raw provider payloads, candidate JSONL, scorer outputs, dev/holdout/full manifests, performance evidence, or Huawei readiness artifacts. A future execution command must replace `--dry-run` with `--execute-approved-source` while keeping the signed adapter and signed provider-client factory above, and must pass the same 8x20/160 signed bounds before it may write compact artifacts. The provider-client injection boundary is signed and importable. If a future execution lacks an approved source-case provider, it fails closed with `source_case_provider_missing`; if it has source cases but lacks the approved transport, it fails closed with `provider_transport_missing`. No real execution is authorized in this commit.
+The template intentionally contains no API key. In this commit it must not call a provider, write diagnostics, generate raw traces, raw provider payloads, candidate JSONL, scorer outputs, dev/holdout/full manifests, performance evidence, or Huawei readiness artifacts. A future execution command must replace `--dry-run` with `--execute-approved-source` while keeping the signed adapter, signed provider-client factory, signed source-case provider, and signed source-input root above, and must pass the same 8x20/160 signed bounds before it may write compact artifacts. The source-case provider boundary is signed and importable; it reads only compact source-input manifests and returns `category`, `ordinal`, `prompt_family`, and irreversible `compact_hash`. If the approved compact source inputs are absent when the source-case provider is actually called, it fails closed with `bfcl_source_inputs_missing`. With the source-case provider injected but no approved transport, current execution fails closed with `provider_transport_missing`. No real execution is authorized in this commit.
 
 ## Compact Artifact Schema
 

@@ -5,9 +5,9 @@ Dry-run/plan-only modes validate the signed runbook scope without executing
 source collection. The approved execution path is adapter-driven: it can only
 write compact schema artifacts after the approved-source and after-source matrix
 gates pass. The signed adapter and provider-client factory are importable;
-true execution still fails closed with ``source_case_provider_missing`` or
-``provider_transport_missing`` until approved source-case and transport
-callables are injected into the signed request.
+true execution injects the signed source-case provider boundary and still
+fails closed with ``provider_transport_missing`` until approved transport is
+injected into the signed request.
 """
 
 from __future__ import annotations
@@ -32,6 +32,8 @@ SIGNED_OUTPUT_ROOT = Path("outputs/artifacts/stage1_bfcl_acceptance/rashe_source
 SIGNED_SCHEMA = Path("outputs/artifacts/stage1_bfcl_acceptance/rashe_source_diagnostic_compact.schema.json")
 SIGNED_EXECUTION_ADAPTER = "scripts.rashe_source_diagnostic_compact_adapter:run_compact_source_diagnostic"
 SIGNED_PROVIDER_CLIENT_FACTORY = "scripts.rashe_source_provider_client:build_chuangzhi_novacode_source_provider_client"
+SIGNED_SOURCE_CASE_PROVIDER = "scripts.rashe_source_case_provider:build_signed_source_case_provider"
+SIGNED_SOURCE_INPUT_ROOT = Path("outputs/artifacts/stage1_bfcl_acceptance/rashe_source_inputs_compact/")
 SIGNED_PUBLISH_FIELDS = (
     "category",
     "case_count",
@@ -92,6 +94,7 @@ RAW_PATH_INDICATORS = (
 )
 AdapterFunc = Callable[[dict[str, Any]], list[dict[str, Any]]]
 ProviderClientFactory = Callable[[dict[str, Any]], Callable[[dict[str, Any]], dict[str, Any]]]
+SourceCaseProviderBuilder = Callable[[dict[str, Any]], Callable[[dict[str, Any]], list[dict[str, Any]]]]
 
 
 def split_csv(value: str) -> list[str]:
@@ -160,6 +163,7 @@ def build_adapter_request(args: argparse.Namespace, categories: list[str], case_
         "max_total_cases": args.max_total_cases,
         "output_root": str(args.output_root),
         "schema_path": str(args.schema),
+        "source_input_root": str(args.source_input_root),
         "forbidden_fields": list(FORBIDDEN_FIELD_NAMES),
         "failure_buckets": list(FAILURE_BUCKETS),
         "candidate_generation_authorized": False,
@@ -261,6 +265,12 @@ def validate_args(args: argparse.Namespace) -> tuple[list[str], list[str], list[
             blockers.append(f"raw_path_indicator_in_output_root:{indicator}")
     if args.schema != SIGNED_SCHEMA:
         blockers.append(f"schema_path_not_signed:{args.schema}")
+    if args.source_input_root != SIGNED_SOURCE_INPUT_ROOT:
+        blockers.append(f"source_input_root_not_signed:{args.source_input_root}")
+    source_input_text = str(args.source_input_root).lower()
+    for indicator in RAW_PATH_INDICATORS:
+        if indicator in source_input_text:
+            blockers.append(f"raw_path_indicator_in_source_input_root:{indicator}")
 
     if set(publish_fields) != set(SIGNED_PUBLISH_FIELDS):
         blockers.append("publish_fields_do_not_match_signed_schema")
@@ -279,6 +289,8 @@ def validate_args(args: argparse.Namespace) -> tuple[list[str], list[str], list[
         blockers.append(f"execution_adapter_not_signed:{args.execution_adapter!r}")
     if args.provider_client_factory != SIGNED_PROVIDER_CLIENT_FACTORY:
         blockers.append(f"provider_client_factory_not_signed:{args.provider_client_factory!r}")
+    if args.source_case_provider != SIGNED_SOURCE_CASE_PROVIDER:
+        blockers.append(f"source_case_provider_not_signed:{args.source_case_provider!r}")
     if not (args.dry_run or args.plan_only or args.execute_approved_source):
         blockers.append("dry_run_or_plan_only_required_without_execution_approval")
     return blockers, categories, publish_fields, planned_case_count
@@ -317,6 +329,16 @@ def load_provider_client_factory(spec: str | None) -> tuple[ProviderClientFactor
         invalid="provider_client_factory_spec_invalid",
         import_failed="provider_client_factory_import_failed",
         callable_missing="provider_client_factory_callable_missing",
+    )
+
+
+def load_source_case_provider(spec: str | None) -> tuple[SourceCaseProviderBuilder | None, str | None]:
+    return load_callable(
+        spec,
+        missing="source_case_provider_missing",
+        invalid="source_case_provider_spec_invalid",
+        import_failed="source_case_provider_import_failed",
+        callable_missing="source_case_provider_callable_missing",
     )
 
 
@@ -364,6 +386,49 @@ def execute_approved_source(
             }
 
     request = build_adapter_request(args, categories, planned_case_count)
+    source_case_provider_builder, source_case_provider_error = load_source_case_provider(args.source_case_provider)
+    if source_case_provider_error:
+        return {
+            "execution_adapter_status": "source_case_provider_invalid",
+            "provider_call_executed": False,
+            "api_key_read": False,
+            "diagnostic_written": False,
+            "written_artifacts": [],
+            "executed_artifacts": [],
+            "blockers": [source_case_provider_error],
+        }
+    try:
+        request["source_case_provider"] = source_case_provider_builder(request)
+    except Exception as exc:  # pragma: no cover - source provider construction failures vary.
+        message = str(exc)
+        if message.startswith("bfcl_source_inputs_missing"):
+            status = "bfcl_source_inputs_missing"
+            blocker = message
+        elif message.startswith("source_case_provider_data_missing"):
+            status = "source_case_provider_data_missing"
+            blocker = message
+        else:
+            status = "source_case_provider_failed"
+            blocker = f"source_case_provider_failed:{message}"
+        return {
+            "execution_adapter_status": status,
+            "provider_call_executed": False,
+            "api_key_read": False,
+            "diagnostic_written": False,
+            "written_artifacts": [],
+            "executed_artifacts": [],
+            "blockers": [blocker],
+        }
+    if not callable(request["source_case_provider"]):
+        return {
+            "execution_adapter_status": "source_case_provider_invalid",
+            "provider_call_executed": False,
+            "api_key_read": False,
+            "diagnostic_written": False,
+            "written_artifacts": [],
+            "executed_artifacts": [],
+            "blockers": ["source_case_provider_output_not_callable"],
+        }
     if provider_client_factory is None:
         provider_client_factory, factory_error = load_provider_client_factory(args.provider_client_factory)
         if factory_error:
@@ -420,6 +485,12 @@ def execute_approved_source(
             blocker = message
         elif message.startswith("source_case_provider_missing"):
             status = "source_case_provider_missing"
+            blocker = message
+        elif message.startswith("bfcl_source_inputs_missing"):
+            status = "bfcl_source_inputs_missing"
+            blocker = message
+        elif message.startswith("source_case_provider_data_missing"):
+            status = "source_case_provider_data_missing"
             blocker = message
         elif message.startswith("provider_transport_missing"):
             status = "provider_transport_missing"
@@ -511,6 +582,15 @@ def check(args: argparse.Namespace) -> dict[str, Any]:
         else:
             provider_client_factory_status = "loadable"
 
+    source_case_provider_status = "not_requested"
+    if args.source_case_provider:
+        _, source_error = load_source_case_provider(args.source_case_provider)
+        if source_error:
+            source_case_provider_status = "missing" if source_error == "source_case_provider_missing" else "invalid"
+            blockers.append(source_error)
+        else:
+            source_case_provider_status = "loadable"
+
     execution = {
         "execution_adapter_status": adapter_load_status,
         "provider_call_executed": False,
@@ -535,6 +615,7 @@ def check(args: argparse.Namespace) -> dict[str, Any]:
         "max_total_cases": args.max_total_cases,
         "output_root": str(args.output_root),
         "schema_path": str(args.schema),
+        "source_input_root": str(args.source_input_root),
         "publish_fields": publish_fields,
         "dry_run": args.dry_run,
         "plan_only": args.plan_only,
@@ -544,6 +625,8 @@ def check(args: argparse.Namespace) -> dict[str, Any]:
         "diagnostic_written": execution["diagnostic_written"],
         "execution_adapter_status": execution["execution_adapter_status"],
         "provider_client_factory_status": provider_client_factory_status,
+        "source_case_provider_status": source_case_provider_status,
+        "source_case_provider_injected": bool(args.execute_approved_source and not args.dry_run and not args.plan_only and not blockers),
         "provider_client_injected": bool(args.execute_approved_source and not args.dry_run and not args.plan_only and not blockers),
         "written_artifacts": execution["written_artifacts"],
         "approved_source_checker_passed": approved_source_checker_passed,
@@ -570,6 +653,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--max-total-cases", type=int, default=SIGNED_TOTAL_CASES)
     parser.add_argument("--output-root", type=Path, default=SIGNED_OUTPUT_ROOT)
     parser.add_argument("--schema", type=Path, default=SIGNED_SCHEMA)
+    parser.add_argument("--source-input-root", type=Path, default=SIGNED_SOURCE_INPUT_ROOT)
     parser.add_argument("--compact-sanitized-only", action="store_true", default=True)
     parser.add_argument("--publish-fields", default=",".join(SIGNED_PUBLISH_FIELDS))
     parser.add_argument("--no-raw-trace", action="store_true", default=True)
@@ -581,6 +665,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--execute-approved-source", action="store_true")
     parser.add_argument("--execution-adapter", default=SIGNED_EXECUTION_ADAPTER, help="Adapter entrypoint as module:function for approved execution.")
     parser.add_argument("--provider-client-factory", default=SIGNED_PROVIDER_CLIENT_FACTORY, help="Signed provider client factory as module:function for approved execution.")
+    parser.add_argument("--source-case-provider", default=SIGNED_SOURCE_CASE_PROVIDER, help="Signed source-case provider builder as module:function for approved execution.")
     parser.add_argument("--skip-preflight-checks", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--compact", action="store_true")
     parser.add_argument("--strict", action="store_true")
