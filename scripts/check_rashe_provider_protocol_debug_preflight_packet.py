@@ -34,12 +34,15 @@ ALLOWED_RESULT_FIELDS = [
     "candidate_generation_authorized",
     "scorer_authorized",
     "performance_evidence",
+    "error_class",
     "blocker",
 ]
 REQUIRED_TRUE = (
     "authorized",
     "execution_authorized",
     "provider_request_authorized",
+    "endpoint_env_only",
+    "api_key_env_only",
 )
 REQUIRED_FALSE = (
     "actual_execution_performed_in_this_commit",
@@ -118,6 +121,8 @@ def validate_packet(packet: dict[str, Any]) -> list[str]:
         "signed_model": "gpt-4.1",
         "provider_profile": "Chuangzhi/Novacode",
         "execution_scope": "single_synthetic_protocol_debug_only",
+        "endpoint_allowed_env_vars": ["CHUANGZHI_NOVACODE_ENDPOINT", "NOVACODE_ENDPOINT"],
+        "api_key_allowed_env_vars": ["CHUANGZHI_API_KEY", "NOVACODE_API_KEY"],
         "allowed_variants": SIGNED_VARIANTS,
         "allowed_result_fields": ALLOWED_RESULT_FIELDS,
     }

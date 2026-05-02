@@ -17,6 +17,7 @@
     "candidate_generation_authorized",
     "scorer_authorized",
     "performance_evidence",
+    "error_class",
     "blocker"
   ],
   "allowed_variants": [
@@ -26,6 +27,11 @@
     "chat_tools_max_completion_tokens",
     "chat_tools_minimal_messages"
   ],
+  "api_key_allowed_env_vars": [
+    "CHUANGZHI_API_KEY",
+    "NOVACODE_API_KEY"
+  ],
+  "api_key_env_only": true,
   "api_key_logged_or_written": false,
   "approval_packet_kind": "provider_protocol_debug_preflight",
   "approval_status": "approved",
@@ -34,6 +40,11 @@
   "candidate_generation_authorized": false,
   "diagnostics_generated": false,
   "diagnostics_write_authorized": false,
+  "endpoint_allowed_env_vars": [
+    "CHUANGZHI_NOVACODE_ENDPOINT",
+    "NOVACODE_ENDPOINT"
+  ],
+  "endpoint_env_only": true,
   "endpoint_value_logged_or_written": false,
   "execution_authorized": true,
   "execution_scope": "single_synthetic_protocol_debug_only",
@@ -60,8 +71,9 @@
   "gpt_4o_fallback_allowed": false,
   "huawei_acceptance_ready": false,
   "notes": [
-    "Prepared synthetic protocol debug plan only; provider execution requires later explicit approval.",
+    "Approved single synthetic protocol debug execution path; actual provider call is not performed in this commit.",
     "Variants are fixed and small to diagnose OpenAI-compatible tool calling protocol without BFCL/source inputs.",
+    "Only signed environment variables may provide endpoint/key values at execution time; values must never be printed or persisted.",
     "No raw request/response/header/body persistence is allowed."
   ],
   "performance_evidence": false,

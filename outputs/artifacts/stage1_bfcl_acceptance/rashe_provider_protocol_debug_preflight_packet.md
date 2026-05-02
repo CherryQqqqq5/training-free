@@ -11,6 +11,9 @@ Status: approved execution packet for one synthetic protocol debug only. This pa
 - execution_authorized: `true`
 - provider_request_authorized: `true`
 - execution_scope: `single_synthetic_protocol_debug_only`
+- endpoint env vars: `CHUANGZHI_NOVACODE_ENDPOINT`, `NOVACODE_ENDPOINT`
+- API key env vars: `CHUANGZHI_API_KEY`, `NOVACODE_API_KEY`
+- endpoint/key source: env-only, execution-time-only
 - actual_execution_performed_in_this_commit: `false`
 - fallback_allowed: `false`
 - gpt-4o fallback: `false`
@@ -33,4 +36,4 @@ The variants are synthetic protocol probes only. They must not read BFCL/source 
 
 No endpoint/key values, raw request, raw response, raw headers, raw body, provider payload, diagnostics, candidate, scorer, performance, +3pp, or Huawei artifacts may be printed, persisted, or committed.
 
-This commit implements the `--execute-debug` path for review but does not run a real provider call.
+This commit implements the env-only `--execute-debug` transport path for review but does not run a real provider call.
