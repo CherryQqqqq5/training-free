@@ -114,6 +114,12 @@ def validate_packet(data: dict[str, Any]) -> list[str]:
         blockers.append(f"provider_profile_invalid:{data.get('provider_profile')!r}")
     if data.get("approval_scope") != "exact_2id_generate_only_smoke":
         blockers.append(f"approval_scope_invalid:{data.get('approval_scope')!r}")
+    if data.get("bfcl_run_ids_manifest_mode") != "temporary_bfcl_package_path_with_backup_restore":
+        blockers.append(f"bfcl_run_ids_manifest_mode_invalid:{data.get('bfcl_run_ids_manifest_mode')!r}")
+    if data.get("bfcl_run_ids_manifest_content") != "exact_signed_ids_only":
+        blockers.append(f"bfcl_run_ids_manifest_content_invalid:{data.get('bfcl_run_ids_manifest_content')!r}")
+    if data.get("bfcl_run_ids_manifest_cleanup_required") is not True:
+        blockers.append(f"bfcl_run_ids_manifest_cleanup_required_not_true:{data.get('bfcl_run_ids_manifest_cleanup_required')!r}")
     expected_paths = {
         "generate_only_runner_path": "scripts/run_bfcl_exact_2id_generate_smoke.py",
         "approved_for_runner_path": "scripts/run_bfcl_exact_2id_generate_smoke.py",

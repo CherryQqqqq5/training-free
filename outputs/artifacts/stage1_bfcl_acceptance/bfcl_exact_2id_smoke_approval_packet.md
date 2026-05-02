@@ -5,3 +5,5 @@ Status: approved for one future generate-only current-system BFCL-shaped smoke s
 Route is fixed to `novacode` / `gpt-4.1`; fallback, OpenRouter, active `gpt-5.2`, and `gpt-4o` fallback remain disabled.
 
 Only compact smoke artifacts may be written and checked by `scripts/check_bfcl_exact_2id_generate_smoke_artifact.py`. Raw logs, traces, provider payloads, prompts, gold/reference data, scorer diffs, endpoint values, and key values must not be committed. Stop gates include empty model response, protocol/schema failure, raw leakage, route drift, candidate activation, or any extra ID.
+
+Run-id manifest boundary: this BFCL version reads `test_case_ids_to_generate.json` from the installed BFCL package root. The reviewed runner may temporarily place an exact two-ID manifest at that BFCL-read path during execute mode only, with backup/restore or deletion cleanup in `finally`. The manifest content is limited to the two signed IDs and contains no raw prompt/case/gold/reference material.

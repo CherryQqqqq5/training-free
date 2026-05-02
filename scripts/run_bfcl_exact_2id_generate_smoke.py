@@ -8,6 +8,7 @@ The execute path calls BFCL generate only; it never calls BFCL evaluate/scorer.
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import os
 import shutil
@@ -117,6 +118,36 @@ def _write_run_ids(run_root: Path) -> Path:
     payload = {"test_case_ids": SIGNED_IDS}
     path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return path
+
+
+def _bfcl_package_run_ids_path() -> Path:
+    from bfcl_eval.constants import eval_config
+
+    return Path(eval_config.TEST_IDS_TO_GENERATE_PATH)
+
+
+def _manifest_payload() -> dict[str, list[str]]:
+    return {"test_case_ids": list(SIGNED_IDS)}
+
+
+def _write_manifest(path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(_manifest_payload(), indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+@contextlib.contextmanager
+def _temporary_bfcl_run_ids_manifest(path: Path | None = None):
+    target = path or _bfcl_package_run_ids_path()
+    backup: bytes | None = target.read_bytes() if target.exists() else None
+    existed = target.exists()
+    _write_manifest(target)
+    try:
+        yield target
+    finally:
+        if existed and backup is not None:
+            target.write_bytes(backup)
+        else:
+            target.unlink(missing_ok=True)
 
 
 def _generate_command(run_root: Path, port: int, runtime_config: Path, rules_dir: Path) -> list[str]:
@@ -311,10 +342,11 @@ def execute_generate_smoke(
     _sync_fixture_env(run_root, port)
     proxy_proc = None
     try:
-        proxy_proc = (start_proxy or _start_proxy)(port, trace_dir, runtime_config, rules_dir, run_root / "proxy.log")
-        command = _generate_command(run_root, port, runtime_config, rules_dir)
-        _assert_generate_only_command(command)
-        completed = (run_generate or (lambda cmd: subprocess.run(cmd, cwd=REPO_ROOT, check=False)))(command)
+        with _temporary_bfcl_run_ids_manifest():
+            proxy_proc = (start_proxy or _start_proxy)(port, trace_dir, runtime_config, rules_dir, run_root / "proxy.log")
+            command = _generate_command(run_root, port, runtime_config, rules_dir)
+            _assert_generate_only_command(command)
+            completed = (run_generate or (lambda cmd: subprocess.run(cmd, cwd=REPO_ROOT, check=False)))(command)
         generated = completed.returncode == 0
         records = [_classify_result_for_run_id(run_id, run_root / "bfcl/result") for run_id in SIGNED_IDS]
         artifact = _write_compact_artifact(output, generated=generated, records=records)

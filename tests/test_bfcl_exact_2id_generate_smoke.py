@@ -10,6 +10,8 @@ from scripts.run_bfcl_exact_2id_generate_smoke import (
     SIGNED_IDS,
     _assert_generate_only_command,
     _generate_command,
+    _manifest_payload,
+    _temporary_bfcl_run_ids_manifest,
     build_plan,
     execute_generate_smoke,
 )
@@ -205,3 +207,53 @@ def test_artifact_checker_rejects_endpoint_and_key_literals() -> None:
     data["records"][0]["status"] = "sk-" + "A" * 32
     blockers = validate_artifact(data)
     assert any("key_literal_forbidden" in blocker for blocker in blockers)
+
+
+def test_manifest_payload_exactly_two_signed_ids() -> None:
+    assert _manifest_payload() == {"test_case_ids": list(SIGNED_IDS)}
+
+
+def test_temporary_manifest_cleanup_removes_new_file(tmp_path: Path) -> None:
+    manifest = tmp_path / "test_case_ids_to_generate.json"
+    with _temporary_bfcl_run_ids_manifest(manifest) as path:
+        assert path == manifest
+        assert json.loads(manifest.read_text(encoding="utf-8")) == {"test_case_ids": list(SIGNED_IDS)}
+    assert not manifest.exists()
+
+
+def test_temporary_manifest_cleanup_restores_existing_file_on_success(tmp_path: Path) -> None:
+    manifest = tmp_path / "test_case_ids_to_generate.json"
+    original = {"test_case_ids": ["existing_case"]}
+    manifest.write_text(json.dumps(original), encoding="utf-8")
+    with _temporary_bfcl_run_ids_manifest(manifest):
+        assert json.loads(manifest.read_text(encoding="utf-8")) == {"test_case_ids": list(SIGNED_IDS)}
+    assert json.loads(manifest.read_text(encoding="utf-8")) == original
+
+
+def test_temporary_manifest_cleanup_restores_existing_file_on_failure(tmp_path: Path) -> None:
+    manifest = tmp_path / "test_case_ids_to_generate.json"
+    original = {"test_case_ids": ["existing_case"]}
+    manifest.write_text(json.dumps(original), encoding="utf-8")
+    try:
+        with _temporary_bfcl_run_ids_manifest(manifest):
+            assert json.loads(manifest.read_text(encoding="utf-8")) == {"test_case_ids": list(SIGNED_IDS)}
+            raise RuntimeError("synthetic_failure")
+    except RuntimeError:
+        pass
+    assert json.loads(manifest.read_text(encoding="utf-8")) == original
+
+
+def test_pending_packet_fails_before_manifest_mutation(tmp_path: Path, monkeypatch) -> None:
+    packet = json.loads(PACKET.read_text(encoding="utf-8"))
+    packet["approval_status"] = "pending"
+    packet["authorized"] = False
+    packet["provider_call_authorized"] = False
+    packet["bfcl_smoke_authorized"] = False
+    packet["bfcl_generate_authorized"] = False
+    pending_packet = tmp_path / "pending_packet.json"
+    pending_packet.write_text(json.dumps(packet), encoding="utf-8")
+    manifest = tmp_path / "should_not_be_touched.json"
+    monkeypatch.setattr("scripts.run_bfcl_exact_2id_generate_smoke._bfcl_package_run_ids_path", lambda: manifest)
+    summary = execute_generate_smoke(output=tmp_path / "out.json", packet_path=pending_packet, run_root=tmp_path / "run")
+    assert summary["blockers"]
+    assert not manifest.exists()
