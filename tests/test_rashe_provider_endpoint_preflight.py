@@ -57,8 +57,8 @@ def test_endpoint_preflight_packet_checker_passes_current_packet():
     assert summary["actual_preflight_executed_in_this_commit"] is False
     assert summary["endpoint_value_read_authorized"] is True
     assert summary["key_value_read_authorized"] is True
-    assert summary["signed_primary_model"] == "gpt-5.2"
-    assert summary["optional_capability_observation_model"] == "gpt-5.4"
+    assert summary["signed_primary_model"] == "gpt-4.1"
+    assert summary["optional_capability_observation_model"] == "gpt-4o"
     assert summary["phase_b_execution_authorized"] is False
     assert summary["bfcl_source_diagnostic_authorized"] is False
     assert summary["candidate_generation_authorized"] is False
@@ -74,7 +74,7 @@ def test_endpoint_preflight_packet_rejects_scope_and_route_drift(tmp_path):
     packet["key_value_read_authorized"] = False
     packet["phase_b_execution_authorized"] = True
     packet["provider_preflight_requires_second_review"] = False
-    packet["signed_primary_model"] = "gpt-5.4"
+    packet["signed_primary_model"] = "gpt-4o"
     packet["route_update_required_if_only_optional_model_supported"] = False
     packet["compact_diagnostic_payload_allowed_for_preflight"] = True
     write_json(packet_path, packet)
@@ -86,7 +86,7 @@ def test_endpoint_preflight_packet_rejects_scope_and_route_drift(tmp_path):
     assert "packet_key_value_read_authorized_not_true:False" in blockers
     assert "packet_phase_b_execution_authorized_not_false:True" in blockers
     assert "packet_provider_preflight_requires_second_review_not_true:False" in blockers
-    assert "packet_signed_primary_model_invalid:'gpt-5.4'" in blockers
+    assert "packet_signed_primary_model_invalid:'gpt-4o'" in blockers
     assert "packet_route_update_required_if_only_optional_model_supported_not_true:False" in blockers
     assert "packet_compact_diagnostic_payload_allowed_for_preflight_not_false:True" in blockers
 
@@ -179,14 +179,14 @@ def test_execute_preflight_mock_success_prioritizes_gpt_5_2_and_tools_without_le
     assert summary["endpoint_value_read"] is True
     assert summary["api_key_value_read"] is True
     assert summary["auth_ok"] is True
-    assert summary["model_gpt_5_2_available"] is True
-    assert summary["optional_model_gpt_5_4_observed"] is False
+    assert summary["model_gpt_4_1_available"] is True
+    assert summary["optional_model_gpt_4o_observed"] is False
     assert summary["tool_calling_supported"] is True
     assert summary["tool_choice_supported"] is True
     assert summary["tool_calls_returned"] is True
     assert summary["raw_payload_persisted"] is False
     assert summary["raw_prompt_persisted"] is False
-    assert [call["model"] for call in calls] == ["gpt-5.2", "gpt-5.2"]
+    assert [call["model"] for call in calls] == ["gpt-4.1", "gpt-4.1"]
     assert "tools" not in calls[0]
     assert calls[1]["tool_choice"]["function"]["name"] == "synthetic_preflight_ping"
 
@@ -196,19 +196,19 @@ def test_execute_preflight_mock_route_update_required_when_only_gpt_5_4_availabl
 
     def fake_post(endpoint, key, payload):
         calls.append(payload["model"])
-        if payload["model"] == "gpt-5.4":
+        if payload["model"] == "gpt-4o":
             return ok_chat()
         return {"ok": False, "status": 404}
 
     summary = build_plan(args(execute_preflight=True), environ={"CHUANGZHI_NOVACODE_ENDPOINT": SECRET, "CHUANGZHI_API_KEY": KEY}, post_json=fake_post)
     assert summary["rashe_provider_endpoint_preflight_plan_passed"] is False
     assert summary["provider_request_executed"] is True
-    assert summary["model_gpt_5_2_available"] is False
-    assert summary["optional_model_gpt_5_4_observed"] is True
+    assert summary["model_gpt_4_1_available"] is False
+    assert summary["optional_model_gpt_4o_observed"] is True
     assert summary["route_update_required"] is True
     assert summary["blocker"] == "route_update_required"
     assert "route_update_required" in summary["blockers"]
-    assert calls == ["gpt-5.2", "gpt-5.4"]
+    assert calls == ["gpt-4.1", "gpt-4o"]
 
 
 def test_execute_preflight_mock_tools_not_supported_blocker():
@@ -218,7 +218,7 @@ def test_execute_preflight_mock_tools_not_supported_blocker():
     summary = build_plan(args(execute_preflight=True), environ={"NOVACODE_ENDPOINT": SECRET, "NOVACODE_API_KEY": KEY}, post_json=fake_post)
     assert summary["rashe_provider_endpoint_preflight_plan_passed"] is False
     assert summary["auth_ok"] is True
-    assert summary["model_gpt_5_2_available"] is True
+    assert summary["model_gpt_4_1_available"] is True
     assert summary["tool_calling_supported"] is False
     assert summary["tool_calls_returned"] is False
     assert summary["blocker"] == "tools_not_supported"

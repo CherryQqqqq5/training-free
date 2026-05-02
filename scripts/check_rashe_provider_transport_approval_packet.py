@@ -149,7 +149,7 @@ def validate_packet(packet: dict[str, Any]) -> list[str]:
         "approval_packet_kind": "provider_transport_execution",
         "approval_status": "approved",
         "provider_profile": "Chuangzhi/Novacode",
-        "provider_model": "gpt-5.2",
+        "provider_model": "gpt-4.1",
         "approved_categories": list(APPROVED_CATEGORIES),
         "case_count_per_category": 20,
         "total_case_count": 160,

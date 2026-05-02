@@ -24,8 +24,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from scripts.check_rashe_source_real_trace_approved import APPROVED_CATEGORIES, FAILURE_BUCKETS
 
-SIGNED_PROVIDER_PROFILES = ("Chuangzhi/Novacode", "Chuangzhi/Novacode gpt-5.2")
-SIGNED_MODEL = "gpt-5.2"
+SIGNED_PROVIDER_PROFILES = ("Chuangzhi/Novacode", "Chuangzhi/Novacode gpt-4.1")
+SIGNED_MODEL = "gpt-4.1"
 SIGNED_CASES_PER_CATEGORY = 20
 SIGNED_TOTAL_CASES = 160
 SIGNED_OUTPUT_ROOT = Path("outputs/artifacts/stage1_bfcl_acceptance/rashe_source_diagnostics_compact/")

@@ -53,7 +53,7 @@ def test_provider_transport_packet_and_approved_checkers_pass_current_packet():
             command = summary["signed_runner_command"]
             for token in [
                 "--provider-profile Chuangzhi/Novacode",
-                "--model gpt-5.2",
+                "--model gpt-4.1",
                 "--min-cases-per-category 20",
                 "--max-cases-per-category 20",
                 "--max-total-cases 160",

@@ -16,7 +16,7 @@ SIGNED_ARGS = [
     "--provider-profile",
     "Chuangzhi/Novacode",
     "--model",
-    "gpt-5.2",
+    "gpt-4.1",
     "--categories",
     ",".join(APPROVED_CATEGORIES),
     "--min-cases-per-category",
@@ -144,10 +144,10 @@ def test_rejects_unsigned_provider_model_and_category():
     provider_summary = load_summary(provider_result)
     assert "signed_provider_profile_invalid:'UnsignedProvider'" in provider_summary["blockers"]
 
-    model_result = run_runner(replace={"--model": "gpt-4.1"})
+    model_result = run_runner(replace={"--model": "gpt-5.2"})
     assert model_result.returncode != 0
     model_summary = load_summary(model_result)
-    assert "signed_model_invalid:'gpt-4.1'" in model_summary["blockers"]
+    assert "signed_model_invalid:'gpt-5.2'" in model_summary["blockers"]
 
     category_result = run_runner(replace={"--categories": "agentic_web_search,not_signed"})
     assert category_result.returncode != 0

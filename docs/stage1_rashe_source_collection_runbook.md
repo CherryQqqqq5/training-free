@@ -21,7 +21,7 @@ First approved diagnostic round: exactly 20 cases per category across 8 categori
 
 ## Provider Profile
 
-Provider profile name only: Chuangzhi/Novacode `gpt-5.2`. Do not place API keys in commands, docs, artifacts, or tracked files.
+Provider profile name only: Chuangzhi/Novacode `gpt-4.1`. Do not place API keys in commands, docs, artifacts, or tracked files.
 
 ## Output Root
 
@@ -63,7 +63,7 @@ Provider endpoint/model/tool-calling preflight is a Phase B prerequisite capabil
 .venv/bin/python scripts/run_rashe_provider_endpoint_preflight.py --dry-run --compact --strict
 ```
 
-This commit implements the actual `--execute-preflight` request path for review but does not run it. The dry-run/plan-only runner may report whether signed endpoint/key env names are present, but it must not print or persist endpoint/key values. The actual preflight path may be used only after separate reviewer authorization, may read signed endpoint/key env values only inside that execution, and must use only a minimal toy chat/tool-calling request with no BFCL/source case, raw prompt, raw tool data, trace, gold/expected/reference, scorer diff, candidate output, feedback, or compact diagnostic payload. The signed primary model remains `gpt-5.2`; `gpt-5.4` may only be observed as optional capability. If only `gpt-5.4` is supported, the result is `route_update_required` and the signed model packet/checker/runbook/tests must be updated before source diagnostics may run. If tools/tool calls are not supported, the result is `tools_not_supported`. If the endpoint supports only standard chat completions, run an OpenAI-compatible chat adapter review before any Phase B execution.
+This commit implements the actual `--execute-preflight` request path for review but does not run it. The dry-run/plan-only runner may report whether signed endpoint/key env names are present, but it must not print or persist endpoint/key values. The actual preflight path may be used only after separate reviewer authorization, may read signed endpoint/key env values only inside that execution, and must use only a minimal toy chat/tool-calling request with no BFCL/source case, raw prompt, raw tool data, trace, gold/expected/reference, scorer diff, candidate output, feedback, or compact diagnostic payload. The signed primary model remains `gpt-4.1`; `gpt-4o` may only be observed as optional capability. If only `gpt-4o` is supported, the result is `route_update_required` and the signed model packet/checker/runbook/tests must be updated before source diagnostics may run. If tools/tool calls are not supported, the result is `tools_not_supported`. If the endpoint supports only standard chat completions, run an OpenAI-compatible chat adapter review before any Phase B execution.
 
 ## Signed Command Template
 
@@ -82,7 +82,7 @@ This commit verifies the signed runner entrypoint in dry-run mode and implements
 ```bash
 .venv/bin/python scripts/run_rashe_source_diagnostic_compact.py \
   --provider-profile "Chuangzhi/Novacode" \
-  --model "gpt-5.2" \
+  --model "gpt-4.1" \
   --categories agentic_web_search,agentic_memory,multi_turn_base,multi_turn_long_context,multi_turn_miss_param,multi_turn_miss_func,hallucination,irrelevance \
   --min-cases-per-category 20 \
   --max-cases-per-category 20 \

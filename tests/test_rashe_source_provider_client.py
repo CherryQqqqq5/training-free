@@ -8,7 +8,7 @@ from scripts import rashe_source_provider_client as provider_client
 def signed_request(**overrides):
     request = {
         "provider_profile": "Chuangzhi/Novacode",
-        "model": "gpt-5.2",
+        "model": "gpt-4.1",
         "categories": list(provider_client.APPROVED_CATEGORIES),
         "case_count_per_category": 20,
         "max_total_cases": 160,
@@ -32,7 +32,7 @@ def category_request(category="agentic_web_search", **overrides):
         "category": category,
         "case_count": 20,
         "provider_profile": "Chuangzhi/Novacode",
-        "model": "gpt-5.2",
+        "model": "gpt-4.1",
         "compact_sanitized_only": True,
         "raw_payload_capture_authorized": False,
         "raw_trace_capture_authorized": False,

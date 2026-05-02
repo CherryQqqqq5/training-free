@@ -6,7 +6,7 @@
 - source_collection_authorized: `true`
 - provider_calls_authorized: `true`
 - provider_profile: `Chuangzhi/Novacode`
-- provider_model: `gpt-5.2`
+- provider_model: `gpt-4.1`
 - raw_trace_capture_authorized: `false`
 - raw_payload_capture_authorized: `false`
 - candidate_generation_authorized: `false`

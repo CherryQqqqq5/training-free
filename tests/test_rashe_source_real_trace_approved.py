@@ -44,7 +44,7 @@ def test_source_real_trace_approved_checker_compact_passes_current_artifacts():
     assert summary["source_collection_authorized"] is True
     assert summary["provider_calls_authorized"] is True
     assert summary["provider_profile"] == "Chuangzhi/Novacode"
-    assert summary["provider_model"] == "gpt-5.2"
+    assert summary["provider_model"] == "gpt-4.1"
     assert summary["approved_source_categories"] == list(APPROVED_CATEGORIES)
     assert summary["candidate_generation_authorized"] is False
     assert summary["candidate_pool_ready"] is False

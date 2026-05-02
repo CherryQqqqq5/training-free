@@ -43,8 +43,8 @@ FAILURE_BUCKETS = (
     "unsupported_hallucinated_answer",
 )
 SIGNED_PROVIDER_PROFILE = "Chuangzhi/Novacode"
-SIGNED_PROVIDER_PROFILE_WITH_MODEL = "Chuangzhi/Novacode gpt-5.2"
-SIGNED_MODEL = "gpt-5.2"
+SIGNED_PROVIDER_PROFILE_WITH_MODEL = "Chuangzhi/Novacode gpt-4.1"
+SIGNED_MODEL = "gpt-4.1"
 SIGNED_CASES_PER_CATEGORY = 20
 SIGNED_TOTAL_CASES = 160
 SIGNED_OUTPUT_ROOT = "outputs/artifacts/stage1_bfcl_acceptance/rashe_source_diagnostics_compact"

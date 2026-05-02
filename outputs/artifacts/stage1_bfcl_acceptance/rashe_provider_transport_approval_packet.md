@@ -3,7 +3,7 @@
 Status: approved for bounded provider transport/source diagnostic execution path only; no execution is performed in this commit.
 
 Approved scope:
-- Provider profile: Chuangzhi/Novacode `gpt-5.2`
+- Provider profile: Chuangzhi/Novacode `gpt-4.1`
 - Categories: signed 8 categories
 - Case count: 20 per category, 160 total
 - Source input root: `outputs/artifacts/stage1_bfcl_acceptance/rashe_source_inputs_compact/`

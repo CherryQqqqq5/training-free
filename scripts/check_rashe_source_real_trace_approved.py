@@ -49,7 +49,7 @@ REQUIRED_TRUE_VALUES = {
     "source_collection_authorized": True,
     "provider_calls_authorized": True,
     "provider_profile": "Chuangzhi/Novacode",
-    "provider_model": "gpt-5.2",
+    "provider_model": "gpt-4.1",
 }
 REQUIRED_FALSE_VALUES = (
     "raw_trace_authorized",

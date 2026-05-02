@@ -12,16 +12,16 @@ from typing import Any
 DEFAULT_PACKET = Path("outputs/artifacts/stage1_bfcl_acceptance/rashe_provider_endpoint_preflight_packet.json")
 SIGNED_ENDPOINT_ENVS = ["CHUANGZHI_NOVACODE_ENDPOINT", "NOVACODE_ENDPOINT"]
 SIGNED_KEY_ENVS = ["CHUANGZHI_API_KEY", "NOVACODE_API_KEY"]
-PRIMARY_MODEL = "gpt-5.2"
-OPTIONAL_MODEL = "gpt-5.4"
+PRIMARY_MODEL = "gpt-4.1"
+OPTIONAL_MODEL = "gpt-4o"
 TOY_TOOL_NAME = "synthetic_preflight_ping"
 PLANNED_FIELDS = [
     "endpoint_present",
     "key_present",
     "https_valid",
     "auth_ok",
-    "model_gpt_5_2_available",
-    "optional_model_gpt_5_4_observed",
+    "model_gpt_4_1_available",
+    "optional_model_gpt_4o_observed",
     "tool_calling_supported",
     "tool_choice_supported",
     "tool_calls_returned",

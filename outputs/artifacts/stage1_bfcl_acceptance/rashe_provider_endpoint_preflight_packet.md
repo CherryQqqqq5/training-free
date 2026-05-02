@@ -25,7 +25,7 @@ The packet signs a future `--execute-preflight` path for a minimal synthetic end
 
 ## Model Route
 
-The signed primary model remains `gpt-5.2`. A future capability preflight may observe `gpt-5.4` only as an optional capability observation. If only `gpt-5.4` is supported, the result must be `route_update_required`; the current `gpt-5.2` Phase B packet/runbook/checkers must be updated before any source diagnostic execution.
+The signed primary model remains `gpt-4.1`. A future capability preflight may observe `gpt-4o` only as an optional capability observation. If only `gpt-4o` is supported, the result must be `route_update_required`; the current `gpt-4.1` Phase B packet/runbook/checkers must be updated before any source diagnostic execution.
 
 ## Synthetic Tool-Calling Probe
 
@@ -35,6 +35,6 @@ If the endpoint supports only standard chat completions, the next step is OpenAI
 
 ## Output Boundary
 
-Allowed compact result fields are `endpoint_present`, `key_present`, `https_valid`, `auth_ok`, `model_gpt_5_2_available`, `optional_model_gpt_5_4_observed`, `tool_calling_supported`, `tool_choice_supported`, `tool_calls_returned`, `raw_payload_persisted`, `raw_prompt_persisted`, `candidate_generation_authorized`, `scorer_authorized`, `performance_evidence`, and `blocker`.
+Allowed compact result fields are `endpoint_present`, `key_present`, `https_valid`, `auth_ok`, `model_gpt_4_1_available`, `optional_model_gpt_4o_observed`, `tool_calling_supported`, `tool_choice_supported`, `tool_calls_returned`, `raw_payload_persisted`, `raw_prompt_persisted`, `candidate_generation_authorized`, `scorer_authorized`, `performance_evidence`, and `blocker`.
 
 In this commit, the runner supports dry-run/plan-only only and does not request the provider.

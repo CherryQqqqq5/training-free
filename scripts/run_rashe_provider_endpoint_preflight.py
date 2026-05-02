@@ -29,8 +29,8 @@ PROBE_FIELDS = [
     "key_present",
     "https_valid",
     "auth_ok",
-    "model_gpt_5_2_available",
-    "optional_model_gpt_5_4_observed",
+    "model_gpt_4_1_available",
+    "optional_model_gpt_4o_observed",
     "tool_calling_supported",
     "tool_choice_supported",
     "tool_calls_returned",
@@ -76,8 +76,8 @@ def base_observation(endpoint_present: bool, key_present: bool) -> dict[str, Any
         "key_present": key_present,
         "https_valid": False,
         "auth_ok": False,
-        "model_gpt_5_2_available": False,
-        "optional_model_gpt_5_4_observed": False,
+        "model_gpt_4_1_available": False,
+        "optional_model_gpt_4o_observed": False,
         "tool_calling_supported": False,
         "tool_choice_supported": False,
         "tool_calls_returned": False,
@@ -229,7 +229,7 @@ def execute_preflight(args: argparse.Namespace, environ: dict[str, str], post_js
         return compact_summary(args, observation, blockers, provider_request_executed=provider_request_executed, endpoint_value_read=endpoint_value_read, api_key_value_read=api_key_value_read)
     if model_available(primary_response):
         observation["auth_ok"] = True
-        observation["model_gpt_5_2_available"] = True
+        observation["model_gpt_4_1_available"] = True
         tool_response = post_json(str(endpoint), str(key), toy_tool_payload(PRIMARY_MODEL))
         if response_auth_failed(tool_response):
             blockers.append("provider_auth_failed")
@@ -249,7 +249,7 @@ def execute_preflight(args: argparse.Namespace, environ: dict[str, str], post_js
         observation["blocker"] = "provider_auth_failed"
     elif model_available(optional_response):
         observation["auth_ok"] = True
-        observation["optional_model_gpt_5_4_observed"] = True
+        observation["optional_model_gpt_4o_observed"] = True
         blockers.append("route_update_required")
         observation["blocker"] = "route_update_required"
     else:

@@ -6,7 +6,7 @@ from grc.bfcl import source_diagnostic_collector as collector
 def signed_request(**overrides):
     request = {
         "provider_profile": "Chuangzhi/Novacode",
-        "model": "gpt-5.2",
+        "model": "gpt-4.1",
         "categories": list(collector.APPROVED_CATEGORIES),
         "case_count_per_category": 20,
         "max_total_cases": 160,
@@ -80,7 +80,7 @@ def test_collector_fails_closed_without_provider_client(monkeypatch):
 def test_collector_rejects_unsigned_request_fields():
     for key, value, expected in [
         ("provider_profile", "Unsigned", "collector_provider_profile_not_signed"),
-        ("model", "gpt-4.1", "collector_model_not_signed"),
+        ("model", "gpt-5.2", "collector_model_not_signed"),
         ("categories", ["agentic_web_search"], "collector_categories_not_signed"),
         ("case_count_per_category", 25, "collector_case_count_per_category_not_signed"),
         ("max_total_cases", 200, "collector_max_total_cases_not_signed"),

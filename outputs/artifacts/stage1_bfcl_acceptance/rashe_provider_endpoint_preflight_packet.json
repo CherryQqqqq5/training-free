@@ -39,6 +39,9 @@
     "performance_claim",
     "huawei_acceptance_claim"
   ],
+  "gpt_4o_fallback_allowed": false,
+  "gpt_4o_observed_supported": true,
+  "gpt_5_2_signed_route_active": false,
   "https_endpoint_required_for_future_preflight": true,
   "huawei_acceptance_ready": false,
   "key_artifact_write_authorized": false,
@@ -49,11 +52,14 @@
     "This packet approves only the preflight mechanism and dry-run/plan-only runner in this commit.",
     "A future synthetic provider preflight requires separate reviewer authorization.",
     "Endpoint and key values must never be printed, logged, persisted, or committed.",
-    "If only gpt-5.4 is supported, route_update_required must be reported and the gpt-5.2 Phase B packet must not be used.",
+    "If only gpt-4o is supported, route_update_required must be reported and the gpt-4.1 Phase B packet must not be used.",
     "This packet signs the actual synthetic endpoint/model/tool-calling preflight request path, but this commit does not execute it.",
-    "Actual preflight may read signed endpoint/key env values only inside --execute-preflight after separate reviewer authorization."
+    "Actual preflight may read signed endpoint/key env values only inside --execute-preflight after separate reviewer authorization.",
+    "Prior gpt-5.2 route is inactive after provider route update; gpt-4o is observed only and fallback is forbidden."
   ],
-  "optional_capability_observation_model": "gpt-5.4",
+  "old_signed_model": "gpt-5.2",
+  "old_signed_model_status": "unavailable_provider_auth_failed",
+  "optional_capability_observation_model": "gpt-4o",
   "performance_evidence": false,
   "phase_b_execution_authorized": false,
   "planned_compact_result_fields": [
@@ -61,8 +67,8 @@
     "key_present",
     "https_valid",
     "auth_ok",
-    "model_gpt_5_2_available",
-    "optional_model_gpt_5_4_observed",
+    "model_gpt_4_1_available",
+    "optional_model_gpt_4o_observed",
     "tool_calling_supported",
     "tool_choice_supported",
     "tool_calls_returned",
@@ -94,7 +100,7 @@
     "CHUANGZHI_API_KEY",
     "NOVACODE_API_KEY"
   ],
-  "signed_primary_model": "gpt-5.2",
+  "signed_primary_model": "gpt-4.1",
   "sota_3pp_claim_ready": false,
   "source_diagnostic_execution_authorized": false,
   "standard_chat_adapter_review_required_if_only_chat_completions": true,

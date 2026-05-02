@@ -69,7 +69,7 @@ Dependency order: `offline scaffold ready -> L1 runtime behavior approved synthe
 - approval_packet_path: `outputs/artifacts/stage1_bfcl_acceptance/rashe_source_real_trace_approval_packet.json`
 - approval_checker_path: `scripts/check_rashe_source_real_trace_approved.py`
 - authorized: `true`
-- provider_profile: Chuangzhi/Novacode `gpt-5.2`
+- provider_profile: Chuangzhi/Novacode `gpt-4.1`
 - approved_scope: bounded source evidence collection only
 
 ### Prerequisites
@@ -80,7 +80,7 @@ Dependency order: `offline scaffold ready -> L1 runtime behavior approved synthe
 
 ### Allowed Only After Approval
 - bounded source collection for approved categories only
-- provider calls through Chuangzhi/Novacode `gpt-5.2` only within source collector boundary
+- provider calls through Chuangzhi/Novacode `gpt-4.1` only within source collector boundary
 - compact sanitized counters/hashes/category labels/no-leakage audit only
 
 ### Allowed Commands

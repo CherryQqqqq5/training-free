@@ -27,7 +27,7 @@ from scripts.check_rashe_provider_transport_approval_packet import (
 from scripts.run_rashe_source_diagnostic_compact import SIGNED_PUBLISH_FIELDS
 
 SIGNED_PROVIDER_PROFILE = "Chuangzhi/Novacode"
-SIGNED_MODEL = "gpt-5.2"
+SIGNED_MODEL = "gpt-4.1"
 SIGNED_CASES_PER_CATEGORY = 20
 SIGNED_TOTAL_CASES = 160
 ROOT = Path(__file__).resolve().parents[1]
