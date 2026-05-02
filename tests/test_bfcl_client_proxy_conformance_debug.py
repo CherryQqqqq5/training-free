@@ -35,8 +35,7 @@ def test_responses_tool_choice_normalized_for_chat_upstream() -> None:
 
 def test_max_output_tokens_forwarded_to_chat_max_tokens_or_recorded_if_not_forwarded() -> None:
     shapes = {record["token_field_forwarded_shape"] for record in _responses_records()}
-    assert shapes <= {"max_output_tokens_forwarded_as_chat_max_tokens", "max_output_tokens_not_forwarded_to_chat"}
-    assert shapes
+    assert shapes == {"max_output_tokens_forwarded_as_chat_max_tokens"}
 
 
 def test_fake_upstream_chat_tool_call_survives_proxy_to_responses_output() -> None:

@@ -2,7 +2,7 @@
 
 Status: Stage 1 remains blocked. No BFCL measurement evidence exists.
 
-- current_head_observed: `97bd2c49bc31c6a15123c53ab99a54436ec92e87`
+- current_head_observed: `25a908e80c9162a699cbbf87b7f67d2826e5c871`
 - runtime_blocker_base_commit: `1006dc95120817bc8b49a7350c1f2f9ab3075433`
 - exact 8-ID BFCL-shaped smoke materialized: `true`
 - stop condition: repeated `Empty response from the model`
@@ -44,3 +44,5 @@ The exact BFCL-shaped runtime/proxy path still repeatedly emits `empty_model_res
 ## Explicit Non-Evidence Statement
 
 No full/default baseline, candidate activation, candidate JSONL/pool, scorer-feedback tuning, performance evidence, +3pp claim, Huawei claim, raw payload, raw case content, or secret material was committed.
+
+Provenance note: `prior_blocked_memo_commit=97bd2c49bc31c6a15123c53ab99a54436ec92e87`; the runtime blocker base remains recorded separately.

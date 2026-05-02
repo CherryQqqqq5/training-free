@@ -128,6 +128,17 @@ def _responses_input_to_messages(input_value: Any, instructions: Any = None) -> 
     return [*prefix_messages, {"role": "user", "content": ""}]
 
 
+def _responses_token_fields_to_chat_fields(request_json: Dict[str, Any]) -> Dict[str, Any]:
+    forwarded: Dict[str, Any] = {}
+    if "max_tokens" in request_json:
+        forwarded["max_tokens"] = request_json["max_tokens"]
+    elif "max_output_tokens" in request_json:
+        forwarded["max_tokens"] = request_json["max_output_tokens"]
+    elif "max_completion_tokens" in request_json:
+        forwarded["max_tokens"] = request_json["max_completion_tokens"]
+    return forwarded
+
+
 def _responses_tools_to_chat_tools(tools: Any) -> list[Dict[str, Any]]:
     if not isinstance(tools, list):
         return []
@@ -333,6 +344,7 @@ def create_app(config_path: str, rules_dir: str, trace_dir: str) -> FastAPI:
                 original_req_json.get("input"),
                 instructions=original_req_json.get("instructions"),
             ),
+            **_responses_token_fields_to_chat_fields(original_req_json),
         }
         chat_tools = _responses_tools_to_chat_tools(original_req_json.get("tools"))
         if chat_tools:

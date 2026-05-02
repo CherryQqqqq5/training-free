@@ -22,6 +22,7 @@ from grc.runtime.engine import RuleEngine  # noqa: E402
 from grc.runtime.proxy import (  # noqa: E402
     _chat_response_to_responses_payload,
     _responses_input_to_messages,
+    _responses_token_fields_to_chat_fields,
     _responses_tools_to_chat_tools,
 )
 
@@ -148,6 +149,7 @@ def _responses_to_chat_request(request: dict[str, Any]) -> dict[str, Any]:
         "messages": _responses_input_to_messages(request.get("input"), instructions=request.get("instructions")),
     }
     chat_tools = _responses_tools_to_chat_tools(request.get("tools"))
+    chat_request.update(_responses_token_fields_to_chat_fields(request))
     if chat_tools:
         chat_request["tools"] = chat_tools
         if isinstance(request.get("tool_choice"), (str, dict)):
@@ -348,7 +350,17 @@ def build_records() -> list[dict[str, Any]]:
 
 def build_report() -> dict[str, Any]:
     records = build_records()
-    suspected = [record["suspected_failure_stage"] for record in records if record["suspected_failure_stage"] != "not_reproduced_local_full_path"]
+    unresolved_main_path_failures = {
+        "responses_instructions_conversion_loss",
+        "tool_choice_tools_conversion_loss",
+        "responses_to_chat_token_field_not_forwarded",
+        "bfcl_responses_parser_decode_mismatch",
+    }
+    suspected = [
+        record["suspected_failure_stage"]
+        for record in records
+        if record["suspected_failure_stage"] in unresolved_main_path_failures
+    ]
     primary = suspected[0] if suspected else "not_reproduced_local_full_path"
     return {
         "artifact_kind": "bfcl_client_proxy_conformance_debug",

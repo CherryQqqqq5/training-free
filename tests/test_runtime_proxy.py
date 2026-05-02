@@ -27,7 +27,7 @@ except ModuleNotFoundError:
     sys.modules["httpx"] = types.SimpleNamespace(AsyncClient=object)
     _INJECTED_HTTPX_STUB = True
 
-from grc.runtime.proxy import _responses_input_to_messages
+from grc.runtime.proxy import _responses_input_to_messages, _responses_token_fields_to_chat_fields
 
 if _INJECTED_YAML_STUB:
     sys.modules.pop("yaml", None)
@@ -48,6 +48,17 @@ class RuntimeProxyTests(unittest.TestCase):
 
         self.assertEqual(messages[0], {"role": "developer", "content": "Always preserve tool-call instructions."})
         self.assertEqual(messages[1], {"role": "user", "content": "Use a tool."})
+
+
+    def test_responses_max_output_tokens_forwarded_as_chat_max_tokens(self) -> None:
+        self.assertEqual(
+            _responses_token_fields_to_chat_fields({"max_output_tokens": 128}),
+            {"max_tokens": 128},
+        )
+        self.assertEqual(
+            _responses_token_fields_to_chat_fields({"max_tokens": 64, "max_output_tokens": 128}),
+            {"max_tokens": 64},
+        )
 
     def test_responses_input_preserves_function_call_history(self) -> None:
         request_input = [
