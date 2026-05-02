@@ -136,6 +136,14 @@ def validate_packet(data: dict[str, Any]) -> list[str]:
         blockers.append(f"bfcl_handler_inherited_openai_base_url_allowed_not_false:{data.get('bfcl_handler_inherited_openai_base_url_allowed')!r}")
     if data.get("bfcl_handler_shell_env_mutation_allowed") is not False:
         blockers.append(f"bfcl_handler_shell_env_mutation_allowed_not_false:{data.get('bfcl_handler_shell_env_mutation_allowed')!r}")
+    if data.get("bfcl_proxy_env_bridge_mode") != "forced_signed_route_subprocess_only":
+        blockers.append(f"bfcl_proxy_env_bridge_mode_invalid:{data.get('bfcl_proxy_env_bridge_mode')!r}")
+    if data.get("bfcl_proxy_required_route_env") != ["GRC_UPSTREAM_PROFILE", "GRC_UPSTREAM_MODEL"]:
+        blockers.append(f"bfcl_proxy_required_route_env_invalid:{data.get('bfcl_proxy_required_route_env')!r}")
+    if data.get("bfcl_proxy_inherited_route_env_allowed") is not False:
+        blockers.append(f"bfcl_proxy_inherited_route_env_allowed_not_false:{data.get('bfcl_proxy_inherited_route_env_allowed')!r}")
+    if data.get("bfcl_proxy_signed_route_guard_required") is not True:
+        blockers.append(f"bfcl_proxy_signed_route_guard_required_not_true:{data.get('bfcl_proxy_signed_route_guard_required')!r}")
     expected_paths = {
         "generate_only_runner_path": "scripts/run_bfcl_exact_2id_generate_smoke.py",
         "approved_for_runner_path": "scripts/run_bfcl_exact_2id_generate_smoke.py",

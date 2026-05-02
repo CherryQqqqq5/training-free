@@ -10,3 +10,6 @@ Run-id manifest boundary: this BFCL version reads `test_case_ids_to_generate.jso
 
 
 BFCL handler env bridge boundary: execute mode may set `OPENAI_API_KEY` and `OPENAI_BASE_URL` only in the BFCL generate subprocess environment. `OPENAI_API_KEY` is bridged from approved key env names when missing; existing `OPENAI_API_KEY` is preserved. `OPENAI_BASE_URL` is forced in the BFCL generate subprocess to the local OpenAI-compatible proxy `/v1` path for the selected port, even if an inherited shell value exists, so BFCL cannot bypass the reviewed proxy/runtime path. The shell/global environment is not mutated, and endpoint/key values must not be printed or written to artifacts.
+
+
+Proxy route boundary: execute mode forces the local proxy subprocess route env to `GRC_UPSTREAM_PROFILE=novacode` and `GRC_UPSTREAM_MODEL=gpt-4.1` regardless of inherited shell values. Inherited `gpt-5.2`, `gpt-4o`, OpenRouter, or any non-signed active route must be rejected before provider access.

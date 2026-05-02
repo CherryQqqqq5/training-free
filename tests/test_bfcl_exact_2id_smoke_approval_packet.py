@@ -35,6 +35,10 @@ class BFCLExact2IDSmokeApprovalPacketTests(unittest.TestCase):
         self.assertTrue(self.packet["bfcl_handler_base_url_force_local_proxy"])
         self.assertFalse(self.packet["bfcl_handler_inherited_openai_base_url_allowed"])
         self.assertFalse(self.packet["bfcl_handler_shell_env_mutation_allowed"])
+        self.assertEqual(self.packet["bfcl_proxy_env_bridge_mode"], "forced_signed_route_subprocess_only")
+        self.assertEqual(self.packet["bfcl_proxy_required_route_env"], ["GRC_UPSTREAM_PROFILE", "GRC_UPSTREAM_MODEL"])
+        self.assertFalse(self.packet["bfcl_proxy_inherited_route_env_allowed"])
+        self.assertTrue(self.packet["bfcl_proxy_signed_route_guard_required"])
 
     def test_rejects_pending_state_for_execution_packet(self) -> None:
         dirty = copy.deepcopy(self.packet)

@@ -8,10 +8,16 @@ from scripts.check_bfcl_exact_2id_generate_smoke_artifact import check as check_
 from scripts.check_bfcl_exact_2id_smoke_approval_packet import check as check_packet, validate_packet
 from scripts.run_bfcl_exact_2id_generate_smoke import (
     SIGNED_IDS,
+    SIGNED_ROUTE_MODEL,
+    SIGNED_ROUTE_PROFILE,
     _assert_generate_only_command,
     _bfcl_generate_env_summary,
     _bfcl_generate_subprocess_env,
     _generate_command,
+    _proxy_route_env_summary,
+    _proxy_subprocess_env,
+    _signed_proxy_route_blockers,
+    _start_proxy,
     _manifest_payload,
     _manifest_payload_blockers,
     _temporary_bfcl_run_ids_manifest,
@@ -164,6 +170,62 @@ def test_env_summary_contains_presence_flags_not_values() -> None:
         "approved_endpoint_env_present": False,
     }
     assert "approved_key_value" not in json.dumps(summary)
+
+
+def test_proxy_subprocess_env_forces_signed_route_from_stale_profile() -> None:
+    source = {
+        "GRC_UPSTREAM_PROFILE": "novacode",
+        "GRC_UPSTREAM_MODEL": "gpt-5.2",
+        "PYTHONPATH": "existing_path",
+    }
+    bridged = _proxy_subprocess_env(source)
+    assert bridged["GRC_UPSTREAM_PROFILE"] == SIGNED_ROUTE_PROFILE
+    assert bridged["GRC_UPSTREAM_MODEL"] == SIGNED_ROUTE_MODEL
+    assert str(Path.cwd() / "src") in bridged["PYTHONPATH"]
+    assert source["GRC_UPSTREAM_MODEL"] == "gpt-5.2"
+
+
+def test_proxy_subprocess_env_forces_signed_route_from_openrouter_or_gpt4o() -> None:
+    bridged = _proxy_subprocess_env({"GRC_UPSTREAM_PROFILE": "openrouter", "GRC_UPSTREAM_MODEL": "gpt-4o"})
+    assert bridged["GRC_UPSTREAM_PROFILE"] == SIGNED_ROUTE_PROFILE
+    assert bridged["GRC_UPSTREAM_MODEL"] == SIGNED_ROUTE_MODEL
+    assert _signed_proxy_route_blockers(bridged) == []
+
+
+def test_signed_proxy_route_blockers_reject_route_drift() -> None:
+    blockers = _signed_proxy_route_blockers({"GRC_UPSTREAM_PROFILE": "novacode", "GRC_UPSTREAM_MODEL": "gpt-5.2"})
+    assert any("proxy_route_model_drift" in blocker for blocker in blockers)
+    assert any("proxy_forbidden_model_active" in blocker for blocker in blockers)
+    blockers = _signed_proxy_route_blockers({"GRC_UPSTREAM_PROFILE": "openrouter", "GRC_UPSTREAM_MODEL": "gpt-4o"})
+    assert any("proxy_route_profile_drift" in blocker for blocker in blockers)
+    assert "proxy_openrouter_forbidden" in blockers
+    assert any("proxy_forbidden_model_active" in blocker for blocker in blockers)
+
+
+def test_proxy_route_summary_contains_labels_only() -> None:
+    summary = _proxy_route_env_summary(_proxy_subprocess_env({"GRC_UPSTREAM_MODEL": "gpt-5.2"}))
+    assert summary == {"grc_upstream_profile": "novacode", "grc_upstream_model": "gpt-4.1"}
+
+
+def test_start_proxy_passes_forced_signed_route_env(tmp_path: Path, monkeypatch) -> None:
+    captured: dict[str, object] = {}
+
+    class FakeProc:
+        pass
+
+    def fake_popen(command, cwd, env, stdout, stderr):
+        captured["command"] = command
+        captured["env"] = env
+        return FakeProc()
+
+    monkeypatch.setattr("scripts.run_bfcl_exact_2id_generate_smoke.subprocess.Popen", fake_popen)
+    monkeypatch.setattr("scripts.run_bfcl_exact_2id_generate_smoke._wait_proxy", lambda port, log_path: None)
+    monkeypatch.setenv("GRC_UPSTREAM_MODEL", "gpt-5.2")
+    _start_proxy(8131, tmp_path / "traces", Path("configs/runtime_bfcl_structured.yaml"), Path("rules/baseline_empty"), tmp_path / "proxy.log")
+    env = captured["env"]
+    assert isinstance(env, dict)
+    assert env["GRC_UPSTREAM_PROFILE"] == SIGNED_ROUTE_PROFILE
+    assert env["GRC_UPSTREAM_MODEL"] == SIGNED_ROUTE_MODEL
 
 
 def test_execute_mode_fails_closed_while_packet_pending(tmp_path: Path) -> None:

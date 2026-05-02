@@ -26,6 +26,8 @@ SIGNED_ID_MANIFEST = {
     "multi_turn_base": ["multi_turn_base_0"],
 }
 SIGNED_CATEGORIES = "web_search_base,multi_turn_base"
+SIGNED_ROUTE_PROFILE = "novacode"
+SIGNED_ROUTE_MODEL = "gpt-4.1"
 PACKET_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_exact_2id_smoke_approval_packet.json")
 DEFAULT_OUTPUT = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_exact_2id_generate_smoke_compact.json")
 DEFAULT_RUN_ROOT = Path("/tmp/bfcl_exact_2id_generate_smoke")
@@ -60,8 +62,8 @@ def _approved_execution_blockers(packet: dict[str, Any]) -> list[str]:
         "performance_evidence": False,
         "sota_3pp_claim_ready": False,
         "huawei_acceptance_ready": False,
-        "route_profile": "novacode",
-        "route_model": "gpt-4.1",
+        "route_profile": SIGNED_ROUTE_PROFILE,
+        "route_model": SIGNED_ROUTE_MODEL,
         "fallback_allowed": False,
         "gpt_4o_fallback_allowed": False,
         "openrouter_allowed": False,
@@ -73,6 +75,10 @@ def _approved_execution_blockers(packet: dict[str, Any]) -> list[str]:
         "scorer_command_allowed": False,
         "full_default_runner_allowed": False,
         "baseline_shell_runner_allowed": False,
+        "bfcl_proxy_env_bridge_mode": "forced_signed_route_subprocess_only",
+        "bfcl_proxy_required_route_env": ["GRC_UPSTREAM_PROFILE", "GRC_UPSTREAM_MODEL"],
+        "bfcl_proxy_inherited_route_env_allowed": False,
+        "bfcl_proxy_signed_route_guard_required": True,
     }
     for key, value in expected.items():
         if packet.get(key) != value:
@@ -91,8 +97,8 @@ def build_plan(packet_path: Path = PACKET_PATH) -> dict[str, Any]:
         "approval_status": packet.get("approval_status"),
         "run_ids": SIGNED_IDS,
         "case_count": 2,
-        "route_profile": "novacode",
-        "route_model": "gpt-4.1",
+        "route_profile": SIGNED_ROUTE_PROFILE,
+        "route_model": SIGNED_ROUTE_MODEL,
         "bfcl_model_alias": BFCL_MODEL_ALIAS,
         "test_category": SIGNED_CATEGORIES,
         "generate_only": True,
@@ -225,6 +231,34 @@ def _bfcl_generate_env_summary(env: dict[str, str]) -> dict[str, bool]:
     }
 
 
+def _proxy_subprocess_env(source_env: dict[str, str] | None = None) -> dict[str, str]:
+    env = dict(source_env or os.environ)
+    env["PYTHONPATH"] = str(REPO_ROOT / "src") + ((":" + env["PYTHONPATH"]) if env.get("PYTHONPATH") else "")
+    env["GRC_UPSTREAM_PROFILE"] = SIGNED_ROUTE_PROFILE
+    env["GRC_UPSTREAM_MODEL"] = SIGNED_ROUTE_MODEL
+    return env
+
+
+def _signed_proxy_route_blockers(env: dict[str, str]) -> list[str]:
+    blockers: list[str] = []
+    if env.get("GRC_UPSTREAM_PROFILE") != SIGNED_ROUTE_PROFILE:
+        blockers.append(f"proxy_route_profile_drift:{env.get('GRC_UPSTREAM_PROFILE')!r}")
+    if env.get("GRC_UPSTREAM_MODEL") != SIGNED_ROUTE_MODEL:
+        blockers.append(f"proxy_route_model_drift:{env.get('GRC_UPSTREAM_MODEL')!r}")
+    if env.get("GRC_UPSTREAM_PROFILE") == "openrouter":
+        blockers.append("proxy_openrouter_forbidden")
+    if env.get("GRC_UPSTREAM_MODEL") in {"gpt-5.2", "gpt-4o"}:
+        blockers.append(f"proxy_forbidden_model_active:{env.get('GRC_UPSTREAM_MODEL')!r}")
+    return blockers
+
+
+def _proxy_route_env_summary(env: dict[str, str]) -> dict[str, str]:
+    return {
+        "grc_upstream_profile": str(env.get("GRC_UPSTREAM_PROFILE", "")),
+        "grc_upstream_model": str(env.get("GRC_UPSTREAM_MODEL", "")),
+    }
+
+
 def _wait_proxy(port: int, log_path: Path) -> None:
     for _ in range(60):
         try:
@@ -237,8 +271,10 @@ def _wait_proxy(port: int, log_path: Path) -> None:
 
 
 def _start_proxy(port: int, trace_dir: Path, runtime_config: Path, rules_dir: Path, log_path: Path) -> subprocess.Popen[bytes]:
-    env = os.environ.copy()
-    env["PYTHONPATH"] = str(REPO_ROOT / "src") + ((":" + env["PYTHONPATH"]) if env.get("PYTHONPATH") else "")
+    env = _proxy_subprocess_env()
+    route_blockers = _signed_proxy_route_blockers(env)
+    if route_blockers:
+        raise RuntimeError(";".join(route_blockers))
     command = [
         _python(),
         "-m",
@@ -308,8 +344,8 @@ def _classify_result_for_run_id(run_id: str, result_root: Path) -> dict[str, Any
         "no_tool_text_recorded": "record_only_no_tool_text" in lowered,
         "tool_call_detected": "tool_calls" in lowered or "function_call" in lowered,
         "protocol_error_detected": status == "protocol_error",
-        "route_profile": "novacode",
-        "route_model": "gpt-4.1",
+        "route_profile": SIGNED_ROUTE_PROFILE,
+        "route_model": SIGNED_ROUTE_MODEL,
         "candidate_runtime_activation_authorized": False,
         "candidate_jsonl_authorized": False,
         "candidate_pool_ready": False,
@@ -326,8 +362,8 @@ def _write_compact_artifact(output: Path, *, generated: bool, records: list[dict
     artifact = {
         "artifact_kind": "bfcl_exact_2id_generate_smoke_compact",
         "approval_status": "executed_generate_only" if generated else "planned_or_failed_closed",
-        "route_profile": "novacode",
-        "route_model": "gpt-4.1",
+        "route_profile": SIGNED_ROUTE_PROFILE,
+        "route_model": SIGNED_ROUTE_MODEL,
         "provider_profile": "Chuangzhi/Novacode",
         "run_ids": SIGNED_IDS,
         "case_count": 2,
