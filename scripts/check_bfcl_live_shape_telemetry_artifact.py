@@ -32,6 +32,20 @@ ALLOWED_RECORD_FIELDS = {
     "raw_header_persisted",
     "raw_log_persisted",
     "raw_trace_persisted",
+    "upstream_returned_tool_call",
+    "upstream_returned_nonempty_text",
+    "upstream_returned_true_empty",
+    "responses_to_chat_conversion_exercised",
+    "runtime_engine_exercised",
+    "engine_final_has_tool_calls",
+    "engine_final_content_empty",
+    "engine_coerced_nonempty_text_to_empty",
+    "chat_to_responses_conversion_exercised",
+    "responses_output_has_function_call",
+    "responses_output_has_message_text",
+    "bfcl_or_openai_decode_exercised",
+    "bfcl_decode_execute_nonempty",
+    "suspected_failure_stage",
 }
 SECRET_OR_ENDPOINT_RE = re.compile(r"(sk-[A-Za-z0-9_-]{16,}|https?://)", re.IGNORECASE)
 RAW_MARKERS = ("prompt", "case_id", "gold", "expected", "reference", "scorer_diff", "provider_payload", "provider_response", "candidate_output")
@@ -87,6 +101,11 @@ def validate(data: dict[str, Any]) -> list[str]:
         for flag in ("raw_text_persisted", "raw_body_persisted", "raw_payload_persisted", "raw_header_persisted", "raw_log_persisted", "raw_trace_persisted"):
             if record.get(flag) is not False:
                 blockers.append(f"telemetry_artifact_record_{index}_{flag}_not_false:{record.get(flag)!r}")
+        for flag in ("responses_to_chat_conversion_exercised", "runtime_engine_exercised", "chat_to_responses_conversion_exercised", "bfcl_or_openai_decode_exercised"):
+            if record.get(flag) is not True:
+                blockers.append(f"telemetry_artifact_record_{index}_{flag}_not_true:{record.get(flag)!r}")
+        if record.get("suspected_failure_stage") in (None, ""):
+            blockers.append(f"telemetry_artifact_record_{index}_suspected_failure_stage_missing")
     for path, value in _walk(data):
         if path and path[-1] in RAW_MARKERS:
             blockers.append(f"telemetry_artifact_forbidden_key:{'.'.join(path)}")

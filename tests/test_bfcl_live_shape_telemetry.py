@@ -12,17 +12,17 @@ from scripts.run_bfcl_live_shape_telemetry import build_plan, execute_telemetry,
 def _clean_artifact() -> dict[str, object]:
     record = {
         "run_id_label": "web_search_base_0",
-        "endpoint_path_label": "responses",
+        "endpoint_path_label": "responses_to_chat_proxy",
         "request_shape_label": "responses_tools_single_function",
         "response_shape_label": "responses_function_call",
         "status_code_class": "2xx",
         "output_empty": False,
         "tool_call_present": True,
-        "parser_decode_path_label": "bfcl_responses_fc_decode",
+        "parser_decode_path_label": "bfcl_or_openai_responses_decode",
         "token_forwarding_label": "max_output_tokens_forwarded_as_chat_max_tokens",
         "tool_choice_forwarding_label": "function_object",
         "instructions_forwarding_label": "developer_message_prepended",
-        "engine_content_empty_label": "content_empty_with_tool_call",
+        "engine_content_empty_label": "content_empty",
         "engine_coercion_label": "not_coerced",
         "raw_text_persisted": False,
         "raw_body_persisted": False,
@@ -30,6 +30,20 @@ def _clean_artifact() -> dict[str, object]:
         "raw_header_persisted": False,
         "raw_log_persisted": False,
         "raw_trace_persisted": False,
+        "upstream_returned_tool_call": True,
+        "upstream_returned_nonempty_text": False,
+        "upstream_returned_true_empty": False,
+        "responses_to_chat_conversion_exercised": True,
+        "runtime_engine_exercised": True,
+        "engine_final_has_tool_calls": True,
+        "engine_final_content_empty": True,
+        "engine_coerced_nonempty_text_to_empty": False,
+        "chat_to_responses_conversion_exercised": True,
+        "responses_output_has_function_call": True,
+        "responses_output_has_message_text": False,
+        "bfcl_or_openai_decode_exercised": True,
+        "bfcl_decode_execute_nonempty": True,
+        "suspected_failure_stage": "not_reproduced_live_shape_path",
     }
     return {
         "artifact_kind": "bfcl_live_shape_telemetry_compact",
@@ -46,7 +60,7 @@ def _clean_artifact() -> dict[str, object]:
         "gpt_4o_fallback_allowed": False,
         "openrouter_allowed": False,
         "run_ids": ["web_search_base_0", "multi_turn_base_0"],
-        "records": [record, {**record, "run_id_label": "multi_turn_base_0", "output_empty": True, "tool_call_present": False}],
+        "records": [record, {**record, "run_id_label": "multi_turn_base_0"}],
     }
 
 
@@ -126,6 +140,9 @@ def test_artifact_checker_rejects_route_drift_and_too_many_ids(tmp_path: Path) -
 class _FakeResponse:
     status = 200
 
+    def __init__(self, payload: dict[str, object] | None = None) -> None:
+        self.payload = payload if payload is not None else _fake_chat_response("tool_call")
+
     def __enter__(self):
         return self
 
@@ -133,22 +150,34 @@ class _FakeResponse:
         return False
 
     def read(self) -> bytes:
-        return json.dumps(
-            {
-                "choices": [
-                    {
-                        "message": {
-                            "tool_calls": [
-                                {
-                                    "type": "function",
-                                    "function": {"name": "synthetic_live_shape_telemetry_ping", "arguments": "{}"},
-                                }
-                            ]
-                        }
+        return json.dumps(self.payload).encode("utf-8")
+
+
+def _fake_chat_response(kind: str) -> dict[str, object]:
+    if kind == "tool_call":
+        return {
+            "choices": [
+                {
+                    "message": {
+                        "role": "assistant",
+                        "content": None,
+                        "tool_calls": [
+                            {
+                                "type": "function",
+                                "function": {"name": "synthetic_live_shape_telemetry_ping", "arguments": "{}"},
+                            }
+                        ],
                     }
-                ]
-            }
-        ).encode("utf-8")
+                }
+            ]
+        }
+    if kind == "text":
+        return {"choices": [{"message": {"role": "assistant", "content": "synthetic text", "tool_calls": []}}]}
+    if kind == "empty":
+        return {}
+    if kind == "malformed_nonempty":
+        return {"choices": [{"delta": {"content": "synthetic text"}}]}
+    raise ValueError(kind)
 
 
 def _signed_env() -> dict[str, str]:
@@ -249,3 +278,65 @@ def test_signed_transport_rejects_non_https_endpoint() -> None:
         assert str(exc) == "telemetry_endpoint_not_https"
     else:
         raise AssertionError("expected fail-closed non-HTTPS endpoint")
+
+
+
+def test_signed_transport_exercises_bfcl_shaped_proxy_runtime_parser_path() -> None:
+    seen_payloads: list[dict[str, object]] = []
+
+    def opener(request, timeout):
+        payload = json.loads(request.data.decode("utf-8"))
+        seen_payloads.append(payload)
+        return _FakeResponse(_fake_chat_response("tool_call"))
+
+    request = {
+        "run_ids": ["web_search_base_0", "multi_turn_base_0"],
+        "route_model": "gpt-4.1",
+        "active_profile": "novacode",
+        "max_total_cases": 2,
+        "raw_persistence_authorized": False,
+    }
+    client = build_signed_live_shape_telemetry_client(request, env=_signed_env(), opener=opener)
+    records = client(request)
+    assert seen_payloads and all("messages" in payload for payload in seen_payloads)
+    assert all(payload["messages"][0]["role"] in {"system", "developer"} for payload in seen_payloads)
+    assert all(payload.get("tool_choice", {}).get("type") == "function" for payload in seen_payloads)
+    assert all(record["responses_to_chat_conversion_exercised"] is True for record in records)
+    assert all(record["runtime_engine_exercised"] is True for record in records)
+    assert all(record["chat_to_responses_conversion_exercised"] is True for record in records)
+    assert all(record["bfcl_or_openai_decode_exercised"] is True for record in records)
+    assert all(record["responses_output_has_function_call"] is True for record in records)
+    assert all(record["bfcl_decode_execute_nonempty"] is True for record in records)
+
+
+def test_live_shaped_mock_upstream_classifies_tool_text_empty_and_malformed_distinctly() -> None:
+    request = {
+        "run_ids": ["web_search_base_0", "multi_turn_base_0"],
+        "route_model": "gpt-4.1",
+        "active_profile": "novacode",
+        "max_total_cases": 2,
+        "raw_persistence_authorized": False,
+    }
+
+    def run_kind(kind: str) -> dict[str, object]:
+        client = build_signed_live_shape_telemetry_client(
+            request,
+            env=_signed_env(),
+            opener=lambda request, timeout: _FakeResponse(_fake_chat_response(kind)),
+        )
+        return client(request)[0]
+
+    tool = run_kind("tool_call")
+    text = run_kind("text")
+    empty = run_kind("empty")
+    malformed = run_kind("malformed_nonempty")
+
+    assert tool["upstream_returned_tool_call"] is True
+    assert tool["responses_output_has_function_call"] is True
+    assert text["upstream_returned_nonempty_text"] is True
+    assert text["responses_output_has_message_text"] is True
+    assert empty["upstream_returned_true_empty"] is True
+    assert empty["suspected_failure_stage"] == "true_upstream_empty_response"
+    assert malformed["suspected_failure_stage"] == "non_openai_compatible_response_shape"
+    assert malformed["upstream_returned_tool_call"] is False
+    assert malformed["upstream_returned_nonempty_text"] is False

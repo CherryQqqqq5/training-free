@@ -56,6 +56,20 @@ ALLOWED_FIELDS = [
     "raw_header_persisted",
     "raw_log_persisted",
     "raw_trace_persisted",
+    "upstream_returned_tool_call",
+    "upstream_returned_nonempty_text",
+    "upstream_returned_true_empty",
+    "responses_to_chat_conversion_exercised",
+    "runtime_engine_exercised",
+    "engine_final_has_tool_calls",
+    "engine_final_content_empty",
+    "engine_coerced_nonempty_text_to_empty",
+    "chat_to_responses_conversion_exercised",
+    "responses_output_has_function_call",
+    "responses_output_has_message_text",
+    "bfcl_or_openai_decode_exercised",
+    "bfcl_decode_execute_nonempty",
+    "suspected_failure_stage",
 ]
 SIGNED_TELEMETRY_CLIENT_FACTORY = "scripts.bfcl_live_shape_telemetry_client:build_signed_live_shape_telemetry_client"
 SECRET_OR_ENDPOINT_RE = re.compile(r"(sk-[A-Za-z0-9_-]{16,}|https?://)", re.IGNORECASE)
@@ -132,6 +146,10 @@ def validate(data: dict[str, Any]) -> list[str]:
         blockers.append(f"telemetry_packet_client_factory_scope_invalid:{data.get('telemetry_client_factory_scope')!r}")
     if data.get("signed_telemetry_client_factory") != SIGNED_TELEMETRY_CLIENT_FACTORY:
         blockers.append(f"telemetry_packet_signed_client_factory_invalid:{data.get('signed_telemetry_client_factory')!r}")
+    if data.get("telemetry_path_requirement") != "bfcl_shaped_responses_proxy_runtime_parser_path":
+        blockers.append(f"telemetry_packet_path_requirement_invalid:{data.get('telemetry_path_requirement')!r}")
+    if data.get("direct_chat_transport_only_allowed") is not False:
+        blockers.append(f"telemetry_packet_direct_chat_only_not_false:{data.get('direct_chat_transport_only_allowed')!r}")
     blockers.extend(_scan_literals(data))
     return blockers
 
