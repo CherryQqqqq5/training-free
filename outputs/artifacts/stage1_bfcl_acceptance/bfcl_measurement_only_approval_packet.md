@@ -58,3 +58,14 @@ Raw logs, raw traces, provider payloads, per-case scorer diffs, candidate output
 - huawei_acceptance_ready: `false`
 
 Provider calls and scorer execution are authorized only for compact current-system measurement. Raw logs, traces, provider payloads, prompts, gold/reference material, scorer diffs, endpoint/key values, and secrets remain forbidden in committed artifacts.
+
+## Runner Tooling Provenance
+
+- local_stage1_approval_commit: `5118d10e4cc2c465a0f7d9291cf9bbf213dd1072`
+- runner_tooling_fix_commit: `6cbc121c7586eb8664f4bb96afacbabbfd12ef7b`
+- measurement_execution_status: `not_executed_after_runner_interpreter_fix`
+- last_measurement_attempt_status: `failed_before_bfcl_generate_evaluate_python_not_found`
+- runner interpreter: `GRC_PYTHON`, default `${REPO_ROOT}/.venv/bin/python`, validated `Python 3.10.20`
+- bare python invocations in baseline runner: `false`
+
+No measurement retry occurred after this tooling fix. Candidate specs remain inert and no JSONL, pool, scorer-feedback tuning, performance/+3pp, SOTA, or Huawei claim is authorized by this provenance update.
