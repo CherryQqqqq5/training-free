@@ -101,6 +101,7 @@ def test_builder_and_checkers_pass_without_provider_or_bfcl_execution():
     check_result, check_summary = run_json([sys.executable, str(CHECK_SHAPE_SCRIPT), "--compact", "--strict"])
     assert check_result.returncode == 0, check_result.stdout + check_result.stderr
     assert check_summary["bfcl_proxy_runtime_adapter_shape_diff_passed"] is True
+    assert check_summary["shape_diff_high_level_conclusion"] == "bfcl_proxy_runtime_adapter_envelope_aligned_to_synthetic_contract_shape_without_execution"
 
 
 def test_shape_diff_records_only_sanitized_structure():
@@ -121,6 +122,8 @@ def test_shape_diff_records_only_sanitized_structure():
     assert report["shape_fields_only"] is True
     assert report["successful_synthetic_provider_contract_shape"]["content_length_buckets"] == ["short", "short"]
     assert "tool_schema_structural_hash" in report["successful_synthetic_provider_contract_shape"]
+    assert report["adapter_risk_labels"] == []
+    assert "schema_local_additional_properties_false_enforced" in report["adapter_alignment_labels"]
 
 
 def test_shape_diff_rejects_route_fallback_and_openrouter_drift():
@@ -167,3 +170,17 @@ def test_shape_diff_rejects_missing_parser_tool_calls():
     report["bfcl_proxy_runtime_planned_shape"]["parser_expected_response_keys"] = ["choices", "message"]
     blockers = validate_shape_diff(report)
     assert "proxy_adapter_shape_diff_proxy_parser_expected_tool_calls_missing" in blockers
+
+
+def test_shape_diff_rejects_regressed_alignment_fields():
+    report = build_report()
+    report["bfcl_proxy_runtime_planned_shape"] = copy.deepcopy(report["bfcl_proxy_runtime_planned_shape"])
+    report["bfcl_proxy_runtime_planned_shape"]["tool_choice_mode"] = "required_string"
+    report["bfcl_proxy_runtime_planned_shape"]["tool_schema_structural_flags"]["additional_properties_false"] = False
+    report["bfcl_proxy_runtime_planned_shape"]["token_field_presence"] = {"max_tokens": "unknown", "max_completion_tokens": "unknown"}
+    report["adapter_risk_labels"] = ["proxy_adapter_token_field_unknown_until_capture"]
+    blockers = "\n".join(validate_shape_diff(report))
+    assert "proxy_adapter_shape_diff_proxy_tool_choice_mode_invalid:'required_string'" in blockers
+    assert "proxy_adapter_shape_diff_proxy_additional_properties_false_not_true:False" in blockers
+    assert "proxy_adapter_shape_diff_proxy_token_field_presence_invalid" in blockers
+    assert "proxy_adapter_shape_diff_adapter_risk_labels_not_empty" in blockers

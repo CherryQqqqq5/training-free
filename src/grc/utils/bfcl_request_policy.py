@@ -11,6 +11,7 @@ def _env_flag(name: str, default: str = "0") -> bool:
 
 _BFCL_MEMORY_POLICY_PREFIX = "[BFCL Memory Retrieval Policy]"
 _BFCL_FINAL_ANSWER_CONTRACT = "For your final answer to the user, you must respond in this format:"
+_BFCL_DEFAULT_MAX_TOKENS = 4096
 
 
 def _message_has_tool_interaction(message: dict[str, Any]) -> bool:
@@ -117,12 +118,108 @@ def apply_bfcl_memory_request_policy(kwargs: dict[str, Any]) -> dict[str, Any]:
     return updated
 
 
+def _normalize_function_tool(tool: dict[str, Any]) -> dict[str, Any]:
+    normalized = dict(tool)
+    function = normalized.get("function")
+    if isinstance(function, dict):
+        normalized["function"] = _normalize_function_definition(function)
+        normalized.setdefault("type", "function")
+        return normalized
+
+    name = normalized.get("name")
+    if not isinstance(name, str) or not name:
+        return normalized
+    function_payload: dict[str, Any] = {"name": name}
+    for key in ("description", "parameters"):
+        if key in normalized:
+            function_payload[key] = normalized[key]
+    return {"type": "function", "function": _normalize_function_definition(function_payload)}
+
+
+def _normalize_function_definition(function: dict[str, Any]) -> dict[str, Any]:
+    normalized = dict(function)
+    parameters = normalized.get("parameters")
+    if isinstance(parameters, dict):
+        normalized["parameters"] = _normalize_schema_object(parameters)
+    return normalized
+
+
+def _normalize_schema_object(schema: dict[str, Any]) -> dict[str, Any]:
+    normalized = dict(schema)
+    if normalized.get("type") == "object":
+        normalized.setdefault("additionalProperties", False)
+    properties = normalized.get("properties")
+    if isinstance(properties, dict):
+        normalized["properties"] = {
+            key: _normalize_schema_object(value) if isinstance(value, dict) else value
+            for key, value in properties.items()
+        }
+    items = normalized.get("items")
+    if isinstance(items, dict):
+        normalized["items"] = _normalize_schema_object(items)
+    return normalized
+
+
+def _normalize_tools(tools: Any) -> list[Any]:
+    if not isinstance(tools, list):
+        return tools
+    normalized: list[Any] = []
+    for tool in tools:
+        if isinstance(tool, dict):
+            normalized.append(_normalize_function_tool(tool))
+        else:
+            normalized.append(tool)
+    return normalized
+
+
+def _function_tool_names(tools: Any) -> list[str]:
+    names: list[str] = []
+    if not isinstance(tools, list):
+        return names
+    for tool in tools:
+        if not isinstance(tool, dict):
+            continue
+        function = tool.get("function")
+        if isinstance(function, dict):
+            name = function.get("name")
+        else:
+            name = tool.get("name")
+        if isinstance(name, str) and name:
+            names.append(name)
+    return names
+
+
+def _required_tool_choice_for_tools(tools: Any) -> str | dict[str, Any]:
+    names = _function_tool_names(tools)
+    if len(names) == 1:
+        return {"type": "function", "function": {"name": names[0]}}
+    return "required"
+
+
+def _normalize_token_fields(updated: dict[str, Any]) -> None:
+    if "max_completion_tokens" in updated:
+        updated.setdefault("max_tokens", updated.pop("max_completion_tokens"))
+    updated.setdefault("max_tokens", int(os.getenv("GRC_BFCL_MAX_TOKENS", str(_BFCL_DEFAULT_MAX_TOKENS))))
+
+
+def _normalize_openai_compatible_fields(updated: dict[str, Any]) -> None:
+    _normalize_token_fields(updated)
+    updated.setdefault("temperature", 0)
+    updated.setdefault("stream", False)
+    updated.setdefault("timeout", int(os.getenv("GRC_BFCL_TIMEOUT_SECONDS", "120")))
+
+
 def apply_bfcl_fc_request_policy(kwargs: dict[str, Any]) -> dict[str, Any]:
     updated = dict(kwargs)
+    if not updated.get("tools"):
+        return updated
+
+    updated["tools"] = _normalize_tools(updated.get("tools"))
+    _normalize_openai_compatible_fields(updated)
+
     if (
-        updated.get("tools")
-        and _env_flag("GRC_BFCL_FORCE_TOOL_CHOICE", "1")
+        _env_flag("GRC_BFCL_FORCE_TOOL_CHOICE", "1")
         and not _history_has_tool_interaction(updated)
     ):
-        updated.setdefault("tool_choice", "required")
+        updated.setdefault("tool_choice", _required_tool_choice_for_tools(updated.get("tools")))
     return updated

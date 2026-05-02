@@ -100,25 +100,25 @@ def _proxy_runtime_planned_shape() -> dict[str, Any]:
         "parameters_type_object": True,
         "properties_present": True,
         "required_present": True,
-        "additional_properties_false": "not_enforced_by_current_bfcl_adapter_shape",
+        "additional_properties_false": True,
         "strict_present": False,
-        "enum_present": "unknown_until_adapter_capture",
+        "enum_present": "preserved_if_present",
     }
     return {
         "route_model": "gpt-4.1",
-        "request_top_level_keys": ["messages_or_input", "model", "tool_choice", "tools"],
+        "request_top_level_keys": ["messages_or_input", "model", "stream", "temperature", "timeout", "tool_choice", "tools", "max_tokens"],
         "message_count": "bfcl_runtime_variable",
         "role_sequence": ["bfcl_runtime_variable"],
         "content_length_buckets": ["bucketed_only_runtime_variable"],
         "tools_count": "bfcl_runtime_variable_positive",
         "tool_schema_structural_flags": flags,
         "tool_schema_structural_hash": _hash_flags(flags),
-        "tool_choice_mode": "required_string",
-        "token_field_presence": {"max_tokens": "unknown_until_adapter_capture", "max_completion_tokens": "unknown_until_adapter_capture"},
-        "temperature_presence": "unknown_until_adapter_capture",
-        "timeout_streaming_flags": {"timeout_seconds_present": "proxy_runtime_configured", "streaming_enabled": False},
+        "tool_choice_mode": "function_object_when_single_tool_else_required_string",
+        "token_field_presence": {"max_tokens": True, "max_completion_tokens": False},
+        "temperature_presence": True,
+        "timeout_streaming_flags": {"timeout_seconds_present": True, "streaming_enabled": False},
         "parser_expected_response_keys": ["choices", "message", "tool_calls", "function.name"],
-        "empty_response_handling_path_labels": ["decode_execute_empty_string_returns_empty_call_list", "bfcl_runner_stops_on_empty_model_response"],
+        "empty_response_handling_path_labels": ["empty_model_response_compact_stop_gate", "missing_tool_call_compact_stop_gate", "openai_response_shape_compact_stop_gate"],
     }
 
 
@@ -148,13 +148,14 @@ def build_report() -> dict[str, Any]:
     contract = record.get("response_contract") if isinstance(record.get("response_contract"), dict) else {}
     if protocol.get("provider_request_executed") is not True or contract.get("tool_call_present") is not True:
         blockers.append("successful_synthetic_protocol_artifact_not_confirmed")
-    risk_labels = []
-    if synthetic_shape["tool_choice_mode"] != proxy_shape["tool_choice_mode"]:
-        risk_labels.append("tool_choice_form_differs_function_object_vs_required_string")
-    if proxy_shape["tool_schema_structural_flags"].get("additional_properties_false") is not True:
-        risk_labels.append("proxy_adapter_additional_properties_flag_unknown_or_not_enforced")
-    if proxy_shape["token_field_presence"]["max_tokens"] == "unknown_until_adapter_capture":
-        risk_labels.append("proxy_adapter_token_field_unknown_until_capture")
+    risk_labels: list[str] = []
+    alignment_labels = [
+        "tool_choice_function_object_for_single_tool_required_for_multi_tool",
+        "schema_local_additional_properties_false_enforced",
+        "max_tokens_normalized_for_signed_route",
+        "temperature_stream_timeout_explicit",
+        "empty_response_compact_stop_gate_labels_present",
+    ]
     return {
         "artifact_kind": "bfcl_proxy_runtime_adapter_envelope_shape_diff",
         "approval_status": "prepared",
@@ -204,7 +205,8 @@ def build_report() -> dict[str, Any]:
             "bfcl_decode_execute_response_keys": proxy_shape["parser_expected_response_keys"],
             "empty_response_handling_path_labels": proxy_shape["empty_response_handling_path_labels"],
         },
-        "shape_diff_high_level_conclusion": "synthetic_provider_contract_passed_but_bfcl_proxy_runtime_adapter_envelope_requires_review_before_retry",
+        "shape_diff_high_level_conclusion": "bfcl_proxy_runtime_adapter_envelope_aligned_to_synthetic_contract_shape_without_execution",
+        "adapter_alignment_labels": alignment_labels,
         "adapter_risk_labels": risk_labels,
         "shape_fields_only": True,
         "blockers": blockers,
@@ -224,7 +226,7 @@ def write_markdown(path: Path, report: dict[str, Any]) -> None:
         f"- conclusion: `{report['shape_diff_high_level_conclusion']}`",
         f"- adapter_risk_labels: `{report['adapter_risk_labels']}`",
         "",
-        "The successful synthetic provider contract proves the env-only novacode gpt-4.1 tool-call path can return an OpenAI-compatible tool call. The stopped BFCL smoke used the reviewed eight run IDs but failed on repeated empty responses before any smoke artifact was committed. This artifact records only envelope and parser structure; it does not include raw prompts, provider payloads, response bodies, headers, logs, traces, case content, gold/reference/expected values, scorer diffs, endpoint/key values, source nonce mappings, or candidate output.",
+        "The successful synthetic provider contract proves the env-only novacode gpt-4.1 tool-call path can return an OpenAI-compatible tool call. The BFCL proxy/runtime adapter policy is now aligned at the envelope level: function-object tool choice for single-tool requests, required tool choice for multi-tool requests, schema-local additionalProperties=false, max_tokens normalization, explicit temperature/stream/timeout fields, and compact empty-response stop-gate labels. The stopped BFCL smoke used the reviewed eight run IDs but failed on repeated empty responses before any smoke artifact was committed. This artifact records only envelope and parser structure; it does not include raw prompts, provider payloads, response bodies, headers, logs, traces, case content, gold/reference/expected values, scorer diffs, endpoint/key values, source nonce mappings, or candidate output.",
     ]
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 

@@ -116,7 +116,7 @@ def validate(data: dict[str, Any]) -> list[str]:
         "provider_profile": "Chuangzhi/Novacode",
         "active_profile": "novacode",
         "route_model": "gpt-4.1",
-        "shape_diff_high_level_conclusion": "synthetic_provider_contract_passed_but_bfcl_proxy_runtime_adapter_envelope_requires_review_before_retry",
+        "shape_diff_high_level_conclusion": "bfcl_proxy_runtime_adapter_envelope_aligned_to_synthetic_contract_shape_without_execution",
     }
     for key, value in expected.items():
         if data.get(key) != value:
@@ -149,8 +149,27 @@ def validate(data: dict[str, Any]) -> list[str]:
         blockers.append("proxy_adapter_shape_diff_route_model_drift")
     if synthetic.get("tools_count") != 1:
         blockers.append(f"proxy_adapter_shape_diff_synthetic_tools_count_invalid:{synthetic.get('tools_count')!r}")
-    if proxy.get("tool_choice_mode") != "required_string":
+    if proxy.get("tool_choice_mode") != "function_object_when_single_tool_else_required_string":
         blockers.append(f"proxy_adapter_shape_diff_proxy_tool_choice_mode_invalid:{proxy.get('tool_choice_mode')!r}")
+    token_presence = proxy.get("token_field_presence") if isinstance(proxy.get("token_field_presence"), dict) else {}
+    if token_presence.get("max_tokens") is not True or token_presence.get("max_completion_tokens") is not False:
+        blockers.append(f"proxy_adapter_shape_diff_proxy_token_field_presence_invalid:{token_presence!r}")
+    timeout_streaming = proxy.get("timeout_streaming_flags") if isinstance(proxy.get("timeout_streaming_flags"), dict) else {}
+    if timeout_streaming.get("streaming_enabled") is not False or timeout_streaming.get("timeout_seconds_present") is not True:
+        blockers.append(f"proxy_adapter_shape_diff_proxy_timeout_streaming_invalid:{timeout_streaming!r}")
+    if proxy.get("temperature_presence") is not True:
+        blockers.append(f"proxy_adapter_shape_diff_proxy_temperature_presence_invalid:{proxy.get('temperature_presence')!r}")
+    if data.get("adapter_risk_labels") not in ([], None):
+        blockers.append(f"proxy_adapter_shape_diff_adapter_risk_labels_not_empty:{data.get('adapter_risk_labels')!r}")
+    expected_alignment_labels = [
+        "tool_choice_function_object_for_single_tool_required_for_multi_tool",
+        "schema_local_additional_properties_false_enforced",
+        "max_tokens_normalized_for_signed_route",
+        "temperature_stream_timeout_explicit",
+        "empty_response_compact_stop_gate_labels_present",
+    ]
+    if data.get("adapter_alignment_labels") != expected_alignment_labels:
+        blockers.append("proxy_adapter_shape_diff_adapter_alignment_labels_drift")
     for shape_name, shape in [("synthetic", synthetic), ("proxy", proxy)]:
         if not isinstance(shape.get("request_top_level_keys"), list):
             blockers.append(f"proxy_adapter_shape_diff_{shape_name}_top_level_keys_missing")
@@ -159,6 +178,8 @@ def validate(data: dict[str, Any]) -> list[str]:
         flags = shape.get("tool_schema_structural_flags") if isinstance(shape.get("tool_schema_structural_flags"), dict) else {}
         if flags.get("function_tool") is not True:
             blockers.append(f"proxy_adapter_shape_diff_{shape_name}_function_tool_not_true:{flags.get('function_tool')!r}")
+        if flags.get("additional_properties_false") is not True:
+            blockers.append(f"proxy_adapter_shape_diff_{shape_name}_additional_properties_false_not_true:{flags.get('additional_properties_false')!r}")
         if not isinstance(shape.get("tool_schema_structural_hash"), str) or len(shape.get("tool_schema_structural_hash", "")) != 16:
             blockers.append(f"proxy_adapter_shape_diff_{shape_name}_tool_schema_hash_invalid")
     blockers.extend(_secret_or_endpoint_blockers(data))

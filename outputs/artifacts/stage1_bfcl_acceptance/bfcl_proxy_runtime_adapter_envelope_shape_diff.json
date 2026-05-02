@@ -1,10 +1,13 @@
 {
   "active_profile": "novacode",
-  "adapter_risk_labels": [
-    "tool_choice_form_differs_function_object_vs_required_string",
-    "proxy_adapter_additional_properties_flag_unknown_or_not_enforced",
-    "proxy_adapter_token_field_unknown_until_capture"
+  "adapter_alignment_labels": [
+    "tool_choice_function_object_for_single_tool_required_for_multi_tool",
+    "schema_local_additional_properties_false_enforced",
+    "max_tokens_normalized_for_signed_route",
+    "temperature_stream_timeout_explicit",
+    "empty_response_compact_stop_gate_labels_present"
   ],
+  "adapter_risk_labels": [],
   "api_key_value_committed": false,
   "approval_status": "prepared",
   "artifact_kind": "bfcl_proxy_runtime_adapter_envelope_shape_diff",
@@ -15,8 +18,9 @@
       "bucketed_only_runtime_variable"
     ],
     "empty_response_handling_path_labels": [
-      "decode_execute_empty_string_returns_empty_call_list",
-      "bfcl_runner_stops_on_empty_model_response"
+      "empty_model_response_compact_stop_gate",
+      "missing_tool_call_compact_stop_gate",
+      "openai_response_shape_compact_stop_gate"
     ],
     "message_count": "bfcl_runtime_variable",
     "parser_expected_response_keys": [
@@ -28,26 +32,30 @@
     "request_top_level_keys": [
       "messages_or_input",
       "model",
+      "stream",
+      "temperature",
+      "timeout",
       "tool_choice",
-      "tools"
+      "tools",
+      "max_tokens"
     ],
     "role_sequence": [
       "bfcl_runtime_variable"
     ],
     "route_model": "gpt-4.1",
-    "temperature_presence": "unknown_until_adapter_capture",
+    "temperature_presence": true,
     "timeout_streaming_flags": {
       "streaming_enabled": false,
-      "timeout_seconds_present": "proxy_runtime_configured"
+      "timeout_seconds_present": true
     },
     "token_field_presence": {
-      "max_completion_tokens": "unknown_until_adapter_capture",
-      "max_tokens": "unknown_until_adapter_capture"
+      "max_completion_tokens": false,
+      "max_tokens": true
     },
-    "tool_choice_mode": "required_string",
+    "tool_choice_mode": "function_object_when_single_tool_else_required_string",
     "tool_schema_structural_flags": {
-      "additional_properties_false": "not_enforced_by_current_bfcl_adapter_shape",
-      "enum_present": "unknown_until_adapter_capture",
+      "additional_properties_false": true,
+      "enum_present": "preserved_if_present",
       "function_name_present": true,
       "function_tool": true,
       "parameters_type_object": true,
@@ -55,7 +63,7 @@
       "required_present": true,
       "strict_present": false
     },
-    "tool_schema_structural_hash": "fa2c5af2e1c6ded9",
+    "tool_schema_structural_hash": "ae793bc325e9fe98",
     "tools_count": "bfcl_runtime_variable_positive"
   },
   "bfcl_smoke_executed": false,
@@ -77,8 +85,9 @@
       "function.name"
     ],
     "empty_response_handling_path_labels": [
-      "decode_execute_empty_string_returns_empty_call_list",
-      "bfcl_runner_stops_on_empty_model_response"
+      "empty_model_response_compact_stop_gate",
+      "missing_tool_call_compact_stop_gate",
+      "openai_response_shape_compact_stop_gate"
     ],
     "synthetic_expected_response_keys": [
       "choices",
@@ -127,7 +136,7 @@
   "route_model": "gpt-4.1",
   "scorer_executed": false,
   "scorer_feedback_tuning_enabled": false,
-  "shape_diff_high_level_conclusion": "synthetic_provider_contract_passed_but_bfcl_proxy_runtime_adapter_envelope_requires_review_before_retry",
+  "shape_diff_high_level_conclusion": "bfcl_proxy_runtime_adapter_envelope_aligned_to_synthetic_contract_shape_without_execution",
   "shape_fields_only": true,
   "sota_3pp_claim_ready": false,
   "source_input_read": false,

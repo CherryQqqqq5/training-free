@@ -4,20 +4,25 @@ from grc.utils.bfcl_request_policy import apply_bfcl_fc_request_policy
 from grc.utils.bfcl_request_policy import apply_bfcl_memory_request_policy
 
 
-def test_apply_fc_request_policy_sets_required_tool_choice(monkeypatch):
+def test_apply_fc_request_policy_sets_function_object_tool_choice_for_single_tool(monkeypatch):
     monkeypatch.setenv("GRC_BFCL_FORCE_TOOL_CHOICE", "1")
 
-    updated = apply_bfcl_fc_request_policy({"model": "m", "tools": [{"type": "function"}]})
+    updated = apply_bfcl_fc_request_policy(
+        {"model": "m", "tools": [{"type": "function", "function": {"name": "touch"}}]}
+    )
 
-    assert updated["tool_choice"] == "required"
+    assert updated["tool_choice"] == {"type": "function", "function": {"name": "touch"}}
 
 
-def test_apply_fc_request_policy_respects_opt_out(monkeypatch):
+def test_apply_fc_request_policy_respects_tool_choice_opt_out(monkeypatch):
     monkeypatch.setenv("GRC_BFCL_FORCE_TOOL_CHOICE", "0")
 
     updated = apply_bfcl_fc_request_policy({"model": "m", "tools": [{"type": "function"}]})
 
     assert "tool_choice" not in updated
+    assert updated["max_tokens"] == 4096
+    assert updated["temperature"] == 0
+    assert updated["stream"] is False
 
 
 def test_apply_fc_request_policy_preserves_existing_tool_choice(monkeypatch):
@@ -64,6 +69,74 @@ def test_apply_fc_request_policy_does_not_force_after_responses_function_output(
     )
 
     assert "tool_choice" not in updated
+
+
+def test_apply_fc_request_policy_keeps_required_for_multiple_tools(monkeypatch):
+    monkeypatch.setenv("GRC_BFCL_FORCE_TOOL_CHOICE", "1")
+
+    updated = apply_bfcl_fc_request_policy(
+        {
+            "model": "m",
+            "tools": [
+                {"type": "function", "function": {"name": "first"}},
+                {"type": "function", "function": {"name": "second"}},
+            ],
+        }
+    )
+
+    assert updated["tool_choice"] == "required"
+
+
+def test_apply_fc_request_policy_normalizes_schema_local_additional_properties(monkeypatch):
+    monkeypatch.setenv("GRC_BFCL_FORCE_TOOL_CHOICE", "1")
+
+    updated = apply_bfcl_fc_request_policy(
+        {
+            "model": "m",
+            "tools": [
+                {
+                    "name": "touch",
+                    "description": "unit fixture",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {"nested": {"type": "object", "properties": {}}},
+                    },
+                }
+            ],
+            "max_completion_tokens": 128,
+        }
+    )
+
+    tool = updated["tools"][0]
+    assert tool["type"] == "function"
+    assert tool["function"]["name"] == "touch"
+    assert tool["function"]["parameters"]["additionalProperties"] is False
+    assert tool["function"]["parameters"]["properties"]["nested"]["additionalProperties"] is False
+    assert updated["max_tokens"] == 128
+    assert "max_completion_tokens" not in updated
+    assert updated["temperature"] == 0
+    assert updated["stream"] is False
+
+
+def test_apply_fc_request_policy_preserves_existing_additional_properties(monkeypatch):
+    monkeypatch.setenv("GRC_BFCL_FORCE_TOOL_CHOICE", "1")
+
+    updated = apply_bfcl_fc_request_policy(
+        {
+            "model": "m",
+            "tools": [
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "touch",
+                        "parameters": {"type": "object", "additionalProperties": {"type": "string"}},
+                    },
+                }
+            ],
+        }
+    )
+
+    assert updated["tools"][0]["function"]["parameters"]["additionalProperties"] == {"type": "string"}
 
 
 def test_apply_memory_request_policy_injects_for_memory_recall(monkeypatch):
