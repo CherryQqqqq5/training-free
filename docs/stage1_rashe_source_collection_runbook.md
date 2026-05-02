@@ -160,6 +160,18 @@ Stop immediately if any of the following occurs:
 - `performance_evidence != false`
 - candidate JSONL, scorer output, or dev/holdout/full manifest is produced
 
+
+## Provider Protocol Debug Preflight Gate
+
+After the bounded Phase B attempt failed closed on provider HTTP 500, the next approved engineering step is only a prepared synthetic protocol debug preflight. It is not Phase B and does not authorize provider debug execution in this commit.
+
+```bash
+.venv/bin/python scripts/check_rashe_provider_protocol_debug_preflight_packet.py --compact --strict
+.venv/bin/python scripts/run_rashe_provider_protocol_debug_preflight.py --dry-run --compact --strict
+```
+
+The fixed variants are `baseline_chat_tools_required`, `chat_tools_auto`, `chat_tools_required_no_strict`, `chat_tools_max_completion_tokens`, and `chat_tools_minimal_messages`. They must remain synthetic protocol probes only: no BFCL/source inputs, no source manifests, no diagnostics, no raw request/response/header/body persistence, no candidate/scorer/performance/+3pp/Huawei work, and no endpoint/key values in output or artifacts. Actual provider debug execution requires a later approval.
+
 ## Rollback Template
 
 No rollback command should be run without explicit approval. If a future execution creates untracked source diagnostics that fail gates, remove only that future output root after review:
