@@ -497,7 +497,24 @@ def test_execute_path_with_env_transport_mock_http_audits_key_without_writing(mo
     schema = runner.load_json(args.schema)
     monkeypatch.setenv("CHUANGZHI_NOVACODE_ENDPOINT", "https://example.test/compact")
     monkeypatch.setenv("CHUANGZHI_API_KEY", "mock-secret-must-not-leak")
-    monkeypatch.setattr(provider_client, "_http_post_json", lambda *_: {"failure_bucket": "answered_without_tool"})
+    monkeypatch.setattr(
+        provider_client,
+        "_http_post_json",
+        lambda *_: {
+            "choices": [
+                {
+                    "message": {
+                        "tool_calls": [
+                            {
+                                "type": "function",
+                                "function": {"name": "synthetic_preflight_ping", "arguments": "{\"failure_bucket\":\"answered_without_tool\"}"},
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+    )
 
     execution = runner.execute_approved_source(
         args,

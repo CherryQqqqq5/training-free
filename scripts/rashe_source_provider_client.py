@@ -184,6 +184,97 @@ def _execution_env_key(audit: dict[str, bool]) -> str:
     raise SourceProviderClientError("provider_key_missing")
 
 
+def build_source_diagnostic_chat_payload(request: dict[str, Any]) -> dict[str, Any]:
+    """Build the signed OpenAI-compatible chat tools payload for one compact source slot.
+
+    The payload carries only sanitized category/ordinal metadata and a fixed
+    synthetic tool schema. It must not include BFCL raw prompt/case material,
+    provider payloads, candidates, scorer data, or performance claims.
+    """
+
+    hits = _forbidden_hits(request)
+    if hits:
+        raise SourceProviderClientError("provider_transport_request_forbidden_field:" + ";".join(hits))
+    if request.get("provider_profile") != SIGNED_PROVIDER_PROFILE:
+        raise SourceProviderClientError("provider_transport_profile_not_signed")
+    if request.get("model") != SIGNED_MODEL:
+        raise SourceProviderClientError("provider_transport_model_not_signed")
+    category = request.get("category")
+    if category not in APPROVED_CATEGORIES:
+        raise SourceProviderClientError(f"provider_transport_category_not_signed:{category!r}")
+    ordinal = request.get("ordinal")
+    if not isinstance(ordinal, int) or ordinal < 0 or ordinal >= SIGNED_CASES_PER_CATEGORY:
+        raise SourceProviderClientError(f"provider_transport_ordinal_not_signed:{ordinal!r}")
+    for flag in [
+        "raw_payload_capture_authorized",
+        "raw_trace_capture_authorized",
+        "candidate_generation_authorized",
+        "scorer_authorized",
+        "performance_evidence",
+    ]:
+        if request.get(flag) is not False:
+            raise SourceProviderClientError(f"provider_transport_{flag}_not_false")
+    if request.get("compact_sanitized_only") is not True:
+        raise SourceProviderClientError("provider_transport_compact_sanitized_only_not_true")
+
+    tool = {
+        "type": "function",
+        "function": {
+            "name": "synthetic_preflight_ping",
+            "description": "Return one signed source diagnostic failure bucket using sanitized metadata only.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "failure_bucket": {"type": "string", "enum": list(FAILURE_BUCKETS)},
+                },
+                "required": ["failure_bucket"],
+                "additionalProperties": False,
+            },
+        },
+    }
+    return {
+        "model": SIGNED_MODEL,
+        "messages": [
+            {"role": "user", "content": f"Return exactly one signed failure_bucket tool call using sanitized metadata only. category={category}; ordinal={ordinal}; compact_source_slot=true"},
+        ],
+        "tools": [tool],
+        "tool_choice": {"type": "function", "function": {"name": "synthetic_preflight_ping"}},
+        "max_tokens": 16,
+        "temperature": 0,
+    }
+
+
+def parse_source_diagnostic_tool_response(response: dict[str, Any]) -> dict[str, Any]:
+    if not isinstance(response, dict):
+        raise SourceProviderClientError("provider_transport_response_not_object")
+    hits = _forbidden_hits(response)
+    if hits:
+        raise SourceProviderClientError("provider_transport_result_forbidden_field:" + ";".join(hits))
+    choices = response.get("choices") if isinstance(response.get("choices"), list) else []
+    for choice in choices:
+        if not isinstance(choice, dict):
+            continue
+        message = choice.get("message") if isinstance(choice.get("message"), dict) else {}
+        calls = message.get("tool_calls") if isinstance(message.get("tool_calls"), list) else []
+        for call in calls:
+            function = call.get("function") if isinstance(call, dict) and isinstance(call.get("function"), dict) else {}
+            arguments = function.get("arguments")
+            if isinstance(arguments, str):
+                try:
+                    parsed = json.loads(arguments)
+                except json.JSONDecodeError as exc:
+                    raise SourceProviderClientError("provider_transport_tool_arguments_not_json") from exc
+            elif isinstance(arguments, dict):
+                parsed = arguments
+            else:
+                continue
+            bucket = parsed.get("failure_bucket") if isinstance(parsed, dict) else None
+            if bucket not in FAILURE_BUCKETS:
+                raise SourceProviderClientError(f"provider_transport_failure_bucket_not_signed:{bucket}")
+            return {"failure_bucket": bucket}
+    raise SourceProviderClientError("provider_transport_tool_call_missing")
+
+
 def _http_post_json(endpoint: str, api_key: str, payload: dict[str, Any]) -> dict[str, Any]:
     body = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
     request = urllib.request.Request(
@@ -225,18 +316,8 @@ def _build_env_only_provider_transport(audit: dict[str, bool]) -> ProviderTransp
             raise SourceProviderClientError("provider_transport_model_not_signed")
         endpoint = _execution_endpoint(audit)
         api_key = _execution_env_key(audit)
-        response = _http_post_json(
-            endpoint,
-            api_key,
-            {
-                "category": request["category"],
-                "ordinal": request["ordinal"],
-                "provider_profile": SIGNED_PROVIDER_PROFILE,
-                "model": SIGNED_MODEL,
-                "compact_sanitized_only": True,
-            },
-        )
-        return response
+        response = _http_post_json(endpoint, api_key, build_source_diagnostic_chat_payload(request))
+        return parse_source_diagnostic_tool_response(response)
 
     return transport
 

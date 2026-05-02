@@ -1,4 +1,5 @@
 import builtins
+import json
 
 import pytest
 
@@ -42,6 +43,26 @@ def category_request(category="agentic_web_search", **overrides):
     }
     request.update(overrides)
     return request
+
+
+def tool_response(bucket="wrong_first_tool"):
+    return {
+        "choices": [
+            {
+                "message": {
+                    "tool_calls": [
+                        {
+                            "type": "function",
+                            "function": {
+                                "name": "synthetic_preflight_ping",
+                                "arguments": json.dumps({"failure_bucket": bucket}),
+                            },
+                        }
+                    ]
+                }
+            }
+        ]
+    }
 
 
 def compact_cases(category):
@@ -111,8 +132,16 @@ def test_env_transport_with_mock_http_reads_key_and_returns_signed_bucket(monkey
         assert endpoint == "https://example.test/compact"
         assert api_key == "mock-secret-must-not-leak"
         assert "mock-secret-must-not-leak" not in str(payload)
-        assert set(payload) == {"category", "ordinal", "provider_profile", "model", "compact_sanitized_only"}
-        return {"failure_bucket": "wrong_first_tool"}
+        assert payload["model"] == "gpt-4.1"
+        assert payload["messages"][0]["role"] == "user"
+        assert payload["tool_choice"]["type"] == "function"
+        assert payload["max_tokens"] == 16
+        assert "max_completion_tokens" not in payload
+        assert payload["tools"][0]["function"]["parameters"]["additionalProperties"] is False
+        assert "strict" not in payload["tools"][0]["function"]
+        assert "gpt-4o" not in str(payload)
+        assert "raw_payload" not in str(payload).lower()
+        return tool_response("wrong_first_tool")
 
     monkeypatch.setattr(provider_client, "_http_post_json", fake_http_post_json)
     request = signed_request(source_case_provider=lambda request: compact_cases(request["category"]))
@@ -145,13 +174,45 @@ def test_env_transport_rejects_forbidden_raw_http_response(monkeypatch):
 def test_env_transport_rejects_unsigned_failure_bucket(monkeypatch):
     monkeypatch.setenv("CHUANGZHI_NOVACODE_ENDPOINT", "https://example.test/compact")
     monkeypatch.setenv("CHUANGZHI_API_KEY", "mock-secret-must-not-leak")
-    monkeypatch.setattr(provider_client, "_http_post_json", lambda *_: {"failure_bucket": "not_signed"})
+    monkeypatch.setattr(provider_client, "_http_post_json", lambda *_: tool_response("not_signed"))
     request = signed_request(source_case_provider=lambda request: compact_cases(request["category"]))
     client = provider_client.build_chuangzhi_novacode_source_provider_client(request)
 
     with pytest.raises(provider_client.SourceProviderClientError, match="provider_transport_failure_bucket_not_signed:not_signed"):
         client(category_request())
     assert getattr(client, "api_key_read") is True
+
+
+def test_source_diagnostic_chat_payload_shape_is_protocol_aligned():
+    payload = provider_client.build_source_diagnostic_chat_payload(
+        {
+            "category": "agentic_web_search",
+            "ordinal": 0,
+            "provider_profile": "Chuangzhi/Novacode",
+            "model": "gpt-4.1",
+            "compact_sanitized_only": True,
+            "raw_payload_capture_authorized": False,
+            "raw_trace_capture_authorized": False,
+            "candidate_generation_authorized": False,
+            "scorer_authorized": False,
+            "performance_evidence": False,
+        }
+    )
+    assert payload["model"] == "gpt-4.1"
+    assert [message["role"] for message in payload["messages"]] == ["user"]
+    assert len(payload["tools"]) == 1
+    assert payload["tool_choice"]["type"] == "function"
+    assert payload["max_tokens"] == 16
+    assert "max_completion_tokens" not in payload
+    assert payload["temperature"] == 0
+    params = payload["tools"][0]["function"]["parameters"]
+    assert params["type"] == "object"
+    assert params["additionalProperties"] is False
+    assert "strict" not in payload["tools"][0]["function"]
+    encoded = str(payload).lower()
+    assert "gpt-4o" not in encoded
+    assert "case_id" not in encoded
+    assert "raw_payload" not in encoded
 
 
 def test_client_with_mock_source_and_transport_returns_compact_counter_only(monkeypatch):
