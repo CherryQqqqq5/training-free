@@ -1,6 +1,6 @@
 # Stage 1 RASHE Candidate Proposer Scope
 
-This document scopes candidate proposer approval preparation only. Candidate proposer execution, candidate JSONL generation, candidate pool readiness, scorer execution, performance evidence, +3pp claims, and Huawei acceptance remain unauthorized.
+This document scopes bounded candidate proposer execution for spec-only artifacts over exactly two seed skills. Candidate generation, candidate JSONL generation, candidate pool readiness, scorer execution, performance evidence, +3pp claims, and Huawei acceptance remain unauthorized.
 
 ## Prepared Seed Skills
 
@@ -30,3 +30,7 @@ Allowed inputs are limited to compact diagnostics, failure bucket counts, frozen
 Raw prompt, trace, provider request/response, case ID, gold, expected, reference, scorer diff, candidate output, repair feedback, holdout/full feedback, endpoint/key material, and source nonce mapping are forbidden. Candidate JSONL, candidate pool artifacts, scorer artifacts, performance artifacts, +3pp artifacts, and Huawei artifacts are not authorized.
 
 This scope is not performance evidence, not a +3pp claim, not Huawei acceptance evidence, and not scorer evidence.
+
+## Approved Execution Boundary
+
+Bounded proposer execution is authorized only to write compact `SKILL.md` and `candidate_spec.json` review artifacts for `bfcl_multi_turn_state_tracking` and `bfcl_hallucination_abstain`. It must not create candidate JSONL, candidate pool artifacts, scorer inputs, performance artifacts, or Huawei/+3pp claims.

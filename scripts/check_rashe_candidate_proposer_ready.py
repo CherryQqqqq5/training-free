@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail-closed readiness check for pending RASHE candidate proposer approval."""
+"""Fail-closed readiness check for bounded RASHE candidate proposer execution."""
 
 from __future__ import annotations
 
@@ -13,6 +13,7 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from scripts.check_rashe_candidate_proposer_approval_packet import DEFAULT_PACKET, ALLOWED_SEED_SKILLS, check as check_packet
+from scripts.check_rashe_candidate_proposer_artifacts import check as check_candidate_artifacts
 from scripts.check_rashe_source_diagnostic_compact import SIGNED_ROOT, check_root
 
 CANDIDATE_FORBIDDEN_ROOTS = (
@@ -111,10 +112,11 @@ def check_ready(packet_path: Path = DEFAULT_PACKET) -> dict[str, Any]:
     packet_summary = check_packet(packet_path)
     if not packet_summary.get("rashe_candidate_proposer_approval_packet_passed"):
         blockers.extend(f"packet:{blocker}" for blocker in packet_summary.get("blockers", []))
-    if packet_summary.get("approval_status") != "pending":
-        blockers.append(f"candidate_ready_packet_not_pending:{packet_summary.get('approval_status')!r}")
+    if packet_summary.get("approval_status") != "approved":
+        blockers.append(f"candidate_ready_packet_not_approved:{packet_summary.get('approval_status')!r}")
+    if packet_summary.get("candidate_proposer_execution_authorized") is not True:
+        blockers.append(f"candidate_ready_packet_candidate_proposer_execution_authorized_not_true:{packet_summary.get('candidate_proposer_execution_authorized')!r}")
     for key in [
-        "candidate_proposer_execution_authorized",
         "candidate_generation_authorized",
         "candidate_jsonl_authorized",
         "candidate_pool_ready",
@@ -136,6 +138,9 @@ def check_ready(packet_path: Path = DEFAULT_PACKET) -> dict[str, Any]:
     if not ok_boundary:
         blockers.append(f"artifact_boundary:{boundary_error}")
     blockers.extend(_candidate_artifact_blockers())
+    artifact_summary = check_candidate_artifacts()
+    if not artifact_summary.get("rashe_candidate_proposer_artifacts_passed"):
+        blockers.extend(f"candidate_artifacts:{blocker}" for blocker in artifact_summary.get("blockers", []))
 
     return {
         "report_scope": "rashe_candidate_proposer_ready_check",
@@ -144,12 +149,14 @@ def check_ready(packet_path: Path = DEFAULT_PACKET) -> dict[str, Any]:
         "approval_status": packet_summary.get("approval_status"),
         "allowed_seed_skills": packet_summary.get("allowed_seed_skills"),
         "candidate_proposer_execution_authorized": packet_summary.get("candidate_proposer_execution_authorized"),
+        "bounded_candidate_proposer_execution_authorized": packet_summary.get("bounded_candidate_proposer_execution_authorized"),
         "candidate_generation_authorized": packet_summary.get("candidate_generation_authorized"),
         "candidate_jsonl_authorized": packet_summary.get("candidate_jsonl_authorized"),
         "candidate_pool_ready": packet_summary.get("candidate_pool_ready"),
         "scorer_authorized": packet_summary.get("scorer_authorized"),
         "performance_evidence": packet_summary.get("performance_evidence"),
         "source_diagnostic_total_case_count": diagnostic_summary.get("total_case_count"),
+        "candidate_proposer_artifacts_passed": artifact_summary.get("rashe_candidate_proposer_artifacts_passed"),
         "rashe_candidate_proposer_ready_passed": not blockers,
         "blockers": blockers,
     }

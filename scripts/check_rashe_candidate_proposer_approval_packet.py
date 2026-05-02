@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check the pending RASHE candidate proposer approval packet."""
+"""Check the bounded RASHE candidate proposer approval packet."""
 
 from __future__ import annotations
 
@@ -17,9 +17,12 @@ DISALLOWED_SEED_SKILLS = [
     "bfcl_memory_retrieve_before_answer",
     "bfcl_parser_feedback_retry",
 ]
-REQUIRED_FALSE = (
+REQUIRED_TRUE = (
     "authorized",
     "candidate_proposer_execution_authorized",
+    "bounded_candidate_proposer_execution_authorized",
+)
+REQUIRED_FALSE = (
     "candidate_generation_authorized",
     "candidate_jsonl_authorized",
     "candidate_pool_ready",
@@ -74,15 +77,20 @@ def validate(packet: dict[str, Any]) -> list[str]:
     blockers: list[str] = []
     expected = {
         "approval_packet_kind": "candidate_proposer_execution_approval",
-        "approval_status": "pending",
+        "approval_status": "approved",
         "source_diagnostics_commit": SOURCE_DIAGNOSTICS_COMMIT,
         "route_model": "gpt-4.1",
         "allowed_seed_skills": ALLOWED_SEED_SKILLS,
         "disallowed_seed_skills": DISALLOWED_SEED_SKILLS,
+        "reviewed_approval_commit": "b03b155210faaf534ab168bd955fe8e655e83aaa",
+        "candidate_proposer_execution_scope": "spec_only_two_seed_skills_no_candidate_jsonl_no_pool",
     }
     for key, value in expected.items():
         if packet.get(key) != value:
             blockers.append(f"candidate_packet_{key}_invalid:{packet.get(key)!r}")
+    for key in REQUIRED_TRUE:
+        if packet.get(key) is not True:
+            blockers.append(f"candidate_packet_{key}_not_true:{packet.get(key)!r}")
     for key in REQUIRED_FALSE:
         if packet.get(key) is not False:
             blockers.append(f"candidate_packet_{key}_not_false:{packet.get(key)!r}")
@@ -127,7 +135,6 @@ def validate(packet: dict[str, Any]) -> list[str]:
         if normalized not in strings:
             blockers.append(f"candidate_packet_forbidden_boundary_missing:{fragment}")
     for bad in [
-        "approval_status=approved",
         "candidate_generation_authorized=true",
         "candidate pool ready",
         "scorer authorized",
@@ -147,6 +154,7 @@ def check(packet_path: Path = DEFAULT_PACKET) -> dict[str, Any]:
         "packet_path": str(packet_path),
         "approval_status": packet.get("approval_status"),
         "candidate_proposer_execution_authorized": packet.get("candidate_proposer_execution_authorized"),
+        "bounded_candidate_proposer_execution_authorized": packet.get("bounded_candidate_proposer_execution_authorized"),
         "candidate_generation_authorized": packet.get("candidate_generation_authorized"),
         "candidate_jsonl_authorized": packet.get("candidate_jsonl_authorized"),
         "candidate_pool_ready": packet.get("candidate_pool_ready"),

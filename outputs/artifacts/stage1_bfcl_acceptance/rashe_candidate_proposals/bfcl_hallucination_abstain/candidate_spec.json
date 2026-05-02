@@ -1,0 +1,38 @@
+{
+  "artifact_kind": "rashe_bounded_candidate_proposer_spec",
+  "authorized_scope": "bounded_candidate_proposer_execution_only",
+  "candidate_artifact_format": "spec_only_no_jsonl_no_pool",
+  "candidate_generation_authorized": false,
+  "candidate_jsonl_authorized": false,
+  "candidate_pool_ready": false,
+  "category_coverage_count": 2,
+  "compact_evidence": {
+    "hallucination": {
+      "unsupported_hallucinated_answer": 20
+    },
+    "irrelevance": {
+      "irrelevant_tool_call": 20
+    }
+  },
+  "huawei_acceptance_ready": false,
+  "performance_evidence": false,
+  "policy": "abstain instead of filling unsupported details; reject if compact evidence coverage is absent or outside signed categories",
+  "primary_bucket_total": 40,
+  "provenance_inputs": [
+    "compact_source_diagnostics",
+    "failure_bucket_counts",
+    "category_coverage_counts",
+    "frozen_skill_bucket_mapping",
+    "no_leakage_booleans",
+    "route_metadata_gpt_4_1"
+  ],
+  "reviewed_approval_commit": "b03b155210faaf534ab168bd955fe8e655e83aaa",
+  "rollback_boundary": "remove this spec directory; no runtime activation is coupled to this artifact",
+  "route_model": "gpt-4.1",
+  "scorer_authorized": false,
+  "skill_id": "bfcl_hallucination_abstain",
+  "sota_3pp_claim_ready": false,
+  "source_diagnostics_commit": "cc21c96b70ab51c2bf586c0e79cdde3838dcb05d",
+  "trigger": "abstention-safety categories with compact hallucination or irrelevance bucket evidence",
+  "verifier": "requires unsupported_hallucinated_answer and irrelevant_tool_call compact counts across the two signed abstention categories and no-leakage audit pass"
+}

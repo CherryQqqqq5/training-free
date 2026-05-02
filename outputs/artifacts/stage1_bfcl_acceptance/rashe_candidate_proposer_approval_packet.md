@@ -1,6 +1,6 @@
 # RASHE Candidate Proposer Approval Packet
 
-Status: `pending` / fail-closed. This packet prepares candidate proposer approval materials only and does not authorize candidate execution.
+Status: `approved` for bounded spec-only candidate proposer execution over exactly two seed skills. This packet does not authorize candidate generation, candidate JSONL, candidate pool readiness, scorer, performance, +3pp, or Huawei execution.
 
 ## Signed Evidence
 
@@ -31,7 +31,8 @@ Raw prompt, raw trace, provider request/response, case ID, gold, expected, refer
 
 ## Authorization Boundary
 
-- candidate_proposer_execution_authorized: `false`
+- candidate_proposer_execution_authorized: `true`
+- bounded_candidate_proposer_execution_authorized: `true`
 - candidate_generation_authorized: `false`
 - candidate_jsonl_authorized: `false`
 - candidate_pool_ready: `false`
@@ -40,3 +41,5 @@ Raw prompt, raw trace, provider request/response, case ID, gold, expected, refer
 - SOTA +3pp/Huawei readiness: `false`
 
 This is not performance evidence, not a +3pp claim, not Huawei acceptance evidence, and not scorer evidence.
+
+Execution approval was reviewed at commit `b03b155210faaf534ab168bd955fe8e655e83aaa` and remains limited to spec-only artifacts for `bfcl_multi_turn_state_tracking` and `bfcl_hallucination_abstain`.
