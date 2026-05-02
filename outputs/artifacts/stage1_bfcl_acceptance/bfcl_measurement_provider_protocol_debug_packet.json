@@ -1,10 +1,12 @@
 {
   "approval_packet_kind": "bfcl_measurement_provider_protocol_debug",
-  "approval_status": "pending",
-  "authorized": false,
+  "approval_status": "approved",
+  "authorized": true,
   "protocol_debug_preparation_authorized": true,
-  "protocol_debug_execution_authorized": false,
-  "provider_request_authorized": false,
+  "protocol_debug_execution_authorized": true,
+  "provider_request_authorized": true,
+  "provider_request_scope": "exactly_one_synthetic_pre_bfcl_protocol_debug_path",
+  "provider_request_count": 1,
   "bfcl_smoke_authorized": false,
   "bfcl_full_eval_authorized": false,
   "scorer_authorized": false,
@@ -50,6 +52,14 @@
     "tool_call_required_guard",
     "openai_compatible_response_shape_guard"
   ],
+  "synthetic_probe_policy": {
+    "bfcl_case_material_allowed": false,
+    "candidate_spec_material_allowed": false,
+    "raw_request_persistence_allowed": false,
+    "raw_response_persistence_allowed": false,
+    "toy_tool_name": "synthetic_measurement_protocol_ping",
+    "tool_call_required": true
+  },
   "forbidden_material": [
     "raw logs",
     "raw traces",

@@ -16,9 +16,6 @@ SIGNED_KEY_ENVS = ["CHUANGZHI_API_KEY", "NOVACODE_API_KEY"]
 ENDPOINT_LITERAL_FRAGMENTS = ("apicz", "boyuerichdata", "http://", "https://")
 KEY_LITERAL_PATTERN = re.compile(r"sk-[A-Za-z0-9_-]{16,}")
 REQUIRED_FALSE = (
-    "authorized",
-    "protocol_debug_execution_authorized",
-    "provider_request_authorized",
     "bfcl_smoke_authorized",
     "bfcl_full_eval_authorized",
     "scorer_authorized",
@@ -43,7 +40,10 @@ REQUIRED_FALSE = (
     "performance_claim_from_failed_attempt",
 )
 REQUIRED_TRUE = (
+    "authorized",
     "protocol_debug_preparation_authorized",
+    "protocol_debug_execution_authorized",
+    "provider_request_authorized",
     "candidate_specs_inert",
     "endpoint_env_only",
     "api_key_env_only",
@@ -85,10 +85,12 @@ def validate(packet: dict[str, Any]) -> list[str]:
     blockers: list[str] = []
     expected = {
         "approval_packet_kind": "bfcl_measurement_provider_protocol_debug",
-        "approval_status": "pending",
+        "approval_status": "approved",
         "provider_profile": "Chuangzhi/Novacode",
         "active_profile": "novacode",
         "route_model": "gpt-4.1",
+        "provider_request_scope": "exactly_one_synthetic_pre_bfcl_protocol_debug_path",
+        "provider_request_count": 1,
         "signed_endpoint_env_vars": SIGNED_ENDPOINT_ENVS,
         "signed_api_key_env_vars": SIGNED_KEY_ENVS,
         "failure_class": "empty_model_response_before_measurement_completion",
@@ -110,6 +112,19 @@ def validate(packet: dict[str, Any]) -> list[str]:
     for key in REQUIRED_FALSE:
         if packet.get(key) is not False:
             blockers.append(f"protocol_debug_packet_{key}_not_false:{packet.get(key)!r}")
+    probe = packet.get("synthetic_probe_policy") if isinstance(packet.get("synthetic_probe_policy"), dict) else {}
+    if probe.get("bfcl_case_material_allowed") is not False:
+        blockers.append("protocol_debug_packet_bfcl_case_material_allowed_not_false")
+    if probe.get("candidate_spec_material_allowed") is not False:
+        blockers.append("protocol_debug_packet_candidate_spec_material_allowed_not_false")
+    if probe.get("raw_request_persistence_allowed") is not False:
+        blockers.append("protocol_debug_packet_raw_request_persistence_allowed_not_false")
+    if probe.get("raw_response_persistence_allowed") is not False:
+        blockers.append("protocol_debug_packet_raw_response_persistence_allowed_not_false")
+    if probe.get("tool_call_required") is not True:
+        blockers.append("protocol_debug_packet_tool_call_required_not_true")
+    if probe.get("toy_tool_name") != "synthetic_measurement_protocol_ping":
+        blockers.append(f"protocol_debug_packet_toy_tool_name_invalid:{probe.get('toy_tool_name')!r}")
     forbidden = packet.get("forbidden_material") if isinstance(packet.get("forbidden_material"), list) else []
     for required in [
         "raw logs",

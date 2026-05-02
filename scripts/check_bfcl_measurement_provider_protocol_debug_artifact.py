@@ -27,6 +27,12 @@ REQUIRED_RECORD_FALSE = (
     "sota_3pp_claim_ready",
     "huawei_acceptance_ready",
 )
+REQUIRED_TOP_FALSE = (
+    "raw_request_persisted",
+    "raw_response_persisted",
+    "raw_header_persisted",
+    "raw_body_persisted",
+)
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -87,8 +93,13 @@ def validate_artifact(data: dict[str, Any]) -> list[str]:
     blockers: list[str] = []
     if data.get("artifact_kind") != "bfcl_measurement_provider_protocol_debug_compact":
         blockers.append(f"protocol_debug_artifact_kind_invalid:{data.get('artifact_kind')!r}")
-    if data.get("provider_request_executed") is not False:
-        blockers.append(f"protocol_debug_artifact_provider_request_executed_not_false:{data.get('provider_request_executed')!r}")
+    if data.get("provider_request_executed") not in (False, True):
+        blockers.append(f"protocol_debug_artifact_provider_request_executed_invalid:{data.get('provider_request_executed')!r}")
+    if data.get("provider_request_executed") is True and data.get("provider_request_count") != 1:
+        blockers.append(f"protocol_debug_artifact_provider_request_count_invalid:{data.get('provider_request_count')!r}")
+    for key in REQUIRED_TOP_FALSE:
+        if data.get(key) is not False:
+            blockers.append(f"protocol_debug_artifact_{key}_not_false:{data.get(key)!r}")
     records = data.get("records")
     if not isinstance(records, list) or not records:
         blockers.append("protocol_debug_artifact_records_missing")

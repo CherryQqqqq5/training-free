@@ -4,7 +4,7 @@ from pathlib import Path
 from scripts.check_bfcl_measurement_provider_protocol_debug_artifact import validate_artifact
 from scripts.check_bfcl_measurement_provider_protocol_debug_packet import check as check_packet
 from scripts.check_bfcl_measurement_provider_protocol_debug_packet import validate as validate_packet
-from scripts.run_bfcl_measurement_provider_protocol_debug import build_plan
+from scripts.run_bfcl_measurement_provider_protocol_debug import build_plan, execute_debug
 
 
 PACKET = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_measurement_provider_protocol_debug_packet.json")
@@ -16,11 +16,15 @@ def load_packet() -> dict:
 
 def valid_record() -> dict:
     return {
-        "variant": "synthetic_tool_call_required_guard",
+        "variant": "synthetic_pre_bfcl_protocol_debug",
         "route_profile": "novacode",
         "route_model": "gpt-4.1",
         "fallback_allowed": False,
         "gpt_4o_fallback_allowed": False,
+        "http_status_class": 2,
+        "auth_ok": True,
+        "model_available": True,
+        "tool_calls_returned": True,
         "raw_provider_payload_persisted": False,
         "raw_log_persisted": False,
         "raw_trace_persisted": False,
@@ -43,19 +47,45 @@ def valid_record() -> dict:
     }
 
 
-def valid_artifact() -> dict:
+def valid_artifact(executed: bool = True) -> dict:
     return {
         "artifact_kind": "bfcl_measurement_provider_protocol_debug_compact",
-        "provider_request_executed": False,
+        "provider_request_executed": executed,
+        "provider_request_count": 1 if executed else 0,
+        "endpoint_present": executed,
+        "endpoint_value_read": executed,
+        "api_key_present": executed,
+        "api_key_value_read": executed,
+        "raw_request_persisted": False,
+        "raw_response_persisted": False,
+        "raw_header_persisted": False,
+        "raw_body_persisted": False,
         "records": [valid_record()],
+        "blockers": [],
+        "bfcl_measurement_provider_protocol_debug_passed": True,
     }
 
 
-def test_packet_passes_fixed_gpt_4_1_route():
+def mock_response() -> dict:
+    return {
+        "choices": [
+            {
+                "message": {
+                    "tool_calls": [
+                        {"type": "function", "function": {"name": "synthetic_measurement_protocol_ping", "arguments": "{}"}}
+                    ]
+                }
+            }
+        ]
+    }
+
+
+def test_packet_passes_fixed_gpt_4_1_route_and_execution_authorization():
     summary = check_packet(PACKET)
     assert summary["bfcl_measurement_provider_protocol_debug_packet_passed"] is True
     assert summary["route_model"] == "gpt-4.1"
-    assert summary["protocol_debug_execution_authorized"] is False
+    assert summary["protocol_debug_execution_authorized"] is True
+    assert summary["provider_request_authorized"] is True
     assert summary["scorer_authorized"] is False
 
 
@@ -114,8 +144,58 @@ def test_runner_dry_run_plan_does_not_read_endpoint_key_or_call_provider():
     assert plan["bfcl_full_eval_executed"] is False
 
 
-def test_artifact_checker_accepts_compact_mock_artifact():
-    assert validate_artifact(valid_artifact()) == []
+def test_execute_mode_is_gated_by_packet_approval(tmp_path):
+    packet = load_packet()
+    packet["provider_request_authorized"] = False
+    packet_path = tmp_path / "packet.json"
+    packet_path.write_text(json.dumps(packet))
+    summary = execute_debug(packet=packet_path, env={})
+    assert summary["provider_request_executed"] is False
+    assert "protocol_debug_packet_provider_request_authorized_not_true:False" in summary["blockers"]
+
+
+def test_env_only_provider_execution_path_mocked_without_value_output():
+    calls = []
+
+    def transport(endpoint, key, payload):
+        calls.append((endpoint, key, payload))
+        return 200, mock_response()
+
+    summary = execute_debug(
+        env={"CHUANGZHI_NOVACODE_ENDPOINT": "https://unit.test/v1/chat/completions", "CHUANGZHI_API_KEY": "unit-secret"},
+        transport=transport,
+    )
+    rendered = json.dumps(summary)
+    assert summary["bfcl_measurement_provider_protocol_debug_passed"] is True
+    assert summary["provider_request_executed"] is True
+    assert summary["endpoint_value_read"] is True
+    assert summary["api_key_value_read"] is True
+    assert len(calls) == 1
+    assert "unit-secret" not in rendered
+    assert "unit.test" not in rendered
+    assert "Return exactly one tool call" not in rendered
+
+
+def test_execute_mode_missing_endpoint_or_key_fails_closed():
+    no_endpoint = execute_debug(env={"CHUANGZHI_API_KEY": "unit-secret"}, transport=lambda *_: (200, mock_response()))
+    assert "provider_endpoint_missing" in no_endpoint["blockers"]
+    assert no_endpoint["provider_request_executed"] is False
+    no_key = execute_debug(env={"CHUANGZHI_NOVACODE_ENDPOINT": "https://unit.test/v1/chat/completions"}, transport=lambda *_: (200, mock_response()))
+    assert "provider_key_missing" in no_key["blockers"]
+    assert no_key["provider_request_executed"] is False
+
+
+def test_execute_mode_rejects_gpt_4o_route_drift_in_artifact():
+    artifact = valid_artifact()
+    artifact["records"][0]["route_model"] = "gpt-4o"
+    artifact["records"][0]["gpt_4o_fallback_allowed"] = True
+    blockers = "\n".join(validate_artifact(artifact))
+    assert "record_0_route_model_invalid:'gpt-4o'" in blockers
+    assert "record_0_fallback_not_false" in blockers
+
+
+def test_artifact_checker_accepts_compact_mock_executed_artifact():
+    assert validate_artifact(valid_artifact(executed=True)) == []
 
 
 def test_artifact_checker_rejects_empty_response():
@@ -143,3 +223,12 @@ def test_artifact_checker_rejects_raw_persistence_and_candidate_activation():
     blockers = "\n".join(validate_artifact(artifact))
     assert "record_0_raw_provider_payload_persisted_not_false:True" in blockers
     assert "record_0_candidate_runtime_activation_authorized_not_false:True" in blockers
+
+
+def test_artifact_checker_rejects_endpoint_and_key_literals():
+    artifact = valid_artifact()
+    artifact["endpoint_debug"] = "https" + "://example.invalid/v1"
+    artifact["key_debug"] = "sk-" + "D" * 24
+    blockers = "\n".join(validate_artifact(artifact))
+    assert "protocol_debug_artifact_endpoint_literal_forbidden" in blockers
+    assert "protocol_debug_artifact_key_literal_forbidden" in blockers

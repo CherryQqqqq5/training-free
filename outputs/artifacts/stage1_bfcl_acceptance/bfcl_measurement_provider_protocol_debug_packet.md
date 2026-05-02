@@ -1,6 +1,6 @@
 # BFCL Measurement Provider Protocol Debug Packet
 
-Status: `pending`. This packet prepares a synthetic, pre-BFCL provider protocol debug gate after the Stage 1 measurement retry stopped before completion. It does not authorize a provider request, BFCL smoke, BFCL full/default evaluation, scorer execution, candidate activation, performance evidence, +3pp claims, SOTA claims, or Huawei readiness.
+Status: `approved` for exactly one synthetic, pre-BFCL provider protocol debug request path. This does not authorize BFCL smoke, BFCL full/default evaluation, scorer execution, candidate activation, performance evidence, +3pp claims, SOTA claims, or Huawei readiness.
 
 ## Signed Route
 
@@ -27,8 +27,10 @@ This failed attempt is protocol/runtime readiness evidence only. It is not measu
 ## Authorization Boundary
 
 - protocol_debug_preparation_authorized: `true`
-- protocol_debug_execution_authorized: `false`
-- provider_request_authorized: `false`
+- protocol_debug_execution_authorized: `true`
+- provider_request_authorized: `true`
+- provider_request_scope: `exactly_one_synthetic_pre_bfcl_protocol_debug_path`
+- provider_request_count: `1`
 - bfcl_smoke_authorized: `false`
 - bfcl_full_eval_authorized: `false`
 - scorer_authorized: `false`
@@ -40,8 +42,8 @@ This failed attempt is protocol/runtime readiness evidence only. It is not measu
 - sota_3pp_claim_ready: `false`
 - huawei_acceptance_ready: `false`
 
-## Prepared Debug Scope
+## Synthetic Debug Scope
 
-The next reviewer-approved diagnostic may use only synthetic, pre-BFCL protocol probes to verify local runtime-to-provider response contract shape. Planned checks are limited to empty-response detection, required tool-call detection, and OpenAI-compatible response shape detection.
+The approved execution path may use only one synthetic, pre-BFCL protocol probe against the signed `novacode` / `gpt-4.1` route. The probe checks empty-response detection, required tool-call detection, and OpenAI-compatible response shape detection. It must not use BFCL cases, source inputs, prompts, gold/reference material, scorer feedback, candidate specs, candidate output, or Phase B diagnostics.
 
-Raw logs, raw traces, provider payloads, prompts, gold/reference material, scorer diffs, candidate output, endpoint values, and key values are not approved for persistence or commit.
+Raw logs, raw traces, provider payloads, prompts, headers, request bodies, response bodies, endpoint values, and key values are not approved for persistence or commit. The runner may emit only compact sanitized booleans/status fields.
