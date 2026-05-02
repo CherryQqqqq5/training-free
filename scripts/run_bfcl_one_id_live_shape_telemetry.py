@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Plan or execute one-ID BFCL live-shape telemetry.
 
-The committed packet is pending/fail-closed. Execute mode is present only for a
-future reviewed packet state; dry-run/plan never reads endpoint or key values.
+The committed packet is pending/fail-closed. Execute mode is present for a
+future reviewed packet state and is testable with a signed fake live-capture
+callable; dry-run/plan never reads endpoint or key values.
 """
 
 from __future__ import annotations
@@ -11,18 +12,20 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from scripts.check_bfcl_one_id_live_shape_telemetry_artifact import validate as validate_artifact
 from scripts.check_bfcl_one_id_live_shape_telemetry_gate import ALLOWED_TELEMETRY_FIELDS, SIGNED_IDS, check as check_packet
 
 DEFAULT_PACKET = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_one_id_live_shape_telemetry_gate_packet.json")
 DEFAULT_OUTPUT = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_one_id_live_shape_telemetry_compact.json")
 SIGNED_ROUTE_PROFILE = "novacode"
 SIGNED_ROUTE_MODEL = "gpt-4.1"
+LiveCapture = Callable[[dict[str, Any]], dict[str, Any]]
 
 
 def build_plan(packet_path: Path = DEFAULT_PACKET, output_artifact: Path = DEFAULT_OUTPUT) -> dict[str, Any]:
@@ -56,7 +59,86 @@ def build_plan(packet_path: Path = DEFAULT_PACKET, output_artifact: Path = DEFAU
     }
 
 
-def execute_live_telemetry(*, packet_path: Path = DEFAULT_PACKET, output_artifact: Path = DEFAULT_OUTPUT, clean_output: bool = False) -> dict[str, Any]:
+def _default_record() -> dict[str, Any]:
+    return {
+        "run_id": SIGNED_IDS[0],
+        "route_profile": SIGNED_ROUTE_PROFILE,
+        "route_model": SIGNED_ROUTE_MODEL,
+        "local_proxy_endpoint_path_label": "bfcl_generate_local_proxy_responses_v1",
+        "bfcl_handler_class_label": "openai_responses_handler",
+        "bfcl_api_path_label": "responses",
+        "request_shape_hash": "shape_hash_unavailable_in_scaffold",
+        "request_message_count_bucket": "unknown",
+        "request_has_instructions": False,
+        "request_has_tools": False,
+        "request_tool_count": 0,
+        "request_tool_choice_shape": "unknown",
+        "request_token_field_shape": "unknown",
+        "provider_status_class": "not_executed",
+        "provider_response_empty_bool": False,
+        "provider_response_has_choices": False,
+        "provider_response_has_message": False,
+        "provider_response_has_tool_calls": False,
+        "provider_response_has_nonempty_text": False,
+        "engine_apply_response_called": False,
+        "engine_final_has_tool_calls": False,
+        "engine_final_has_nonempty_text": False,
+        "engine_final_content_empty": False,
+        "engine_coerced_nonempty_text_to_empty": False,
+        "proxy_responses_output_has_function_call": False,
+        "proxy_responses_output_has_nonempty_text": False,
+        "bfcl_parse_called": False,
+        "bfcl_parse_model_response_empty": False,
+        "bfcl_decode_execute_called": False,
+        "bfcl_decode_execute_nonempty": False,
+        "result_file_written": False,
+        "result_file_contains_nonempty_shape": False,
+        "compact_classifier_status": "not_executed",
+        "protocol_exception_observed": False,
+        "protocol_exception_converted_to_empty_model_response": False,
+        "classifier_false_empty_for_nonempty_result": False,
+        "suspected_live_failure_stage": "provider_true_empty",
+    }
+
+
+def _sanitize_record(record: dict[str, Any]) -> dict[str, Any]:
+    sanitized = _default_record()
+    for key in ALLOWED_TELEMETRY_FIELDS:
+        if key in record:
+            sanitized[key] = record[key]
+    sanitized["run_id"] = SIGNED_IDS[0]
+    sanitized["route_profile"] = SIGNED_ROUTE_PROFILE
+    sanitized["route_model"] = SIGNED_ROUTE_MODEL
+    return sanitized
+
+
+def _artifact_from_record(record: dict[str, Any], *, provider_request_executed: bool, bfcl_generate_executed: bool) -> dict[str, Any]:
+    return {
+        "artifact_kind": "bfcl_one_id_live_shape_telemetry_compact",
+        "route_profile": SIGNED_ROUTE_PROFILE,
+        "route_model": SIGNED_ROUTE_MODEL,
+        "provider_request_executed": bool(provider_request_executed),
+        "bfcl_generate_executed": bool(bfcl_generate_executed),
+        "bfcl_smoke_executed": False,
+        "bfcl_evaluate_executed": False,
+        "scorer_executed": False,
+        "full_baseline_executed": False,
+        "candidate_runtime_activation_authorized": False,
+        "candidate_jsonl_authorized": False,
+        "candidate_pool_ready": False,
+        "performance_evidence": False,
+        "sota_3pp_claim_ready": False,
+        "huawei_acceptance_ready": False,
+        "fallback_allowed": False,
+        "gpt_4o_fallback_allowed": False,
+        "openrouter_allowed": False,
+        "gpt_5_2_active": False,
+        "run_ids": list(SIGNED_IDS),
+        "records": [_sanitize_record(record)],
+    }
+
+
+def execute_live_telemetry(*, packet_path: Path = DEFAULT_PACKET, output_artifact: Path = DEFAULT_OUTPUT, clean_output: bool = False, live_capture: LiveCapture | None = None) -> dict[str, Any]:
     packet_summary = check_packet(packet_path)
     if not packet_summary.get("bfcl_one_id_live_shape_telemetry_gate_passed"):
         return {
@@ -88,14 +170,68 @@ def execute_live_telemetry(*, packet_path: Path = DEFAULT_PACKET, output_artifac
             "diagnostic_written": False,
             "blockers": ["output_artifact_exists_without_clean_output"],
         }
+    if live_capture is None:
+        return {
+            "report_scope": "bfcl_one_id_live_shape_telemetry_execute",
+            "provider_request_executed": False,
+            "bfcl_generate_executed": False,
+            "endpoint_value_read": False,
+            "api_key_value_read": False,
+            "diagnostic_written": False,
+            "blockers": ["one_id_live_shape_telemetry_live_capture_not_configured_for_direct_execution"],
+        }
+    request = {
+        "run_ids": list(SIGNED_IDS),
+        "route_profile": SIGNED_ROUTE_PROFILE,
+        "route_model": SIGNED_ROUTE_MODEL,
+        "generate_only": True,
+        "raw_persistence_authorized": False,
+    }
+    try:
+        captured = live_capture(request)
+    except Exception as exc:
+        return {
+            "report_scope": "bfcl_one_id_live_shape_telemetry_execute",
+            "provider_request_executed": False,
+            "bfcl_generate_executed": False,
+            "endpoint_value_read": False,
+            "api_key_value_read": False,
+            "diagnostic_written": False,
+            "blockers": [type(exc).__name__],
+        }
+    if not isinstance(captured, dict):
+        return {
+            "report_scope": "bfcl_one_id_live_shape_telemetry_execute",
+            "provider_request_executed": False,
+            "bfcl_generate_executed": False,
+            "endpoint_value_read": False,
+            "api_key_value_read": False,
+            "diagnostic_written": False,
+            "blockers": ["live_capture_record_not_object"],
+        }
+    artifact = _artifact_from_record(captured, provider_request_executed=bool(captured.get("provider_request_executed", True)), bfcl_generate_executed=bool(captured.get("bfcl_generate_executed", True)))
+    blockers = validate_artifact(artifact)
+    if blockers:
+        return {
+            "report_scope": "bfcl_one_id_live_shape_telemetry_execute",
+            "provider_request_executed": artifact["provider_request_executed"],
+            "bfcl_generate_executed": artifact["bfcl_generate_executed"],
+            "endpoint_value_read": False,
+            "api_key_value_read": False,
+            "diagnostic_written": False,
+            "blockers": blockers,
+        }
+    output_artifact.parent.mkdir(parents=True, exist_ok=True)
+    output_artifact.write_text(json.dumps(artifact, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return {
         "report_scope": "bfcl_one_id_live_shape_telemetry_execute",
-        "provider_request_executed": False,
-        "bfcl_generate_executed": False,
+        "provider_request_executed": artifact["provider_request_executed"],
+        "bfcl_generate_executed": artifact["bfcl_generate_executed"],
         "endpoint_value_read": False,
         "api_key_value_read": False,
-        "diagnostic_written": False,
-        "blockers": ["one_id_live_shape_telemetry_execute_transport_not_implemented_in_prep_gate"],
+        "diagnostic_written": True,
+        "artifact_path": str(output_artifact),
+        "blockers": [],
     }
 
 

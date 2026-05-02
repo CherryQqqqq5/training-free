@@ -4,6 +4,7 @@ import copy
 import json
 from pathlib import Path
 
+from scripts.check_bfcl_one_id_live_shape_telemetry_artifact import check as check_artifact, validate as validate_artifact
 from scripts.check_bfcl_one_id_live_shape_telemetry_gate import ALLOWED_TELEMETRY_FIELDS, check, validate_packet
 from scripts.run_bfcl_one_id_live_shape_telemetry import build_plan, execute_live_telemetry, main as runner_main
 
@@ -12,9 +13,134 @@ def _packet() -> dict[str, object]:
     return json.loads(Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_one_id_live_shape_telemetry_gate_packet.json").read_text(encoding="utf-8"))
 
 
+def _approved_packet_path(tmp_path: Path) -> Path:
+    packet = _packet()
+    packet["approval_status"] = "approved"
+    packet["authorized"] = True
+    packet["provider_request_authorized"] = True
+    packet["bfcl_generate_authorized"] = True
+    path = tmp_path / "approved_packet.json"
+    path.write_text(json.dumps(packet, indent=2, sort_keys=True), encoding="utf-8")
+    return path
+
+
 def _assert_rejected(packet: dict[str, object], expected: str) -> None:
     blockers = validate_packet(packet)
     assert any(expected in blocker for blocker in blockers), blockers
+
+
+def _record(stage: str) -> dict[str, object]:
+    record: dict[str, object] = {
+        "run_id": "web_search_base_0",
+        "route_profile": "novacode",
+        "route_model": "gpt-4.1",
+        "local_proxy_endpoint_path_label": "bfcl_generate_local_proxy_responses_v1",
+        "bfcl_handler_class_label": "openai_responses_handler",
+        "bfcl_api_path_label": "responses",
+        "request_shape_hash": "shape_hash_fixture",
+        "request_message_count_bucket": "one_to_three",
+        "request_has_instructions": True,
+        "request_has_tools": True,
+        "request_tool_count": 3,
+        "request_tool_choice_shape": "required_string",
+        "request_token_field_shape": "max_output_tokens",
+        "provider_status_class": "2xx",
+        "provider_response_empty_bool": False,
+        "provider_response_has_choices": True,
+        "provider_response_has_message": True,
+        "provider_response_has_tool_calls": True,
+        "provider_response_has_nonempty_text": False,
+        "engine_apply_response_called": True,
+        "engine_final_has_tool_calls": True,
+        "engine_final_has_nonempty_text": False,
+        "engine_final_content_empty": True,
+        "engine_coerced_nonempty_text_to_empty": False,
+        "proxy_responses_output_has_function_call": True,
+        "proxy_responses_output_has_nonempty_text": False,
+        "bfcl_parse_called": True,
+        "bfcl_parse_model_response_empty": False,
+        "bfcl_decode_execute_called": True,
+        "bfcl_decode_execute_nonempty": True,
+        "result_file_written": True,
+        "result_file_contains_nonempty_shape": True,
+        "compact_classifier_status": "generated",
+        "protocol_exception_observed": False,
+        "protocol_exception_converted_to_empty_model_response": False,
+        "classifier_false_empty_for_nonempty_result": False,
+        "suspected_live_failure_stage": stage,
+    }
+    if stage == "provider_true_empty":
+        record.update(
+            provider_response_empty_bool=True,
+            provider_response_has_choices=False,
+            provider_response_has_message=False,
+            provider_response_has_tool_calls=False,
+            engine_apply_response_called=False,
+            engine_final_has_tool_calls=False,
+            proxy_responses_output_has_function_call=False,
+            bfcl_parse_called=False,
+            bfcl_decode_execute_called=False,
+            bfcl_decode_execute_nonempty=False,
+            result_file_written=False,
+            result_file_contains_nonempty_shape=False,
+            compact_classifier_status="empty_model_response",
+        )
+    elif stage == "provider_text_no_tool":
+        record.update(
+            provider_response_has_tool_calls=False,
+            provider_response_has_nonempty_text=True,
+            engine_final_has_tool_calls=False,
+            engine_final_has_nonempty_text=True,
+            engine_final_content_empty=False,
+            proxy_responses_output_has_function_call=False,
+            proxy_responses_output_has_nonempty_text=True,
+            bfcl_decode_execute_nonempty=False,
+            result_file_contains_nonempty_shape=True,
+            compact_classifier_status="no_tool_text",
+        )
+    elif stage == "proxy_engine_tool_loss":
+        record.update(engine_final_has_tool_calls=False, proxy_responses_output_has_function_call=False, bfcl_decode_execute_nonempty=False, result_file_contains_nonempty_shape=False, compact_classifier_status="empty_model_response")
+    elif stage == "engine_text_coercion":
+        record.update(provider_response_has_tool_calls=False, provider_response_has_nonempty_text=True, engine_final_has_tool_calls=False, engine_final_content_empty=True, engine_coerced_nonempty_text_to_empty=True, proxy_responses_output_has_function_call=False, bfcl_decode_execute_nonempty=False, result_file_contains_nonempty_shape=False, compact_classifier_status="empty_model_response")
+    elif stage == "responses_envelope_loss":
+        record.update(proxy_responses_output_has_function_call=False, bfcl_decode_execute_nonempty=False, result_file_contains_nonempty_shape=False, compact_classifier_status="empty_model_response")
+    elif stage == "bfcl_parse_decode_loss":
+        record.update(bfcl_parse_model_response_empty=True, bfcl_decode_execute_nonempty=False, result_file_contains_nonempty_shape=False, compact_classifier_status="empty_model_response")
+    elif stage == "materialization_classifier_loss":
+        record.update(result_file_contains_nonempty_shape=False, classifier_false_empty_for_nonempty_result=True, compact_classifier_status="empty_model_response")
+    elif stage == "protocol_exception":
+        record.update(protocol_exception_observed=True, provider_status_class="protocol_exception", provider_response_has_choices=False, provider_response_has_message=False, provider_response_has_tool_calls=False, engine_apply_response_called=False, engine_final_has_tool_calls=False, proxy_responses_output_has_function_call=False, bfcl_parse_called=False, bfcl_decode_execute_called=False, bfcl_decode_execute_nonempty=False, result_file_written=False, result_file_contains_nonempty_shape=False, compact_classifier_status="protocol_exception")
+    elif stage == "live_path_nonempty":
+        pass
+    else:
+        raise ValueError(stage)
+    return record
+
+
+def _artifact(stage: str) -> dict[str, object]:
+    return {
+        "artifact_kind": "bfcl_one_id_live_shape_telemetry_compact",
+        "route_profile": "novacode",
+        "route_model": "gpt-4.1",
+        "provider_request_executed": True,
+        "bfcl_generate_executed": True,
+        "bfcl_smoke_executed": False,
+        "bfcl_evaluate_executed": False,
+        "scorer_executed": False,
+        "full_baseline_executed": False,
+        "candidate_runtime_activation_authorized": False,
+        "candidate_jsonl_authorized": False,
+        "candidate_pool_ready": False,
+        "performance_evidence": False,
+        "sota_3pp_claim_ready": False,
+        "huawei_acceptance_ready": False,
+        "fallback_allowed": False,
+        "gpt_4o_fallback_allowed": False,
+        "openrouter_allowed": False,
+        "gpt_5_2_active": False,
+        "run_ids": ["web_search_base_0"],
+        "records": [_record(stage)],
+    }
 
 
 def test_pending_fail_closed_packet_passes() -> None:
@@ -128,6 +254,8 @@ def test_dry_run_output_contains_only_compact_field_names() -> None:
     assert plan["telemetry_fields"] == ALLOWED_TELEMETRY_FIELDS
     assert not any(field.startswith("raw_") for field in plan["telemetry_fields"])
     assert "provider_response_has_nonempty_text" in plan["telemetry_fields"]
+    assert "protocol_exception_observed" in plan["telemetry_fields"]
+    assert "classifier_false_empty_for_nonempty_result" in plan["telemetry_fields"]
     assert "suspected_live_failure_stage" in plan["telemetry_fields"]
 
 
@@ -143,3 +271,81 @@ def test_approved_packet_would_allow_exactly_one_generate_only_telemetry_id() ->
     assert packet["bfcl_smoke_authorized"] is False
     assert packet["bfcl_evaluate_authorized"] is False
     assert packet["scorer_authorized"] is False
+
+
+def test_fake_approved_packet_and_capture_produce_valid_compact_artifact(tmp_path: Path) -> None:
+    packet_path = _approved_packet_path(tmp_path)
+    out = tmp_path / "telemetry.json"
+
+    def fake_capture(request: dict[str, object]) -> dict[str, object]:
+        assert request["run_ids"] == ["web_search_base_0"]
+        assert request["raw_persistence_authorized"] is False
+        return _record("live_path_nonempty")
+
+    summary = execute_live_telemetry(packet_path=packet_path, output_artifact=out, live_capture=fake_capture)
+    assert summary["blockers"] == []
+    assert summary["diagnostic_written"] is True
+    assert check_artifact(out)["bfcl_one_id_live_shape_telemetry_artifact_passed"] is True
+
+
+def test_artifact_checker_accepts_valid_compact_variants() -> None:
+    for stage in (
+        "provider_true_empty",
+        "provider_text_no_tool",
+        "proxy_engine_tool_loss",
+        "engine_text_coercion",
+        "responses_envelope_loss",
+        "bfcl_parse_decode_loss",
+        "materialization_classifier_loss",
+        "protocol_exception",
+        "live_path_nonempty",
+    ):
+        blockers = validate_artifact(_artifact(stage))
+        assert blockers == [], (stage, blockers)
+
+
+def test_artifact_checker_rejects_missing_protocol_exception_flags() -> None:
+    data = _artifact("live_path_nonempty")
+    del data["records"][0]["protocol_exception_observed"]
+    blockers = validate_artifact(data)
+    assert any("record_missing_fields" in blocker for blocker in blockers)
+
+
+def test_artifact_checker_rejects_raw_fields_and_secret_literals() -> None:
+    data = _artifact("live_path_nonempty")
+    data["records"][0]["raw_provider_response_body"] = "redacted"
+    data["records"][0]["request_shape_hash"] = "https" + "://example.invalid"
+    blockers = validate_artifact(data)
+    assert any("record_unknown_fields" in blocker or "forbidden_raw_or_secret_key" in blocker for blocker in blockers)
+    assert any("endpoint_or_key_literal" in blocker for blocker in blockers)
+
+
+def test_artifact_checker_rejects_multiple_or_wrong_ids() -> None:
+    data = _artifact("live_path_nonempty")
+    data["run_ids"] = ["web_search_base_0", "multi_turn_base_0"]
+    data["records"][0]["run_id"] = "multi_turn_base_0"
+    blockers = validate_artifact(data)
+    assert any("run_ids_invalid" in blocker for blocker in blockers)
+    assert any("record_run_id_invalid" in blocker for blocker in blockers)
+
+
+def test_artifact_checker_rejects_scorer_candidate_performance_flags() -> None:
+    for key in ("bfcl_evaluate_executed", "scorer_executed", "full_baseline_executed", "candidate_runtime_activation_authorized", "performance_evidence", "sota_3pp_claim_ready", "huawei_acceptance_ready"):
+        data = _artifact("live_path_nonempty")
+        data[key] = True
+        blockers = validate_artifact(data)
+        assert any(f"{key}_not_false" in blocker for blocker in blockers), (key, blockers)
+
+
+def test_artifact_checker_rejects_inconsistent_suspected_stage() -> None:
+    data = _artifact("proxy_engine_tool_loss")
+    data["records"][0]["suspected_live_failure_stage"] = "provider_true_empty"
+    blockers = validate_artifact(data)
+    assert any("proxy_engine_tool_loss_stage_mismatch" in blocker for blocker in blockers)
+
+
+def test_artifact_checker_rejects_protocol_exception_converted_to_empty() -> None:
+    data = _artifact("protocol_exception")
+    data["records"][0]["protocol_exception_converted_to_empty_model_response"] = True
+    blockers = validate_artifact(data)
+    assert any("protocol_exception_converted_to_empty_forbidden" in blocker for blocker in blockers)

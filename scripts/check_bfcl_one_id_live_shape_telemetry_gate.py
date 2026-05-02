@@ -45,6 +45,9 @@ ALLOWED_TELEMETRY_FIELDS = [
     "result_file_written",
     "result_file_contains_nonempty_shape",
     "compact_classifier_status",
+    "protocol_exception_observed",
+    "protocol_exception_converted_to_empty_model_response",
+    "classifier_false_empty_for_nonempty_result",
     "suspected_live_failure_stage",
 ]
 AUTHORIZATION_KEYS = (
@@ -174,6 +177,12 @@ def validate_packet(data: dict[str, Any]) -> list[str]:
         blockers.append(f"runner_path_invalid:{data.get('runner_path')!r}")
     if data.get("checker_path") != "scripts/check_bfcl_one_id_live_shape_telemetry_gate.py":
         blockers.append(f"checker_path_invalid:{data.get('checker_path')!r}")
+    if data.get("compact_artifact_checker_path") != "scripts/check_bfcl_one_id_live_shape_telemetry_artifact.py":
+        blockers.append(f"compact_artifact_checker_path_invalid:{data.get('compact_artifact_checker_path')!r}")
+    if data.get("protocol_exception_policy") != "preserve_as_protocol_exception_not_empty_model_response":
+        blockers.append(f"protocol_exception_policy_invalid:{data.get('protocol_exception_policy')!r}")
+    if data.get("classifier_false_empty_policy") != "reject_false_empty_for_nonempty_result":
+        blockers.append(f"classifier_false_empty_policy_invalid:{data.get('classifier_false_empty_policy')!r}")
     if data.get("allowed_telemetry_fields") != ALLOWED_TELEMETRY_FIELDS:
         blockers.append("allowed_telemetry_fields_drift")
     for field in data.get("allowed_telemetry_fields", []):

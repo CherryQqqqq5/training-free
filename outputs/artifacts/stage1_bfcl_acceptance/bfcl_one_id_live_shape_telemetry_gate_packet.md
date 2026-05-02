@@ -21,3 +21,7 @@ No raw prompt text, BFCL case content, provider request, provider response body,
 ## Current Evidence Boundary
 
 Offline handler decode, result materialization, compact classifier, and exception-to-empty paths did not reproduce the live exact-BFCL empty blocker. This packet prepares a separate one-ID telemetry gate only; it is not measurement evidence and does not authorize a patch or rerun.
+
+## Execution Scaffold Requirements
+
+The reviewed scaffold must validate compact artifacts with `scripts/check_bfcl_one_id_live_shape_telemetry_artifact.py`. Future telemetry must include protocol exception flags and classifier false-empty flags: `protocol_exception_observed`, `protocol_exception_converted_to_empty_model_response`, and `classifier_false_empty_for_nonempty_result`. Protocol exceptions must remain distinguishable from `empty_model_response`; nonempty result material must not be classified as empty.
