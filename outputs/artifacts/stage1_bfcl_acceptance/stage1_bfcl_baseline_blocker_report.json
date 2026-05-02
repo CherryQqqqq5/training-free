@@ -1,0 +1,57 @@
+{
+  "artifact_kind": "stage1_bfcl_baseline_blocker_report",
+  "bfcl_measurement_evidence": false,
+  "cleaned_state": {
+    "branches_synchronized_observed": true,
+    "output_smoke_root_removed": true,
+    "smoke_artifact_committed": false,
+    "tmp_smoke_root_removed": true,
+    "worktree_clean_observed": true
+  },
+  "current_head_observed": "97bd2c49bc31c6a15123c53ab99a54436ec92e87",
+  "exact_8_id_smoke_materialized": true,
+  "forbidden_paths_not_run": {
+    "candidate_activation": false,
+    "candidate_jsonl": false,
+    "candidate_pool": false,
+    "full_default_baseline": false,
+    "huawei_claim": false,
+    "performance_claim": false,
+    "plus_3pp_claim": false,
+    "scorer_feedback_tuning": false
+  },
+  "known_fixed_issues": [
+    "max_tokens_max_output_tokens_path_mismatch",
+    "responses_instructions_to_chat_messages_conversion_loss"
+  ],
+  "pre_gates_passed_before_smoke": [
+    "check_bfcl_proxy_response_parser_debug_packet.py",
+    "check_bfcl_proxy_runtime_adapter_shape_diff.py",
+    "check_bfcl_stage1_smoke_run_id_manifest.py",
+    "check_bfcl_stage1_smoke_scope_manifest.py",
+    "check_bfcl_measurement_provider_protocol_debug_artifact.py",
+    "check_bfcl_measurement_route_consistency.py",
+    "check_bfcl_runner_interpreter.py",
+    "check_artifact_boundary.py"
+  ],
+  "raw_or_secret_material_committed": false,
+  "run_ids": [
+    "web_search_base_0",
+    "memory_kv_0-customer-0",
+    "multi_turn_base_0",
+    "multi_turn_long_context_0",
+    "multi_turn_miss_param_0",
+    "multi_turn_miss_func_0",
+    "irrelevance_0",
+    "live_irrelevance_0-0-0"
+  ],
+  "runtime_blocker_base_commit": "1006dc95120817bc8b49a7350c1f2f9ab3075433",
+  "stage_status": "stage1_blocked",
+  "stop_condition": {
+    "condition": "repeated_empty_model_response",
+    "message": "Empty response from the model",
+    "observed_after_max_tokens_fix": true,
+    "observed_after_responses_instructions_fix": true,
+    "stopped_at_progress": "6/8"
+  }
+}
