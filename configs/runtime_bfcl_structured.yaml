@@ -1,61 +1,43 @@
 timeout_sec: 120
-
 runtime_policy:
-  # Preserve current conservative runtime behavior for general traffic, but add
-  # an opt-in compatibility mode for strict function-calling evaluators.
   record_only_no_tool_kinds:
-    - clarification_request
-    - unsupported_request
-    - hallucinated_completion
-    - malformed_output
-    - natural_language_termination
-
-  # BFCL's FC decoder assumes tool-enabled turns yield structured function-call
-  # payloads. When the upstream model emits text-only clarification or terminal
-  # prose instead, coerce those no-tool responses to empty content so the
-  # evaluator does not try to decode arbitrary text as function-call objects.
+  - clarification_request
+  - unsupported_request
+  - hallucinated_completion
+  - malformed_output
+  - natural_language_termination
   coerce_no_tool_response_to_empty_kinds:
-    - clarification_request
-    - unsupported_request
-    - hallucinated_completion
-    - malformed_output
-    - natural_language_termination
-    - post_tool_prose_summary
-    - actionable_no_tool_decision
-
-  # Request-side guidance for strict tool clients: bias the model toward
-  # emitting the next tool call, grounding path-sensitive actions in the latest
-  # working state, and reusing explicit literals from prior turns/tool outputs.
+  - clarification_request
+  - unsupported_request
+  - hallucinated_completion
+  - malformed_output
+  - natural_language_termination
+  - post_tool_prose_summary
+  - actionable_no_tool_decision
   inject_structured_tool_guidance: true
   inject_context_literal_hints: true
-
-  # Response-side cleanup: when a tool call still contains references like
-  # "the file I previously mentioned", resolve them against explicit literals
-  # already present in the conversation/tool state.
   resolve_contextual_string_args: true
-
-  # M2.7l: keep BFCL-lite interventions as action-specific guidance by default.
-  # Exact function forcing is available only through the conditional mode and is
-  # disabled for trajectory-sensitive generic filesystem tools unless explicitly
-  # reconfigured.
   exact_next_tool_choice_mode: guidance_only
   exact_tool_choice_trajectory_sensitive_tools:
-    - cat
-    - touch
-    - mkdir
-
-  # M2.7y: scorer-gap/regression feedback is an offline calibration overlay.
-  # Matching candidates are downgraded to record_only until a later scorer run proves recovery.
+  - cat
+  - touch
+  - mkdir
   scorer_feedback_path: outputs/artifacts/bfcl_ctspc_subset30_v1/m27y_scorer_feedback.json
-
 upstream:
-  active_profile: "novacode"
-  base_url: "https://YOUR_UPSTREAM_OPENAI_COMPATIBLE_ENDPOINT/v1"
-  api_key_env: "OPENAI_API_KEY"
-  model: "gpt-5.2"
+  active_profile: novacode
+  base_url: https://YOUR_UPSTREAM_OPENAI_COMPATIBLE_ENDPOINT/v1
+  api_key_env: OPENAI_API_KEY
+  model: gpt-4.1
   profiles:
     novacode:
-      base_url_env: "NOVACODE_BASE_URL"
-      base_url: "https://apicz.boyuerichdata.com/v1"
-      api_key_env: "NOVACODE_API_KEY"
-      model: "gpt-5.2"
+      base_url_env: NOVACODE_BASE_URL
+      base_url: https://apicz.boyuerichdata.com/v1
+      api_key_env: NOVACODE_API_KEY
+      model: gpt-4.1
+      provider_profile: Chuangzhi/Novacode
+      fallback_allowed: false
+      gpt_4o_fallback_allowed: false
+  fallback_allowed: false
+  gpt_4o_fallback_allowed: false
+  old_signed_model: gpt-5.2
+  old_signed_model_status: historical_superseded_inactive

@@ -11,21 +11,26 @@ comparison:
 model:
   bfcl_model_alias: gpt-4o-mini-2024-07-18-FC
   upstream_profile: novacode
-  upstream_model_route: gpt-5.2
+  upstream_model_route: gpt-4.1
+  provider_profile: Chuangzhi/Novacode
+  fallback_allowed: false
+  gpt_4o_fallback_allowed: false
+  old_signed_model: gpt-5.2
+  old_signed_model_status: historical_superseded_inactive
 runtime:
   config: configs/runtime_bfcl_structured.yaml
   baseline_rules_dir: rules/baseline_empty
   candidate_mode: ctspc
 categories:
   baseline_freeze:
-    - simple
-    - multiple
-    - parallel
-    - parallel_multiple
-    - multi_turn_base
-    - multi_turn_miss_func
-    - multi_turn_miss_param
-    - multi_turn_long_context
+  - simple
+  - multiple
+  - parallel
+  - parallel_multiple
+  - multi_turn_base
+  - multi_turn_miss_func
+  - multi_turn_miss_param
+  - multi_turn_long_context
 metrics:
   primary: accuracy
   paired_subset:
