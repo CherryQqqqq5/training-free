@@ -139,6 +139,56 @@ def test_apply_fc_request_policy_preserves_existing_additional_properties(monkey
     assert updated["tools"][0]["function"]["parameters"]["additionalProperties"] == {"type": "string"}
 
 
+def test_apply_fc_request_policy_responses_path_uses_max_output_tokens(monkeypatch):
+    monkeypatch.setenv("GRC_BFCL_FORCE_TOOL_CHOICE", "1")
+
+    updated = apply_bfcl_fc_request_policy(
+        {
+            "model": "m",
+            "tools": [{"type": "function", "function": {"name": "touch"}}],
+            "max_tokens": 256,
+        },
+        api_path="responses",
+    )
+
+    assert updated["max_output_tokens"] == 256
+    assert "max_tokens" not in updated
+    assert "max_completion_tokens" not in updated
+
+
+def test_apply_fc_request_policy_responses_path_converts_max_completion_tokens(monkeypatch):
+    monkeypatch.setenv("GRC_BFCL_FORCE_TOOL_CHOICE", "1")
+
+    updated = apply_bfcl_fc_request_policy(
+        {
+            "model": "m",
+            "tools": [{"type": "function", "function": {"name": "touch"}}],
+            "max_completion_tokens": 96,
+        },
+        api_path="responses",
+    )
+
+    assert updated["max_output_tokens"] == 96
+    assert "max_tokens" not in updated
+    assert "max_completion_tokens" not in updated
+
+
+def test_apply_fc_request_policy_chat_path_keeps_max_tokens(monkeypatch):
+    monkeypatch.setenv("GRC_BFCL_FORCE_TOOL_CHOICE", "1")
+
+    updated = apply_bfcl_fc_request_policy(
+        {
+            "model": "m",
+            "tools": [{"type": "function", "function": {"name": "touch"}}],
+            "max_tokens": 256,
+        },
+        api_path="chat_completions",
+    )
+
+    assert updated["max_tokens"] == 256
+    assert "max_output_tokens" not in updated
+
+
 def test_apply_memory_request_policy_injects_for_memory_recall(monkeypatch):
     monkeypatch.setenv("GRC_BFCL_MEMORY_RETRIEVAL_POLICY", "1")
 

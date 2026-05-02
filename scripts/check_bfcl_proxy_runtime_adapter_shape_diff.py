@@ -152,7 +152,11 @@ def validate(data: dict[str, Any]) -> list[str]:
     if proxy.get("tool_choice_mode") != "function_object_when_single_tool_else_required_string":
         blockers.append(f"proxy_adapter_shape_diff_proxy_tool_choice_mode_invalid:{proxy.get('tool_choice_mode')!r}")
     token_presence = proxy.get("token_field_presence") if isinstance(proxy.get("token_field_presence"), dict) else {}
-    if token_presence.get("max_tokens") is not True or token_presence.get("max_completion_tokens") is not False:
+    expected_token_presence = {
+        "chat_completions": {"max_tokens": True, "max_completion_tokens": False, "max_output_tokens": False},
+        "responses": {"max_tokens": False, "max_completion_tokens": False, "max_output_tokens": True},
+    }
+    if token_presence != expected_token_presence:
         blockers.append(f"proxy_adapter_shape_diff_proxy_token_field_presence_invalid:{token_presence!r}")
     timeout_streaming = proxy.get("timeout_streaming_flags") if isinstance(proxy.get("timeout_streaming_flags"), dict) else {}
     if timeout_streaming.get("streaming_enabled") is not False or timeout_streaming.get("timeout_seconds_present") is not True:
@@ -164,7 +168,7 @@ def validate(data: dict[str, Any]) -> list[str]:
     expected_alignment_labels = [
         "tool_choice_function_object_for_single_tool_required_for_multi_tool",
         "schema_local_additional_properties_false_enforced",
-        "max_tokens_normalized_for_signed_route",
+        "path_specific_token_policy_chat_max_tokens_responses_max_output_tokens",
         "temperature_stream_timeout_explicit",
         "empty_response_compact_stop_gate_labels_present",
     ]

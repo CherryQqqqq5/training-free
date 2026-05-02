@@ -3,7 +3,7 @@
   "adapter_alignment_labels": [
     "tool_choice_function_object_for_single_tool_required_for_multi_tool",
     "schema_local_additional_properties_false_enforced",
-    "max_tokens_normalized_for_signed_route",
+    "path_specific_token_policy_chat_max_tokens_responses_max_output_tokens",
     "temperature_stream_timeout_explicit",
     "empty_response_compact_stop_gate_labels_present"
   ],
@@ -37,7 +37,7 @@
       "timeout",
       "tool_choice",
       "tools",
-      "max_tokens"
+      "path_specific_token_field"
     ],
     "role_sequence": [
       "bfcl_runtime_variable"
@@ -49,8 +49,16 @@
       "timeout_seconds_present": true
     },
     "token_field_presence": {
-      "max_completion_tokens": false,
-      "max_tokens": true
+      "chat_completions": {
+        "max_completion_tokens": false,
+        "max_output_tokens": false,
+        "max_tokens": true
+      },
+      "responses": {
+        "max_completion_tokens": false,
+        "max_output_tokens": true,
+        "max_tokens": false
+      }
     },
     "tool_choice_mode": "function_object_when_single_tool_else_required_string",
     "tool_schema_structural_flags": {
@@ -186,6 +194,7 @@
     },
     "token_field_presence": {
       "max_completion_tokens": false,
+      "max_output_tokens": false,
       "max_tokens": true
     },
     "tool_choice_mode": "function_object",

@@ -124,6 +124,10 @@ def test_shape_diff_records_only_sanitized_structure():
     assert "tool_schema_structural_hash" in report["successful_synthetic_provider_contract_shape"]
     assert report["adapter_risk_labels"] == []
     assert "schema_local_additional_properties_false_enforced" in report["adapter_alignment_labels"]
+    assert "path_specific_token_policy_chat_max_tokens_responses_max_output_tokens" in report["adapter_alignment_labels"]
+    token_policy = report["bfcl_proxy_runtime_planned_shape"]["token_field_presence"]
+    assert token_policy["chat_completions"] == {"max_tokens": True, "max_completion_tokens": False, "max_output_tokens": False}
+    assert token_policy["responses"] == {"max_tokens": False, "max_completion_tokens": False, "max_output_tokens": True}
 
 
 def test_shape_diff_rejects_route_fallback_and_openrouter_drift():

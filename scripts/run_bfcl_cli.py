@@ -61,11 +61,11 @@ def _coerce_text_result_to_execution_list(result: str, tools_payload: list[dict[
     return []
 
 
-def _patch_generate_with_backoff(handler_cls: type) -> None:
+def _patch_generate_with_backoff(handler_cls: type, *, api_path: str) -> None:
     original = handler_cls.generate_with_backoff
 
     def wrapped(self, **kwargs):  # type: ignore[no-untyped-def]
-        patched = apply_bfcl_fc_request_policy(kwargs)
+        patched = apply_bfcl_fc_request_policy(kwargs, api_path=api_path)
         patched = apply_bfcl_memory_request_policy(patched)
         self._grc_last_tools_payload = list(patched.get("tools", []))
         return original(self, **patched)
@@ -87,8 +87,8 @@ def _patch_decode_execute(handler_cls: type) -> None:
     handler_cls.decode_execute = wrapped
 
 
-_patch_generate_with_backoff(OpenAIResponsesHandler)
-_patch_generate_with_backoff(OpenAICompletionsHandler)
+_patch_generate_with_backoff(OpenAIResponsesHandler, api_path="responses")
+_patch_generate_with_backoff(OpenAICompletionsHandler, api_path="chat_completions")
 _patch_decode_execute(OpenAIResponsesHandler)
 _patch_decode_execute(OpenAICompletionsHandler)
 

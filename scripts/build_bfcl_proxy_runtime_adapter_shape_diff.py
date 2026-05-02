@@ -55,6 +55,7 @@ def _token_presence(payload: dict[str, Any]) -> dict[str, bool]:
     return {
         "max_tokens": "max_tokens" in payload,
         "max_completion_tokens": "max_completion_tokens" in payload,
+        "max_output_tokens": "max_output_tokens" in payload,
     }
 
 
@@ -106,7 +107,7 @@ def _proxy_runtime_planned_shape() -> dict[str, Any]:
     }
     return {
         "route_model": "gpt-4.1",
-        "request_top_level_keys": ["messages_or_input", "model", "stream", "temperature", "timeout", "tool_choice", "tools", "max_tokens"],
+        "request_top_level_keys": ["messages_or_input", "model", "stream", "temperature", "timeout", "tool_choice", "tools", "path_specific_token_field"],
         "message_count": "bfcl_runtime_variable",
         "role_sequence": ["bfcl_runtime_variable"],
         "content_length_buckets": ["bucketed_only_runtime_variable"],
@@ -114,7 +115,10 @@ def _proxy_runtime_planned_shape() -> dict[str, Any]:
         "tool_schema_structural_flags": flags,
         "tool_schema_structural_hash": _hash_flags(flags),
         "tool_choice_mode": "function_object_when_single_tool_else_required_string",
-        "token_field_presence": {"max_tokens": True, "max_completion_tokens": False},
+        "token_field_presence": {
+            "chat_completions": {"max_tokens": True, "max_completion_tokens": False, "max_output_tokens": False},
+            "responses": {"max_tokens": False, "max_completion_tokens": False, "max_output_tokens": True},
+        },
         "temperature_presence": True,
         "timeout_streaming_flags": {"timeout_seconds_present": True, "streaming_enabled": False},
         "parser_expected_response_keys": ["choices", "message", "tool_calls", "function.name"],
@@ -152,7 +156,7 @@ def build_report() -> dict[str, Any]:
     alignment_labels = [
         "tool_choice_function_object_for_single_tool_required_for_multi_tool",
         "schema_local_additional_properties_false_enforced",
-        "max_tokens_normalized_for_signed_route",
+        "path_specific_token_policy_chat_max_tokens_responses_max_output_tokens",
         "temperature_stream_timeout_explicit",
         "empty_response_compact_stop_gate_labels_present",
     ]
@@ -226,7 +230,7 @@ def write_markdown(path: Path, report: dict[str, Any]) -> None:
         f"- conclusion: `{report['shape_diff_high_level_conclusion']}`",
         f"- adapter_risk_labels: `{report['adapter_risk_labels']}`",
         "",
-        "The successful synthetic provider contract proves the env-only novacode gpt-4.1 tool-call path can return an OpenAI-compatible tool call. The BFCL proxy/runtime adapter policy is now aligned at the envelope level: function-object tool choice for single-tool requests, required tool choice for multi-tool requests, schema-local additionalProperties=false, max_tokens normalization, explicit temperature/stream/timeout fields, and compact empty-response stop-gate labels. The stopped BFCL smoke used the reviewed eight run IDs but failed on repeated empty responses before any smoke artifact was committed. This artifact records only envelope and parser structure; it does not include raw prompts, provider payloads, response bodies, headers, logs, traces, case content, gold/reference/expected values, scorer diffs, endpoint/key values, source nonce mappings, or candidate output.",
+        "The successful synthetic provider contract proves the env-only novacode gpt-4.1 tool-call path can return an OpenAI-compatible tool call. The BFCL proxy/runtime adapter policy is now aligned at the envelope level: function-object tool choice for single-tool requests, required tool choice for multi-tool requests, schema-local additionalProperties=false, path-specific token fields with chat-completions using max_tokens and Responses using max_output_tokens, explicit temperature/stream/timeout fields, and compact empty-response stop-gate labels. The stopped BFCL smoke used the reviewed eight run IDs but failed on repeated empty responses before any smoke artifact was committed. This artifact records only envelope and parser structure; it does not include raw prompts, provider payloads, response bodies, headers, logs, traces, case content, gold/reference/expected values, scorer diffs, endpoint/key values, source nonce mappings, or candidate output.",
     ]
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 

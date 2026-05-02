@@ -196,26 +196,46 @@ def _required_tool_choice_for_tools(tools: Any) -> str | dict[str, Any]:
     return "required"
 
 
-def _normalize_token_fields(updated: dict[str, Any]) -> None:
+def _token_limit() -> int:
+    return int(os.getenv("GRC_BFCL_MAX_TOKENS", str(_BFCL_DEFAULT_MAX_TOKENS)))
+
+
+def _normalize_chat_token_fields(updated: dict[str, Any]) -> None:
     if "max_completion_tokens" in updated:
         updated.setdefault("max_tokens", updated.pop("max_completion_tokens"))
-    updated.setdefault("max_tokens", int(os.getenv("GRC_BFCL_MAX_TOKENS", str(_BFCL_DEFAULT_MAX_TOKENS))))
+    updated.setdefault("max_tokens", _token_limit())
 
 
-def _normalize_openai_compatible_fields(updated: dict[str, Any]) -> None:
-    _normalize_token_fields(updated)
+def _normalize_responses_token_fields(updated: dict[str, Any]) -> None:
+    if "max_output_tokens" not in updated:
+        if "max_tokens" in updated:
+            updated["max_output_tokens"] = updated.pop("max_tokens")
+        elif "max_completion_tokens" in updated:
+            updated["max_output_tokens"] = updated.pop("max_completion_tokens")
+        else:
+            updated["max_output_tokens"] = _token_limit()
+    else:
+        updated.pop("max_tokens", None)
+        updated.pop("max_completion_tokens", None)
+
+
+def _normalize_openai_compatible_fields(updated: dict[str, Any], *, api_path: str = "chat_completions") -> None:
+    if api_path == "responses":
+        _normalize_responses_token_fields(updated)
+    else:
+        _normalize_chat_token_fields(updated)
     updated.setdefault("temperature", 0)
     updated.setdefault("stream", False)
     updated.setdefault("timeout", int(os.getenv("GRC_BFCL_TIMEOUT_SECONDS", "120")))
 
 
-def apply_bfcl_fc_request_policy(kwargs: dict[str, Any]) -> dict[str, Any]:
+def apply_bfcl_fc_request_policy(kwargs: dict[str, Any], *, api_path: str = "chat_completions") -> dict[str, Any]:
     updated = dict(kwargs)
     if not updated.get("tools"):
         return updated
 
     updated["tools"] = _normalize_tools(updated.get("tools"))
-    _normalize_openai_compatible_fields(updated)
+    _normalize_openai_compatible_fields(updated, api_path=api_path)
 
     if (
         _env_flag("GRC_BFCL_FORCE_TOOL_CHOICE", "1")
