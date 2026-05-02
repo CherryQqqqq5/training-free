@@ -168,6 +168,21 @@ def _responses_tools_to_chat_tools(tools: Any) -> list[Dict[str, Any]]:
     return mapped
 
 
+
+def _responses_tool_choice_to_chat_tool_choice(
+    tool_choice: Any,
+    chat_tools: list[Dict[str, Any]],
+    *,
+    normalize_missing_none_to_required: bool = False,
+) -> Any:
+    if not chat_tools:
+        return None
+    if normalize_missing_none_to_required and (tool_choice is None or tool_choice == "none"):
+        return "required"
+    if isinstance(tool_choice, (str, dict)):
+        return tool_choice
+    return None
+
 def _chat_response_to_responses_payload(chat_json: Dict[str, Any]) -> Dict[str, Any]:
     choices = chat_json.get("choices", [])
     message = choices[0].get("message", {}) if choices and isinstance(choices[0], dict) else {}
@@ -264,8 +279,12 @@ def _resolve_upstream_config(cfg: Dict[str, Any]) -> Dict[str, Any]:
 
 def create_app(config_path: str, rules_dir: str, trace_dir: str) -> FastAPI:
     cfg = yaml.safe_load(Path(config_path).read_text(encoding="utf-8"))
-    engine = RuleEngine(rules_dir, runtime_policy=cfg.get("runtime_policy"))
+    runtime_policy = cfg.get("runtime_policy") if isinstance(cfg.get("runtime_policy"), dict) else {}
+    engine = RuleEngine(rules_dir, runtime_policy=runtime_policy)
     trace_store = TraceStore(trace_dir)
+    normalize_responses_tool_choice_required = bool(
+        runtime_policy.get("bfcl_measurement_responses_to_chat_tool_choice_normalization")
+    )
 
     upstream_cfg = _resolve_upstream_config(cfg)
     upstream_profile = upstream_cfg["profile_name"]
@@ -349,8 +368,13 @@ def create_app(config_path: str, rules_dir: str, trace_dir: str) -> FastAPI:
         chat_tools = _responses_tools_to_chat_tools(original_req_json.get("tools"))
         if chat_tools:
             chat_req_json["tools"] = chat_tools
-            if isinstance(original_req_json.get("tool_choice"), (str, dict)):
-                chat_req_json["tool_choice"] = original_req_json["tool_choice"]
+            chat_tool_choice = _responses_tool_choice_to_chat_tool_choice(
+                original_req_json.get("tool_choice"),
+                chat_tools,
+                normalize_missing_none_to_required=normalize_responses_tool_choice_required,
+            )
+            if chat_tool_choice is not None:
+                chat_req_json["tool_choice"] = chat_tool_choice
 
         req_json, request_patches = engine.apply_request(chat_req_json)
         if upstream_model:

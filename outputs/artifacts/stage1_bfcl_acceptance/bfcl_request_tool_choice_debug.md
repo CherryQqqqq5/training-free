@@ -12,6 +12,12 @@ bfcl_handler_tool_choice_shape: `required_string`
 
 reviewed_telemetry_tool_choice_shape: `function_object`
 
+offline_patched_missing_tool_choice_shape: `required_string`
+
+offline_patched_none_tool_choice_shape: `required_string`
+
+offline_patched_tool_choice_normalized: `True`
+
 candidate_patch_kind: `proxy_normalization`
 
 patch_surface_label: `bfcl_measurement_responses_to_chat_tool_choice_normalization`

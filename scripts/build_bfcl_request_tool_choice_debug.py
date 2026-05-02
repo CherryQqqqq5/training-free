@@ -16,7 +16,11 @@ if str(REPO_ROOT) not in sys.path:
 if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
-from grc.runtime.proxy import _responses_token_fields_to_chat_fields, _responses_tools_to_chat_tools  # noqa: E402
+from grc.runtime.proxy import (  # noqa: E402
+    _responses_token_fields_to_chat_fields,
+    _responses_tool_choice_to_chat_tool_choice,
+    _responses_tools_to_chat_tools,
+)
 
 ARTIFACT_ROOT = Path("outputs/artifacts/stage1_bfcl_acceptance")
 DEFAULT_OUTPUT = ARTIFACT_ROOT / "bfcl_request_tool_choice_debug.json"
@@ -99,13 +103,25 @@ def _proposed_proxy_shape() -> dict[str, str]:
             {"type": "function", "name": "shape_tool", "parameters": {"type": "object", "properties": {}}},
             {"type": "function", "name": "shape_tool_alt", "parameters": {"type": "object", "properties": {}}},
         ],
-        "tool_choice": "required",
     }
     chat_tools = _responses_tools_to_chat_tools(toy_responses_request["tools"])
     chat_fields = _responses_token_fields_to_chat_fields(toy_responses_request)
+    missing_choice = _responses_tool_choice_to_chat_tool_choice(
+        toy_responses_request.get("tool_choice"),
+        chat_tools,
+        normalize_missing_none_to_required=True,
+    )
+    none_choice = _responses_tool_choice_to_chat_tool_choice(
+        "none",
+        chat_tools,
+        normalize_missing_none_to_required=True,
+    )
     return {
-        "expected_tool_choice_shape_if_fixed": _shape(toy_responses_request.get("tool_choice")),
-        "proposed_proxy_forwarded_tool_choice_shape": _shape(toy_responses_request.get("tool_choice")),
+        "expected_tool_choice_shape_if_fixed": _shape("required"),
+        "proposed_proxy_forwarded_tool_choice_shape": _shape(missing_choice),
+        "offline_patched_missing_tool_choice_shape": _shape(missing_choice),
+        "offline_patched_none_tool_choice_shape": _shape(none_choice),
+        "offline_patched_tool_choice_normalized": missing_choice == "required" and none_choice == "required",
         "proposed_proxy_forwarded_tools_count_bucket": _bucket_count(len(chat_tools)),
         "proposed_proxy_forwarded_token_field_shape": "max_tokens" if "max_tokens" in chat_fields else "none",
     }
@@ -182,6 +198,9 @@ def write_report(output: Path = DEFAULT_OUTPUT, md_output: Path = DEFAULT_MD) ->
         f"original_tool_choice_shape: `{record['original_tool_choice_shape']}`\n\n"
         f"bfcl_handler_tool_choice_shape: `{record['bfcl_handler_tool_choice_shape']}`\n\n"
         f"reviewed_telemetry_tool_choice_shape: `{record['reviewed_telemetry_tool_choice_shape']}`\n\n"
+        f"offline_patched_missing_tool_choice_shape: `{record['offline_patched_missing_tool_choice_shape']}`\n\n"
+        f"offline_patched_none_tool_choice_shape: `{record['offline_patched_none_tool_choice_shape']}`\n\n"
+        f"offline_patched_tool_choice_normalized: `{record['offline_patched_tool_choice_normalized']}`\n\n"
         f"candidate_patch_kind: `{record['candidate_patch_kind']}`\n\n"
         f"patch_surface_label: `{record['patch_surface_label']}`\n\n"
         f"suspected_failure_stage: `{record['suspected_failure_stage']}`\n",

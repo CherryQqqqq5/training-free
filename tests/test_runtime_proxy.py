@@ -27,7 +27,12 @@ except ModuleNotFoundError:
     sys.modules["httpx"] = types.SimpleNamespace(AsyncClient=object)
     _INJECTED_HTTPX_STUB = True
 
-from grc.runtime.proxy import _responses_input_to_messages, _responses_token_fields_to_chat_fields
+from grc.runtime.proxy import (
+    _responses_input_to_messages,
+    _responses_token_fields_to_chat_fields,
+    _responses_tool_choice_to_chat_tool_choice,
+    _responses_tools_to_chat_tools,
+)
 
 if _INJECTED_YAML_STUB:
     sys.modules.pop("yaml", None)
@@ -58,6 +63,76 @@ class RuntimeProxyTests(unittest.TestCase):
         self.assertEqual(
             _responses_token_fields_to_chat_fields({"max_tokens": 64, "max_output_tokens": 128}),
             {"max_tokens": 64},
+        )
+
+
+    def test_bfcl_measurement_responses_tool_choice_missing_normalizes_to_required(self) -> None:
+        chat_tools = _responses_tools_to_chat_tools([
+            {"type": "function", "name": "lookup_weather", "parameters": {"type": "object", "properties": {}}},
+            {"type": "function", "name": "lookup_time", "parameters": {"type": "object", "properties": {}}},
+        ])
+
+        self.assertEqual(
+            _responses_tool_choice_to_chat_tool_choice(
+                None,
+                chat_tools,
+                normalize_missing_none_to_required=True,
+            ),
+            "required",
+        )
+
+    def test_bfcl_measurement_responses_tool_choice_none_normalizes_to_required(self) -> None:
+        chat_tools = _responses_tools_to_chat_tools([
+            {"type": "function", "name": "lookup_weather", "parameters": {"type": "object", "properties": {}}},
+        ])
+
+        self.assertEqual(
+            _responses_tool_choice_to_chat_tool_choice(
+                "none",
+                chat_tools,
+                normalize_missing_none_to_required=True,
+            ),
+            "required",
+        )
+
+    def test_responses_tool_choice_not_injected_when_tools_absent(self) -> None:
+        self.assertIsNone(
+            _responses_tool_choice_to_chat_tool_choice(
+                None,
+                [],
+                normalize_missing_none_to_required=True,
+            )
+        )
+
+    def test_responses_tool_choice_default_behavior_does_not_force_required(self) -> None:
+        chat_tools = _responses_tools_to_chat_tools([
+            {"type": "function", "name": "lookup_weather", "parameters": {"type": "object", "properties": {}}},
+        ])
+
+        self.assertIsNone(_responses_tool_choice_to_chat_tool_choice(None, chat_tools))
+        self.assertEqual(_responses_tool_choice_to_chat_tool_choice("none", chat_tools), "none")
+
+    def test_responses_explicit_tool_choice_preserved(self) -> None:
+        chat_tools = _responses_tools_to_chat_tools([
+            {"type": "function", "name": "lookup_weather", "parameters": {"type": "object", "properties": {}}},
+        ])
+        function_object = {"type": "function", "function": {"name": "lookup_weather"}}
+
+        self.assertEqual(
+            _responses_tool_choice_to_chat_tool_choice(
+                "required",
+                chat_tools,
+                normalize_missing_none_to_required=True,
+            ),
+            "required",
+        )
+        self.assertIs(
+            _responses_tool_choice_to_chat_tool_choice(
+                function_object,
+                chat_tools,
+                normalize_missing_none_to_required=True,
+            ),
+            function_object,
         )
 
     def test_responses_input_preserves_function_call_history(self) -> None:

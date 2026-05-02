@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check the fail-closed BFCL tool-choice normalization patch gate."""
+"""Check the BFCL tool-choice normalization patch gate and result."""
 
 from __future__ import annotations
 
@@ -11,6 +11,7 @@ from typing import Any
 
 DEFAULT_PACKET = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_tool_choice_normalization_patch_gate_packet.json")
 DEFAULT_DESIGN = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_tool_choice_normalization_patch_design.json")
+DEFAULT_RESULT = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_tool_choice_normalization_patch_result.json")
 PATCH_NAME = "bfcl_measurement_responses_to_chat_tool_choice_normalization"
 PATCH_KIND = "proxy_normalization"
 TARGET_SCOPE = "bfcl_measurement_generate_path_only"
@@ -46,6 +47,24 @@ REQUIRED_FALSE_DESIGN = (
     "scorer_authorized",
     "full_baseline_authorized",
     "candidate_runtime_activation_authorized",
+    "performance_evidence",
+    "sota_3pp_claim_ready",
+    "huawei_acceptance_ready",
+    "gpt_4o_fallback_enabled",
+    "gpt_5_2_active",
+    "openrouter_enabled",
+)
+REQUIRED_FALSE_RESULT = (
+    "provider_request_authorized",
+    "live_telemetry_authorized",
+    "bfcl_generate_authorized",
+    "bfcl_smoke_authorized",
+    "bfcl_evaluate_authorized",
+    "scorer_authorized",
+    "full_baseline_authorized",
+    "candidate_runtime_activation_authorized",
+    "candidate_jsonl_authorized",
+    "candidate_pool_ready",
     "performance_evidence",
     "sota_3pp_claim_ready",
     "huawei_acceptance_ready",
@@ -105,12 +124,27 @@ def _check_route(data: dict[str, Any], label: str) -> list[str]:
     return blockers
 
 
+def _check_patch_fields(data: dict[str, Any], label: str, prefix: str = "") -> list[str]:
+    blockers: list[str] = []
+    expected = {
+        f"{prefix}patch_name": PATCH_NAME,
+        f"{prefix}patch_kind": PATCH_KIND,
+        f"{prefix}target_scope": TARGET_SCOPE,
+        f"{prefix}condition": CONDITION,
+        f"{prefix}normalized_tool_choice": NORMALIZED_TOOL_CHOICE,
+    }
+    for key, value in expected.items():
+        if data.get(key) != value:
+            blockers.append(f"{label}_{key}_invalid:{data.get(key)!r}")
+    return blockers
+
+
 def validate_packet(data: dict[str, Any]) -> list[str]:
     blockers: list[str] = []
     if data.get("artifact_kind") != "bfcl_tool_choice_normalization_patch_gate_packet":
-        blockers.append(f"packet_kind_invalid:{data.get(artifact_kind)!r}")
+        blockers.append(f"packet_kind_invalid:{data.get('artifact_kind')!r}")
     if data.get("approval_status") != "prepared":
-        blockers.append(f"packet_approval_status_invalid:{data.get(approval_status)!r}")
+        blockers.append(f"packet_approval_status_invalid:{data.get('approval_status')!r}")
     for key in REQUIRED_FALSE_PACKET:
         if data.get(key) is not False:
             blockers.append(f"packet_{key}_not_false:{data.get(key)!r}")
@@ -132,28 +166,19 @@ def validate_packet(data: dict[str, Any]) -> list[str]:
 def validate_design(data: dict[str, Any]) -> list[str]:
     blockers: list[str] = []
     if data.get("artifact_kind") != "bfcl_tool_choice_normalization_patch_design":
-        blockers.append(f"design_kind_invalid:{data.get(artifact_kind)!r}")
+        blockers.append(f"design_kind_invalid:{data.get('artifact_kind')!r}")
     if data.get("approval_status") != "prepared":
-        blockers.append(f"design_approval_status_invalid:{data.get(approval_status)!r}")
-    expected = {
-        "patch_name": PATCH_NAME,
-        "patch_kind": PATCH_KIND,
-        "target_scope": TARGET_SCOPE,
-        "condition": CONDITION,
-        "normalized_tool_choice": NORMALIZED_TOOL_CHOICE,
-    }
-    for key, value in expected.items():
-        if data.get(key) != value:
-            blockers.append(f"design_{key}_invalid:{data.get(key)!r}")
+        blockers.append(f"design_approval_status_invalid:{data.get('approval_status')!r}")
+    blockers.extend(_check_patch_fields(data, "design"))
     for key in REQUIRED_FALSE_DESIGN:
         if data.get(key) is not False:
             blockers.append(f"design_{key}_not_false:{data.get(key)!r}")
     if data.get("no_provider_required") is not True:
-        blockers.append(f"design_no_provider_required_not_true:{data.get(no_provider_required)!r}")
+        blockers.append(f"design_no_provider_required_not_true:{data.get('no_provider_required')!r}")
     if data.get("no_bfcl_generate_required") is not True:
-        blockers.append(f"design_no_bfcl_generate_required_not_true:{data.get(no_bfcl_generate_required)!r}")
+        blockers.append(f"design_no_bfcl_generate_required_not_true:{data.get('no_bfcl_generate_required')!r}")
     if data.get("no_performance_claim") is not True:
-        blockers.append(f"design_no_performance_claim_not_true:{data.get(no_performance_claim)!r}")
+        blockers.append(f"design_no_performance_claim_not_true:{data.get('no_performance_claim')!r}")
     forbidden_scope = set(data.get("forbidden_scope") or [])
     if not REQUIRED_FORBIDDEN_SCOPE.issubset(forbidden_scope):
         blockers.append(f"design_forbidden_scope_incomplete:{sorted(forbidden_scope)!r}")
@@ -174,21 +199,53 @@ def validate_design(data: dict[str, Any]) -> list[str]:
     return sorted(set(blockers))
 
 
-def check(packet_path: Path = DEFAULT_PACKET, design_path: Path = DEFAULT_DESIGN) -> dict[str, Any]:
+def validate_result(data: dict[str, Any]) -> list[str]:
+    blockers: list[str] = []
+    if data.get("artifact_kind") != "bfcl_tool_choice_normalization_patch_result":
+        blockers.append(f"result_kind_invalid:{data.get('artifact_kind')!r}")
+    if data.get("approval_status") != "completed":
+        blockers.append(f"result_approval_status_invalid:{data.get('approval_status')!r}")
+    if data.get("patch_authorized") is not True:
+        blockers.append(f"result_patch_authorized_not_true:{data.get('patch_authorized')!r}")
+    if data.get("patch_completed") is not True:
+        blockers.append(f"result_patch_completed_not_true:{data.get('patch_completed')!r}")
+    blockers.extend(_check_patch_fields(data, "result"))
+    if data.get("condition") != CONDITION:
+        blockers.append(f"result_condition_invalid:{data.get('condition')!r}")
+    for key in REQUIRED_FALSE_RESULT:
+        if data.get(key) is not False:
+            blockers.append(f"result_{key}_not_false:{data.get(key)!r}")
+    touched = set(data.get("code_paths_touched") or [])
+    required_paths = {"src/grc/runtime/proxy.py", "configs/runtime_bfcl_structured.yaml"}
+    if not required_paths.issubset(touched):
+        blockers.append(f"result_code_paths_touched_incomplete:{sorted(touched)!r}")
+    blockers.extend(_check_route(data, "result"))
+    blockers.extend(f"result_{item}" for item in _scan(data))
+    return sorted(set(blockers))
+
+
+def check(packet_path: Path = DEFAULT_PACKET, design_path: Path = DEFAULT_DESIGN, result_path: Path = DEFAULT_RESULT) -> dict[str, Any]:
     packet = _load(packet_path)
     design = _load(design_path)
     blockers = validate_packet(packet) + validate_design(design)
+    result_present = result_path.exists()
+    result: dict[str, Any] = {}
+    if result_present:
+        result = _load(result_path)
+        blockers.extend(validate_result(result))
     return {
         "report_scope": "bfcl_tool_choice_normalization_patch_gate_check",
         "packet_path": str(packet_path),
         "design_path": str(design_path),
+        "result_path": str(result_path) if result_present else None,
         "bfcl_tool_choice_normalization_patch_gate_passed": not blockers,
         "patch_name": design.get("patch_name"),
         "patch_kind": design.get("patch_kind"),
         "target_scope": design.get("target_scope"),
         "condition": design.get("condition"),
         "normalized_tool_choice": design.get("normalized_tool_choice"),
-        "patch_authorized": packet.get("patch_authorized"),
+        "patch_authorized": result.get("patch_authorized", packet.get("patch_authorized")),
+        "patch_completed": result.get("patch_completed", False),
         "blockers": sorted(set(blockers)),
     }
 
@@ -197,11 +254,12 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--packet", type=Path, default=DEFAULT_PACKET)
     parser.add_argument("--design", type=Path, default=DEFAULT_DESIGN)
+    parser.add_argument("--result", type=Path, default=DEFAULT_RESULT)
     parser.add_argument("--compact", action="store_true")
     parser.add_argument("--strict", action="store_true")
     args = parser.parse_args(argv)
     try:
-        summary = check(args.packet, args.design)
+        summary = check(args.packet, args.design, args.result)
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         summary = {
             "report_scope": "bfcl_tool_choice_normalization_patch_gate_check",
