@@ -32,9 +32,9 @@ def test_protocol_debug_packet_checker_passes_current_packet():
     assert result.returncode == 0, result.stdout + result.stderr
     summary = json.loads(result.stdout)
     assert summary["rashe_provider_protocol_debug_preflight_packet_passed"] is True
-    assert summary["approval_status"] == "prepared"
-    assert summary["execution_authorized"] is False
-    assert summary["provider_request_authorized"] is False
+    assert summary["approval_status"] == "approved"
+    assert summary["execution_authorized"] is True
+    assert summary["provider_request_authorized"] is True
     assert summary["signed_model"] == "gpt-4.1"
     assert summary["fallback_allowed"] is False
     assert summary["source_diagnostic_execution_authorized"] is False
@@ -64,12 +64,45 @@ def test_protocol_debug_runner_dry_run_and_plan_only_do_not_execute():
             assert variant["source_input_read"] is False
 
 
-def test_protocol_debug_execute_without_approval_fails_closed():
+def test_protocol_debug_execute_without_transport_fails_closed():
     result = subprocess.run([sys.executable, str(RUNNER), "--execute-debug", "--compact", "--strict"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=False)
     assert result.returncode != 0
     summary = json.loads(result.stdout)
-    assert "protocol_debug_execution_not_approved" in summary["blockers"]
     assert summary["provider_request_executed"] is False
+    assert len(summary["variants"]) == 5
+    assert all(variant["provider_request_executed"] is False for variant in summary["variants"])
+    assert all("provider_protocol_debug_request_failed" in blocker for blocker in summary["blockers"])
+
+
+def test_protocol_debug_execute_path_mock_provider_compact_no_leakage():
+    import scripts.run_rashe_provider_protocol_debug_preflight as runner
+
+    def fake_post(payload):
+        assert payload["model"] == "gpt-4.1"
+        assert "rashe_source_inputs_compact" not in json.dumps(payload)
+        return {"status": 200, "json": {"choices": [{"message": {"tool_calls": [{"id": "call_1", "type": "function", "function": {"name": "synthetic_preflight_ping", "arguments": "{}"}}]}}]}}
+
+    class Args:
+        packet = PACKET
+        dry_run = False
+        plan_only = False
+        execute_debug = True
+
+    summary = runner.build_plan(Args(), post_json=fake_post)
+    encoded = json.dumps(summary, sort_keys=True)
+    assert "https://" not in encoded
+    assert "secret" not in encoded.lower()
+    assert summary["rashe_provider_protocol_debug_preflight_plan_passed"] is True
+    assert summary["provider_request_executed"] is True
+    assert summary["endpoint_value_read"] is False
+    assert summary["api_key_value_read"] is False
+    assert summary["source_input_read"] is False
+    assert summary["diagnostic_written"] is False
+    assert len(summary["variants"]) == 5
+    assert all(variant["http_status_class"] == "2xx" for variant in summary["variants"])
+    assert all(variant["tool_calls_returned"] is True for variant in summary["variants"])
+    assert all(variant["raw_request_persisted"] is False for variant in summary["variants"])
+    assert all(variant["raw_response_persisted"] is False for variant in summary["variants"])
 
 
 def test_protocol_debug_packet_rejects_variant_drift(tmp_path):

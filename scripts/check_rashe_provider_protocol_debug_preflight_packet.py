@@ -21,6 +21,10 @@ ALLOWED_RESULT_FIELDS = [
     "variant",
     "planned_only",
     "provider_request_executed",
+    "http_status_class",
+    "auth_ok",
+    "model_available",
+    "tool_calls_returned",
     "raw_request_persisted",
     "raw_response_persisted",
     "raw_headers_persisted",
@@ -32,15 +36,20 @@ ALLOWED_RESULT_FIELDS = [
     "performance_evidence",
     "blocker",
 ]
-REQUIRED_FALSE = (
+REQUIRED_TRUE = (
     "authorized",
     "execution_authorized",
     "provider_request_authorized",
+)
+REQUIRED_FALSE = (
+    "actual_execution_performed_in_this_commit",
     "fallback_allowed",
     "gpt_4o_fallback_allowed",
     "source_diagnostic_execution_authorized",
     "bfcl_source_input_authorized",
+    "source_input_read_authorized",
     "source_input_root_read_authorized",
+    "diagnostics_write_authorized",
     "candidate_generation_authorized",
     "scorer_authorized",
     "performance_evidence",
@@ -105,9 +114,10 @@ def validate_packet(packet: dict[str, Any]) -> list[str]:
     blockers: list[str] = []
     expected = {
         "approval_packet_kind": "provider_protocol_debug_preflight",
-        "approval_status": "prepared",
+        "approval_status": "approved",
         "signed_model": "gpt-4.1",
         "provider_profile": "Chuangzhi/Novacode",
+        "execution_scope": "single_synthetic_protocol_debug_only",
         "allowed_variants": SIGNED_VARIANTS,
         "allowed_result_fields": ALLOWED_RESULT_FIELDS,
     }
@@ -116,6 +126,9 @@ def validate_packet(packet: dict[str, Any]) -> list[str]:
             blockers.append(f"packet_{key}_invalid:{packet.get(key)!r}")
     if len(packet.get("allowed_variants") or []) != len(SIGNED_VARIANTS):
         blockers.append("packet_allowed_variants_count_invalid")
+    for key in REQUIRED_TRUE:
+        if packet.get(key) is not True:
+            blockers.append(f"packet_{key}_not_true:{packet.get(key)!r}")
     for key in REQUIRED_FALSE:
         if packet.get(key) is not False:
             blockers.append(f"packet_{key}_not_false:{packet.get(key)!r}")
@@ -143,6 +156,8 @@ def check(packet_path: Path = DEFAULT_PACKET) -> dict[str, Any]:
         "signed_model": packet.get("signed_model"),
         "fallback_allowed": packet.get("fallback_allowed"),
         "source_diagnostic_execution_authorized": packet.get("source_diagnostic_execution_authorized"),
+        "source_input_read_authorized": packet.get("source_input_read_authorized"),
+        "diagnostics_write_authorized": packet.get("diagnostics_write_authorized"),
         "candidate_generation_authorized": packet.get("candidate_generation_authorized"),
         "scorer_authorized": packet.get("scorer_authorized"),
         "performance_evidence": packet.get("performance_evidence"),
