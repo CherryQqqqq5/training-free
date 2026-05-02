@@ -1,0 +1,51 @@
+{
+  "artifact_kind": "bfcl_tool_choice_normalization_patch_design",
+  "approval_status": "prepared",
+  "patch_name": "bfcl_measurement_responses_to_chat_tool_choice_normalization",
+  "patch_kind": "proxy_normalization",
+  "target_scope": "bfcl_measurement_generate_path_only",
+  "condition": "tools_present_and_tool_choice_missing_or_none",
+  "normalized_tool_choice": "required",
+  "forbidden_scope": [
+    "candidate",
+    "scorer",
+    "baseline",
+    "performance",
+    "general_runtime_if_not_config_gated"
+  ],
+  "rollback_plan": [
+    "revert_future_behavior_patch_commit",
+    "rerun_no_provider_tool_choice_debug_checker",
+    "confirm_route_and_artifact_boundary_gates"
+  ],
+  "offline_tests_required": [
+    "missing_tool_choice_with_tools_normalizes_to_required_in_bfcl_measurement_path",
+    "explicit_none_tool_choice_with_tools_normalizes_to_required_in_bfcl_measurement_path",
+    "tools_absent_does_not_normalize",
+    "explicit_required_or_function_object_is_preserved",
+    "non_bfcl_measurement_path_is_unchanged_or_fails_closed",
+    "route_remains_novacode_gpt_4_1",
+    "candidate_scorer_baseline_performance_flags_remain_false"
+  ],
+  "no_provider_required": true,
+  "no_bfcl_generate_required": true,
+  "no_performance_claim": true,
+  "route_profile": "novacode",
+  "route_model": "gpt-4.1",
+  "gpt_4o_fallback_enabled": false,
+  "gpt_5_2_active": false,
+  "openrouter_enabled": false,
+  "patch_authorized": false,
+  "provider_request_authorized": false,
+  "live_telemetry_authorized": false,
+  "bfcl_generate_authorized": false,
+  "bfcl_smoke_authorized": false,
+  "bfcl_evaluate_authorized": false,
+  "scorer_authorized": false,
+  "full_baseline_authorized": false,
+  "candidate_runtime_activation_authorized": false,
+  "performance_evidence": false,
+  "sota_3pp_claim_ready": false,
+  "huawei_acceptance_ready": false,
+  "next_step_if_approved": "minimal_offline_behavior_patch_gate_only"
+}
