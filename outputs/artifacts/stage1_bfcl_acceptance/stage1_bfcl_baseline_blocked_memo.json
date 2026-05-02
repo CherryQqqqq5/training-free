@@ -1,0 +1,86 @@
+{
+  "artifact_kind": "stage1_bfcl_baseline_blocked_memo",
+  "bfcl_measurement_evidence": false,
+  "cleaned_state": {
+    "branches_synchronized_observed": true,
+    "output_smoke_root_removed": true,
+    "smoke_artifact_committed": false,
+    "tmp_smoke_root_removed": true,
+    "worktree_clean_observed": true
+  },
+  "current_head": "1006dc95120817bc8b49a7350c1f2f9ab3075433",
+  "explicit_no_evidence_statement": {
+    "candidate_activation": false,
+    "candidate_jsonl": false,
+    "candidate_pool": false,
+    "full_default_baseline_ran": false,
+    "huawei_claim": false,
+    "performance_claim": false,
+    "plus_3pp_evidence": false,
+    "raw_or_secret_material_committed": false,
+    "scorer_feedback_tuning": false,
+    "validated_bfcl_measurement": false
+  },
+  "future_harness_checks": [
+    "real_client_proxy_fake_upstream_returns_nonempty_decoded_function_call",
+    "responses_tool_choice_normalized_to_chat_completions_form",
+    "max_output_tokens_to_chat_max_tokens_in_proxy_call",
+    "nonempty_text_only_no_tool_output_classified_as_no_tool_text_not_provider_empty",
+    "true_empty_distinguishable_from_runtime_coerced_empty",
+    "responses_output_envelope_includes_required_function_call_fields"
+  ],
+  "known_fixed_issues": [
+    "max_tokens_max_output_tokens_path_mismatch",
+    "responses_instructions_to_chat_messages_conversion_loss"
+  ],
+  "pre_smoke_gates_passed": [
+    "check_bfcl_proxy_response_parser_debug_packet.py --compact --strict",
+    "check_bfcl_proxy_runtime_adapter_shape_diff.py --compact --strict",
+    "check_bfcl_stage1_smoke_run_id_manifest.py --compact --strict",
+    "check_bfcl_stage1_smoke_scope_manifest.py --compact --strict",
+    "check_bfcl_measurement_provider_protocol_debug_artifact.py --compact --strict",
+    "check_bfcl_measurement_route_consistency.py --compact --strict",
+    "check_bfcl_runner_interpreter.py --compact --strict",
+    "check_artifact_boundary.py"
+  ],
+  "proposed_future_debug_gate": {
+    "bfcl_case_content_authorized": false,
+    "bfcl_smoke_authorized": false,
+    "kind": "no_provider_bfcl_client_proxy_conformance_harness",
+    "local_fake_upstream": true,
+    "provider_call_authorized": false,
+    "real_bfcl_openai_client_parser_path_if_importable": true,
+    "scorer_authorized": false,
+    "synthetic_toy_request_only": true
+  },
+  "run_ids": [
+    "web_search_base_0",
+    "memory_kv_0-customer-0",
+    "multi_turn_base_0",
+    "multi_turn_long_context_0",
+    "multi_turn_miss_param_0",
+    "multi_turn_miss_func_0",
+    "irrelevance_0",
+    "live_irrelevance_0-0-0"
+  ],
+  "status": "blocked",
+  "stop_condition": {
+    "condition": "repeated_empty_model_response",
+    "message": "Empty response from the model",
+    "observed_after_fixes": [
+      "max_tokens_max_output_tokens_path_mismatch",
+      "responses_instructions_to_chat_messages_conversion_loss"
+    ],
+    "scope": "exact_8_id_bfcl_shaped_smoke",
+    "stopped_at_progress": "6/8"
+  },
+  "suspected_remaining_causes": [
+    "real_bfcl_responses_request_shape_not_covered_by_toy_fixture",
+    "runtime_no_tool_text_to_empty_coercion_may_make_nonempty_text_appear_empty",
+    "chat_to_responses_envelope_or_bfcl_sdk_parser_decode_mismatch"
+  ],
+  "unresolved_blocker": [
+    "exact_bfcl_shaped_runtime_proxy_path_still_emits_repeated_empty_model_response",
+    "offline_synthetic_parser_path_no_longer_reproduces_instruction_loss_failure"
+  ]
+}
