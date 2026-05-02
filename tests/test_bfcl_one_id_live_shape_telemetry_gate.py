@@ -513,3 +513,160 @@ def test_temporary_manifest_restores_or_removes(tmp_path: Path) -> None:
     with _temporary_one_id_manifest(target):
         assert json.loads(target.read_text(encoding="utf-8")) == SIGNED_ID_MANIFEST
     assert json.loads(target.read_text(encoding="utf-8")) == {"existing": ["id"]}
+
+
+def _proxy_trace_tool_call() -> dict[str, object]:
+    return {
+        "request_endpoint": "/v1/responses",
+        "request_original": {"instructions": "redacted", "input": [{"role": "user", "content": "redacted"}]},
+        "request": {
+            "messages": [{"role": "developer", "content": "redacted"}, {"role": "user", "content": "redacted"}],
+            "tools": [{"type": "function", "function": {"name": "redacted", "parameters": {"type": "object"}}}],
+            "tool_choice": "required",
+            "max_tokens": 64,
+        },
+        "raw_response": {
+            "choices": [
+                {
+                    "message": {
+                        "content": "",
+                        "tool_calls": [{"id": "call_1", "type": "function", "function": {"name": "redacted", "arguments": "{}"}}],
+                    }
+                }
+            ]
+        },
+        "final_chat_response": {
+            "choices": [
+                {
+                    "message": {
+                        "content": "",
+                        "tool_calls": [{"id": "call_1", "type": "function", "function": {"name": "redacted", "arguments": "{}"}}],
+                    }
+                }
+            ]
+        },
+        "final_response": {
+            "output": [{"type": "function_call", "id": "call_1", "call_id": "call_1", "name": "redacted", "arguments": "{}"}]
+        },
+        "validation": {"repair_kinds": []},
+        "status_code": 200,
+    }
+
+
+def test_default_signed_capture_path_uses_stage_trace_and_result(monkeypatch, tmp_path: Path) -> None:
+    import contextlib
+    import subprocess
+    import scripts.bfcl_one_id_live_shape_telemetry_capture as capture
+    from scripts.bfcl_one_id_live_shape_telemetry_capture import build_signed_one_id_live_shape_capture
+
+    packet_path = _approved_packet_path(tmp_path)
+    roots: list[Path] = []
+    trace_dirs: list[Path] = []
+
+    class Proc:
+        def terminate(self) -> None:
+            pass
+
+        def wait(self, timeout: int = 0) -> None:
+            pass
+
+        def kill(self) -> None:
+            pass
+
+    def fake_start_proxy(port: int, trace_dir: Path, runtime_config: Path, rules_dir: Path, log_path: Path) -> Proc:
+        trace_dirs.append(trace_dir)
+        trace_dir.mkdir(parents=True)
+        (trace_dir / "trace.json").write_text(json.dumps(_proxy_trace_tool_call()), encoding="utf-8")
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        log_path.write_text("synthetic compact proxy log", encoding="utf-8")
+        return Proc()
+
+    def fake_run(command: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+        result_dir = Path(command[command.index("--result-dir") + 1])
+        roots.append(result_dir.parents[1])
+        result_dir.mkdir(parents=True, exist_ok=True)
+        (result_dir / "result.json").write_text(
+            json.dumps(
+                {
+                    "id": "web_search_base_0",
+                    "model_response": [{"function_call": True}],
+                    "model_response_decoded": [{"function_call": True}],
+                }
+            ),
+            encoding="utf-8",
+        )
+        return subprocess.CompletedProcess(command, 0)
+
+    monkeypatch.setattr(capture, "_sync_fixture_env", lambda run_root, port: None)
+    monkeypatch.setattr(capture, "_start_proxy", fake_start_proxy)
+    monkeypatch.setattr(capture.subprocess, "run", fake_run)
+    monkeypatch.setattr(capture, "_temporary_one_id_manifest", lambda: contextlib.nullcontext(tmp_path / "package_manifest.json"))
+
+    request = {"run_ids": ["web_search_base_0"], "route_profile": "novacode", "route_model": "gpt-4.1", "generate_only": True, "raw_persistence_authorized": False}
+    summary = execute_live_telemetry(
+        packet_path=packet_path,
+        output_artifact=tmp_path / "telemetry.json",
+        live_capture_factory=lambda req: build_signed_one_id_live_shape_capture(req),
+    )
+    assert request["run_ids"] == ["web_search_base_0"]
+    assert summary["blockers"] == []
+    assert check_artifact(tmp_path / "telemetry.json")["bfcl_one_id_live_shape_telemetry_artifact_passed"] is True
+    artifact = json.loads((tmp_path / "telemetry.json").read_text(encoding="utf-8"))
+    record = artifact["records"][0]
+    assert record["provider_response_has_tool_calls"] is True
+    assert record["engine_apply_response_called"] is True
+    assert record["proxy_responses_output_has_function_call"] is True
+    assert record["bfcl_decode_execute_called"] is True
+    assert record["bfcl_decode_execute_nonempty"] is True
+    assert record["suspected_live_failure_stage"] == "live_path_nonempty"
+    assert roots and all(not root.exists() for root in roots)
+    assert trace_dirs and all(not trace_dir.exists() for trace_dir in trace_dirs)
+
+
+def test_default_signed_capture_missing_provider_trace_fails_closed(monkeypatch, tmp_path: Path) -> None:
+    import contextlib
+    import subprocess
+    import scripts.bfcl_one_id_live_shape_telemetry_capture as capture
+    from scripts.bfcl_one_id_live_shape_telemetry_capture import build_signed_one_id_live_shape_capture
+
+    packet_path = _approved_packet_path(tmp_path)
+
+    class Proc:
+        def terminate(self) -> None:
+            pass
+
+        def wait(self, timeout: int = 0) -> None:
+            pass
+
+        def kill(self) -> None:
+            pass
+
+    def fake_start_proxy(port: int, trace_dir: Path, runtime_config: Path, rules_dir: Path, log_path: Path) -> Proc:
+        trace_dir.mkdir(parents=True)
+        return Proc()
+
+    monkeypatch.setattr(capture, "_sync_fixture_env", lambda run_root, port: None)
+    monkeypatch.setattr(capture, "_start_proxy", fake_start_proxy)
+    monkeypatch.setattr(capture.subprocess, "run", lambda command, **kwargs: subprocess.CompletedProcess(command, 0))
+    monkeypatch.setattr(capture, "_temporary_one_id_manifest", lambda: contextlib.nullcontext(tmp_path / "package_manifest.json"))
+
+    summary = execute_live_telemetry(
+        packet_path=packet_path,
+        output_artifact=tmp_path / "telemetry.json",
+        live_capture_factory=lambda req: build_signed_one_id_live_shape_capture(req),
+    )
+    assert summary["blockers"] == ["live_shape_stage_not_instrumented:provider_upstream_response"]
+    assert summary["diagnostic_written"] is False
+
+
+def test_missing_non_provider_stage_uses_stage_label() -> None:
+    from scripts.bfcl_one_id_live_shape_telemetry_capture import _normalize_observed_record
+
+    record = _record("live_path_nonempty")
+    record.pop("engine_apply_response_called")
+    try:
+        _normalize_observed_record(record)
+    except RuntimeError as exc:
+        assert str(exc) == "live_shape_stage_not_instrumented:runtime_engine_apply_response"
+    else:
+        raise AssertionError("expected missing runtime stage to fail closed")
