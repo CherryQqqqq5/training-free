@@ -26,6 +26,7 @@ class BFCLExact2IDSmokeApprovalPacketTests(unittest.TestCase):
         self.assertFalse(self.packet["scorer_authorized"])
         self.assertEqual(self.packet["bfcl_run_ids_manifest_mode"], "temporary_bfcl_package_path_with_backup_restore")
         self.assertEqual(self.packet["bfcl_run_ids_manifest_content"], "exact_signed_ids_only")
+        self.assertEqual(self.packet["bfcl_run_ids_manifest_schema"], "category_to_signed_id_list")
         self.assertTrue(self.packet["bfcl_run_ids_manifest_cleanup_required"])
 
     def test_rejects_pending_state_for_execution_packet(self) -> None:

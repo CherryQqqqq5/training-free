@@ -21,6 +21,10 @@ from urllib.request import urlopen
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SIGNED_IDS = ["web_search_base_0", "multi_turn_base_0"]
+SIGNED_ID_MANIFEST = {
+    "web_search_base": ["web_search_base_0"],
+    "multi_turn_base": ["multi_turn_base_0"],
+}
 SIGNED_CATEGORIES = "web_search_base,multi_turn_base"
 PACKET_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_exact_2id_smoke_approval_packet.json")
 DEFAULT_OUTPUT = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_exact_2id_generate_smoke_compact.json")
@@ -115,8 +119,7 @@ def build_plan(packet_path: Path = PACKET_PATH) -> dict[str, Any]:
 def _write_run_ids(run_root: Path) -> Path:
     path = run_root / "bfcl/test_case_ids_to_generate.json"
     path.parent.mkdir(parents=True, exist_ok=True)
-    payload = {"test_case_ids": SIGNED_IDS}
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    path.write_text(json.dumps(_manifest_payload(), indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return path
 
 
@@ -127,12 +130,25 @@ def _bfcl_package_run_ids_path() -> Path:
 
 
 def _manifest_payload() -> dict[str, list[str]]:
-    return {"test_case_ids": list(SIGNED_IDS)}
+    return {category: list(ids) for category, ids in SIGNED_ID_MANIFEST.items()}
+
+
+def _manifest_payload_blockers(payload: dict[str, Any]) -> list[str]:
+    blockers: list[str] = []
+    if "test_case_ids" in payload:
+        blockers.append("legacy_test_case_ids_key_forbidden")
+    if payload != SIGNED_ID_MANIFEST:
+        blockers.append(f"manifest_schema_or_ids_invalid:{payload!r}")
+    return blockers
 
 
 def _write_manifest(path: Path) -> None:
+    payload = _manifest_payload()
+    blockers = _manifest_payload_blockers(payload)
+    if blockers:
+        raise RuntimeError(";".join(blockers))
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(_manifest_payload(), indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
 @contextlib.contextmanager

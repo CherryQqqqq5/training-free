@@ -11,6 +11,7 @@ from scripts.run_bfcl_exact_2id_generate_smoke import (
     _assert_generate_only_command,
     _generate_command,
     _manifest_payload,
+    _manifest_payload_blockers,
     _temporary_bfcl_run_ids_manifest,
     build_plan,
     execute_generate_smoke,
@@ -209,15 +210,27 @@ def test_artifact_checker_rejects_endpoint_and_key_literals() -> None:
     assert any("key_literal_forbidden" in blocker for blocker in blockers)
 
 
-def test_manifest_payload_exactly_two_signed_ids() -> None:
-    assert _manifest_payload() == {"test_case_ids": list(SIGNED_IDS)}
+def test_manifest_payload_uses_bfcl_category_to_id_schema() -> None:
+    assert _manifest_payload() == {
+        "web_search_base": ["web_search_base_0"],
+        "multi_turn_base": ["multi_turn_base_0"],
+    }
+
+
+def test_manifest_payload_rejects_legacy_test_case_ids_shape() -> None:
+    blockers = _manifest_payload_blockers({"test_case_ids": list(SIGNED_IDS)})
+    assert "legacy_test_case_ids_key_forbidden" in blockers
+    assert any("manifest_schema_or_ids_invalid" in blocker for blocker in blockers)
 
 
 def test_temporary_manifest_cleanup_removes_new_file(tmp_path: Path) -> None:
     manifest = tmp_path / "test_case_ids_to_generate.json"
     with _temporary_bfcl_run_ids_manifest(manifest) as path:
         assert path == manifest
-        assert json.loads(manifest.read_text(encoding="utf-8")) == {"test_case_ids": list(SIGNED_IDS)}
+        assert json.loads(manifest.read_text(encoding="utf-8")) == {
+            "web_search_base": ["web_search_base_0"],
+            "multi_turn_base": ["multi_turn_base_0"],
+        }
     assert not manifest.exists()
 
 
@@ -226,7 +239,10 @@ def test_temporary_manifest_cleanup_restores_existing_file_on_success(tmp_path: 
     original = {"test_case_ids": ["existing_case"]}
     manifest.write_text(json.dumps(original), encoding="utf-8")
     with _temporary_bfcl_run_ids_manifest(manifest):
-        assert json.loads(manifest.read_text(encoding="utf-8")) == {"test_case_ids": list(SIGNED_IDS)}
+        assert json.loads(manifest.read_text(encoding="utf-8")) == {
+            "web_search_base": ["web_search_base_0"],
+            "multi_turn_base": ["multi_turn_base_0"],
+        }
     assert json.loads(manifest.read_text(encoding="utf-8")) == original
 
 
@@ -236,7 +252,10 @@ def test_temporary_manifest_cleanup_restores_existing_file_on_failure(tmp_path: 
     manifest.write_text(json.dumps(original), encoding="utf-8")
     try:
         with _temporary_bfcl_run_ids_manifest(manifest):
-            assert json.loads(manifest.read_text(encoding="utf-8")) == {"test_case_ids": list(SIGNED_IDS)}
+            assert json.loads(manifest.read_text(encoding="utf-8")) == {
+                "web_search_base": ["web_search_base_0"],
+                "multi_turn_base": ["multi_turn_base_0"],
+            }
             raise RuntimeError("synthetic_failure")
     except RuntimeError:
         pass

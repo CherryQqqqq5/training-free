@@ -118,6 +118,8 @@ def validate_packet(data: dict[str, Any]) -> list[str]:
         blockers.append(f"bfcl_run_ids_manifest_mode_invalid:{data.get('bfcl_run_ids_manifest_mode')!r}")
     if data.get("bfcl_run_ids_manifest_content") != "exact_signed_ids_only":
         blockers.append(f"bfcl_run_ids_manifest_content_invalid:{data.get('bfcl_run_ids_manifest_content')!r}")
+    if data.get("bfcl_run_ids_manifest_schema") != "category_to_signed_id_list":
+        blockers.append(f"bfcl_run_ids_manifest_schema_invalid:{data.get('bfcl_run_ids_manifest_schema')!r}")
     if data.get("bfcl_run_ids_manifest_cleanup_required") is not True:
         blockers.append(f"bfcl_run_ids_manifest_cleanup_required_not_true:{data.get('bfcl_run_ids_manifest_cleanup_required')!r}")
     expected_paths = {
