@@ -428,3 +428,88 @@ def test_execute_rejects_preexisting_output_before_capture_factory(tmp_path: Pat
     assert called is False
     assert summary["endpoint_value_read"] is False
     assert summary["api_key_value_read"] is False
+
+
+def test_signed_instrumented_capture_requires_stage_observations(tmp_path: Path) -> None:
+    from scripts.bfcl_one_id_live_shape_telemetry_capture import build_signed_one_id_live_shape_capture
+
+    packet_path = _approved_packet_path(tmp_path)
+
+    def incomplete_executor(request: dict[str, object]) -> dict[str, object]:
+        return {"run_id": "web_search_base_0"}
+
+    def factory(request: dict[str, object]):
+        return build_signed_one_id_live_shape_capture(request, executor=incomplete_executor)
+
+    summary = execute_live_telemetry(packet_path=packet_path, output_artifact=tmp_path / "telemetry.json", live_capture_factory=factory)
+    assert any(str(blocker).startswith("live_shape_stage_not_instrumented:") for blocker in summary["blockers"])
+    assert summary["diagnostic_written"] is False
+
+
+def test_empty_model_response_requires_observed_upstream_empty(tmp_path: Path) -> None:
+    from scripts.bfcl_one_id_live_shape_telemetry_capture import build_signed_one_id_live_shape_capture
+
+    packet_path = _approved_packet_path(tmp_path)
+
+    def fake_executor(request: dict[str, object]) -> dict[str, object]:
+        record = _record("provider_true_empty")
+        record["provider_response_empty_bool"] = False
+        return record
+
+    def factory(request: dict[str, object]):
+        return build_signed_one_id_live_shape_capture(request, executor=fake_executor)
+
+    summary = execute_live_telemetry(packet_path=packet_path, output_artifact=tmp_path / "telemetry.json", live_capture_factory=factory)
+    assert summary["blockers"] == ["live_shape_empty_model_response_without_observed_upstream_empty"]
+    assert summary["diagnostic_written"] is False
+
+
+def test_capture_temp_run_root_cleanup_on_success_and_failure(tmp_path: Path) -> None:
+    from scripts.bfcl_one_id_live_shape_telemetry_capture import build_signed_one_id_live_shape_capture
+
+    packet_path = _approved_packet_path(tmp_path)
+    roots: list[Path] = []
+
+    def success_executor(request: dict[str, object]) -> dict[str, object]:
+        root = Path(str(request["run_root"]))
+        roots.append(root)
+        (root / "bfcl/result").mkdir(parents=True)
+        (root / "proxy.log").write_text("compact-test-log", encoding="utf-8")
+        return _record("live_path_nonempty")
+
+    def success_factory(request: dict[str, object]):
+        return build_signed_one_id_live_shape_capture(request, executor=success_executor)
+
+    summary = execute_live_telemetry(packet_path=packet_path, output_artifact=tmp_path / "success.json", live_capture_factory=success_factory)
+    assert summary["blockers"] == []
+    assert roots and all(not root.exists() for root in roots)
+
+    failure_roots: list[Path] = []
+
+    def failure_executor(request: dict[str, object]) -> dict[str, object]:
+        root = Path(str(request["run_root"]))
+        failure_roots.append(root)
+        (root / "traces").mkdir(parents=True)
+        (root / "traces/trace.json").write_text("compact-test-trace", encoding="utf-8")
+        raise RuntimeError("live_shape_stage_not_instrumented:provider_upstream_response")
+
+    def failure_factory(request: dict[str, object]):
+        return build_signed_one_id_live_shape_capture(request, executor=failure_executor)
+
+    failed = execute_live_telemetry(packet_path=packet_path, output_artifact=tmp_path / "failure.json", live_capture_factory=failure_factory)
+    assert failed["blockers"] == ["live_shape_stage_not_instrumented:provider_upstream_response"]
+    assert failure_roots and all(not root.exists() for root in failure_roots)
+
+
+def test_temporary_manifest_restores_or_removes(tmp_path: Path) -> None:
+    from scripts.bfcl_one_id_live_shape_telemetry_capture import SIGNED_ID_MANIFEST, _temporary_one_id_manifest
+
+    target = tmp_path / "test_case_ids_to_generate.json"
+    with _temporary_one_id_manifest(target):
+        assert json.loads(target.read_text(encoding="utf-8")) == SIGNED_ID_MANIFEST
+    assert not target.exists()
+
+    target.write_text('{"existing": ["id"]}\n', encoding="utf-8")
+    with _temporary_one_id_manifest(target):
+        assert json.loads(target.read_text(encoding="utf-8")) == SIGNED_ID_MANIFEST
+    assert json.loads(target.read_text(encoding="utf-8")) == {"existing": ["id"]}

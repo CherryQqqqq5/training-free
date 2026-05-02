@@ -144,7 +144,7 @@ def _artifact_from_record(record: dict[str, Any], *, provider_request_executed: 
 
 def _safe_error(exc: Exception) -> str:
     message = str(exc)
-    if message.startswith("one_id_"):
+    if message.startswith("one_id_") or message.startswith("live_shape_"):
         return message
     return type(exc).__name__
 
@@ -238,7 +238,7 @@ def execute_live_telemetry(*, packet_path: Path = DEFAULT_PACKET, output_artifac
             "endpoint_value_read": False,
             "api_key_value_read": False,
             "diagnostic_written": False,
-            "blockers": [type(exc).__name__],
+            "blockers": [_safe_error(exc)],
         }
     if not isinstance(captured, dict):
         return {
