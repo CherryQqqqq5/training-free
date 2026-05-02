@@ -767,10 +767,13 @@ def test_after_patch_packet_rejects_previous_output_mismatch() -> None:
     assert any("output_artifact_mismatch_packet_scope" in blocker for blocker in plan["blockers"])
 
 
-def test_previous_artifact_remains_valid_and_after_patch_artifact_absent() -> None:
+def test_previous_and_after_patch_artifacts_remain_valid() -> None:
     assert PREVIOUS_OUTPUT.exists()
     assert check_artifact(PREVIOUS_OUTPUT)["bfcl_one_id_live_shape_telemetry_artifact_passed"] is True
-    assert not AFTER_PATCH_OUTPUT.exists()
+    assert AFTER_PATCH_OUTPUT.exists()
+    after_patch_summary = check_artifact(AFTER_PATCH_OUTPUT)
+    assert after_patch_summary["bfcl_one_id_live_shape_telemetry_artifact_passed"] is True
+    assert after_patch_summary["run_ids"] == ["web_search_base_0"]
 
 
 def test_after_patch_synthetic_artifact_path_accepted_by_checker(tmp_path: Path) -> None:
