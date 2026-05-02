@@ -742,14 +742,14 @@ def test_missing_non_provider_stage_uses_stage_label() -> None:
         raise AssertionError("expected missing runtime stage to fail closed")
 
 
-def test_after_patch_packet_pending_scope_passes_and_requires_explicit_execution_authorization() -> None:
+def test_after_patch_packet_approved_scope_passes_without_broadening() -> None:
     summary = check(AFTER_PATCH_PACKET_PATH)
     assert summary["bfcl_one_id_live_shape_telemetry_gate_passed"] is True
-    assert summary["approval_status"] == "pending"
+    assert summary["approval_status"] == "approved"
     assert summary["signed_run_ids"] == ["web_search_base_0"]
-    assert summary["provider_request_authorized"] is False
-    assert summary["bfcl_generate_authorized"] is False
-    assert summary["live_shape_telemetry_authorized"] is False
+    assert summary["provider_request_authorized"] is True
+    assert summary["bfcl_generate_authorized"] is True
+    assert summary["live_shape_telemetry_authorized"] is True
 
 
 def test_after_patch_dry_run_plan_uses_new_output_and_no_execution() -> None:

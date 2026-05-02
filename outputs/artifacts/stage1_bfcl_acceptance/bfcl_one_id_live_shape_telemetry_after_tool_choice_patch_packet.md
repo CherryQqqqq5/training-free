@@ -1,6 +1,6 @@
 # BFCL One-ID Live Shape Telemetry After Tool Choice Patch Packet
 
-Status: pending and fail-closed. This prepares a future rerun only; it does not authorize execution.
+Status: approved for exactly one after-patch one-ID live-shape telemetry execution. This does not authorize smoke, evaluate, scorer, full baseline, candidate, or performance paths.
 
 ## Scope
 
@@ -13,7 +13,7 @@ Status: pending and fail-closed. This prepares a future rerun only; it does not 
 
 ## Non-Authorization
 
-Provider request, live telemetry, BFCL generate, smoke, evaluate, scorer, full baseline, candidate paths, performance evidence, +3pp, SOTA, and Huawei claims remain unauthorized until a separate manager execution authorization flips the packet state or provides an explicit approved packet.
+Only the scoped provider request, BFCL generate needed for live-shape telemetry, and live-shape telemetry are authorized. Smoke, evaluate, scorer, full baseline, candidate paths, performance evidence, +3pp, SOTA, and Huawei claims remain unauthorized.
 
 ## Boundary
 
