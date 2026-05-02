@@ -16,3 +16,9 @@ Checked active configs:
 - `configs/runtime_bfcl_structured.yaml`
 - `configs/bfcl_eval_protocol.yaml`
 - `configs/bfcl_v4_phase1.env`
+
+## Endpoint And Feedback Hygiene
+
+- endpoint/key values committed: `false`
+- endpoint/key routing: env-only via signed env var names
+- scorer feedback input: `disabled_inert_for_measurement_only`

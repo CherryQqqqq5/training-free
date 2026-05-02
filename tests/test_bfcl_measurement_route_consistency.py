@@ -129,3 +129,79 @@ def test_rejects_gpt_4o_fallback_allowed_true(tmp_path):
     assert "bfcl_eval_protocol_gpt_4o_fallback_allowed_not_false:True" in joined
     assert "bfcl_eval_protocol_fallback_allowed_true:model.gpt_4o_fallback_allowed" in joined
     assert "bfcl_eval_protocol_gpt_4o_fallback_route:model.fallback_model" in joined
+
+
+def test_rejects_endpoint_literal_in_runtime_yaml(tmp_path):
+    root = copy_min_repo(tmp_path)
+    path = root / "configs/runtime.yaml"
+    data = load_yaml(path)
+    data["upstream"]["base_url"] = "https" + "://example.invalid/v1"
+    write_yaml(path, data)
+
+    joined = "\n".join(blockers(root))
+    assert "runtime_yaml_endpoint_literal_forbidden:upstream.base_url" in joined
+
+
+def test_rejects_endpoint_literal_in_runtime_bfcl_structured_yaml(tmp_path):
+    root = copy_min_repo(tmp_path)
+    path = root / "configs/runtime_bfcl_structured.yaml"
+    data = load_yaml(path)
+    data["upstream"]["profiles"]["novacode"]["base_url"] = "https" + "://example.invalid/v1"
+    write_yaml(path, data)
+
+    joined = "\n".join(blockers(root))
+    assert "runtime_bfcl_structured_yaml_endpoint_literal_forbidden:upstream.profiles.novacode.base_url" in joined
+
+
+def test_rejects_key_like_literal_in_runtime_yaml(tmp_path):
+    root = copy_min_repo(tmp_path)
+    path = root / "configs/runtime.yaml"
+    data = load_yaml(path)
+    data["upstream"]["api_key"] = "sk-" + "A" * 24
+    write_yaml(path, data)
+
+    joined = "\n".join(blockers(root))
+    assert "runtime_yaml_key_literal_forbidden:upstream.api_key" in joined
+
+
+def test_accepts_env_only_endpoint_reference_and_disabled_feedback():
+    runtime = load_yaml(Path("configs/runtime.yaml"))
+    structured = load_yaml(Path("configs/runtime_bfcl_structured.yaml"))
+    for data in [runtime, structured]:
+        upstream = data["upstream"]
+        assert upstream["base_url_env"] == "NOVACODE_BASE_URL"
+        assert upstream["endpoint_env_only"] is True
+        assert upstream["api_key_env_only"] is True
+        assert upstream["endpoint_value_committed"] is False
+        assert upstream["api_key_value_committed"] is False
+        policy = data["runtime_policy"]
+        assert policy["scorer_feedback_enabled"] is False
+        assert policy["scorer_feedback_status"] == "disabled_inert_for_measurement_only"
+        assert policy["scorer_feedback_path"] is None
+    assert check(Path("."))["bfcl_measurement_route_consistency_passed"] is True
+
+
+def test_rejects_active_scorer_feedback_path(tmp_path):
+    root = copy_min_repo(tmp_path)
+    path = root / "configs/runtime_bfcl_structured.yaml"
+    data = load_yaml(path)
+    data["runtime_policy"]["scorer_feedback_enabled"] = True
+    data["runtime_policy"]["scorer_feedback_status"] = "enabled"
+    data["runtime_policy"]["scorer_feedback_path"] = "outputs/artifacts/scorer_feedback.json"
+    write_yaml(path, data)
+
+    joined = "\n".join(blockers(root))
+    assert "runtime_bfcl_structured_yaml_scorer_feedback_enabled_not_false:True" in joined
+    assert "runtime_bfcl_structured_yaml_scorer_feedback_status_not_disabled_inert:'enabled'" in joined
+    assert "runtime_bfcl_structured_yaml_scorer_feedback_path_active:'outputs/artifacts/scorer_feedback.json'" in joined
+
+
+def test_rejects_missing_disabled_inert_scorer_feedback_status(tmp_path):
+    root = copy_min_repo(tmp_path)
+    path = root / "configs/runtime_bfcl_structured.yaml"
+    data = load_yaml(path)
+    data["runtime_policy"].pop("scorer_feedback_status")
+    write_yaml(path, data)
+
+    joined = "\n".join(blockers(root))
+    assert "runtime_bfcl_structured_yaml_scorer_feedback_status_not_disabled_inert:None" in joined

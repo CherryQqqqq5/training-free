@@ -24,6 +24,10 @@ SIGNED_MODEL = "gpt-4.1"
 SIGNED_PROFILE = "novacode"
 SIGNED_PROVIDER_PROFILE = "Chuangzhi/Novacode"
 HISTORICAL_GPT_5_2_KEYS = {"old_signed_model", "old_signed_model_status"}
+SIGNED_ENDPOINT_ENVS = ["CHUANGZHI_NOVACODE_ENDPOINT", "NOVACODE_ENDPOINT"]
+SIGNED_KEY_ENVS = ["CHUANGZHI_API_KEY", "NOVACODE_API_KEY"]
+ENDPOINT_LITERAL_FRAGMENTS = ("apicz", "boyuerichdata", "http://", "https://")
+KEY_LITERAL_PATTERN = re.compile(r"sk-[A-Za-z0-9_-]{16,}")
 
 
 def load_yaml(path: Path) -> dict[str, Any]:
@@ -75,9 +79,57 @@ def _check_no_gpt_4o_fallback(name: str, data: dict[str, Any]) -> list[str]:
     return blockers
 
 
+def _check_no_endpoint_or_key_literals(name: str, data: dict[str, Any]) -> list[str]:
+    blockers: list[str] = []
+    for path, value in _walk_json(data):
+        if not isinstance(value, str):
+            continue
+        lowered = value.lower()
+        for fragment in ENDPOINT_LITERAL_FRAGMENTS:
+            if fragment in lowered:
+                blockers.append(f"{name}_endpoint_literal_forbidden:{'.'.join(path)}")
+                break
+        if KEY_LITERAL_PATTERN.search(value):
+            blockers.append(f"{name}_key_literal_forbidden:{'.'.join(path)}")
+    return blockers
+
+
+def _check_env_only_route(name: str, upstream: dict[str, Any], blockers: list[str]) -> None:
+    if upstream.get("base_url_env") is None:
+        blockers.append(f"{name}_base_url_env_missing")
+    if upstream.get("api_key_env") is None:
+        blockers.append(f"{name}_api_key_env_missing")
+    if upstream.get("endpoint_env_only") is not True:
+        blockers.append(f"{name}_endpoint_env_only_not_true:{upstream.get('endpoint_env_only')!r}")
+    if upstream.get("api_key_env_only") is not True:
+        blockers.append(f"{name}_api_key_env_only_not_true:{upstream.get('api_key_env_only')!r}")
+    if upstream.get("endpoint_value_committed") is not False:
+        blockers.append(f"{name}_endpoint_value_committed_not_false:{upstream.get('endpoint_value_committed')!r}")
+    if upstream.get("api_key_value_committed") is not False:
+        blockers.append(f"{name}_api_key_value_committed_not_false:{upstream.get('api_key_value_committed')!r}")
+
+
+def _check_no_active_scorer_feedback(name: str, data: dict[str, Any]) -> list[str]:
+    blockers: list[str] = []
+    runtime_policy = data.get("runtime_policy") if isinstance(data.get("runtime_policy"), dict) else {}
+    enabled = runtime_policy.get("scorer_feedback_enabled")
+    status = runtime_policy.get("scorer_feedback_status")
+    if enabled is not False:
+        blockers.append(f"{name}_scorer_feedback_enabled_not_false:{enabled!r}")
+    if status != "disabled_inert_for_measurement_only":
+        blockers.append(f"{name}_scorer_feedback_status_not_disabled_inert:{status!r}")
+    for key in ("scorer_feedback_path", "feedback_path", "scorer_feedback_input", "feedback_input"):
+        value = runtime_policy.get(key)
+        if value not in (None, "", False):
+            blockers.append(f"{name}_{key}_active:{value!r}")
+    return blockers
+
+
 def _check_runtime(name: str, path: Path, blockers: list[str]) -> None:
     data = load_yaml(path)
     upstream = data.get("upstream") if isinstance(data.get("upstream"), dict) else {}
+    blockers.extend(_check_no_endpoint_or_key_literals(name, data))
+    blockers.extend(_check_no_active_scorer_feedback(name, data))
     if upstream.get("active_profile") != SIGNED_PROFILE:
         blockers.append(f"{name}_active_profile_invalid:{upstream.get('active_profile')!r}")
     if upstream.get("model") != SIGNED_MODEL:
@@ -86,12 +138,14 @@ def _check_runtime(name: str, path: Path, blockers: list[str]) -> None:
         blockers.append(f"{name}_fallback_allowed_not_false:{upstream.get('fallback_allowed')!r}")
     if upstream.get("gpt_4o_fallback_allowed") is not False:
         blockers.append(f"{name}_gpt_4o_fallback_allowed_not_false:{upstream.get('gpt_4o_fallback_allowed')!r}")
+    _check_env_only_route(f"{name}_upstream", upstream, blockers)
     profiles = upstream.get("profiles") if isinstance(upstream.get("profiles"), dict) else {}
     novacode = profiles.get("novacode") if isinstance(profiles.get("novacode"), dict) else {}
     if novacode.get("model") != SIGNED_MODEL:
         blockers.append(f"{name}_novacode_model_invalid:{novacode.get('model')!r}")
     if novacode.get("provider_profile") != SIGNED_PROVIDER_PROFILE:
         blockers.append(f"{name}_provider_profile_invalid:{novacode.get('provider_profile')!r}")
+    _check_env_only_route(f"{name}_novacode", novacode, blockers)
     if "openrouter" in profiles:
         blockers.append(f"{name}_openrouter_profile_present")
     blockers.extend(_check_no_active_gpt_5_2(name, data))
@@ -101,6 +155,7 @@ def _check_runtime(name: str, path: Path, blockers: list[str]) -> None:
 def _check_protocol(path: Path, blockers: list[str]) -> None:
     data = load_yaml(path)
     model = data.get("model") if isinstance(data.get("model"), dict) else {}
+    blockers.extend(_check_no_endpoint_or_key_literals("bfcl_eval_protocol", data))
     if model.get("upstream_profile") != SIGNED_PROFILE:
         blockers.append(f"bfcl_eval_protocol_upstream_profile_invalid:{model.get('upstream_profile')!r}")
     if model.get("provider_profile") != SIGNED_PROVIDER_PROFILE:
@@ -122,6 +177,10 @@ def _env_default_model(text: str) -> str | None:
 
 def _check_env(path: Path, blockers: list[str]) -> None:
     text = path.read_text(encoding="utf-8")
+    if any(fragment in text.lower() for fragment in ENDPOINT_LITERAL_FRAGMENTS):
+        blockers.append("bfcl_v4_phase1_env_endpoint_literal_forbidden")
+    if KEY_LITERAL_PATTERN.search(text):
+        blockers.append("bfcl_v4_phase1_env_key_literal_forbidden")
     if 'export GRC_UPSTREAM_PROFILE="${GRC_UPSTREAM_PROFILE:-novacode}"' not in text:
         blockers.append("bfcl_v4_phase1_env_default_profile_not_novacode")
     if 'export GRC_UPSTREAM_MODEL="gpt-4.1"' not in text:
@@ -140,6 +199,7 @@ def _check_env(path: Path, blockers: list[str]) -> None:
 
 def _check_route_metadata(path: Path, blockers: list[str]) -> None:
     data = load_json(path)
+    blockers.extend(_check_no_endpoint_or_key_literals("route_metadata", data))
     expected = {
         "artifact_kind": "bfcl_measurement_route_consistency",
         "provider_profile": SIGNED_PROVIDER_PROFILE,
@@ -159,6 +219,14 @@ def _check_route_metadata(path: Path, blockers: list[str]) -> None:
         "performance_evidence": False,
         "sota_3pp_claim_ready": False,
         "huawei_acceptance_ready": False,
+        "endpoint_env_only": True,
+        "api_key_env_only": True,
+        "endpoint_value_committed": False,
+        "api_key_value_committed": False,
+        "signed_endpoint_env_vars": SIGNED_ENDPOINT_ENVS,
+        "signed_api_key_env_vars": SIGNED_KEY_ENVS,
+        "scorer_feedback_enabled": False,
+        "scorer_feedback_status": "disabled_inert_for_measurement_only",
     }
     for key, value in expected.items():
         if data.get(key) != value:

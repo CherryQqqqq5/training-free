@@ -22,22 +22,33 @@ runtime_policy:
   - cat
   - touch
   - mkdir
-  scorer_feedback_path: outputs/artifacts/bfcl_ctspc_subset30_v1/m27y_scorer_feedback.json
+  scorer_feedback_path: null
+  scorer_feedback_enabled: false
+  scorer_feedback_status: disabled_inert_for_measurement_only
 upstream:
   active_profile: novacode
-  base_url: https://YOUR_UPSTREAM_OPENAI_COMPATIBLE_ENDPOINT/v1
+  base_url: ENV_ONLY_OPENAI_COMPATIBLE_BASE_URL
   api_key_env: OPENAI_API_KEY
   model: gpt-4.1
   profiles:
     novacode:
       base_url_env: NOVACODE_BASE_URL
-      base_url: https://apicz.boyuerichdata.com/v1
+      base_url: ENV_ONLY_NOVACODE_BASE_URL
       api_key_env: NOVACODE_API_KEY
       model: gpt-4.1
       provider_profile: Chuangzhi/Novacode
       fallback_allowed: false
       gpt_4o_fallback_allowed: false
+      endpoint_env_only: true
+      api_key_env_only: true
+      endpoint_value_committed: false
+      api_key_value_committed: false
   fallback_allowed: false
   gpt_4o_fallback_allowed: false
   old_signed_model: gpt-5.2
   old_signed_model_status: historical_superseded_inactive
+  endpoint_value_committed: false
+  api_key_value_committed: false
+  endpoint_env_only: true
+  api_key_env_only: true
+  base_url_env: NOVACODE_BASE_URL
