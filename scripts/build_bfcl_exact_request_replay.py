@@ -275,6 +275,9 @@ def _record(run_id: str, kwargs: dict[str, Any], variant: str) -> dict[str, Any]
     return {
         "run_id": run_id,
         "fake_upstream_variant": variant,
+        "upstream_returned_tool_call": variant == "tool_call",
+        "upstream_returned_nonempty_text": variant in {"text_only", "malformed_nonempty"},
+        "upstream_returned_true_empty": variant == "true_empty",
         "exact_tool_choice_shape": _shape(kwargs.get("tool_choice")),
         "multi_tool_schema_present": isinstance(kwargs.get("tools"), list) and len(kwargs.get("tools") or []) > 1,
         "responses_to_chat_conversion_exercised": True,
@@ -288,6 +291,7 @@ def _record(run_id: str, kwargs: dict[str, Any], variant: str) -> dict[str, Any]
         "chat_to_responses_conversion_exercised": True,
         "responses_output_has_function_call": has_function_call,
         "responses_output_has_message_text": has_message_text,
+        "no_tool_text_classification": "record_only_no_tool_text" if variant == "text_only" and has_message_text and not final_empty and not coerced else ("true_empty" if variant == "true_empty" else "not_applicable"),
         "bfcl_or_openai_decode_exercised": decode_exercised,
         "bfcl_decode_execute_nonempty": decode_nonempty,
         "provider_request_executed": False,
@@ -360,6 +364,7 @@ def build_report() -> dict[str, Any]:
         "required_string_multi_tool_survives_local_conversion_runtime_decode": survives,
         "suspected_replay_failure_stage": primary,
         "minimal_tool_choice_patch_recommended_next": False,
+        "measurement_no_tool_text_coercion_patch_active": True,
         "not_measurement_evidence": True,
     }
 

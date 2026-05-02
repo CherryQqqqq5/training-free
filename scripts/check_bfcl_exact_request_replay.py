@@ -127,6 +127,8 @@ def validate_artifact(data: dict[str, Any]) -> list[str]:
     records = data.get("records") if isinstance(data.get("records"), list) else []
     if len(records) != len(SIGNED_IDS) * len(FAKE_VARIANTS):
         blockers.append(f"artifact_record_count_invalid:{len(records)}")
+    if data.get("measurement_no_tool_text_coercion_patch_active") is not True:
+        blockers.append("artifact_measurement_no_tool_text_coercion_patch_active_not_true")
     seen = set()
     for index, record in enumerate(records):
         if not isinstance(record, dict):
@@ -146,6 +148,24 @@ def validate_artifact(data: dict[str, Any]) -> list[str]:
                 blockers.append(f"artifact_record_{index}_{key}_not_false:{record.get(key)!r}")
         if not record.get("suspected_replay_failure_stage"):
             blockers.append(f"artifact_record_{index}_suspected_stage_missing")
+        if variant == "text_only":
+            if record.get("upstream_returned_nonempty_text") is not True:
+                blockers.append(f"artifact_record_{index}_text_only_upstream_nonempty_not_true")
+            if record.get("engine_final_content_empty") is not False:
+                blockers.append(f"artifact_record_{index}_text_only_engine_final_content_empty_not_false")
+            if record.get("engine_coerced_nonempty_text_to_empty") is not False:
+                blockers.append(f"artifact_record_{index}_text_only_coercion_not_false")
+            if record.get("no_tool_text_classification") != "record_only_no_tool_text":
+                blockers.append(f"artifact_record_{index}_text_only_classification_invalid:{record.get('no_tool_text_classification')!r}")
+        if variant == "true_empty":
+            if record.get("upstream_returned_true_empty") is not True:
+                blockers.append(f"artifact_record_{index}_true_empty_upstream_flag_not_true")
+            if record.get("engine_final_content_empty") is not True:
+                blockers.append(f"artifact_record_{index}_true_empty_engine_final_content_empty_not_true")
+            if record.get("no_tool_text_classification") != "true_empty":
+                blockers.append(f"artifact_record_{index}_true_empty_classification_invalid:{record.get('no_tool_text_classification')!r}")
+        if variant == "tool_call" and record.get("bfcl_decode_execute_nonempty") is not True:
+            blockers.append(f"artifact_record_{index}_tool_call_decode_nonempty_not_true")
     expected = {(run_id, variant) for run_id in SIGNED_IDS for variant in FAKE_VARIANTS}
     if seen != expected:
         blockers.append("artifact_record_matrix_incomplete")

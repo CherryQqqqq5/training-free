@@ -6,14 +6,7 @@ runtime_policy:
   - hallucinated_completion
   - malformed_output
   - natural_language_termination
-  coerce_no_tool_response_to_empty_kinds:
-  - clarification_request
-  - unsupported_request
-  - hallucinated_completion
-  - malformed_output
-  - natural_language_termination
-  - post_tool_prose_summary
-  - actionable_no_tool_decision
+  coerce_no_tool_response_to_empty_kinds: []
   inject_structured_tool_guidance: true
   inject_context_literal_hints: true
   resolve_contextual_string_args: true
@@ -25,6 +18,8 @@ runtime_policy:
   scorer_feedback_path: null
   scorer_feedback_enabled: false
   scorer_feedback_status: disabled_inert_for_measurement_only
+  no_tool_text_handling_status: measurement_only_record_only_no_empty_coercion
+  true_empty_response_status: preserve_empty_distinguishable_from_no_tool_text
 upstream:
   active_profile: novacode
   base_url: ENV_ONLY_OPENAI_COMPATIBLE_BASE_URL

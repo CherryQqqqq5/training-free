@@ -54,20 +54,28 @@ class BFCLExactRequestReplayTests(unittest.TestCase):
         text_records = [record for record in self.report["records"] if record["fake_upstream_variant"] == "text_only"]
         self.assertEqual(len(text_records), len(SIGNED_IDS))
         for record in text_records:
-            self.assertIn(record["suspected_replay_failure_stage"], {"engine_no_tool_text_to_empty_coercion", "non_tool_text_preserved_as_message_text"})
+            self.assertTrue(record["upstream_returned_nonempty_text"])
+            self.assertFalse(record["engine_final_content_empty"])
+            self.assertFalse(record["engine_coerced_nonempty_text_to_empty"])
             self.assertFalse(record["engine_final_has_tool_calls"])
+            self.assertEqual(record["responses_output_has_message_text"], True)
+            self.assertEqual(record["no_tool_text_classification"], "record_only_no_tool_text")
+            self.assertEqual(record["suspected_replay_failure_stage"], "non_tool_text_preserved_as_message_text")
 
     def test_true_empty_variant_distinguished(self) -> None:
         empty_records = [record for record in self.report["records"] if record["fake_upstream_variant"] == "true_empty"]
         self.assertEqual(len(empty_records), len(SIGNED_IDS))
         for record in empty_records:
+            self.assertTrue(record["upstream_returned_true_empty"])
             self.assertTrue(record["engine_final_content_empty"])
+            self.assertEqual(record["no_tool_text_classification"], "true_empty")
             self.assertEqual(record["suspected_replay_failure_stage"], "true_empty_distinguished")
 
     def test_malformed_nonempty_variant_distinguished(self) -> None:
         malformed_records = [record for record in self.report["records"] if record["fake_upstream_variant"] == "malformed_nonempty"]
         self.assertEqual(len(malformed_records), len(SIGNED_IDS))
         for record in malformed_records:
+            self.assertTrue(record["upstream_returned_nonempty_text"])
             self.assertEqual(record["suspected_replay_failure_stage"], "malformed_nonempty_response_shape_distinguished")
 
     def test_rejects_unsigned_ids(self) -> None:

@@ -16,6 +16,7 @@
   "full_baseline_executed": false,
   "huawei_acceptance_ready": false,
   "live_telemetry_executed": false,
+  "measurement_no_tool_text_coercion_patch_active": true,
   "minimal_tool_choice_patch_recommended_next": false,
   "not_measurement_evidence": true,
   "performance_evidence": false,
@@ -43,6 +44,7 @@
       "huawei_acceptance_ready": false,
       "live_telemetry_executed": false,
       "multi_tool_schema_present": true,
+      "no_tool_text_classification": "not_applicable",
       "performance_evidence": false,
       "provider_request_executed": false,
       "responses_output_has_function_call": true,
@@ -53,7 +55,10 @@
       "scorer_executed": false,
       "sota_3pp_claim_ready": false,
       "suspected_replay_failure_stage": "required_string_multi_tool_survives_local_conversion_runtime_decode",
-      "token_field_forwarded_shape": "max_output_tokens_forwarded_as_chat_max_tokens"
+      "token_field_forwarded_shape": "max_output_tokens_forwarded_as_chat_max_tokens",
+      "upstream_returned_nonempty_text": false,
+      "upstream_returned_tool_call": true,
+      "upstream_returned_true_empty": false
     },
     {
       "bfcl_decode_execute_nonempty": false,
@@ -72,6 +77,7 @@
       "huawei_acceptance_ready": false,
       "live_telemetry_executed": false,
       "multi_tool_schema_present": true,
+      "no_tool_text_classification": "record_only_no_tool_text",
       "performance_evidence": false,
       "provider_request_executed": false,
       "responses_output_has_function_call": false,
@@ -82,7 +88,10 @@
       "scorer_executed": false,
       "sota_3pp_claim_ready": false,
       "suspected_replay_failure_stage": "non_tool_text_preserved_as_message_text",
-      "token_field_forwarded_shape": "max_output_tokens_forwarded_as_chat_max_tokens"
+      "token_field_forwarded_shape": "max_output_tokens_forwarded_as_chat_max_tokens",
+      "upstream_returned_nonempty_text": true,
+      "upstream_returned_tool_call": false,
+      "upstream_returned_true_empty": false
     },
     {
       "bfcl_decode_execute_nonempty": false,
@@ -101,6 +110,7 @@
       "huawei_acceptance_ready": false,
       "live_telemetry_executed": false,
       "multi_tool_schema_present": true,
+      "no_tool_text_classification": "true_empty",
       "performance_evidence": false,
       "provider_request_executed": false,
       "responses_output_has_function_call": false,
@@ -111,7 +121,10 @@
       "scorer_executed": false,
       "sota_3pp_claim_ready": false,
       "suspected_replay_failure_stage": "true_empty_distinguished",
-      "token_field_forwarded_shape": "max_output_tokens_forwarded_as_chat_max_tokens"
+      "token_field_forwarded_shape": "max_output_tokens_forwarded_as_chat_max_tokens",
+      "upstream_returned_nonempty_text": false,
+      "upstream_returned_tool_call": false,
+      "upstream_returned_true_empty": true
     },
     {
       "bfcl_decode_execute_nonempty": false,
@@ -130,6 +143,7 @@
       "huawei_acceptance_ready": false,
       "live_telemetry_executed": false,
       "multi_tool_schema_present": true,
+      "no_tool_text_classification": "not_applicable",
       "performance_evidence": false,
       "provider_request_executed": false,
       "responses_output_has_function_call": false,
@@ -140,7 +154,10 @@
       "scorer_executed": false,
       "sota_3pp_claim_ready": false,
       "suspected_replay_failure_stage": "malformed_nonempty_response_shape_distinguished",
-      "token_field_forwarded_shape": "max_output_tokens_forwarded_as_chat_max_tokens"
+      "token_field_forwarded_shape": "max_output_tokens_forwarded_as_chat_max_tokens",
+      "upstream_returned_nonempty_text": true,
+      "upstream_returned_tool_call": false,
+      "upstream_returned_true_empty": false
     },
     {
       "bfcl_decode_execute_nonempty": true,
@@ -159,6 +176,7 @@
       "huawei_acceptance_ready": false,
       "live_telemetry_executed": false,
       "multi_tool_schema_present": true,
+      "no_tool_text_classification": "not_applicable",
       "performance_evidence": false,
       "provider_request_executed": false,
       "responses_output_has_function_call": true,
@@ -169,7 +187,10 @@
       "scorer_executed": false,
       "sota_3pp_claim_ready": false,
       "suspected_replay_failure_stage": "required_string_multi_tool_survives_local_conversion_runtime_decode",
-      "token_field_forwarded_shape": "max_output_tokens_forwarded_as_chat_max_tokens"
+      "token_field_forwarded_shape": "max_output_tokens_forwarded_as_chat_max_tokens",
+      "upstream_returned_nonempty_text": false,
+      "upstream_returned_tool_call": true,
+      "upstream_returned_true_empty": false
     },
     {
       "bfcl_decode_execute_nonempty": false,
@@ -177,8 +198,8 @@
       "bfcl_smoke_executed": false,
       "candidate_runtime_activation_authorized": false,
       "chat_to_responses_conversion_exercised": true,
-      "engine_coerced_nonempty_text_to_empty": true,
-      "engine_final_content_empty": true,
+      "engine_coerced_nonempty_text_to_empty": false,
+      "engine_final_content_empty": false,
       "engine_final_has_tool_calls": false,
       "exact_tool_choice_shape": "required_string",
       "fake_upstream_variant": "text_only",
@@ -188,17 +209,21 @@
       "huawei_acceptance_ready": false,
       "live_telemetry_executed": false,
       "multi_tool_schema_present": true,
+      "no_tool_text_classification": "record_only_no_tool_text",
       "performance_evidence": false,
       "provider_request_executed": false,
       "responses_output_has_function_call": false,
-      "responses_output_has_message_text": false,
+      "responses_output_has_message_text": true,
       "responses_to_chat_conversion_exercised": true,
       "run_id": "multi_turn_base_0",
       "runtime_engine_exercised": true,
       "scorer_executed": false,
       "sota_3pp_claim_ready": false,
-      "suspected_replay_failure_stage": "engine_no_tool_text_to_empty_coercion",
-      "token_field_forwarded_shape": "max_output_tokens_forwarded_as_chat_max_tokens"
+      "suspected_replay_failure_stage": "non_tool_text_preserved_as_message_text",
+      "token_field_forwarded_shape": "max_output_tokens_forwarded_as_chat_max_tokens",
+      "upstream_returned_nonempty_text": true,
+      "upstream_returned_tool_call": false,
+      "upstream_returned_true_empty": false
     },
     {
       "bfcl_decode_execute_nonempty": false,
@@ -217,6 +242,7 @@
       "huawei_acceptance_ready": false,
       "live_telemetry_executed": false,
       "multi_tool_schema_present": true,
+      "no_tool_text_classification": "true_empty",
       "performance_evidence": false,
       "provider_request_executed": false,
       "responses_output_has_function_call": false,
@@ -227,7 +253,10 @@
       "scorer_executed": false,
       "sota_3pp_claim_ready": false,
       "suspected_replay_failure_stage": "true_empty_distinguished",
-      "token_field_forwarded_shape": "max_output_tokens_forwarded_as_chat_max_tokens"
+      "token_field_forwarded_shape": "max_output_tokens_forwarded_as_chat_max_tokens",
+      "upstream_returned_nonempty_text": false,
+      "upstream_returned_tool_call": false,
+      "upstream_returned_true_empty": true
     },
     {
       "bfcl_decode_execute_nonempty": false,
@@ -246,6 +275,7 @@
       "huawei_acceptance_ready": false,
       "live_telemetry_executed": false,
       "multi_tool_schema_present": true,
+      "no_tool_text_classification": "not_applicable",
       "performance_evidence": false,
       "provider_request_executed": false,
       "responses_output_has_function_call": false,
@@ -256,7 +286,10 @@
       "scorer_executed": false,
       "sota_3pp_claim_ready": false,
       "suspected_replay_failure_stage": "malformed_nonempty_response_shape_distinguished",
-      "token_field_forwarded_shape": "max_output_tokens_forwarded_as_chat_max_tokens"
+      "token_field_forwarded_shape": "max_output_tokens_forwarded_as_chat_max_tokens",
+      "upstream_returned_nonempty_text": true,
+      "upstream_returned_tool_call": false,
+      "upstream_returned_true_empty": false
     }
   ],
   "required_string_multi_tool_survives_local_conversion_runtime_decode": true,
@@ -267,5 +300,5 @@
     "multi_turn_base_0"
   ],
   "sota_3pp_claim_ready": false,
-  "suspected_replay_failure_stage": "engine_no_tool_text_to_empty_coercion"
+  "suspected_replay_failure_stage": "required_string_multi_tool_survives_local_conversion_runtime_decode"
 }
