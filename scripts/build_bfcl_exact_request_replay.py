@@ -335,7 +335,7 @@ def build_report() -> dict[str, Any]:
         "malformed_nonempty_response_shape_distinguished",
     }
     failure_stages = [record["suspected_replay_failure_stage"] for record in records if record["suspected_replay_failure_stage"] not in expected_non_failure]
-    primary = failure_stages[0] if failure_stages else "required_string_multi_tool_survives_local_conversion_runtime_decode"
+    primary = failure_stages[0] if failure_stages else "not_reproduced_after_measurement_text_coercion_patch"
     return {
         "artifact_kind": "bfcl_exact_request_replay",
         "approval_status": "prepared",
