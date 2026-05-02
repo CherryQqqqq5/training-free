@@ -1,10 +1,10 @@
 # BFCL One-ID Live-Shape Telemetry Gate Packet
 
-Status: pending / fail-closed. This packet does not authorize provider requests, BFCL generate, BFCL smoke, BFCL evaluate/scorer, full/default baseline, candidate activation, candidate JSONL/pool, scorer-feedback tuning, performance evidence, +3pp, or Huawei readiness.
+Status: approved for exactly one one-ID live-shape telemetry execution scope. This authorizes provider request and BFCL generate only for compact telemetry on `web_search_base_0`; it does not authorize BFCL smoke, BFCL evaluate/scorer, full/default baseline, candidate activation, candidate JSONL/pool, scorer-feedback tuning, performance evidence, +3pp, or Huawei readiness.
 
 ## Requested Future Scope
 
-- Scope: one live-shape BFCL generate-only telemetry probe, only after separate review approval.
+- Scope: one live-shape BFCL generate-only telemetry probe under the reviewed one-ID telemetry gate.
 - Signed run ID: `web_search_base_0`.
 - Route: `novacode` / `gpt-4.1`; fallback, OpenRouter, active `gpt-5.2`, and `gpt-4o` fallback are disabled.
 - Output policy: compact shape flags and enum labels only.
@@ -20,7 +20,7 @@ No raw prompt text, BFCL case content, provider request, provider response body,
 
 ## Current Evidence Boundary
 
-Offline handler decode, result materialization, compact classifier, and exception-to-empty paths did not reproduce the live exact-BFCL empty blocker. This packet prepares a separate one-ID telemetry gate only; it is not measurement evidence and does not authorize a patch or rerun.
+Offline handler decode, result materialization, compact classifier, and exception-to-empty paths did not reproduce the live exact-BFCL empty blocker. This packet authorizes only the reviewed one-ID telemetry gate state; it is not measurement evidence and does not authorize a patch, smoke, scorer, baseline, candidate, or performance path.
 
 ## Execution Scaffold Requirements
 

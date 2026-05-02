@@ -54,6 +54,7 @@ AUTHORIZATION_KEYS = (
     "authorized",
     "provider_request_authorized",
     "bfcl_generate_authorized",
+    "live_shape_telemetry_authorized",
 )
 ALWAYS_FALSE_KEYS = (
     "bfcl_smoke_authorized",
@@ -202,6 +203,7 @@ def check(packet_path: Path = DEFAULT_PACKET) -> dict[str, Any]:
         "signed_run_ids": data.get("signed_run_ids"),
         "provider_request_authorized": data.get("provider_request_authorized"),
         "bfcl_generate_authorized": data.get("bfcl_generate_authorized"),
+        "live_shape_telemetry_authorized": data.get("live_shape_telemetry_authorized"),
         "bfcl_one_id_live_shape_telemetry_gate_passed": not blockers,
         "blockers": blockers,
     }

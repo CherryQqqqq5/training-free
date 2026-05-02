@@ -19,10 +19,22 @@ def _approved_packet_path(tmp_path: Path) -> Path:
     packet["authorized"] = True
     packet["provider_request_authorized"] = True
     packet["bfcl_generate_authorized"] = True
+    packet["live_shape_telemetry_authorized"] = True
     path = tmp_path / "approved_packet.json"
     path.write_text(json.dumps(packet, indent=2, sort_keys=True), encoding="utf-8")
     return path
 
+
+def _pending_packet_path(tmp_path: Path) -> Path:
+    packet = _packet()
+    packet["approval_status"] = "pending"
+    packet["authorized"] = False
+    packet["provider_request_authorized"] = False
+    packet["bfcl_generate_authorized"] = False
+    packet["live_shape_telemetry_authorized"] = False
+    path = tmp_path / "pending_packet.json"
+    path.write_text(json.dumps(packet, indent=2, sort_keys=True), encoding="utf-8")
+    return path
 
 def _assert_rejected(packet: dict[str, object], expected: str) -> None:
     blockers = validate_packet(packet)
@@ -143,14 +155,14 @@ def _artifact(stage: str) -> dict[str, object]:
     }
 
 
-def test_pending_fail_closed_packet_passes() -> None:
+def test_approved_current_packet_passes() -> None:
     summary = check()
     assert summary["bfcl_one_id_live_shape_telemetry_gate_passed"] is True
-    assert summary["approval_status"] == "pending"
+    assert summary["approval_status"] == "approved"
     assert summary["signed_run_ids"] == ["web_search_base_0"]
-    assert summary["provider_request_authorized"] is False
-    assert summary["bfcl_generate_authorized"] is False
-
+    assert summary["provider_request_authorized"] is True
+    assert summary["bfcl_generate_authorized"] is True
+    assert summary["live_shape_telemetry_authorized"] is True
 
 def test_rejects_multiple_run_ids() -> None:
     packet = _packet()
@@ -168,11 +180,15 @@ def test_rejects_unapproved_run_id() -> None:
 
 def test_rejects_authorized_true_in_pending_packet() -> None:
     packet = _packet()
+    packet["approval_status"] = "pending"
     packet["authorized"] = True
     packet["provider_request_authorized"] = True
+    packet["bfcl_generate_authorized"] = True
+    packet["live_shape_telemetry_authorized"] = True
     _assert_rejected(packet, "authorized_invalid_for_pending")
     _assert_rejected(packet, "provider_request_authorized_invalid_for_pending")
-
+    _assert_rejected(packet, "bfcl_generate_authorized_invalid_for_pending")
+    _assert_rejected(packet, "live_shape_telemetry_authorized_invalid_for_pending")
 
 def test_rejects_evaluate_scorer_full_baseline_flags() -> None:
     packet = _packet()
@@ -239,15 +255,14 @@ def test_cli_dry_run_passes_strict_without_execution() -> None:
     assert runner_main(["--plan-only", "--compact", "--strict"]) == 0
 
 
-def test_execute_fails_closed_while_pending_without_env_read() -> None:
-    summary = execute_live_telemetry()
+def test_execute_fails_closed_while_pending_without_env_read(tmp_path: Path) -> None:
+    summary = execute_live_telemetry(packet_path=_pending_packet_path(tmp_path))
     assert summary["provider_request_executed"] is False
     assert summary["bfcl_generate_executed"] is False
     assert summary["endpoint_value_read"] is False
     assert summary["api_key_value_read"] is False
     assert summary["diagnostic_written"] is False
     assert summary["blockers"] == ["one_id_live_shape_telemetry_packet_not_approved"]
-
 
 def test_dry_run_output_contains_only_compact_field_names() -> None:
     plan = build_plan()
@@ -265,6 +280,7 @@ def test_approved_packet_would_allow_exactly_one_generate_only_telemetry_id() ->
     packet["authorized"] = True
     packet["provider_request_authorized"] = True
     packet["bfcl_generate_authorized"] = True
+    packet["live_shape_telemetry_authorized"] = True
     blockers = validate_packet(packet)
     assert blockers == []
     assert packet["signed_run_ids"] == ["web_search_base_0"]
