@@ -5,8 +5,8 @@
     "bfcl_hallucination_abstain"
   ],
   "approval_packet_kind": "bfcl_measurement_only_approval",
-  "approval_status": "pending",
-  "authorized": false,
+  "approval_status": "approved",
+  "authorized": true,
   "bfcl": {
     "checkout": "f7cf735",
     "evaluator_package": "bfcl-eval==2025.12.17",
@@ -27,16 +27,19 @@
   },
   "fallback_allowed": false,
   "forbidden_paths": [
-    "BFCL scorer",
-    "provider calls before review authorization",
     "Phase B rerun",
+    "candidate runtime activation",
     "candidate JSONL",
     "candidate pool",
-    "runtime activation of proposal specs",
-    "performance/+3pp/Huawei claim"
+    "using scorer feedback for tuning",
+    "changing runtime after seeing scorer results",
+    "performance/+3pp/Huawei claim",
+    "raw logs/traces/provider payloads/prompts/gold/reference/scorer diffs committed"
   ],
+  "frozen_runtime_target_commit": "831f0b933c435eb03957f0db93f57306e7ca13f7",
   "gpt_4o_fallback_allowed": false,
   "huawei_acceptance_ready": false,
+  "measurement_execution_scope": "current_system_baseline_only_no_candidate_activation",
   "measurement_kind": "current_system_measurement_only",
   "old_signed_model": "gpt-5.2",
   "old_signed_model_status": "historical_superseded_inactive",
@@ -49,18 +52,20 @@
   "performance_evidence": false,
   "prior_route_cleanup_commit": "94f2546d52e0e2b06d8e24630f7714fc8bbe475c",
   "proposer_artifact_commit": "e73900fc7553735e5dbf5121fc46d3ead44c5077",
-  "provider_call_authorized": false,
+  "provider_call_authorized": true,
   "provider_profile": "Chuangzhi/Novacode",
   "reviewed_measurement_gate_head": "62e84abeb01aa5fbcdacebb27c27083c6c305a02",
+  "reviewed_stage0_commit": "831f0b933c435eb03957f0db93f57306e7ca13f7",
   "route_model": "gpt-4.1",
-  "scorer_authorized": false,
+  "scorer_authorized": true,
   "sota_3pp_claim_ready": false,
   "source_diagnostics_commit": "cc21c96b70ab51c2bf586c0e79cdde3838dcb05d",
   "split_protocol": {
     "dev_tuning_split_use_authorized": false,
     "holdout_feedback_to_proposer_authorized": false,
-    "measurement_split": "holdout_or_full_measurement_only_pending_authorization",
+    "measurement_split": "bfcl_v4_default_full_protocol_current_system_measurement_only",
     "per_case_scorer_diff_feedback_authorized": false
   },
+  "stage1_measurement_only_authorized": true,
   "target_commit_for_measurement": "62e84abeb01aa5fbcdacebb27c27083c6c305a02"
 }
