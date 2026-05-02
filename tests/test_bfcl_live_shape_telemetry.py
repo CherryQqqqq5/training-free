@@ -5,7 +5,7 @@ from pathlib import Path
 
 from scripts.check_bfcl_live_shape_telemetry_artifact import check as check_artifact
 from scripts.check_bfcl_live_shape_telemetry_packet import check as check_packet
-from scripts.run_bfcl_live_shape_telemetry import build_plan, main as run_main
+from scripts.run_bfcl_live_shape_telemetry import build_plan, execute_telemetry, main as run_main
 
 
 def _clean_artifact() -> dict[str, object]:
@@ -49,11 +49,11 @@ def _clean_artifact() -> dict[str, object]:
     }
 
 
-def test_packet_checker_passes_prepared_fail_closed_packet() -> None:
+def test_packet_checker_passes_approved_telemetry_only_packet() -> None:
     summary = check_packet()
     assert summary["bfcl_live_shape_telemetry_packet_passed"] is True
     assert summary["planned_run_ids"] == ["web_search_base_0", "multi_turn_base_0"]
-    assert summary["live_shape_telemetry_execution_authorized"] is False
+    assert summary["live_shape_telemetry_execution_authorized"] is True
 
 
 def test_runner_dry_run_plan_reads_no_endpoint_or_key_and_calls_no_provider() -> None:
@@ -65,8 +65,31 @@ def test_runner_dry_run_plan_reads_no_endpoint_or_key_and_calls_no_provider() ->
     assert plan["planned_run_id_count"] == 2
 
 
-def test_runner_execute_mode_fails_closed_without_approval() -> None:
+def test_runner_execute_mode_fails_closed_without_env_or_client(monkeypatch) -> None:
+    for name in ("CHUANGZHI_NOVACODE_ENDPOINT", "NOVACODE_ENDPOINT", "CHUANGZHI_API_KEY", "NOVACODE_API_KEY"):
+        monkeypatch.delenv(name, raising=False)
     assert run_main(["--execute-telemetry", "--compact", "--strict"]) == 1
+
+
+def test_execute_mode_mock_client_writes_clean_artifact_without_raws(tmp_path: Path) -> None:
+    def client(request: dict[str, object]) -> list[dict[str, object]]:
+        assert request["run_ids"] == ["web_search_base_0", "multi_turn_base_0"]
+        return _clean_artifact()["records"]
+
+    out = tmp_path / "telemetry.json"
+    summary = execute_telemetry(output=out, client=client, read_env=False)
+    assert summary["blockers"] == []
+    assert summary["provider_request_executed"] is True
+    assert summary["endpoint_value_read"] is False
+    assert summary["api_key_value_read"] is False
+    assert summary["diagnostic_written"] is True
+    assert check_artifact(out)["bfcl_live_shape_telemetry_artifact_passed"] is True
+
+
+def test_execute_mode_rejects_wrong_record_count(tmp_path: Path) -> None:
+    summary = execute_telemetry(output=tmp_path / "telemetry.json", client=lambda request: [_clean_artifact()["records"][0]], read_env=False)
+    assert summary["diagnostic_written"] is False
+    assert summary["blockers"] == ["telemetry_record_count_invalid:1"]
 
 
 def test_artifact_checker_accepts_clean_mock_artifact(tmp_path: Path) -> None:

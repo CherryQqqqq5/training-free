@@ -61,7 +61,9 @@ def validate(data: dict[str, Any]) -> list[str]:
         blockers.append(f"telemetry_artifact_kind_invalid:{data.get('artifact_kind')!r}")
     if data.get("route_model") != "gpt-4.1" or data.get("active_profile") != "novacode":
         blockers.append("telemetry_artifact_route_drift")
-    for key in ("provider_request_executed", "bfcl_smoke_executed", "bfcl_scorer_executed", "candidate_runtime_activation_authorized", "performance_evidence", "sota_3pp_claim_ready", "huawei_acceptance_ready", "fallback_allowed", "gpt_4o_fallback_allowed", "openrouter_allowed"):
+    if data.get("provider_request_executed") not in (True, False):
+        blockers.append("telemetry_artifact_provider_request_executed_not_boolean:%r" % data.get("provider_request_executed"))
+    for key in ("bfcl_smoke_executed", "bfcl_scorer_executed", "candidate_runtime_activation_authorized", "performance_evidence", "sota_3pp_claim_ready", "huawei_acceptance_ready", "fallback_allowed", "gpt_4o_fallback_allowed", "openrouter_allowed"):
         if data.get(key) is not False:
             blockers.append(f"telemetry_artifact_{key}_not_false:{data.get(key)!r}")
     run_ids = data.get("run_ids") if isinstance(data.get("run_ids"), list) else []

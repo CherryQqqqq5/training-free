@@ -13,9 +13,6 @@ from typing import Any
 DEFAULT_PACKET = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_live_shape_telemetry_packet.json")
 SIGNED_IDS = ["web_search_base_0", "multi_turn_base_0"]
 REQUIRED_FALSE = (
-    "authorized",
-    "live_shape_telemetry_execution_authorized",
-    "provider_request_authorized",
     "bfcl_smoke_authorized",
     "bfcl_full_eval_authorized",
     "bfcl_scorer_authorized",
@@ -32,7 +29,10 @@ REQUIRED_FALSE = (
     "api_key_value_committed",
 )
 REQUIRED_TRUE = (
+    "authorized",
     "live_shape_telemetry_preparation_authorized",
+    "live_shape_telemetry_execution_authorized",
+    "provider_request_authorized",
     "endpoint_env_only",
     "api_key_env_only",
     "candidate_specs_inert",
@@ -97,7 +97,7 @@ def validate(data: dict[str, Any]) -> list[str]:
     blockers: list[str] = []
     expected = {
         "artifact_kind": "bfcl_live_shape_telemetry_packet",
-        "approval_status": "prepared",
+        "approval_status": "approved",
         "provider_profile": "Chuangzhi/Novacode",
         "active_profile": "novacode",
         "route_model": "gpt-4.1",
@@ -121,6 +121,10 @@ def validate(data: dict[str, Any]) -> list[str]:
         blockers.append("telemetry_packet_duplicate_run_ids")
     if data.get("allowed_artifact_fields") != ALLOWED_FIELDS:
         blockers.append("telemetry_packet_allowed_artifact_fields_drift")
+    if data.get("provider_request_authorized_scope") != "single_live_shape_telemetry_gate_only":
+        blockers.append(f"telemetry_packet_provider_scope_invalid:{data.get('provider_request_authorized_scope')!r}")
+    if data.get("max_execution_count") != 1:
+        blockers.append(f"telemetry_packet_max_execution_count_invalid:{data.get('max_execution_count')!r}")
     blockers.extend(_scan_literals(data))
     return blockers
 
