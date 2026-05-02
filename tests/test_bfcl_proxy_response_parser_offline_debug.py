@@ -27,11 +27,15 @@ def _engine() -> RuleEngine:
 
 
 def test_responses_instructions_preserved_to_chat_request() -> None:
+    request = build_responses_request()
+    chat_request = build_chat_request_from_responses(request)
     report = build_report()
     assert report["has_instructions"] is True
-    assert report["input_message_count"] == 1
-    if report["instructions_preserved_to_chat_messages"] is False:
-        assert report["suspected_failure_stage"] == "responses_instructions_input_conversion_loss"
+    assert report["instructions_preserved_to_chat_messages"] is True
+    assert report["input_message_count"] == 2
+    assert chat_request["messages"][0]["role"] in {"system", "developer"}
+    assert chat_request["messages"][1]["role"] == "user"
+    assert report["suspected_failure_stage"] != "responses_instructions_input_conversion_loss"
 
 
 def test_responses_tools_and_tool_choice_preserved() -> None:

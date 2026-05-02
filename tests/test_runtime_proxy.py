@@ -39,6 +39,16 @@ if _INJECTED_HTTPX_STUB:
 
 
 class RuntimeProxyTests(unittest.TestCase):
+
+    def test_responses_instructions_prepend_developer_message(self) -> None:
+        messages = _responses_input_to_messages(
+            [{"role": "user", "content": "Use a tool."}],
+            instructions="Always preserve tool-call instructions.",
+        )
+
+        self.assertEqual(messages[0], {"role": "developer", "content": "Always preserve tool-call instructions."})
+        self.assertEqual(messages[1], {"role": "user", "content": "Use a tool."})
+
     def test_responses_input_preserves_function_call_history(self) -> None:
         request_input = [
             {"role": "user", "content": "Unlock the driver door."},

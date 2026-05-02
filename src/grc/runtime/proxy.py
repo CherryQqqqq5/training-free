@@ -63,12 +63,20 @@ def _responses_function_call_to_chat_tool_call(item: Dict[str, Any], index: int)
     }
 
 
-def _responses_input_to_messages(input_value: Any) -> list[Dict[str, Any]]:
+def _responses_instructions_to_messages(instructions: Any) -> list[Dict[str, Any]]:
+    text = _responses_content_to_text(instructions)
+    if not text.strip():
+        return []
+    return [{"role": "developer", "content": text}]
+
+
+def _responses_input_to_messages(input_value: Any, instructions: Any = None) -> list[Dict[str, Any]]:
+    prefix_messages = _responses_instructions_to_messages(instructions)
     if isinstance(input_value, str):
-        return [{"role": "user", "content": input_value}]
+        return [*prefix_messages, {"role": "user", "content": input_value}]
 
     if isinstance(input_value, list):
-        messages: list[Dict[str, Any]] = []
+        messages: list[Dict[str, Any]] = list(prefix_messages)
         pending_assistant_index: int | None = None
         for index, item in enumerate(input_value):
             if isinstance(item, str):
@@ -114,10 +122,10 @@ def _responses_input_to_messages(input_value: Any) -> list[Dict[str, Any]]:
                 messages.append({"role": role, "content": text})
                 pending_assistant_index = len(messages) - 1 if role == "assistant" else None
 
-        if messages:
+        if len(messages) > len(prefix_messages):
             return messages
 
-    return [{"role": "user", "content": ""}]
+    return [*prefix_messages, {"role": "user", "content": ""}]
 
 
 def _responses_tools_to_chat_tools(tools: Any) -> list[Dict[str, Any]]:
@@ -321,7 +329,10 @@ def create_app(config_path: str, rules_dir: str, trace_dir: str) -> FastAPI:
 
         chat_req_json: Dict[str, Any] = {
             "model": original_req_json.get("model"),
-            "messages": _responses_input_to_messages(original_req_json.get("input")),
+            "messages": _responses_input_to_messages(
+                original_req_json.get("input"),
+                instructions=original_req_json.get("instructions"),
+            ),
         }
         chat_tools = _responses_tools_to_chat_tools(original_req_json.get("tools"))
         if chat_tools:

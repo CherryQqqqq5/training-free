@@ -61,7 +61,7 @@ def build_responses_request() -> dict[str, Any]:
 def build_chat_request_from_responses(request: dict[str, Any]) -> dict[str, Any]:
     chat_request: dict[str, Any] = {
         "model": request.get("model"),
-        "messages": _responses_input_to_messages(request.get("input")),
+        "messages": _responses_input_to_messages(request.get("input"), instructions=request.get("instructions")),
     }
     chat_tools = _responses_tools_to_chat_tools(request.get("tools"))
     if chat_tools:
