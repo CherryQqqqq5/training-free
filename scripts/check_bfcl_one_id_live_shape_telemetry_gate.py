@@ -11,6 +11,7 @@ from typing import Any
 
 DEFAULT_PACKET = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_one_id_live_shape_telemetry_gate_packet.json")
 SIGNED_IDS = ["web_search_base_0"]
+SIGNED_LIVE_CAPTURE_FACTORY = "scripts.bfcl_one_id_live_shape_telemetry_capture:build_signed_one_id_live_shape_capture"
 ALLOWED_TELEMETRY_FIELDS = [
     "run_id",
     "route_profile",
@@ -180,6 +181,12 @@ def validate_packet(data: dict[str, Any]) -> list[str]:
         blockers.append(f"checker_path_invalid:{data.get('checker_path')!r}")
     if data.get("compact_artifact_checker_path") != "scripts/check_bfcl_one_id_live_shape_telemetry_artifact.py":
         blockers.append(f"compact_artifact_checker_path_invalid:{data.get('compact_artifact_checker_path')!r}")
+    if data.get("signed_live_capture_factory") != SIGNED_LIVE_CAPTURE_FACTORY:
+        blockers.append(f"signed_live_capture_factory_invalid:{data.get('signed_live_capture_factory')!r}")
+    if data.get("live_capture_factory_required") is not True:
+        blockers.append(f"live_capture_factory_required_not_true:{data.get('live_capture_factory_required')!r}")
+    if data.get("unsigned_live_capture_factory_allowed") is not False:
+        blockers.append(f"unsigned_live_capture_factory_allowed_not_false:{data.get('unsigned_live_capture_factory_allowed')!r}")
     if data.get("protocol_exception_policy") != "preserve_as_protocol_exception_not_empty_model_response":
         blockers.append(f"protocol_exception_policy_invalid:{data.get('protocol_exception_policy')!r}")
     if data.get("classifier_false_empty_policy") != "reject_false_empty_for_nonempty_result":

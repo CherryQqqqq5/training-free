@@ -25,3 +25,7 @@ Offline handler decode, result materialization, compact classifier, and exceptio
 ## Execution Scaffold Requirements
 
 The reviewed scaffold must validate compact artifacts with `scripts/check_bfcl_one_id_live_shape_telemetry_artifact.py`. Future telemetry must include protocol exception flags and classifier false-empty flags: `protocol_exception_observed`, `protocol_exception_converted_to_empty_model_response`, and `classifier_false_empty_for_nonempty_result`. Protocol exceptions must remain distinguishable from `empty_model_response`; nonempty result material must not be classified as empty.
+
+## Signed Capture Boundary
+
+Signed live-capture factory: `scripts.bfcl_one_id_live_shape_telemetry_capture:build_signed_one_id_live_shape_capture`. Unsigned capture factories are not allowed. The factory is bounded to `web_search_base_0`, `novacode/gpt-4.1`, generate-only shape telemetry, compact fields only, and no evaluate/scorer/baseline/candidate/performance path.

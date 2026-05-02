@@ -9,6 +9,7 @@ callable; dry-run/plan never reads endpoint or key values.
 from __future__ import annotations
 
 import argparse
+import importlib
 import json
 import sys
 from pathlib import Path
@@ -25,7 +26,9 @@ DEFAULT_PACKET = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_one_id_live
 DEFAULT_OUTPUT = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_one_id_live_shape_telemetry_compact.json")
 SIGNED_ROUTE_PROFILE = "novacode"
 SIGNED_ROUTE_MODEL = "gpt-4.1"
+SIGNED_LIVE_CAPTURE_FACTORY = "scripts.bfcl_one_id_live_shape_telemetry_capture:build_signed_one_id_live_shape_capture"
 LiveCapture = Callable[[dict[str, Any]], dict[str, Any]]
+LiveCaptureFactory = Callable[[dict[str, Any]], LiveCapture]
 
 
 def build_plan(packet_path: Path = DEFAULT_PACKET, output_artifact: Path = DEFAULT_OUTPUT) -> dict[str, Any]:
@@ -54,6 +57,7 @@ def build_plan(packet_path: Path = DEFAULT_PACKET, output_artifact: Path = DEFAU
         "api_key_value_read": False,
         "raw_persistence_authorized": False,
         "output_artifact_planned": str(output_artifact),
+        "signed_live_capture_factory": SIGNED_LIVE_CAPTURE_FACTORY,
         "telemetry_fields": list(ALLOWED_TELEMETRY_FIELDS),
         "blockers": [] if packet_summary.get("bfcl_one_id_live_shape_telemetry_gate_passed") else packet_summary.get("blockers", []),
     }
@@ -138,7 +142,27 @@ def _artifact_from_record(record: dict[str, Any], *, provider_request_executed: 
     }
 
 
-def execute_live_telemetry(*, packet_path: Path = DEFAULT_PACKET, output_artifact: Path = DEFAULT_OUTPUT, clean_output: bool = False, live_capture: LiveCapture | None = None) -> dict[str, Any]:
+def _safe_error(exc: Exception) -> str:
+    message = str(exc)
+    if message.startswith("one_id_"):
+        return message
+    return type(exc).__name__
+
+
+def _load_signed_live_capture_factory(factory_ref: str) -> LiveCaptureFactory:
+    if factory_ref != SIGNED_LIVE_CAPTURE_FACTORY:
+        raise RuntimeError("one_id_live_capture_factory_not_signed")
+    module_name, sep, function_name = factory_ref.partition(":")
+    if not sep or not module_name or not function_name:
+        raise RuntimeError("one_id_live_capture_factory_ref_invalid")
+    module = importlib.import_module(module_name)
+    factory = getattr(module, function_name, None)
+    if not callable(factory):
+        raise RuntimeError("one_id_live_capture_factory_not_callable")
+    return factory
+
+
+def execute_live_telemetry(*, packet_path: Path = DEFAULT_PACKET, output_artifact: Path = DEFAULT_OUTPUT, clean_output: bool = False, live_capture: LiveCapture | None = None, live_capture_factory: LiveCaptureFactory | None = None, live_capture_factory_ref: str = SIGNED_LIVE_CAPTURE_FACTORY) -> dict[str, Any]:
     packet_summary = check_packet(packet_path)
     if not packet_summary.get("bfcl_one_id_live_shape_telemetry_gate_passed"):
         return {
@@ -170,16 +194,6 @@ def execute_live_telemetry(*, packet_path: Path = DEFAULT_PACKET, output_artifac
             "diagnostic_written": False,
             "blockers": ["output_artifact_exists_without_clean_output"],
         }
-    if live_capture is None:
-        return {
-            "report_scope": "bfcl_one_id_live_shape_telemetry_execute",
-            "provider_request_executed": False,
-            "bfcl_generate_executed": False,
-            "endpoint_value_read": False,
-            "api_key_value_read": False,
-            "diagnostic_written": False,
-            "blockers": ["one_id_live_shape_telemetry_live_capture_not_configured_for_direct_execution"],
-        }
     request = {
         "run_ids": list(SIGNED_IDS),
         "route_profile": SIGNED_ROUTE_PROFILE,
@@ -187,6 +201,33 @@ def execute_live_telemetry(*, packet_path: Path = DEFAULT_PACKET, output_artifac
         "generate_only": True,
         "raw_persistence_authorized": False,
     }
+    if live_capture is None:
+        selected_factory = live_capture_factory
+        if selected_factory is None:
+            try:
+                selected_factory = _load_signed_live_capture_factory(live_capture_factory_ref)
+            except Exception as exc:
+                return {
+                    "report_scope": "bfcl_one_id_live_shape_telemetry_execute",
+                    "provider_request_executed": False,
+                    "bfcl_generate_executed": False,
+                    "endpoint_value_read": False,
+                    "api_key_value_read": False,
+                    "diagnostic_written": False,
+                    "blockers": [_safe_error(exc)],
+                }
+        try:
+            live_capture = selected_factory(request)
+        except Exception as exc:
+            return {
+                "report_scope": "bfcl_one_id_live_shape_telemetry_execute",
+                "provider_request_executed": False,
+                "bfcl_generate_executed": False,
+                "endpoint_value_read": False,
+                "api_key_value_read": False,
+                "diagnostic_written": False,
+                "blockers": [_safe_error(exc)],
+            }
     try:
         captured = live_capture(request)
     except Exception as exc:
@@ -244,11 +285,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--packet", type=Path, default=DEFAULT_PACKET)
     parser.add_argument("--output-artifact", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--clean-output", action="store_true")
+    parser.add_argument("--live-capture-factory", default=SIGNED_LIVE_CAPTURE_FACTORY)
     parser.add_argument("--compact", action="store_true")
     parser.add_argument("--strict", action="store_true")
     args = parser.parse_args(argv)
     if args.execute_live_telemetry:
-        summary = execute_live_telemetry(packet_path=args.packet, output_artifact=args.output_artifact, clean_output=args.clean_output)
+        summary = execute_live_telemetry(packet_path=args.packet, output_artifact=args.output_artifact, clean_output=args.clean_output, live_capture_factory_ref=args.live_capture_factory)
     else:
         summary = build_plan(packet_path=args.packet, output_artifact=args.output_artifact)
     print(json.dumps(summary, sort_keys=True) if args.compact else json.dumps(summary, indent=2, sort_keys=True))

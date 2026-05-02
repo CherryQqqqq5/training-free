@@ -365,3 +365,66 @@ def test_artifact_checker_rejects_protocol_exception_converted_to_empty() -> Non
     data["records"][0]["protocol_exception_converted_to_empty_model_response"] = True
     blockers = validate_artifact(data)
     assert any("protocol_exception_converted_to_empty_forbidden" in blocker for blocker in blockers)
+
+
+def test_signed_capture_factory_path_can_produce_valid_compact_artifact(tmp_path: Path) -> None:
+    from scripts.bfcl_one_id_live_shape_telemetry_capture import build_signed_one_id_live_shape_capture
+
+    packet_path = _approved_packet_path(tmp_path)
+    out = tmp_path / "telemetry.json"
+
+    def fake_executor(request: dict[str, object]) -> dict[str, object]:
+        assert request["run_ids"] == ["web_search_base_0"]
+        assert request["route_model"] == "gpt-4.1"
+        return _record("live_path_nonempty")
+
+    def factory(request: dict[str, object]):
+        return build_signed_one_id_live_shape_capture(request, executor=fake_executor)
+
+    summary = execute_live_telemetry(packet_path=packet_path, output_artifact=out, live_capture_factory=factory)
+    assert summary["blockers"] == []
+    assert summary["provider_request_executed"] is True
+    assert summary["bfcl_generate_executed"] is True
+    assert check_artifact(out)["bfcl_one_id_live_shape_telemetry_artifact_passed"] is True
+
+
+def test_unsigned_capture_factory_cli_fails_before_secret_read() -> None:
+    rc = runner_main(["--execute-live-telemetry", "--live-capture-factory", "tests.fake:build", "--compact", "--strict"])
+    assert rc == 1
+
+
+def test_signed_capture_factory_rejects_route_drift_extra_id_and_raw_flag() -> None:
+    from scripts.bfcl_one_id_live_shape_telemetry_capture import build_signed_one_id_live_shape_capture
+
+    base = {"run_ids": ["web_search_base_0"], "route_profile": "novacode", "route_model": "gpt-4.1", "generate_only": True, "raw_persistence_authorized": False}
+    for update, expected in (
+        ({"route_model": "gpt-5.2"}, "route_model_drift"),
+        ({"run_ids": ["web_search_base_0", "multi_turn_base_0"]}, "run_ids_not_signed"),
+        ({"raw_persistence_authorized": True}, "raw_persistence_not_false"),
+    ):
+        request = dict(base)
+        request.update(update)
+        try:
+            build_signed_one_id_live_shape_capture(request, executor=lambda req: _record("live_path_nonempty"))
+        except RuntimeError as exc:
+            assert expected in str(exc)
+        else:
+            raise AssertionError("expected signed capture request rejection")
+
+
+def test_execute_rejects_preexisting_output_before_capture_factory(tmp_path: Path) -> None:
+    packet_path = _approved_packet_path(tmp_path)
+    out = tmp_path / "telemetry.json"
+    out.write_text("{}", encoding="utf-8")
+    called = False
+
+    def factory(request: dict[str, object]):
+        nonlocal called
+        called = True
+        return lambda capture_request: _record("live_path_nonempty")
+
+    summary = execute_live_telemetry(packet_path=packet_path, output_artifact=out, live_capture_factory=factory)
+    assert summary["blockers"] == ["output_artifact_exists_without_clean_output"]
+    assert called is False
+    assert summary["endpoint_value_read"] is False
+    assert summary["api_key_value_read"] is False
