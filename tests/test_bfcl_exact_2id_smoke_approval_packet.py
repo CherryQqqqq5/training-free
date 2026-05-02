@@ -15,11 +15,26 @@ class BFCLExact2IDSmokeApprovalPacketTests(unittest.TestCase):
     def setUp(self) -> None:
         self.packet = json.loads(PACKET_PATH.read_text(encoding="utf-8"))
 
-    def test_pending_fail_closed_packet_passes(self) -> None:
+    def test_approved_exact_generate_only_packet_passes(self) -> None:
         self.assertEqual(validate_packet(self.packet), [])
-        self.assertEqual(self.packet["approval_status"], "pending")
-        self.assertFalse(self.packet["provider_call_authorized"])
-        self.assertFalse(self.packet["bfcl_smoke_authorized"])
+        self.assertEqual(self.packet["approval_status"], "approved")
+        self.assertTrue(self.packet["authorized"])
+        self.assertTrue(self.packet["provider_call_authorized"])
+        self.assertTrue(self.packet["bfcl_smoke_authorized"])
+        self.assertTrue(self.packet["bfcl_generate_authorized"])
+        self.assertFalse(self.packet["bfcl_evaluate_authorized"])
+        self.assertFalse(self.packet["scorer_authorized"])
+
+    def test_rejects_pending_state_for_execution_packet(self) -> None:
+        dirty = copy.deepcopy(self.packet)
+        dirty["approval_status"] = "pending"
+        dirty["authorized"] = False
+        dirty["provider_call_authorized"] = False
+        dirty["bfcl_smoke_authorized"] = False
+        dirty["bfcl_generate_authorized"] = False
+        blockers = validate_packet(dirty)
+        self.assertTrue(any("approval_status_not_approved" in blocker for blocker in blockers))
+        self.assertTrue(any("provider_call_authorized_not_true" in blocker for blocker in blockers))
 
     def test_rejects_extra_ids(self) -> None:
         dirty = copy.deepcopy(self.packet)

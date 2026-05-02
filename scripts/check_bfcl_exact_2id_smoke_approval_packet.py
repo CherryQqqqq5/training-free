@@ -11,12 +11,14 @@ from typing import Any
 
 DEFAULT_PACKET = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_exact_2id_smoke_approval_packet.json")
 SIGNED_IDS = ["web_search_base_0", "multi_turn_base_0"]
-REQUIRED_FALSE = (
+REQUIRED_TRUE_AUTHORIZATION = (
     "authorized",
     "provider_call_authorized",
     "bfcl_smoke_authorized",
-    "scorer_authorized",
     "bfcl_generate_authorized",
+)
+REQUIRED_FALSE = (
+    "scorer_authorized",
     "bfcl_evaluate_authorized",
     "evaluate_command_allowed",
     "scorer_command_allowed",
@@ -91,8 +93,11 @@ def validate_packet(data: dict[str, Any]) -> list[str]:
     blockers = []
     if data.get("artifact_kind") != "bfcl_exact_2id_smoke_approval_packet":
         blockers.append(f"packet_kind_invalid:{data.get('artifact_kind')!r}")
-    if data.get("approval_status") != "pending":
-        blockers.append(f"packet_approval_status_not_pending:{data.get('approval_status')!r}")
+    if data.get("approval_status") != "approved":
+        blockers.append(f"packet_approval_status_not_approved:{data.get('approval_status')!r}")
+    for key in REQUIRED_TRUE_AUTHORIZATION:
+        if data.get(key) is not True:
+            blockers.append(f"{key}_not_true:{data.get(key)!r}")
     for key in REQUIRED_FALSE:
         if data.get(key) is not False:
             blockers.append(f"{key}_not_false:{data.get(key)!r}")
@@ -107,9 +112,13 @@ def validate_packet(data: dict[str, Any]) -> list[str]:
         blockers.append("route_drift")
     if data.get("provider_profile") != "Chuangzhi/Novacode":
         blockers.append(f"provider_profile_invalid:{data.get('provider_profile')!r}")
+    if data.get("approval_scope") != "exact_2id_generate_only_smoke":
+        blockers.append(f"approval_scope_invalid:{data.get('approval_scope')!r}")
     expected_paths = {
         "generate_only_runner_path": "scripts/run_bfcl_exact_2id_generate_smoke.py",
+        "approved_for_runner_path": "scripts/run_bfcl_exact_2id_generate_smoke.py",
         "compact_artifact_checker_path": "scripts/check_bfcl_exact_2id_generate_smoke_artifact.py",
+        "approved_for_artifact_checker_path": "scripts/check_bfcl_exact_2id_generate_smoke_artifact.py",
         "compact_output_artifact": "outputs/artifacts/stage1_bfcl_acceptance/bfcl_exact_2id_generate_smoke_compact.json",
     }
     for key, expected in expected_paths.items():

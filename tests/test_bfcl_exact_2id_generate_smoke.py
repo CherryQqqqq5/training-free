@@ -96,7 +96,10 @@ def test_exact_smoke_packet_checker_includes_generate_only_paths() -> None:
     packet = json.loads(PACKET.read_text(encoding="utf-8"))
     assert packet["generate_only_runner_path"] == "scripts/run_bfcl_exact_2id_generate_smoke.py"
     assert packet["compact_artifact_checker_path"] == "scripts/check_bfcl_exact_2id_generate_smoke_artifact.py"
-    assert packet["bfcl_generate_authorized"] is False
+    assert packet["approval_status"] == "approved"
+    assert packet["provider_call_authorized"] is True
+    assert packet["bfcl_smoke_authorized"] is True
+    assert packet["bfcl_generate_authorized"] is True
     assert packet["bfcl_evaluate_authorized"] is False
 
 
@@ -112,7 +115,15 @@ def test_dry_run_plan_reads_no_endpoint_or_key_and_calls_no_provider() -> None:
 
 
 def test_execute_mode_fails_closed_while_packet_pending(tmp_path: Path) -> None:
-    summary = execute_generate_smoke(output=tmp_path / "out.json", packet_path=PACKET, run_root=tmp_path / "run")
+    packet = json.loads(PACKET.read_text(encoding="utf-8"))
+    packet["approval_status"] = "pending"
+    packet["authorized"] = False
+    packet["provider_call_authorized"] = False
+    packet["bfcl_smoke_authorized"] = False
+    packet["bfcl_generate_authorized"] = False
+    pending_packet = tmp_path / "pending_packet.json"
+    pending_packet.write_text(json.dumps(packet), encoding="utf-8")
+    summary = execute_generate_smoke(output=tmp_path / "out.json", packet_path=pending_packet, run_root=tmp_path / "run")
     assert summary["provider_call_executed"] is False
     assert summary["bfcl_generate_executed"] is False
     assert summary["bfcl_evaluate_executed"] is False
