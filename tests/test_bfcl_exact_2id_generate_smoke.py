@@ -127,7 +127,7 @@ def test_subprocess_env_bridges_openai_api_key_from_approved_env_when_missing() 
     assert "OPENAI_API_KEY" not in source
 
 
-def test_subprocess_env_preserves_existing_openai_api_key_and_base_url() -> None:
+def test_subprocess_env_preserves_existing_openai_api_key_but_forces_base_url() -> None:
     source = {
         "OPENAI_API_KEY": "existing_openai_key",
         "OPENAI_BASE_URL": "http://127.0.0.1:9999/v1",
@@ -135,7 +135,17 @@ def test_subprocess_env_preserves_existing_openai_api_key_and_base_url() -> None
     }
     bridged = _bfcl_generate_subprocess_env(8131, source)
     assert bridged["OPENAI_API_KEY"] == "existing_openai_key"
-    assert bridged["OPENAI_BASE_URL"] == "http://127.0.0.1:9999/v1"
+    assert bridged["OPENAI_BASE_URL"] == "http://127.0.0.1:8131/v1"
+
+
+def test_subprocess_env_overrides_external_openai_base_url() -> None:
+    bridged = _bfcl_generate_subprocess_env(8133, {"OPENAI_BASE_URL": "http://external.invalid/v1"})
+    assert bridged["OPENAI_BASE_URL"] == "http://127.0.0.1:8133/v1"
+
+
+def test_subprocess_env_overrides_wrong_port_local_openai_base_url() -> None:
+    bridged = _bfcl_generate_subprocess_env(8134, {"OPENAI_BASE_URL": "http://127.0.0.1:9999/v1"})
+    assert bridged["OPENAI_BASE_URL"] == "http://127.0.0.1:8134/v1"
 
 
 def test_subprocess_env_can_bridge_from_novacode_key() -> None:

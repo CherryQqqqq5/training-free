@@ -130,6 +130,10 @@ def validate_packet(data: dict[str, Any]) -> list[str]:
         blockers.append(f"bfcl_handler_api_key_bridge_envs_invalid:{data.get('bfcl_handler_api_key_bridge_envs')!r}")
     if data.get("bfcl_handler_base_url_bridge") != "local_proxy_openai_compatible_v1":
         blockers.append(f"bfcl_handler_base_url_bridge_invalid:{data.get('bfcl_handler_base_url_bridge')!r}")
+    if data.get("bfcl_handler_base_url_force_local_proxy") is not True:
+        blockers.append(f"bfcl_handler_base_url_force_local_proxy_not_true:{data.get('bfcl_handler_base_url_force_local_proxy')!r}")
+    if data.get("bfcl_handler_inherited_openai_base_url_allowed") is not False:
+        blockers.append(f"bfcl_handler_inherited_openai_base_url_allowed_not_false:{data.get('bfcl_handler_inherited_openai_base_url_allowed')!r}")
     if data.get("bfcl_handler_shell_env_mutation_allowed") is not False:
         blockers.append(f"bfcl_handler_shell_env_mutation_allowed_not_false:{data.get('bfcl_handler_shell_env_mutation_allowed')!r}")
     expected_paths = {

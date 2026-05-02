@@ -32,6 +32,8 @@ class BFCLExact2IDSmokeApprovalPacketTests(unittest.TestCase):
         self.assertEqual(self.packet["bfcl_handler_required_env"], ["OPENAI_API_KEY", "OPENAI_BASE_URL"])
         self.assertEqual(self.packet["bfcl_handler_api_key_bridge_envs"], ["CHUANGZHI_API_KEY", "NOVACODE_API_KEY"])
         self.assertEqual(self.packet["bfcl_handler_base_url_bridge"], "local_proxy_openai_compatible_v1")
+        self.assertTrue(self.packet["bfcl_handler_base_url_force_local_proxy"])
+        self.assertFalse(self.packet["bfcl_handler_inherited_openai_base_url_allowed"])
         self.assertFalse(self.packet["bfcl_handler_shell_env_mutation_allowed"])
 
     def test_rejects_pending_state_for_execution_packet(self) -> None:

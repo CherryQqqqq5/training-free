@@ -210,8 +210,7 @@ def _bfcl_generate_subprocess_env(port: int, source_env: dict[str, str] | None =
         bridged_key = _first_present(env, ("CHUANGZHI_API_KEY", "NOVACODE_API_KEY"))
         if bridged_key:
             env["OPENAI_API_KEY"] = bridged_key
-    if not env.get("OPENAI_BASE_URL"):
-        env["OPENAI_BASE_URL"] = f"http://127.0.0.1:{port}/v1"
+    env["OPENAI_BASE_URL"] = f"http://127.0.0.1:{port}/v1"
     return env
 
 
