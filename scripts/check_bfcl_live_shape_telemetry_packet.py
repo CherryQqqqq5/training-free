@@ -57,6 +57,7 @@ ALLOWED_FIELDS = [
     "raw_log_persisted",
     "raw_trace_persisted",
 ]
+SIGNED_TELEMETRY_CLIENT_FACTORY = "scripts.bfcl_live_shape_telemetry_client:build_signed_live_shape_telemetry_client"
 SECRET_OR_ENDPOINT_RE = re.compile(r"(sk-[A-Za-z0-9_-]{16,}|https?://)", re.IGNORECASE)
 RAW_MARKERS = ("raw prompt", "BFCL case content", "provider payload", "response body", "scorer diff", "gold/reference/expected", "candidate output")
 
@@ -125,6 +126,12 @@ def validate(data: dict[str, Any]) -> list[str]:
         blockers.append(f"telemetry_packet_provider_scope_invalid:{data.get('provider_request_authorized_scope')!r}")
     if data.get("max_execution_count") != 1:
         blockers.append(f"telemetry_packet_max_execution_count_invalid:{data.get('max_execution_count')!r}")
+    if data.get("telemetry_client_factory_required") is not True:
+        blockers.append(f"telemetry_packet_client_factory_required_not_true:{data.get('telemetry_client_factory_required')!r}")
+    if data.get("telemetry_client_factory_scope") != "single_live_shape_telemetry_gate_only":
+        blockers.append(f"telemetry_packet_client_factory_scope_invalid:{data.get('telemetry_client_factory_scope')!r}")
+    if data.get("signed_telemetry_client_factory") != SIGNED_TELEMETRY_CLIENT_FACTORY:
+        blockers.append(f"telemetry_packet_signed_client_factory_invalid:{data.get('signed_telemetry_client_factory')!r}")
     blockers.extend(_scan_literals(data))
     return blockers
 

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import importlib
 import json
 import os
 import sys
@@ -20,6 +21,7 @@ from scripts.check_bfcl_live_shape_telemetry_packet import SIGNED_IDS, check as 
 DEFAULT_OUTPUT = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_live_shape_telemetry_compact.json")
 SIGNED_ENDPOINT_ENVS = ("CHUANGZHI_NOVACODE_ENDPOINT", "NOVACODE_ENDPOINT")
 SIGNED_KEY_ENVS = ("CHUANGZHI_API_KEY", "NOVACODE_API_KEY")
+SIGNED_TELEMETRY_CLIENT_FACTORY = "scripts.bfcl_live_shape_telemetry_client:build_signed_live_shape_telemetry_client"
 TelemetryClient = Callable[[dict[str, Any]], list[dict[str, Any]]]
 
 
@@ -45,6 +47,7 @@ def build_plan() -> dict[str, object]:
         "performance_evidence": False,
         "raw_persistence_authorized": False,
         "output_artifact_planned": str(DEFAULT_OUTPUT),
+        "signed_telemetry_client_factory": SIGNED_TELEMETRY_CLIENT_FACTORY,
         "telemetry_fields": [
             "endpoint_path_label",
             "request_shape_label",
@@ -63,8 +66,24 @@ def build_plan() -> dict[str, object]:
     }
 
 
-def _default_unavailable_client(_: dict[str, Any]) -> list[dict[str, Any]]:
-    raise RuntimeError("live_shape_telemetry_transport_not_configured_for_direct_execution")
+def _load_signed_client_factory(factory_ref: str) -> Callable[[dict[str, Any]], TelemetryClient]:
+    if factory_ref != SIGNED_TELEMETRY_CLIENT_FACTORY:
+        raise RuntimeError("telemetry_client_factory_not_signed")
+    module_name, sep, function_name = factory_ref.partition(":")
+    if not sep or not module_name or not function_name:
+        raise RuntimeError("telemetry_client_factory_ref_invalid")
+    module = importlib.import_module(module_name)
+    factory = getattr(module, function_name, None)
+    if not callable(factory):
+        raise RuntimeError("telemetry_client_factory_not_callable")
+    return factory
+
+
+def _safe_error(exc: Exception) -> str:
+    message = str(exc)
+    if message.startswith("telemetry_"):
+        return message
+    return type(exc).__name__
 
 
 def _sanitize_record(record: dict[str, Any], run_id: str) -> dict[str, Any]:
@@ -96,18 +115,10 @@ def _sanitize_record(record: dict[str, Any], run_id: str) -> dict[str, Any]:
     return sanitized
 
 
-def execute_telemetry(*, output: Path = DEFAULT_OUTPUT, client: TelemetryClient | None = None, read_env: bool = True) -> dict[str, Any]:
+def execute_telemetry(*, output: Path = DEFAULT_OUTPUT, client: TelemetryClient | None = None, client_factory: Callable[[dict[str, Any]], TelemetryClient] | None = None, client_factory_ref: str = SIGNED_TELEMETRY_CLIENT_FACTORY, read_env: bool = True) -> dict[str, Any]:
     packet_summary = check_packet()
     if not packet_summary.get("bfcl_live_shape_telemetry_packet_passed"):
         return {"report_scope": "bfcl_live_shape_telemetry_execute", "provider_request_executed": False, "endpoint_value_read": False, "api_key_value_read": False, "diagnostic_written": False, "blockers": packet_summary.get("blockers", [])}
-    if read_env:
-        endpoint_present = _env_present(SIGNED_ENDPOINT_ENVS)
-        key_present = _env_present(SIGNED_KEY_ENVS)
-        if not endpoint_present:
-            return {"report_scope": "bfcl_live_shape_telemetry_execute", "provider_request_executed": False, "endpoint_value_read": False, "api_key_value_read": False, "diagnostic_written": False, "blockers": ["telemetry_endpoint_missing"]}
-        if not key_present:
-            return {"report_scope": "bfcl_live_shape_telemetry_execute", "provider_request_executed": False, "endpoint_value_read": True, "api_key_value_read": False, "diagnostic_written": False, "blockers": ["telemetry_api_key_missing"]}
-    provider_client = client or _default_unavailable_client
     request = {
         "run_ids": list(SIGNED_IDS),
         "route_model": "gpt-4.1",
@@ -115,10 +126,31 @@ def execute_telemetry(*, output: Path = DEFAULT_OUTPUT, client: TelemetryClient 
         "max_total_cases": 2,
         "raw_persistence_authorized": False,
     }
+    selected_factory: Callable[[dict[str, Any]], TelemetryClient] | None = client_factory
+    if client is None and selected_factory is None:
+        try:
+            selected_factory = _load_signed_client_factory(client_factory_ref)
+        except Exception as exc:
+            return {"report_scope": "bfcl_live_shape_telemetry_execute", "provider_request_executed": False, "endpoint_value_read": False, "api_key_value_read": False, "diagnostic_written": False, "blockers": [_safe_error(exc)]}
+    if read_env:
+        endpoint_present = _env_present(SIGNED_ENDPOINT_ENVS)
+        key_present = _env_present(SIGNED_KEY_ENVS)
+        if not endpoint_present:
+            return {"report_scope": "bfcl_live_shape_telemetry_execute", "provider_request_executed": False, "endpoint_value_read": False, "api_key_value_read": False, "diagnostic_written": False, "blockers": ["telemetry_endpoint_missing"]}
+        if not key_present:
+            return {"report_scope": "bfcl_live_shape_telemetry_execute", "provider_request_executed": False, "endpoint_value_read": True, "api_key_value_read": False, "diagnostic_written": False, "blockers": ["telemetry_api_key_missing"]}
+    if client is not None:
+        provider_client = client
+    else:
+        try:
+            assert selected_factory is not None
+            provider_client = selected_factory(request)
+        except Exception as exc:
+            return {"report_scope": "bfcl_live_shape_telemetry_execute", "provider_request_executed": False, "endpoint_value_read": bool(read_env), "api_key_value_read": bool(read_env), "diagnostic_written": False, "blockers": [_safe_error(exc)]}
     try:
         records = provider_client(request)
     except Exception as exc:
-        return {"report_scope": "bfcl_live_shape_telemetry_execute", "provider_request_executed": False, "endpoint_value_read": bool(read_env), "api_key_value_read": False, "diagnostic_written": False, "blockers": [f"telemetry_client_failed:{type(exc).__name__}"]}
+        return {"report_scope": "bfcl_live_shape_telemetry_execute", "provider_request_executed": False, "endpoint_value_read": bool(read_env), "api_key_value_read": bool(read_env), "diagnostic_written": False, "blockers": [_safe_error(exc)]}
     if not isinstance(records, list):
         return {"report_scope": "bfcl_live_shape_telemetry_execute", "provider_request_executed": True, "endpoint_value_read": bool(read_env), "api_key_value_read": bool(read_env), "diagnostic_written": False, "blockers": ["telemetry_client_records_not_list"]}
     if len(records) != len(SIGNED_IDS):
@@ -156,11 +188,12 @@ def main(argv: list[str] | None = None) -> int:
     mode.add_argument("--plan-only", action="store_true")
     mode.add_argument("--execute-telemetry", action="store_true")
     parser.add_argument("--output-artifact", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument("--telemetry-client-factory", default=SIGNED_TELEMETRY_CLIENT_FACTORY)
     parser.add_argument("--compact", action="store_true")
     parser.add_argument("--strict", action="store_true")
     args = parser.parse_args(argv)
     if args.execute_telemetry:
-        summary = execute_telemetry(output=args.output_artifact)
+        summary = execute_telemetry(output=args.output_artifact, client_factory_ref=args.telemetry_client_factory)
     else:
         summary = build_plan()
     print(json.dumps(summary, sort_keys=True) if args.compact else json.dumps(summary, indent=2, sort_keys=True))

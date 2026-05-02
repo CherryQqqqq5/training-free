@@ -5,6 +5,7 @@ from pathlib import Path
 
 from scripts.check_bfcl_live_shape_telemetry_artifact import check as check_artifact
 from scripts.check_bfcl_live_shape_telemetry_packet import check as check_packet
+from scripts.bfcl_live_shape_telemetry_client import build_signed_live_shape_telemetry_client
 from scripts.run_bfcl_live_shape_telemetry import build_plan, execute_telemetry, main as run_main
 
 
@@ -120,3 +121,131 @@ def test_artifact_checker_rejects_route_drift_and_too_many_ids(tmp_path: Path) -
     summary = check_artifact(path)
     assert summary["bfcl_live_shape_telemetry_artifact_passed"] is False
     assert any("route" in blocker or "too_many" in blocker for blocker in summary["blockers"])
+
+
+class _FakeResponse:
+    status = 200
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        return False
+
+    def read(self) -> bytes:
+        return json.dumps(
+            {
+                "choices": [
+                    {
+                        "message": {
+                            "tool_calls": [
+                                {
+                                    "type": "function",
+                                    "function": {"name": "synthetic_live_shape_telemetry_ping", "arguments": "{}"},
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        ).encode("utf-8")
+
+
+def _signed_env() -> dict[str, str]:
+    return {
+        "CHUANGZHI_NOVACODE_ENDPOINT": "https://example.invalid/v1/chat/completions",
+        "CHUANGZHI_API_KEY": "fixture-token-not-secret-shaped",
+    }
+
+
+def test_execute_mode_rejects_unsigned_cli_factory_before_env(monkeypatch) -> None:
+    for name in ("CHUANGZHI_NOVACODE_ENDPOINT", "NOVACODE_ENDPOINT", "CHUANGZHI_API_KEY", "NOVACODE_API_KEY"):
+        monkeypatch.delenv(name, raising=False)
+    assert run_main(["--execute-telemetry", "--telemetry-client-factory", "tests.fake:build", "--compact", "--strict"]) == 1
+
+
+def test_execute_mode_uses_signed_factory_injection(tmp_path: Path) -> None:
+    calls: list[dict[str, object]] = []
+
+    def factory(request: dict[str, object]):
+        calls.append(request)
+        return lambda client_request: _clean_artifact()["records"]
+
+    out = tmp_path / "telemetry.json"
+    summary = execute_telemetry(output=out, client_factory=factory, read_env=False)
+    assert summary["blockers"] == []
+    assert calls and calls[0]["run_ids"] == ["web_search_base_0", "multi_turn_base_0"]
+    assert check_artifact(out)["bfcl_live_shape_telemetry_artifact_passed"] is True
+
+
+def test_signed_transport_factory_mock_opener_returns_compact_records_without_raws() -> None:
+    seen_urls: list[str] = []
+
+    def opener(request, timeout):
+        seen_urls.append(request.full_url)
+        assert timeout == 30
+        return _FakeResponse()
+
+    request = {
+        "run_ids": ["web_search_base_0", "multi_turn_base_0"],
+        "route_model": "gpt-4.1",
+        "active_profile": "novacode",
+        "max_total_cases": 2,
+        "raw_persistence_authorized": False,
+    }
+    client = build_signed_live_shape_telemetry_client(request, env=_signed_env(), opener=opener)
+    records = client(request)
+    assert len(records) == 2
+    assert seen_urls == ["https://example.invalid/v1/chat/completions"] * 2
+    assert {record["run_id_label"] for record in records} == {"web_search_base_0", "multi_turn_base_0"}
+    assert all(record["tool_call_present"] is True for record in records)
+    assert all(record["raw_payload_persisted"] is False for record in records)
+
+
+def test_signed_transport_rejects_id_drift() -> None:
+    request = {
+        "run_ids": ["web_search_base_0", "unexpected"],
+        "route_model": "gpt-4.1",
+        "active_profile": "novacode",
+        "max_total_cases": 2,
+        "raw_persistence_authorized": False,
+    }
+    try:
+        build_signed_live_shape_telemetry_client(request, env=_signed_env(), opener=lambda request, timeout: _FakeResponse())
+    except RuntimeError as exc:
+        assert str(exc).startswith("telemetry_run_ids_not_signed")
+    else:
+        raise AssertionError("expected fail-closed ID drift")
+
+
+def test_signed_transport_rejects_raw_persistence_flag() -> None:
+    request = {
+        "run_ids": ["web_search_base_0", "multi_turn_base_0"],
+        "route_model": "gpt-4.1",
+        "active_profile": "novacode",
+        "max_total_cases": 2,
+        "raw_persistence_authorized": True,
+    }
+    try:
+        build_signed_live_shape_telemetry_client(request, env=_signed_env(), opener=lambda request, timeout: _FakeResponse())
+    except RuntimeError as exc:
+        assert str(exc) == "telemetry_raw_persistence_not_false"
+    else:
+        raise AssertionError("expected fail-closed raw persistence flag")
+
+
+def test_signed_transport_rejects_non_https_endpoint() -> None:
+    request = {
+        "run_ids": ["web_search_base_0", "multi_turn_base_0"],
+        "route_model": "gpt-4.1",
+        "active_profile": "novacode",
+        "max_total_cases": 2,
+        "raw_persistence_authorized": False,
+    }
+    env = {"CHUANGZHI_NOVACODE_ENDPOINT": "http://example.invalid/v1/chat/completions", "CHUANGZHI_API_KEY": "fixture-token"}
+    try:
+        build_signed_live_shape_telemetry_client(request, env=env, opener=lambda request, timeout: _FakeResponse())
+    except RuntimeError as exc:
+        assert str(exc) == "telemetry_endpoint_not_https"
+    else:
+        raise AssertionError("expected fail-closed non-HTTPS endpoint")
