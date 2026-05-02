@@ -28,6 +28,11 @@ class BFCLExact2IDSmokeApprovalPacketTests(unittest.TestCase):
         self.assertEqual(self.packet["bfcl_run_ids_manifest_content"], "exact_signed_ids_only")
         self.assertEqual(self.packet["bfcl_run_ids_manifest_schema"], "category_to_signed_id_list")
         self.assertTrue(self.packet["bfcl_run_ids_manifest_cleanup_required"])
+        self.assertEqual(self.packet["bfcl_handler_env_bridge_mode"], "subprocess_only_openai_env")
+        self.assertEqual(self.packet["bfcl_handler_required_env"], ["OPENAI_API_KEY", "OPENAI_BASE_URL"])
+        self.assertEqual(self.packet["bfcl_handler_api_key_bridge_envs"], ["CHUANGZHI_API_KEY", "NOVACODE_API_KEY"])
+        self.assertEqual(self.packet["bfcl_handler_base_url_bridge"], "local_proxy_openai_compatible_v1")
+        self.assertFalse(self.packet["bfcl_handler_shell_env_mutation_allowed"])
 
     def test_rejects_pending_state_for_execution_packet(self) -> None:
         dirty = copy.deepcopy(self.packet)

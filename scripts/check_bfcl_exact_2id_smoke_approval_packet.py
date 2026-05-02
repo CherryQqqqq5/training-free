@@ -122,6 +122,16 @@ def validate_packet(data: dict[str, Any]) -> list[str]:
         blockers.append(f"bfcl_run_ids_manifest_schema_invalid:{data.get('bfcl_run_ids_manifest_schema')!r}")
     if data.get("bfcl_run_ids_manifest_cleanup_required") is not True:
         blockers.append(f"bfcl_run_ids_manifest_cleanup_required_not_true:{data.get('bfcl_run_ids_manifest_cleanup_required')!r}")
+    if data.get("bfcl_handler_env_bridge_mode") != "subprocess_only_openai_env":
+        blockers.append(f"bfcl_handler_env_bridge_mode_invalid:{data.get('bfcl_handler_env_bridge_mode')!r}")
+    if data.get("bfcl_handler_required_env") != ["OPENAI_API_KEY", "OPENAI_BASE_URL"]:
+        blockers.append(f"bfcl_handler_required_env_invalid:{data.get('bfcl_handler_required_env')!r}")
+    if data.get("bfcl_handler_api_key_bridge_envs") != ["CHUANGZHI_API_KEY", "NOVACODE_API_KEY"]:
+        blockers.append(f"bfcl_handler_api_key_bridge_envs_invalid:{data.get('bfcl_handler_api_key_bridge_envs')!r}")
+    if data.get("bfcl_handler_base_url_bridge") != "local_proxy_openai_compatible_v1":
+        blockers.append(f"bfcl_handler_base_url_bridge_invalid:{data.get('bfcl_handler_base_url_bridge')!r}")
+    if data.get("bfcl_handler_shell_env_mutation_allowed") is not False:
+        blockers.append(f"bfcl_handler_shell_env_mutation_allowed_not_false:{data.get('bfcl_handler_shell_env_mutation_allowed')!r}")
     expected_paths = {
         "generate_only_runner_path": "scripts/run_bfcl_exact_2id_generate_smoke.py",
         "approved_for_runner_path": "scripts/run_bfcl_exact_2id_generate_smoke.py",

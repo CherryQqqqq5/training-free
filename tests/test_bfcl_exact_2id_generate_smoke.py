@@ -9,6 +9,8 @@ from scripts.check_bfcl_exact_2id_smoke_approval_packet import check as check_pa
 from scripts.run_bfcl_exact_2id_generate_smoke import (
     SIGNED_IDS,
     _assert_generate_only_command,
+    _bfcl_generate_env_summary,
+    _bfcl_generate_subprocess_env,
     _generate_command,
     _manifest_payload,
     _manifest_payload_blockers,
@@ -115,6 +117,43 @@ def test_dry_run_plan_reads_no_endpoint_or_key_and_calls_no_provider() -> None:
     assert plan["endpoint_value_read"] is False
     assert plan["api_key_value_read"] is False
     assert plan["run_ids"] == list(SIGNED_IDS)
+
+
+def test_subprocess_env_bridges_openai_api_key_from_approved_env_when_missing() -> None:
+    source = {"CHUANGZHI_API_KEY": "approved_key_value"}
+    bridged = _bfcl_generate_subprocess_env(8131, source)
+    assert bridged["OPENAI_API_KEY"] == "approved_key_value"
+    assert bridged["OPENAI_BASE_URL"] == "http://127.0.0.1:8131/v1"
+    assert "OPENAI_API_KEY" not in source
+
+
+def test_subprocess_env_preserves_existing_openai_api_key_and_base_url() -> None:
+    source = {
+        "OPENAI_API_KEY": "existing_openai_key",
+        "OPENAI_BASE_URL": "http://127.0.0.1:9999/v1",
+        "CHUANGZHI_API_KEY": "approved_key_value",
+    }
+    bridged = _bfcl_generate_subprocess_env(8131, source)
+    assert bridged["OPENAI_API_KEY"] == "existing_openai_key"
+    assert bridged["OPENAI_BASE_URL"] == "http://127.0.0.1:9999/v1"
+
+
+def test_subprocess_env_can_bridge_from_novacode_key() -> None:
+    bridged = _bfcl_generate_subprocess_env(8132, {"NOVACODE_API_KEY": "novacode_key_value"})
+    assert bridged["OPENAI_API_KEY"] == "novacode_key_value"
+    assert bridged["OPENAI_BASE_URL"] == "http://127.0.0.1:8132/v1"
+
+
+def test_env_summary_contains_presence_flags_not_values() -> None:
+    bridged = _bfcl_generate_subprocess_env(8131, {"CHUANGZHI_API_KEY": "approved_key_value"})
+    summary = _bfcl_generate_env_summary(bridged)
+    assert summary == {
+        "openai_api_key_present": True,
+        "openai_base_url_present": True,
+        "approved_key_env_present": True,
+        "approved_endpoint_env_present": False,
+    }
+    assert "approved_key_value" not in json.dumps(summary)
 
 
 def test_execute_mode_fails_closed_while_packet_pending(tmp_path: Path) -> None:

@@ -196,6 +196,36 @@ def _assert_generate_only_command(command: list[str]) -> None:
         raise RuntimeError("generate_command_missing")
 
 
+def _first_present(env: dict[str, str], names: tuple[str, ...]) -> str | None:
+    for name in names:
+        value = env.get(name)
+        if value:
+            return value
+    return None
+
+
+def _bfcl_generate_subprocess_env(port: int, source_env: dict[str, str] | None = None) -> dict[str, str]:
+    env = dict(source_env or os.environ)
+    if not env.get("OPENAI_API_KEY"):
+        bridged_key = _first_present(env, ("CHUANGZHI_API_KEY", "NOVACODE_API_KEY"))
+        if bridged_key:
+            env["OPENAI_API_KEY"] = bridged_key
+    if not env.get("OPENAI_BASE_URL"):
+        env["OPENAI_BASE_URL"] = f"http://127.0.0.1:{port}/v1"
+    return env
+
+
+def _bfcl_generate_env_summary(env: dict[str, str]) -> dict[str, bool]:
+    return {
+        "openai_api_key_present": bool(env.get("OPENAI_API_KEY")),
+        "openai_base_url_present": bool(env.get("OPENAI_BASE_URL")),
+        "approved_key_env_present": bool(env.get("CHUANGZHI_API_KEY") or env.get("NOVACODE_API_KEY")),
+        "approved_endpoint_env_present": bool(
+            env.get("CHUANGZHI_NOVACODE_ENDPOINT") or env.get("NOVACODE_ENDPOINT") or env.get("NOVACODE_BASE_URL")
+        ),
+    }
+
+
 def _wait_proxy(port: int, log_path: Path) -> None:
     for _ in range(60):
         try:
@@ -362,7 +392,11 @@ def execute_generate_smoke(
             proxy_proc = (start_proxy or _start_proxy)(port, trace_dir, runtime_config, rules_dir, run_root / "proxy.log")
             command = _generate_command(run_root, port, runtime_config, rules_dir)
             _assert_generate_only_command(command)
-            completed = (run_generate or (lambda cmd: subprocess.run(cmd, cwd=REPO_ROOT, check=False)))(command)
+            generate_env = _bfcl_generate_subprocess_env(port)
+            completed = (
+                run_generate
+                or (lambda cmd, env=generate_env: subprocess.run(cmd, cwd=REPO_ROOT, env=env, check=False))
+            )(command)
         generated = completed.returncode == 0
         records = [_classify_result_for_run_id(run_id, run_root / "bfcl/result") for run_id in SIGNED_IDS]
         artifact = _write_compact_artifact(output, generated=generated, records=records)
