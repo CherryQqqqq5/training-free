@@ -15,6 +15,10 @@ CONFIGS = [
 ARTIFACTS = [
     Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_measurement_route_consistency.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/rashe_provider_route_update_approval_packet.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/provider_green_preflight.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/provider_green_preflight.md"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/performance_ready.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/active_evidence_index.json"),
 ]
 
 
@@ -205,3 +209,73 @@ def test_rejects_missing_disabled_inert_scorer_feedback_status(tmp_path):
 
     joined = "\n".join(blockers(root))
     assert "runtime_bfcl_structured_yaml_scorer_feedback_status_not_disabled_inert:None" in joined
+
+
+def test_rejects_provider_green_preflight_json_endpoint_literal(tmp_path):
+    root = copy_min_repo(tmp_path)
+    path = root / "outputs/artifacts/stage1_bfcl_acceptance/provider_green_preflight.json"
+    data = load_json(path)
+    data["endpoint_url"] = "https" + "://example.invalid/v1"
+    write_json(path, data)
+
+    joined = "\n".join(blockers(root))
+    assert "stage1_artifact_endpoint_literal_forbidden:" in joined
+    assert "provider_green_preflight.json" in joined
+
+
+def test_rejects_provider_green_preflight_md_endpoint_literal(tmp_path):
+    root = copy_min_repo(tmp_path)
+    path = root / "outputs/artifacts/stage1_bfcl_acceptance/provider_green_preflight.md"
+    path.write_text(path.read_text() + "\nendpoint=" + "https" + "://example.invalid/v1\n")
+
+    joined = "\n".join(blockers(root))
+    assert "stage1_artifact_endpoint_literal_forbidden:" in joined
+    assert "provider_green_preflight.md" in joined
+
+
+def test_rejects_performance_ready_endpoint_literal(tmp_path):
+    root = copy_min_repo(tmp_path)
+    path = root / "outputs/artifacts/stage1_bfcl_acceptance/performance_ready.json"
+    data = load_json(path)
+    data["endpoint_url"] = "https" + "://example.invalid/v1"
+    write_json(path, data)
+
+    joined = "\n".join(blockers(root))
+    assert "stage1_artifact_endpoint_literal_forbidden:" in joined
+    assert "performance_ready.json" in joined
+
+
+def test_rejects_active_evidence_index_endpoint_literal(tmp_path):
+    root = copy_min_repo(tmp_path)
+    path = root / "outputs/artifacts/stage1_bfcl_acceptance/active_evidence_index.json"
+    data = load_json(path)
+    data.setdefault("active_provider", {})["endpoint_url"] = "https" + "://example.invalid/v1"
+    write_json(path, data)
+
+    joined = "\n".join(blockers(root))
+    assert "stage1_artifact_endpoint_literal_forbidden:" in joined
+    assert "active_evidence_index.json" in joined
+
+
+def test_stage1_artifact_env_only_placeholder_accepted():
+    for rel in [
+        "outputs/artifacts/stage1_bfcl_acceptance/provider_green_preflight.json",
+        "outputs/artifacts/stage1_bfcl_acceptance/performance_ready.json",
+        "outputs/artifacts/stage1_bfcl_acceptance/active_evidence_index.json",
+    ]:
+        text = Path(rel).read_text()
+        assert "<env-only-redacted>" in text
+        assert "CHUANGZHI_NOVACODE_ENDPOINT" in text
+    assert check(Path("."))["bfcl_measurement_route_consistency_passed"] is True
+
+
+def test_rejects_key_like_literal_in_stage1_artifact(tmp_path):
+    root = copy_min_repo(tmp_path)
+    path = root / "outputs/artifacts/stage1_bfcl_acceptance/provider_green_preflight.json"
+    data = load_json(path)
+    data["api_key"] = "sk-" + "B" * 24
+    write_json(path, data)
+
+    joined = "\n".join(blockers(root))
+    assert "stage1_artifact_key_literal_forbidden:" in joined
+    assert "provider_green_preflight.json" in joined

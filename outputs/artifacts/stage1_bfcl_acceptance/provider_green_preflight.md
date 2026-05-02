@@ -6,7 +6,7 @@
 - Expected API key env: `NOVACODE_API_KEY`
 - Provider profile: `novacode`
 - Provider route policy: `chuangzhi_novacode_only_openrouter_disabled`
-- Upstream base URL: `https://apicz.boyuerichdata.com/v1`
+- Upstream endpoint: `<env-only-redacted>` via `CHUANGZHI_NOVACODE_ENDPOINT`; endpoint_env_only=`true`; endpoint_value_redacted=`true`
 - Upstream model: `gpt-5.2`
 - Blockers: `[]`
 - Next action: `provider_green_run_source_collection_when_scope_approved`

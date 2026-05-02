@@ -20,6 +20,12 @@ CONFIG_PATHS = {
 }
 ROUTE_METADATA = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_measurement_route_consistency.json")
 ROUTE_PACKET = Path("outputs/artifacts/stage1_bfcl_acceptance/rashe_provider_route_update_approval_packet.json")
+STAGE1_MEASUREMENT_ARTIFACTS = [
+    Path("outputs/artifacts/stage1_bfcl_acceptance/provider_green_preflight.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/provider_green_preflight.md"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/performance_ready.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/active_evidence_index.json"),
+]
 SIGNED_MODEL = "gpt-4.1"
 SIGNED_PROFILE = "novacode"
 SIGNED_PROVIDER_PROFILE = "Chuangzhi/Novacode"
@@ -245,6 +251,18 @@ def _check_route_packet(path: Path, blockers: list[str]) -> None:
         blockers.append("route_packet_fallback_allowed_not_false")
 
 
+def _check_stage1_measurement_artifact(path: Path, blockers: list[str]) -> None:
+    text = path.read_text(encoding="utf-8")
+    lowered = text.lower()
+    if any(fragment in lowered for fragment in ENDPOINT_LITERAL_FRAGMENTS):
+        blockers.append(f"stage1_artifact_endpoint_literal_forbidden:{path}")
+    if KEY_LITERAL_PATTERN.search(text):
+        blockers.append(f"stage1_artifact_key_literal_forbidden:{path}")
+    if path.suffix == ".json":
+        data = json.loads(text)
+        blockers.extend(_check_no_endpoint_or_key_literals(f"stage1_artifact:{path.name}", data))
+
+
 def check(repo_root: Path = Path(".")) -> dict[str, Any]:
     blockers: list[str] = []
     _check_runtime("runtime_yaml", repo_root / CONFIG_PATHS["runtime"], blockers)
@@ -253,6 +271,8 @@ def check(repo_root: Path = Path(".")) -> dict[str, Any]:
     _check_env(repo_root / CONFIG_PATHS["bfcl_v4_phase1_env"], blockers)
     _check_route_metadata(repo_root / ROUTE_METADATA, blockers)
     _check_route_packet(repo_root / ROUTE_PACKET, blockers)
+    for artifact_path in STAGE1_MEASUREMENT_ARTIFACTS:
+        _check_stage1_measurement_artifact(repo_root / artifact_path, blockers)
     return {
         "report_scope": "bfcl_measurement_route_consistency_check",
         "route_model": SIGNED_MODEL,
@@ -260,7 +280,7 @@ def check(repo_root: Path = Path(".")) -> dict[str, Any]:
         "fallback_allowed": False,
         "gpt_4o_fallback_allowed": False,
         "openrouter_allowed": False,
-        "checked_paths": [str(path) for path in CONFIG_PATHS.values()] + [str(ROUTE_METADATA), str(ROUTE_PACKET)],
+        "checked_paths": [str(path) for path in CONFIG_PATHS.values()] + [str(ROUTE_METADATA), str(ROUTE_PACKET)] + [str(path) for path in STAGE1_MEASUREMENT_ARTIFACTS],
         "bfcl_measurement_route_consistency_passed": not blockers,
         "blockers": blockers,
     }
