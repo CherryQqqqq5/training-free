@@ -207,8 +207,11 @@ def _missing_instrumentation(record: dict[str, Any]) -> list[str]:
 
 
 def _derive_stage(record: dict[str, Any]) -> str:
+    provider_status = str(record.get("provider_status_class") or "")
     if record.get("protocol_exception_observed") is True:
-        return "protocol_exception"
+        return "protocol_exception" if provider_status == "protocol_exception" else "provider_protocol_error"
+    if provider_status != "2xx":
+        return "provider_protocol_error"
     provider_empty = record.get("provider_response_empty_bool") is True
     provider_tool = record.get("provider_response_has_tool_calls") is True
     provider_text = record.get("provider_response_has_nonempty_text") is True
@@ -366,15 +369,17 @@ def _provider_observation_from_trace(trace: dict[str, Any]) -> dict[str, Any]:
     has_message = bool(message)
     has_tool_calls = isinstance(message.get("tool_calls"), list) and bool(message.get("tool_calls"))
     has_text = _content_text_present(message.get("content"))
+    status_class = _status_class(trace.get("status_code"))
     protocol_exception = str(trace.get("status_code")) == "protocol_exception"
+    provider_protocol_error = protocol_exception or status_class != "2xx"
     return {
-        "provider_status_class": "protocol_exception" if protocol_exception else _status_class(trace.get("status_code")),
-        "provider_response_empty_bool": not protocol_exception and not has_tool_calls and not has_text,
+        "provider_status_class": "protocol_exception" if protocol_exception else status_class,
+        "provider_response_empty_bool": not provider_protocol_error and has_choices and has_message and not has_tool_calls and not has_text,
         "provider_response_has_choices": has_choices,
         "provider_response_has_message": has_message,
         "provider_response_has_tool_calls": has_tool_calls,
         "provider_response_has_nonempty_text": has_text,
-        "protocol_exception_observed": protocol_exception,
+        "protocol_exception_observed": provider_protocol_error,
     }
 
 

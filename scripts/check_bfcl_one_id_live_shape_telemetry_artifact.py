@@ -60,6 +60,7 @@ FORBIDDEN_VALUE_RE = re.compile(("s" + "k-" + r"[A-Za-z0-9_-]{16,}|https?://|" +
 RAW_KEY_RE = re.compile(r"(^|_)(raw|prompt|case_content|provider_payload|provider_request_body|response_body|headers|logs|traces|model_output_text|tool_arguments|gold|reference|expected|scorer_diff|candidate_output|endpoint_value|api_key_value)(_|$)", re.IGNORECASE)
 ALLOWED_STATUSES = {
     "provider_true_empty",
+    "provider_protocol_error",
     "provider_text_no_tool",
     "proxy_engine_tool_loss",
     "engine_text_coercion",
@@ -142,16 +143,28 @@ def _validate_record(record: dict[str, Any]) -> list[str]:
     exception_to_empty = _bool(record, "protocol_exception_converted_to_empty_model_response")
     false_empty = _bool(record, "classifier_false_empty_for_nonempty_result")
 
+    provider_status_class = str(record.get("provider_status_class") or "")
+    provider_shape_valid = _bool(record, "provider_response_has_choices") and _bool(record, "provider_response_has_message")
+
     if protocol_exception:
         if exception_to_empty:
             blockers.append("protocol_exception_converted_to_empty_forbidden")
-        if status != "protocol_exception":
-            blockers.append("protocol_exception_stage_mismatch")
+        expected = "protocol_exception" if provider_status_class == "protocol_exception" else "provider_protocol_error"
+        if status != expected:
+            blockers.append("protocol_exception_stage_mismatch" if expected == "protocol_exception" else "provider_protocol_error_stage_mismatch")
         return blockers
     if exception_to_empty:
         blockers.append("exception_to_empty_without_protocol_exception")
+    if provider_status_class != "2xx":
+        if status != "provider_protocol_error":
+            blockers.append("provider_protocol_error_stage_mismatch")
+        if provider_empty and status == "provider_true_empty":
+            blockers.append("provider_true_empty_requires_2xx_valid_shape")
+        return blockers
 
     if provider_empty:
+        if provider_status_class != "2xx" or not provider_shape_valid:
+            blockers.append("provider_true_empty_requires_2xx_valid_shape")
         if provider_tool or provider_text:
             blockers.append("provider_empty_with_tool_or_text")
         if status != "provider_true_empty":

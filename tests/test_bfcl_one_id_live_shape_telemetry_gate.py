@@ -84,8 +84,8 @@ def _record(stage: str) -> dict[str, object]:
     if stage == "provider_true_empty":
         record.update(
             provider_response_empty_bool=True,
-            provider_response_has_choices=False,
-            provider_response_has_message=False,
+            provider_response_has_choices=True,
+            provider_response_has_message=True,
             provider_response_has_tool_calls=False,
             engine_apply_response_called=False,
             engine_final_has_tool_calls=False,
@@ -96,6 +96,24 @@ def _record(stage: str) -> dict[str, object]:
             result_file_written=False,
             result_file_contains_nonempty_shape=False,
             compact_classifier_status="empty_model_response",
+        )
+    elif stage == "provider_protocol_error":
+        record.update(
+            provider_status_class="5xx",
+            provider_response_empty_bool=False,
+            provider_response_has_choices=False,
+            provider_response_has_message=False,
+            provider_response_has_tool_calls=False,
+            protocol_exception_observed=True,
+            engine_apply_response_called=False,
+            engine_final_has_tool_calls=False,
+            proxy_responses_output_has_function_call=False,
+            bfcl_parse_called=False,
+            bfcl_decode_execute_called=False,
+            bfcl_decode_execute_nonempty=False,
+            result_file_written=False,
+            result_file_contains_nonempty_shape=False,
+            compact_classifier_status="provider_protocol_error",
         )
     elif stage == "provider_text_no_tool":
         record.update(
@@ -307,6 +325,7 @@ def test_fake_approved_packet_and_capture_produce_valid_compact_artifact(tmp_pat
 def test_artifact_checker_accepts_valid_compact_variants() -> None:
     for stage in (
         "provider_true_empty",
+        "provider_protocol_error",
         "provider_text_no_tool",
         "proxy_engine_tool_loss",
         "engine_text_coercion",
@@ -318,6 +337,53 @@ def test_artifact_checker_accepts_valid_compact_variants() -> None:
     ):
         blockers = validate_artifact(_artifact(stage))
         assert blockers == [], (stage, blockers)
+
+
+def test_http_4xx_5xx_trace_not_provider_true_empty() -> None:
+    from scripts.bfcl_one_id_live_shape_telemetry_capture import (
+        _derive_stage,
+        _normalize_observed_record,
+        _provider_observation_from_trace,
+    )
+
+    for status_code in (404, 500):
+        record = _record("provider_true_empty")
+        record.update(_provider_observation_from_trace({"status_code": status_code, "raw_response": {}}))
+        normalized = _normalize_observed_record(record)
+        assert normalized["provider_response_empty_bool"] is False
+        assert normalized["protocol_exception_observed"] is True
+        assert normalized["suspected_live_failure_stage"] == "provider_protocol_error"
+        assert _derive_stage(normalized) == "provider_protocol_error"
+
+
+def test_artifact_checker_rejects_non_2xx_provider_true_empty() -> None:
+    data = _artifact("provider_true_empty")
+    data["records"][0]["provider_status_class"] = "5xx"
+    blockers = validate_artifact(data)
+    assert any("provider_protocol_error_stage_mismatch" in blocker for blocker in blockers)
+
+
+def test_valid_2xx_empty_response_can_be_provider_true_empty() -> None:
+    data = _artifact("provider_true_empty")
+    record = data["records"][0]
+    assert record["provider_status_class"] == "2xx"
+    assert record["provider_response_has_choices"] is True
+    assert record["provider_response_has_message"] is True
+    assert validate_artifact(data) == []
+
+
+def test_protocol_exception_remains_protocol_exception_not_empty() -> None:
+    from scripts.bfcl_one_id_live_shape_telemetry_capture import _normalize_observed_record, _provider_observation_from_trace
+
+    record = _record("protocol_exception")
+    record.update(_provider_observation_from_trace({"status_code": "protocol_exception", "raw_response": {}}))
+    normalized = _normalize_observed_record(record)
+    assert normalized["provider_response_empty_bool"] is False
+    assert normalized["protocol_exception_observed"] is True
+    assert normalized["suspected_live_failure_stage"] == "protocol_exception"
+    data = _artifact("protocol_exception")
+    data["records"][0].update(normalized)
+    assert validate_artifact(data) == []
 
 
 def test_artifact_checker_rejects_missing_protocol_exception_flags() -> None:
