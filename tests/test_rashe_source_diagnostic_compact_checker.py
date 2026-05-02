@@ -96,13 +96,14 @@ def test_source_diagnostic_compact_checker_rejects_bad_counts_and_bucket_taxonom
     assert "source_diagnostic_failure_bucket_keys_invalid:agentic_web_search" in blockers
 
 
-def test_source_diagnostic_compact_checker_cli_missing_default_root_is_precise():
-    result = subprocess.run([sys.executable, "scripts/check_rashe_source_diagnostic_compact.py", "--compact"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=False)
+def test_source_diagnostic_compact_checker_cli_default_root_matches_current_artifacts():
+    result = subprocess.run([sys.executable, "scripts/check_rashe_source_diagnostic_compact.py", "--compact", "--strict"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=False)
 
-    assert result.returncode == 0
+    assert result.returncode == 0, result.stdout + result.stderr
     summary = json.loads(result.stdout)
-    assert summary["rashe_source_diagnostic_compact_passed"] is False
-    assert any(blocker.startswith("source_diagnostic_root_missing:") for blocker in summary["blockers"])
+    assert summary["rashe_source_diagnostic_compact_passed"] is True
+    assert summary["total_case_count"] == 160
+    assert summary["blockers"] == []
 
 
 def test_source_diagnostic_compact_checker_cli_strict_passes_fixture(tmp_path):

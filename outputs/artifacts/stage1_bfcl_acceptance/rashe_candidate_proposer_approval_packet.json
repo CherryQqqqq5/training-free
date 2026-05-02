@@ -1,0 +1,91 @@
+{
+  "allowed_inputs": [
+    "compact_source_diagnostics",
+    "failure_bucket_counts",
+    "frozen_skill_bucket_mapping",
+    "category_coverage_counts",
+    "no_leakage_booleans",
+    "route_metadata_gpt_4_1"
+  ],
+  "allowed_seed_skills": [
+    "bfcl_multi_turn_state_tracking",
+    "bfcl_hallucination_abstain"
+  ],
+  "approval_packet_kind": "candidate_proposer_execution_approval",
+  "approval_status": "pending",
+  "authorized": false,
+  "candidate_generation_authorized": false,
+  "candidate_jsonl_authorized": false,
+  "candidate_pool_ready": false,
+  "candidate_proposer_execution_authorized": false,
+  "disallowed_seed_skills": [
+    "bfcl_web_search_decomposition",
+    "bfcl_memory_retrieve_before_answer",
+    "bfcl_parser_feedback_retry"
+  ],
+  "evidence": {
+    "bfcl_hallucination_abstain": {
+      "category_coverage_count": 2,
+      "primary_bucket_total": 40,
+      "required_category_buckets": {
+        "hallucination": {
+          "unsupported_hallucinated_answer": 20
+        },
+        "irrelevance": {
+          "irrelevant_tool_call": 20
+        }
+      }
+    },
+    "bfcl_multi_turn_state_tracking": {
+      "category_coverage_count": 4,
+      "primary_bucket_total": 80,
+      "required_category_buckets": {
+        "multi_turn_base": {
+          "multi_turn_state_lost": 20
+        },
+        "multi_turn_long_context": {
+          "multi_turn_state_lost": 20
+        },
+        "multi_turn_miss_func": {
+          "multi_turn_state_lost": 20
+        },
+        "multi_turn_miss_param": {
+          "multi_turn_state_lost": 20
+        }
+      }
+    }
+  },
+  "forbidden_material": [
+    "raw prompt",
+    "raw trace",
+    "provider request/response",
+    "case id",
+    "gold",
+    "expected",
+    "reference",
+    "scorer diff",
+    "candidate output",
+    "repair feedback",
+    "holdout/full feedback",
+    "endpoint/key",
+    "source nonce mapping"
+  ],
+  "huawei_acceptance_ready": false,
+  "no_leakage_required": true,
+  "performance_evidence": false,
+  "route_model": "gpt-4.1",
+  "scorer_authorized": false,
+  "sota_3pp_claim_ready": false,
+  "source_diagnostics_commit": "cc21c96b70ab51c2bf586c0e79cdde3838dcb05d",
+  "source_diagnostics_root": "outputs/artifacts/stage1_bfcl_acceptance/rashe_source_diagnostics_compact",
+  "trigger_policy_verifier": {
+    "bfcl_hallucination_abstain": {
+      "policy": "trigger on hallucination/irrelevance abstention failures only",
+      "verifier": "requires unsupported_hallucinated_answer and irrelevant_tool_call compact buckets, no raw prompt or scorer material"
+    },
+    "bfcl_multi_turn_state_tracking": {
+      "policy": "trigger on multi-turn state tracking failures only",
+      "verifier": "requires multi_turn_state_lost compact buckets across signed multi-turn categories, no raw prompt or scorer material"
+    }
+  }
+}
