@@ -6,7 +6,9 @@ Status: `pending` / fail-closed. This packet records measurement design only. It
 
 Phase B compact 8x20 diagnostics remain hypothesis generation only. They must not be used as final performance evidence.
 
-- target_commit_for_measurement: `94f2546d52e0e2b06d8e24630f7714fc8bbe475c`
+- target_commit_for_measurement: `62e84abeb01aa5fbcdacebb27c27083c6c305a02`
+- prior_route_cleanup_commit: `94f2546d52e0e2b06d8e24630f7714fc8bbe475c`
+- reviewed_measurement_gate_head: `62e84abeb01aa5fbcdacebb27c27083c6c305a02`
 - proposer_artifact_commit: `e73900fc7553735e5dbf5121fc46d3ead44c5077`
 - route: `Chuangzhi/Novacode` / `gpt-4.1`
 

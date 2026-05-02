@@ -4,7 +4,9 @@ Status: `pending` / fail-closed. This packet prepares a future measurement-only 
 
 ## Signed Scope
 
-- target_commit_for_measurement: `94f2546d52e0e2b06d8e24630f7714fc8bbe475c`
+- target_commit_for_measurement: `62e84abeb01aa5fbcdacebb27c27083c6c305a02`
+- prior_route_cleanup_commit: `94f2546d52e0e2b06d8e24630f7714fc8bbe475c`
+- reviewed_measurement_gate_head: `62e84abeb01aa5fbcdacebb27c27083c6c305a02`
 - proposer_artifact_commit: `e73900fc7553735e5dbf5121fc46d3ead44c5077`
 - source_diagnostics_commit: `cc21c96b70ab51c2bf586c0e79cdde3838dcb05d`
 - route: `Chuangzhi/Novacode` / `novacode` / `gpt-4.1`
