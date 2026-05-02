@@ -10,6 +10,8 @@ from pathlib import Path
 from typing import Any
 
 DEFAULT_PACKET = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_one_id_live_shape_telemetry_gate_packet.json")
+DEFAULT_OUTPUT = "outputs/artifacts/stage1_bfcl_acceptance/bfcl_one_id_live_shape_telemetry_compact.json"
+AFTER_TOOL_CHOICE_PATCH_OUTPUT = "outputs/artifacts/stage1_bfcl_acceptance/bfcl_one_id_live_shape_telemetry_after_tool_choice_patch_compact.json"
 SIGNED_IDS = ["web_search_base_0"]
 SIGNED_LIVE_CAPTURE_FACTORY = "scripts.bfcl_one_id_live_shape_telemetry_capture:build_signed_one_id_live_shape_capture"
 ALLOWED_TELEMETRY_FIELDS = [
@@ -191,6 +193,24 @@ def validate_packet(data: dict[str, Any]) -> list[str]:
         blockers.append(f"protocol_exception_policy_invalid:{data.get('protocol_exception_policy')!r}")
     if data.get("classifier_false_empty_policy") != "reject_false_empty_for_nonempty_result":
         blockers.append(f"classifier_false_empty_policy_invalid:{data.get('classifier_false_empty_policy')!r}")
+    output_artifact = data.get("output_artifact")
+    if output_artifact not in {DEFAULT_OUTPUT, AFTER_TOOL_CHOICE_PATCH_OUTPUT}:
+        blockers.append(f"output_artifact_invalid:{output_artifact!r}")
+    if data.get("telemetry_rerun_label") == "after_tool_choice_patch":
+        if output_artifact != AFTER_TOOL_CHOICE_PATCH_OUTPUT:
+            blockers.append(f"after_patch_output_artifact_invalid:{output_artifact!r}")
+        if data.get("previous_artifact") != DEFAULT_OUTPUT:
+            blockers.append(f"after_patch_previous_artifact_invalid:{data.get('previous_artifact')!r}")
+        if data.get("previous_artifact_preserve_required") is not True:
+            blockers.append(f"after_patch_previous_artifact_preserve_required_not_true:{data.get('previous_artifact_preserve_required')!r}")
+        if data.get("output_artifact_must_not_preexist") is not True:
+            blockers.append(f"after_patch_output_artifact_must_not_preexist_not_true:{data.get('output_artifact_must_not_preexist')!r}")
+        if data.get("manager_execution_authorization_required") is not True:
+            blockers.append(f"after_patch_manager_execution_authorization_required_not_true:{data.get('manager_execution_authorization_required')!r}")
+        if data.get("patch_state_commit") != "2d7d8059919f2eb019907eaeb8a2289223b26519":
+            blockers.append(f"after_patch_patch_state_commit_invalid:{data.get('patch_state_commit')!r}")
+        if data.get("post_patch_request_tool_choice_shape") != "required_string":
+            blockers.append(f"after_patch_request_tool_choice_shape_invalid:{data.get('post_patch_request_tool_choice_shape')!r}")
     if data.get("allowed_telemetry_fields") != ALLOWED_TELEMETRY_FIELDS:
         blockers.append("allowed_telemetry_fields_drift")
     for field in data.get("allowed_telemetry_fields", []):

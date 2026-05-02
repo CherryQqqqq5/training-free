@@ -8,6 +8,10 @@ from scripts.check_bfcl_one_id_live_shape_telemetry_artifact import check as che
 from scripts.check_bfcl_one_id_live_shape_telemetry_gate import ALLOWED_TELEMETRY_FIELDS, check, validate_packet
 from scripts.run_bfcl_one_id_live_shape_telemetry import build_plan, execute_live_telemetry, main as runner_main
 
+AFTER_PATCH_PACKET_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_one_id_live_shape_telemetry_after_tool_choice_patch_packet.json")
+AFTER_PATCH_OUTPUT = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_one_id_live_shape_telemetry_after_tool_choice_patch_compact.json")
+PREVIOUS_OUTPUT = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_one_id_live_shape_telemetry_compact.json")
+
 
 def _packet() -> dict[str, object]:
     return json.loads(Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_one_id_live_shape_telemetry_gate_packet.json").read_text(encoding="utf-8"))
@@ -736,3 +740,57 @@ def test_missing_non_provider_stage_uses_stage_label() -> None:
         assert str(exc) == "live_shape_stage_not_instrumented:runtime_engine_apply_response"
     else:
         raise AssertionError("expected missing runtime stage to fail closed")
+
+
+def test_after_patch_packet_pending_scope_passes_and_requires_explicit_execution_authorization() -> None:
+    summary = check(AFTER_PATCH_PACKET_PATH)
+    assert summary["bfcl_one_id_live_shape_telemetry_gate_passed"] is True
+    assert summary["approval_status"] == "pending"
+    assert summary["signed_run_ids"] == ["web_search_base_0"]
+    assert summary["provider_request_authorized"] is False
+    assert summary["bfcl_generate_authorized"] is False
+    assert summary["live_shape_telemetry_authorized"] is False
+
+
+def test_after_patch_dry_run_plan_uses_new_output_and_no_execution() -> None:
+    plan = build_plan(packet_path=AFTER_PATCH_PACKET_PATH, output_artifact=AFTER_PATCH_OUTPUT)
+    assert plan["blockers"] == []
+    assert plan["output_artifact_planned"] == str(AFTER_PATCH_OUTPUT)
+    assert plan["provider_request_executed"] is False
+    assert plan["bfcl_generate_executed"] is False
+    assert plan["endpoint_value_read"] is False
+    assert plan["api_key_value_read"] is False
+
+
+def test_after_patch_packet_rejects_previous_output_mismatch() -> None:
+    plan = build_plan(packet_path=AFTER_PATCH_PACKET_PATH, output_artifact=PREVIOUS_OUTPUT)
+    assert any("output_artifact_mismatch_packet_scope" in blocker for blocker in plan["blockers"])
+
+
+def test_previous_artifact_remains_valid_and_after_patch_artifact_absent() -> None:
+    assert PREVIOUS_OUTPUT.exists()
+    assert check_artifact(PREVIOUS_OUTPUT)["bfcl_one_id_live_shape_telemetry_artifact_passed"] is True
+    assert not AFTER_PATCH_OUTPUT.exists()
+
+
+def test_after_patch_synthetic_artifact_path_accepted_by_checker(tmp_path: Path) -> None:
+    artifact_path = tmp_path / AFTER_PATCH_OUTPUT.name
+    artifact_path.write_text(json.dumps(_artifact("live_path_nonempty"), indent=2, sort_keys=True), encoding="utf-8")
+    assert check_artifact(artifact_path)["bfcl_one_id_live_shape_telemetry_artifact_passed"] is True
+
+
+def test_preexisting_output_rejected_before_capture(tmp_path: Path) -> None:
+    packet_path = _approved_packet_path(tmp_path)
+    out = tmp_path / AFTER_PATCH_OUTPUT.name
+    out.write_text("{}", encoding="utf-8")
+
+    def should_not_run(_: dict[str, object]) -> dict[str, object]:
+        raise AssertionError("capture should not run when output exists")
+
+    summary = execute_live_telemetry(packet_path=packet_path, output_artifact=out, live_capture=should_not_run)
+    assert summary["provider_request_executed"] is False
+    assert summary["bfcl_generate_executed"] is False
+    assert summary["endpoint_value_read"] is False
+    assert summary["api_key_value_read"] is False
+    assert summary["diagnostic_written"] is False
+    assert summary["blockers"] == ["output_artifact_exists_without_clean_output"]

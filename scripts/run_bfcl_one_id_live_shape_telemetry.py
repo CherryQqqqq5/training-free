@@ -24,11 +24,25 @@ from scripts.check_bfcl_one_id_live_shape_telemetry_gate import ALLOWED_TELEMETR
 
 DEFAULT_PACKET = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_one_id_live_shape_telemetry_gate_packet.json")
 DEFAULT_OUTPUT = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_one_id_live_shape_telemetry_compact.json")
+AFTER_TOOL_CHOICE_PATCH_OUTPUT = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_one_id_live_shape_telemetry_after_tool_choice_patch_compact.json")
 SIGNED_ROUTE_PROFILE = "novacode"
 SIGNED_ROUTE_MODEL = "gpt-4.1"
 SIGNED_LIVE_CAPTURE_FACTORY = "scripts.bfcl_one_id_live_shape_telemetry_capture:build_signed_one_id_live_shape_capture"
 LiveCapture = Callable[[dict[str, Any]], dict[str, Any]]
 LiveCaptureFactory = Callable[[dict[str, Any]], LiveCapture]
+
+
+def _packet_output_blockers(packet_path: Path, output_artifact: Path) -> list[str]:
+    try:
+        packet = json.loads(packet_path.read_text(encoding="utf-8"))
+    except Exception as exc:
+        return [f"packet_output_scope_load_failed:{type(exc).__name__}"]
+    scoped_output = packet.get("output_artifact")
+    output_scope_required = packet.get("output_artifact_must_not_preexist") is True
+    if output_scope_required and isinstance(scoped_output, str) and scoped_output:
+        if Path(scoped_output) != output_artifact:
+            return [f"output_artifact_mismatch_packet_scope:{output_artifact}"]
+    return []
 
 
 def build_plan(packet_path: Path = DEFAULT_PACKET, output_artifact: Path = DEFAULT_OUTPUT) -> dict[str, Any]:
@@ -59,7 +73,7 @@ def build_plan(packet_path: Path = DEFAULT_PACKET, output_artifact: Path = DEFAU
         "output_artifact_planned": str(output_artifact),
         "signed_live_capture_factory": SIGNED_LIVE_CAPTURE_FACTORY,
         "telemetry_fields": list(ALLOWED_TELEMETRY_FIELDS),
-        "blockers": [] if packet_summary.get("bfcl_one_id_live_shape_telemetry_gate_passed") else packet_summary.get("blockers", []),
+        "blockers": ([] if packet_summary.get("bfcl_one_id_live_shape_telemetry_gate_passed") else packet_summary.get("blockers", [])) + _packet_output_blockers(packet_path, output_artifact),
     }
 
 
@@ -164,6 +178,17 @@ def _load_signed_live_capture_factory(factory_ref: str) -> LiveCaptureFactory:
 
 def execute_live_telemetry(*, packet_path: Path = DEFAULT_PACKET, output_artifact: Path = DEFAULT_OUTPUT, clean_output: bool = False, live_capture: LiveCapture | None = None, live_capture_factory: LiveCaptureFactory | None = None, live_capture_factory_ref: str = SIGNED_LIVE_CAPTURE_FACTORY) -> dict[str, Any]:
     packet_summary = check_packet(packet_path)
+    output_blockers = _packet_output_blockers(packet_path, output_artifact)
+    if output_blockers:
+        return {
+            "report_scope": "bfcl_one_id_live_shape_telemetry_execute",
+            "provider_request_executed": False,
+            "bfcl_generate_executed": False,
+            "endpoint_value_read": False,
+            "api_key_value_read": False,
+            "diagnostic_written": False,
+            "blockers": output_blockers,
+        }
     if not packet_summary.get("bfcl_one_id_live_shape_telemetry_gate_passed"):
         return {
             "report_scope": "bfcl_one_id_live_shape_telemetry_execute",
