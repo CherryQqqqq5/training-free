@@ -16,6 +16,12 @@ REQUIRED_FALSE = (
     "provider_call_authorized",
     "bfcl_smoke_authorized",
     "scorer_authorized",
+    "bfcl_generate_authorized",
+    "bfcl_evaluate_authorized",
+    "evaluate_command_allowed",
+    "scorer_command_allowed",
+    "full_default_runner_allowed",
+    "baseline_shell_runner_allowed",
     "full_baseline_authorized",
     "default_bfcl_authorized",
     "eight_id_smoke_authorized",
@@ -44,6 +50,7 @@ REQUIRED_TRUE = (
     "compact_smoke_artifact_only",
     "endpoint_env_only",
     "api_key_env_only",
+    "generate_only",
 )
 FORBIDDEN_KEY_RE = re.compile(r"(raw_(?:prompt|case|provider|payload|log|trace|response)|case_id|gold|reference|expected|scorer_diff|candidate_output|endpoint_value|api_key_value)", re.IGNORECASE)
 FORBIDDEN_VALUE_RE = re.compile(r"(sk-[A-Za-z0-9_-]{16,}|https?://|raw prompt|raw case|provider payload|scorer diff|gold/reference/expected|candidate output)", re.IGNORECASE)
@@ -100,6 +107,14 @@ def validate_packet(data: dict[str, Any]) -> list[str]:
         blockers.append("route_drift")
     if data.get("provider_profile") != "Chuangzhi/Novacode":
         blockers.append(f"provider_profile_invalid:{data.get('provider_profile')!r}")
+    expected_paths = {
+        "generate_only_runner_path": "scripts/run_bfcl_exact_2id_generate_smoke.py",
+        "compact_artifact_checker_path": "scripts/check_bfcl_exact_2id_generate_smoke_artifact.py",
+        "compact_output_artifact": "outputs/artifacts/stage1_bfcl_acceptance/bfcl_exact_2id_generate_smoke_compact.json",
+    }
+    for key, expected in expected_paths.items():
+        if data.get(key) != expected:
+            blockers.append(f"{key}_invalid:{data.get(key)!r}")
     stop_gates = data.get("stop_gates") if isinstance(data.get("stop_gates"), list) else []
     for required in ("empty_model_response", "protocol_or_schema_failure", "raw_leakage", "route_drift", "candidate_activation", "extra_run_id"):
         if required not in stop_gates:
