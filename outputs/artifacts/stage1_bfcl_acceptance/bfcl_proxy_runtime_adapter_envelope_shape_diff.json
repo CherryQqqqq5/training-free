@@ -1,0 +1,196 @@
+{
+  "active_profile": "novacode",
+  "adapter_risk_labels": [
+    "tool_choice_form_differs_function_object_vs_required_string",
+    "proxy_adapter_additional_properties_flag_unknown_or_not_enforced",
+    "proxy_adapter_token_field_unknown_until_capture"
+  ],
+  "api_key_value_committed": false,
+  "approval_status": "prepared",
+  "artifact_kind": "bfcl_proxy_runtime_adapter_envelope_shape_diff",
+  "bfcl_full_eval_executed": false,
+  "bfcl_proxy_runtime_adapter_shape_diff_passed": true,
+  "bfcl_proxy_runtime_planned_shape": {
+    "content_length_buckets": [
+      "bucketed_only_runtime_variable"
+    ],
+    "empty_response_handling_path_labels": [
+      "decode_execute_empty_string_returns_empty_call_list",
+      "bfcl_runner_stops_on_empty_model_response"
+    ],
+    "message_count": "bfcl_runtime_variable",
+    "parser_expected_response_keys": [
+      "choices",
+      "message",
+      "tool_calls",
+      "function.name"
+    ],
+    "request_top_level_keys": [
+      "messages_or_input",
+      "model",
+      "tool_choice",
+      "tools"
+    ],
+    "role_sequence": [
+      "bfcl_runtime_variable"
+    ],
+    "route_model": "gpt-4.1",
+    "temperature_presence": "unknown_until_adapter_capture",
+    "timeout_streaming_flags": {
+      "streaming_enabled": false,
+      "timeout_seconds_present": "proxy_runtime_configured"
+    },
+    "token_field_presence": {
+      "max_completion_tokens": "unknown_until_adapter_capture",
+      "max_tokens": "unknown_until_adapter_capture"
+    },
+    "tool_choice_mode": "required_string",
+    "tool_schema_structural_flags": {
+      "additional_properties_false": "not_enforced_by_current_bfcl_adapter_shape",
+      "enum_present": "unknown_until_adapter_capture",
+      "function_name_present": true,
+      "function_tool": true,
+      "parameters_type_object": true,
+      "properties_present": true,
+      "required_present": true,
+      "strict_present": false
+    },
+    "tool_schema_structural_hash": "fa2c5af2e1c6ded9",
+    "tools_count": "bfcl_runtime_variable_positive"
+  },
+  "bfcl_smoke_executed": false,
+  "blockers": [],
+  "candidate_jsonl_authorized": false,
+  "candidate_pool_ready": false,
+  "candidate_runtime_activation_authorized": false,
+  "diagnostic_written": false,
+  "endpoint_value_committed": false,
+  "fallback_allowed": false,
+  "gpt_4o_fallback_allowed": false,
+  "huawei_acceptance_ready": false,
+  "openrouter_allowed": false,
+  "parser_alignment": {
+    "bfcl_decode_execute_response_keys": [
+      "choices",
+      "message",
+      "tool_calls",
+      "function.name"
+    ],
+    "empty_response_handling_path_labels": [
+      "decode_execute_empty_string_returns_empty_call_list",
+      "bfcl_runner_stops_on_empty_model_response"
+    ],
+    "synthetic_expected_response_keys": [
+      "choices",
+      "message",
+      "tool_calls",
+      "function.name"
+    ]
+  },
+  "performance_evidence": false,
+  "provider_profile": "Chuangzhi/Novacode",
+  "provider_request_executed": false,
+  "raw_body_persisted": false,
+  "raw_case_content_persisted": false,
+  "raw_header_persisted": false,
+  "raw_log_persisted": false,
+  "raw_prompt_persisted": false,
+  "raw_request_persisted": false,
+  "raw_response_persisted": false,
+  "raw_trace_persisted": false,
+  "reviewed_run_id_references": {
+    "irrelevance": [
+      "irrelevance_0"
+    ],
+    "live_irrelevance": [
+      "live_irrelevance_0-0-0"
+    ],
+    "memory_kv": [
+      "memory_kv_0-customer-0"
+    ],
+    "multi_turn_base": [
+      "multi_turn_base_0"
+    ],
+    "multi_turn_long_context": [
+      "multi_turn_long_context_0"
+    ],
+    "multi_turn_miss_func": [
+      "multi_turn_miss_func_0"
+    ],
+    "multi_turn_miss_param": [
+      "multi_turn_miss_param_0"
+    ],
+    "web_search_base": [
+      "web_search_base_0"
+    ]
+  },
+  "route_model": "gpt-4.1",
+  "scorer_executed": false,
+  "scorer_feedback_tuning_enabled": false,
+  "shape_diff_high_level_conclusion": "synthetic_provider_contract_passed_but_bfcl_proxy_runtime_adapter_envelope_requires_review_before_retry",
+  "shape_fields_only": true,
+  "sota_3pp_claim_ready": false,
+  "source_input_read": false,
+  "stopped_smoke_facts": {
+    "committed_results": false,
+    "committed_smoke_artifacts": false,
+    "exact_8_ids_materialized": true,
+    "performance_claim": false,
+    "progress_observed": "6/8",
+    "run_id_count": 8,
+    "stopped_on": "repeated_empty_model_response"
+  },
+  "successful_synthetic_provider_contract_shape": {
+    "content_length_buckets": [
+      "short",
+      "short"
+    ],
+    "empty_response_handling_path_labels": [
+      "empty_model_response_stop_gate",
+      "missing_tool_call_stop_gate",
+      "openai_response_shape_stop_gate"
+    ],
+    "message_count": 2,
+    "parser_expected_response_keys": [
+      "choices",
+      "message",
+      "tool_calls",
+      "function.name"
+    ],
+    "request_top_level_keys": [
+      "max_tokens",
+      "messages",
+      "model",
+      "temperature",
+      "tool_choice",
+      "tools"
+    ],
+    "role_sequence": [
+      "system",
+      "user"
+    ],
+    "route_model": "gpt-4.1",
+    "temperature_presence": true,
+    "timeout_streaming_flags": {
+      "streaming_enabled": false,
+      "timeout_seconds_present": true
+    },
+    "token_field_presence": {
+      "max_completion_tokens": false,
+      "max_tokens": true
+    },
+    "tool_choice_mode": "function_object",
+    "tool_schema_structural_flags": {
+      "additional_properties_false": true,
+      "enum_present": false,
+      "function_name_present": true,
+      "function_tool": true,
+      "parameters_type_object": true,
+      "properties_present": true,
+      "required_present": true,
+      "strict_present": false
+    },
+    "tool_schema_structural_hash": "fb669a736e25b74f",
+    "tools_count": 1
+  }
+}
