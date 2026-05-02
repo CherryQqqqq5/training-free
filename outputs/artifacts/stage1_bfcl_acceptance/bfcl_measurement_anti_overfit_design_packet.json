@@ -1,0 +1,72 @@
+{
+  "ablation_plan": [
+    {
+      "condition": "frozen_current_system_no_candidate_activation",
+      "id": "A"
+    },
+    {
+      "condition": "multi_turn_state_tracking_only",
+      "id": "B"
+    },
+    {
+      "condition": "hallucination_abstain_only",
+      "id": "C"
+    },
+    {
+      "condition": "both_combined",
+      "id": "D"
+    }
+  ],
+  "approval_packet_kind": "bfcl_measurement_anti_overfit_design",
+  "approval_status": "pending",
+  "authorized": false,
+  "candidate_generation_authorized": false,
+  "candidate_jsonl_authorized": false,
+  "candidate_pool_ready": false,
+  "candidate_runtime_activation_authorized": false,
+  "forbidden_material": [
+    "raw prompt",
+    "raw trace",
+    "provider request/response",
+    "case id",
+    "gold",
+    "expected",
+    "reference",
+    "scorer diff",
+    "candidate output",
+    "repair feedback",
+    "holdout/full feedback",
+    "endpoint/key",
+    "source nonce mapping"
+  ],
+  "huawei_acceptance_ready": false,
+  "negative_controls_for_future_integration": [
+    "simple",
+    "multiple",
+    "parallel",
+    "parallel_multiple",
+    "multi_turn_correction_override_cases",
+    "abstention_false_positive_cases"
+  ],
+  "overfit_blockers": [
+    "reject_if_improvement_appears_only_in_source_diagnostic_categories",
+    "reject_if_abstention_false_positives_increase",
+    "reject_if_simple_multiple_parallel_regress_beyond_threshold",
+    "reject_if_holdout_delta_materially_lower_than_dev_delta",
+    "reject_if_scorer_feedback_used_before_freezing_holdout"
+  ],
+  "performance_evidence": false,
+  "phase_b_compact_8x20_role": "hypothesis_generation_only_not_final_performance_evidence",
+  "proposer_artifact_commit": "e73900fc7553735e5dbf5121fc46d3ead44c5077",
+  "provider_call_authorized": false,
+  "provider_profile": "Chuangzhi/Novacode",
+  "route_model": "gpt-4.1",
+  "scorer_authorized": false,
+  "sota_3pp_claim_ready": false,
+  "split_discipline": {
+    "dev_tuning_split": "may_be_used_only_after_explicit_integration_authorization",
+    "holdout_full_split": "measurement_only_no_feedback_to_proposer_or_runtime",
+    "per_case_scorer_diff_feedback": "forbidden_until_new_tuning_gate_approved"
+  },
+  "target_commit_for_measurement": "94f2546d52e0e2b06d8e24630f7714fc8bbe475c"
+}
