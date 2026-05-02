@@ -2,6 +2,12 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+GRC_PYTHON="${GRC_PYTHON:-${REPO_ROOT}/.venv/bin/python}"
+if [[ ! -x "${GRC_PYTHON}" ]]; then
+  echo "error: GRC_PYTHON is not executable: ${GRC_PYTHON}" >&2
+  echo "       set GRC_PYTHON to the repo virtualenv interpreter before running BFCL" >&2
+  exit 2
+fi
 source "${REPO_ROOT}/configs/bfcl_v4_phase1.env"
 if [[ -f "${REPO_ROOT}/configs/bfcl_v4_openrouter.env" ]]; then
   source "${REPO_ROOT}/configs/bfcl_v4_openrouter.env"
@@ -56,8 +62,8 @@ bfcl_fix_result_layout() {
   echo "fixed bfcl result layout: ${nested_result_dir} -> ${canonical_result_dir}" >&2
 }
 
-BFCL_CLI=(python "${REPO_ROOT}/scripts/run_bfcl_cli.py")
-GRC_CLI=(python -m grc.cli)
+BFCL_CLI=("${GRC_PYTHON}" "${REPO_ROOT}/scripts/run_bfcl_cli.py")
+GRC_CLI=("${GRC_PYTHON}" -m grc.cli)
 
 validate_model_split() {
   if [[ -z "${BFCL_MODEL}" ]]; then
@@ -79,7 +85,7 @@ ensure_upstream_auth() {
       fi
       if [[ -z "${OPENROUTER_API_KEY:-}" ]]; then
         if [[ "${BFCL_PREFLIGHT_DEFAULT}" == "1" ]]; then
-          python - "${ARTIFACT_DIR}/preflight_report.json" <<'PY'
+          "${GRC_PYTHON}" - "${ARTIFACT_DIR}/preflight_report.json" <<'PY'
 import json
 import sys
 from pathlib import Path
@@ -162,7 +168,7 @@ export LOCAL_SERVER_PORT="${PORT}"
 export OPENAI_BASE_URL="http://127.0.0.1:${PORT}/v1"
 export OPENAI_API_KEY="${OPENAI_API_KEY:-dummy}"
 
-python "${REPO_ROOT}/scripts/sync_bfcl_fixture_env.py" \
+"${GRC_PYTHON}" "${REPO_ROOT}/scripts/sync_bfcl_fixture_env.py" \
   --bfcl-root "${BFCL_ROOT}" \
   --openai-base-url "${OPENAI_BASE_URL}" \
   --local-server-endpoint "${LOCAL_SERVER_ENDPOINT}" \
@@ -197,7 +203,7 @@ if [[ "${GRC_START_PROXY:-1}" == "1" ]]; then
 fi
 
 if [[ "${BFCL_PREFLIGHT_DEFAULT}" == "1" ]]; then
-  python "${REPO_ROOT}/scripts/run_bfcl_preflight.py" \
+  "${GRC_PYTHON}" "${REPO_ROOT}/scripts/run_bfcl_preflight.py" \
     --base-url "http://127.0.0.1:${PORT}" \
     --trace-dir "${TRACE_DIR}" \
     --config-path "${CONFIG_PATH}" \
@@ -233,7 +239,7 @@ fi
 bfcl_fix_result_layout "${BFCL_ROOT}"
 "${BFCL_CLI[@]}" "${EVAL_ARGS[@]}"
 
-python "${REPO_ROOT}/scripts/aggregate_bfcl_metrics.py" \
+"${GRC_PYTHON}" "${REPO_ROOT}/scripts/aggregate_bfcl_metrics.py" \
   --bfcl-root "${BFCL_ROOT}" \
   --trace-dir "${TRACE_DIR}" \
   --out "${ARTIFACT_DIR}/metrics.json" \
@@ -244,7 +250,7 @@ python "${REPO_ROOT}/scripts/aggregate_bfcl_metrics.py" \
   --model "${BFCL_MODEL}" \
   --test-category "${TEST_CATEGORY}"
 
-python "${REPO_ROOT}/scripts/write_run_manifest.py" \
+"${GRC_PYTHON}" "${REPO_ROOT}/scripts/write_run_manifest.py" \
   --out "${ARTIFACT_DIR}/run_manifest.json" \
   --kind baseline \
   --repo-root "${REPO_ROOT}" \
