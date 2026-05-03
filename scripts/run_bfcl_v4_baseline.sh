@@ -307,6 +307,12 @@ if [[ "${BFCL_PREFLIGHT_DEFAULT}" == "1" ]]; then
   grc_stage_event preflight completed
 fi
 
+if [[ "${GRC_BFCL_STOP_AFTER_PREFLIGHT:-0}" == "1" ]]; then
+  grc_stage_event stop_after_preflight started
+  grc_stage_event stop_after_preflight completed
+  exit 0
+fi
+
 GENERATE_ARGS=(
   generate
   --model "${BFCL_MODEL}"

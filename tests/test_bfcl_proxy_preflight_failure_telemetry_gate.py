@@ -2,8 +2,13 @@ from __future__ import annotations
 
 import copy
 import json
+import subprocess
 from pathlib import Path
 
+from scripts.check_bfcl_proxy_preflight_failure_telemetry_artifact import (
+    check as check_artifact,
+    validate as validate_artifact,
+)
 from scripts.check_bfcl_proxy_preflight_failure_telemetry_gate import (
     DEFAULT_PACKET,
     REQUIRED_COMPACT_FIELDS,
@@ -66,6 +71,57 @@ def _approved_packet(tmp_path: Path) -> Path:
     path = tmp_path / "approved_proxy_preflight_telemetry_packet.json"
     path.write_text(json.dumps(data, indent=2, sort_keys=True), encoding="utf-8")
     return path
+
+
+def _write_stage(env: dict, events: list[tuple[str, str]]) -> None:
+    stage_path = Path(env["GRC_BASELINE_STAGE_TELEMETRY_PATH"])
+    stage_path.parent.mkdir(parents=True, exist_ok=True)
+    stage_path.write_text("".join(json.dumps({"stage": stage, "event": event}) + "\n" for stage, event in events), encoding="utf-8")
+
+
+def _write_success_report(command: list[str]) -> None:
+    artifact_dir = Path(command[-1])
+    artifact_dir.mkdir(parents=True, exist_ok=True)
+    report = {
+        "environment_check": {"is_set": True},
+        "passed": True,
+        "checks": [
+            {"name": "chat_tool_call", "passed": True, "status_code": 200, "request_path_label": "local_proxy_chat_path"},
+            {"name": "responses_function_call", "passed": True, "status_code": 200, "request_path_label": "local_proxy_responses_path"},
+            {"name": "chat_text_response", "passed": True, "status_code": 200, "request_path_label": "local_proxy_chat_path"},
+            {"name": "trace_emission", "passed": True, "status_code": 200, "request_path_label": "local_proxy_responses_path"},
+        ],
+    }
+    (artifact_dir / "preflight_report.json").write_text(json.dumps(report, sort_keys=True), encoding="utf-8")
+
+
+def _mock_success(command, *, cwd, env, stdout, stderr, check):
+    assert env["GRC_BFCL_STOP_AFTER_PREFLIGHT"] == "1"
+    assert env["GRC_UPSTREAM_PROFILE"] == "novacode"
+    assert env["GRC_UPSTREAM_MODEL"] == "gpt-4.1"
+    assert "GRC_BFCL_STOP_AFTER_GENERATE" not in env
+    assert command[:4] == ["bash", "-lc", runner._profile_wrapped_command([])[2], "bash"]
+    _write_stage(
+        env,
+        [
+            ("validate_model_split", "started"),
+            ("validate_model_split", "completed"),
+            ("ensure_upstream_auth", "started"),
+            ("ensure_upstream_auth", "completed"),
+            ("clean_run_state", "started"),
+            ("clean_run_state", "completed"),
+            ("sync_bfcl_fixture_env", "started"),
+            ("sync_bfcl_fixture_env", "completed"),
+            ("start_proxy", "started"),
+            ("start_proxy", "completed"),
+            ("preflight", "started"),
+            ("preflight", "completed"),
+            ("stop_after_preflight", "started"),
+            ("stop_after_preflight", "completed"),
+        ],
+    )
+    _write_success_report(command)
+    return subprocess.CompletedProcess(command, 0)
 
 
 def test_committed_packet_passes_pending_fail_closed() -> None:
@@ -178,8 +234,11 @@ def test_dry_run_includes_required_compact_schema() -> None:
 
 
 def test_execute_with_pending_packet_fails_closed_before_env_provider_preflight_or_bfcl(tmp_path: Path) -> None:
+    def forbidden_run(*args, **kwargs):  # pragma: no cover - should never be called
+        raise AssertionError("pending packet reached mocked live command")
+
     pending = _pending_packet(tmp_path)
-    summary = execute_proxy_preflight_telemetry(pending, tmp_path / "telemetry.json")
+    summary = execute_proxy_preflight_telemetry(pending, tmp_path / "telemetry.json", run_command=forbidden_run)
     assert "proxy_preflight_telemetry_packet_not_approved" in summary["blockers"]
     assert summary["env_profile_sourced"] is False
     assert summary["endpoint_value_read"] is False
@@ -204,3 +263,44 @@ def test_execute_with_pending_packet_rejects_preexisting_output_before_any_execu
     assert summary["preflight_command_executed"] is False
     assert summary["endpoint_value_read"] is False
     assert summary["api_key_value_read"] is False
+
+
+def test_approved_execute_path_uses_mocked_preflight_and_writes_compact_artifact(tmp_path: Path) -> None:
+    output = tmp_path / "telemetry.json"
+    summary = execute_proxy_preflight_telemetry(_approved_packet(tmp_path), output, run_command=_mock_success)
+    assert summary["blockers"] == []
+    assert summary["preflight_command_executed"] is True
+    assert summary["live_preflight_executed"] is True
+    assert summary["provider_call_started"] is False
+    assert summary["bfcl_generate_started"] is False
+    assert summary["bfcl_evaluate_started"] is False
+    assert summary["scorer_started"] is False
+    assert summary["raw_outputs_removed"] is True
+    assert check_artifact(output)["bfcl_proxy_preflight_failure_telemetry_artifact_passed"] is True
+
+
+def test_provider_call_started_in_mocked_execute_is_stop_gated(tmp_path: Path) -> None:
+    def fake_provider_started(command, *, cwd, env, stdout, stderr, check):
+        _write_stage(env, [("start_proxy", "started"), ("start_proxy", "completed"), ("preflight", "started"), ("provider_call", "started")])
+        _write_success_report(command)
+        return subprocess.CompletedProcess(command, 0)
+
+    output = tmp_path / "telemetry.json"
+    summary = execute_proxy_preflight_telemetry(_approved_packet(tmp_path), output, run_command=fake_provider_started)
+    assert "provider_call_started" in summary["blockers"]
+    assert summary["stop_gate_triggered"] == "provider_call_started"
+    assert summary["suspected_proxy_preflight_failure_stage"] == "forbidden_provider_call_started"
+    assert any("provider_call_started_not_false" in blocker for blocker in check_artifact(output)["blockers"])
+
+
+def test_artifact_checker_rejects_bfcl_or_scorer_true_and_raw_fields(tmp_path: Path) -> None:
+    output = tmp_path / "telemetry.json"
+    execute_proxy_preflight_telemetry(_approved_packet(tmp_path), output, run_command=_mock_success)
+    data = json.loads(output.read_text(encoding="utf-8"))
+    for key in ("bfcl_generate_started", "bfcl_evaluate_started", "scorer_started"):
+        mutated = copy.deepcopy(data)
+        mutated["records"][0][key] = True
+        assert any(key in blocker for blocker in validate_artifact(mutated))
+    mutated = copy.deepcopy(data)
+    mutated["records"][0]["raw_logs"] = "shape"
+    assert any("forbidden_key" in blocker or "extra_fields" in blocker for blocker in validate_artifact(mutated))
