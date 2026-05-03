@@ -20,6 +20,9 @@ import scripts.run_bfcl_generate_failure_telemetry as runner
 
 build_plan = runner.build_plan
 classify_bfcl_cli_failure = runner.classify_bfcl_cli_failure
+classify_category_arg_shape = runner.classify_category_arg_shape
+classify_category_arg_validation = runner.classify_category_arg_validation
+classify_pregenerate_substage_labels = runner.classify_pregenerate_substage_labels
 classify_provider_proxy_status = runner.classify_provider_proxy_status
 execute_generate_failure_telemetry = runner.execute_generate_failure_telemetry
 
@@ -264,6 +267,20 @@ def test_approved_execute_path_uses_mocked_command_stops_before_evaluate_and_wri
                     json.dumps({"stage": "start_proxy", "event": "completed"}),
                     json.dumps({"stage": "preflight", "event": "started"}),
                     json.dumps({"stage": "preflight", "event": "completed"}),
+                    json.dumps({"stage": "pregenerate_config_source", "event": "started"}),
+                    json.dumps({"stage": "pregenerate_config_source", "event": "completed", "config_source_exit_class": "ok"}),
+                    json.dumps({"stage": "pregenerate_env_default_expansion", "event": "started"}),
+                    json.dumps({"stage": "pregenerate_env_default_expansion", "event": "completed", "env_default_expansion_class": "ok"}),
+                    json.dumps({"stage": "pregenerate_category_arg_assembly", "event": "started"}),
+                    json.dumps({"stage": "pregenerate_category_arg_assembly", "event": "completed", "category_arg_assembly_shape": "single_comma_joined_test_category_argument"}),
+                    json.dumps({"stage": "pregenerate_category_arg_validation", "event": "started"}),
+                    json.dumps({"stage": "pregenerate_category_arg_validation", "event": "completed", "category_arg_validation_result": "accepted_by_static_shape"}),
+                    json.dumps({"stage": "pregenerate_bfcl_cli_import_probe", "event": "started"}),
+                    json.dumps({"stage": "pregenerate_bfcl_cli_import_probe", "event": "completed", "bfcl_cli_import_probe_class_without_generate": "not_run_by_design"}),
+                    json.dumps({"stage": "pregenerate_bfcl_cli_argument_probe", "event": "started"}),
+                    json.dumps({"stage": "pregenerate_bfcl_cli_argument_probe", "event": "completed", "bfcl_cli_argument_probe_class_without_generate": "not_run_by_design"}),
+                    json.dumps({"stage": "pregenerate_marker_boundary", "event": "started"}),
+                    json.dumps({"stage": "pregenerate_marker_boundary", "event": "completed", "pre_generate_marker_boundary_class": "after_preflight_before_bfcl_generate"}),
                     json.dumps({"stage": "bfcl_generate", "event": "started"}),
                     json.dumps({"stage": "bfcl_generate", "event": "completed"}),
                     json.dumps({"stage": "stop_after_generate", "event": "started"}),
@@ -296,10 +313,19 @@ def test_approved_execute_path_uses_mocked_command_stops_before_evaluate_and_wri
     payload = json.loads(output.read_text(encoding="utf-8"))
     assert payload["artifact_kind"] == "bfcl_generate_failure_telemetry_compact"
     record = payload["records"][0]
-    assert set(record) == set(REQUIRED_COMPACT_FIELDS)
+    assert set(REQUIRED_COMPACT_FIELDS).issubset(record)
+    assert set(OPTIONAL_PREGENERATE_SUBSTAGE_FIELDS).issubset(record)
     assert record["bfcl_evaluate_started"] is False
     assert record["scorer_started"] is False
     assert record["performance_evidence"] is False
+    assert record["config_source_exit_class"] == "ok"
+    assert record["env_default_expansion_class"] == "ok"
+    assert record["category_arg_assembly_shape"] == "single_comma_joined_test_category_argument"
+    assert record["category_arg_validation_result"] == "accepted_by_static_shape"
+    assert record["bfcl_cli_import_probe_class_without_generate"] == "not_run_by_design"
+    assert record["bfcl_cli_argument_probe_class_without_generate"] == "not_run_by_design"
+    assert record["pre_generate_marker_boundary_class"] == "after_preflight_before_bfcl_generate"
+    assert record["suspected_pregenerate_failure_substage"] == "none_generate_stage_entered"
     artifact_summary = check_artifact(output)
     assert artifact_summary["bfcl_generate_failure_telemetry_artifact_passed"] is True
     assert artifact_summary["suspected_generate_failure_stage"] == "generate_stage_completed_before_evaluate"
@@ -357,3 +383,67 @@ def test_generate_failure_artifact_checker_rejects_invalid_optional_pregenerate_
     data["records"][0]["category_arg_validation_result"] = "raw_prompt"
     blockers = validate_artifact(data)
     assert any("category_arg_validation_result_invalid" in blocker for blocker in blockers)
+
+
+
+def test_pregenerate_category_arg_shape_and_validation_classifiers() -> None:
+    assert classify_category_arg_shape("") == "empty_test_category_argument"
+    assert classify_category_arg_shape("simple") == "single_category_argument"
+    assert classify_category_arg_shape("simple,multiple") == "single_comma_joined_test_category_argument"
+    assert classify_category_arg_validation("") == "not_validated_without_execution"
+    assert classify_category_arg_validation("simple,multi_turn_base") == "accepted_by_static_shape"
+    assert classify_category_arg_validation("simple, multi_turn_base") == "rejected_by_static_shape"
+    assert classify_category_arg_validation("simple,,multiple") == "rejected_by_static_shape"
+
+
+def test_pregenerate_substage_labels_from_synthetic_stage_events() -> None:
+    events = [
+        {"stage": "preflight", "event": "started"},
+        {"stage": "preflight", "event": "completed"},
+        {"stage": "pregenerate_config_source", "event": "started"},
+        {"stage": "pregenerate_config_source", "event": "completed", "config_source_exit_class": "ok"},
+        {"stage": "pregenerate_env_default_expansion", "event": "started"},
+        {"stage": "pregenerate_env_default_expansion", "event": "completed", "env_default_expansion_class": "ok"},
+        {"stage": "pregenerate_category_arg_assembly", "event": "started"},
+        {"stage": "pregenerate_category_arg_assembly", "event": "completed", "category_arg_assembly_shape": "single_comma_joined_test_category_argument"},
+        {"stage": "pregenerate_category_arg_validation", "event": "started"},
+        {"stage": "pregenerate_category_arg_validation", "event": "completed", "category_arg_validation_result": "accepted_by_static_shape"},
+        {"stage": "pregenerate_bfcl_cli_import_probe", "event": "started"},
+        {"stage": "pregenerate_bfcl_cli_import_probe", "event": "completed", "bfcl_cli_import_probe_class_without_generate": "not_run_by_design"},
+        {"stage": "pregenerate_bfcl_cli_argument_probe", "event": "started"},
+        {"stage": "pregenerate_bfcl_cli_argument_probe", "event": "completed", "bfcl_cli_argument_probe_class_without_generate": "not_run_by_design"},
+        {"stage": "pregenerate_marker_boundary", "event": "started"},
+        {"stage": "pregenerate_marker_boundary", "event": "completed", "pre_generate_marker_boundary_class": "after_preflight_before_bfcl_generate"},
+    ]
+    labels = classify_pregenerate_substage_labels(events, generate_entered=False)
+    assert labels["config_source_exit_class"] == "ok"
+    assert labels["env_default_expansion_class"] == "ok"
+    assert labels["category_arg_validation_result"] == "accepted_by_static_shape"
+    assert labels["bfcl_cli_import_probe_class_without_generate"] == "not_run_by_design"
+    assert labels["bfcl_cli_argument_probe_class_without_generate"] == "not_run_by_design"
+    assert labels["last_started_stage"] == "pregenerate_marker_boundary"
+    assert labels["last_completed_stage"] == "pregenerate_marker_boundary"
+    assert labels["suspected_pregenerate_failure_substage"] == "after_pregenerate_marker_boundary_before_bfcl_generate"
+
+
+def test_pregenerate_substage_failure_label_precedence() -> None:
+    labels = classify_pregenerate_substage_labels(
+        [{"stage": "pregenerate_config_source", "event": "completed", "config_source_exit_class": "missing"}],
+        generate_entered=False,
+    )
+    assert labels["suspected_pregenerate_failure_substage"] == "config_source"
+    labels = classify_pregenerate_substage_labels(
+        [{"stage": "pregenerate_category_arg_validation", "event": "completed", "category_arg_validation_result": "rejected_by_static_shape"}],
+        generate_entered=False,
+    )
+    assert labels["suspected_pregenerate_failure_substage"] == "category_arg_validation"
+    labels = classify_pregenerate_substage_labels(
+        [{"stage": "pregenerate_category_arg_validation", "event": "started"}],
+        generate_entered=False,
+    )
+    assert labels["suspected_pregenerate_failure_substage"] == "pregenerate_category_arg_validation_not_completed"
+    labels = classify_pregenerate_substage_labels(
+        [{"stage": "pregenerate_marker_boundary", "event": "completed"}],
+        generate_entered=True,
+    )
+    assert labels["suspected_pregenerate_failure_substage"] == "none_generate_stage_entered"

@@ -68,22 +68,32 @@ GRC_CLI=("${GRC_PYTHON}" -m grc.cli)
 grc_stage_event() {
   local stage="$1"
   local event="$2"
+  shift 2
   if [[ -z "${GRC_BASELINE_STAGE_TELEMETRY_PATH:-}" ]]; then
     return 0
   fi
   mkdir -p "$(dirname "${GRC_BASELINE_STAGE_TELEMETRY_PATH}")"
-  "${GRC_PYTHON}" - "${GRC_BASELINE_STAGE_TELEMETRY_PATH}" "${stage}" "${event}" <<'PY'
+  "${GRC_PYTHON}" - "${GRC_BASELINE_STAGE_TELEMETRY_PATH}" "${stage}" "${event}" "$@" <<'PY'
 import json
+import re
 import sys
 from pathlib import Path
 
 path = Path(sys.argv[1])
 stage = sys.argv[2]
 event = sys.argv[3]
+payload = {"stage": stage, "event": event}
+for item in sys.argv[4:]:
+    if "=" not in item:
+        continue
+    key, value = item.split("=", 1)
+    if re.fullmatch(r"[A-Za-z0-9_]+", key) and re.fullmatch(r"[A-Za-z0-9_.-]+", value):
+        payload[key] = value
 with path.open("a", encoding="utf-8") as handle:
-    handle.write(json.dumps({"stage": stage, "event": event}, sort_keys=True) + "\n")
+    handle.write(json.dumps(payload, sort_keys=True) + "\n")
 PY
 }
+
 
 grc_stage_run() {
   local stage="$1"
@@ -91,6 +101,59 @@ grc_stage_run() {
   grc_stage_event "${stage}" started
   "$@"
   grc_stage_event "${stage}" completed
+}
+
+grc_category_arg_shape_label() {
+  local value="$1"
+  if [[ -z "${value}" ]]; then
+    echo "empty_test_category_argument"
+  elif [[ "${value}" == *,* ]]; then
+    echo "single_comma_joined_test_category_argument"
+  else
+    echo "single_category_argument"
+  fi
+}
+
+grc_category_arg_validation_label() {
+  local value="$1"
+  if [[ -z "${value}" ]]; then
+    echo "not_validated_without_execution"
+  elif [[ "${value}" =~ ^[A-Za-z0-9_.-]+(,[A-Za-z0-9_.-]+)*$ ]]; then
+    echo "accepted_by_static_shape"
+  else
+    echo "rejected_by_static_shape"
+  fi
+}
+
+grc_pregenerate_substage_observability() {
+  local config_source_exit_class="ok"
+  local env_default_expansion_class="ok"
+  local category_arg_assembly_shape
+  local category_arg_validation_result
+
+  if [[ ! -r "${REPO_ROOT}/configs/bfcl_v4_phase1.env" || ! -r "${CONFIG_PATH}" ]]; then
+    config_source_exit_class="missing"
+  fi
+  if [[ -z "${BFCL_MODEL:-}" || -z "${RUN_ROOT:-}" || -z "${PORT:-}" || -z "${BFCL_RESULT_DIR:-}" ]]; then
+    env_default_expansion_class="missing"
+  fi
+  category_arg_assembly_shape="$(grc_category_arg_shape_label "${TEST_CATEGORY}")"
+  category_arg_validation_result="$(grc_category_arg_validation_label "${TEST_CATEGORY}")"
+
+  grc_stage_event pregenerate_config_source started
+  grc_stage_event pregenerate_config_source completed "config_source_exit_class=${config_source_exit_class}"
+  grc_stage_event pregenerate_env_default_expansion started
+  grc_stage_event pregenerate_env_default_expansion completed "env_default_expansion_class=${env_default_expansion_class}"
+  grc_stage_event pregenerate_category_arg_assembly started
+  grc_stage_event pregenerate_category_arg_assembly completed "category_arg_assembly_shape=${category_arg_assembly_shape}"
+  grc_stage_event pregenerate_category_arg_validation started
+  grc_stage_event pregenerate_category_arg_validation completed "category_arg_validation_result=${category_arg_validation_result}"
+  grc_stage_event pregenerate_bfcl_cli_import_probe started
+  grc_stage_event pregenerate_bfcl_cli_import_probe completed "bfcl_cli_import_probe_class_without_generate=not_run_by_design"
+  grc_stage_event pregenerate_bfcl_cli_argument_probe started
+  grc_stage_event pregenerate_bfcl_cli_argument_probe completed "bfcl_cli_argument_probe_class_without_generate=not_run_by_design"
+  grc_stage_event pregenerate_marker_boundary started
+  grc_stage_event pregenerate_marker_boundary completed "pre_generate_marker_boundary_class=after_preflight_before_bfcl_generate"
 }
 
 validate_model_split() {
@@ -268,6 +331,8 @@ fi
 if [[ "${GRC_BFCL_PARTIAL_EVAL}" == "1" ]]; then
   EVAL_ARGS+=(--partial-eval)
 fi
+
+grc_pregenerate_substage_observability
 
 grc_stage_event bfcl_generate started
 "${BFCL_CLI[@]}" "${GENERATE_ARGS[@]}"

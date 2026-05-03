@@ -37,6 +37,18 @@ PROVIDER_STATUS_CLASSES = {"2xx", "3xx", "4xx", "5xx", "timeout", "proxy_unreach
 PROVIDER_COMPLETION_CLASSES = {"completed_2xx", "completed_non2xx", "timeout", "connection_error", "not_observed", "unknown_compact"}
 BFCL_EXCEPTION_CLASSES = {"command_config_error", "import_error", "runtime_exception", "timeout", "result_path_error", "proxy_or_provider_error", "unknown_nonzero", "none_observed"}
 BFCL_EXCEPTION_STAGE_LABELS = {"generate_command_setup", "proxy_request", "result_materialization", "unknown_generate", "none_observed"}
+OPTIONAL_PREGENERATE_SUBSTAGE_FIELDS = [
+    "config_source_exit_class",
+    "env_default_expansion_class",
+    "category_arg_assembly_shape",
+    "category_arg_validation_result",
+    "bfcl_cli_import_probe_class_without_generate",
+    "bfcl_cli_argument_probe_class_without_generate",
+    "pre_generate_marker_boundary_class",
+    "last_started_stage",
+    "last_completed_stage",
+    "suspected_pregenerate_failure_substage",
+]
 
 RunCommand = Callable[..., subprocess.CompletedProcess[Any]]
 
@@ -132,7 +144,12 @@ def _load_stage_events(stage_path: Path) -> list[dict[str, str]]:
         except json.JSONDecodeError:
             continue
         if isinstance(item, dict) and item.get("event") in {"started", "completed"} and isinstance(item.get("stage"), str):
-            events.append({"stage": item["stage"], "event": item["event"]})
+            sanitized = {"stage": str(item["stage"]), "event": str(item["event"])}
+            for key in OPTIONAL_PREGENERATE_SUBSTAGE_FIELDS:
+                value = item.get(key)
+                if isinstance(value, str):
+                    sanitized[key] = value
+            events.append(sanitized)
     return events
 
 
@@ -142,6 +159,74 @@ def _stage_started(events: list[dict[str, str]], stage: str) -> bool:
 
 def _stage_completed(events: list[dict[str, str]], stage: str) -> bool:
     return any(item.get("stage") == stage and item.get("event") == "completed" for item in events)
+
+
+def _last_stage(events: list[dict[str, str]], event: str) -> str:
+    for item in reversed(events):
+        if item.get("event") == event:
+            return str(item.get("stage") or "not_observed")
+    return "not_observed"
+
+
+def _latest_event_field(events: list[dict[str, str]], field: str, default: str = "not_observed") -> str:
+    for item in reversed(events):
+        value = item.get(field)
+        if isinstance(value, str) and value:
+            return value
+    return default
+
+
+def classify_category_arg_shape(category_arg: str) -> str:
+    if not category_arg:
+        return "empty_test_category_argument"
+    if "," in category_arg:
+        return "single_comma_joined_test_category_argument"
+    return "single_category_argument"
+
+
+def classify_category_arg_validation(category_arg: str) -> str:
+    if not category_arg:
+        return "not_validated_without_execution"
+    if re.fullmatch(r"[A-Za-z0-9_.-]+(,[A-Za-z0-9_.-]+)*", category_arg):
+        return "accepted_by_static_shape"
+    return "rejected_by_static_shape"
+
+
+def classify_pregenerate_substage_labels(events: list[dict[str, str]], *, generate_entered: bool, category_arg: str = DEFAULT_CATEGORIES) -> dict[str, str]:
+    labels = {
+        "config_source_exit_class": _latest_event_field(events, "config_source_exit_class", "not_observed"),
+        "env_default_expansion_class": _latest_event_field(events, "env_default_expansion_class", "not_observed"),
+        "category_arg_assembly_shape": _latest_event_field(events, "category_arg_assembly_shape", classify_category_arg_shape(category_arg)),
+        "category_arg_validation_result": _latest_event_field(events, "category_arg_validation_result", classify_category_arg_validation(category_arg)),
+        "bfcl_cli_import_probe_class_without_generate": _latest_event_field(events, "bfcl_cli_import_probe_class_without_generate", "not_observed"),
+        "bfcl_cli_argument_probe_class_without_generate": _latest_event_field(events, "bfcl_cli_argument_probe_class_without_generate", "not_observed"),
+        "pre_generate_marker_boundary_class": _latest_event_field(events, "pre_generate_marker_boundary_class", "not_observed"),
+        "last_started_stage": _last_stage(events, "started"),
+        "last_completed_stage": _last_stage(events, "completed"),
+        "suspected_pregenerate_failure_substage": "pending_classification",
+    }
+    labels["suspected_pregenerate_failure_substage"] = _suspected_pregenerate_substage(labels, generate_entered=generate_entered)
+    return labels
+
+
+def _suspected_pregenerate_substage(labels: dict[str, str], *, generate_entered: bool) -> str:
+    if generate_entered:
+        return "none_generate_stage_entered"
+    if labels["config_source_exit_class"] in {"nonzero", "missing"}:
+        return "config_source"
+    if labels["env_default_expansion_class"] in {"nonzero", "missing"}:
+        return "env_default_expansion"
+    if labels["category_arg_validation_result"] == "rejected_by_static_shape":
+        return "category_arg_validation"
+    started = labels["last_started_stage"]
+    completed = labels["last_completed_stage"]
+    if started != "not_observed" and started != completed:
+        return f"{started}_not_completed"
+    if completed == "preflight":
+        return "after_preflight_before_pregenerate_substage"
+    if completed.startswith("pregenerate_"):
+        return f"after_{completed}_before_bfcl_generate"
+    return "unknown_pregenerate_substage"
 
 
 def _exit_code_class(code: int) -> str:
@@ -264,6 +349,7 @@ def _compact_record(exit_code: int, stage_path: Path, run_root: Path, exec_log: 
         generate_entered=generate_entered,
         result_file_count=result_file_count,
     )
+    pregenerate_labels = classify_pregenerate_substage_labels(events, generate_entered=generate_entered)
     record: dict[str, Any] = {
         "baseline_command_executed": True,
         "generate_stage_entered": generate_entered,
@@ -292,6 +378,7 @@ def _compact_record(exit_code: int, stage_path: Path, run_root: Path, exec_log: 
         "performance_evidence": False,
         "stop_gate_triggered": "pending_cleanup",
         "suspected_generate_failure_stage": "pending_classification",
+        **pregenerate_labels,
     }
     record["stop_gate_triggered"] = _stop_gate(record)
     record["suspected_generate_failure_stage"] = _suspected_stage(record)
@@ -312,7 +399,13 @@ def _write_artifact(record: dict[str, Any], output_artifact: Path) -> None:
         "huawei_acceptance_ready": False,
         "scorer_feedback_used": False,
         "raw_outputs_committed": False,
-        "records": [{field: record.get(field) for field in REQUIRED_COMPACT_FIELDS}],
+        "records": [
+            {
+                field: record.get(field)
+                for field in [*REQUIRED_COMPACT_FIELDS, *OPTIONAL_PREGENERATE_SUBSTAGE_FIELDS]
+                if field in record
+            }
+        ],
     }
     output_artifact.parent.mkdir(parents=True, exist_ok=True)
     output_artifact.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
