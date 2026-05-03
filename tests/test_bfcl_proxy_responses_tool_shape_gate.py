@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import copy
+import importlib.util
 import json
+import sys
+import types
 from pathlib import Path
 
 from scripts.check_bfcl_proxy_responses_tool_shape_artifact import check as check_artifact
@@ -16,6 +19,72 @@ import scripts.run_bfcl_proxy_responses_tool_shape as runner
 
 build_plan = runner.build_plan
 execute_proxy_responses_tool_shape = runner.execute_proxy_responses_tool_shape
+
+
+def _load_proxy_module_with_stubs(monkeypatch):
+    fake_fastapi = types.ModuleType("fastapi")
+
+    class FakeFastAPI:
+        def get(self, *_args, **_kwargs):
+            return lambda func: func
+
+        def post(self, *_args, **_kwargs):
+            return lambda func: func
+
+    class FakeHTTPException(Exception):
+        def __init__(self, status_code=None, detail=None):
+            super().__init__(detail)
+            self.status_code = status_code
+            self.detail = detail
+
+    class FakeRequest:
+        pass
+
+    fake_fastapi.FastAPI = FakeFastAPI
+    fake_fastapi.HTTPException = FakeHTTPException
+    fake_fastapi.Request = FakeRequest
+    fake_responses = types.ModuleType("fastapi.responses")
+
+    class FakeJSONResponse:
+        def __init__(self, content=None, status_code=200):
+            self.content = content
+            self.status_code = status_code
+
+    fake_responses.JSONResponse = FakeJSONResponse
+    fake_httpx = types.ModuleType("httpx")
+    fake_yaml = types.ModuleType("yaml")
+    fake_yaml.safe_load = lambda _text: {}
+    fake_engine = types.ModuleType("grc.runtime.engine")
+
+    class FakeRuleEngine:
+        def __init__(self, *_args, **_kwargs):
+            pass
+
+    fake_engine.RuleEngine = FakeRuleEngine
+    fake_trace = types.ModuleType("grc.runtime.trace_store")
+
+    class FakeTraceStore:
+        def __init__(self, *_args, **_kwargs):
+            pass
+
+    fake_trace.TraceStore = FakeTraceStore
+    fake_schema = types.ModuleType("grc.utils.tool_schema")
+    fake_schema.tool_map_from_tools_payload = lambda _tools: {}
+    for name, module in {
+        "fastapi": fake_fastapi,
+        "fastapi.responses": fake_responses,
+        "httpx": fake_httpx,
+        "yaml": fake_yaml,
+        "grc.runtime.engine": fake_engine,
+        "grc.runtime.trace_store": fake_trace,
+        "grc.utils.tool_schema": fake_schema,
+    }.items():
+        monkeypatch.setitem(sys.modules, name, module)
+    spec = importlib.util.spec_from_file_location("proxy_under_tightening_test", Path("src/grc/runtime/proxy.py"))
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def _packet() -> dict:
@@ -93,6 +162,48 @@ def test_synthetic_responses_payload_is_direct_chat_aligned() -> None:
     assert payload["tool_choice"] == {"type": "function", "function": {"name": runner.TOOL_NAME}}
     assert payload["input"] and payload["input"][0]["role"] == "user"
 
+
+
+def test_diagnostic_direct_alignment_requires_exact_synthetic_request(monkeypatch) -> None:
+    proxy = _load_proxy_module_with_stubs(monkeypatch)
+    payload = runner._responses_payload()
+    monkeypatch.setenv("GRC_PROXY_RESPONSES_TOOL_SHAPE_DIRECT_ALIGNMENT", "1")
+    assert proxy._is_proxy_responses_tool_shape_diagnostic_request(payload) is True
+    assert proxy._should_direct_align_proxy_responses_tool_shape(payload) is True
+
+    monkeypatch.delenv("GRC_PROXY_RESPONSES_TOOL_SHAPE_DIRECT_ALIGNMENT", raising=False)
+    assert proxy._should_direct_align_proxy_responses_tool_shape(payload) is False
+
+
+def test_non_synthetic_request_with_env_flag_uses_normal_policy_path(monkeypatch) -> None:
+    proxy = _load_proxy_module_with_stubs(monkeypatch)
+    monkeypatch.setenv("GRC_PROXY_RESPONSES_TOOL_SHAPE_DIRECT_ALIGNMENT", "1")
+    base = runner._responses_payload()
+    cases = []
+    mutated = copy.deepcopy(base)
+    mutated["instructions"] = "not synthetic direct aligned"
+    cases.append(mutated)
+    mutated = copy.deepcopy(base)
+    mutated["temperature"] = 1
+    cases.append(mutated)
+    mutated = copy.deepcopy(base)
+    mutated["max_output_tokens"] = 32
+    cases.append(mutated)
+    mutated = copy.deepcopy(base)
+    mutated["model"] = "other"
+    cases.append(mutated)
+    mutated = copy.deepcopy(base)
+    mutated["input"] = [{"role": "user", "content": "a"}, {"role": "user", "content": "b"}]
+    cases.append(mutated)
+    mutated = copy.deepcopy(base)
+    mutated["tools"][0]["name"] = "other_tool"
+    cases.append(mutated)
+    mutated = copy.deepcopy(base)
+    mutated["tools"].append(copy.deepcopy(mutated["tools"][0]))
+    cases.append(mutated)
+    for payload in cases:
+        assert proxy._is_proxy_responses_tool_shape_diagnostic_request(payload) is False
+        assert proxy._should_direct_align_proxy_responses_tool_shape(payload) is False
 
 
 def test_default_proxy_probe_classifies_missing_base_url_before_process_start(tmp_path: Path, monkeypatch) -> None:

@@ -16,6 +16,55 @@ from grc.runtime.trace_store import TraceStore
 from grc.utils.tool_schema import tool_map_from_tools_payload
 
 
+PROXY_RESPONSES_TOOL_SHAPE_DIAGNOSTIC_TOOL = "synthetic_proxy_responses_tool_shape_ping"
+PROXY_RESPONSES_TOOL_SHAPE_DIAGNOSTIC_MODEL = "gpt-4.1"
+PROXY_RESPONSES_TOOL_SHAPE_DIAGNOSTIC_MAX_OUTPUT_TOKENS = 16
+
+
+def _is_proxy_responses_tool_shape_diagnostic_request(request_json: Dict[str, Any]) -> bool:
+    if not isinstance(request_json, dict):
+        return False
+    if request_json.get("model") != PROXY_RESPONSES_TOOL_SHAPE_DIAGNOSTIC_MODEL:
+        return False
+    if "instructions" in request_json:
+        return False
+    input_value = request_json.get("input")
+    if not isinstance(input_value, list) or len(input_value) != 1:
+        return False
+    input_item = input_value[0]
+    if not isinstance(input_item, dict) or input_item.get("role") != "user":
+        return False
+    tools = request_json.get("tools")
+    if not isinstance(tools, list) or len(tools) != 1:
+        return False
+    tool = tools[0]
+    if not isinstance(tool, dict):
+        return False
+    if tool.get("type") != "function" or tool.get("name") != PROXY_RESPONSES_TOOL_SHAPE_DIAGNOSTIC_TOOL:
+        return False
+    tool_choice = request_json.get("tool_choice")
+    if not isinstance(tool_choice, dict):
+        return False
+    choice_function = tool_choice.get("function")
+    if tool_choice.get("type") != "function" or not isinstance(choice_function, dict):
+        return False
+    if choice_function.get("name") != PROXY_RESPONSES_TOOL_SHAPE_DIAGNOSTIC_TOOL:
+        return False
+    temperature = request_json.get("temperature")
+    if isinstance(temperature, bool) or not isinstance(temperature, (int, float)) or temperature != 0:
+        return False
+    if request_json.get("max_output_tokens") != PROXY_RESPONSES_TOOL_SHAPE_DIAGNOSTIC_MAX_OUTPUT_TOKENS:
+        return False
+    return True
+
+
+def _should_direct_align_proxy_responses_tool_shape(request_json: Dict[str, Any]) -> bool:
+    return (
+        os.environ.get("GRC_PROXY_RESPONSES_TOOL_SHAPE_DIRECT_ALIGNMENT") == "1"
+        and _is_proxy_responses_tool_shape_diagnostic_request(request_json)
+    )
+
+
 def _responses_content_to_text(content: Any) -> str:
     if isinstance(content, str):
         return content
@@ -357,7 +406,7 @@ def create_app(config_path: str, rules_dir: str, trace_dir: str) -> FastAPI:
     async def responses(request: Request) -> JSONResponse:
         original_req_json = await request.json()
 
-        diagnostic_direct_shape = os.environ.get("GRC_PROXY_RESPONSES_TOOL_SHAPE_DIRECT_ALIGNMENT") == "1"
+        diagnostic_direct_shape = _should_direct_align_proxy_responses_tool_shape(original_req_json)
         chat_req_json: Dict[str, Any] = {
             "model": original_req_json.get("model"),
             "messages": _responses_input_to_messages(
