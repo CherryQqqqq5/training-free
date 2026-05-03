@@ -65,6 +65,34 @@ bfcl_fix_result_layout() {
 BFCL_CLI=("${GRC_PYTHON}" "${REPO_ROOT}/scripts/run_bfcl_cli.py")
 GRC_CLI=("${GRC_PYTHON}" -m grc.cli)
 
+grc_stage_event() {
+  local stage="$1"
+  local event="$2"
+  if [[ -z "${GRC_BASELINE_STAGE_TELEMETRY_PATH:-}" ]]; then
+    return 0
+  fi
+  mkdir -p "$(dirname "${GRC_BASELINE_STAGE_TELEMETRY_PATH}")"
+  "${GRC_PYTHON}" - "${GRC_BASELINE_STAGE_TELEMETRY_PATH}" "${stage}" "${event}" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+stage = sys.argv[2]
+event = sys.argv[3]
+with path.open("a", encoding="utf-8") as handle:
+    handle.write(json.dumps({"stage": stage, "event": event}, sort_keys=True) + "\n")
+PY
+}
+
+grc_stage_run() {
+  local stage="$1"
+  shift
+  grc_stage_event "${stage}" started
+  "$@"
+  grc_stage_event "${stage}" completed
+}
+
 validate_model_split() {
   if [[ -z "${BFCL_MODEL}" ]]; then
     echo "error: BFCL model alias is empty; set GRC_BFCL_MODEL or pass it as arg1" >&2
@@ -141,9 +169,9 @@ BFCL_RESULT_DIR="${BFCL_ROOT}/result"
 BFCL_SCORE_DIR="${BFCL_ROOT}/score"
 RUN_ID="${GRC_RUN_ID:-$(date -u +%Y%m%dT%H%M%SZ)}"
 
-validate_model_split
-ensure_upstream_auth
-clean_run_state
+grc_stage_run validate_model_split validate_model_split
+grc_stage_run ensure_upstream_auth ensure_upstream_auth
+grc_stage_run clean_run_state clean_run_state
 
 mkdir -p "${BFCL_ROOT}" "${TRACE_DIR}" "${ARTIFACT_DIR}"
 mkdir -p "$(dirname "${REPAIRS_OUT}")"
@@ -168,12 +196,14 @@ export LOCAL_SERVER_PORT="${PORT}"
 export OPENAI_BASE_URL="http://127.0.0.1:${PORT}/v1"
 export OPENAI_API_KEY="${OPENAI_API_KEY:-dummy}"
 
+grc_stage_event sync_bfcl_fixture_env started
 "${GRC_PYTHON}" "${REPO_ROOT}/scripts/sync_bfcl_fixture_env.py" \
   --bfcl-root "${BFCL_ROOT}" \
   --openai-base-url "${OPENAI_BASE_URL}" \
   --local-server-endpoint "${LOCAL_SERVER_ENDPOINT}" \
   --local-server-port "${LOCAL_SERVER_PORT}" \
   --openai-api-key "${OPENAI_API_KEY}"
+grc_stage_event sync_bfcl_fixture_env completed
 
 PROXY_PID=""
 cleanup() {
@@ -185,6 +215,7 @@ trap cleanup EXIT
 
 PROXY_LOG="${GRC_PROXY_LOG:-/tmp/grc_baseline_proxy.log}"
 if [[ "${GRC_START_PROXY:-1}" == "1" ]]; then
+  grc_stage_event start_proxy started
   grc_assert_fresh_port "${PORT}"
   PYTHONPATH="${REPO_ROOT}/src${PYTHONPATH:+:${PYTHONPATH}}" "${GRC_CLI[@]}" serve \
     --config "${CONFIG_PATH}" \
@@ -200,14 +231,17 @@ if [[ "${GRC_START_PROXY:-1}" == "1" ]]; then
     echo "error: grc serve process exited before inference (pid ${PROXY_PID})" >&2
     exit 1
   fi
+  grc_stage_event start_proxy completed
 fi
 
 if [[ "${BFCL_PREFLIGHT_DEFAULT}" == "1" ]]; then
+  grc_stage_event preflight started
   "${GRC_PYTHON}" "${REPO_ROOT}/scripts/run_bfcl_preflight.py" \
     --base-url "http://127.0.0.1:${PORT}" \
     --trace-dir "${TRACE_DIR}" \
     --config-path "${CONFIG_PATH}" \
     --out "${ARTIFACT_DIR}/preflight_report.json"
+  grc_stage_event preflight completed
 fi
 
 GENERATE_ARGS=(
@@ -235,10 +269,15 @@ if [[ "${GRC_BFCL_PARTIAL_EVAL}" == "1" ]]; then
   EVAL_ARGS+=(--partial-eval)
 fi
 
+grc_stage_event bfcl_generate started
 "${BFCL_CLI[@]}" "${GENERATE_ARGS[@]}"
-bfcl_fix_result_layout "${BFCL_ROOT}"
+grc_stage_event bfcl_generate completed
+grc_stage_run fix_result_layout bfcl_fix_result_layout "${BFCL_ROOT}"
+grc_stage_event bfcl_evaluate started
 "${BFCL_CLI[@]}" "${EVAL_ARGS[@]}"
+grc_stage_event bfcl_evaluate completed
 
+grc_stage_event aggregate_bfcl_metrics started
 "${GRC_PYTHON}" "${REPO_ROOT}/scripts/aggregate_bfcl_metrics.py" \
   --bfcl-root "${BFCL_ROOT}" \
   --trace-dir "${TRACE_DIR}" \
@@ -249,7 +288,9 @@ bfcl_fix_result_layout "${BFCL_ROOT}"
   --protocol-id "${GRC_PROTOCOL_ID}" \
   --model "${BFCL_MODEL}" \
   --test-category "${TEST_CATEGORY}"
+grc_stage_event aggregate_bfcl_metrics completed
 
+grc_stage_event write_run_manifest started
 "${GRC_PYTHON}" "${REPO_ROOT}/scripts/write_run_manifest.py" \
   --out "${ARTIFACT_DIR}/run_manifest.json" \
   --kind baseline \
@@ -260,3 +301,4 @@ bfcl_fix_result_layout "${BFCL_ROOT}"
   --protocol-id "${GRC_PROTOCOL_ID}" \
   --test-category "${TEST_CATEGORY}" \
   --run-id "${RUN_ID}"
+grc_stage_event write_run_manifest completed

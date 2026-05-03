@@ -10,7 +10,10 @@ from scripts.check_bfcl_baseline_live_failure_telemetry_gate import (
     check,
     validate_packet,
 )
-from scripts.run_bfcl_baseline_live_failure_telemetry import build_plan, execute_live_failure_telemetry
+import scripts.run_bfcl_baseline_live_failure_telemetry as runner
+
+build_plan = runner.build_plan
+execute_live_failure_telemetry = runner.execute_live_failure_telemetry
 
 
 def _packet() -> dict:
@@ -129,9 +132,81 @@ def test_dry_run_includes_required_compact_schema() -> None:
 def test_execute_mode_pending_fails_closed_without_env_or_baseline(tmp_path: Path) -> None:
     summary = execute_live_failure_telemetry(DEFAULT_PACKET, tmp_path / "telemetry.json")
     assert "baseline_live_failure_telemetry_packet_not_approved" in summary["blockers"]
-    assert "baseline_live_failure_telemetry_execution_not_enabled_in_gate_preparation" in summary["blockers"]
     assert summary["endpoint_value_read"] is False
     assert summary["api_key_value_read"] is False
     assert summary["baseline_command_executed"] is False
     assert summary["provider_call_started"] is False
     assert summary["bfcl_generate_started"] is False
+
+
+def _approved_packet(tmp_path: Path) -> Path:
+    data = _packet()
+    data["approval_status"] = "approved"
+    for key in (
+        "authorized",
+        "provider_call_authorized",
+        "live_failure_telemetry_authorized",
+        "bfcl_generate_authorized",
+        "bfcl_evaluate_authorized",
+        "scorer_authorized",
+        "full_baseline_authorized",
+    ):
+        data[key] = True
+    path = tmp_path / "approved_packet.json"
+    path.write_text(json.dumps(data, indent=2, sort_keys=True), encoding="utf-8")
+    return path
+
+
+def test_approved_execute_path_uses_mocked_command_and_writes_compact_artifact(tmp_path: Path, monkeypatch) -> None:
+    packet_path = _approved_packet(tmp_path)
+    output = tmp_path / "telemetry.json"
+    run_root = tmp_path / "run_root"
+    metrics = run_root / "artifacts" / "metrics.json"
+    run_manifest = run_root / "artifacts" / "run_manifest.json"
+    compact_manifest = tmp_path / "compact_manifest.json"
+    monkeypatch.setattr(runner, "RUN_ROOT", run_root)
+    monkeypatch.setattr(runner, "METRICS_PATH", metrics)
+    monkeypatch.setattr(runner, "RUN_MANIFEST_PATH", run_manifest)
+    monkeypatch.setattr(runner, "COMPACT_MANIFEST_PATH", compact_manifest)
+
+    def fake_run(command, cwd, env, stdout, stderr, check):
+        assert command[0:2] == ["bash", "scripts/run_bfcl_v4_baseline.sh"]
+        assert env["GRC_UPSTREAM_PROFILE"] == "novacode"
+        assert env["GRC_UPSTREAM_MODEL"] == "gpt-4.1"
+        stage_path = Path(env["GRC_BASELINE_STAGE_TELEMETRY_PATH"])
+        stage_path.write_text(
+            '\n'.join([
+                json.dumps({"stage": "validate_model_split", "event": "started"}),
+                json.dumps({"stage": "validate_model_split", "event": "completed"}),
+                json.dumps({"stage": "bfcl_generate", "event": "started"}),
+            ]) + '\n',
+            encoding="utf-8",
+        )
+        run_root.mkdir(parents=True, exist_ok=True)
+        return runner.subprocess.CompletedProcess(command, 1)
+
+    summary = execute_live_failure_telemetry(packet_path, output, run_command=fake_run)
+    assert summary["blockers"] == []
+    assert summary["baseline_command_executed"] is True
+    assert summary["bfcl_generate_started"] is True
+    assert summary["bfcl_generate_completed"] is False
+    assert summary["failed_stage"] == "bfcl_generate"
+    assert summary["baseline_exit_code_class"] == "nonzero_1"
+    assert summary["run_root_present"] is False
+    assert summary["raw_outputs_removed"] is True
+    assert output.exists()
+    payload = json.loads(output.read_text(encoding="utf-8"))
+    assert payload["records"][0]["failed_stage"] == "bfcl_generate"
+    assert payload["records"][0]["performance_evidence"] is False
+    assert not run_root.exists()
+
+
+def test_approved_execute_rejects_preexisting_output_before_command(tmp_path: Path) -> None:
+    packet_path = _approved_packet(tmp_path)
+    output = tmp_path / "telemetry.json"
+    output.write_text("{}", encoding="utf-8")
+    summary = execute_live_failure_telemetry(packet_path, output, run_command=lambda *args, **kwargs: None)
+    assert "output_artifact_exists" in summary["blockers"]
+    assert summary["baseline_command_executed"] is False
+    assert summary["endpoint_value_read"] is False
+    assert summary["api_key_value_read"] is False
