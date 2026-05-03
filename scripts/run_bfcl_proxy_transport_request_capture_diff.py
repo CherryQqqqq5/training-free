@@ -293,6 +293,14 @@ def _install_proxy_import_stubs(capture: dict[str, Any]) -> dict[str, Any]:
             capture["has_json_kwarg"] = "json" in kwargs
             capture["has_content_kwarg"] = "content" in kwargs
             capture["has_data_kwarg"] = "data" in kwargs
+            content = kwargs.get("content")
+            if isinstance(content, (bytes, bytearray)):
+                try:
+                    decoded = json.loads(bytes(content).decode("utf-8"))
+                except (UnicodeDecodeError, json.JSONDecodeError):
+                    decoded = None
+                if isinstance(decoded, dict):
+                    capture["json"] = decoded
 
             class FakeResponse:
                 status_code = 200
@@ -448,9 +456,15 @@ def _proxy_transport_capture_actual() -> dict[str, str]:
     else:
         body_submission = "unknown"
         json_serialization = "unknown"
+    if capture.get("has_json_kwarg"):
+        client_stack = "proxy_httpx_json_kwarg"
+    elif capture.get("has_content_kwarg"):
+        client_stack = "proxy_httpx_content_bytes"
+    else:
+        client_stack = "unknown"
     return {
         "transport_client_label": "httpx_async_client_post",
-        "client_stack_label": "proxy_httpx_json_kwarg" if capture.get("has_json_kwarg") else "unknown",
+        "client_stack_label": client_stack,
         "body_submission_label": body_submission,
         "json_serialization_label": json_serialization,
         "content_type_header_label": "present" if has_content_type else "missing",
@@ -484,6 +498,8 @@ def _suspected_cause(direct: dict[str, str], proxy: dict[str, str], payload_matc
         return "payload_shape_drift"
     if proxy.get("url_join_label") != "base_url_chat_completions_appended":
         return "url_join_or_provider_policy"
+    if proxy.get("json_serialization_label") == direct.get("json_serialization_label"):
+        return "transport_patch_ready" if proxy.get("transport_client_label") != direct.get("transport_client_label") else "none_observed"
     if proxy.get("transport_client_label") != direct.get("transport_client_label") or proxy.get("json_serialization_label") != direct.get("json_serialization_label"):
         return "transport_stack_or_serialization_drift"
     return "none_observed"

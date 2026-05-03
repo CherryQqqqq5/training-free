@@ -125,9 +125,9 @@ def test_execute_fake_transport_capture_labels_proxy_vs_direct(tmp_path: Path) -
     assert summary["raw_outputs_committed"] is False
     assert summary["raw_temp_outputs_removed"] is True
     assert summary["transport_client_label"] == "httpx_async_client_post"
-    assert summary["client_stack_label"] == "proxy_httpx_json_kwarg"
-    assert summary["body_submission_label"] == "httpx_json_kwarg"
-    assert summary["json_serialization_label"] == "httpx_json_parameter"
+    assert summary["client_stack_label"] == "proxy_httpx_content_bytes"
+    assert summary["body_submission_label"] == "content_bytes"
+    assert summary["json_serialization_label"] == "manual_json_compact_bytes"
     assert summary["content_type_header_label"] == "present"
     assert summary["authorization_header_label"] == "present"
     assert summary["auth_scheme_label"] == "bearer"
@@ -141,7 +141,7 @@ def test_execute_fake_transport_capture_labels_proxy_vs_direct(tmp_path: Path) -
     assert summary["selected_base_url_env_label"] == "GRC_UPSTREAM_BASE_URL"
     assert summary["selected_api_key_env_label"] == "CHUANGZHI_API_KEY"
     assert summary["proxy_python_label"] in {"grc_python_env", "repo_venv", "caller_python"}
-    assert summary["suspected_403_cause_label"] == "transport_stack_or_serialization_drift"
+    assert summary["suspected_403_cause_label"] == "transport_patch_ready"
     assert summary["direct_transport_client_label"] == "urllib_request"
     assert summary["direct_body_submission_label"] == "urllib_data_bytes"
     assert summary["direct_json_serialization_label"] == "manual_json_compact_bytes"

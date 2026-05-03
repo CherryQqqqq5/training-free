@@ -445,12 +445,17 @@ def create_app(config_path: str, rules_dir: str, trace_dir: str) -> FastAPI:
         }
         headers.update(upstream_cfg["headers"])
 
+        post_kwargs: Dict[str, Any] = {"headers": headers}
+        if diagnostic_direct_shape:
+            post_kwargs["content"] = json.dumps(req_json, separators=(",", ":")).encode("utf-8")
+        else:
+            post_kwargs["json"] = req_json
+
         async with httpx.AsyncClient(timeout=timeout_sec) as client:
             started_at = time.perf_counter()
             resp = await client.post(
                 f"{upstream_base_url}/chat/completions",
-                headers=headers,
-                json=req_json,
+                **post_kwargs,
             )
             elapsed_ms = round((time.perf_counter() - started_at) * 1000, 3)
 

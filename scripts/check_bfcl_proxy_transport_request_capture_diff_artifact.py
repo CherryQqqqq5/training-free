@@ -18,7 +18,7 @@ from scripts.check_bfcl_proxy_transport_request_capture_diff_gate import REQUIRE
 
 DEFAULT_ARTIFACT = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_proxy_transport_request_capture_diff_compact.json")
 TRANSPORT_CLIENT_LABELS = {"httpx_async_client_post", "urllib_request", "unknown"}
-CLIENT_STACK_LABELS = {"proxy_httpx_json_kwarg", "direct_urllib_manual_bytes", "unknown"}
+CLIENT_STACK_LABELS = {"proxy_httpx_json_kwarg", "proxy_httpx_content_bytes", "direct_urllib_manual_bytes", "unknown"}
 BODY_SUBMISSION_LABELS = {"httpx_json_kwarg", "content_bytes", "data_bytes", "urllib_data_bytes", "unknown"}
 JSON_SERIALIZATION_LABELS = {"httpx_json_parameter", "manual_json_compact_bytes", "unknown"}
 PRESENCE_LABELS = {"present", "missing", "unknown"}
@@ -33,7 +33,7 @@ PAYLOAD_SHAPE_LABELS = {"chat_tool_direct_aligned", "chat_tool_shape_drift", "un
 BASE_URL_ENV_LABELS = {"GRC_UPSTREAM_BASE_URL", "NOVACODE_BASE_URL", "GRC_UPSTREAM_BASE_URL_then_NOVACODE_BASE_URL", "unknown"}
 API_KEY_ENV_LABELS = {"CHUANGZHI_API_KEY", "NOVACODE_API_KEY", "unknown"}
 PROXY_PYTHON_LABELS = {"grc_python_env", "repo_venv", "caller_python", "not_used"}
-CAUSE_LABELS = {"transport_stack_or_serialization_drift", "header_shape_drift", "url_join_or_provider_policy", "payload_shape_drift", "none_observed", "unknown"}
+CAUSE_LABELS = {"transport_stack_or_serialization_drift", "transport_patch_ready", "header_shape_drift", "url_join_or_provider_policy", "payload_shape_drift", "none_observed", "unknown"}
 STOP_LABELS = {"none", "stopped_after_fake_transport_capture", "packet_not_approved", "output_artifact_exists", "unknown"}
 FAILED_CHECK_LABELS = {"none_observed", "packet_not_approved", "output_artifact_exists", "raw_or_secret_leak", "unknown"}
 FORBIDDEN_KEY_RE = re.compile(
