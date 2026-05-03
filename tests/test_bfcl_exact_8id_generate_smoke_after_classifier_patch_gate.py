@@ -36,6 +36,18 @@ def _write_packet(tmp_path: Path, data: dict) -> Path:
     return packet_path
 
 
+
+
+def _pending_packet(tmp_path: Path) -> Path:
+    data = copy.deepcopy(_packet())
+    data["approval_status"] = "pending"
+    data["authorized"] = False
+    data["provider_request_authorized"] = False
+    data["bfcl_generate_authorized"] = False
+    data["bfcl_smoke_authorized"] = False
+    return _write_packet(tmp_path, data)
+
+
 def _approved_packet(tmp_path: Path) -> Path:
     data = copy.deepcopy(_packet())
     data["approval_status"] = "approved"
@@ -46,13 +58,13 @@ def _approved_packet(tmp_path: Path) -> Path:
     return _write_packet(tmp_path, data)
 
 
-def test_committed_pending_packet_passes_fail_closed_gate() -> None:
+def test_committed_approved_packet_passes_scoped_gate() -> None:
     summary = check(PACKET)
     assert summary["bfcl_exact_8id_generate_smoke_after_classifier_patch_gate_passed"] is True
-    assert summary["approval_status"] == "pending"
-    assert summary["provider_request_authorized"] is False
-    assert summary["bfcl_generate_authorized"] is False
-    assert summary["bfcl_smoke_authorized"] is False
+    assert summary["approval_status"] == "approved"
+    assert summary["provider_request_authorized"] is True
+    assert summary["bfcl_generate_authorized"] is True
+    assert summary["bfcl_smoke_authorized"] is True
     assert summary["signed_run_ids"] == list(SIGNED_IDS)
     packet = _packet()
     for key in (
@@ -69,8 +81,8 @@ def test_committed_pending_packet_passes_fail_closed_gate() -> None:
         assert packet[key] is False
 
 
-def test_rejects_pending_authorized_true() -> None:
-    data = copy.deepcopy(_packet())
+def test_rejects_pending_authorized_true(tmp_path: Path) -> None:
+    data = json.loads(_pending_packet(tmp_path).read_text(encoding="utf-8"))
     data["authorized"] = True
     blockers = validate_packet(data)
     assert any("authorized_not_false" in blocker for blocker in blockers)
@@ -141,8 +153,8 @@ def test_rejects_route_drift_fallback_openrouter() -> None:
         assert validate_packet(data)
 
 
-def test_dry_run_does_not_read_endpoint_key_or_execute_provider_or_generate() -> None:
-    plan = build_plan(PACKET)
+def test_dry_run_does_not_read_endpoint_key_or_execute_provider_or_generate(tmp_path: Path) -> None:
+    plan = build_plan(_pending_packet(tmp_path))
     assert plan["blockers"] == []
     assert plan["approval_status"] == "pending"
     assert plan["endpoint_value_read"] is False
@@ -156,7 +168,7 @@ def test_dry_run_does_not_read_endpoint_key_or_execute_provider_or_generate() ->
 
 
 def test_pending_execute_fails_closed_without_endpoint_key_or_execution(tmp_path: Path) -> None:
-    summary = execute_exact_8id_generate_smoke_after_classifier_patch(PACKET, tmp_path / "artifact.json")
+    summary = execute_exact_8id_generate_smoke_after_classifier_patch(_pending_packet(tmp_path), tmp_path / "artifact.json")
     assert "exact_8id_generate_smoke_after_classifier_patch_packet_not_approved" in summary["blockers"]
     assert summary["endpoint_value_read"] is False
     assert summary["api_key_value_read"] is False
