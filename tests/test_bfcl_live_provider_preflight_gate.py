@@ -150,6 +150,11 @@ def test_dry_run_does_not_source_profile_read_secrets_or_execute_provider() -> N
     assert plan["endpoint_mode_label"] == "not_selected"
     assert plan["selected_endpoint_env_label"] == "none"
     assert plan["transport_path_join_label"] == "not_reached"
+    assert plan["http_status_class"] == "not_observed"
+    assert plan["provider_http_status_label"] == "not_observed"
+    summary_text = json.dumps(plan, sort_keys=True)
+    assert "endpoint_value_read" not in summary_text
+    assert "api_key_value_read" not in summary_text
     assert plan["bfcl_generate_started"] is False
     assert plan["bfcl_evaluate_started"] is False
     assert plan["scorer_started"] is False
@@ -169,6 +174,7 @@ def test_pending_execute_fails_closed_before_env_or_provider(tmp_path: Path) -> 
     assert summary["preflight_command_executed"] is False
     assert summary["provider_request_executed"] is False
     assert summary["provider_call_started"] is False
+    assert summary["provider_http_status_label"] == "not_observed"
     assert summary["env_profile_sourced"] is False
     assert summary["bfcl_generate_started"] is False
     assert summary["bfcl_evaluate_started"] is False
@@ -184,6 +190,7 @@ def test_approved_execute_missing_env_writes_compact_failure_without_provider(tm
     assert summary["blockers"] == ["missing_endpoint_env"]
     assert summary["provider_request_executed"] is False
     assert summary["provider_call_started"] is False
+    assert summary["provider_http_status_label"] == "not_observed"
     artifact_summary = check_artifact(output)
     assert artifact_summary["bfcl_live_provider_preflight_artifact_passed"] is True
     text = output.read_text(encoding="utf-8")
@@ -213,6 +220,7 @@ def test_approved_execute_base_url_mode_appends_probe_paths(tmp_path: Path) -> N
     assert summary["selected_endpoint_env_label"] == "NOVACODE_BASE_URL"
     assert summary["transport_path_join_label"] == "base_url_path_appended"
     assert summary["http_status_class"] == "2xx"
+    assert summary["provider_http_status_label"] == "unknown"
     assert summary["auth_status_label"] == "ok"
     assert summary["model_route_label"] == "available"
     assert summary["chat_tool_call_label"] == "passed"
@@ -279,5 +287,66 @@ def test_artifact_checker_rejects_raw_material_and_downstream_flags(tmp_path: Pa
     mutated["records"][0]["raw_response_body"] = "shape"
     assert any("forbidden_key" in blocker or "extra_fields" in blocker for blocker in validate_artifact(mutated))
     mutated = copy.deepcopy(data)
+    mutated["records"][0]["status_body"] = "shape"
+    assert any("forbidden_key" in blocker or "extra_fields" in blocker for blocker in validate_artifact(mutated))
+    mutated = copy.deepcopy(data)
+    mutated["records"][0]["provider_http_status_label"] = "status_418"
+    assert any("provider_http_status_label_invalid" in blocker for blocker in validate_artifact(mutated))
+    mutated = copy.deepcopy(data)
     mutated["records"][0]["note"] = "Huawei +3pp performance evidence"
     assert any("forbidden_value" in blocker or "extra_fields" in blocker for blocker in validate_artifact(mutated))
+
+
+def test_provider_http_status_label_classifies_mocked_statuses(tmp_path: Path) -> None:
+    env = {"NOVACODE_BASE_URL": "https://provider.invalid/base", "CHUANGZHI_API_KEY": "secret-test-key"}
+    cases = [
+        (400, "status_400", "provider_non_2xx", "unknown"),
+        (401, "status_401", "provider_auth_failed", "auth_failed"),
+        (403, "status_403", "provider_auth_failed", "auth_failed"),
+        (404, "status_404", "provider_non_2xx", "unknown"),
+        (405, "status_405", "provider_non_2xx", "unknown"),
+        (415, "status_415", "provider_non_2xx", "unknown"),
+        (422, "status_422", "provider_non_2xx", "unknown"),
+        (429, "status_429", "provider_non_2xx", "unknown"),
+        (418, "other_4xx", "provider_non_2xx", "unknown"),
+        (500, "status_5xx", "provider_non_2xx", "unknown"),
+        (503, "status_5xx", "provider_non_2xx", "unknown"),
+    ]
+    for status, label, blocker, auth_label in cases:
+        def post_json(target_url: str, api_key: str, payload: dict, status=status):
+            assert target_url.endswith("/v1/chat/completions")
+            assert api_key == "secret-test-key"
+            return status, {}
+
+        output = tmp_path / f"artifact_{status}.json"
+        summary = execute_live_provider_preflight(_approved_packet(tmp_path), output, environ=env, post_json=post_json)
+        assert summary["provider_request_executed"] is True
+        assert summary["provider_call_started"] is True
+        assert summary["http_status_class"] == ("4xx" if 400 <= status <= 499 else "5xx")
+        assert summary["provider_http_status_label"] == label
+        assert summary["auth_status_label"] == auth_label
+        assert blocker in summary["blockers"]
+        artifact_summary = check_artifact(output)
+        assert artifact_summary["bfcl_live_provider_preflight_artifact_passed"] is True
+        assert artifact_summary["provider_http_status_label"] == label
+        text = output.read_text(encoding="utf-8")
+        assert "https://provider.invalid" not in text
+        assert "secret-test-key" not in text
+
+
+def test_provider_http_status_label_classifies_transport_exception(tmp_path: Path) -> None:
+    env = {"NOVACODE_BASE_URL": "https://provider.invalid/base", "CHUANGZHI_API_KEY": "secret-test-key"}
+
+    def post_json(target_url: str, api_key: str, payload: dict):
+        raise RuntimeError("synthetic transport failure")
+
+    output = tmp_path / "artifact_transport_error.json"
+    summary = execute_live_provider_preflight(_approved_packet(tmp_path), output, environ=env, post_json=post_json)
+    assert summary["provider_call_started"] is True
+    assert summary["provider_request_executed"] is False
+    assert summary["http_status_class"] == "transport_error"
+    assert summary["provider_http_status_label"] == "transport_error"
+    assert "provider_transport_error" in summary["blockers"]
+    artifact_summary = check_artifact(output)
+    assert artifact_summary["bfcl_live_provider_preflight_artifact_passed"] is True
+    assert artifact_summary["provider_http_status_label"] == "transport_error"

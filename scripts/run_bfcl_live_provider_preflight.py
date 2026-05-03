@@ -61,6 +61,18 @@ def _http_status_class(status: int | None) -> str:
     return "unknown"
 
 
+def _provider_http_status_label(status: int | None) -> str:
+    if status is None:
+        return "transport_error"
+    if status in {400, 401, 403, 404, 405, 415, 422, 429}:
+        return f"status_{status}"
+    if 400 <= status <= 499:
+        return "other_4xx"
+    if 500 <= status <= 599:
+        return "status_5xx"
+    return "unknown"
+
+
 def _exit_code_class(blockers: list[str]) -> str:
     return "zero" if not blockers else "nonzero_1"
 
@@ -188,6 +200,7 @@ def _base_record(*, command_executed: bool = False) -> dict[str, Any]:
         "selected_endpoint_env_label": "none",
         "transport_path_join_label": "not_reached",
         "http_status_class": "not_observed",
+        "provider_http_status_label": "not_observed",
         "auth_status_label": "not_checked",
         "model_route_label": "not_checked",
         "chat_tool_call_label": "not_checked",
@@ -218,7 +231,7 @@ def _set_failure(record: dict[str, Any], label: str, stage: str) -> None:
 def _write_artifact(record: dict[str, Any], output_artifact: Path) -> None:
     payload = {
         "artifact_kind": "bfcl_live_provider_preflight_compact",
-        "compact_schema_version": "live_provider_preflight_endpoint_base_url_v2",
+        "compact_schema_version": "live_provider_preflight_http_status_label_v3",
         "measurement_kind": "compact_synthetic_live_provider_preflight",
         "route_profile": "novacode",
         "route_model": "gpt-4.1",
@@ -350,12 +363,14 @@ def execute_live_provider_preflight(
                 record["provider_request_executed"] = True
             except Exception:
                 record["http_status_class"] = "transport_error"
+                record["provider_http_status_label"] = "transport_error"
                 record[field] = "transport_error"
                 _set_failure(record, "provider_transport_error", "provider_transport_error")
                 blockers.append("provider_transport_error")
                 break
             status_class = _http_status_class(status)
             record["http_status_class"] = status_class
+            record["provider_http_status_label"] = _provider_http_status_label(status)
             if status in {401, 403}:
                 record["auth_status_label"] = "auth_failed"
                 record[field] = "failed"

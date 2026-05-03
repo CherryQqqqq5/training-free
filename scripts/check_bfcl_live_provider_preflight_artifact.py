@@ -23,6 +23,7 @@ from scripts.check_bfcl_live_provider_preflight_gate import (
 
 DEFAULT_ARTIFACT = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_live_provider_preflight_compact.json")
 HTTP_STATUS_CLASSES = {"not_observed", "2xx", "3xx", "4xx", "5xx", "transport_error", "unknown"}
+PROVIDER_HTTP_STATUS_LABELS = {"not_observed", "status_400", "status_401", "status_403", "status_404", "status_405", "status_415", "status_422", "status_429", "other_4xx", "status_5xx", "transport_error", "unknown"}
 AUTH_LABELS = {"not_checked", "ok", "missing_endpoint_env", "missing_api_key_env", "endpoint_not_https", "auth_failed", "unknown"}
 MODEL_LABELS = {"not_checked", "available", "unavailable", "unknown"}
 ENDPOINT_MODE_LABELS = {"not_selected", "base_url", "full_endpoint"}
@@ -48,11 +49,11 @@ FAILED_CHECK_LABELS = {
     "unknown",
 }
 FORBIDDEN_KEY_RE = re.compile(
-    r"(^|_)(raw_(requests?|responses?|bod(y|ies)|headers?|logs?|traces?|prompts?|cases?|tool_args?|provider_payloads?)|provider_payload|endpoint_values?|key_values?|api_key_values?|secret_values?|full_urls?|prompt_text|case_content|trace_content|log_content|tool_argument_value|gold_value|reference_value|expected_value|scorer_diffs?|candidate_outputs?|huawei_claim|performance_claim)(_|$)",
+    r"(^|_)(raw_(requests?|responses?|bod(y|ies)|headers?|logs?|traces?|prompts?|cases?|tool_args?|provider_payloads?)|status_bod(y|ies)|provider_payload|endpoint_values?|key_values?|api_key_values?|secret_values?|full_urls?|prompt_text|case_content|trace_content|log_content|tool_argument_value|gold_value|reference_value|expected_value|scorer_diffs?|candidate_outputs?|huawei_claim|performance_claim)(_|$)",
     re.IGNORECASE,
 )
 FORBIDDEN_VALUE_RE = re.compile(
-    ("s" + "k-" + r"[A-Za-z0-9_-]{16,}|https?://|api[_ -]?key|bearer |endpoint value|key value|full url|secret|provider payload|raw request|raw response|raw body|raw header|raw log|raw trace|raw prompt|raw case|raw tool arg|scorer diff|candidate output|huawei|\+3pp|performance evidence"),
+    ("s" + "k-" + r"[A-Za-z0-9_-]{16,}|https?://|api[_ -]?key|bearer |endpoint value|key value|full url|secret|provider payload|raw request|raw response|raw body|raw header|raw log|raw trace|raw prompt|raw case|raw tool arg|status body|scorer diff|candidate output|huawei|\+3pp|performance evidence"),
     re.IGNORECASE,
 )
 ALLOWED_RAW_KEYS = {"raw_outputs_removed", "raw_outputs_committed"}
@@ -121,17 +122,22 @@ def validate(data: dict[str, Any]) -> list[str]:
         record: dict[str, Any] = {}
     else:
         record = records[0]
+    schema_version = data.get("compact_schema_version")
     missing = [field for field in REQUIRED_COMPACT_FIELDS if field not in record]
-    if data.get("compact_schema_version") != "live_provider_preflight_endpoint_base_url_v2":
-        legacy_optional = {"base_url_env_present", "endpoint_mode_label", "selected_endpoint_env_label", "transport_path_join_label"}
-        missing = [field for field in missing if field not in legacy_optional]
+    legacy_optional: set[str] = set()
+    if schema_version not in {"live_provider_preflight_endpoint_base_url_v2", "live_provider_preflight_http_status_label_v3"}:
+        legacy_optional.update({"base_url_env_present", "endpoint_mode_label", "selected_endpoint_env_label", "transport_path_join_label"})
+    if schema_version != "live_provider_preflight_http_status_label_v3":
+        legacy_optional.add("provider_http_status_label")
+    missing = [field for field in missing if field not in legacy_optional]
     extra = [field for field in record if field not in REQUIRED_COMPACT_FIELDS]
     if missing:
         blockers.append(f"missing_required_fields:{missing!r}")
     if extra:
         blockers.append(f"extra_fields:{extra!r}")
     if record:
-        require_transport_labels = data.get("compact_schema_version") == "live_provider_preflight_endpoint_base_url_v2"
+        require_transport_labels = schema_version in {"live_provider_preflight_endpoint_base_url_v2", "live_provider_preflight_http_status_label_v3"}
+        require_http_status_label = schema_version == "live_provider_preflight_http_status_label_v3"
         for key in ("preflight_command_executed", "provider_request_executed", "provider_call_started", "endpoint_env_present", "base_url_env_present", "api_key_env_present", "https_endpoint_valid"):
             if key == "base_url_env_present" and not require_transport_labels and key not in record:
                 continue
@@ -139,6 +145,9 @@ def validate(data: dict[str, Any]) -> list[str]:
                 blockers.append(f"{key}_not_bool:{record.get(key)!r}")
         if record.get("http_status_class") not in HTTP_STATUS_CLASSES:
             blockers.append(f"http_status_class_invalid:{record.get('http_status_class')!r}")
+        if require_http_status_label or record.get("provider_http_status_label") is not None:
+            if record.get("provider_http_status_label") not in PROVIDER_HTTP_STATUS_LABELS:
+                blockers.append(f"provider_http_status_label_invalid:{record.get('provider_http_status_label')!r}")
         if record.get("auth_status_label") not in AUTH_LABELS:
             blockers.append(f"auth_status_label_invalid:{record.get('auth_status_label')!r}")
         if record.get("model_route_label") not in MODEL_LABELS:
@@ -187,6 +196,7 @@ def check(path: Path = DEFAULT_ARTIFACT) -> dict[str, Any]:
         "provider_request_executed": record.get("provider_request_executed") if isinstance(record, dict) else None,
         "provider_call_started": record.get("provider_call_started") if isinstance(record, dict) else None,
         "http_status_class": record.get("http_status_class") if isinstance(record, dict) else None,
+        "provider_http_status_label": record.get("provider_http_status_label") if isinstance(record, dict) else None,
         "auth_status_label": record.get("auth_status_label") if isinstance(record, dict) else None,
         "bfcl_generate_started": record.get("bfcl_generate_started") if isinstance(record, dict) else None,
         "bfcl_evaluate_started": record.get("bfcl_evaluate_started") if isinstance(record, dict) else None,

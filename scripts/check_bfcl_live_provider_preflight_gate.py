@@ -22,6 +22,7 @@ REQUIRED_COMPACT_FIELDS = [
     "selected_endpoint_env_label",
     "transport_path_join_label",
     "http_status_class",
+    "provider_http_status_label",
     "auth_status_label",
     "model_route_label",
     "chat_tool_call_label",
@@ -120,11 +121,11 @@ ALLOWED_FORBIDDEN_LIST_VALUES = {
     "+3pp performance evidence",
 }
 FORBIDDEN_KEY_RE = re.compile(
-    r"(^|_)(raw_(requests?|responses?|bod(y|ies)|headers?|logs?|traces?|prompts?|cases?|tool_args?|provider_payloads?)|provider_payload|endpoint_values?|key_values?|api_key_values?|secret_values?|full_urls?|prompt_text|case_content|trace_content|log_content|tool_argument_value|gold_value|reference_value|expected_value|scorer_diffs?|candidate_outputs?|huawei_claim|performance_claim)(_|$)",
+    r"(^|_)(raw_(requests?|responses?|bod(y|ies)|headers?|logs?|traces?|prompts?|cases?|tool_args?|provider_payloads?)|status_bod(y|ies)|provider_payload|endpoint_values?|key_values?|api_key_values?|secret_values?|full_urls?|prompt_text|case_content|trace_content|log_content|tool_argument_value|gold_value|reference_value|expected_value|scorer_diffs?|candidate_outputs?|huawei_claim|performance_claim)(_|$)",
     re.IGNORECASE,
 )
 FORBIDDEN_VALUE_RE = re.compile(
-    ("s" + "k-" + r"[A-Za-z0-9_-]{16,}|https?://|api[_ -]?key|bearer |endpoint value|key value|full url|secret|provider payload|raw request|raw response|raw body|raw header|raw log|raw trace|raw prompt|raw case|raw tool arg|scorer diff|candidate output|huawei|\+3pp|performance evidence"),
+    ("s" + "k-" + r"[A-Za-z0-9_-]{16,}|https?://|api[_ -]?key|bearer |endpoint value|key value|full url|secret|provider payload|raw request|raw response|raw body|raw header|raw log|raw trace|raw prompt|raw case|raw tool arg|status body|scorer diff|candidate output|huawei|\+3pp|performance evidence"),
     re.IGNORECASE,
 )
 
