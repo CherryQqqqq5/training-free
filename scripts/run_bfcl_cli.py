@@ -51,8 +51,26 @@ def _decoded_execution_output_count(value: Any) -> int:
     return 0
 
 
+def _entry_has_protocol_error_indicator(value: Any) -> bool:
+    if isinstance(value, dict):
+        for key, child in value.items():
+            if str(key).lower() in {"error", "exception", "traceback"}:
+                return True
+            if _entry_has_protocol_error_indicator(child):
+                return True
+        return False
+    if isinstance(value, list):
+        return any(_entry_has_protocol_error_indicator(child) for child in value)
+    if isinstance(value, str):
+        lowered = value.lower()
+        return "error during inference" in lowered or "protocol" in lowered or "exception" in lowered
+    return False
+
+
 def _preserve_decoded_execution_output_shape_entry(entry: Any) -> Any:
     if not isinstance(entry, dict):
+        return entry
+    if _entry_has_protocol_error_indicator(entry):
         return entry
     decoded_count = _decoded_execution_output_count(entry.get("inference_log"))
     if decoded_count <= 0:

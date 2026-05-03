@@ -395,3 +395,35 @@ def test_protocol_exception_result_remains_protocol_error(tmp_path):
     classification = _classify_result_for_run_id("web_search_base_0", tmp_path)
     assert classification["protocol_error_detected"] is True
     assert classification["status"] == "protocol_error"
+
+
+
+def test_mixed_protocol_error_with_nonempty_decoded_list_stays_protocol_error(tmp_path):
+    entry = {
+        "id": "web_search_base_0",
+        "result": "Error during inference: protocol failure",
+        "inference_log": [
+            {
+                "step_0": [
+                    {
+                        "role": "handler_log",
+                        "content": "Successfully decoded model response.",
+                        "model_response_decoded": ["decoded_execution_shape"],
+                    },
+                    {
+                        "role": "handler_log",
+                        "content": "Error decoding the model response. Proceed to next turn.",
+                        "error": "ProtocolError",
+                    },
+                ]
+            }
+        ],
+    }
+
+    patched = _preserve_decoded_execution_output_shape(entry)
+    assert "grc_decoded_execution_output_shape" not in patched
+    _write_with_patched_base_handler(tmp_path, entry)
+    classification = _classify_result_for_run_id("web_search_base_0", tmp_path)
+    assert classification["status"] == "protocol_error"
+    assert classification["protocol_error_detected"] is True
+    assert classification["tool_call_detected"] is False
