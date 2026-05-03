@@ -23,8 +23,14 @@ REQUIRED_COMPACT_FIELDS = [
     "transport_path_join_label",
     "http_status_class",
     "provider_http_status_label",
+    "capability_probe_kind",
     "status_classifier_only",
     "response_body_read",
+    "response_body_persisted",
+    "response_json_parse_label",
+    "openai_chat_shape_label",
+    "tool_call_present",
+    "text_present",
     "auth_status_label",
     "model_route_label",
     "chat_tool_call_label",
@@ -63,7 +69,6 @@ REQUIRED_TRUE_KEYS = (
     "compact_only",
     "one_attempt_only",
     "synthetic_probe_only",
-    "status_classifier_only",
     "fail_if_output_artifact_exists",
     "raw_output_cleanup_required",
 )
@@ -198,6 +203,11 @@ def validate_packet(data: dict[str, Any]) -> list[str]:
             blockers.append(f"{key}_not_true:{data.get(key)!r}")
     if data.get("requested_future_scope") != "one_synthetic_live_provider_preflight_attempt_only":
         blockers.append(f"requested_future_scope_invalid:{data.get('requested_future_scope')!r}")
+
+    if data.get("capability_probe_kind") != "chat_tool_call_shape":
+        blockers.append(f"capability_probe_kind_invalid:{data.get('capability_probe_kind')!r}")
+    if data.get("status_classifier_only") is not False:
+        blockers.append(f"status_classifier_only_not_false:{data.get('status_classifier_only')!r}")
     if data.get("route_profile") != "novacode" or data.get("route_model") != "gpt-4.1":
         blockers.append("route_drift")
     if data.get("signed_base_url_env_vars") != SIGNED_BASE_URL_ENVS:

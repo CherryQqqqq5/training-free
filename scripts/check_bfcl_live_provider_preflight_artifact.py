@@ -29,7 +29,10 @@ MODEL_LABELS = {"not_checked", "available", "unavailable", "unknown"}
 ENDPOINT_MODE_LABELS = {"not_selected", "base_url", "full_endpoint"}
 SELECTED_ENDPOINT_ENV_LABELS = set(SIGNED_BASE_URL_ENVS + SIGNED_ENDPOINT_ENVS + ["none"])
 TRANSPORT_PATH_JOIN_LABELS = {"not_reached", "base_url_path_appended", "base_url_chat_completions_appended", "endpoint_used_as_is"}
-CHECK_LABELS = {"not_checked", "passed", "failed", "missing_tool_call", "missing_text", "transport_error", "unknown"}
+CHECK_LABELS = {"not_checked", "passed", "failed", "missing_tool_call", "missing_text", "transport_error", "non_2xx", "malformed", "unknown"}
+CAPABILITY_PROBE_KINDS = {"not_checked", "chat_tool_call_shape"}
+RESPONSE_JSON_PARSE_LABELS = {"parsed_json", "invalid_json", "empty_body", "not_read"}
+OPENAI_CHAT_SHAPE_LABELS = {"choices_message", "choices_no_message", "no_choices", "malformed", "not_checked"}
 TRACE_LABELS = {"not_persisted_compact_only", "not_observed", "unknown"}
 EXIT_CODE_CLASSES = {"zero", "nonzero_1", "nonzero_other", "not_executed"}
 FAILED_CHECK_LABELS = {
@@ -126,12 +129,15 @@ def validate(data: dict[str, Any]) -> list[str]:
     missing = [field for field in REQUIRED_COMPACT_FIELDS if field not in record]
     legacy_optional: set[str] = set()
     status_classifier_schema = "live_provider_preflight_status_classifier_v4"
-    if schema_version not in {"live_provider_preflight_endpoint_base_url_v2", "live_provider_preflight_http_status_label_v3", status_classifier_schema}:
+    capability_schema = "live_provider_preflight_chat_tool_shape_v5"
+    if schema_version not in {"live_provider_preflight_endpoint_base_url_v2", "live_provider_preflight_http_status_label_v3", status_classifier_schema, capability_schema}:
         legacy_optional.update({"base_url_env_present", "endpoint_mode_label", "selected_endpoint_env_label", "transport_path_join_label"})
-    if schema_version not in {"live_provider_preflight_http_status_label_v3", status_classifier_schema}:
+    if schema_version not in {"live_provider_preflight_http_status_label_v3", status_classifier_schema, capability_schema}:
         legacy_optional.add("provider_http_status_label")
-    if schema_version != status_classifier_schema:
+    if schema_version not in {status_classifier_schema, capability_schema}:
         legacy_optional.update({"status_classifier_only", "response_body_read"})
+    if schema_version != capability_schema:
+        legacy_optional.update({"capability_probe_kind", "response_body_persisted", "response_json_parse_label", "openai_chat_shape_label", "tool_call_present", "text_present"})
     missing = [field for field in missing if field not in legacy_optional]
     extra = [field for field in record if field not in REQUIRED_COMPACT_FIELDS]
     if missing:
@@ -139,12 +145,14 @@ def validate(data: dict[str, Any]) -> list[str]:
     if extra:
         blockers.append(f"extra_fields:{extra!r}")
     if record:
-        require_transport_labels = schema_version in {"live_provider_preflight_endpoint_base_url_v2", "live_provider_preflight_http_status_label_v3", status_classifier_schema}
-        require_http_status_label = schema_version in {"live_provider_preflight_http_status_label_v3", status_classifier_schema}
-        for key in ("preflight_command_executed", "provider_request_executed", "provider_call_started", "endpoint_env_present", "base_url_env_present", "api_key_env_present", "https_endpoint_valid", "status_classifier_only", "response_body_read"):
+        require_transport_labels = schema_version in {"live_provider_preflight_endpoint_base_url_v2", "live_provider_preflight_http_status_label_v3", status_classifier_schema, capability_schema}
+        require_http_status_label = schema_version in {"live_provider_preflight_http_status_label_v3", status_classifier_schema, capability_schema}
+        for key in ("preflight_command_executed", "provider_request_executed", "provider_call_started", "endpoint_env_present", "base_url_env_present", "api_key_env_present", "https_endpoint_valid", "status_classifier_only", "response_body_read", "response_body_persisted", "tool_call_present", "text_present"):
             if key == "base_url_env_present" and not require_transport_labels and key not in record:
                 continue
-            if key in {"status_classifier_only", "response_body_read"} and schema_version != status_classifier_schema and key not in record:
+            if key in {"status_classifier_only", "response_body_read"} and schema_version not in {status_classifier_schema, capability_schema} and key not in record:
+                continue
+            if key in {"response_body_persisted", "tool_call_present", "text_present"} and schema_version != capability_schema and key not in record:
                 continue
             if record.get(key) not in (True, False):
                 blockers.append(f"{key}_not_bool:{record.get(key)!r}")
@@ -153,6 +161,13 @@ def validate(data: dict[str, Any]) -> list[str]:
         if require_http_status_label or record.get("provider_http_status_label") is not None:
             if record.get("provider_http_status_label") not in PROVIDER_HTTP_STATUS_LABELS:
                 blockers.append(f"provider_http_status_label_invalid:{record.get('provider_http_status_label')!r}")
+        if schema_version == capability_schema:
+            if record.get("capability_probe_kind") not in CAPABILITY_PROBE_KINDS:
+                blockers.append(f"capability_probe_kind_invalid:{record.get('capability_probe_kind')!r}")
+            if record.get("response_json_parse_label") not in RESPONSE_JSON_PARSE_LABELS:
+                blockers.append(f"response_json_parse_label_invalid:{record.get('response_json_parse_label')!r}")
+            if record.get("openai_chat_shape_label") not in OPENAI_CHAT_SHAPE_LABELS:
+                blockers.append(f"openai_chat_shape_label_invalid:{record.get('openai_chat_shape_label')!r}")
         if record.get("auth_status_label") not in AUTH_LABELS:
             blockers.append(f"auth_status_label_invalid:{record.get('auth_status_label')!r}")
         if record.get("model_route_label") not in MODEL_LABELS:
@@ -182,6 +197,12 @@ def validate(data: dict[str, Any]) -> list[str]:
             blockers.append(f"status_classifier_only_not_true:{record.get('status_classifier_only')!r}")
         if schema_version == status_classifier_schema and record.get("response_body_read") is not False:
             blockers.append(f"response_body_read_not_false:{record.get('response_body_read')!r}")
+        if schema_version == capability_schema and record.get("status_classifier_only") is not False:
+            blockers.append(f"status_classifier_only_not_false:{record.get('status_classifier_only')!r}")
+        if schema_version == capability_schema and record.get("provider_request_executed") is True and record.get("response_body_read") is not True:
+            blockers.append(f"response_body_read_not_true:{record.get('response_body_read')!r}")
+        if schema_version == capability_schema and record.get("response_body_persisted") is not False:
+            blockers.append(f"response_body_persisted_not_false:{record.get('response_body_persisted')!r}")
         if record.get("candidate_specs_inert") is not True:
             blockers.append(f"candidate_specs_inert_not_true:{record.get('candidate_specs_inert')!r}")
         if record.get("raw_outputs_removed") is not True:
@@ -206,8 +227,14 @@ def check(path: Path = DEFAULT_ARTIFACT) -> dict[str, Any]:
         "provider_call_started": record.get("provider_call_started") if isinstance(record, dict) else None,
         "http_status_class": record.get("http_status_class") if isinstance(record, dict) else None,
         "provider_http_status_label": record.get("provider_http_status_label") if isinstance(record, dict) else None,
+        "capability_probe_kind": record.get("capability_probe_kind") if isinstance(record, dict) else None,
         "status_classifier_only": record.get("status_classifier_only") if isinstance(record, dict) else None,
         "response_body_read": record.get("response_body_read") if isinstance(record, dict) else None,
+        "response_body_persisted": record.get("response_body_persisted") if isinstance(record, dict) else None,
+        "response_json_parse_label": record.get("response_json_parse_label") if isinstance(record, dict) else None,
+        "openai_chat_shape_label": record.get("openai_chat_shape_label") if isinstance(record, dict) else None,
+        "tool_call_present": record.get("tool_call_present") if isinstance(record, dict) else None,
+        "text_present": record.get("text_present") if isinstance(record, dict) else None,
         "auth_status_label": record.get("auth_status_label") if isinstance(record, dict) else None,
         "bfcl_generate_started": record.get("bfcl_generate_started") if isinstance(record, dict) else None,
         "bfcl_evaluate_started": record.get("bfcl_evaluate_started") if isinstance(record, dict) else None,

@@ -30,6 +30,7 @@ DEFAULT_OUTPUT = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_live_provid
 TOY_TOOL_NAME = "synthetic_live_provider_preflight_ping"
 PostJson = Callable[..., Any]
 STATUS_CLASSIFIER_SCHEMA = "live_provider_preflight_status_classifier_v4"
+CAPABILITY_SCHEMA = "live_provider_preflight_chat_tool_shape_v5"
 
 
 def _first_present_env(env: dict[str, str], names: list[str]) -> tuple[bool, str | None, str]:
@@ -130,7 +131,7 @@ def _chat_text_payload() -> dict[str, Any]:
     return {"model": "gpt-4.1", "messages": [{"role": "user", "content": "Reply with the single word PONG."}], "temperature": 0, "max_tokens": 8}
 
 
-def _default_post_json(target_url: str, api_key: str, payload: dict[str, Any]) -> tuple[Any, dict[str, Any]]:
+def _default_post_json(target_url: str, api_key: str, payload: dict[str, Any]) -> tuple[Any, Any, str]:
     request = urllib.request.Request(
         target_url,
         data=json.dumps(payload, separators=(",", ":")).encode("utf-8"),
@@ -139,12 +140,66 @@ def _default_post_json(target_url: str, api_key: str, payload: dict[str, Any]) -
     )
     try:
         with urllib.request.urlopen(request, timeout=30) as response:
-            return int(response.status), {}
+            status = int(response.status)
+            body = response.read()
     except urllib.error.HTTPError as exc:
-        return int(exc.code), {}
+        status = int(exc.code)
+        body = exc.read()
     except Exception:
-        return None, {}
+        return None, {}, "not_read"
+    if not body:
+        return status, {}, "empty_body"
+    try:
+        return status, json.loads(body.decode("utf-8")), "parsed_json"
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        return status, {}, "invalid_json"
 
+
+
+def _normalize_post_result(result: Any) -> tuple[Any, Any, str]:
+    if isinstance(result, tuple) and len(result) == 3:
+        return result[0], result[1], str(result[2])
+    if isinstance(result, tuple) and len(result) == 2:
+        return result[0], result[1], "parsed_json" if isinstance(result[1], dict) else "invalid_json"
+    return None, {}, "not_read"
+
+
+def _content_text_present(value: Any) -> bool:
+    if isinstance(value, str):
+        return bool(value.strip())
+    if isinstance(value, list):
+        return any(_content_text_present(item) for item in value)
+    if isinstance(value, dict):
+        for key in ("text", "content", "input_text", "output_text"):
+            if _content_text_present(value.get(key)):
+                return True
+    return False
+
+
+def _chat_message(payload: Any) -> tuple[str, dict[str, Any]]:
+    if not isinstance(payload, dict):
+        return "malformed", {}
+    choices = payload.get("choices")
+    if not isinstance(choices, list) or not choices:
+        return "no_choices", {}
+    first = choices[0]
+    if not isinstance(first, dict):
+        return "choices_no_message", {}
+    message = first.get("message")
+    if not isinstance(message, dict):
+        return "choices_no_message", {}
+    return "choices_message", message
+
+
+def _message_has_tool_call(message: dict[str, Any]) -> bool:
+    calls = message.get("tool_calls")
+    if not isinstance(calls, list):
+        return False
+    for call in calls:
+        function = call.get("function") if isinstance(call, dict) and isinstance(call.get("function"), dict) else {}
+        if function.get("name") == TOY_TOOL_NAME:
+            return True
+    return False
 
 def _chat_has_tool_call(payload: dict[str, Any]) -> bool:
     choices = payload.get("choices") if isinstance(payload.get("choices"), list) else []
@@ -196,8 +251,14 @@ def _base_record(*, command_executed: bool = False) -> dict[str, Any]:
         "transport_path_join_label": "not_reached",
         "http_status_class": "not_observed",
         "provider_http_status_label": "not_observed",
-        "status_classifier_only": True,
+        "capability_probe_kind": "chat_tool_call_shape",
+        "status_classifier_only": False,
         "response_body_read": False,
+        "response_body_persisted": False,
+        "response_json_parse_label": "not_read",
+        "openai_chat_shape_label": "not_checked",
+        "tool_call_present": False,
+        "text_present": False,
         "auth_status_label": "not_checked",
         "model_route_label": "not_checked",
         "chat_tool_call_label": "not_checked",
@@ -228,7 +289,7 @@ def _set_failure(record: dict[str, Any], label: str, stage: str) -> None:
 def _write_artifact(record: dict[str, Any], output_artifact: Path) -> None:
     payload = {
         "artifact_kind": "bfcl_live_provider_preflight_compact",
-        "compact_schema_version": STATUS_CLASSIFIER_SCHEMA,
+        "compact_schema_version": CAPABILITY_SCHEMA,
         "measurement_kind": "compact_synthetic_live_provider_preflight",
         "route_profile": "novacode",
         "route_model": "gpt-4.1",
@@ -350,8 +411,10 @@ def execute_live_provider_preflight(
             record["provider_call_started"] = True
             target_url, join_label = _transport_target(base_url, endpoint, "/chat/completions", endpoint_mode)
             record["transport_path_join_label"] = join_label
-            status, _response = selected_post_json(target_url, api_key or "", _chat_tool_payload())
+            status, response, parse_label = _normalize_post_result(selected_post_json(target_url, api_key or "", _chat_tool_payload()))
             record["provider_request_executed"] = True
+            record["response_body_read"] = True
+            record["response_json_parse_label"] = parse_label
         except Exception:
             record["http_status_class"] = "transport_error"
             record["provider_http_status_label"] = "transport_error"
@@ -367,16 +430,31 @@ def execute_live_provider_preflight(
                 blockers.append("provider_auth_failed")
             elif status_class != "2xx":
                 record["auth_status_label"] = "unknown"
+                record["chat_tool_call_label"] = "non_2xx"
                 _set_failure(record, "provider_non_2xx", "provider_non_2xx")
                 blockers.append("provider_non_2xx")
             else:
                 record["auth_status_label"] = "ok"
-                record["model_route_label"] = "unknown"
+                record["model_route_label"] = "available"
+                shape_label, message = _chat_message(response)
+                record["openai_chat_shape_label"] = shape_label
+                record["tool_call_present"] = _message_has_tool_call(message)
+                record["text_present"] = _content_text_present(message.get("content"))
+                if shape_label != "choices_message":
+                    record["chat_tool_call_label"] = "malformed"
+                    _set_failure(record, "chat_tool_call", "chat_tool_call_shape_malformed")
+                    blockers.append("chat_tool_call")
+                elif record["tool_call_present"]:
+                    record["chat_tool_call_label"] = "passed"
+                else:
+                    record["chat_tool_call_label"] = "missing_tool_call"
+                    _set_failure(record, "chat_tool_call", "chat_tool_call_missing_tool_call")
+                    blockers.append("chat_tool_call")
 
     if not blockers:
         record["preflight_failed_check_label"] = "none_observed"
         record["stop_gate_triggered"] = "stopped_after_live_provider_preflight"
-        record["suspected_live_preflight_failure_stage"] = "status_classifier_completed_without_body_read"
+        record["suspected_live_preflight_failure_stage"] = "chat_tool_call_shape_classified_without_raw_persistence"
     record["preflight_exact_exit_code_class"] = _exit_code_class(blockers)
     _write_artifact(record, output_artifact)
     artifact_summary = check_artifact(output_artifact)
