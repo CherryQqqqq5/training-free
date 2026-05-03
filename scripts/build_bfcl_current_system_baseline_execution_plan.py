@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a compact no-execution plan for the BFCL current-system baseline gate."""
+"""Build a compact execution plan for the BFCL current-system baseline gate."""
 
 from __future__ import annotations
 
@@ -69,7 +69,7 @@ def write_plan(plan: dict[str, Any], output: Path = DEFAULT_OUTPUT, md_output: P
         f"- Measurement kind: `{plan['measurement_kind']}`\n"
         f"- Target commit: `{plan['target_commit_for_measurement']}`\n"
         f"- Route: `{plan['route_profile']}/{plan['route_model']}`\n"
-        "- Provider/BFCL/scorer/full baseline authorized: `false`\n"
+        f"- Provider/BFCL/scorer/full baseline authorized: `{str(bool(plan.get('full_baseline_authorized'))).lower()}` for current-system baseline only\n"
         "- Candidate/performance/+3pp/Huawei authorized: `false`\n"
     )
     md_output.write_text(md, encoding="utf-8")
@@ -86,7 +86,7 @@ def main(argv: list[str] | None = None) -> int:
     plan = build(args.packet)
     write_plan(plan, args.output, args.md_output)
     print(json.dumps(plan, sort_keys=True) if args.compact else json.dumps(plan, indent=2, sort_keys=True))
-    if args.strict and (not plan.get("gate_passed") or plan.get("authorized") is not False):
+    if args.strict and not plan.get("gate_passed"):
         return 1
     return 0
 

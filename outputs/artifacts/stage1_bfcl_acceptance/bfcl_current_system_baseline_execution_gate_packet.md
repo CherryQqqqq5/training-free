@@ -27,3 +27,6 @@ Future execution must stop on route drift, candidate activation, raw/secret leak
 ## Claim Policy
 
 This gate requests only current-system baseline measurement readiness. It does not authorize candidate comparison, +3pp, SOTA, Huawei, or performance claims.
+
+- Approval scope: `current_system_baseline_execution_only`
+- Candidate activation, candidate artifacts, performance/+3pp/SOTA/Huawei claims remain `false`.

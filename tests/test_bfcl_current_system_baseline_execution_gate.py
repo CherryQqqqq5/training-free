@@ -12,11 +12,26 @@ def _packet() -> dict:
     return json.loads(DEFAULT_PACKET.read_text(encoding="utf-8"))
 
 
-def test_committed_pending_packet_passes_fail_closed_gate() -> None:
+def _pending_packet() -> dict:
+    data = copy.deepcopy(_packet())
+    data["approval_status"] = "pending"
+    for key in (
+        "authorized",
+        "provider_call_authorized",
+        "bfcl_generate_authorized",
+        "bfcl_evaluate_authorized",
+        "scorer_authorized",
+        "full_baseline_authorized",
+    ):
+        data[key] = False
+    return data
+
+
+def test_committed_approved_packet_passes_baseline_only_gate() -> None:
     summary = check(DEFAULT_PACKET)
     assert summary["bfcl_current_system_baseline_execution_gate_passed"] is True
-    assert summary["approval_status"] == "pending"
-    assert summary["authorized"] is False
+    assert summary["approval_status"] == "approved"
+    assert summary["authorized"] is True
     assert summary["measurement_kind"] == "current_system_baseline_only"
     assert summary["route_profile"] == "novacode"
     assert summary["route_model"] == "gpt-4.1"
@@ -32,7 +47,7 @@ def test_rejects_execution_authorization_while_pending() -> None:
         "scorer_authorized",
         "full_baseline_authorized",
     ):
-        data = copy.deepcopy(_packet())
+        data = _pending_packet()
         data[key] = True
         blockers = validate(data, current_head=data["target_commit_for_measurement"])
         assert any(key in blocker for blocker in blockers)
@@ -48,7 +63,7 @@ def test_rejects_candidate_and_performance_flags() -> None:
         "sota_3pp_claim_ready",
         "huawei_acceptance_ready",
     ):
-        data = copy.deepcopy(_packet())
+        data = _pending_packet()
         data[key] = True
         blockers = validate(data, current_head=data["target_commit_for_measurement"])
         assert any(key in blocker for blocker in blockers)
@@ -139,12 +154,12 @@ def test_target_commit_mismatch_allowed_with_gate_only_justification() -> None:
 def test_plan_builder_is_no_execution_and_freezes_outputs() -> None:
     plan = build(DEFAULT_PACKET)
     assert plan["gate_passed"] is True
-    assert plan["authorized"] is False
-    assert plan["provider_call_authorized"] is False
-    assert plan["bfcl_generate_authorized"] is False
-    assert plan["bfcl_evaluate_authorized"] is False
-    assert plan["scorer_authorized"] is False
-    assert plan["full_baseline_authorized"] is False
+    assert plan["authorized"] is True
+    assert plan["provider_call_authorized"] is True
+    assert plan["bfcl_generate_authorized"] is True
+    assert plan["bfcl_evaluate_authorized"] is True
+    assert plan["scorer_authorized"] is True
+    assert plan["full_baseline_authorized"] is True
     assert plan["candidate_runtime_activation_authorized"] is False
     assert plan["performance_evidence"] is False
     assert plan["sota_3pp_claim_ready"] is False

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check the pending BFCL current-system baseline execution gate."""
+"""Check the BFCL current-system baseline execution gate."""
 
 from __future__ import annotations
 
@@ -11,13 +11,15 @@ from pathlib import Path
 from typing import Any
 
 DEFAULT_PACKET = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_current_system_baseline_execution_gate_packet.json")
-FALSE_KEYS = (
+EXECUTION_AUTH_KEYS = (
     "authorized",
     "provider_call_authorized",
     "bfcl_generate_authorized",
     "bfcl_evaluate_authorized",
     "scorer_authorized",
     "full_baseline_authorized",
+)
+ALWAYS_FALSE_KEYS = (
     "candidate_runtime_activation_authorized",
     "candidate_jsonl_authorized",
     "candidate_pool_ready",
@@ -128,9 +130,14 @@ def validate(data: dict[str, Any], *, current_head: str | None = None) -> list[s
     current_head = current_head or _current_head()
     if data.get("artifact_kind") != "bfcl_current_system_baseline_execution_gate_packet":
         blockers.append(f"artifact_kind_invalid:{data.get('artifact_kind')!r}")
-    if data.get("approval_status") != "pending":
-        blockers.append(f"approval_status_not_pending:{data.get('approval_status')!r}")
-    for key in FALSE_KEYS:
+    approval_status = data.get("approval_status")
+    if approval_status not in {"pending", "approved"}:
+        blockers.append(f"approval_status_invalid:{approval_status!r}")
+    execution_expected = approval_status == "approved"
+    for key in EXECUTION_AUTH_KEYS:
+        if data.get(key) is not execution_expected:
+            blockers.append(f"{key}_not_{str(execution_expected).lower()}:{data.get(key)!r}")
+    for key in ALWAYS_FALSE_KEYS:
         if data.get(key) is not False:
             blockers.append(f"{key}_not_false:{data.get(key)!r}")
     for key in TRUE_KEYS:
