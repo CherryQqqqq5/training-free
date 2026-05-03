@@ -29,6 +29,7 @@ from scripts.check_bfcl_live_provider_preflight_gate import (
 DEFAULT_OUTPUT = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_live_provider_preflight_compact.json")
 TOY_TOOL_NAME = "synthetic_live_provider_preflight_ping"
 PostJson = Callable[..., Any]
+STATUS_CLASSIFIER_SCHEMA = "live_provider_preflight_status_classifier_v4"
 
 
 def _first_present_env(env: dict[str, str], names: list[str]) -> tuple[bool, str | None, str]:
@@ -138,17 +139,11 @@ def _default_post_json(target_url: str, api_key: str, payload: dict[str, Any]) -
     )
     try:
         with urllib.request.urlopen(request, timeout=30) as response:
-            status = int(response.status)
-            body = response.read()
+            return int(response.status), {}
     except urllib.error.HTTPError as exc:
         return int(exc.code), {}
     except Exception:
         return None, {}
-    try:
-        parsed = json.loads(body.decode("utf-8")) if body else {}
-    except (UnicodeDecodeError, json.JSONDecodeError):
-        parsed = {}
-    return status, parsed if isinstance(parsed, dict) else {}
 
 
 def _chat_has_tool_call(payload: dict[str, Any]) -> bool:
@@ -201,6 +196,8 @@ def _base_record(*, command_executed: bool = False) -> dict[str, Any]:
         "transport_path_join_label": "not_reached",
         "http_status_class": "not_observed",
         "provider_http_status_label": "not_observed",
+        "status_classifier_only": True,
+        "response_body_read": False,
         "auth_status_label": "not_checked",
         "model_route_label": "not_checked",
         "chat_tool_call_label": "not_checked",
@@ -231,7 +228,7 @@ def _set_failure(record: dict[str, Any], label: str, stage: str) -> None:
 def _write_artifact(record: dict[str, Any], output_artifact: Path) -> None:
     payload = {
         "artifact_kind": "bfcl_live_provider_preflight_compact",
-        "compact_schema_version": "live_provider_preflight_http_status_label_v3",
+        "compact_schema_version": STATUS_CLASSIFIER_SCHEMA,
         "measurement_kind": "compact_synthetic_live_provider_preflight",
         "route_profile": "novacode",
         "route_model": "gpt-4.1",
@@ -349,54 +346,37 @@ def execute_live_provider_preflight(
     else:
         record["https_endpoint_valid"] = True
         selected_post_json = _default_post_json if post_json is None else post_json
-        specs = [
-            ("chat_tool_call_label", "/v1/chat/completions", _chat_tool_payload(), _chat_has_tool_call, "chat_tool_call"),
-            ("responses_tool_call_label", "/v1/responses", _responses_tool_payload(), _responses_has_tool_call, "responses_tool_call"),
-            ("chat_text_response_label", "/v1/chat/completions", _chat_text_payload(), _chat_has_pong, "chat_text_response"),
-        ]
-        for field, path, payload, validator, failed_label in specs:
-            try:
-                record["provider_call_started"] = True
-                target_url, join_label = _transport_target(base_url, endpoint, path, endpoint_mode)
-                record["transport_path_join_label"] = join_label
-                status, response = selected_post_json(target_url, api_key or "", payload)
-                record["provider_request_executed"] = True
-            except Exception:
-                record["http_status_class"] = "transport_error"
-                record["provider_http_status_label"] = "transport_error"
-                record[field] = "transport_error"
-                _set_failure(record, "provider_transport_error", "provider_transport_error")
-                blockers.append("provider_transport_error")
-                break
+        try:
+            record["provider_call_started"] = True
+            target_url, join_label = _transport_target(base_url, endpoint, "/v1/chat/completions", endpoint_mode)
+            record["transport_path_join_label"] = join_label
+            status, _response = selected_post_json(target_url, api_key or "", _chat_tool_payload())
+            record["provider_request_executed"] = True
+        except Exception:
+            record["http_status_class"] = "transport_error"
+            record["provider_http_status_label"] = "transport_error"
+            _set_failure(record, "provider_transport_error", "provider_transport_error")
+            blockers.append("provider_transport_error")
+        else:
             status_class = _http_status_class(status)
             record["http_status_class"] = status_class
             record["provider_http_status_label"] = _provider_http_status_label(status)
             if status in {401, 403}:
                 record["auth_status_label"] = "auth_failed"
-                record[field] = "failed"
                 _set_failure(record, "provider_auth_failed", "provider_auth_failed")
                 blockers.append("provider_auth_failed")
-                break
-            if status_class != "2xx":
+            elif status_class != "2xx":
                 record["auth_status_label"] = "unknown"
-                record[field] = "failed"
                 _set_failure(record, "provider_non_2xx", "provider_non_2xx")
                 blockers.append("provider_non_2xx")
-                break
-            record["auth_status_label"] = "ok"
-            record["model_route_label"] = "available"
-            if validator(response):
-                record[field] = "passed"
             else:
-                record[field] = "missing_tool_call" if failed_label != "chat_text_response" else "missing_text"
-                _set_failure(record, failed_label, f"{failed_label}_failed")
-                blockers.append(failed_label)
-                break
+                record["auth_status_label"] = "ok"
+                record["model_route_label"] = "unknown"
 
     if not blockers:
         record["preflight_failed_check_label"] = "none_observed"
         record["stop_gate_triggered"] = "stopped_after_live_provider_preflight"
-        record["suspected_live_preflight_failure_stage"] = "live_provider_preflight_completed_without_bfcl_or_raw_persistence"
+        record["suspected_live_preflight_failure_stage"] = "status_classifier_completed_without_body_read"
     record["preflight_exact_exit_code_class"] = _exit_code_class(blockers)
     _write_artifact(record, output_artifact)
     artifact_summary = check_artifact(output_artifact)

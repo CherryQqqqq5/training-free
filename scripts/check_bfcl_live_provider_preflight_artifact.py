@@ -125,10 +125,13 @@ def validate(data: dict[str, Any]) -> list[str]:
     schema_version = data.get("compact_schema_version")
     missing = [field for field in REQUIRED_COMPACT_FIELDS if field not in record]
     legacy_optional: set[str] = set()
-    if schema_version not in {"live_provider_preflight_endpoint_base_url_v2", "live_provider_preflight_http_status_label_v3"}:
+    status_classifier_schema = "live_provider_preflight_status_classifier_v4"
+    if schema_version not in {"live_provider_preflight_endpoint_base_url_v2", "live_provider_preflight_http_status_label_v3", status_classifier_schema}:
         legacy_optional.update({"base_url_env_present", "endpoint_mode_label", "selected_endpoint_env_label", "transport_path_join_label"})
-    if schema_version != "live_provider_preflight_http_status_label_v3":
+    if schema_version not in {"live_provider_preflight_http_status_label_v3", status_classifier_schema}:
         legacy_optional.add("provider_http_status_label")
+    if schema_version != status_classifier_schema:
+        legacy_optional.update({"status_classifier_only", "response_body_read"})
     missing = [field for field in missing if field not in legacy_optional]
     extra = [field for field in record if field not in REQUIRED_COMPACT_FIELDS]
     if missing:
@@ -136,10 +139,12 @@ def validate(data: dict[str, Any]) -> list[str]:
     if extra:
         blockers.append(f"extra_fields:{extra!r}")
     if record:
-        require_transport_labels = schema_version in {"live_provider_preflight_endpoint_base_url_v2", "live_provider_preflight_http_status_label_v3"}
-        require_http_status_label = schema_version == "live_provider_preflight_http_status_label_v3"
-        for key in ("preflight_command_executed", "provider_request_executed", "provider_call_started", "endpoint_env_present", "base_url_env_present", "api_key_env_present", "https_endpoint_valid"):
+        require_transport_labels = schema_version in {"live_provider_preflight_endpoint_base_url_v2", "live_provider_preflight_http_status_label_v3", status_classifier_schema}
+        require_http_status_label = schema_version in {"live_provider_preflight_http_status_label_v3", status_classifier_schema}
+        for key in ("preflight_command_executed", "provider_request_executed", "provider_call_started", "endpoint_env_present", "base_url_env_present", "api_key_env_present", "https_endpoint_valid", "status_classifier_only", "response_body_read"):
             if key == "base_url_env_present" and not require_transport_labels and key not in record:
+                continue
+            if key in {"status_classifier_only", "response_body_read"} and schema_version != status_classifier_schema and key not in record:
                 continue
             if record.get(key) not in (True, False):
                 blockers.append(f"{key}_not_bool:{record.get(key)!r}")
@@ -173,6 +178,10 @@ def validate(data: dict[str, Any]) -> list[str]:
         for key in ("bfcl_generate_started", "bfcl_evaluate_started", "scorer_started", "full_baseline_executed", "performance_evidence", "raw_outputs_committed"):
             if record.get(key) is not False:
                 blockers.append(f"{key}_not_false:{record.get(key)!r}")
+        if schema_version == status_classifier_schema and record.get("status_classifier_only") is not True:
+            blockers.append(f"status_classifier_only_not_true:{record.get('status_classifier_only')!r}")
+        if schema_version == status_classifier_schema and record.get("response_body_read") is not False:
+            blockers.append(f"response_body_read_not_false:{record.get('response_body_read')!r}")
         if record.get("candidate_specs_inert") is not True:
             blockers.append(f"candidate_specs_inert_not_true:{record.get('candidate_specs_inert')!r}")
         if record.get("raw_outputs_removed") is not True:
@@ -197,6 +206,8 @@ def check(path: Path = DEFAULT_ARTIFACT) -> dict[str, Any]:
         "provider_call_started": record.get("provider_call_started") if isinstance(record, dict) else None,
         "http_status_class": record.get("http_status_class") if isinstance(record, dict) else None,
         "provider_http_status_label": record.get("provider_http_status_label") if isinstance(record, dict) else None,
+        "status_classifier_only": record.get("status_classifier_only") if isinstance(record, dict) else None,
+        "response_body_read": record.get("response_body_read") if isinstance(record, dict) else None,
         "auth_status_label": record.get("auth_status_label") if isinstance(record, dict) else None,
         "bfcl_generate_started": record.get("bfcl_generate_started") if isinstance(record, dict) else None,
         "bfcl_evaluate_started": record.get("bfcl_evaluate_started") if isinstance(record, dict) else None,

@@ -23,6 +23,8 @@ REQUIRED_COMPACT_FIELDS = [
     "transport_path_join_label",
     "http_status_class",
     "provider_http_status_label",
+    "status_classifier_only",
+    "response_body_read",
     "auth_status_label",
     "model_route_label",
     "chat_tool_call_label",
@@ -61,6 +63,7 @@ REQUIRED_TRUE_KEYS = (
     "compact_only",
     "one_attempt_only",
     "synthetic_probe_only",
+    "status_classifier_only",
     "fail_if_output_artifact_exists",
     "raw_output_cleanup_required",
 )

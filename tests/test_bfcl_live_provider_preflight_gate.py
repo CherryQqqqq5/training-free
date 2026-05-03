@@ -152,6 +152,8 @@ def test_dry_run_does_not_source_profile_read_secrets_or_execute_provider() -> N
     assert plan["transport_path_join_label"] == "not_reached"
     assert plan["http_status_class"] == "not_observed"
     assert plan["provider_http_status_label"] == "not_observed"
+    assert plan["status_classifier_only"] is True
+    assert plan["response_body_read"] is False
     summary_text = json.dumps(plan, sort_keys=True)
     assert "endpoint_value_read" not in summary_text
     assert "api_key_value_read" not in summary_text
@@ -175,6 +177,8 @@ def test_pending_execute_fails_closed_before_env_or_provider(tmp_path: Path) -> 
     assert summary["provider_request_executed"] is False
     assert summary["provider_call_started"] is False
     assert summary["provider_http_status_label"] == "not_observed"
+    assert summary["status_classifier_only"] is True
+    assert summary["response_body_read"] is False
     assert summary["env_profile_sourced"] is False
     assert summary["bfcl_generate_started"] is False
     assert summary["bfcl_evaluate_started"] is False
@@ -191,6 +195,8 @@ def test_approved_execute_missing_env_writes_compact_failure_without_provider(tm
     assert summary["provider_request_executed"] is False
     assert summary["provider_call_started"] is False
     assert summary["provider_http_status_label"] == "not_observed"
+    assert summary["status_classifier_only"] is True
+    assert summary["response_body_read"] is False
     artifact_summary = check_artifact(output)
     assert artifact_summary["bfcl_live_provider_preflight_artifact_passed"] is True
     text = output.read_text(encoding="utf-8")
@@ -203,11 +209,7 @@ def test_approved_execute_base_url_mode_appends_probe_paths(tmp_path: Path) -> N
     env = {"NOVACODE_BASE_URL": "https://provider.invalid/base", "CHUANGZHI_API_KEY": "secret-test-key"}
     output = tmp_path / "artifact.json"
     summary = execute_live_provider_preflight(_approved_packet(tmp_path), output, environ=env, post_json=_capturing_success(calls))
-    assert calls == [
-        "https://provider.invalid/base/v1/chat/completions",
-        "https://provider.invalid/base/v1/responses",
-        "https://provider.invalid/base/v1/chat/completions",
-    ]
+    assert calls == ["https://provider.invalid/base/v1/chat/completions"]
     assert summary["blockers"] == []
     assert summary["preflight_command_executed"] is True
     assert summary["provider_request_executed"] is True
@@ -221,11 +223,13 @@ def test_approved_execute_base_url_mode_appends_probe_paths(tmp_path: Path) -> N
     assert summary["transport_path_join_label"] == "base_url_path_appended"
     assert summary["http_status_class"] == "2xx"
     assert summary["provider_http_status_label"] == "unknown"
+    assert summary["status_classifier_only"] is True
+    assert summary["response_body_read"] is False
     assert summary["auth_status_label"] == "ok"
-    assert summary["model_route_label"] == "available"
-    assert summary["chat_tool_call_label"] == "passed"
-    assert summary["responses_tool_call_label"] == "passed"
-    assert summary["chat_text_response_label"] == "passed"
+    assert summary["model_route_label"] == "unknown"
+    assert summary["chat_tool_call_label"] == "not_checked"
+    assert summary["responses_tool_call_label"] == "not_checked"
+    assert summary["chat_text_response_label"] == "not_checked"
     assert summary["bfcl_generate_started"] is False
     assert summary["bfcl_evaluate_started"] is False
     assert summary["scorer_started"] is False
@@ -244,21 +248,43 @@ def test_approved_execute_full_endpoint_mode_does_not_append_probe_paths(tmp_pat
     env = {"CHUANGZHI_NOVACODE_ENDPOINT": "https://provider.invalid/full/chat", "CHUANGZHI_API_KEY": "secret-test-key"}
     output = tmp_path / "artifact.json"
     summary = execute_live_provider_preflight(_approved_packet(tmp_path), output, environ=env, post_json=_capturing_success(calls))
-    assert calls == [
-        "https://provider.invalid/full/chat",
-        "https://provider.invalid/full/chat",
-        "https://provider.invalid/full/chat",
-    ]
+    assert calls == ["https://provider.invalid/full/chat"]
     assert summary["blockers"] == []
     assert summary["endpoint_env_present"] is True
     assert summary["base_url_env_present"] is False
     assert summary["endpoint_mode_label"] == "full_endpoint"
     assert summary["selected_endpoint_env_label"] == "CHUANGZHI_NOVACODE_ENDPOINT"
     assert summary["transport_path_join_label"] == "endpoint_used_as_is"
+    assert summary["status_classifier_only"] is True
+    assert summary["response_body_read"] is False
     assert check_artifact(output)["bfcl_live_provider_preflight_artifact_passed"] is True
     text = output.read_text(encoding="utf-8")
     assert "https://provider.invalid" not in text
     assert "secret-test-key" not in text
+
+
+
+def test_default_transport_does_not_read_2xx_response_body(monkeypatch) -> None:
+    class FakeResponse:
+        status = 200
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, traceback):
+            return False
+
+        def read(self):  # pragma: no cover - must not be called
+            raise AssertionError("response body was read")
+
+    def fake_urlopen(request, timeout):
+        assert timeout == 30
+        return FakeResponse()
+
+    monkeypatch.setattr(runner.urllib.request, "urlopen", fake_urlopen)
+    status, payload = runner._default_post_json("https://provider.invalid/v1/chat/completions", "secret-test-key", {"model": "gpt-4.1"})
+    assert status == 200
+    assert payload == {}
 
 
 def test_output_artifact_exists_blocks_before_provider(tmp_path: Path) -> None:
@@ -283,6 +309,12 @@ def test_artifact_checker_rejects_raw_material_and_downstream_flags(tmp_path: Pa
         mutated = copy.deepcopy(data)
         mutated["records"][0][key] = True
         assert any(key in blocker for blocker in validate_artifact(mutated))
+    mutated = copy.deepcopy(data)
+    mutated["records"][0]["response_body_read"] = True
+    assert any("response_body_read_not_false" in blocker for blocker in validate_artifact(mutated))
+    mutated = copy.deepcopy(data)
+    mutated["records"][0]["status_classifier_only"] = False
+    assert any("status_classifier_only_not_true" in blocker for blocker in validate_artifact(mutated))
     mutated = copy.deepcopy(data)
     mutated["records"][0]["raw_response_body"] = "shape"
     assert any("forbidden_key" in blocker or "extra_fields" in blocker for blocker in validate_artifact(mutated))
