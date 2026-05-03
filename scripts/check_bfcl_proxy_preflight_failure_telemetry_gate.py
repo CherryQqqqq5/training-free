@@ -23,6 +23,8 @@ REQUIRED_COMPACT_FIELDS = [
     "preflight_trace_emission_label",
     "preflight_report_written_label",
     "provider_call_started",
+    "upstream_provider_transport_blocked",
+    "preflight_upstream_mode",
     "bfcl_generate_started",
     "bfcl_evaluate_started",
     "scorer_started",
@@ -56,7 +58,15 @@ REQUIRED_STOP_GATES = {
     "missing_sanitized_preflight_telemetry",
     "second_attempt_without_new_authorization",
     "output_boundary_failure",
+    "upstream_provider_transport_attempted",
+    "upstream_transport_not_blocked",
 }
+REQUIRED_LOCAL_STUB_PACKET_FIELDS = {
+    "preflight_upstream_mode": "local_stub_no_provider",
+    "upstream_provider_transport_blocked": True,
+    "provider_transport_instrumentation_required": True,
+}
+
 FORBIDDEN_KEY_RE = re.compile(
     r"(^|_)(raw_prompts?|raw_bfcl_case_content|raw_cases?|raw_provider_requests?|raw_provider_responses?|raw_response_headers?|raw_logs?|raw_traces?|raw_model_output_text|raw_tool_args?|raw_result_trees?|endpoint_values?|key_values?|api_key_values?|secret_values?|scorer_diffs?|candidate_outputs?|provider_payload_value|prompt_text|case_content|trace_content|log_content|tool_argument_value|gold_value|reference_value|expected_value)(_|$)",
     re.IGNORECASE,
@@ -133,8 +143,11 @@ def validate_packet(data: dict[str, Any]) -> list[str]:
     for key in ALWAYS_FALSE_KEYS:
         if data.get(key) is not False:
             blockers.append(f"{key}_not_false:{data.get(key)!r}")
-    if data.get("requested_future_scope") != "one_sanitized_local_proxy_preflight_telemetry_attempt_only":
+    if data.get("requested_future_scope") != "one_sanitized_local_stub_proxy_preflight_telemetry_attempt_only":
         blockers.append(f"requested_future_scope_invalid:{data.get('requested_future_scope')!r}")
+    for key, expected in REQUIRED_LOCAL_STUB_PACKET_FIELDS.items():
+        if data.get(key) is not expected and data.get(key) != expected:
+            blockers.append(f"{key}_invalid:{data.get(key)!r}")
     if data.get("route_profile") != "novacode" or data.get("route_model") != "gpt-4.1":
         blockers.append("route_drift")
     for key in (
@@ -166,7 +179,7 @@ def validate_packet(data: dict[str, Any]) -> list[str]:
             blockers.append(f"compact_field_not_string:{field!r}")
         elif FORBIDDEN_KEY_RE.search(field):
             blockers.append(f"forbidden_compact_field:{field}")
-    for field in ("preflight_exact_exit_code_class", "preflight_failed_check_label", "provider_call_started", "stop_gate_triggered", "suspected_proxy_preflight_failure_stage"):
+    for field in ("preflight_exact_exit_code_class", "preflight_failed_check_label", "provider_call_started", "upstream_provider_transport_blocked", "preflight_upstream_mode", "stop_gate_triggered", "suspected_proxy_preflight_failure_stage"):
         if field not in fields:
             blockers.append(f"required_preflight_field_missing:{field}")
 
@@ -206,6 +219,8 @@ def check(path: Path = DEFAULT_PACKET) -> dict[str, Any]:
         "bfcl_generate_authorized": packet.get("bfcl_generate_authorized"),
         "route_profile": packet.get("route_profile"),
         "route_model": packet.get("route_model"),
+        "preflight_upstream_mode": packet.get("preflight_upstream_mode"),
+        "upstream_provider_transport_blocked": packet.get("upstream_provider_transport_blocked"),
         "compact_field_count": len(packet.get("allowed_compact_fields", [])) if isinstance(packet.get("allowed_compact_fields"), list) else 0,
         "performance_evidence": packet.get("performance_evidence"),
         "blockers": blockers,

@@ -12,6 +12,8 @@
     "preflight_trace_emission_label",
     "preflight_report_written_label",
     "provider_call_started",
+    "upstream_provider_transport_blocked",
+    "preflight_upstream_mode",
     "bfcl_generate_started",
     "bfcl_evaluate_started",
     "scorer_started",
@@ -41,7 +43,8 @@
     "candidate_jsonl_or_pool",
     "scorer_feedback_tuning",
     "baseline_vs_treatment_comparison",
-    "performance_or_3pp_or_huawei_claim"
+    "performance_or_3pp_or_huawei_claim",
+    "upstream_provider_transport"
   ],
   "forbidden_telemetry_content": [
     "raw_prompt",
@@ -69,19 +72,24 @@
     "raw_or_secret_leak",
     "missing_sanitized_preflight_telemetry",
     "second_attempt_without_new_authorization",
-    "output_boundary_failure"
+    "output_boundary_failure",
+    "upstream_provider_transport_attempted",
+    "upstream_transport_not_blocked"
   ],
   "huawei_acceptance_ready": false,
   "one_attempt_only": true,
   "performance_evidence": false,
+  "preflight_upstream_mode": "local_stub_no_provider",
   "provider_call_must_remain_false": true,
   "provider_request_authorized": false,
+  "provider_transport_instrumentation_required": true,
   "proxy_live_preflight_authorized": false,
   "raw_output_cleanup_required": true,
-  "requested_future_scope": "one_sanitized_local_proxy_preflight_telemetry_attempt_only",
+  "requested_future_scope": "one_sanitized_local_stub_proxy_preflight_telemetry_attempt_only",
   "route_model": "gpt-4.1",
   "route_profile": "novacode",
   "scorer_authorized": false,
   "sota_3pp_claim_ready": false,
-  "stop_before_bfcl_generate": true
+  "stop_before_bfcl_generate": true,
+  "upstream_provider_transport_blocked": true
 }

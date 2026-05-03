@@ -27,6 +27,7 @@ RESPONSE_SHAPE_LABELS = {"all_expected_shapes", "missing_tool_call", "missing_fu
 TIMEOUT_EXCEPTION_LABELS = {"none_observed", "timeout", "http_error", "runtime_exception", "unknown_compact"}
 TRACE_LABELS = {"trace_emitted", "trace_missing", "not_observed", "unknown_compact"}
 REPORT_LABELS = {"written", "missing", "not_observed"}
+UPSTREAM_MODES = {"local_stub_no_provider"}
 FORBIDDEN_KEY_RE = re.compile(
     r"(^|_)(raw_prompts?|raw_bfcl_case_content|raw_cases?|raw_commands?|raw_provider_requests?|raw_provider_responses?|raw_response_headers?|raw_logs?|raw_traces?|raw_model_output_text|raw_tool_args?|raw_result_trees?|endpoint_values?|key_values?|api_key_values?|secret_values?|scorer_diffs?|candidate_outputs?|provider_payload_value|prompt_text|case_content|trace_content|log_content|tool_argument_value|gold_value|reference_value|expected_value)(_|$)",
     re.IGNORECASE,
@@ -125,6 +126,10 @@ def validate(data: dict[str, Any]) -> list[str]:
         for key in ("provider_call_started", "bfcl_generate_started", "bfcl_evaluate_started", "scorer_started", "performance_evidence"):
             if record.get(key) is not False:
                 blockers.append(f"{key}_not_false:{record.get(key)!r}")
+        if record.get("upstream_provider_transport_blocked") is not True:
+            blockers.append(f"upstream_provider_transport_blocked_not_true:{record.get('upstream_provider_transport_blocked')!r}")
+        if record.get("preflight_upstream_mode") not in UPSTREAM_MODES:
+            blockers.append(f"preflight_upstream_mode_invalid:{record.get('preflight_upstream_mode')!r}")
         if record.get("candidate_specs_inert") is not True:
             blockers.append("candidate_specs_inert_not_true")
         if record.get("raw_outputs_removed") is not True:
@@ -147,6 +152,8 @@ def check(path: Path = DEFAULT_ARTIFACT) -> dict[str, Any]:
         "bfcl_proxy_preflight_failure_telemetry_artifact_passed": not blockers,
         "preflight_exact_exit_code_class": record.get("preflight_exact_exit_code_class") if isinstance(record, dict) else None,
         "provider_call_started": record.get("provider_call_started") if isinstance(record, dict) else None,
+        "upstream_provider_transport_blocked": record.get("upstream_provider_transport_blocked") if isinstance(record, dict) else None,
+        "preflight_upstream_mode": record.get("preflight_upstream_mode") if isinstance(record, dict) else None,
         "bfcl_generate_started": record.get("bfcl_generate_started") if isinstance(record, dict) else None,
         "stop_gate_triggered": record.get("stop_gate_triggered") if isinstance(record, dict) else None,
         "suspected_proxy_preflight_failure_stage": record.get("suspected_proxy_preflight_failure_stage") if isinstance(record, dict) else None,

@@ -80,9 +80,12 @@ def _write_stage(env: dict, events: list[tuple[str, str]]) -> None:
 
 
 def _write_success_report(command: list[str]) -> None:
-    artifact_dir = Path(command[-1])
-    artifact_dir.mkdir(parents=True, exist_ok=True)
+    report_path = Path(command[-1])
+    report_path.parent.mkdir(parents=True, exist_ok=True)
     report = {
+        "preflight_upstream_mode": "local_stub_no_provider",
+        "upstream_provider_transport_blocked": True,
+        "upstream_provider_transport_attempted": False,
         "environment_check": {"is_set": True},
         "passed": True,
         "checks": [
@@ -92,15 +95,20 @@ def _write_success_report(command: list[str]) -> None:
             {"name": "trace_emission", "passed": True, "status_code": 200, "request_path_label": "local_proxy_responses_path"},
         ],
     }
-    (artifact_dir / "preflight_report.json").write_text(json.dumps(report, sort_keys=True), encoding="utf-8")
+    report_path.write_text(json.dumps(report, sort_keys=True), encoding="utf-8")
 
 
 def _mock_success(command, *, cwd, env, stdout, stderr, check):
-    assert env["GRC_BFCL_STOP_AFTER_PREFLIGHT"] == "1"
-    assert env["GRC_UPSTREAM_PROFILE"] == "novacode"
-    assert env["GRC_UPSTREAM_MODEL"] == "gpt-4.1"
+    assert env["GRC_PROXY_PREFLIGHT_UPSTREAM_MODE"] == "local_stub_no_provider"
+    assert env["GRC_PROVIDER_TRANSPORT_DISABLED"] == "1"
+    assert env["GRC_PROVIDER_REQUEST_AUTHORIZED"] == "0"
+    assert env["GRC_UPSTREAM_PROFILE"] == "local_stub_no_provider"
+    assert env["GRC_UPSTREAM_MODEL"] == "local-stub-no-provider"
+    assert "OPENAI_API_KEY" not in env
+    assert "OPENROUTER_API_KEY" not in env
     assert "GRC_BFCL_STOP_AFTER_GENERATE" not in env
-    assert command[:4] == ["bash", "-lc", runner._profile_wrapped_command([])[2], "bash"]
+    assert "--internal-local-stub-preflight" in command
+    assert not any("/cephfs/qiuyn/.profile" in str(part) for part in command)
     _write_stage(
         env,
         [
@@ -132,6 +140,8 @@ def test_committed_packet_passes_pending_fail_closed() -> None:
     assert summary["proxy_live_preflight_authorized"] is False
     assert summary["provider_request_authorized"] is False
     assert summary["bfcl_generate_authorized"] is False
+    assert summary["preflight_upstream_mode"] == "local_stub_no_provider"
+    assert summary["upstream_provider_transport_blocked"] is True
     assert summary["compact_field_count"] == len(REQUIRED_COMPACT_FIELDS)
     assert summary["performance_evidence"] is False
 
@@ -230,6 +240,10 @@ def test_dry_run_includes_required_compact_schema() -> None:
     assert plan["compact_fields"] == REQUIRED_COMPACT_FIELDS
     assert "preflight_exact_exit_code_class" in plan["compact_fields"]
     assert "provider_call_started" in plan["compact_fields"]
+    assert "upstream_provider_transport_blocked" in plan["compact_fields"]
+    assert "preflight_upstream_mode" in plan["compact_fields"]
+    assert plan["upstream_provider_transport_blocked"] is True
+    assert plan["preflight_upstream_mode"] == "local_stub_no_provider"
     assert "suspected_proxy_preflight_failure_stage" in plan["compact_fields"]
 
 
@@ -246,6 +260,11 @@ def test_execute_with_pending_packet_fails_closed_before_env_provider_preflight_
     assert summary["preflight_command_executed"] is False
     assert summary["live_preflight_executed"] is False
     assert summary["provider_call_started"] is False
+    assert summary["upstream_provider_transport_blocked"] is True
+    assert summary["preflight_upstream_mode"] == "local_stub_no_provider"
+    assert summary["endpoint_value_read"] is False
+    assert summary["api_key_value_read"] is False
+    assert summary["env_profile_sourced"] is False
     assert summary["bfcl_generate_started"] is False
     assert summary["bfcl_evaluate_started"] is False
     assert summary["scorer_started"] is False
@@ -288,10 +307,50 @@ def test_provider_call_started_in_mocked_execute_is_stop_gated(tmp_path: Path) -
     output = tmp_path / "telemetry.json"
     summary = execute_proxy_preflight_telemetry(_approved_packet(tmp_path), output, run_command=fake_provider_started)
     assert "provider_call_started" in summary["blockers"]
+    assert summary["upstream_provider_transport_blocked"] is True
+    assert summary["preflight_upstream_mode"] == "local_stub_no_provider"
     assert summary["stop_gate_triggered"] == "provider_call_started"
     assert summary["suspected_proxy_preflight_failure_stage"] == "forbidden_provider_call_started"
     assert any("provider_call_started_not_false" in blocker for blocker in check_artifact(output)["blockers"])
 
+
+
+def test_wrong_upstream_mode_is_stop_gated(tmp_path: Path) -> None:
+    def fake_upstream_mode(command, *, cwd, env, stdout, stderr, check):
+        _write_stage(env, [("start_proxy", "started"), ("start_proxy", "completed"), ("preflight", "started"), ("preflight", "completed")])
+        _write_success_report(command)
+        report_path = Path(command[-1])
+        data = json.loads(report_path.read_text(encoding="utf-8"))
+        data["preflight_upstream_mode"] = "novacode"
+        data["upstream_provider_transport_blocked"] = False
+        report_path.write_text(json.dumps(data, sort_keys=True), encoding="utf-8")
+        return subprocess.CompletedProcess(command, 0)
+
+    output = tmp_path / "telemetry.json"
+    summary = execute_proxy_preflight_telemetry(_approved_packet(tmp_path), output, run_command=fake_upstream_mode)
+    assert "upstream_provider_transport_not_blocked" in summary["blockers"]
+    assert "preflight_upstream_mode_not_local_stub_no_provider" in summary["blockers"]
+    assert summary["stop_gate_triggered"] == "upstream_transport_not_blocked"
+    artifact_blockers = check_artifact(output)["blockers"]
+    assert any("upstream_provider_transport_blocked_not_true" in blocker for blocker in artifact_blockers)
+    assert any("preflight_upstream_mode_invalid" in blocker for blocker in artifact_blockers)
+
+
+def test_upstream_transport_attempted_is_instrumented_as_provider_call(tmp_path: Path) -> None:
+    def fake_transport_attempt(command, *, cwd, env, stdout, stderr, check):
+        _write_stage(env, [("start_proxy", "started"), ("start_proxy", "completed"), ("preflight", "started"), ("preflight", "completed")])
+        _write_success_report(command)
+        report_path = Path(command[-1])
+        data = json.loads(report_path.read_text(encoding="utf-8"))
+        data["upstream_provider_transport_attempted"] = True
+        report_path.write_text(json.dumps(data, sort_keys=True), encoding="utf-8")
+        return subprocess.CompletedProcess(command, 0)
+
+    output = tmp_path / "telemetry.json"
+    summary = execute_proxy_preflight_telemetry(_approved_packet(tmp_path), output, run_command=fake_transport_attempt)
+    assert "provider_call_started" in summary["blockers"]
+    assert summary["provider_call_started"] is True
+    assert summary["suspected_proxy_preflight_failure_stage"] == "forbidden_provider_call_started"
 
 def test_artifact_checker_rejects_bfcl_or_scorer_true_and_raw_fields(tmp_path: Path) -> None:
     output = tmp_path / "telemetry.json"

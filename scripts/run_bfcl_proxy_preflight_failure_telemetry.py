@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Dry-run or execute sanitized BFCL proxy/preflight failure telemetry."""
+"""Dry-run or execute sanitized no-upstream BFCL proxy/preflight telemetry."""
 
 from __future__ import annotations
 
@@ -11,6 +11,9 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import threading
+import urllib.request
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any, Callable
 
@@ -28,12 +31,8 @@ from scripts.check_bfcl_proxy_preflight_failure_telemetry_artifact import (  # n
 )
 
 DEFAULT_OUTPUT = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_proxy_preflight_failure_telemetry_compact.json")
-BASELINE_SCRIPT = Path("scripts/run_bfcl_v4_baseline.sh")
-DEFAULT_BFCL_MODEL = "gpt-4o-mini-2024-07-18-FC"
 DEFAULT_CATEGORIES = "simple,multiple,parallel,parallel_multiple,multi_turn_base,multi_turn_miss_func,multi_turn_miss_param,multi_turn_long_context"
-DEFAULT_PORT = "8011"
-DEFAULT_CONFIG = "configs/runtime_bfcl_structured.yaml"
-DEFAULT_RULES = "rules/baseline_empty"
+LOCAL_STUB_MODE = "local_stub_no_provider"
 RunCommand = Callable[..., subprocess.CompletedProcess[Any]]
 
 
@@ -63,6 +62,8 @@ def build_plan(packet_path: Path = DEFAULT_PACKET, output_artifact: Path = DEFAU
         "preflight_trace_emission_label": "not_observed_dry_run",
         "preflight_report_written_label": "not_written_dry_run",
         "provider_call_started": False,
+        "upstream_provider_transport_blocked": True,
+        "preflight_upstream_mode": LOCAL_STUB_MODE,
         "bfcl_generate_started": False,
         "bfcl_evaluate_started": False,
         "scorer_started": False,
@@ -83,33 +84,162 @@ def build_plan(packet_path: Path = DEFAULT_PACKET, output_artifact: Path = DEFAU
         "output_artifact_planned": str(output_artifact),
         "compact_fields": list(REQUIRED_COMPACT_FIELDS),
         "stop_gate_triggered": "none",
-        "suspected_proxy_preflight_failure_stage": "pending_live_proxy_preflight_telemetry",
+        "suspected_proxy_preflight_failure_stage": "pending_no_upstream_local_stub_proxy_preflight_telemetry",
         "blockers": [] if gate_passed else packet_summary.get("blockers", []),
     }
 
 
-def _baseline_args(run_root: Path, trace_dir: Path, artifact_dir: Path) -> list[str]:
+def _internal_stub_command(stage_path: Path, trace_dir: Path, report_path: Path) -> list[str]:
     return [
-        str(BASELINE_SCRIPT),
-        os.environ.get("GRC_BFCL_MODEL", DEFAULT_BFCL_MODEL),
-        str(run_root),
-        DEFAULT_PORT,
-        DEFAULT_CATEGORIES,
-        DEFAULT_CONFIG,
-        DEFAULT_RULES,
+        sys.executable,
+        str(Path(__file__).resolve()),
+        "--internal-local-stub-preflight",
+        "--stage-path",
+        str(stage_path),
+        "--trace-dir",
         str(trace_dir),
-        str(artifact_dir),
+        "--out",
+        str(report_path),
     ]
 
 
-def _profile_wrapped_command(args: list[str]) -> list[str]:
-    return [
-        "bash",
-        "-lc",
-        "set +x; set -a; source /cephfs/qiuyn/.profile >/dev/null 2>&1; set +a; exec \"$@\"",
-        "bash",
-        *args,
-    ]
+def _write_stage_event(stage_path: Path, stage: str, event: str) -> None:
+    stage_path.parent.mkdir(parents=True, exist_ok=True)
+    with stage_path.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps({"stage": stage, "event": event}, sort_keys=True) + "\n")
+
+
+class _LocalStubHandler(BaseHTTPRequestHandler):
+    trace_dir: Path
+    request_count = 0
+    upstream_provider_transport_attempted = False
+
+    def log_message(self, format: str, *args: Any) -> None:  # noqa: A003
+        return
+
+    def do_POST(self) -> None:  # noqa: N802
+        type(self).request_count += 1
+        length = int(self.headers.get("Content-Length") or 0)
+        body = self.rfile.read(length) if length > 0 else b"{}"
+        try:
+            payload = json.loads(body.decode("utf-8")) if body else {}
+        except json.JSONDecodeError:
+            payload = {}
+        self.trace_dir.mkdir(parents=True, exist_ok=True)
+        trace_payload = {
+            "trace_kind": "local_stub_no_provider_preflight",
+            "request_index": type(self).request_count,
+            "request_path_label": _request_path_label(self.path),
+            "upstream_provider_transport_attempted": False,
+        }
+        (self.trace_dir / f"local_stub_trace_{type(self).request_count}.json").write_text(json.dumps(trace_payload, sort_keys=True) + "\n", encoding="utf-8")
+        if self.path == "/v1/responses":
+            response = {
+                "id": "stub_response",
+                "object": "response",
+                "output": [{"type": "function_call", "name": "echo", "arguments": json.dumps({"text": "ping"}), "call_id": "stub_call"}],
+            }
+        elif self.path == "/v1/chat/completions" and isinstance(payload.get("tools"), list):
+            response = {
+                "id": "stub_chat_tool",
+                "object": "chat.completion",
+                "choices": [{"message": {"role": "assistant", "tool_calls": [{"type": "function", "function": {"name": "echo", "arguments": json.dumps({"text": "ping"})}}]}}],
+            }
+        elif self.path == "/v1/chat/completions":
+            response = {"id": "stub_chat_text", "object": "chat.completion", "choices": [{"message": {"role": "assistant", "content": "PONG"}}]}
+        else:
+            self.send_response(404)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps({"error": "unknown local stub path"}).encode("utf-8"))
+            return
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json")
+        self.end_headers()
+        self.wfile.write(json.dumps(response).encode("utf-8"))
+
+
+def _request_path_label(path: str | None) -> str:
+    if path == "/v1/chat/completions":
+        return "local_proxy_chat_path"
+    if path == "/v1/responses":
+        return "local_proxy_responses_path"
+    return "unknown_compact"
+
+
+def _post_json(base_url: str, path: str, payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
+    request = urllib.request.Request(
+        f"{base_url}{path}",
+        data=json.dumps(payload).encode("utf-8"),
+        headers={"Content-Type": "application/json", "Authorization": "Bearer local-stub-no-provider"},
+        method="POST",
+    )
+    with urllib.request.urlopen(request, timeout=15) as response:
+        return response.getcode(), json.loads(response.read().decode("utf-8"))
+
+
+def _validate_chat_tool(payload: dict[str, Any]) -> bool:
+    choices = payload.get("choices")
+    message = choices[0].get("message") if isinstance(choices, list) and choices and isinstance(choices[0], dict) else {}
+    calls = message.get("tool_calls") if isinstance(message, dict) else None
+    return isinstance(calls, list) and bool(calls)
+
+
+def _validate_responses_tool(payload: dict[str, Any]) -> bool:
+    output = payload.get("output")
+    return isinstance(output, list) and any(isinstance(item, dict) and item.get("type") == "function_call" for item in output)
+
+
+def _validate_chat_text(payload: dict[str, Any]) -> bool:
+    choices = payload.get("choices")
+    message = choices[0].get("message") if isinstance(choices, list) and choices and isinstance(choices[0], dict) else {}
+    content = message.get("content") if isinstance(message, dict) else ""
+    return isinstance(content, str) and "pong" in content.lower()
+
+
+def run_internal_local_stub_preflight(stage_path: Path, trace_dir: Path, out: Path) -> int:
+    _write_stage_event(stage_path, "start_proxy", "started")
+    _LocalStubHandler.trace_dir = trace_dir
+    _LocalStubHandler.request_count = 0
+    _LocalStubHandler.upstream_provider_transport_attempted = False
+    server = ThreadingHTTPServer(("127.0.0.1", 0), _LocalStubHandler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    base_url = f"http://127.0.0.1:{server.server_port}"
+    _write_stage_event(stage_path, "start_proxy", "completed")
+    _write_stage_event(stage_path, "preflight", "started")
+    checks: list[dict[str, Any]] = []
+    try:
+        request_specs = [
+            ("chat_tool_call", "/v1/chat/completions", {"model": "local-stub", "messages": [{"role": "user", "content": "shape-only"}], "tools": [{"type": "function", "function": {"name": "echo", "parameters": {"type": "object"}}}]}, _validate_chat_tool),
+            ("responses_function_call", "/v1/responses", {"model": "local-stub", "input": [{"role": "user", "content": "shape-only"}], "tools": [{"type": "function", "name": "echo", "parameters": {"type": "object"}}]}, _validate_responses_tool),
+            ("chat_text_response", "/v1/chat/completions", {"model": "local-stub", "messages": [{"role": "user", "content": "shape-only"}]}, _validate_chat_text),
+        ]
+        for name, path, payload, validator in request_specs:
+            status_code, response = _post_json(base_url, path, payload)
+            checks.append({"name": name, "request_path_label": _request_path_label(path), "status_code": status_code, "passed": status_code < 400 and validator(response)})
+        trace_count = len(list(trace_dir.glob("local_stub_trace_*.json")))
+        checks.append({"name": "trace_emission", "request_path_label": "local_proxy_responses_path", "status_code": 200, "passed": trace_count >= len(request_specs)})
+    except Exception:
+        checks.append({"name": "unknown_compact", "request_path_label": "unknown_compact", "status_code": None, "passed": False})
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=5)
+    report = {
+        "preflight_upstream_mode": LOCAL_STUB_MODE,
+        "upstream_provider_transport_blocked": True,
+        "upstream_provider_transport_attempted": False,
+        "environment_check": {"is_set": True, "reason_label": "endpoint_key_not_required_local_stub_no_provider"},
+        "checks": checks,
+        "passed": all(item.get("passed") is True for item in checks),
+    }
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    _write_stage_event(stage_path, "preflight", "completed")
+    _write_stage_event(stage_path, "stop_after_preflight", "started")
+    _write_stage_event(stage_path, "stop_after_preflight", "completed")
+    return 0 if report["passed"] else 1
 
 
 def _load_stage_events(stage_path: Path) -> list[dict[str, str]]:
@@ -272,7 +402,26 @@ def _proxy_health(events: list[dict[str, str]]) -> str:
     return "not_reached"
 
 
+def _provider_transport_attempted(report: dict[str, Any] | None) -> bool:
+    if report is None:
+        return False
+    return bool(report.get("upstream_provider_transport_attempted") is True or report.get("provider_call_started") is True)
+
+
+def _transport_blocked(report: dict[str, Any] | None) -> bool:
+    return bool(report and report.get("preflight_upstream_mode") == LOCAL_STUB_MODE and report.get("upstream_provider_transport_blocked") is True)
+
+
+def _upstream_mode(report: dict[str, Any] | None) -> str:
+    value = report.get("preflight_upstream_mode") if report else None
+    return value if isinstance(value, str) and value else "unknown_compact"
+
+
 def _stop_gate(record: dict[str, Any]) -> str:
+    if not record["upstream_provider_transport_blocked"]:
+        return "upstream_transport_not_blocked"
+    if record["preflight_upstream_mode"] != LOCAL_STUB_MODE:
+        return "upstream_mode_not_local_stub_no_provider"
     if record["provider_call_started"]:
         return "provider_call_started"
     if record["bfcl_generate_started"]:
@@ -285,10 +434,14 @@ def _stop_gate(record: dict[str, Any]) -> str:
         return "preflight_exit_nonzero"
     if record["preflight_failed_check_label"] not in {"none_observed", "unknown_compact"}:
         return record["preflight_failed_check_label"]
-    return "stopped_after_preflight"
+    return "stopped_after_local_stub_preflight"
 
 
 def _suspected_stage(record: dict[str, Any]) -> str:
+    if not record["upstream_provider_transport_blocked"]:
+        return "upstream_provider_transport_not_blocked"
+    if record["preflight_upstream_mode"] != LOCAL_STUB_MODE:
+        return "wrong_preflight_upstream_mode"
     if record["provider_call_started"]:
         return "forbidden_provider_call_started"
     if record["bfcl_generate_started"]:
@@ -302,13 +455,14 @@ def _suspected_stage(record: dict[str, Any]) -> str:
         return f"preflight_{failed}_failed"
     if record["preflight_exact_exit_code_class"] != "zero":
         return "preflight_nonzero_exit_unknown"
-    return "preflight_completed_without_bfcl_generate"
+    return "local_stub_preflight_completed_without_upstream_or_bfcl"
 
 
 def _compact_record(exit_code: int, stage_path: Path, artifact_dir: Path, exec_log: Path, proxy_log: Path) -> dict[str, Any]:
     events = _load_stage_events(stage_path)
     report = _load_preflight_report(artifact_dir / "preflight_report.json")
     text = _read_temp_text(exec_log, proxy_log)
+    provider_attempted = _stage_started(events, "provider_call") or _provider_transport_attempted(report)
     record: dict[str, Any] = {
         "preflight_command_executed": True,
         "preflight_exact_exit_code_class": _exit_code_class(exit_code),
@@ -321,7 +475,9 @@ def _compact_record(exit_code: int, stage_path: Path, artifact_dir: Path, exec_l
         "preflight_timeout_or_exception_class": _timeout_or_exception_label(text, exit_code, report),
         "preflight_trace_emission_label": _trace_label(report),
         "preflight_report_written_label": "written" if report is not None else "missing",
-        "provider_call_started": _stage_started(events, "provider_call"),
+        "provider_call_started": provider_attempted,
+        "upstream_provider_transport_blocked": _transport_blocked(report),
+        "preflight_upstream_mode": _upstream_mode(report),
         "bfcl_generate_started": _stage_started(events, "bfcl_generate"),
         "bfcl_evaluate_started": _stage_started(events, "bfcl_evaluate"),
         "scorer_started": _stage_started(events, "aggregate_bfcl_metrics") or _stage_started(events, "bfcl_evaluate"),
@@ -360,6 +516,8 @@ def _blocked_execute_summary(blockers: list[str]) -> dict[str, Any]:
         "report_scope": "bfcl_proxy_preflight_failure_telemetry_execute",
         "preflight_command_executed": False,
         "provider_call_started": False,
+        "upstream_provider_transport_blocked": True,
+        "preflight_upstream_mode": LOCAL_STUB_MODE,
         "bfcl_generate_started": False,
         "bfcl_evaluate_started": False,
         "scorer_started": False,
@@ -377,6 +535,19 @@ def _blocked_execute_summary(blockers: list[str]) -> dict[str, Any]:
         "performance_evidence": False,
         "raw_outputs_removed": True,
         "blockers": sorted(set(blockers)),
+    }
+
+
+def _minimal_no_upstream_env(stage_path: Path) -> dict[str, str]:
+    return {
+        "PATH": os.environ.get("PATH", ""),
+        "PYTHONPATH": f"{REPO_ROOT}:{REPO_ROOT / 'src'}",
+        "GRC_PROXY_PREFLIGHT_UPSTREAM_MODE": LOCAL_STUB_MODE,
+        "GRC_PROVIDER_TRANSPORT_DISABLED": "1",
+        "GRC_PROVIDER_REQUEST_AUTHORIZED": "0",
+        "GRC_UPSTREAM_PROFILE": LOCAL_STUB_MODE,
+        "GRC_UPSTREAM_MODEL": "local-stub-no-provider",
+        "GRC_BASELINE_STAGE_TELEMETRY_PATH": str(stage_path),
     }
 
 
@@ -399,43 +570,31 @@ def execute_proxy_preflight_telemetry(
     record: dict[str, Any] | None = None
     with tempfile.TemporaryDirectory(prefix="bfcl_proxy_preflight_telemetry_") as temp_dir:
         temp = Path(temp_dir)
-        run_root = temp / "run_root"
         trace_dir = temp / "traces"
         artifact_dir = temp / "artifacts"
         stage_path = temp / "stage_events.jsonl"
         exec_log = temp / "preflight_execution.log"
         proxy_log = temp / "preflight_proxy.log"
-        repairs_out = temp / "repairs.jsonl"
-        env = os.environ.copy()
-        env.update(
-            {
-                "GRC_UPSTREAM_PROFILE": "novacode",
-                "GRC_UPSTREAM_MODEL": "gpt-4.1",
-                "GRC_BFCL_TEST_CATEGORY": DEFAULT_CATEGORIES,
-                "GRC_BFCL_USE_RUN_IDS": "0",
-                "GRC_BFCL_CLEAN_RUN": "1",
-                "GRC_BFCL_NUM_THREADS": "1",
-                "GRC_BFCL_STOP_AFTER_PREFLIGHT": "1",
-                "GRC_BASELINE_STAGE_TELEMETRY_PATH": str(stage_path),
-                "GRC_PROXY_LOG": str(proxy_log),
-                "GRC_BFCL_REPAIRS_OUT": str(repairs_out),
-            }
-        )
-        command = _profile_wrapped_command(_baseline_args(run_root, trace_dir, artifact_dir))
+        report_path = artifact_dir / "preflight_report.json"
+        env = _minimal_no_upstream_env(stage_path)
+        command = _internal_stub_command(stage_path, trace_dir, report_path)
         with exec_log.open("wb") as handle:
             result = run_command(command, cwd=REPO_ROOT, env=env, stdout=handle, stderr=subprocess.STDOUT, check=False)
         exit_code = int(getattr(result, "returncode", 1))
         record = _compact_record(exit_code, stage_path, artifact_dir, exec_log, proxy_log)
-        shutil.rmtree(run_root, ignore_errors=True)
         shutil.rmtree(trace_dir, ignore_errors=True)
         shutil.rmtree(artifact_dir, ignore_errors=True)
-        for raw_temp_path in (exec_log, proxy_log, repairs_out, stage_path):
+        for raw_temp_path in (exec_log, proxy_log, stage_path):
             raw_temp_path.unlink(missing_ok=True)
-        raw_removed = not any(path.exists() for path in (run_root, trace_dir, artifact_dir, exec_log, proxy_log, repairs_out, stage_path))
+        raw_removed = not any(path.exists() for path in (trace_dir, artifact_dir, exec_log, proxy_log, stage_path))
         record["raw_outputs_removed"] = raw_removed
         _write_artifact(record, output_artifact)
 
     blockers = []
+    if not record.get("upstream_provider_transport_blocked"):
+        blockers.append("upstream_provider_transport_not_blocked")
+    if record.get("preflight_upstream_mode") != LOCAL_STUB_MODE:
+        blockers.append("preflight_upstream_mode_not_local_stub_no_provider")
     if record.get("provider_call_started"):
         blockers.append("provider_call_started")
     if record.get("bfcl_generate_started"):
@@ -457,9 +616,9 @@ def execute_proxy_preflight_telemetry(
         "bfcl_evaluate_executed": False,
         "scorer_executed": False,
         "full_baseline_executed": False,
-        "endpoint_value_read": True,
-        "api_key_value_read": True,
-        "env_profile_sourced": True,
+        "endpoint_value_read": False,
+        "api_key_value_read": False,
+        "env_profile_sourced": False,
         "output_artifact": str(output_artifact),
         "blockers": sorted(set(blockers)),
     }
@@ -471,9 +630,17 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--output-artifact", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--execute-proxy-preflight-telemetry", action="store_true")
+    parser.add_argument("--internal-local-stub-preflight", action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument("--stage-path", type=Path, help=argparse.SUPPRESS)
+    parser.add_argument("--trace-dir", type=Path, help=argparse.SUPPRESS)
+    parser.add_argument("--out", type=Path, help=argparse.SUPPRESS)
     parser.add_argument("--compact", action="store_true")
     parser.add_argument("--strict", action="store_true")
     args = parser.parse_args(argv)
+    if args.internal_local_stub_preflight:
+        if args.stage_path is None or args.trace_dir is None or args.out is None:
+            raise SystemExit("internal local stub preflight requires --stage-path, --trace-dir, and --out")
+        return run_internal_local_stub_preflight(args.stage_path, args.trace_dir, args.out)
     if args.execute_proxy_preflight_telemetry:
         summary = execute_proxy_preflight_telemetry(args.packet, args.output_artifact)
     else:
