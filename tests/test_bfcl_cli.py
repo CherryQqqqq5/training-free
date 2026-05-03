@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 from grc.utils.bfcl_request_policy import apply_bfcl_fc_request_policy
 from grc.utils.bfcl_request_policy import apply_bfcl_memory_request_policy
 
@@ -534,3 +536,113 @@ def test_mixed_protocol_error_with_nonempty_decoded_list_stays_protocol_error(tm
     assert classification["status"] == "protocol_error"
     assert classification["protocol_error_detected"] is True
     assert classification["tool_call_detected"] is False
+
+
+def _write_classifier_payload(tmp_path, payload):
+    path = tmp_path / "result.json"
+    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return path
+
+
+def test_classifier_materialized_marker_nonzero_without_protocol_indicator_is_generated(tmp_path):
+    _write_classifier_payload(
+        tmp_path,
+        {
+            "records": [
+                {
+                    "id": "multi_turn_long_context_0",
+                    "result": "protocol_error_shape",
+                    "grc_decoded_execution_output_shape": {
+                        "shape_label": "execution_list_nonempty",
+                        "decoded_output_count": 1,
+                        "function_call_shape_present": True,
+                    },
+                }
+            ]
+        },
+    )
+
+    classification = _classify_result_for_run_id("multi_turn_long_context_0", tmp_path)
+
+    assert classification["status"] == "generated"
+    assert classification["tool_call_detected"] is True
+    assert classification["protocol_error_detected"] is False
+
+
+def test_classifier_materialized_marker_with_structured_error_stays_protocol_error(tmp_path):
+    _write_classifier_payload(
+        tmp_path,
+        {
+            "records": [
+                {
+                    "id": "multi_turn_long_context_0",
+                    "result": "protocol_error_shape",
+                    "error": "structured handler error shape",
+                    "grc_decoded_execution_output_shape": {
+                        "shape_label": "execution_list_nonempty",
+                        "decoded_output_count": 1,
+                        "function_call_shape_present": True,
+                    },
+                }
+            ]
+        },
+    )
+
+    classification = _classify_result_for_run_id("multi_turn_long_context_0", tmp_path)
+
+    assert classification["status"] == "protocol_error"
+    assert classification["protocol_error_detected"] is True
+    assert classification["tool_call_detected"] is False
+
+
+def test_classifier_materialized_marker_with_handler_error_phrase_stays_protocol_error(tmp_path):
+    _write_classifier_payload(
+        tmp_path,
+        {
+            "records": [
+                {
+                    "id": "multi_turn_long_context_0",
+                    "result": "Error during inference: shape only",
+                    "grc_decoded_execution_output_shape": {
+                        "shape_label": "execution_list_nonempty",
+                        "decoded_output_count": 1,
+                        "function_call_shape_present": True,
+                    },
+                }
+            ]
+        },
+    )
+
+    classification = _classify_result_for_run_id("multi_turn_long_context_0", tmp_path)
+
+    assert classification["status"] == "protocol_error"
+    assert classification["protocol_error_detected"] is True
+    assert classification["tool_call_detected"] is False
+
+
+def test_classifier_true_empty_and_missing_result_unchanged(tmp_path):
+    _write_classifier_payload(
+        tmp_path,
+        {"records": [{"id": "web_search_base_0", "result": "Empty response from the model."}]},
+    )
+
+    empty_classification = _classify_result_for_run_id("web_search_base_0", tmp_path)
+    missing_classification = _classify_result_for_run_id("multi_turn_long_context_0", tmp_path)
+
+    assert empty_classification["status"] == "empty_model_response"
+    assert empty_classification["empty_model_response_detected"] is True
+    assert missing_classification["status"] == "missing_result"
+    assert missing_classification["tool_call_detected"] is False
+
+
+def test_classifier_prior_tool_call_behavior_unchanged(tmp_path):
+    _write_classifier_payload(
+        tmp_path,
+        {"records": [{"id": "web_search_base_0", "tool_calls": [{"shape": "present"}]}]},
+    )
+
+    classification = _classify_result_for_run_id("web_search_base_0", tmp_path)
+
+    assert classification["status"] == "generated"
+    assert classification["tool_call_detected"] is True
+    assert classification["protocol_error_detected"] is False

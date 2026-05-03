@@ -317,6 +317,103 @@ def _sync_fixture_env(run_root: Path, port: int) -> None:
     )
 
 
+_CLASSIFIER_PROTOCOL_ERROR_KEYS = {
+    "error",
+    "exception",
+    "traceback",
+    "exc_info",
+    "error_type",
+    "exception_class",
+    "protocol_error",
+}
+_CLASSIFIER_PROTOCOL_ERROR_PHRASES = (
+    "error during inference",
+    "error decoding",
+    "traceback (most recent call last)",
+    "protocolerror",
+    "protocol error",
+)
+
+
+def _classifier_entry_has_protocol_error_indicator(value: Any) -> bool:
+    if isinstance(value, dict):
+        for key, child in value.items():
+            if str(key).lower() in _CLASSIFIER_PROTOCOL_ERROR_KEYS:
+                return True
+            if _classifier_entry_has_protocol_error_indicator(child):
+                return True
+        return False
+    if isinstance(value, list):
+        return any(_classifier_entry_has_protocol_error_indicator(child) for child in value)
+    if isinstance(value, str):
+        lowered = value.lower()
+        return any(phrase in lowered for phrase in _CLASSIFIER_PROTOCOL_ERROR_PHRASES)
+    return False
+
+
+def _positive_int(value: Any) -> bool:
+    if isinstance(value, bool):
+        return False
+    if isinstance(value, int):
+        return value > 0
+    if isinstance(value, str) and value.isdigit():
+        return int(value) > 0
+    return False
+
+
+def _classifier_entry_has_materialized_marker(value: Any) -> bool:
+    if isinstance(value, dict):
+        marker = value.get("grc_decoded_execution_output_shape")
+        if isinstance(marker, dict) and _positive_int(marker.get("decoded_output_count")):
+            return True
+        return any(_classifier_entry_has_materialized_marker(child) for child in value.values())
+    if isinstance(value, list):
+        return any(_classifier_entry_has_materialized_marker(child) for child in value)
+    return False
+
+
+def _classifier_entries_for_run_id(value: Any, run_id: str) -> list[Any]:
+    entries: list[Any] = []
+    if isinstance(value, dict):
+        if value.get("id") == run_id or value.get("run_id") == run_id:
+            entries.append(value)
+        for child in value.values():
+            entries.extend(_classifier_entries_for_run_id(child, run_id))
+    elif isinstance(value, list):
+        for child in value:
+            entries.extend(_classifier_entries_for_run_id(child, run_id))
+    return entries
+
+
+def _classifier_shape_flags_for_run_id(run_id: str, result_root: Path) -> dict[str, bool]:
+    flags = {
+        "protocol_error_indicator_present": False,
+        "materialized_marker_without_protocol_error": False,
+    }
+    for path in result_root.rglob("*.json"):
+        try:
+            candidate = path.read_text(encoding="utf-8", errors="ignore")
+        except OSError:
+            continue
+        if run_id not in candidate:
+            continue
+        try:
+            payload = json.loads(candidate)
+        except json.JSONDecodeError:
+            continue
+        entries = _classifier_entries_for_run_id(payload, run_id) or [payload]
+        for entry in entries:
+            has_protocol_error = _classifier_entry_has_protocol_error_indicator(entry)
+            has_marker = _classifier_entry_has_materialized_marker(entry)
+            flags["protocol_error_indicator_present"] = (
+                flags["protocol_error_indicator_present"] or has_protocol_error
+            )
+            flags["materialized_marker_without_protocol_error"] = (
+                flags["materialized_marker_without_protocol_error"] or (has_marker and not has_protocol_error)
+            )
+    return flags
+
+
 def _classify_result_for_run_id(run_id: str, result_root: Path) -> dict[str, Any]:
     text = ""
     for path in result_root.rglob("*.json"):
@@ -327,11 +424,17 @@ def _classify_result_for_run_id(run_id: str, result_root: Path) -> dict[str, Any
         if run_id in candidate:
             text += "\n" + candidate[:20000]
     lowered = text.lower()
+    shape_flags = _classifier_shape_flags_for_run_id(run_id, result_root)
+    explicit_protocol_error = shape_flags["protocol_error_indicator_present"]
+    generated_marker = shape_flags["materialized_marker_without_protocol_error"]
+    raw_tool_call = "tool_calls" in lowered or "function_call" in lowered
     if not text:
         status = "missing_result"
     elif "empty response from the model" in lowered or "empty_model_response" in lowered:
         status = "empty_model_response"
-    elif "tool_calls" in lowered or "function_call" in lowered:
+    elif explicit_protocol_error:
+        status = "protocol_error"
+    elif generated_marker or raw_tool_call:
         status = "generated"
     elif "error" in lowered or "exception" in lowered:
         status = "protocol_error"
@@ -342,7 +445,7 @@ def _classify_result_for_run_id(run_id: str, result_root: Path) -> dict[str, Any
         "status": status,
         "empty_model_response_detected": status == "empty_model_response",
         "no_tool_text_recorded": "record_only_no_tool_text" in lowered,
-        "tool_call_detected": "tool_calls" in lowered or "function_call" in lowered,
+        "tool_call_detected": status == "generated" and (generated_marker or raw_tool_call),
         "protocol_error_detected": status == "protocol_error",
         "route_profile": SIGNED_ROUTE_PROFILE,
         "route_model": SIGNED_ROUTE_MODEL,
