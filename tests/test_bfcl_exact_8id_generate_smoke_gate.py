@@ -27,19 +27,52 @@ def _packet() -> dict:
     return json.loads(PACKET.read_text(encoding="utf-8"))
 
 
-def test_committed_pending_packet_passes_fail_closed_gate() -> None:
+def _write_packet(tmp_path: Path, data: dict) -> Path:
+    packet_path = tmp_path / "packet.json"
+    packet_path.write_text(json.dumps(data, indent=2, sort_keys=True), encoding="utf-8")
+    return packet_path
+
+
+def _pending_packet(tmp_path: Path) -> Path:
+    data = copy.deepcopy(_packet())
+    data["approval_status"] = "pending"
+    data["authorized"] = False
+    data["provider_request_authorized"] = False
+    data["bfcl_generate_authorized"] = False
+    data["bfcl_smoke_authorized"] = False
+    return _write_packet(tmp_path, data)
+
+
+def test_committed_approved_packet_passes_scoped_gate() -> None:
     summary = check(PACKET)
     assert summary["bfcl_exact_8id_generate_smoke_gate_passed"] is True
-    assert summary["approval_status"] == "pending"
-    assert summary["provider_request_authorized"] is False
-    assert summary["bfcl_generate_authorized"] is False
-    assert summary["bfcl_smoke_authorized"] is False
+    assert summary["approval_status"] == "approved"
+    assert summary["provider_request_authorized"] is True
+    assert summary["bfcl_generate_authorized"] is True
+    assert summary["bfcl_smoke_authorized"] is True
     assert summary["signed_run_ids"] == list(SIGNED_IDS)
+    packet = _packet()
+    for key in (
+        "bfcl_evaluate_authorized",
+        "scorer_authorized",
+        "full_baseline_authorized",
+        "candidate_runtime_activation_authorized",
+        "candidate_jsonl_authorized",
+        "candidate_pool_ready",
+        "performance_evidence",
+        "sota_3pp_claim_ready",
+        "huawei_acceptance_ready",
+    ):
+        assert packet[key] is False
 
 
 def test_rejects_pending_authorized_true() -> None:
-    data = _packet()
+    data = copy.deepcopy(_packet())
+    data["approval_status"] = "pending"
     data["authorized"] = True
+    data["provider_request_authorized"] = False
+    data["bfcl_generate_authorized"] = False
+    data["bfcl_smoke_authorized"] = False
     assert any("authorized_not_false" in blocker for blocker in validate_packet(data))
 
 
@@ -112,7 +145,8 @@ def test_dry_run_does_not_read_endpoint_key_or_execute_provider_or_generate() ->
 
 
 def test_execute_pending_fails_closed_without_endpoint_key_or_execution(tmp_path: Path) -> None:
-    summary = execute_exact_8id_generate_smoke(PACKET, tmp_path / "artifact.json")
+    pending_packet = _pending_packet(tmp_path)
+    summary = execute_exact_8id_generate_smoke(pending_packet, tmp_path / "artifact.json")
     assert "exact_8id_generate_smoke_packet_not_approved" in summary["blockers"]
     assert summary["endpoint_value_read"] is False
     assert summary["api_key_value_read"] is False
@@ -121,15 +155,23 @@ def test_execute_pending_fails_closed_without_endpoint_key_or_execution(tmp_path
     assert not (tmp_path / "artifact.json").exists()
 
 
-def test_approved_execute_path_with_mocks_reaches_pre_execution_without_real_provider(tmp_path: Path) -> None:
-    data = _packet()
+def test_approved_execute_path_with_mocks_reaches_pre_execution_without_real_provider(tmp_path: Path, monkeypatch) -> None:
+    for name in (
+        "CHUANGZHI_NOVACODE_ENDPOINT",
+        "NOVACODE_ENDPOINT",
+        "NOVACODE_BASE_URL",
+        "CHUANGZHI_API_KEY",
+        "NOVACODE_API_KEY",
+        "OPENAI_API_KEY",
+    ):
+        monkeypatch.delenv(name, raising=False)
+    data = copy.deepcopy(_packet())
     data["approval_status"] = "approved"
     data["authorized"] = True
     data["provider_request_authorized"] = True
     data["bfcl_generate_authorized"] = True
     data["bfcl_smoke_authorized"] = True
-    packet_path = tmp_path / "approved_packet.json"
-    packet_path.write_text(json.dumps(data, indent=2, sort_keys=True), encoding="utf-8")
+    packet_path = _write_packet(tmp_path, data)
     calls: dict[str, object] = {}
 
     class FakeProc:
@@ -187,6 +229,8 @@ def test_approved_execute_path_with_mocks_reaches_pre_execution_without_real_pro
     assert summary["blockers"] == []
     assert summary["provider_request_executed"] is True
     assert summary["bfcl_generate_executed"] is True
+    assert summary["endpoint_value_read"] is False
+    assert summary["api_key_value_read"] is False
     assert summary["bfcl_evaluate_executed"] is False
     assert summary["scorer_executed"] is False
     artifact = json.loads(output.read_text(encoding="utf-8"))
