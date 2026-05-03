@@ -33,7 +33,7 @@ from scripts.check_bfcl_proxy_preflight_failure_telemetry_artifact import (  # n
 DEFAULT_OUTPUT = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_proxy_preflight_failure_telemetry_compact.json")
 DEFAULT_CATEGORIES = "simple,multiple,parallel,parallel_multiple,multi_turn_base,multi_turn_miss_func,multi_turn_miss_param,multi_turn_long_context"
 LOCAL_STUB_MODE = "local_stub_no_provider"
-RunCommand = Callable[..., subprocess.CompletedProcess[Any]]
+RunCommand = Callable[..., subprocess.CompletedProcess]
 
 
 def build_plan(packet_path: Path = DEFAULT_PACKET, output_artifact: Path = DEFAULT_OUTPUT) -> dict[str, Any]:
