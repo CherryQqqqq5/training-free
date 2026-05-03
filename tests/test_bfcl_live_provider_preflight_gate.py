@@ -138,8 +138,6 @@ def test_dry_run_does_not_source_profile_read_secrets_or_execute_provider() -> N
     plan = build_plan(DEFAULT_PACKET)
     assert plan["blockers"] == []
     assert plan["env_profile_sourced"] is False
-    assert plan["endpoint_value_read"] is False
-    assert plan["api_key_value_read"] is False
     assert plan["preflight_command_executed"] is False
     assert plan["provider_request_executed"] is False
     assert plan["provider_call_started"] is False
@@ -162,8 +160,6 @@ def test_pending_execute_fails_closed_before_env_or_provider(tmp_path: Path) -> 
     assert summary["preflight_command_executed"] is False
     assert summary["provider_request_executed"] is False
     assert summary["provider_call_started"] is False
-    assert summary["endpoint_value_read"] is False
-    assert summary["api_key_value_read"] is False
     assert summary["env_profile_sourced"] is False
     assert summary["bfcl_generate_started"] is False
     assert summary["bfcl_evaluate_started"] is False
@@ -179,8 +175,6 @@ def test_approved_execute_missing_env_writes_compact_failure_without_provider(tm
     assert summary["blockers"] == ["missing_endpoint_env"]
     assert summary["provider_request_executed"] is False
     assert summary["provider_call_started"] is False
-    assert summary["endpoint_value_read"] is False
-    assert summary["api_key_value_read"] is False
     artifact_summary = check_artifact(output)
     assert artifact_summary["bfcl_live_provider_preflight_artifact_passed"] is True
     text = output.read_text(encoding="utf-8")
@@ -228,8 +222,6 @@ def test_output_artifact_exists_blocks_before_provider(tmp_path: Path) -> None:
     summary = execute_live_provider_preflight(_approved_packet(tmp_path), output, environ={}, post_json=forbidden_post)
     assert "output_artifact_exists" in summary["blockers"]
     assert summary["provider_request_executed"] is False
-    assert summary["endpoint_value_read"] is False
-    assert summary["api_key_value_read"] is False
 
 
 def test_artifact_checker_rejects_raw_material_and_downstream_flags(tmp_path: Path) -> None:

@@ -232,8 +232,6 @@ def _blocked_summary(blockers: list[str]) -> dict[str, Any]:
     return {
         "report_scope": "bfcl_live_provider_preflight_execute",
         **record,
-        "endpoint_value_read": False,
-        "api_key_value_read": False,
         "env_profile_sourced": False,
         "bfcl_generate_executed": False,
         "bfcl_evaluate_executed": False,
@@ -264,8 +262,6 @@ def build_plan(packet_path: Path = DEFAULT_PACKET, output_artifact: Path = DEFAU
         "compact_only": True,
         "synthetic_probe_only": True,
         "env_profile_sourced": False,
-        "endpoint_value_read": False,
-        "api_key_value_read": False,
         "compact_fields": list(REQUIRED_COMPACT_FIELDS),
         **record,
         "bfcl_generate_executed": False,
@@ -304,24 +300,18 @@ def execute_live_provider_preflight(
     key_present, api_key = _first_present_env(env, SIGNED_API_KEY_ENVS)
     record["endpoint_env_present"] = endpoint_present
     record["api_key_env_present"] = key_present
-    endpoint_value_read = False
-    api_key_value_read = False
     blockers = []
 
     if not endpoint_present:
         _set_failure(record, "missing_endpoint_env", "endpoint_env_missing")
         blockers.append("missing_endpoint_env")
     elif endpoint is None or not endpoint.startswith("https://"):
-        endpoint_value_read = True
         _set_failure(record, "endpoint_not_https", "endpoint_not_https")
         blockers.append("endpoint_not_https")
     elif not key_present:
-        endpoint_value_read = True
         _set_failure(record, "missing_api_key_env", "api_key_env_missing")
         blockers.append("missing_api_key_env")
     else:
-        endpoint_value_read = True
-        api_key_value_read = True
         record["https_endpoint_valid"] = True
         selected_post_json = _default_post_json if post_json is None else post_json
         specs = [
@@ -376,8 +366,6 @@ def execute_live_provider_preflight(
     return {
         "report_scope": "bfcl_live_provider_preflight_execute",
         **record,
-        "endpoint_value_read": endpoint_value_read,
-        "api_key_value_read": api_key_value_read,
         "env_profile_sourced": False,
         "bfcl_generate_executed": False,
         "bfcl_evaluate_executed": False,
