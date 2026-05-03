@@ -206,10 +206,10 @@ def test_approved_execute_missing_env_writes_compact_failure_without_provider(tm
 
 def test_approved_execute_base_url_mode_appends_probe_paths(tmp_path: Path) -> None:
     calls: list[str] = []
-    env = {"NOVACODE_BASE_URL": "https://provider.invalid/base", "CHUANGZHI_API_KEY": "secret-test-key"}
+    env = {"NOVACODE_BASE_URL": "https://provider.invalid/v1", "CHUANGZHI_API_KEY": "secret-test-key"}
     output = tmp_path / "artifact.json"
     summary = execute_live_provider_preflight(_approved_packet(tmp_path), output, environ=env, post_json=_capturing_success(calls))
-    assert calls == ["https://provider.invalid/base/v1/chat/completions"]
+    assert calls == ["https://provider.invalid/v1/chat/completions"]
     assert summary["blockers"] == []
     assert summary["preflight_command_executed"] is True
     assert summary["provider_request_executed"] is True
@@ -220,7 +220,7 @@ def test_approved_execute_base_url_mode_appends_probe_paths(tmp_path: Path) -> N
     assert summary["https_endpoint_valid"] is True
     assert summary["endpoint_mode_label"] == "base_url"
     assert summary["selected_endpoint_env_label"] == "NOVACODE_BASE_URL"
-    assert summary["transport_path_join_label"] == "base_url_path_appended"
+    assert summary["transport_path_join_label"] == "base_url_chat_completions_appended"
     assert summary["http_status_class"] == "2xx"
     assert summary["provider_http_status_label"] == "unknown"
     assert summary["status_classifier_only"] is True
@@ -243,12 +243,27 @@ def test_approved_execute_base_url_mode_appends_probe_paths(tmp_path: Path) -> N
     assert "secret-test-key" not in text
 
 
-def test_approved_execute_full_endpoint_mode_does_not_append_probe_paths(tmp_path: Path) -> None:
+def test_approved_execute_grc_base_url_mode_appends_chat_completions_without_extra_v1(tmp_path: Path) -> None:
     calls: list[str] = []
-    env = {"CHUANGZHI_NOVACODE_ENDPOINT": "https://provider.invalid/full/chat", "CHUANGZHI_API_KEY": "secret-test-key"}
+    env = {"GRC_UPSTREAM_BASE_URL": "https://provider.invalid/v1", "CHUANGZHI_API_KEY": "secret-test-key"}
     output = tmp_path / "artifact.json"
     summary = execute_live_provider_preflight(_approved_packet(tmp_path), output, environ=env, post_json=_capturing_success(calls))
-    assert calls == ["https://provider.invalid/full/chat"]
+    assert calls == ["https://provider.invalid/v1/chat/completions"]
+    assert summary["blockers"] == []
+    assert summary["endpoint_mode_label"] == "base_url"
+    assert summary["selected_endpoint_env_label"] == "GRC_UPSTREAM_BASE_URL"
+    assert summary["transport_path_join_label"] == "base_url_chat_completions_appended"
+    assert summary["status_classifier_only"] is True
+    assert summary["response_body_read"] is False
+    assert check_artifact(output)["bfcl_live_provider_preflight_artifact_passed"] is True
+
+
+def test_approved_execute_full_endpoint_mode_does_not_append_probe_paths(tmp_path: Path) -> None:
+    calls: list[str] = []
+    env = {"CHUANGZHI_NOVACODE_ENDPOINT": "https://provider.invalid/v1/chat/completions", "CHUANGZHI_API_KEY": "secret-test-key"}
+    output = tmp_path / "artifact.json"
+    summary = execute_live_provider_preflight(_approved_packet(tmp_path), output, environ=env, post_json=_capturing_success(calls))
+    assert calls == ["https://provider.invalid/v1/chat/completions"]
     assert summary["blockers"] == []
     assert summary["endpoint_env_present"] is True
     assert summary["base_url_env_present"] is False
@@ -301,7 +316,7 @@ def test_output_artifact_exists_blocks_before_provider(tmp_path: Path) -> None:
 
 def test_artifact_checker_rejects_raw_material_and_downstream_flags(tmp_path: Path) -> None:
     calls: list[str] = []
-    env = {"NOVACODE_BASE_URL": "https://provider.invalid/base", "CHUANGZHI_API_KEY": "secret-test-key"}
+    env = {"NOVACODE_BASE_URL": "https://provider.invalid/v1", "CHUANGZHI_API_KEY": "secret-test-key"}
     output = tmp_path / "artifact.json"
     execute_live_provider_preflight(_approved_packet(tmp_path), output, environ=env, post_json=_capturing_success(calls))
     data = json.loads(output.read_text(encoding="utf-8"))
@@ -330,7 +345,7 @@ def test_artifact_checker_rejects_raw_material_and_downstream_flags(tmp_path: Pa
 
 
 def test_provider_http_status_label_classifies_mocked_statuses(tmp_path: Path) -> None:
-    env = {"NOVACODE_BASE_URL": "https://provider.invalid/base", "CHUANGZHI_API_KEY": "secret-test-key"}
+    env = {"NOVACODE_BASE_URL": "https://provider.invalid/v1", "CHUANGZHI_API_KEY": "secret-test-key"}
     cases = [
         (400, "status_400", "provider_non_2xx", "unknown"),
         (401, "status_401", "provider_auth_failed", "auth_failed"),
@@ -367,7 +382,7 @@ def test_provider_http_status_label_classifies_mocked_statuses(tmp_path: Path) -
 
 
 def test_provider_http_status_label_classifies_transport_exception(tmp_path: Path) -> None:
-    env = {"NOVACODE_BASE_URL": "https://provider.invalid/base", "CHUANGZHI_API_KEY": "secret-test-key"}
+    env = {"NOVACODE_BASE_URL": "https://provider.invalid/v1", "CHUANGZHI_API_KEY": "secret-test-key"}
 
     def post_json(target_url: str, api_key: str, payload: dict):
         raise RuntimeError("synthetic transport failure")

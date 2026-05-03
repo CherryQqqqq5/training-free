@@ -42,7 +42,7 @@ def _first_present_env(env: dict[str, str], names: list[str]) -> tuple[bool, str
 
 def _transport_target(base_url: str | None, endpoint: str | None, path: str, mode: str) -> tuple[str, str]:
     if mode == "base_url" and base_url is not None:
-        return base_url.rstrip("/") + path, "base_url_path_appended"
+        return base_url.rstrip("/") + path, "base_url_chat_completions_appended"
     if mode == "full_endpoint" and endpoint is not None:
         return endpoint, "endpoint_used_as_is"
     return "", "not_reached"
@@ -348,7 +348,7 @@ def execute_live_provider_preflight(
         selected_post_json = _default_post_json if post_json is None else post_json
         try:
             record["provider_call_started"] = True
-            target_url, join_label = _transport_target(base_url, endpoint, "/v1/chat/completions", endpoint_mode)
+            target_url, join_label = _transport_target(base_url, endpoint, "/chat/completions", endpoint_mode)
             record["transport_path_join_label"] = join_label
             status, _response = selected_post_json(target_url, api_key or "", _chat_tool_payload())
             record["provider_request_executed"] = True
