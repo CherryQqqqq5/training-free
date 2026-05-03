@@ -6,8 +6,13 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sys
 from pathlib import Path
 from typing import Any
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 from scripts.check_bfcl_baseline_live_failure_telemetry_gate import REQUIRED_COMPACT_FIELDS
 
