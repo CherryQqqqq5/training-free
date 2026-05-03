@@ -34,6 +34,8 @@ def _base_record(*, command_executed: bool = False) -> dict[str, Any]:
         "proxy_started": False,
         "local_proxy_request_executed": False,
         "local_responses_path_selected": False,
+        "proxy_python_label": _select_proxy_python()[1],
+        "proxy_start_failure_label": "none_observed",
         "upstream_provider_request_authorized": False,
         "upstream_provider_call_started": False,
         "upstream_chat_route_label": "not_reached",
@@ -104,6 +106,22 @@ def _set_failure(record: dict[str, Any], label: str, stage: str) -> None:
     record["stop_gate_triggered"] = label
     record["suspected_failure_stage"] = stage
 
+
+
+def _select_proxy_python() -> tuple[str, str]:
+    grc_python = os.environ.get("GRC_PYTHON")
+    if grc_python:
+        return grc_python, "grc_python_env"
+    repo_venv = REPO_ROOT / ".venv" / "bin" / "python"
+    if repo_venv.is_file() and os.access(str(repo_venv), os.X_OK):
+        return str(repo_venv), "repo_venv"
+    return sys.executable, "caller_python"
+
+
+def _proxy_config_start_failure_label(env: dict[str, str]) -> str:
+    if env.get("GRC_UPSTREAM_BASE_URL") or env.get("NOVACODE_BASE_URL"):
+        return "none_observed"
+    return "proxy_config_startup_failed"
 
 def _responses_payload() -> dict[str, Any]:
     return {
@@ -247,8 +265,20 @@ def _default_proxy_probe(temp_root: Path) -> dict[str, Any]:
     port = int(os.environ.get("GRC_PROXY_RESPONSES_TOOL_SHAPE_PORT", "8139"))
     env = dict(os.environ)
     env["PYTHONPATH"] = f"{REPO_ROOT / 'src'}{os.pathsep}{env.get('PYTHONPATH', '')}" if env.get("PYTHONPATH") else str(REPO_ROOT / "src")
+    proxy_python, proxy_python_label = _select_proxy_python()
+    config_start_failure_label = _proxy_config_start_failure_label(env)
+    if config_start_failure_label != "none_observed":
+        return {
+            "proxy_started": False,
+            "status": None,
+            "payload": {},
+            "parse_label": "not_read",
+            "trace_count": 0,
+            "proxy_python_label": proxy_python_label,
+            "proxy_start_failure_label": config_start_failure_label,
+        }
     command = [
-        sys.executable,
+        proxy_python,
         "-m",
         "grc.cli",
         "serve",
@@ -261,25 +291,53 @@ def _default_proxy_probe(temp_root: Path) -> dict[str, Any]:
         "--port",
         str(port),
     ]
-    proc = subprocess.Popen(command, cwd=str(REPO_ROOT), env=env, stdout=proxy_log.open("w"), stderr=subprocess.STDOUT)
-    try:
-        for _ in range(60):
-            try:
-                urllib.request.urlopen(f"http://127.0.0.1:{port}/health", timeout=1).read()
-                break
-            except Exception:
-                time.sleep(0.2)
-        else:
-            return {"proxy_started": False, "status": None, "payload": {}, "parse_label": "not_read", "trace_count": 0}
-        status, payload, parse_label = _post_json(f"http://127.0.0.1:{port}/v1/responses", _responses_payload())
-        return {"proxy_started": True, "status": status, "payload": payload, "parse_label": parse_label, "trace_count": len(list(trace_dir.glob("*.json")))}
-    finally:
-        proc.terminate()
+    with proxy_log.open("w", encoding="utf-8") as log_handle:
+        proc = subprocess.Popen(command, cwd=str(REPO_ROOT), env=env, stdout=log_handle, stderr=subprocess.STDOUT)
         try:
-            proc.wait(timeout=5)
-        except subprocess.TimeoutExpired:
-            proc.kill()
-            proc.wait(timeout=5)
+            for _ in range(60):
+                if proc.poll() is not None:
+                    return {
+                        "proxy_started": False,
+                        "status": None,
+                        "payload": {},
+                        "parse_label": "not_read",
+                        "trace_count": 0,
+                        "proxy_python_label": proxy_python_label,
+                        "proxy_start_failure_label": "proxy_import_or_process_exit",
+                    }
+                try:
+                    urllib.request.urlopen(f"http://127.0.0.1:{port}/health", timeout=1).read()
+                    break
+                except Exception:
+                    time.sleep(0.2)
+            else:
+                return {
+                    "proxy_started": False,
+                    "status": None,
+                    "payload": {},
+                    "parse_label": "not_read",
+                    "trace_count": 0,
+                    "proxy_python_label": proxy_python_label,
+                    "proxy_start_failure_label": "proxy_health_timeout",
+                }
+            status, payload, parse_label = _post_json(f"http://127.0.0.1:{port}/v1/responses", _responses_payload())
+            return {
+                "proxy_started": True,
+                "status": status,
+                "payload": payload,
+                "parse_label": parse_label,
+                "trace_count": len(list(trace_dir.glob("*.json"))),
+                "proxy_python_label": proxy_python_label,
+                "proxy_start_failure_label": "none_observed",
+            }
+        finally:
+            if proc.poll() is None:
+                proc.terminate()
+                try:
+                    proc.wait(timeout=5)
+                except subprocess.TimeoutExpired:
+                    proc.kill()
+                    proc.wait(timeout=5)
 
 
 def execute_proxy_responses_tool_shape(
@@ -308,9 +366,26 @@ def execute_proxy_responses_tool_shape(
         except TypeError:
             observation = selected_probe(temp_root)
         except Exception:
-            observation = {"proxy_started": False, "status": None, "payload": {}, "parse_label": "not_read", "trace_count": 0, "probe_exception": True}
+            observation = {
+                "proxy_started": False,
+                "status": None,
+                "payload": {},
+                "parse_label": "not_read",
+                "trace_count": 0,
+                "probe_exception": True,
+                "proxy_python_label": record["proxy_python_label"],
+                "proxy_start_failure_label": "unknown",
+            }
+        proxy_python_label = observation.get("proxy_python_label")
+        if proxy_python_label in {"grc_python_env", "repo_venv", "caller_python"}:
+            record["proxy_python_label"] = str(proxy_python_label)
+        proxy_start_failure_label = observation.get("proxy_start_failure_label")
+        if proxy_start_failure_label in {"proxy_import_or_process_exit", "proxy_config_startup_failed", "proxy_health_timeout", "none_observed", "unknown"}:
+            record["proxy_start_failure_label"] = str(proxy_start_failure_label)
         record["proxy_started"] = bool(observation.get("proxy_started"))
         if not record["proxy_started"]:
+            if record["proxy_start_failure_label"] == "none_observed":
+                record["proxy_start_failure_label"] = "unknown"
             _set_failure(record, "proxy_start_failed", "proxy_start_failed")
             blockers.append("proxy_start_failed")
         else:

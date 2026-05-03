@@ -62,6 +62,99 @@ def _success_probe(temp_roots: list[Path] | None = None):
     return probe
 
 
+
+def test_proxy_python_selection_prefers_env_then_repo_venv_then_caller(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv("GRC_PYTHON", "/tmp/synthetic-python")
+    assert runner._select_proxy_python() == ("/tmp/synthetic-python", "grc_python_env")
+
+    monkeypatch.delenv("GRC_PYTHON", raising=False)
+    repo = tmp_path / "repo"
+    venv_python = repo / ".venv" / "bin" / "python"
+    venv_python.parent.mkdir(parents=True)
+    venv_python.write_text("#!/bin/sh\n", encoding="utf-8")
+    venv_python.chmod(0o755)
+    monkeypatch.setattr(runner, "REPO_ROOT", repo)
+    assert runner._select_proxy_python() == (str(venv_python), "repo_venv")
+
+    no_venv_repo = tmp_path / "repo_without_venv"
+    no_venv_repo.mkdir()
+    monkeypatch.setattr(runner, "REPO_ROOT", no_venv_repo)
+    selected_python, label = runner._select_proxy_python()
+    assert selected_python == runner.sys.executable
+    assert label == "caller_python"
+
+
+
+def test_default_proxy_probe_classifies_missing_base_url_before_process_start(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv("GRC_PYTHON", "/tmp/synthetic-grc-python")
+    monkeypatch.delenv("GRC_UPSTREAM_BASE_URL", raising=False)
+    monkeypatch.delenv("NOVACODE_BASE_URL", raising=False)
+
+    def forbidden_popen(*args, **kwargs):  # pragma: no cover - must not start proxy
+        raise AssertionError("missing base URL should not start proxy")
+
+    monkeypatch.setattr(runner.subprocess, "Popen", forbidden_popen)
+    observation = runner._default_proxy_probe(tmp_path)
+    assert observation["proxy_started"] is False
+    assert observation["proxy_python_label"] == "grc_python_env"
+    assert observation["proxy_start_failure_label"] == "proxy_config_startup_failed"
+    assert "https://" not in json.dumps(observation, sort_keys=True)
+
+
+def test_default_proxy_probe_classifies_early_process_exit_without_raw_log(tmp_path: Path, monkeypatch) -> None:
+    commands: list[list[str]] = []
+    monkeypatch.setenv("GRC_PYTHON", "/tmp/synthetic-grc-python")
+    monkeypatch.setenv("GRC_UPSTREAM_BASE_URL", "https://provider.invalid/v1")
+
+    class ExitedProcess:
+        def poll(self):
+            return 1
+        def terminate(self):  # pragma: no cover - poll prevents terminate
+            raise AssertionError("terminated exited process")
+        def wait(self, timeout=None):
+            return 1
+        def kill(self):  # pragma: no cover
+            raise AssertionError("killed exited process")
+
+    def fake_popen(command, **kwargs):
+        commands.append(command)
+        return ExitedProcess()
+
+    monkeypatch.setattr(runner.subprocess, "Popen", fake_popen)
+    observation = runner._default_proxy_probe(tmp_path)
+    assert commands and commands[0][0] == "/tmp/synthetic-grc-python"
+    assert observation["proxy_started"] is False
+    assert observation["proxy_python_label"] == "grc_python_env"
+    assert observation["proxy_start_failure_label"] == "proxy_import_or_process_exit"
+    assert "raw" not in json.dumps(observation, sort_keys=True)
+
+
+def test_default_proxy_probe_classifies_health_timeout(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv("GRC_PYTHON", "/tmp/synthetic-grc-python")
+    monkeypatch.setenv("GRC_UPSTREAM_BASE_URL", "https://provider.invalid/v1")
+    monkeypatch.setattr(runner.time, "sleep", lambda _seconds: None)
+    monkeypatch.setattr(runner.urllib.request, "urlopen", lambda *args, **kwargs: (_ for _ in ()).throw(OSError("not ready")))
+
+    class RunningProcess:
+        terminated = False
+        def poll(self):
+            return None
+        def terminate(self):
+            self.terminated = True
+        def wait(self, timeout=None):
+            return 0
+        def kill(self):  # pragma: no cover
+            raise AssertionError("health timeout should terminate cleanly")
+
+    proc = RunningProcess()
+    monkeypatch.setattr(runner.subprocess, "Popen", lambda *args, **kwargs: proc)
+    observation = runner._default_proxy_probe(tmp_path)
+    assert observation["proxy_started"] is False
+    assert observation["proxy_python_label"] == "grc_python_env"
+    assert observation["proxy_start_failure_label"] == "proxy_health_timeout"
+    assert proc.terminated is True
+
+
 def test_committed_packet_is_pending_and_fail_closed() -> None:
     summary = check(DEFAULT_PACKET)
     assert summary["bfcl_proxy_responses_tool_shape_gate_passed"] is True
@@ -193,6 +286,8 @@ def test_mocked_proxy_success_returns_responses_function_call_labels(tmp_path: P
     assert summary["function_name_match"] is True
     assert summary["trace_emission_label"] == "trace_emitted"
     assert summary["trace_count_class"] == "one"
+    assert summary["proxy_python_label"] in {"grc_python_env", "repo_venv", "caller_python"}
+    assert summary["proxy_start_failure_label"] == "none_observed"
     assert summary["raw_temp_outputs_removed"] is True
     assert summary["bfcl_generate_started"] is False
     assert summary["bfcl_evaluate_started"] is False
@@ -245,6 +340,13 @@ def test_artifact_checker_rejects_raw_leaks_and_downstream_flags(tmp_path: Path)
     mutated = copy.deepcopy(data)
     mutated["records"][0]["note"] = "https://provider.example/raw response body"
     assert any("forbidden_value" in blocker or "extra_fields" in blocker for blocker in validate_artifact(mutated))
+
+    mutated = copy.deepcopy(data)
+    mutated["records"][0]["proxy_python_label"] = "python_path_value"
+    assert any("proxy_python_label_invalid" in blocker for blocker in validate_artifact(mutated))
+    mutated = copy.deepcopy(data)
+    mutated["records"][0]["proxy_start_failure_label"] = "proxy_log_contains_error"
+    assert any("proxy_start_failure_label_invalid" in blocker for blocker in validate_artifact(mutated))
     mutated = copy.deepcopy(data)
     mutated["records"][0]["raw_temp_outputs_removed"] = False
     assert any("raw_temp_outputs_removed_not_true" in blocker for blocker in validate_artifact(mutated))
@@ -254,3 +356,9 @@ def test_runner_source_does_not_source_profile() -> None:
     source = Path(runner.__file__).read_text(encoding="utf-8")
     assert "/cephfs/qiuyn/.profile" not in source
     assert "source " not in source
+
+
+def test_existing_v1_compact_artifact_remains_valid() -> None:
+    artifact = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_proxy_responses_tool_shape_v1_compact.json")
+    if artifact.exists():
+        assert check_artifact(artifact)["bfcl_proxy_responses_tool_shape_artifact_passed"] is True

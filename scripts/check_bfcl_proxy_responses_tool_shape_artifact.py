@@ -24,6 +24,9 @@ RESPONSE_JSON_PARSE_LABELS = {"parsed_json", "invalid_json", "empty_body", "not_
 RESPONSES_ENVELOPE_LABELS = {"not_checked", "responses_function_call", "responses_message_text", "responses_empty_output", "no_output", "malformed", "invalid_json", "non_2xx"}
 TRACE_LABELS = {"not_observed", "trace_emitted", "trace_missing", "trace_deleted"}
 TRACE_COUNT_CLASSES = {"not_observed", "zero", "one", "multiple"}
+PROXY_PYTHON_LABELS = {"grc_python_env", "repo_venv", "caller_python"}
+PROXY_START_FAILURE_LABELS = {"proxy_import_or_process_exit", "proxy_config_startup_failed", "proxy_health_timeout", "none_observed", "unknown"}
+BACKCOMPAT_OPTIONAL_FIELDS = {"proxy_python_label", "proxy_start_failure_label"}
 FAILED_CHECK_LABELS = {"none_observed", "packet_not_approved", "output_artifact_exists", "proxy_start_failed", "local_proxy_request_failed", "provider_transport_error", "provider_non_2xx", "responses_envelope_malformed", "responses_function_call_missing", "raw_or_secret_leak", "temp_raw_cleanup_failed", "unknown"}
 FORBIDDEN_KEY_RE = re.compile(
     r"(^|_)(raw_(requests?|responses?|bod(y|ies)|contents?|headers?|logs?|traces?|prompts?|cases?|tool_args?|provider_payloads?)|provider_payload|endpoint_values?|key_values?|api_key_values?|secret_values?|full_urls?|prompt_text|case_content|trace_content|log_content|tool_argument_value|gold_value|reference_value|expected_value|scorer_diffs?|candidate_outputs?|huawei_claim|performance_claim)(_|$)",
@@ -102,7 +105,7 @@ def validate(data: dict[str, Any]) -> list[str]:
     else:
         record = records[0]
     if record:
-        missing = [field for field in REQUIRED_COMPACT_FIELDS if field not in record]
+        missing = [field for field in REQUIRED_COMPACT_FIELDS if field not in record and field not in BACKCOMPAT_OPTIONAL_FIELDS]
         extra = [field for field in record if field not in REQUIRED_COMPACT_FIELDS]
         if missing:
             blockers.append(f"missing_required_fields:{missing!r}")
@@ -134,6 +137,10 @@ def validate(data: dict[str, Any]) -> list[str]:
                 blockers.append(f"{key}_not_bool:{record.get(key)!r}")
         if record.get("upstream_chat_route_label") not in UPSTREAM_ROUTE_LABELS:
             blockers.append(f"upstream_chat_route_label_invalid:{record.get('upstream_chat_route_label')!r}")
+        if record.get("proxy_python_label") is not None and record.get("proxy_python_label") not in PROXY_PYTHON_LABELS:
+            blockers.append(f"proxy_python_label_invalid:{record.get('proxy_python_label')!r}")
+        if record.get("proxy_start_failure_label") is not None and record.get("proxy_start_failure_label") not in PROXY_START_FAILURE_LABELS:
+            blockers.append(f"proxy_start_failure_label_invalid:{record.get('proxy_start_failure_label')!r}")
         if record.get("http_status_class") not in HTTP_STATUS_CLASSES:
             blockers.append(f"http_status_class_invalid:{record.get('http_status_class')!r}")
         if record.get("provider_http_status_label") not in PROVIDER_HTTP_STATUS_LABELS:
@@ -174,6 +181,8 @@ def check(path: Path = DEFAULT_ARTIFACT) -> dict[str, Any]:
         "proxy_started": record.get("proxy_started") if isinstance(record, dict) else None,
         "local_responses_path_selected": record.get("local_responses_path_selected") if isinstance(record, dict) else None,
         "upstream_chat_route_label": record.get("upstream_chat_route_label") if isinstance(record, dict) else None,
+        "proxy_python_label": record.get("proxy_python_label") if isinstance(record, dict) else None,
+        "proxy_start_failure_label": record.get("proxy_start_failure_label") if isinstance(record, dict) else None,
         "http_status_class": record.get("http_status_class") if isinstance(record, dict) else None,
         "provider_http_status_label": record.get("provider_http_status_label") if isinstance(record, dict) else None,
         "responses_envelope_shape_label": record.get("responses_envelope_shape_label") if isinstance(record, dict) else None,

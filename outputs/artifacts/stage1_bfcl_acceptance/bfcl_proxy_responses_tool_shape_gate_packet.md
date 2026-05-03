@@ -4,6 +4,6 @@ Status: pending. This canonical packet is fail-closed and does not authorize a p
 
 Scope: one synthetic local proxy `/v1/responses` tool-call shape preflight. The intended future live path is BFCL-style Responses request -> local proxy `/v1/responses` -> one upstream chat-completions request -> compact Responses-envelope shape labels.
 
-Compact boundary: the runner may use temporary traces/logs while deriving labels, but it must delete temporary raw material before writing the compact artifact. The committed artifact may contain labels and booleans only; raw request/response/body/content/header/log/trace/full URL/key/prompt/tool arguments must not persist.
+Compact boundary: the runner may use temporary traces/logs while deriving labels, but it must delete temporary raw material before writing the compact artifact. The committed artifact may contain labels and booleans only; raw request/response/body/content/header/log/trace/full URL/key/prompt/tool arguments must not persist. The compact artifact may also classify proxy interpreter selection and proxy startup failure class without persisting proxy log content.
 
 Forbidden: BFCL generate/evaluate, scorer, full/default baseline, source collection/diagnostics, candidate activation/jsonl/pool, performance/+3pp/Huawei claims.
