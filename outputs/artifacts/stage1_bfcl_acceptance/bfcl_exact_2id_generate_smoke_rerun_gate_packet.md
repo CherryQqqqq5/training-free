@@ -1,8 +1,8 @@
 # BFCL Exact 2-ID Generate-Only Smoke Rerun Gate
 
-Status: pending and fail-closed.
+Status: approved for one exact 2-ID generate-only smoke rerun.
 
-This packet requests future approval for one exact 2-ID BFCL generate-only smoke rerun after the materialization preservation patch. It does not authorize execution in its committed state.
+This packet requests future approval for one exact 2-ID BFCL generate-only smoke rerun after the materialization preservation patch. It authorizes only the reviewed exact 2-ID generate-only smoke rerun scope.
 
 ## Requested Scope
 
@@ -12,10 +12,13 @@ This packet requests future approval for one exact 2-ID BFCL generate-only smoke
 - Generate-only smoke rerun sufficient to check both IDs for nonempty/non-protocol results
 - Compact artifact only at `outputs/artifacts/stage1_bfcl_acceptance/bfcl_exact_2id_generate_smoke_rerun_compact.json`
 
+## Authorized For This Scope
+
+- One provider request path only as required by the exact 2-ID generate-only smoke rerun
+- BFCL generate-only smoke for the two signed IDs only
+
 ## Still Not Authorized
 
-- Provider request
-- BFCL generate or smoke execution
 - BFCL evaluate or scorer
 - Full/default baseline
 - Candidate activation, JSONL, or pool generation
