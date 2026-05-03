@@ -1,0 +1,123 @@
+{
+  "approval_status": "pending",
+  "artifact_kind": "bfcl_measurement_readiness_gate_packet",
+  "authorized": false,
+  "bfcl_case_set_protocol": {
+    "baseline_freeze_categories": [
+      "simple",
+      "multiple",
+      "parallel",
+      "parallel_multiple",
+      "multi_turn_base",
+      "multi_turn_miss_func",
+      "multi_turn_miss_param",
+      "multi_turn_long_context"
+    ],
+    "case_selection_status": "future_current_system_baseline_pending_approval",
+    "split_label": "bfcl_v4_pinned_by_evaluator_checkout"
+  },
+  "bfcl_data_version": "pinned_by_evaluator_checkout",
+  "bfcl_evaluate_authorized": false,
+  "bfcl_evaluator_checkout": "f7cf735",
+  "bfcl_generate_authorized": false,
+  "bfcl_model_alias": "gpt-4o-mini-2024-07-18-FC",
+  "bfcl_version": "v4",
+  "candidate_jsonl_authorized": false,
+  "candidate_pool_ready": false,
+  "candidate_runtime_activation_authorized": false,
+  "candidate_specs_activated": false,
+  "candidate_specs_activation_status": "inert_not_activated",
+  "candidates_inert": true,
+  "config_files": [
+    "configs/bfcl_eval_protocol.yaml",
+    "configs/runtime_bfcl_structured.yaml",
+    "configs/runtime.yaml",
+    "configs/bfcl_v4_phase1.env"
+  ],
+  "evaluator_package": "bfcl-eval==2025.12.17",
+  "fallback_allowed": false,
+  "forbidden_claims": [
+    "measurement_evidence",
+    "performance_evidence",
+    "sota_3pp",
+    "huawei_acceptance"
+  ],
+  "full_baseline_authorized": false,
+  "future_runner_paths": [
+    "scripts/run_bfcl_cli.py",
+    "scripts/check_bfcl_measurement_route_consistency.py"
+  ],
+  "generate_path_readiness_smoke": {
+    "measurement_evidence": false,
+    "signed_8id_smoke_passed": true,
+    "source_artifact": "outputs/artifacts/stage1_bfcl_acceptance/bfcl_exact_8id_generate_smoke_after_classifier_patch_compact.json"
+  },
+  "gpt_4o_fallback_allowed": false,
+  "gpt_5_2_active": false,
+  "huawei_acceptance_ready": false,
+  "measurement_scope_requested_for_future_review": "current_system_baseline_measurement_only",
+  "old_signed_model": "gpt-5.2",
+  "old_signed_model_status": "historical_superseded_inactive",
+  "openrouter_allowed": false,
+  "output_policy": {
+    "commit_bfcl_result_trees": false,
+    "commit_compact_manifests": true,
+    "commit_compact_metrics": true,
+    "commit_endpoint_or_key_values": false,
+    "commit_logs": false,
+    "commit_provider_payloads": false,
+    "commit_raw_prompts": false,
+    "commit_raw_traces": false
+  },
+  "performance_evidence": false,
+  "provider_call_authorized": false,
+  "provider_profile": "Chuangzhi/Novacode",
+  "reproducibility": {
+    "commit": "1c52d67151c8cc917144c413cdfa1912db0ef67b",
+    "config_files": [
+      "configs/bfcl_eval_protocol.yaml",
+      "configs/runtime_bfcl_structured.yaml",
+      "configs/runtime.yaml",
+      "configs/bfcl_v4_phase1.env"
+    ],
+    "env_values_committed": false,
+    "env_var_names_only": [
+      "NOVACODE_BASE_URL",
+      "NOVACODE_API_KEY",
+      "OPENAI_BASE_URL",
+      "OPENAI_API_KEY",
+      "GRC_UPSTREAM_PROFILE",
+      "GRC_UPSTREAM_MODEL",
+      "GRC_BFCL_MODEL",
+      "GRC_BFCL_NUM_THREADS"
+    ],
+    "runner_paths": [
+      "scripts/run_bfcl_cli.py"
+    ]
+  },
+  "route_model": "gpt-4.1",
+  "route_profile": "novacode",
+  "scorer_authorized": false,
+  "scorer_feedback_enabled": false,
+  "scorer_feedback_isolation": "no_feedback_to_implementation_or_candidate_without_later_gate",
+  "scorer_feedback_status": "disabled_inert_for_measurement_only",
+  "sota_3pp_claim_ready": false,
+  "source_artifacts": [
+    "outputs/artifacts/stage1_bfcl_acceptance/bfcl_exact_8id_generate_smoke_after_classifier_patch_compact.json",
+    "outputs/artifacts/stage1_bfcl_acceptance/bfcl_measurement_route_consistency.json",
+    "outputs/artifacts/stage1_bfcl_acceptance/bfcl_stage1_smoke_run_id_manifest.json"
+  ],
+  "stop_gates": [
+    "route_drift",
+    "missing_manifest",
+    "raw_or_secret_leak",
+    "candidate_activation",
+    "scorer_feedback_contamination",
+    "output_boundary_failure",
+    "fallback_or_openrouter_enabled",
+    "active_gpt_5_2_route"
+  ],
+  "target_commit_current_head_mismatch_justification": "gate_artifact_commit_may_follow_frozen_target_without_behavior_or_execution_change",
+  "target_commit_for_measurement": "1c52d67151c8cc917144c413cdfa1912db0ef67b",
+  "target_commit_source": "current_head_at_gate_creation"
+}
