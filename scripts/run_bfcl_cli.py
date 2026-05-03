@@ -14,6 +14,7 @@ if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
 from bfcl_eval.__main__ import cli  # noqa: E402
+from bfcl_eval.model_handler.base_handler import BaseHandler  # noqa: E402
 from bfcl_eval.model_handler.api_inference.openai_completion import (  # noqa: E402
     OpenAICompletionsHandler,
 )
@@ -29,6 +30,46 @@ from grc.utils.nl_tool_recovery import recover_high_confidence_tool_calls  # noq
 
 
 
+
+
+
+def _decoded_execution_output_count(value: Any) -> int:
+    if isinstance(value, dict):
+        count = 0
+        for key in ("model_response_decoded", "model_responses_decoded"):
+            decoded = value.get(key)
+            if isinstance(decoded, list) and decoded:
+                count = max(count, len(decoded))
+        for child in value.values():
+            count = max(count, _decoded_execution_output_count(child))
+        return count
+    if isinstance(value, list):
+        count = 0
+        for child in value:
+            count = max(count, _decoded_execution_output_count(child))
+        return count
+    return 0
+
+
+def _preserve_decoded_execution_output_shape_entry(entry: Any) -> Any:
+    if not isinstance(entry, dict):
+        return entry
+    decoded_count = _decoded_execution_output_count(entry.get("inference_log"))
+    if decoded_count <= 0:
+        return entry
+    preserved = dict(entry)
+    preserved["grc_decoded_execution_output_shape"] = {
+        "shape_label": "execution_list_nonempty",
+        "decoded_output_count": decoded_count,
+        "function_call_shape_present": True,
+    }
+    return preserved
+
+
+def _preserve_decoded_execution_output_shape(result: Any) -> Any:
+    if isinstance(result, list):
+        return [_preserve_decoded_execution_output_shape_entry(entry) for entry in result]
+    return _preserve_decoded_execution_output_shape_entry(result)
 
 def _capture_event_path() -> Path | None:
     value = os.environ.get("GRC_BFCL_DECODE_SHAPE_CAPTURE_PATH")
@@ -193,11 +234,26 @@ def _patch_decode_execute(handler_cls: type) -> None:
     handler_cls.decode_execute = wrapped
 
 
+def _patch_result_materialization_write(handler_cls: type) -> None:
+    original = handler_cls.write
+
+    def wrapped(self, result, result_dir, update_mode=False):  # type: ignore[no-untyped-def]
+        return original(
+            self,
+            _preserve_decoded_execution_output_shape(result),
+            result_dir,
+            update_mode=update_mode,
+        )
+
+    handler_cls.write = wrapped
+
+
 _patch_generate_with_backoff(OpenAIResponsesHandler, api_path="responses")
 _patch_generate_with_backoff(OpenAICompletionsHandler, api_path="chat_completions")
 _patch_parse_query_response_fc(OpenAIResponsesHandler)
 _patch_decode_execute(OpenAIResponsesHandler)
 _patch_decode_execute(OpenAICompletionsHandler)
+_patch_result_materialization_write(BaseHandler)
 
 
 if __name__ == "__main__":

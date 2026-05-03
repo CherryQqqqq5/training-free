@@ -3,6 +3,10 @@ from __future__ import annotations
 from grc.utils.bfcl_request_policy import apply_bfcl_fc_request_policy
 from grc.utils.bfcl_request_policy import apply_bfcl_memory_request_policy
 
+from bfcl_eval.model_handler.base_handler import BaseHandler
+from scripts.run_bfcl_cli import _preserve_decoded_execution_output_shape
+from scripts.run_bfcl_exact_2id_generate_smoke import _classify_result_for_run_id
+
 
 def test_apply_fc_request_policy_sets_function_object_tool_choice_for_single_tool(monkeypatch):
     monkeypatch.setenv("GRC_BFCL_FORCE_TOOL_CHOICE", "1")
@@ -299,3 +303,95 @@ def test_apply_memory_request_policy_skips_if_already_present(monkeypatch):
     )
 
     assert updated["messages"][0]["content"] == "[BFCL Memory Retrieval Policy]\n- Existing."
+
+
+
+def _write_with_patched_base_handler(tmp_path, entry):
+    handler = object.__new__(BaseHandler)
+    handler.registry_dir_name = "offline_model"
+    BaseHandler.write(handler, entry, tmp_path, update_mode=False)
+    return list(tmp_path.rglob("*.json"))
+
+
+def test_decoded_execution_nonempty_materializes_nonempty_result_shape(tmp_path):
+    entry = {
+        "id": "web_search_base_0",
+        "result": [["response_shape_only"]],
+        "inference_log": [
+            {
+                "step_0": [
+                    {
+                        "role": "handler_log",
+                        "content": "Successfully decoded model response.",
+                        "model_response_decoded": ["decoded_execution_shape"],
+                    }
+                ]
+            }
+        ],
+    }
+
+    patched = _preserve_decoded_execution_output_shape(entry)
+    assert patched["grc_decoded_execution_output_shape"] == {
+        "shape_label": "execution_list_nonempty",
+        "decoded_output_count": 1,
+        "function_call_shape_present": True,
+    }
+
+    files = _write_with_patched_base_handler(tmp_path, entry)
+    assert len(files) == 1
+    rel = files[0].relative_to(tmp_path / "offline_model")
+    assert len(rel.parts) >= 2
+    assert "web_search_base" in files[0].name
+    classification = _classify_result_for_run_id("web_search_base_0", tmp_path)
+    assert classification["tool_call_detected"] is True
+    assert classification["status"] == "generated"
+
+
+def test_true_empty_decoded_output_remains_empty(tmp_path):
+    entry = {
+        "id": "web_search_base_0",
+        "result": [[""]],
+        "inference_log": [
+            {
+                "step_0": [
+                    {
+                        "role": "handler_log",
+                        "content": "Empty response from the model. Proceed to next turn.",
+                        "model_response_decoded": [],
+                    }
+                ]
+            }
+        ],
+    }
+
+    patched = _preserve_decoded_execution_output_shape(entry)
+    assert "grc_decoded_execution_output_shape" not in patched
+    _write_with_patched_base_handler(tmp_path, entry)
+    classification = _classify_result_for_run_id("web_search_base_0", tmp_path)
+    assert classification["empty_model_response_detected"] is True
+    assert classification["tool_call_detected"] is False
+
+
+def test_protocol_exception_result_remains_protocol_error(tmp_path):
+    entry = {
+        "id": "web_search_base_0",
+        "result": "Error during inference: protocol failure",
+        "inference_log": [
+            {
+                "step_0": [
+                    {
+                        "role": "handler_log",
+                        "content": "Error decoding the model response. Proceed to next turn.",
+                        "error": "ProtocolError",
+                    }
+                ]
+            }
+        ],
+    }
+
+    patched = _preserve_decoded_execution_output_shape(entry)
+    assert "grc_decoded_execution_output_shape" not in patched
+    _write_with_patched_base_handler(tmp_path, entry)
+    classification = _classify_result_for_run_id("web_search_base_0", tmp_path)
+    assert classification["protocol_error_detected"] is True
+    assert classification["status"] == "protocol_error"
