@@ -1,0 +1,28 @@
+{
+  "artifact_kind": "bfcl_proxy_preflight_failure_plan_diagnosis",
+  "local_proxy_vs_provider_boundary_label": "preflight_targets_local_proxy_and_prior_generate_telemetry_observed_no_provider_call",
+  "missing_proxy_preflight_observability_fields": [
+    "preflight_exact_exit_code_class",
+    "preflight_failed_check_label",
+    "preflight_http_status_class",
+    "preflight_environment_check_label",
+    "preflight_trace_emission_label",
+    "preflight_report_written_label"
+  ],
+  "next_gate_recommended": "prepare_sanitized_proxy_preflight_failure_telemetry_gate",
+  "preflight_command_shape_label": "python_run_bfcl_preflight_with_base_url_trace_config_and_report_out_args",
+  "preflight_expected_response_shape_label": "chat_tool_calls_responses_function_call_chat_text_and_trace_emission",
+  "preflight_request_target_label": "local_proxy_openai_compatible_chat_and_responses_paths",
+  "preflight_timeout_label": "urllib_request_timeout_120s_per_check",
+  "prior_suspected_substage": "preflight_not_completed",
+  "provider_not_observed_prior": true,
+  "proxy_health_expected_status_class": "2xx",
+  "proxy_health_probe_command_shape": "curl_silent_failfast_health_probe_with_60s_retry_loop",
+  "proxy_health_probe_target_label": "local_proxy_health_path",
+  "proxy_port_binding_label": "local_loopback_port_arg_with_fresh_port_guard_and_optional_reuse",
+  "proxy_process_start_command_shape": "grc_cli_serve_with_config_rules_trace_dir_and_port_args",
+  "route_model_label": "gpt-4.1",
+  "route_profile_label": "novacode",
+  "start_proxy_completion_semantics_label": "process_started_health_probe_completed_and_process_alive_before_stage_completed",
+  "suspected_proxy_preflight_failure_class": "local_proxy_preflight_probe_or_env_check_failed_without_sanitized_detail"
+}
