@@ -1,6 +1,6 @@
 # BFCL Exact 8-ID Generate-Only Smoke After Classifier Patch Gate
 
-Status: pending and fail-closed. This packet does not authorize execution.
+Status: approved for one exact 8-ID generate-only smoke after classifier patch.
 
 ## Signed ID Source
 
@@ -14,9 +14,13 @@ The eight labels come from `outputs/artifacts/stage1_bfcl_acceptance/bfcl_stage1
 - Generate-only compact smoke after the classifier materialized-marker patch
 - Future compact artifact path: `outputs/artifacts/stage1_bfcl_acceptance/bfcl_exact_8id_generate_smoke_after_classifier_patch_compact.json`
 
-## Not Authorized
+## Authorized For This Scope
 
-- Provider request or BFCL generate until separately approved
+- One provider request path only as required by the exact 8-ID generate-only smoke
+- BFCL generate-only smoke for the eight signed IDs only
+
+## Still Not Authorized
+
 - BFCL evaluate or scorer
 - Full/default baseline
 - Candidate activation, JSONL, or pool generation
