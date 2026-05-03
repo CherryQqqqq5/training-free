@@ -19,7 +19,7 @@ from scripts.check_bfcl_proxy_transport_request_capture_diff_gate import REQUIRE
 DEFAULT_ARTIFACT = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_proxy_transport_request_capture_diff_compact.json")
 TRANSPORT_CLIENT_LABELS = {"httpx_async_client_post", "urllib_request", "unknown"}
 CLIENT_STACK_LABELS = {"proxy_httpx_json_kwarg", "direct_urllib_manual_bytes", "unknown"}
-BODY_SUBMISSION_LABELS = {"httpx_json_kwarg", "urllib_data_bytes", "unknown"}
+BODY_SUBMISSION_LABELS = {"httpx_json_kwarg", "content_bytes", "data_bytes", "urllib_data_bytes", "unknown"}
 JSON_SERIALIZATION_LABELS = {"httpx_json_parameter", "manual_json_compact_bytes", "unknown"}
 PRESENCE_LABELS = {"present", "missing", "unknown"}
 AUTH_SCHEME_LABELS = {"bearer", "missing", "unknown"}

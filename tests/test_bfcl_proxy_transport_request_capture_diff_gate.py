@@ -138,7 +138,7 @@ def test_execute_fake_transport_capture_labels_proxy_vs_direct(tmp_path: Path) -
     assert summary["timeout_shape_label"] == "config_timeout_sec"
     assert summary["payload_shape_match_label"] == "matched_direct_chat_tool_shape"
     assert summary["payload_shape_label"] == "chat_tool_direct_aligned"
-    assert summary["selected_base_url_env_label"] == "GRC_UPSTREAM_BASE_URL_then_NOVACODE_BASE_URL"
+    assert summary["selected_base_url_env_label"] == "GRC_UPSTREAM_BASE_URL"
     assert summary["selected_api_key_env_label"] == "CHUANGZHI_API_KEY"
     assert summary["proxy_python_label"] in {"grc_python_env", "repo_venv", "caller_python"}
     assert summary["suspected_403_cause_label"] == "transport_stack_or_serialization_drift"

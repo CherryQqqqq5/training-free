@@ -4,9 +4,12 @@
 from __future__ import annotations
 
 import argparse
+import asyncio
+import importlib.util
 import json
 import os
 import sys
+import types
 from pathlib import Path
 from typing import Any
 
@@ -16,11 +19,10 @@ if str(REPO_ROOT) not in sys.path:
 
 from scripts.check_bfcl_proxy_transport_request_capture_diff_artifact import check as check_artifact
 from scripts.check_bfcl_proxy_transport_request_capture_diff_gate import DEFAULT_PACKET, REQUIRED_COMPACT_FIELDS, check as check_packet
+from scripts.run_bfcl_proxy_responses_tool_shape import _responses_payload
 
 DEFAULT_OUTPUT = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_proxy_transport_request_capture_diff_compact.json")
 PROXY_SOURCE = Path("src/grc/runtime/proxy.py")
-DIRECT_RUNNER_SOURCE = Path("scripts/run_bfcl_live_provider_preflight.py")
-RUNTIME_CONFIG = Path("configs/runtime_bfcl_structured.yaml")
 
 
 def _select_proxy_python_label() -> str:
@@ -89,52 +91,381 @@ def _header_shape(has_auth: bool, has_content_type: bool, extra_shape: str) -> s
     return "unknown"
 
 
-def _direct_transport_capture(direct_source: str) -> dict[str, str]:
+def _headers_to_name_map(headers: Any) -> dict[str, str]:
+    if not isinstance(headers, dict):
+        return {}
+    return {str(key).lower(): str(value) for key, value in headers.items()}
+
+
+def _extra_header_shape(header_names: set[str]) -> str:
+    extra = header_names - {"authorization", "content-type"}
+    if not extra:
+        return "none"
+    if extra.intersection({"http-referer", "x-title"}):
+        return "referer_or_title_possible"
+    return "other_extra"
+
+
+def _payload_shape_label(payload: Any) -> str:
+    if not isinstance(payload, dict):
+        return "unknown"
+    messages = payload.get("messages")
+    tools = payload.get("tools")
+    tool_choice = payload.get("tool_choice")
+    if not isinstance(messages, list) or len(messages) != 1 or not isinstance(messages[0], dict) or messages[0].get("role") != "user":
+        return "chat_tool_shape_drift"
+    if payload.get("model") != "gpt-4.1" or payload.get("temperature") != 0 or payload.get("max_tokens") != 16:
+        return "chat_tool_shape_drift"
+    if not isinstance(tools, list) or len(tools) != 1 or not isinstance(tools[0], dict):
+        return "chat_tool_shape_drift"
+    function = tools[0].get("function") if isinstance(tools[0].get("function"), dict) else {}
+    if tools[0].get("type") != "function" or not function.get("name"):
+        return "chat_tool_shape_drift"
+    if not isinstance(tool_choice, dict) or tool_choice.get("type") != "function":
+        return "chat_tool_shape_drift"
+    choice_function = tool_choice.get("function") if isinstance(tool_choice.get("function"), dict) else {}
+    if choice_function.get("name") != function.get("name"):
+        return "chat_tool_shape_drift"
+    return "chat_tool_direct_aligned"
+
+
+def _direct_transport_capture_actual() -> dict[str, str]:
+    import scripts.run_bfcl_live_provider_preflight as direct_runner
+
+    captured: dict[str, Any] = {}
+
+    class FakeUrlopenResponse:
+        status = 200
+
+        def __enter__(self) -> "FakeUrlopenResponse":
+            return self
+
+        def __exit__(self, _exc_type: Any, _exc: Any, _tb: Any) -> bool:
+            return False
+
+        def read(self) -> bytes:
+            return b"{}"
+
+    def fake_urlopen(request: Any, timeout: Any = None) -> FakeUrlopenResponse:
+        captured["request"] = request
+        captured["timeout"] = timeout
+        return FakeUrlopenResponse()
+
+    original_urlopen = direct_runner.urllib.request.urlopen
+    try:
+        direct_runner.urllib.request.urlopen = fake_urlopen
+        direct_runner._default_post_json(
+            "http://capture.invalid/chat/completions",
+            "synthetic-direct-key",
+            direct_runner._chat_tool_payload(),
+        )
+    finally:
+        direct_runner.urllib.request.urlopen = original_urlopen
+
+    request = captured.get("request")
+    header_items = dict(request.header_items()) if request is not None else {}
+    header_map = {str(key).lower(): str(value) for key, value in header_items.items()}
+    header_names = set(header_map)
+    has_auth = "authorization" in header_names
+    has_content_type = "content-type" in header_names
+    extra_shape = _extra_header_shape(header_names)
+    data = getattr(request, "data", None)
+    target = getattr(request, "full_url", "")
     return {
-        "transport_client_label": "urllib_request" if "urllib.request.Request" in direct_source else "unknown",
-        "client_stack_label": "direct_urllib_manual_bytes" if "urllib.request.urlopen" in direct_source else "unknown",
-        "body_submission_label": "urllib_data_bytes" if "data=json.dumps" in direct_source and ".encode(\"utf-8\")" in direct_source else "unknown",
-        "json_serialization_label": "manual_json_compact_bytes" if "separators=(\",\", \":\")" in direct_source or "separators=(\",\",\":\")" in direct_source else "manual_json_compact_bytes",
-        "content_type_header_label": "present" if "Content-Type" in direct_source else "unknown",
-        "authorization_header_label": "present" if "Authorization" in direct_source else "unknown",
-        "auth_scheme_label": "bearer" if "Bearer" in direct_source else "unknown",
-        "extra_header_shape_label": "none",
-        "provider_header_shape_label": "authorization_content_type_only",
+        "transport_client_label": "urllib_request",
+        "client_stack_label": "direct_urllib_manual_bytes",
+        "body_submission_label": "urllib_data_bytes" if isinstance(data, (bytes, bytearray)) else "unknown",
+        "json_serialization_label": "manual_json_compact_bytes" if isinstance(data, (bytes, bytearray)) else "unknown",
+        "content_type_header_label": "present" if has_content_type else "missing",
+        "authorization_header_label": "present" if has_auth else "missing",
+        "auth_scheme_label": "bearer" if header_map.get("authorization", "").lower().startswith("bearer ") else "missing",
+        "extra_header_shape_label": extra_shape,
+        "provider_header_shape_label": _header_shape(has_auth, has_content_type, extra_shape),
         "url_join_label": "direct_target_url_supplied",
-        "request_target_suffix_label": "chat_completions_suffix",
-        "timeout_shape_label": "urllib_timeout_30" if "timeout=30" in direct_source else "unknown",
-        "payload_shape_label": "chat_tool_direct_aligned" if "_chat_tool_payload" in direct_source and "max_tokens" in direct_source else "unknown",
+        "request_target_suffix_label": "chat_completions_suffix" if str(target).endswith("/chat/completions") else "unknown",
+        "timeout_shape_label": "urllib_timeout_30" if captured.get("timeout") == 30 else "unknown",
+        "payload_shape_label": "chat_tool_direct_aligned" if isinstance(data, (bytes, bytearray)) else "unknown",
     }
 
 
-def _proxy_transport_capture(proxy_source: str, config_text: str) -> dict[str, str]:
-    has_httpx_post = "httpx.AsyncClient" in proxy_source and ".post(" in proxy_source
-    has_json_kwarg = "json=req_json" in proxy_source
-    has_headers_kwarg = "headers=headers" in proxy_source
-    has_auth = '"Authorization"' in proxy_source
-    has_content_type = '"Content-Type"' in proxy_source
-    extra_header_shape = "referer_or_title_possible" if "HTTP-Referer" in proxy_source or "X-Title" in proxy_source else "none"
-    # Current committed config has no default title and the diagnostic boundary does not source env values.
-    if "default_title" not in config_text:
-        extra_header_shape = "none"
-    selected_base = "GRC_UPSTREAM_BASE_URL_then_NOVACODE_BASE_URL" if "GRC_UPSTREAM_BASE_URL" in proxy_source and "base_url_env: NOVACODE_BASE_URL" in config_text else "unknown"
-    selected_api = "CHUANGZHI_API_KEY" if "GRC_UPSTREAM_API_KEY_ENV" in proxy_source else "NOVACODE_API_KEY"
+class _FakeFastAPI:
+    def __init__(self) -> None:
+        self.routes: dict[tuple[str, str], Any] = {}
+
+    def get(self, path: str, *_args: Any, **_kwargs: Any) -> Any:
+        def decorator(func: Any) -> Any:
+            self.routes[("GET", path)] = func
+            return func
+        return decorator
+
+    def post(self, path: str, *_args: Any, **_kwargs: Any) -> Any:
+        def decorator(func: Any) -> Any:
+            self.routes[("POST", path)] = func
+            return func
+        return decorator
+
+
+class _FakeHTTPException(Exception):
+    def __init__(self, status_code: int | None = None, detail: str | None = None) -> None:
+        super().__init__(detail)
+        self.status_code = status_code
+        self.detail = detail
+
+
+class _FakeJSONResponse:
+    def __init__(self, content: Any = None, status_code: int = 200) -> None:
+        self.content = content
+        self.status_code = status_code
+
+
+class _FakeRequest:
+    def __init__(self, payload: dict[str, Any]) -> None:
+        self._payload = payload
+
+    async def json(self) -> dict[str, Any]:
+        return self._payload
+
+
+class _FakeRuleEngine:
+    apply_request_called = False
+
+    def __init__(self, *_args: Any, **_kwargs: Any) -> None:
+        pass
+
+    def apply_request(self, request_json: dict[str, Any]) -> tuple[dict[str, Any], list[Any]]:
+        type(self).apply_request_called = True
+        return request_json, []
+
+    def apply_response(self, request_json: dict[str, Any], raw_json: dict[str, Any], request_patches: list[Any] | None = None) -> tuple[dict[str, Any], list[Any], Any]:
+        class Validation:
+            def model_dump(self, mode: str = "json") -> dict[str, Any]:
+                return {"issues": [], "rule_hits": [], "request_patches": []}
+        return raw_json, [], Validation()
+
+
+class _FakeTraceStore:
+    write_called = False
+
+    def __init__(self, *_args: Any, **_kwargs: Any) -> None:
+        pass
+
+    def write(self, _payload: dict[str, Any]) -> None:
+        type(self).write_called = True
+
+
+def _install_proxy_import_stubs(capture: dict[str, Any]) -> dict[str, Any]:
+    original_modules = {name: sys.modules.get(name) for name in (
+        "fastapi",
+        "fastapi.responses",
+        "httpx",
+        "yaml",
+        "grc",
+        "grc.runtime",
+        "grc.runtime.engine",
+        "grc.runtime.trace_store",
+        "grc.utils",
+        "grc.utils.tool_schema",
+    )}
+
+    fake_fastapi = types.ModuleType("fastapi")
+    fake_fastapi.FastAPI = _FakeFastAPI
+    fake_fastapi.HTTPException = _FakeHTTPException
+    fake_fastapi.Request = _FakeRequest
+    fake_responses = types.ModuleType("fastapi.responses")
+    fake_responses.JSONResponse = _FakeJSONResponse
+
+    fake_httpx = types.ModuleType("httpx")
+
+    class FakeAsyncClient:
+        def __init__(self, timeout: Any = None) -> None:
+            capture["timeout"] = timeout
+
+        async def __aenter__(self) -> "FakeAsyncClient":
+            return self
+
+        async def __aexit__(self, _exc_type: Any, _exc: Any, _tb: Any) -> bool:
+            return False
+
+        async def post(self, url: str, **kwargs: Any) -> Any:
+            capture["url_suffix_chat"] = str(url).endswith("/chat/completions")
+            capture["headers"] = kwargs.get("headers")
+            capture["json"] = kwargs.get("json")
+            capture["has_json_kwarg"] = "json" in kwargs
+            capture["has_content_kwarg"] = "content" in kwargs
+            capture["has_data_kwarg"] = "data" in kwargs
+
+            class FakeResponse:
+                status_code = 200
+
+                def json(self) -> dict[str, Any]:
+                    return {
+                        "id": "synthetic",
+                        "model": "gpt-4.1",
+                        "choices": [
+                            {
+                                "message": {
+                                    "tool_calls": [
+                                        {
+                                            "id": "synthetic_call",
+                                            "type": "function",
+                                            "function": {"name": "synthetic_proxy_responses_tool_shape_ping", "arguments": "{}"},
+                                        }
+                                    ]
+                                }
+                            }
+                        ],
+                    }
+
+            return FakeResponse()
+
+    fake_httpx.AsyncClient = FakeAsyncClient
+
+    fake_yaml = types.ModuleType("yaml")
+    fake_yaml.safe_load = lambda _text: {
+        "timeout_sec": 120,
+        "runtime_policy": {"bfcl_measurement_responses_to_chat_tool_choice_normalization": True},
+        "upstream": {
+            "active_profile": "novacode",
+            "base_url": "ENV_ONLY",
+            "api_key_env": "OPENAI_API_KEY",
+            "model": "gpt-4.1",
+            "profiles": {
+                "novacode": {
+                    "base_url_env": "NOVACODE_BASE_URL",
+                    "base_url": "ENV_ONLY_NOVACODE_BASE_URL",
+                    "api_key_env": "NOVACODE_API_KEY",
+                    "model": "gpt-4.1",
+                }
+            },
+            "base_url_env": "NOVACODE_BASE_URL",
+        },
+    }
+
+    fake_grc = types.ModuleType("grc")
+    fake_grc.__path__ = []
+    fake_runtime = types.ModuleType("grc.runtime")
+    fake_runtime.__path__ = []
+    fake_engine = types.ModuleType("grc.runtime.engine")
+    fake_engine.RuleEngine = _FakeRuleEngine
+    fake_trace = types.ModuleType("grc.runtime.trace_store")
+    fake_trace.TraceStore = _FakeTraceStore
+    fake_utils = types.ModuleType("grc.utils")
+    fake_utils.__path__ = []
+    fake_tool_schema = types.ModuleType("grc.utils.tool_schema")
+    fake_tool_schema.tool_map_from_tools_payload = lambda _tools: {}
+
+    replacements = {
+        "fastapi": fake_fastapi,
+        "fastapi.responses": fake_responses,
+        "httpx": fake_httpx,
+        "yaml": fake_yaml,
+        "grc": fake_grc,
+        "grc.runtime": fake_runtime,
+        "grc.runtime.engine": fake_engine,
+        "grc.runtime.trace_store": fake_trace,
+        "grc.utils": fake_utils,
+        "grc.utils.tool_schema": fake_tool_schema,
+    }
+    sys.modules.update(replacements)
+    return original_modules
+
+
+def _restore_modules(original_modules: dict[str, Any]) -> None:
+    for name, original in original_modules.items():
+        if original is None:
+            sys.modules.pop(name, None)
+        else:
+            sys.modules[name] = original
+
+
+def _temporary_env(updates: dict[str, str]) -> dict[str, str | None]:
+    old: dict[str, str | None] = {}
+    for key, value in updates.items():
+        old[key] = os.environ.get(key)
+        os.environ[key] = value
+    return old
+
+
+def _restore_env(old: dict[str, str | None]) -> None:
+    for key, value in old.items():
+        if value is None:
+            os.environ.pop(key, None)
+        else:
+            os.environ[key] = value
+
+
+def _load_proxy_module_with_fake_transport(capture: dict[str, Any]) -> Any:
+    original_modules = _install_proxy_import_stubs(capture)
+    try:
+        spec = importlib.util.spec_from_file_location("proxy_actual_capture_module", REPO_ROOT / PROXY_SOURCE)
+        if spec is None or spec.loader is None:
+            raise RuntimeError("proxy module spec unavailable")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module, original_modules
+    except Exception:
+        _restore_modules(original_modules)
+        raise
+
+
+def _proxy_transport_capture_actual() -> dict[str, str]:
+    capture: dict[str, Any] = {}
+    _FakeRuleEngine.apply_request_called = False
+    _FakeTraceStore.write_called = False
+    module, original_modules = _load_proxy_module_with_fake_transport(capture)
+    old_env = _temporary_env(
+        {
+            "GRC_UPSTREAM_PROFILE": "novacode",
+            "GRC_UPSTREAM_BASE_URL": "http://capture.invalid/v1",
+            "GRC_UPSTREAM_API_KEY_ENV": "CHUANGZHI_API_KEY",
+            "CHUANGZHI_API_KEY": "synthetic-proxy-key",
+            "GRC_PROXY_RESPONSES_TOOL_SHAPE_DIRECT_ALIGNMENT": "1",
+        }
+    )
+    try:
+        app = module.create_app("configs/runtime_bfcl_structured.yaml", "rules/baseline_empty", "/tmp/fake-traces-not-written")
+        handler = app.routes[("POST", "/v1/responses")]
+        asyncio.run(handler(_FakeRequest(_responses_payload())))
+    finally:
+        _restore_env(old_env)
+        _restore_modules(original_modules)
+
+    headers = _headers_to_name_map(capture.get("headers"))
+    header_names = set(headers)
+    has_auth = "authorization" in header_names
+    has_content_type = "content-type" in header_names
+    extra_shape = _extra_header_shape(header_names)
+    payload = capture.get("json")
+    if capture.get("has_json_kwarg"):
+        body_submission = "httpx_json_kwarg"
+        json_serialization = "httpx_json_parameter"
+    elif capture.get("has_content_kwarg"):
+        body_submission = "content_bytes"
+        json_serialization = "manual_json_compact_bytes"
+    elif capture.get("has_data_kwarg"):
+        body_submission = "data_bytes"
+        json_serialization = "manual_json_compact_bytes"
+    else:
+        body_submission = "unknown"
+        json_serialization = "unknown"
     return {
-        "transport_client_label": "httpx_async_client_post" if has_httpx_post else "unknown",
-        "client_stack_label": "proxy_httpx_json_kwarg" if has_httpx_post and has_json_kwarg else "unknown",
-        "body_submission_label": "httpx_json_kwarg" if has_json_kwarg else "unknown",
-        "json_serialization_label": "httpx_json_parameter" if has_json_kwarg else "unknown",
+        "transport_client_label": "httpx_async_client_post",
+        "client_stack_label": "proxy_httpx_json_kwarg" if capture.get("has_json_kwarg") else "unknown",
+        "body_submission_label": body_submission,
+        "json_serialization_label": json_serialization,
         "content_type_header_label": "present" if has_content_type else "missing",
-        "authorization_header_label": "present" if has_auth and has_headers_kwarg else "missing",
-        "auth_scheme_label": "bearer" if "Bearer" in proxy_source else "unknown",
-        "extra_header_shape_label": extra_header_shape,
-        "provider_header_shape_label": _header_shape(has_auth, has_content_type, extra_header_shape),
-        "url_join_label": "base_url_chat_completions_appended" if "/chat/completions" in proxy_source else "unknown",
-        "request_target_suffix_label": "chat_completions_suffix" if "/chat/completions" in proxy_source else "unknown",
-        "timeout_shape_label": "config_timeout_sec" if "timeout=timeout_sec" in proxy_source else "unknown",
-        "payload_shape_label": "chat_tool_direct_aligned" if "GRC_PROXY_RESPONSES_TOOL_SHAPE_DIRECT_ALIGNMENT" in proxy_source else "unknown",
-        "selected_base_url_env_label": selected_base,
-        "selected_api_key_env_label": selected_api,
+        "authorization_header_label": "present" if has_auth else "missing",
+        "auth_scheme_label": "bearer" if headers.get("authorization", "").lower().startswith("bearer ") else "missing",
+        "extra_header_shape_label": extra_shape,
+        "provider_header_shape_label": _header_shape(has_auth, has_content_type, extra_shape),
+        "url_join_label": "base_url_chat_completions_appended" if capture.get("url_suffix_chat") else "unknown",
+        "request_target_suffix_label": "chat_completions_suffix" if capture.get("url_suffix_chat") else "unknown",
+        "timeout_shape_label": "config_timeout_sec" if capture.get("timeout") == 120 else "unknown",
+        "payload_shape_label": _payload_shape_label(payload),
+        "selected_base_url_env_label": "GRC_UPSTREAM_BASE_URL",
+        "selected_api_key_env_label": "CHUANGZHI_API_KEY",
+        "engine_apply_request_label": "bypassed_for_exact_synthetic" if not _FakeRuleEngine.apply_request_called else "normal_policy_path",
+        "trace_write_label": "in_memory_fake_trace_write" if _FakeTraceStore.write_called else "not_observed",
     }
 
 
@@ -159,11 +490,8 @@ def _suspected_cause(direct: dict[str, str], proxy: dict[str, str], payload_matc
 
 
 def build_diff_record() -> dict[str, Any]:
-    proxy_source = (REPO_ROOT / PROXY_SOURCE).read_text(encoding="utf-8")
-    direct_source = (REPO_ROOT / DIRECT_RUNNER_SOURCE).read_text(encoding="utf-8")
-    config_text = (REPO_ROOT / RUNTIME_CONFIG).read_text(encoding="utf-8")
-    direct = _direct_transport_capture(direct_source)
-    proxy = _proxy_transport_capture(proxy_source, config_text)
+    direct = _direct_transport_capture_actual()
+    proxy = _proxy_transport_capture_actual()
     payload_match = _payload_match_label(direct, proxy)
     record = _base_record(command_executed=True)
     record.update(
