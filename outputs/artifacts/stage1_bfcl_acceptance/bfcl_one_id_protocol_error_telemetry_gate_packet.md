@@ -1,6 +1,6 @@
 # BFCL One-ID Protocol-Error Telemetry Gate
 
-Status: `pending` and fail-closed. No provider request, BFCL generate, smoke, evaluate, scorer, full baseline, candidate path, performance evidence, +3pp, SOTA, or Huawei acceptance path is authorized.
+Status: `approved` for exactly one scoped execution. Only the one-ID provider/generate telemetry path is authorized; smoke, evaluate, scorer, full baseline, candidate path, performance evidence, +3pp, SOTA, and Huawei acceptance remain unauthorized.
 
 Requested future scope: exactly one signed ID, `multi_turn_long_context_0`, on route `novacode/gpt-4.1`, candidates inert, generate-only path only as needed to capture compact protocol-error stage flags.
 
