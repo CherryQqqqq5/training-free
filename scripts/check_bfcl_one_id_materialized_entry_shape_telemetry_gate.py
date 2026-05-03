@@ -32,11 +32,13 @@ REQUIRED_COMPACT_FIELDS = [
     "compact_result_status",
     "suspected_materialized_entry_shape_stage",
 ]
-FALSE_KEYS = (
+APPROVED_TRUE_KEYS = (
     "authorized",
     "provider_request_authorized",
     "live_materialized_entry_shape_telemetry_authorized",
     "bfcl_generate_authorized",
+)
+FALSE_KEYS = (
     "bfcl_smoke_authorized",
     "bfcl_evaluate_authorized",
     "scorer_authorized",
@@ -105,8 +107,13 @@ def validate_packet(data: dict[str, Any]) -> list[str]:
     blockers: list[str] = []
     if data.get("artifact_kind") != "bfcl_one_id_materialized_entry_shape_telemetry_gate_packet":
         blockers.append(f"artifact_kind_invalid:{data.get('artifact_kind')!r}")
-    if data.get("approval_status") != "pending":
-        blockers.append(f"approval_status_invalid:{data.get('approval_status')!r}")
+    status = data.get("approval_status")
+    if status not in {"pending", "approved"}:
+        blockers.append(f"approval_status_invalid:{status!r}")
+    approved = status == "approved"
+    for key in APPROVED_TRUE_KEYS:
+        if data.get(key) is not approved:
+            blockers.append(f"{key}_not_{str(approved).lower()}:{data.get(key)!r}")
     for key in FALSE_KEYS:
         if data.get(key) is not False:
             blockers.append(f"{key}_not_false:{data.get(key)!r}")
