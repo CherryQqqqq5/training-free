@@ -35,8 +35,8 @@ OPTIONAL_PREGENERATE_SUBSTAGE_FIELDS = [
 ]
 GENERIC_PREGENERATE_CLASSES = {"ok", "nonzero", "missing", "not_inspected", "not_observed", "unknown_compact"}
 CATEGORY_ARG_VALIDATION_CLASSES = {"accepted_by_static_shape", "rejected_by_static_shape", "not_validated_without_execution", "unknown_compact"}
-IMPORT_PROBE_CLASSES = {"importable_without_generate", "import_error", "not_run_by_design", "unknown_compact"}
-ARG_PROBE_CLASSES = {"argparse_ok_without_generate", "argparse_error_without_generate", "not_run_by_design", "unknown_compact"}
+IMPORT_PROBE_CLASSES = {"importable_without_generate", "import_error", "not_run_by_design", "not_observed", "unknown_compact"}
+ARG_PROBE_CLASSES = {"argparse_ok_without_generate", "argparse_error_without_generate", "not_run_by_design", "not_observed", "unknown_compact"}
 ALLOWED_RECORD_FIELDS = set(REQUIRED_COMPACT_FIELDS) | set(OPTIONAL_PREGENERATE_SUBSTAGE_FIELDS)
 FORBIDDEN_KEY_RE = re.compile(
     r"(^|_)(raw_prompts?|raw_bfcl_case_content|raw_cases?|raw_commands?|raw_provider_requests?|raw_provider_responses?|raw_response_headers?|raw_logs?|raw_traces?|raw_model_output_text|raw_tool_args?|raw_result_trees?|endpoint_values?|key_values?|api_key_values?|secret_values?|scorer_diffs?|candidate_outputs?|provider_payload_value|prompt_text|case_content|trace_content|log_content|tool_argument_value|gold_value|reference_value|expected_value)(_|$)",

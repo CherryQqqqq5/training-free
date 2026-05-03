@@ -378,6 +378,26 @@ def test_generate_failure_artifact_checker_accepts_optional_pregenerate_substage
     assert validate_artifact(data) == []
 
 
+def test_generate_failure_artifact_checker_accepts_unreached_pregenerate_probe_labels() -> None:
+    data = json.loads(DEFAULT_TELEMETRY_ARTIFACT.read_text(encoding="utf-8"))
+    record = data["records"][0]
+    record.update(
+        {
+            "config_source_exit_class": "not_observed",
+            "env_default_expansion_class": "not_observed",
+            "category_arg_assembly_shape": "single_comma_joined_test_category_argument",
+            "category_arg_validation_result": "accepted_by_static_shape",
+            "bfcl_cli_import_probe_class_without_generate": "not_observed",
+            "bfcl_cli_argument_probe_class_without_generate": "not_observed",
+            "pre_generate_marker_boundary_class": "not_observed",
+            "last_started_stage": "preflight",
+            "last_completed_stage": "start_proxy",
+            "suspected_pregenerate_failure_substage": "preflight_not_completed",
+        }
+    )
+    assert validate_artifact(data) == []
+
+
 def test_generate_failure_artifact_checker_rejects_invalid_optional_pregenerate_label() -> None:
     data = json.loads(DEFAULT_TELEMETRY_ARTIFACT.read_text(encoding="utf-8"))
     data["records"][0]["category_arg_validation_result"] = "raw_prompt"
