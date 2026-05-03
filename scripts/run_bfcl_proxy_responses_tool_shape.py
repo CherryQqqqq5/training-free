@@ -128,7 +128,6 @@ def _proxy_config_start_failure_label(env: dict[str, str]) -> str:
 def _responses_payload() -> dict[str, Any]:
     return {
         "model": "gpt-4.1",
-        "instructions": "Synthetic proxy Responses tool-shape preflight. Use the tool when required.",
         "input": [{"role": "user", "content": "Run synthetic proxy Responses shape preflight."}],
         "tools": [
             {
@@ -144,6 +143,7 @@ def _responses_payload() -> dict[str, Any]:
             }
         ],
         "tool_choice": {"type": "function", "function": {"name": TOOL_NAME}},
+        "temperature": 0,
         "max_output_tokens": 16,
     }
 
@@ -268,6 +268,7 @@ def _default_proxy_probe(temp_root: Path) -> dict[str, Any]:
     env = dict(os.environ)
     env["PYTHONPATH"] = f"{REPO_ROOT / 'src'}{os.pathsep}{env.get('PYTHONPATH', '')}" if env.get("PYTHONPATH") else str(REPO_ROOT / "src")
     env["GRC_UPSTREAM_API_KEY_ENV"] = "CHUANGZHI_API_KEY"
+    env["GRC_PROXY_RESPONSES_TOOL_SHAPE_DIRECT_ALIGNMENT"] = "1"
     proxy_python, proxy_python_label = _select_proxy_python()
     config_start_failure_label = _proxy_config_start_failure_label(env)
     if config_start_failure_label != "none_observed":

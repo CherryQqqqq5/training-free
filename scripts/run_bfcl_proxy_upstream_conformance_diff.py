@@ -68,12 +68,13 @@ def _runtime_policy_flags(config_text: str) -> tuple[bool, bool]:
 def _responses_probe_shape() -> dict[str, Any]:
     return {
         "model": ROUTE_MODEL,
-        "instructions_present": True,
+        "instructions_present": False,
         "input_roles": ["user"],
         "tools_shape": "responses_function_schema",
         "tool_choice_shape": "responses_function_object",
         "max_output_tokens_present": True,
-        "temperature_present": False,
+        "temperature_present": True,
+        "temperature_zero": True,
     }
 
 
@@ -91,7 +92,7 @@ def _adapt_responses_to_chat_shape(responses_shape: dict[str, Any], *, inject_sy
         "tool_choice_shape": "chat_function_object" if responses_shape.get("tool_choice_shape") == "responses_function_object" else "malformed",
         "max_tokens_present": bool(responses_shape.get("max_output_tokens_present")),
         "temperature_present": bool(responses_shape.get("temperature_present")),
-        "temperature_zero": False,
+        "temperature_zero": bool(responses_shape.get("temperature_zero")),
     }
 
 
@@ -179,7 +180,11 @@ def build_diff_record() -> dict[str, Any]:
     config_text = (REPO_ROOT / RUNTIME_CONFIG).read_text(encoding="utf-8")
     structured, literal_hints = _runtime_policy_flags(config_text)
     responses_shape = _responses_probe_shape()
-    chat_shape = _adapt_responses_to_chat_shape(responses_shape, inject_system=structured or literal_hints)
+    diagnostic_direct_alignment = True
+    chat_shape = _adapt_responses_to_chat_shape(
+        responses_shape,
+        inject_system=(structured or literal_hints) and not diagnostic_direct_alignment,
+    )
     capture = _fake_upstream_capture(chat_shape)
     header_shape, authorization, content_type, extra_header = _label_headers(capture["provider_header_names"])
     roles_label = _label_roles(capture["provider_message_roles"])
@@ -198,7 +203,7 @@ def build_diff_record() -> dict[str, Any]:
             "tool_choice_shape_label": str(capture.get("provider_tool_choice_shape") or "unknown"),
             "tools_shape_label": str(capture.get("provider_tools_shape") or "unknown"),
             "model_label": _label_model(capture.get("provider_model")),
-            "runtime_patch_label": "nonzero_policy_patch" if structured or literal_hints else "zero_policy_patch",
+            "runtime_patch_label": "zero_policy_patch" if diagnostic_direct_alignment else ("nonzero_policy_patch" if structured or literal_hints else "zero_policy_patch"),
             "responses_to_chat_adapter_label": "responses_to_chat_applied",
         }
     )

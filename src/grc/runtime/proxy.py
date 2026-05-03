@@ -357,6 +357,7 @@ def create_app(config_path: str, rules_dir: str, trace_dir: str) -> FastAPI:
     async def responses(request: Request) -> JSONResponse:
         original_req_json = await request.json()
 
+        diagnostic_direct_shape = os.environ.get("GRC_PROXY_RESPONSES_TOOL_SHAPE_DIRECT_ALIGNMENT") == "1"
         chat_req_json: Dict[str, Any] = {
             "model": original_req_json.get("model"),
             "messages": _responses_input_to_messages(
@@ -365,6 +366,8 @@ def create_app(config_path: str, rules_dir: str, trace_dir: str) -> FastAPI:
             ),
             **_responses_token_fields_to_chat_fields(original_req_json),
         }
+        if diagnostic_direct_shape and "temperature" in original_req_json:
+            chat_req_json["temperature"] = original_req_json["temperature"]
         chat_tools = _responses_tools_to_chat_tools(original_req_json.get("tools"))
         if chat_tools:
             chat_req_json["tools"] = chat_tools
@@ -376,7 +379,11 @@ def create_app(config_path: str, rules_dir: str, trace_dir: str) -> FastAPI:
             if chat_tool_choice is not None:
                 chat_req_json["tool_choice"] = chat_tool_choice
 
-        req_json, request_patches = engine.apply_request(chat_req_json)
+        if diagnostic_direct_shape:
+            req_json = chat_req_json
+            request_patches = []
+        else:
+            req_json, request_patches = engine.apply_request(chat_req_json)
         if upstream_model:
             req_json["model"] = upstream_model
 

@@ -85,6 +85,16 @@ def test_proxy_python_selection_prefers_env_then_repo_venv_then_caller(tmp_path:
 
 
 
+def test_synthetic_responses_payload_is_direct_chat_aligned() -> None:
+    payload = runner._responses_payload()
+    assert "instructions" not in payload
+    assert payload["temperature"] == 0
+    assert payload["max_output_tokens"] == 16
+    assert payload["tool_choice"] == {"type": "function", "function": {"name": runner.TOOL_NAME}}
+    assert payload["input"] and payload["input"][0]["role"] == "user"
+
+
+
 def test_default_proxy_probe_classifies_missing_base_url_before_process_start(tmp_path: Path, monkeypatch) -> None:
     monkeypatch.setenv("GRC_PYTHON", "/tmp/synthetic-grc-python")
     monkeypatch.delenv("GRC_UPSTREAM_BASE_URL", raising=False)
@@ -132,6 +142,7 @@ def test_default_proxy_probe_classifies_early_process_exit_without_raw_log(tmp_p
     assert observation["proxy_api_key_env_override_label"] == "approved_chuangzhi_key_env"
     assert "GRC_UPSTREAM_API_KEY_ENV" in captured_env
     assert captured_env["GRC_UPSTREAM_API_KEY_ENV"] == "CHUANGZHI_API_KEY"
+    assert captured_env["GRC_PROXY_RESPONSES_TOOL_SHAPE_DIRECT_ALIGNMENT"] == "1"
     assert "raw" not in json.dumps(observation, sort_keys=True)
 
 

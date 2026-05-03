@@ -128,18 +128,18 @@ def test_execute_fake_capture_detects_policy_header_conformance_labels(tmp_path:
     assert summary["authorization_header_presence_label"] == "present"
     assert summary["content_type_header_label"] == "present"
     assert summary["extra_provider_header_shape_label"] == "none"
-    assert summary["messages_role_sequence_label"] == "system_developer_user"
-    assert summary["system_injection_label"] == "present"
-    assert summary["developer_instruction_label"] == "present"
-    assert summary["temperature_field_label"] == "missing"
+    assert summary["messages_role_sequence_label"] == "user"
+    assert summary["system_injection_label"] == "absent"
+    assert summary["developer_instruction_label"] == "absent"
+    assert summary["temperature_field_label"] == "present_zero"
     assert summary["token_field_label"] == "max_output_tokens_mapped_to_max_tokens"
     assert summary["tool_choice_shape_label"] == "chat_function_object"
     assert summary["tools_shape_label"] == "chat_function_schema"
     assert summary["model_label"] == "gpt_4_1"
-    assert summary["runtime_patch_label"] == "nonzero_policy_patch"
+    assert summary["runtime_patch_label"] == "zero_policy_patch"
     assert summary["responses_to_chat_adapter_label"] == "responses_to_chat_applied"
-    assert summary["suspected_403_cause_label"] == "temperature_missing_with_policy_drift"
-    assert summary["direct_proxy_conformance_label"] == "partial_drift_headers_aligned"
+    assert summary["suspected_403_cause_label"] == "none_observed"
+    assert summary["direct_proxy_conformance_label"] == "matched_direct_chat_tool_shape"
     assert summary["bfcl_generate_started"] is False
     assert summary["bfcl_evaluate_started"] is False
     assert summary["scorer_started"] is False
@@ -159,11 +159,13 @@ def test_execute_fake_capture_detects_policy_header_conformance_labels(tmp_path:
 def test_runtime_zero_patch_changes_conformance_labels(monkeypatch) -> None:
     monkeypatch.setattr(runner, "_runtime_policy_flags", lambda _text: (False, False))
     record = runner.build_diff_record()
-    assert record["messages_role_sequence_label"] == "developer_user"
+    assert record["messages_role_sequence_label"] == "user"
     assert record["system_injection_label"] == "absent"
+    assert record["developer_instruction_label"] == "absent"
+    assert record["temperature_field_label"] == "present_zero"
     assert record["runtime_patch_label"] == "zero_policy_patch"
-    assert record["suspected_403_cause_label"] == "policy_message_shape_drift"
-    assert record["direct_proxy_conformance_label"] == "partial_drift_headers_aligned"
+    assert record["suspected_403_cause_label"] == "none_observed"
+    assert record["direct_proxy_conformance_label"] == "matched_direct_chat_tool_shape"
 
 
 def test_artifact_checker_rejects_raw_leaks_and_downstream_flags(tmp_path: Path) -> None:
