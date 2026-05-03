@@ -1,6 +1,6 @@
 # BFCL one-ID post-decode materialization telemetry gate
 
-Status: pending / fail-closed. This packet prepares a future one-ID live post-decode materialization telemetry capture only; it does not authorize execution.
+Status: approved for exactly one live post-decode materialization telemetry capture on `web_search_base_0`.
 
 ## Scope
 
@@ -11,7 +11,7 @@ Status: pending / fail-closed. This packet prepares a future one-ID live post-de
 
 ## Unauthorized
 
-Provider request, live post-decode telemetry, BFCL generate, BFCL smoke, BFCL evaluate, scorer, full/default baseline, candidate activation, candidate JSONL/pool, scorer-feedback tuning, and performance/+3pp/Huawei paths remain unauthorized.
+Only provider request, BFCL generate, and live post-decode telemetry are authorized for this one compact capture. BFCL smoke, BFCL evaluate, scorer, full/default baseline, candidate activation, candidate JSONL/pool, scorer-feedback tuning, and performance/+3pp/Huawei paths remain unauthorized.
 
 ## Data boundary
 

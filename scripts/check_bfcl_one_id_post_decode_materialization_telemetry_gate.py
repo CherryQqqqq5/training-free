@@ -36,11 +36,13 @@ REQUIRED_COMPACT_FIELDS = [
     "compact_result_status",
     "suspected_post_decode_failure_stage",
 ]
-ALWAYS_FALSE_KEYS = (
+APPROVED_TRUE_KEYS = (
     "authorized",
     "provider_request_authorized",
     "live_post_decode_telemetry_authorized",
     "bfcl_generate_authorized",
+)
+ALWAYS_FALSE_KEYS = (
     "bfcl_smoke_authorized",
     "bfcl_evaluate_authorized",
     "scorer_authorized",
@@ -116,8 +118,9 @@ def validate_packet(data: dict[str, Any]) -> list[str]:
     blockers: list[str] = []
     if data.get("artifact_kind") != "bfcl_one_id_post_decode_materialization_telemetry_gate_packet":
         blockers.append(f"artifact_kind_invalid:{data.get('artifact_kind')!r}")
-    if data.get("approval_status") != "pending":
-        blockers.append(f"approval_status_not_pending:{data.get('approval_status')!r}")
+    status = data.get("approval_status")
+    if status not in {"pending", "approved"}:
+        blockers.append(f"approval_status_invalid:{status!r}")
     if data.get("route_profile") != "novacode" or data.get("route_model") != "gpt-4.1":
         blockers.append("route_drift")
     if data.get("signed_run_ids") != [SIGNED_ID]:
@@ -132,6 +135,10 @@ def validate_packet(data: dict[str, Any]) -> list[str]:
         blockers.append("stop_after_capture_not_true")
     if data.get("generate_only_path_for_future_capture") is not True:
         blockers.append("generate_only_path_for_future_capture_not_true")
+    for key in APPROVED_TRUE_KEYS:
+        expected = status == "approved"
+        if data.get(key) is not expected:
+            blockers.append(f"{key}_not_{str(expected).lower()}:{data.get(key)!r}")
     for key in ALWAYS_FALSE_KEYS:
         if data.get(key) is not False:
             blockers.append(f"{key}_not_false:{data.get(key)!r}")

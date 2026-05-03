@@ -21,19 +21,22 @@ def _packet() -> dict:
     return json.loads(PACKET_PATH.read_text(encoding="utf-8"))
 
 
-def test_committed_pending_packet_passes_fail_closed_gate() -> None:
+def test_committed_approved_packet_passes_scoped_gate() -> None:
     summary = check(PACKET_PATH)
     assert summary["bfcl_one_id_post_decode_materialization_telemetry_gate_passed"] is True
-    assert summary["approval_status"] == "pending"
-    assert summary["provider_request_authorized"] is False
-    assert summary["live_post_decode_telemetry_authorized"] is False
-    assert summary["bfcl_generate_authorized"] is False
+    assert summary["approval_status"] == "approved"
+    assert summary["provider_request_authorized"] is True
+    assert summary["live_post_decode_telemetry_authorized"] is True
+    assert summary["bfcl_generate_authorized"] is True
     assert summary["signed_run_ids"] == ["web_search_base_0"]
     assert summary["compact_field_count"] == len(REQUIRED_COMPACT_FIELDS)
 
 
 def test_rejects_pending_packet_with_authorized_true() -> None:
     data = _packet()
+    data["approval_status"] = "pending"
+    for key in ("provider_request_authorized", "live_post_decode_telemetry_authorized", "bfcl_generate_authorized"):
+        data[key] = False
     data["authorized"] = True
     assert any("authorized_not_false" in blocker for blocker in validate_packet(data))
 
@@ -126,7 +129,13 @@ def test_dry_run_includes_required_compact_field_schema() -> None:
 
 
 def test_execute_mode_pending_fails_closed_without_endpoint_key_or_execution(tmp_path: Path) -> None:
-    summary = execute_live_post_decode_telemetry(PACKET_PATH, tmp_path / "post_decode.json")
+    data = _packet()
+    data["approval_status"] = "pending"
+    for key in ("authorized", "provider_request_authorized", "live_post_decode_telemetry_authorized", "bfcl_generate_authorized"):
+        data[key] = False
+    packet_path = tmp_path / "pending_packet.json"
+    packet_path.write_text(json.dumps(data, indent=2, sort_keys=True), encoding="utf-8")
+    summary = execute_live_post_decode_telemetry(packet_path, tmp_path / "post_decode.json")
     assert "post_decode_materialization_telemetry_packet_not_approved" in summary["blockers"]
     assert summary["endpoint_value_read"] is False
     assert summary["api_key_value_read"] is False
