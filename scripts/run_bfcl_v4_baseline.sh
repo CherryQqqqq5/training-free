@@ -273,6 +273,11 @@ grc_stage_event bfcl_generate started
 "${BFCL_CLI[@]}" "${GENERATE_ARGS[@]}"
 grc_stage_event bfcl_generate completed
 grc_stage_run fix_result_layout bfcl_fix_result_layout "${BFCL_ROOT}"
+if [[ "${GRC_BFCL_STOP_AFTER_GENERATE:-0}" == "1" ]]; then
+  grc_stage_event stop_after_generate started
+  grc_stage_event stop_after_generate completed
+  exit 0
+fi
 grc_stage_event bfcl_evaluate started
 "${BFCL_CLI[@]}" "${EVAL_ARGS[@]}"
 grc_stage_event bfcl_evaluate completed
