@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -31,6 +32,11 @@ DEFAULT_PORT = "8011"
 DEFAULT_CONFIG = "configs/runtime_bfcl_structured.yaml"
 DEFAULT_RULES = "rules/baseline_empty"
 PROFILE_PATH = Path("/cephfs/qiuyn/.profile")
+
+PROVIDER_STATUS_CLASSES = {"2xx", "3xx", "4xx", "5xx", "timeout", "proxy_unreachable", "connection_error", "not_observed", "unknown_compact"}
+PROVIDER_COMPLETION_CLASSES = {"completed_2xx", "completed_non2xx", "timeout", "connection_error", "not_observed", "unknown_compact"}
+BFCL_EXCEPTION_CLASSES = {"command_config_error", "import_error", "runtime_exception", "timeout", "result_path_error", "proxy_or_provider_error", "unknown_nonzero", "none_observed"}
+BFCL_EXCEPTION_STAGE_LABELS = {"generate_command_setup", "proxy_request", "result_materialization", "unknown_generate", "none_observed"}
 
 RunCommand = Callable[..., subprocess.CompletedProcess[Any]]
 
@@ -164,21 +170,60 @@ def _count_result_files(result_dir: Path) -> int:
     return sum(1 for path in result_dir.rglob("*") if path.is_file())
 
 
-def _exception_class(exit_code: int, generate_entered: bool) -> str:
-    if exit_code == 0:
-        return "none"
-    if generate_entered:
-        return "nonzero_exit_no_exception_class"
-    return "not_reached"
+def _read_temp_text(*paths: Path) -> str:
+    chunks: list[str] = []
+    for path in paths:
+        if path.exists():
+            chunks.append(path.read_text(encoding="utf-8", errors="ignore")[-20000:])
+    return "\n".join(chunks)
 
 
-def _exception_stage(exit_code: int, events: list[dict[str, str]]) -> str:
+def _status_code_class(text: str) -> str | None:
+    for match in re.finditer(r"(?:status(?:\s+code)?|http(?:/\d(?:\.\d)?)?)[^0-9]{0,16}([1-5][0-9][0-9])", text, re.IGNORECASE):
+        code = int(match.group(1))
+        return f"{code // 100}xx"
+    return None
+
+
+def classify_provider_proxy_status(text: str, *, generate_entered: bool) -> tuple[str, str]:
+    lower = text.lower()
+    if not generate_entered and not lower.strip():
+        return "not_observed", "not_observed"
+    if "timed out" in lower or "timeout" in lower or "readtimeout" in lower:
+        return "timeout", "timeout"
+    if "proxy did not respond" in lower or "grc proxy did not respond" in lower or "failed to connect to 127.0.0.1" in lower or "connection refused" in lower and ("127.0.0.1" in lower or "localhost" in lower):
+        return "proxy_unreachable", "connection_error"
+    if "connectionerror" in lower or "connection reset" in lower or "failed to establish a new connection" in lower or "max retries exceeded" in lower:
+        return "connection_error", "connection_error"
+    status_class = _status_code_class(text)
+    if status_class:
+        return status_class, "completed_2xx" if status_class == "2xx" else "completed_non2xx"
+    if lower.strip():
+        return "unknown_compact", "unknown_compact"
+    return "not_observed", "not_observed"
+
+
+def classify_bfcl_cli_failure(exit_code: int, text: str, *, provider_status_class: str, generate_entered: bool, result_file_count: int) -> tuple[str, str]:
     if exit_code == 0:
-        return "none"
-    for item in reversed(events):
-        if item.get("event") == "started" and not _stage_completed(events, item.get("stage", "")):
-            return item.get("stage", "unknown")
-    return "baseline_command"
+        return "none_observed", "none_observed"
+    lower = text.lower()
+    if "timed out" in lower or "timeout" in lower or "readtimeout" in lower:
+        return "timeout", "proxy_request" if generate_entered else "generate_command_setup"
+    if "modulenotfounderror" in lower or "importerror" in lower or "no module named" in lower:
+        return "import_error", "generate_command_setup"
+    if "unrecognized arguments" in lower or "invalid choice" in lower or "usage:" in lower or "error: argument" in lower or "bfcl model alias is empty" in lower:
+        return "command_config_error", "generate_command_setup"
+    if "result-dir" in lower or "result dir" in lower or "result_path" in lower or "result path" in lower or "permission denied" in lower or "no such file or directory" in lower and "result" in lower:
+        return "result_path_error", "result_materialization"
+    if provider_status_class in {"4xx", "5xx", "timeout", "proxy_unreachable", "connection_error"}:
+        return "proxy_or_provider_error", "proxy_request"
+    if "proxy" in lower or "provider" in lower or "connection refused" in lower or "connectionerror" in lower or "max retries exceeded" in lower or _status_code_class(text) in {"4xx", "5xx"}:
+        return "proxy_or_provider_error", "proxy_request"
+    if "traceback" in lower or "exception" in lower or "runtimeerror" in lower or "error during" in lower:
+        return "runtime_exception", "unknown_generate"
+    if generate_entered and result_file_count == 0:
+        return "result_path_error", "result_materialization"
+    return "unknown_nonzero", "unknown_generate"
 
 
 def _suspected_stage(record: dict[str, Any]) -> str:
@@ -205,10 +250,20 @@ def _stop_gate(record: dict[str, Any]) -> str:
     return "stopped_after_generate"
 
 
-def _compact_record(exit_code: int, stage_path: Path, run_root: Path) -> dict[str, Any]:
+def _compact_record(exit_code: int, stage_path: Path, run_root: Path, exec_log: Path, proxy_log: Path) -> dict[str, Any]:
     events = _load_stage_events(stage_path)
     generate_entered = _stage_started(events, "bfcl_generate")
     result_dir = run_root / "bfcl" / "result"
+    result_file_count = _count_result_files(result_dir)
+    temp_text = _read_temp_text(exec_log, proxy_log)
+    provider_status_class, provider_completed_class = classify_provider_proxy_status(temp_text, generate_entered=generate_entered)
+    bfcl_exception_class, bfcl_exception_stage = classify_bfcl_cli_failure(
+        exit_code,
+        temp_text,
+        provider_status_class=provider_status_class,
+        generate_entered=generate_entered,
+        result_file_count=result_file_count,
+    )
     record: dict[str, Any] = {
         "baseline_command_executed": True,
         "generate_stage_entered": generate_entered,
@@ -219,12 +274,12 @@ def _compact_record(exit_code: int, stage_path: Path, run_root: Path) -> dict[st
         "route_profile": "novacode",
         "route_model": "gpt-4.1",
         "proxy_health_at_generate_start": _proxy_health_label(events, generate_entered),
-        "provider_status_class_during_generate": "unknown_compact_stage_only" if generate_entered else "not_called_or_not_reached",
+        "provider_status_class_during_generate": provider_status_class,
         "provider_call_started": generate_entered,
-        "provider_call_completed_class": "unknown_compact_stage_only" if generate_entered else "not_called_or_not_reached",
-        "bfcl_cli_exception_class": _exception_class(exit_code, generate_entered),
-        "bfcl_cli_exception_stage_label": _exception_stage(exit_code, events),
-        "result_file_count_after_generate": _count_result_files(result_dir),
+        "provider_call_completed_class": provider_completed_class,
+        "bfcl_cli_exception_class": bfcl_exception_class,
+        "bfcl_cli_exception_stage_label": bfcl_exception_stage,
+        "result_file_count_after_generate": result_file_count,
         "generated_output_root_present_after_generate": result_dir.exists(),
         "compact_metrics_present": False,
         "compact_manifest_present": False,
@@ -331,7 +386,7 @@ def execute_generate_failure_telemetry(
         with exec_log.open("wb") as handle:
             result = run_command(command, cwd=REPO_ROOT, env=env, stdout=handle, stderr=subprocess.STDOUT, check=False)
         exit_code = int(getattr(result, "returncode", 1))
-        record = _compact_record(exit_code, stage_path, run_root)
+        record = _compact_record(exit_code, stage_path, run_root, exec_log, proxy_log)
         shutil.rmtree(run_root, ignore_errors=True)
         shutil.rmtree(trace_dir, ignore_errors=True)
         shutil.rmtree(artifact_dir, ignore_errors=True)

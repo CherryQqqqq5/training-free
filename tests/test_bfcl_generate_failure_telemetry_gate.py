@@ -14,6 +14,8 @@ from scripts.check_bfcl_generate_failure_telemetry_gate import (
 import scripts.run_bfcl_generate_failure_telemetry as runner
 
 build_plan = runner.build_plan
+classify_bfcl_cli_failure = runner.classify_bfcl_cli_failure
+classify_provider_proxy_status = runner.classify_provider_proxy_status
 execute_generate_failure_telemetry = runner.execute_generate_failure_telemetry
 
 
@@ -69,13 +71,13 @@ def _approved_packet(tmp_path: Path) -> Path:
     return path
 
 
-def test_committed_approved_packet_passes_gate_lifecycle() -> None:
+def test_committed_packet_is_pending_fail_closed_for_review() -> None:
     summary = check(DEFAULT_PACKET)
     assert summary["bfcl_generate_failure_telemetry_gate_passed"] is True
-    assert summary["approval_status"] == "approved"
-    assert summary["authorized"] is True
-    assert summary["provider_request_authorized"] is True
-    assert summary["bfcl_generate_authorized"] is True
+    assert summary["approval_status"] == "pending"
+    assert summary["authorized"] is False
+    assert summary["provider_request_authorized"] is False
+    assert summary["bfcl_generate_authorized"] is False
     assert summary["route_profile"] == "novacode"
     assert summary["route_model"] == "gpt-4.1"
     assert summary["compact_field_count"] == len(REQUIRED_COMPACT_FIELDS)
@@ -182,6 +184,38 @@ def test_dry_run_includes_required_compact_field_schema() -> None:
     assert "suspected_generate_failure_stage" in plan["compact_fields"]
 
 
+def test_provider_proxy_status_classifier_labels() -> None:
+    assert classify_provider_proxy_status("HTTP status 200", generate_entered=True) == ("2xx", "completed_2xx")
+    assert classify_provider_proxy_status("HTTP status 404", generate_entered=True) == ("4xx", "completed_non2xx")
+    assert classify_provider_proxy_status("HTTP status 503", generate_entered=True) == ("5xx", "completed_non2xx")
+    assert classify_provider_proxy_status("request timed out", generate_entered=True) == ("timeout", "timeout")
+    assert classify_provider_proxy_status("failed to connect to 127.0.0.1 connection refused", generate_entered=True) == ("proxy_unreachable", "connection_error")
+    assert classify_provider_proxy_status("ConnectionError max retries exceeded", generate_entered=True) == ("connection_error", "connection_error")
+    assert classify_provider_proxy_status("", generate_entered=False) == ("not_observed", "not_observed")
+
+
+def test_bfcl_cli_failure_classifier_labels() -> None:
+    assert classify_bfcl_cli_failure(0, "", provider_status_class="not_observed", generate_entered=True, result_file_count=1) == ("none_observed", "none_observed")
+    assert classify_bfcl_cli_failure(1, "ModuleNotFoundError: no module named shape", provider_status_class="not_observed", generate_entered=False, result_file_count=0) == ("import_error", "generate_command_setup")
+    assert classify_bfcl_cli_failure(1, "usage: generate error: unrecognized arguments", provider_status_class="not_observed", generate_entered=False, result_file_count=0) == ("command_config_error", "generate_command_setup")
+    assert classify_bfcl_cli_failure(1, "result path no such file or directory", provider_status_class="not_observed", generate_entered=True, result_file_count=0) == ("result_path_error", "result_materialization")
+    assert classify_bfcl_cli_failure(1, "provider returned HTTP status 500", provider_status_class="5xx", generate_entered=True, result_file_count=0) == ("proxy_or_provider_error", "proxy_request")
+    assert classify_bfcl_cli_failure(1, "Traceback runtime exception", provider_status_class="not_observed", generate_entered=True, result_file_count=0) == ("runtime_exception", "unknown_generate")
+    assert classify_bfcl_cli_failure(2, "opaque failure", provider_status_class="not_observed", generate_entered=True, result_file_count=1) == ("unknown_nonzero", "unknown_generate")
+
+
+def test_execute_with_committed_pending_packet_fails_closed_before_env_provider_or_bfcl(tmp_path: Path) -> None:
+    summary = execute_generate_failure_telemetry(DEFAULT_PACKET, tmp_path / "telemetry.json")
+    assert "generate_failure_telemetry_packet_not_approved" in summary["blockers"]
+    assert summary["env_profile_sourced"] is False
+    assert summary["endpoint_value_read"] is False
+    assert summary["api_key_value_read"] is False
+    assert summary["baseline_command_executed"] is False
+    assert summary["generate_stage_entered"] is False
+    assert summary["provider_call_started"] is False
+    assert summary["bfcl_generate_executed"] is False
+
+
 def test_execute_with_pending_packet_fails_closed_before_env_provider_or_bfcl(tmp_path: Path) -> None:
     pending = _pending_packet(tmp_path)
     summary = execute_generate_failure_telemetry(pending, tmp_path / "telemetry.json")
@@ -223,6 +257,7 @@ def test_approved_execute_path_uses_mocked_command_stops_before_evaluate_and_wri
         result_file = run_root / "bfcl" / "result" / "shape.json"
         result_file.parent.mkdir(parents=True, exist_ok=True)
         result_file.write_text("{}", encoding="utf-8")
+        stdout.write(b"HTTP status 200\n")
         stage_path.write_text(
             "\n".join(
                 [
@@ -259,6 +294,10 @@ def test_approved_execute_path_uses_mocked_command_stops_before_evaluate_and_wri
     assert summary["env_profile_sourced"] is True
     assert summary["endpoint_value_read"] is True
     assert summary["api_key_value_read"] is True
+    assert summary["provider_status_class_during_generate"] == "2xx"
+    assert summary["provider_call_completed_class"] == "completed_2xx"
+    assert summary["bfcl_cli_exception_class"] == "none_observed"
+    assert summary["bfcl_cli_exception_stage_label"] == "none_observed"
     payload = json.loads(output.read_text(encoding="utf-8"))
     assert payload["artifact_kind"] == "bfcl_generate_failure_telemetry_compact"
     record = payload["records"][0]
@@ -277,6 +316,7 @@ def test_approved_execute_path_records_generate_nonzero_without_raw_output(tmp_p
 
     def fake_run(command, cwd, env, stdout, stderr, check):
         stage_path = Path(env["GRC_BASELINE_STAGE_TELEMETRY_PATH"])
+        stdout.write(b"provider returned HTTP status 500\n")
         stage_path.write_text(
             json.dumps({"stage": "bfcl_generate", "event": "started"}) + "\n",
             encoding="utf-8",
@@ -286,8 +326,10 @@ def test_approved_execute_path_records_generate_nonzero_without_raw_output(tmp_p
     summary = execute_generate_failure_telemetry(packet, output, run_command=fake_run)
     assert summary["blockers"] == []
     assert summary["generate_exit_code_class"] == "nonzero_1"
-    assert summary["bfcl_cli_exception_class"] == "nonzero_exit_no_exception_class"
-    assert summary["bfcl_cli_exception_stage_label"] == "bfcl_generate"
+    assert summary["provider_status_class_during_generate"] == "5xx"
+    assert summary["provider_call_completed_class"] == "completed_non2xx"
+    assert summary["bfcl_cli_exception_class"] == "proxy_or_provider_error"
+    assert summary["bfcl_cli_exception_stage_label"] == "proxy_request"
     assert summary["stop_gate_triggered"] == "bfcl_generate_exit_nonzero"
     assert summary["suspected_generate_failure_stage"] == "bfcl_generate_nonzero_exit"
     assert summary["raw_outputs_removed"] is True

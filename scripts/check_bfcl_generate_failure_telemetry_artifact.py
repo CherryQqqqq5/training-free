@@ -17,6 +17,10 @@ if str(REPO_ROOT) not in sys.path:
 from scripts.check_bfcl_generate_failure_telemetry_gate import REQUIRED_COMPACT_FIELDS
 
 DEFAULT_ARTIFACT = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_generate_failure_telemetry_compact.json")
+PROVIDER_STATUS_CLASSES = {"2xx", "3xx", "4xx", "5xx", "timeout", "proxy_unreachable", "connection_error", "not_observed", "unknown_compact"}
+PROVIDER_COMPLETION_CLASSES = {"completed_2xx", "completed_non2xx", "timeout", "connection_error", "not_observed", "unknown_compact"}
+BFCL_EXCEPTION_CLASSES = {"command_config_error", "import_error", "runtime_exception", "timeout", "result_path_error", "proxy_or_provider_error", "unknown_nonzero", "none_observed"}
+BFCL_EXCEPTION_STAGE_LABELS = {"generate_command_setup", "proxy_request", "result_materialization", "unknown_generate", "none_observed"}
 FORBIDDEN_KEY_RE = re.compile(
     r"(^|_)(raw_prompts?|raw_bfcl_case_content|raw_cases?|raw_commands?|raw_provider_requests?|raw_provider_responses?|raw_response_headers?|raw_logs?|raw_traces?|raw_model_output_text|raw_tool_args?|raw_result_trees?|endpoint_values?|key_values?|api_key_values?|secret_values?|scorer_diffs?|candidate_outputs?|provider_payload_value|prompt_text|case_content|trace_content|log_content|tool_argument_value|gold_value|reference_value|expected_value)(_|$)",
     re.IGNORECASE,
@@ -101,6 +105,14 @@ def validate(data: dict[str, Any]) -> list[str]:
             blockers.append(f"generate_exit_code_class_invalid:{record.get('generate_exit_code_class')!r}")
         if record.get("route_profile") != "novacode" or record.get("route_model") != "gpt-4.1":
             blockers.append("record_route_drift")
+        if record.get("provider_status_class_during_generate") not in PROVIDER_STATUS_CLASSES:
+            blockers.append(f"provider_status_class_invalid:{record.get('provider_status_class_during_generate')!r}")
+        if record.get("provider_call_completed_class") not in PROVIDER_COMPLETION_CLASSES:
+            blockers.append(f"provider_call_completed_class_invalid:{record.get('provider_call_completed_class')!r}")
+        if record.get("bfcl_cli_exception_class") not in BFCL_EXCEPTION_CLASSES:
+            blockers.append(f"bfcl_cli_exception_class_invalid:{record.get('bfcl_cli_exception_class')!r}")
+        if record.get("bfcl_cli_exception_stage_label") not in BFCL_EXCEPTION_STAGE_LABELS:
+            blockers.append(f"bfcl_cli_exception_stage_label_invalid:{record.get('bfcl_cli_exception_stage_label')!r}")
         if record.get("bfcl_evaluate_started") is not False:
             blockers.append("bfcl_evaluate_started_not_false")
         if record.get("scorer_started") is not False:
