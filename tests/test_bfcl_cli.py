@@ -348,6 +348,65 @@ def test_decoded_execution_nonempty_materializes_nonempty_result_shape(tmp_path)
 
 
 
+def test_decoded_execution_result_list_without_prior_marker_materializes_nonempty(tmp_path):
+    entry = {
+        "id": "multi_turn_long_context_0",
+        "result": [["shape_only_decoded_execution"]],
+        "inference_log": [
+            {
+                "step_0": [
+                    {
+                        "role": "handler_log",
+                        "content": "Successfully decoded model response.",
+                    }
+                ]
+            }
+        ],
+    }
+
+    patched = _preserve_decoded_execution_output_shape(entry)
+    assert patched["grc_decoded_execution_output_shape"] == {
+        "shape_label": "execution_list_nonempty",
+        "decoded_output_count": 1,
+        "function_call_shape_present": True,
+    }
+    _write_with_patched_base_handler(tmp_path, entry)
+    classification = _classify_result_for_run_id("multi_turn_long_context_0", tmp_path)
+    assert classification["status"] == "generated"
+    assert classification["tool_call_detected"] is True
+    assert classification["protocol_error_detected"] is False
+
+
+def test_prior_function_call_marker_behavior_unchanged_when_result_also_nonempty(tmp_path):
+    entry = {
+        "id": "web_search_base_0",
+        "result": [["shape_only_decoded_execution"]],
+        "inference_log": [
+            {
+                "step_0": [
+                    {
+                        "role": "handler_log",
+                        "content": "Successfully decoded model response.",
+                        "model_response_decoded": ["decoded_execution_shape"],
+                    }
+                ]
+            }
+        ],
+    }
+
+    patched = _preserve_decoded_execution_output_shape(entry)
+    assert patched["grc_decoded_execution_output_shape"] == {
+        "shape_label": "execution_list_nonempty",
+        "decoded_output_count": 1,
+        "function_call_shape_present": True,
+    }
+    _write_with_patched_base_handler(tmp_path, entry)
+    classification = _classify_result_for_run_id("web_search_base_0", tmp_path)
+    assert classification["status"] == "generated"
+    assert classification["tool_call_detected"] is True
+    assert classification["protocol_error_detected"] is False
+
+
 def test_clean_decoded_content_mentioning_protocol_materializes_nonempty(tmp_path):
     entry = {
         "id": "web_search_base_0",

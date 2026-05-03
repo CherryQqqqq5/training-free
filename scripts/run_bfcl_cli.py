@@ -51,6 +51,24 @@ def _decoded_execution_output_count(value: Any) -> int:
     return 0
 
 
+def _execution_list_item_has_shape(value: Any) -> bool:
+    if value is None:
+        return False
+    if isinstance(value, str):
+        return bool(value.strip())
+    if isinstance(value, list):
+        return any(_execution_list_item_has_shape(child) for child in value)
+    if isinstance(value, dict):
+        return True
+    return True
+
+
+def _decoded_execution_result_output_count(value: Any) -> int:
+    if not isinstance(value, list):
+        return 0
+    return sum(1 for item in value if _execution_list_item_has_shape(item))
+
+
 def _entry_has_protocol_error_indicator(value: Any) -> bool:
     if isinstance(value, dict):
         for key, child in value.items():
@@ -78,7 +96,10 @@ def _preserve_decoded_execution_output_shape_entry(entry: Any) -> Any:
         return entry
     if _entry_has_protocol_error_indicator(entry):
         return entry
-    decoded_count = _decoded_execution_output_count(entry.get("inference_log"))
+    decoded_count = max(
+        _decoded_execution_output_count(entry.get("inference_log")),
+        _decoded_execution_result_output_count(entry.get("result")),
+    )
     if decoded_count <= 0:
         return entry
     preserved = dict(entry)
