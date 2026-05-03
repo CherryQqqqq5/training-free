@@ -1,0 +1,88 @@
+{
+  "approval_status": "prepared",
+  "artifact_kind": "bfcl_unknown_status_after_decode_replay",
+  "bfcl_evaluate_executed": false,
+  "bfcl_generate_executed": false,
+  "bfcl_smoke_executed": false,
+  "candidate_jsonl_authorized": false,
+  "candidate_pool_ready": false,
+  "candidate_runtime_activation_authorized": false,
+  "classifier_replay_called": true,
+  "full_baseline_executed": false,
+  "huawei_acceptance_ready": false,
+  "irrelevance_unknowns_covered": false,
+  "irrelevance_unknowns_status": "insufficient_compact_labels_needs_live_telemetry",
+  "live_telemetry_executed": false,
+  "materialization_replay_called": true,
+  "no_provider": true,
+  "patch_gate_recommended": true,
+  "per_id_classifier_status": {
+    "irrelevance_0": "unknown_compact_status",
+    "live_irrelevance_0-0-0": "unknown_compact_status",
+    "multi_turn_long_context_0": "unknown_compact_status"
+  },
+  "per_id_decode_nonempty_known": {
+    "irrelevance_0": "unknown_from_compact_8id_labels",
+    "live_irrelevance_0-0-0": "unknown_from_compact_8id_labels",
+    "multi_turn_long_context_0": true
+  },
+  "per_id_materialized_nonempty_known": {
+    "irrelevance_0": "unknown_from_compact_8id_labels",
+    "live_irrelevance_0-0-0": "unknown_from_compact_8id_labels",
+    "multi_turn_long_context_0": false
+  },
+  "per_id_protocol_status_label": {
+    "irrelevance_0": "unknown_from_compact_8id_labels",
+    "live_irrelevance_0-0-0": "unknown_from_compact_8id_labels",
+    "multi_turn_long_context_0": "unknown_compact_status"
+  },
+  "per_id_unknown_status_reason_label": {
+    "irrelevance_0": "insufficient_compact_labels_needs_live_telemetry",
+    "live_irrelevance_0-0-0": "insufficient_compact_labels_needs_live_telemetry",
+    "multi_turn_long_context_0": "missing_nonempty_marker_after_decode"
+  },
+  "performance_evidence": false,
+  "protocol_status_replay_called": true,
+  "provider_request_executed": false,
+  "replay_source_artifacts": [
+    "outputs/artifacts/stage1_bfcl_acceptance/bfcl_one_id_protocol_error_telemetry_compact.json",
+    "outputs/artifacts/stage1_bfcl_acceptance/bfcl_exact_8id_generate_smoke_compact.json"
+  ],
+  "route_model": "gpt-4.1",
+  "route_profile": "novacode",
+  "run_ids_replayed": [
+    "multi_turn_long_context_0",
+    "irrelevance_0",
+    "live_irrelevance_0-0-0"
+  ],
+  "scorer_executed": false,
+  "sota_3pp_claim_ready": false,
+  "suspected_unknown_status_failure_stage": "materialization_preservation_missing_nonempty_marker_after_decode",
+  "synthetic_or_compact_labels_only": true,
+  "synthetic_variant_replay": [
+    {
+      "classifier_detected_nonempty": true,
+      "materialization_replay_status": "generated",
+      "unknown_status_reason_label": "covered_by_existing_function_call_marker",
+      "variant": "prior_function_call_marker_shape"
+    },
+    {
+      "classifier_detected_nonempty": false,
+      "materialization_replay_status": "unknown_compact_status",
+      "unknown_status_reason_label": "missing_nonempty_marker_after_decode",
+      "variant": "execution_list_nonempty_without_nonempty_marker"
+    },
+    {
+      "classifier_detected_nonempty": false,
+      "materialization_replay_status": "unknown_compact_status",
+      "unknown_status_reason_label": "materialized_shape_unrecognized_by_compact_classifier",
+      "variant": "alternate_decoded_shape_label_without_marker"
+    },
+    {
+      "classifier_detected_nonempty": false,
+      "materialization_replay_status": "protocol_error",
+      "unknown_status_reason_label": "protocol_status_classifier_maps_explicit_error",
+      "variant": "explicit_protocol_status_shape"
+    }
+  ]
+}
