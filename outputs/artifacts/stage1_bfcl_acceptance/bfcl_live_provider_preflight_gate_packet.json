@@ -4,8 +4,12 @@
     "provider_request_executed",
     "provider_call_started",
     "endpoint_env_present",
+    "base_url_env_present",
     "api_key_env_present",
     "https_endpoint_valid",
+    "endpoint_mode_label",
+    "selected_endpoint_env_label",
+    "transport_path_join_label",
     "http_status_class",
     "auth_status_label",
     "model_route_label",
@@ -37,18 +41,19 @@
   "compact_only": true,
   "fail_if_output_artifact_exists": true,
   "forbidden_scope": [
-    "bfcl_generate",
+    "base_url_or_endpoint_value_logging",
     "bfcl_evaluate",
-    "scorer",
-    "full_baseline",
+    "bfcl_generate",
     "candidate_activation",
     "candidate_jsonl_or_pool",
-    "source_collection",
-    "source_diagnostics",
-    "raw_request_or_response_persistence",
-    "raw_logs_or_traces",
     "endpoint_or_key_value_logging",
-    "performance_or_3pp_or_huawei_claim"
+    "full_baseline",
+    "performance_or_3pp_or_huawei_claim",
+    "raw_logs_or_traces",
+    "raw_request_or_response_persistence",
+    "scorer",
+    "source_collection",
+    "source_diagnostics"
   ],
   "forbidden_telemetry_content": [
     "raw request",
@@ -102,6 +107,10 @@
   "signed_api_key_env_vars": [
     "CHUANGZHI_API_KEY",
     "NOVACODE_API_KEY"
+  ],
+  "signed_base_url_env_vars": [
+    "GRC_UPSTREAM_BASE_URL",
+    "NOVACODE_BASE_URL"
   ],
   "signed_endpoint_env_vars": [
     "CHUANGZHI_NOVACODE_ENDPOINT",

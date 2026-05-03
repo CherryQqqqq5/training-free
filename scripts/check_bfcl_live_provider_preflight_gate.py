@@ -15,8 +15,12 @@ REQUIRED_COMPACT_FIELDS = [
     "provider_request_executed",
     "provider_call_started",
     "endpoint_env_present",
+    "base_url_env_present",
     "api_key_env_present",
     "https_endpoint_valid",
+    "endpoint_mode_label",
+    "selected_endpoint_env_label",
+    "transport_path_join_label",
     "http_status_class",
     "auth_status_label",
     "model_route_label",
@@ -59,6 +63,7 @@ REQUIRED_TRUE_KEYS = (
     "fail_if_output_artifact_exists",
     "raw_output_cleanup_required",
 )
+SIGNED_BASE_URL_ENVS = ["GRC_UPSTREAM_BASE_URL", "NOVACODE_BASE_URL"]
 SIGNED_ENDPOINT_ENVS = ["CHUANGZHI_NOVACODE_ENDPOINT", "NOVACODE_ENDPOINT"]
 SIGNED_API_KEY_ENVS = ["CHUANGZHI_API_KEY", "NOVACODE_API_KEY"]
 REQUIRED_FORBIDDEN_SCOPE = {
@@ -73,6 +78,7 @@ REQUIRED_FORBIDDEN_SCOPE = {
     "raw_request_or_response_persistence",
     "raw_logs_or_traces",
     "endpoint_or_key_value_logging",
+    "base_url_or_endpoint_value_logging",
     "performance_or_3pp_or_huawei_claim",
 }
 REQUIRED_STOP_GATES = {
@@ -155,6 +161,8 @@ def _scan(data: dict[str, Any]) -> list[str]:
                 continue
             if parent == "allowed_compact_fields" and value in REQUIRED_COMPACT_FIELDS:
                 continue
+            if parent == "signed_base_url_env_vars" and value in SIGNED_BASE_URL_ENVS:
+                continue
             if parent == "signed_endpoint_env_vars" and value in SIGNED_ENDPOINT_ENVS:
                 continue
             if parent == "signed_api_key_env_vars" and value in SIGNED_API_KEY_ENVS:
@@ -188,6 +196,8 @@ def validate_packet(data: dict[str, Any]) -> list[str]:
         blockers.append(f"requested_future_scope_invalid:{data.get('requested_future_scope')!r}")
     if data.get("route_profile") != "novacode" or data.get("route_model") != "gpt-4.1":
         blockers.append("route_drift")
+    if data.get("signed_base_url_env_vars") != SIGNED_BASE_URL_ENVS:
+        blockers.append(f"signed_base_url_env_vars_invalid:{data.get('signed_base_url_env_vars')!r}")
     if data.get("signed_endpoint_env_vars") != SIGNED_ENDPOINT_ENVS:
         blockers.append(f"signed_endpoint_env_vars_invalid:{data.get('signed_endpoint_env_vars')!r}")
     if data.get("signed_api_key_env_vars") != SIGNED_API_KEY_ENVS:

@@ -21,6 +21,7 @@ from scripts.check_bfcl_live_provider_preflight_gate import (
     DEFAULT_PACKET,
     REQUIRED_COMPACT_FIELDS,
     SIGNED_API_KEY_ENVS,
+    SIGNED_BASE_URL_ENVS,
     SIGNED_ENDPOINT_ENVS,
     check as check_packet,
 )
@@ -30,12 +31,20 @@ TOY_TOOL_NAME = "synthetic_live_provider_preflight_ping"
 PostJson = Callable[..., Any]
 
 
-def _first_present_env(env: dict[str, str], names: list[str]) -> tuple[bool, str | None]:
+def _first_present_env(env: dict[str, str], names: list[str]) -> tuple[bool, str | None, str]:
     for name in names:
         value = env.get(name)
         if value:
-            return True, value
-    return False, None
+            return True, value, name
+    return False, None, "none"
+
+
+def _transport_target(base_url: str | None, endpoint: str | None, path: str, mode: str) -> tuple[str, str]:
+    if mode == "base_url" and base_url is not None:
+        return base_url.rstrip("/") + path, "base_url_path_appended"
+    if mode == "full_endpoint" and endpoint is not None:
+        return endpoint, "endpoint_used_as_is"
+    return "", "not_reached"
 
 
 def _http_status_class(status: int | None) -> str:
@@ -108,9 +117,9 @@ def _chat_text_payload() -> dict[str, Any]:
     return {"model": "gpt-4.1", "messages": [{"role": "user", "content": "Reply with the single word PONG."}], "temperature": 0, "max_tokens": 8}
 
 
-def _default_post_json(endpoint: str, api_key: str, path: str, payload: dict[str, Any]) -> tuple[Any, dict[str, Any]]:
+def _default_post_json(target_url: str, api_key: str, payload: dict[str, Any]) -> tuple[Any, dict[str, Any]]:
     request = urllib.request.Request(
-        endpoint.rstrip("/") + path,
+        target_url,
         data=json.dumps(payload, separators=(",", ":")).encode("utf-8"),
         headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
         method="POST",
@@ -172,8 +181,12 @@ def _base_record(*, command_executed: bool = False) -> dict[str, Any]:
         "provider_request_executed": False,
         "provider_call_started": False,
         "endpoint_env_present": False,
+        "base_url_env_present": False,
         "api_key_env_present": False,
         "https_endpoint_valid": False,
+        "endpoint_mode_label": "not_selected",
+        "selected_endpoint_env_label": "none",
+        "transport_path_join_label": "not_reached",
         "http_status_class": "not_observed",
         "auth_status_label": "not_checked",
         "model_route_label": "not_checked",
@@ -205,6 +218,7 @@ def _set_failure(record: dict[str, Any], label: str, stage: str) -> None:
 def _write_artifact(record: dict[str, Any], output_artifact: Path) -> None:
     payload = {
         "artifact_kind": "bfcl_live_provider_preflight_compact",
+        "compact_schema_version": "live_provider_preflight_endpoint_base_url_v2",
         "measurement_kind": "compact_synthetic_live_provider_preflight",
         "route_profile": "novacode",
         "route_model": "gpt-4.1",
@@ -296,16 +310,24 @@ def execute_live_provider_preflight(
 
     env = dict(os.environ if environ is None else environ)
     record = _base_record(command_executed=True)
-    endpoint_present, endpoint = _first_present_env(env, SIGNED_ENDPOINT_ENVS)
-    key_present, api_key = _first_present_env(env, SIGNED_API_KEY_ENVS)
+    base_url_present, base_url, base_url_label = _first_present_env(env, SIGNED_BASE_URL_ENVS)
+    endpoint_present, endpoint, endpoint_label = _first_present_env(env, SIGNED_ENDPOINT_ENVS)
+    key_present, api_key, _api_key_label = _first_present_env(env, SIGNED_API_KEY_ENVS)
     record["endpoint_env_present"] = endpoint_present
+    record["base_url_env_present"] = base_url_present
     record["api_key_env_present"] = key_present
     blockers = []
 
-    if not endpoint_present:
+    selected_target = base_url if base_url_present else endpoint
+    selected_label = base_url_label if base_url_present else endpoint_label
+    endpoint_mode = "base_url" if base_url_present else "full_endpoint" if endpoint_present else "not_selected"
+    record["endpoint_mode_label"] = endpoint_mode
+    record["selected_endpoint_env_label"] = selected_label
+
+    if not (base_url_present or endpoint_present):
         _set_failure(record, "missing_endpoint_env", "endpoint_env_missing")
         blockers.append("missing_endpoint_env")
-    elif endpoint is None or not endpoint.startswith("https://"):
+    elif selected_target is None or not selected_target.startswith("https://"):
         _set_failure(record, "endpoint_not_https", "endpoint_not_https")
         blockers.append("endpoint_not_https")
     elif not key_present:
@@ -322,7 +344,9 @@ def execute_live_provider_preflight(
         for field, path, payload, validator, failed_label in specs:
             try:
                 record["provider_call_started"] = True
-                status, response = selected_post_json(endpoint, api_key or "", path, payload)
+                target_url, join_label = _transport_target(base_url, endpoint, path, endpoint_mode)
+                record["transport_path_join_label"] = join_label
+                status, response = selected_post_json(target_url, api_key or "", payload)
                 record["provider_request_executed"] = True
             except Exception:
                 record["http_status_class"] = "transport_error"

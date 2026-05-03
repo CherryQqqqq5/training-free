@@ -37,15 +37,21 @@ def _approved_packet(tmp_path: Path) -> Path:
     return _write_packet(tmp_path, data, "approved_live_provider_preflight_packet.json")
 
 
-def _success_post_json(endpoint: str, api_key: str, path: str, payload: dict):
-    assert endpoint == "https://provider.invalid/compatible"
-    assert api_key == "secret-test-key"
+def _response_for_payload(payload: dict):
     assert "/cephfs/qiuyn/.profile" not in json.dumps(payload)
-    if path == "/v1/responses":
-        return 200, {"output": [{"type": "function_call", "name": "synthetic_live_provider_preflight_ping", "arguments": "{}"}]}
-    if path == "/v1/chat/completions" and payload.get("tools"):
-        return 200, {"choices": [{"message": {"tool_calls": [{"type": "function", "function": {"name": "synthetic_live_provider_preflight_ping", "arguments": "{}"}}]}}]}
-    return 200, {"choices": [{"message": {"content": "PONG"}}]}
+    if "input" in payload:
+        return {"output": [{"type": "function_call", "name": "synthetic_live_provider_preflight_ping", "arguments": "{}"}]}
+    if payload.get("tools"):
+        return {"choices": [{"message": {"tool_calls": [{"type": "function", "function": {"name": "synthetic_live_provider_preflight_ping", "arguments": "{}"}}]}}]}
+    return {"choices": [{"message": {"content": "PONG"}}]}
+
+
+def _capturing_success(calls: list[str]):
+    def post_json(target_url: str, api_key: str, payload: dict):
+        assert api_key == "secret-test-key"
+        calls.append(target_url)
+        return 200, _response_for_payload(payload)
+    return post_json
 
 
 def test_committed_packet_is_pending_and_fail_closed() -> None:
@@ -141,6 +147,9 @@ def test_dry_run_does_not_source_profile_read_secrets_or_execute_provider() -> N
     assert plan["preflight_command_executed"] is False
     assert plan["provider_request_executed"] is False
     assert plan["provider_call_started"] is False
+    assert plan["endpoint_mode_label"] == "not_selected"
+    assert plan["selected_endpoint_env_label"] == "none"
+    assert plan["transport_path_join_label"] == "not_reached"
     assert plan["bfcl_generate_started"] is False
     assert plan["bfcl_evaluate_started"] is False
     assert plan["scorer_started"] is False
@@ -182,17 +191,27 @@ def test_approved_execute_missing_env_writes_compact_failure_without_provider(tm
     assert "secret-test-key" not in text
 
 
-def test_approved_execute_with_mock_transport_writes_compact_success(tmp_path: Path) -> None:
-    env = {"CHUANGZHI_NOVACODE_ENDPOINT": "https://provider.invalid/compatible", "CHUANGZHI_API_KEY": "secret-test-key"}
+def test_approved_execute_base_url_mode_appends_probe_paths(tmp_path: Path) -> None:
+    calls: list[str] = []
+    env = {"NOVACODE_BASE_URL": "https://provider.invalid/base", "CHUANGZHI_API_KEY": "secret-test-key"}
     output = tmp_path / "artifact.json"
-    summary = execute_live_provider_preflight(_approved_packet(tmp_path), output, environ=env, post_json=_success_post_json)
+    summary = execute_live_provider_preflight(_approved_packet(tmp_path), output, environ=env, post_json=_capturing_success(calls))
+    assert calls == [
+        "https://provider.invalid/base/v1/chat/completions",
+        "https://provider.invalid/base/v1/responses",
+        "https://provider.invalid/base/v1/chat/completions",
+    ]
     assert summary["blockers"] == []
     assert summary["preflight_command_executed"] is True
     assert summary["provider_request_executed"] is True
     assert summary["provider_call_started"] is True
-    assert summary["endpoint_env_present"] is True
+    assert summary["endpoint_env_present"] is False
+    assert summary["base_url_env_present"] is True
     assert summary["api_key_env_present"] is True
     assert summary["https_endpoint_valid"] is True
+    assert summary["endpoint_mode_label"] == "base_url"
+    assert summary["selected_endpoint_env_label"] == "NOVACODE_BASE_URL"
+    assert summary["transport_path_join_label"] == "base_url_path_appended"
     assert summary["http_status_class"] == "2xx"
     assert summary["auth_status_label"] == "ok"
     assert summary["model_route_label"] == "available"
@@ -212,6 +231,28 @@ def test_approved_execute_with_mock_transport_writes_compact_success(tmp_path: P
     assert "secret-test-key" not in text
 
 
+def test_approved_execute_full_endpoint_mode_does_not_append_probe_paths(tmp_path: Path) -> None:
+    calls: list[str] = []
+    env = {"CHUANGZHI_NOVACODE_ENDPOINT": "https://provider.invalid/full/chat", "CHUANGZHI_API_KEY": "secret-test-key"}
+    output = tmp_path / "artifact.json"
+    summary = execute_live_provider_preflight(_approved_packet(tmp_path), output, environ=env, post_json=_capturing_success(calls))
+    assert calls == [
+        "https://provider.invalid/full/chat",
+        "https://provider.invalid/full/chat",
+        "https://provider.invalid/full/chat",
+    ]
+    assert summary["blockers"] == []
+    assert summary["endpoint_env_present"] is True
+    assert summary["base_url_env_present"] is False
+    assert summary["endpoint_mode_label"] == "full_endpoint"
+    assert summary["selected_endpoint_env_label"] == "CHUANGZHI_NOVACODE_ENDPOINT"
+    assert summary["transport_path_join_label"] == "endpoint_used_as_is"
+    assert check_artifact(output)["bfcl_live_provider_preflight_artifact_passed"] is True
+    text = output.read_text(encoding="utf-8")
+    assert "https://provider.invalid" not in text
+    assert "secret-test-key" not in text
+
+
 def test_output_artifact_exists_blocks_before_provider(tmp_path: Path) -> None:
     output = tmp_path / "artifact.json"
     output.write_text("{}", encoding="utf-8")
@@ -225,9 +266,10 @@ def test_output_artifact_exists_blocks_before_provider(tmp_path: Path) -> None:
 
 
 def test_artifact_checker_rejects_raw_material_and_downstream_flags(tmp_path: Path) -> None:
-    env = {"CHUANGZHI_NOVACODE_ENDPOINT": "https://provider.invalid/compatible", "CHUANGZHI_API_KEY": "secret-test-key"}
+    calls: list[str] = []
+    env = {"NOVACODE_BASE_URL": "https://provider.invalid/base", "CHUANGZHI_API_KEY": "secret-test-key"}
     output = tmp_path / "artifact.json"
-    execute_live_provider_preflight(_approved_packet(tmp_path), output, environ=env, post_json=_success_post_json)
+    execute_live_provider_preflight(_approved_packet(tmp_path), output, environ=env, post_json=_capturing_success(calls))
     data = json.loads(output.read_text(encoding="utf-8"))
     for key in ("bfcl_generate_started", "bfcl_evaluate_started", "scorer_started", "full_baseline_executed", "performance_evidence", "raw_outputs_committed"):
         mutated = copy.deepcopy(data)

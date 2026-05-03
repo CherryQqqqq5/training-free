@@ -14,12 +14,20 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from scripts.check_bfcl_live_provider_preflight_gate import REQUIRED_COMPACT_FIELDS
+from scripts.check_bfcl_live_provider_preflight_gate import (
+    REQUIRED_COMPACT_FIELDS,
+    SIGNED_API_KEY_ENVS,
+    SIGNED_BASE_URL_ENVS,
+    SIGNED_ENDPOINT_ENVS,
+)
 
 DEFAULT_ARTIFACT = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_live_provider_preflight_compact.json")
 HTTP_STATUS_CLASSES = {"not_observed", "2xx", "3xx", "4xx", "5xx", "transport_error", "unknown"}
 AUTH_LABELS = {"not_checked", "ok", "missing_endpoint_env", "missing_api_key_env", "endpoint_not_https", "auth_failed", "unknown"}
 MODEL_LABELS = {"not_checked", "available", "unavailable", "unknown"}
+ENDPOINT_MODE_LABELS = {"not_selected", "base_url", "full_endpoint"}
+SELECTED_ENDPOINT_ENV_LABELS = set(SIGNED_BASE_URL_ENVS + SIGNED_ENDPOINT_ENVS + ["none"])
+TRANSPORT_PATH_JOIN_LABELS = {"not_reached", "base_url_path_appended", "endpoint_used_as_is"}
 CHECK_LABELS = {"not_checked", "passed", "failed", "missing_tool_call", "missing_text", "transport_error", "unknown"}
 TRACE_LABELS = {"not_persisted_compact_only", "not_observed", "unknown"}
 EXIT_CODE_CLASSES = {"zero", "nonzero_1", "nonzero_other", "not_executed"}
@@ -114,13 +122,19 @@ def validate(data: dict[str, Any]) -> list[str]:
     else:
         record = records[0]
     missing = [field for field in REQUIRED_COMPACT_FIELDS if field not in record]
+    if data.get("compact_schema_version") != "live_provider_preflight_endpoint_base_url_v2":
+        legacy_optional = {"base_url_env_present", "endpoint_mode_label", "selected_endpoint_env_label", "transport_path_join_label"}
+        missing = [field for field in missing if field not in legacy_optional]
     extra = [field for field in record if field not in REQUIRED_COMPACT_FIELDS]
     if missing:
         blockers.append(f"missing_required_fields:{missing!r}")
     if extra:
         blockers.append(f"extra_fields:{extra!r}")
     if record:
-        for key in ("preflight_command_executed", "provider_request_executed", "provider_call_started", "endpoint_env_present", "api_key_env_present", "https_endpoint_valid"):
+        require_transport_labels = data.get("compact_schema_version") == "live_provider_preflight_endpoint_base_url_v2"
+        for key in ("preflight_command_executed", "provider_request_executed", "provider_call_started", "endpoint_env_present", "base_url_env_present", "api_key_env_present", "https_endpoint_valid"):
+            if key == "base_url_env_present" and not require_transport_labels and key not in record:
+                continue
             if record.get(key) not in (True, False):
                 blockers.append(f"{key}_not_bool:{record.get(key)!r}")
         if record.get("http_status_class") not in HTTP_STATUS_CLASSES:
@@ -129,6 +143,15 @@ def validate(data: dict[str, Any]) -> list[str]:
             blockers.append(f"auth_status_label_invalid:{record.get('auth_status_label')!r}")
         if record.get("model_route_label") not in MODEL_LABELS:
             blockers.append(f"model_route_label_invalid:{record.get('model_route_label')!r}")
+        if require_transport_labels or record.get("endpoint_mode_label") is not None:
+            if record.get("endpoint_mode_label") not in ENDPOINT_MODE_LABELS:
+                blockers.append(f"endpoint_mode_label_invalid:{record.get('endpoint_mode_label')!r}")
+        if require_transport_labels or record.get("selected_endpoint_env_label") is not None:
+            if record.get("selected_endpoint_env_label") not in SELECTED_ENDPOINT_ENV_LABELS:
+                blockers.append(f"selected_endpoint_env_label_invalid:{record.get('selected_endpoint_env_label')!r}")
+        if require_transport_labels or record.get("transport_path_join_label") is not None:
+            if record.get("transport_path_join_label") not in TRANSPORT_PATH_JOIN_LABELS:
+                blockers.append(f"transport_path_join_label_invalid:{record.get('transport_path_join_label')!r}")
         for key in ("chat_tool_call_label", "responses_tool_call_label", "chat_text_response_label"):
             if record.get(key) not in CHECK_LABELS:
                 blockers.append(f"{key}_invalid:{record.get(key)!r}")
@@ -172,6 +195,9 @@ def check(path: Path = DEFAULT_ARTIFACT) -> dict[str, Any]:
         "performance_evidence": record.get("performance_evidence") if isinstance(record, dict) else None,
         "raw_outputs_removed": record.get("raw_outputs_removed") if isinstance(record, dict) else None,
         "raw_outputs_committed": record.get("raw_outputs_committed") if isinstance(record, dict) else None,
+        "endpoint_mode_label": record.get("endpoint_mode_label") if isinstance(record, dict) else None,
+        "selected_endpoint_env_label": record.get("selected_endpoint_env_label") if isinstance(record, dict) else None,
+        "transport_path_join_label": record.get("transport_path_join_label") if isinstance(record, dict) else None,
         "blockers": blockers,
     }
 
