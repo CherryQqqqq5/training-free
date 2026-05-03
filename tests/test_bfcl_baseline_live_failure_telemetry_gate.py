@@ -4,6 +4,7 @@ import copy
 import json
 from pathlib import Path
 
+from scripts.check_bfcl_baseline_live_failure_telemetry_artifact import DEFAULT_ARTIFACT, check as check_artifact
 from scripts.check_bfcl_baseline_live_failure_telemetry_gate import (
     DEFAULT_PACKET,
     REQUIRED_COMPACT_FIELDS,
@@ -20,19 +21,9 @@ def _packet() -> dict:
     return json.loads(DEFAULT_PACKET.read_text(encoding="utf-8"))
 
 
-def test_committed_pending_packet_passes_fail_closed_gate() -> None:
-    summary = check(DEFAULT_PACKET)
-    assert summary["bfcl_baseline_live_failure_telemetry_gate_passed"] is True
-    assert summary["approval_status"] == "pending"
-    assert summary["authorized"] is False
-    assert summary["live_failure_telemetry_authorized"] is False
-    assert summary["route_profile"] == "novacode"
-    assert summary["route_model"] == "gpt-4.1"
-    assert summary["compact_field_count"] == len(REQUIRED_COMPACT_FIELDS)
-    assert summary["performance_evidence"] is False
-
-
-def test_rejects_pending_packet_with_execution_flags_true() -> None:
+def _pending_packet(tmp_path: Path) -> Path:
+    data = _packet()
+    data["approval_status"] = "pending"
     for key in (
         "authorized",
         "provider_call_authorized",
@@ -42,13 +33,43 @@ def test_rejects_pending_packet_with_execution_flags_true() -> None:
         "scorer_authorized",
         "full_baseline_authorized",
     ):
-        data = _packet()
+        data[key] = False
+    path = tmp_path / "pending_packet.json"
+    path.write_text(json.dumps(data, indent=2, sort_keys=True), encoding="utf-8")
+    return path
+
+
+def test_committed_approved_packet_passes_executed_gate_lifecycle() -> None:
+    summary = check(DEFAULT_PACKET)
+    assert summary["bfcl_baseline_live_failure_telemetry_gate_passed"] is True
+    assert summary["approval_status"] == "approved"
+    assert summary["authorized"] is True
+    assert summary["live_failure_telemetry_authorized"] is True
+    assert summary["route_profile"] == "novacode"
+    assert summary["route_model"] == "gpt-4.1"
+    assert summary["compact_field_count"] == len(REQUIRED_COMPACT_FIELDS)
+    assert summary["performance_evidence"] is False
+
+
+def test_pending_fixture_rejects_execution_flags_true(tmp_path: Path) -> None:
+    base = json.loads(_pending_packet(tmp_path).read_text(encoding="utf-8"))
+    for key in (
+        "authorized",
+        "provider_call_authorized",
+        "live_failure_telemetry_authorized",
+        "bfcl_generate_authorized",
+        "bfcl_evaluate_authorized",
+        "scorer_authorized",
+        "full_baseline_authorized",
+    ):
+        data = copy.deepcopy(base)
         data[key] = True
         blockers = validate_packet(data)
         assert any(key in blocker for blocker in blockers)
 
 
-def test_rejects_candidate_and_performance_flags() -> None:
+def test_rejects_candidate_and_performance_flags(tmp_path: Path) -> None:
+    base = json.loads(_pending_packet(tmp_path).read_text(encoding="utf-8"))
     for key in (
         "candidate_runtime_activation_authorized",
         "candidate_jsonl_authorized",
@@ -58,7 +79,7 @@ def test_rejects_candidate_and_performance_flags() -> None:
         "huawei_acceptance_ready",
         "scorer_feedback_used",
     ):
-        data = _packet()
+        data = copy.deepcopy(base)
         data[key] = True
         blockers = validate_packet(data)
         assert any(key in blocker for blocker in blockers)
@@ -76,6 +97,14 @@ def test_rejects_route_fallback_openrouter_and_active_gpt52() -> None:
         data = copy.deepcopy(_packet())
         data[key] = value
         assert validate_packet(data)
+
+
+def test_committed_telemetry_artifact_passes_after_execution() -> None:
+    summary = check_artifact(DEFAULT_ARTIFACT)
+    assert summary["bfcl_baseline_live_failure_telemetry_artifact_passed"] is True
+    assert summary["failed_stage"] == "bfcl_generate"
+    assert summary["baseline_exit_code_class"] == "nonzero_1"
+    assert summary["raw_outputs_removed"] is True
 
 
 def test_rejects_missing_or_extra_compact_fields() -> None:
@@ -129,8 +158,9 @@ def test_dry_run_includes_required_compact_schema() -> None:
     assert "stop_gate_triggered" in plan["compact_fields"]
 
 
-def test_execute_mode_pending_fails_closed_without_env_or_baseline(tmp_path: Path) -> None:
-    summary = execute_live_failure_telemetry(DEFAULT_PACKET, tmp_path / "telemetry.json")
+def test_execute_mode_pending_fixture_fails_closed_without_env_or_baseline(tmp_path: Path) -> None:
+    pending_path = _pending_packet(tmp_path)
+    summary = execute_live_failure_telemetry(pending_path, tmp_path / "telemetry.json")
     assert "baseline_live_failure_telemetry_packet_not_approved" in summary["blockers"]
     assert summary["endpoint_value_read"] is False
     assert summary["api_key_value_read"] is False
