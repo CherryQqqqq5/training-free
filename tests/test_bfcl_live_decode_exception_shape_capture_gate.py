@@ -14,16 +14,32 @@ def _packet() -> dict:
     return json.loads(PACKET_PATH.read_text(encoding="utf-8"))
 
 
-def test_committed_pending_packet_passes_fail_closed() -> None:
+def _pending_packet_path(tmp_path: Path) -> Path:
+    data = _packet()
+    data["approval_status"] = "pending"
+    for key in ("authorized", "provider_request_authorized", "live_shape_capture_authorized", "bfcl_generate_authorized"):
+        data[key] = False
+    path = tmp_path / "pending_packet.json"
+    path.write_text(json.dumps(data, indent=2, sort_keys=True), encoding="utf-8")
+    return path
+
+
+def test_committed_approved_packet_passes_scoped_gate() -> None:
     summary = check(PACKET_PATH)
     assert summary["bfcl_live_decode_exception_shape_capture_gate_passed"] is True
-    assert summary["approval_status"] == "pending"
+    assert summary["approval_status"] == "approved"
+    assert summary["provider_request_authorized"] is True
+    assert summary["live_shape_capture_authorized"] is True
+    assert summary["bfcl_generate_authorized"] is True
     assert summary["signed_run_ids"] == ["web_search_base_0"]
     assert summary["compact_field_count"] == len(REQUIRED_COMPACT_FIELDS)
 
 
 def test_rejects_pending_packet_with_authorized_true() -> None:
     data = _packet()
+    data["approval_status"] = "pending"
+    for key in ("provider_request_authorized", "live_shape_capture_authorized", "bfcl_generate_authorized"):
+        data[key] = False
     data["authorized"] = True
     assert any("authorized_not_false" in blocker for blocker in validate_packet(data))
 
@@ -98,8 +114,8 @@ def test_dry_run_includes_required_compact_field_schema() -> None:
     assert "suspected_live_decode_failure_stage" in plan["compact_fields"]
 
 
-def test_execute_mode_pending_fails_closed_without_execution() -> None:
-    summary = execute_live_shape_capture(PACKET_PATH)
+def test_execute_mode_pending_fails_closed_without_execution(tmp_path: Path) -> None:
+    summary = execute_live_shape_capture(_pending_packet_path(tmp_path), tmp_path / "capture.json")
     assert "live_decode_exception_shape_capture_packet_not_approved" in summary["blockers"]
     assert summary["provider_request_executed"] is False
     assert summary["bfcl_generate_executed"] is False

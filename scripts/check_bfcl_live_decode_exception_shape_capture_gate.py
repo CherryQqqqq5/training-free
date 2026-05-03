@@ -12,56 +12,23 @@ from typing import Any
 DEFAULT_PACKET = Path("outputs/artifacts/stage1_bfcl_acceptance/bfcl_live_decode_exception_shape_capture_gate_packet.json")
 SIGNED_ID = "web_search_base_0"
 REQUIRED_COMPACT_FIELDS = [
-    "run_id",
-    "route_profile",
-    "route_model",
-    "bfcl_handler_class_label",
-    "bfcl_api_path_label",
-    "provider_status_class",
-    "provider_response_has_tool_calls",
-    "provider_response_has_nonempty_text",
-    "proxy_responses_output_has_function_call",
-    "proxy_function_call_item_count",
-    "proxy_function_call_has_call_id",
-    "proxy_function_call_has_name",
-    "proxy_function_call_has_arguments",
-    "proxy_function_call_has_status",
-    "proxy_function_call_has_id",
-    "proxy_name_field_placement_label",
-    "proxy_arguments_shape_label",
-    "proxy_arguments_json_parseable_bool",
-    "proxy_status_shape_label",
-    "proxy_call_id_source_label",
-    "bfcl_parse_called",
-    "bfcl_parse_exception_class",
-    "bfcl_parse_model_responses_count",
-    "bfcl_parse_model_responses_shape_label",
-    "bfcl_decode_execute_called",
-    "bfcl_decode_exception_class",
-    "bfcl_decode_execute_nonempty",
-    "bfcl_decode_output_count",
-    "compact_result_status",
+    "run_id", "route_profile", "route_model", "bfcl_handler_class_label", "bfcl_api_path_label",
+    "provider_status_class", "provider_response_has_tool_calls", "provider_response_has_nonempty_text",
+    "proxy_responses_output_has_function_call", "proxy_function_call_item_count", "proxy_function_call_has_call_id",
+    "proxy_function_call_has_name", "proxy_function_call_has_arguments", "proxy_function_call_has_status",
+    "proxy_function_call_has_id", "proxy_name_field_placement_label", "proxy_arguments_shape_label",
+    "proxy_arguments_json_parseable_bool", "proxy_status_shape_label", "proxy_call_id_source_label",
+    "bfcl_parse_called", "bfcl_parse_exception_class", "bfcl_parse_model_responses_count",
+    "bfcl_parse_model_responses_shape_label", "bfcl_decode_execute_called", "bfcl_decode_exception_class",
+    "bfcl_decode_execute_nonempty", "bfcl_decode_output_count", "compact_result_status",
     "suspected_live_decode_failure_stage",
 ]
-FALSE_KEYS = (
-    "authorized",
-    "provider_request_authorized",
-    "live_shape_capture_authorized",
-    "bfcl_generate_authorized",
-    "bfcl_smoke_authorized",
-    "bfcl_evaluate_authorized",
-    "scorer_authorized",
-    "full_baseline_authorized",
-    "candidate_runtime_activation_authorized",
-    "candidate_jsonl_authorized",
-    "candidate_pool_ready",
-    "performance_evidence",
-    "sota_3pp_claim_ready",
-    "huawei_acceptance_ready",
-    "fallback_allowed",
-    "gpt_4o_fallback_allowed",
-    "gpt_5_2_active",
-    "openrouter_allowed",
+APPROVED_TRUE_KEYS = ("authorized", "provider_request_authorized", "live_shape_capture_authorized", "bfcl_generate_authorized")
+ALWAYS_FALSE_KEYS = (
+    "bfcl_smoke_authorized", "bfcl_evaluate_authorized", "scorer_authorized", "full_baseline_authorized",
+    "candidate_runtime_activation_authorized", "candidate_jsonl_authorized", "candidate_pool_ready",
+    "performance_evidence", "sota_3pp_claim_ready", "huawei_acceptance_ready", "fallback_allowed",
+    "gpt_4o_fallback_allowed", "gpt_5_2_active", "openrouter_allowed",
 )
 FORBIDDEN_FIELD_RE = re.compile(r"(raw|prompt|case_content|provider_request|provider_response_body|response_headers|logs?|traces?|model_output_text|tool_arguments|function_name|gold|reference|expected|scorer_diff|endpoint|api_key|secret|candidate_output)", re.IGNORECASE)
 FORBIDDEN_VALUE_RE = re.compile(("s" + "k-" + r"[A-Za-z0-9_-]{16,}|" + "api" + "cz" + "|" + "boyue" + "richdata|endpoint value|api key|provider payload|scorer diff|candidate output"), re.IGNORECASE)
@@ -97,13 +64,13 @@ def validate_packet(data: dict[str, Any]) -> list[str]:
     blockers: list[str] = []
     if data.get("artifact_kind") != "bfcl_live_decode_exception_shape_capture_gate_packet":
         blockers.append(f"artifact_kind_invalid:{data.get('artifact_kind')!r}")
-    if data.get("approval_status") != "pending":
-        blockers.append(f"approval_status_not_pending:{data.get('approval_status')!r}")
+    status = data.get("approval_status")
+    if status not in {"pending", "approved"}:
+        blockers.append(f"approval_status_invalid:{status!r}")
     if data.get("route_profile") != "novacode" or data.get("route_model") != "gpt-4.1":
         blockers.append("route_drift")
-    signed_ids = data.get("signed_run_ids")
-    if signed_ids != [SIGNED_ID]:
-        blockers.append(f"signed_run_ids_invalid:{signed_ids!r}")
+    if data.get("signed_run_ids") != [SIGNED_ID]:
+        blockers.append(f"signed_run_ids_invalid:{data.get('signed_run_ids')!r}")
     if data.get("max_run_ids") != 1:
         blockers.append(f"max_run_ids_invalid:{data.get('max_run_ids')!r}")
     if data.get("requested_future_scope") != "one_id_live_decode_exception_shape_capture":
@@ -112,7 +79,11 @@ def validate_packet(data: dict[str, Any]) -> list[str]:
         blockers.append("compact_only_not_true")
     if data.get("stop_after_compact_decode_exception_shape_capture") is not True:
         blockers.append("stop_after_capture_not_true")
-    for key in FALSE_KEYS:
+    for key in APPROVED_TRUE_KEYS:
+        expected = status == "approved"
+        if data.get(key) is not expected:
+            blockers.append(f"{key}_not_{str(expected).lower()}:{data.get(key)!r}")
+    for key in ALWAYS_FALSE_KEYS:
         if data.get(key) is not False:
             blockers.append(f"{key}_not_false:{data.get(key)!r}")
     fields = data.get("allowed_compact_fields")
@@ -131,8 +102,7 @@ def validate_packet(data: dict[str, Any]) -> list[str]:
     for field in fields:
         if not isinstance(field, str):
             blockers.append(f"compact_field_not_string:{field!r}")
-            continue
-        if FORBIDDEN_FIELD_RE.search(field):
+        elif FORBIDDEN_FIELD_RE.search(field):
             blockers.append(f"forbidden_compact_field:{field}")
     if "suspected_live_decode_failure_stage" not in fields:
         blockers.append("suspected_live_decode_failure_stage_missing_from_schema")
@@ -148,6 +118,9 @@ def check(path: Path = DEFAULT_PACKET) -> dict[str, Any]:
         "packet_path": str(path),
         "bfcl_live_decode_exception_shape_capture_gate_passed": not blockers,
         "approval_status": packet.get("approval_status"),
+        "provider_request_authorized": packet.get("provider_request_authorized"),
+        "live_shape_capture_authorized": packet.get("live_shape_capture_authorized"),
+        "bfcl_generate_authorized": packet.get("bfcl_generate_authorized"),
         "signed_run_ids": packet.get("signed_run_ids"),
         "route_profile": packet.get("route_profile"),
         "route_model": packet.get("route_model"),

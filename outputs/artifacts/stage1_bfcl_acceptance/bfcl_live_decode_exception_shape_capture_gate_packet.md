@@ -1,8 +1,8 @@
 # BFCL Live Decode Exception Shape Capture Gate Packet
 
-Status: pending and fail-closed. This prepares a future one-ID live decode exception/field-shape capture gate only; it does not authorize provider access, live capture, BFCL generate, smoke, evaluate, scorer, full/default baseline, candidate paths, performance evidence, +3pp, SOTA, or Huawei claims.
+Status: approved for exactly one one-ID live decode exception/field-shape capture execution. This does not authorize BFCL smoke, evaluate, scorer, full/default baseline, candidate paths, performance evidence, +3pp, SOTA, or Huawei claims.
 
-## Requested Future Scope
+## Approved Scope
 
 - Exactly one signed ID: `web_search_base_0`
 - Route: `novacode/gpt-4.1`
