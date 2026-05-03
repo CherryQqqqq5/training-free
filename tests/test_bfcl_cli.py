@@ -347,6 +347,33 @@ def test_decoded_execution_nonempty_materializes_nonempty_result_shape(tmp_path)
     assert classification["status"] == "generated"
 
 
+
+def test_clean_decoded_content_mentioning_protocol_materializes_nonempty(tmp_path):
+    entry = {
+        "id": "web_search_base_0",
+        "result": [["ordinary protocol note shape"]],
+        "inference_log": [
+            {
+                "step_0": [
+                    {
+                        "role": "handler_log",
+                        "content": "Successfully decoded model response.",
+                        "model_response_decoded": ["decoded protocol content shape"],
+                    }
+                ]
+            }
+        ],
+    }
+
+    patched = _preserve_decoded_execution_output_shape(entry)
+    assert patched["grc_decoded_execution_output_shape"]["shape_label"] == "execution_list_nonempty"
+    _write_with_patched_base_handler(tmp_path, entry)
+    classification = _classify_result_for_run_id("web_search_base_0", tmp_path)
+    assert classification["status"] == "generated"
+    assert classification["tool_call_detected"] is True
+    assert classification["protocol_error_detected"] is False
+
+
 def test_true_empty_decoded_output_remains_empty(tmp_path):
     entry = {
         "id": "web_search_base_0",

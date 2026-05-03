@@ -54,7 +54,7 @@ def _decoded_execution_output_count(value: Any) -> int:
 def _entry_has_protocol_error_indicator(value: Any) -> bool:
     if isinstance(value, dict):
         for key, child in value.items():
-            if str(key).lower() in {"error", "exception", "traceback"}:
+            if str(key).lower() in {"error", "exception", "traceback", "exc_info", "error_type", "exception_class", "protocol_error"}:
                 return True
             if _entry_has_protocol_error_indicator(child):
                 return True
@@ -63,7 +63,13 @@ def _entry_has_protocol_error_indicator(value: Any) -> bool:
         return any(_entry_has_protocol_error_indicator(child) for child in value)
     if isinstance(value, str):
         lowered = value.lower()
-        return "error during inference" in lowered or "protocol" in lowered or "exception" in lowered
+        return (
+            "error during inference" in lowered
+            or "error decoding" in lowered
+            or "traceback (most recent call last)" in lowered
+            or "protocolerror" in lowered
+            or "protocol error" in lowered
+        )
     return False
 
 
