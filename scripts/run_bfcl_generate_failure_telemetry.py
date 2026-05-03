@@ -179,7 +179,7 @@ def _read_temp_text(*paths: Path) -> str:
 
 
 def _status_code_class(text: str) -> str | None:
-    for match in re.finditer(r"(?:status(?:\s+code)?|http(?:/\d(?:\.\d)?)?)[^0-9]{0,16}([1-5][0-9][0-9])", text, re.IGNORECASE):
+    for match in re.finditer(r"(?:status(?:\s+code)?|http(?:/\d(?:\.\d)?)?)[^0-9]{0,16}([2-5][0-9][0-9])", text, re.IGNORECASE):
         code = int(match.group(1))
         return f"{code // 100}xx"
     return None
@@ -187,7 +187,7 @@ def _status_code_class(text: str) -> str | None:
 
 def classify_provider_proxy_status(text: str, *, generate_entered: bool) -> tuple[str, str]:
     lower = text.lower()
-    if not generate_entered and not lower.strip():
+    if not generate_entered:
         return "not_observed", "not_observed"
     if "timed out" in lower or "timeout" in lower or "readtimeout" in lower:
         return "timeout", "timeout"

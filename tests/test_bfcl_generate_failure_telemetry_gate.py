@@ -71,13 +71,13 @@ def _approved_packet(tmp_path: Path) -> Path:
     return path
 
 
-def test_committed_packet_is_pending_fail_closed_for_review() -> None:
+def test_committed_packet_matches_post_execution_lifecycle() -> None:
     summary = check(DEFAULT_PACKET)
     assert summary["bfcl_generate_failure_telemetry_gate_passed"] is True
-    assert summary["approval_status"] == "pending"
-    assert summary["authorized"] is False
-    assert summary["provider_request_authorized"] is False
-    assert summary["bfcl_generate_authorized"] is False
+    assert summary["approval_status"] == "approved"
+    assert summary["authorized"] is True
+    assert summary["provider_request_authorized"] is True
+    assert summary["bfcl_generate_authorized"] is True
     assert summary["route_profile"] == "novacode"
     assert summary["route_model"] == "gpt-4.1"
     assert summary["compact_field_count"] == len(REQUIRED_COMPACT_FIELDS)
@@ -191,6 +191,8 @@ def test_provider_proxy_status_classifier_labels() -> None:
     assert classify_provider_proxy_status("request timed out", generate_entered=True) == ("timeout", "timeout")
     assert classify_provider_proxy_status("failed to connect to 127.0.0.1 connection refused", generate_entered=True) == ("proxy_unreachable", "connection_error")
     assert classify_provider_proxy_status("ConnectionError max retries exceeded", generate_entered=True) == ("connection_error", "connection_error")
+    assert classify_provider_proxy_status("local endpoint 127.0.0.1 without provider call", generate_entered=False) == ("not_observed", "not_observed")
+    assert classify_provider_proxy_status("local endpoint 127.0.0.1", generate_entered=True) == ("unknown_compact", "unknown_compact")
     assert classify_provider_proxy_status("", generate_entered=False) == ("not_observed", "not_observed")
 
 
@@ -202,18 +204,6 @@ def test_bfcl_cli_failure_classifier_labels() -> None:
     assert classify_bfcl_cli_failure(1, "provider returned HTTP status 500", provider_status_class="5xx", generate_entered=True, result_file_count=0) == ("proxy_or_provider_error", "proxy_request")
     assert classify_bfcl_cli_failure(1, "Traceback runtime exception", provider_status_class="not_observed", generate_entered=True, result_file_count=0) == ("runtime_exception", "unknown_generate")
     assert classify_bfcl_cli_failure(2, "opaque failure", provider_status_class="not_observed", generate_entered=True, result_file_count=1) == ("unknown_nonzero", "unknown_generate")
-
-
-def test_execute_with_committed_pending_packet_fails_closed_before_env_provider_or_bfcl(tmp_path: Path) -> None:
-    summary = execute_generate_failure_telemetry(DEFAULT_PACKET, tmp_path / "telemetry.json")
-    assert "generate_failure_telemetry_packet_not_approved" in summary["blockers"]
-    assert summary["env_profile_sourced"] is False
-    assert summary["endpoint_value_read"] is False
-    assert summary["api_key_value_read"] is False
-    assert summary["baseline_command_executed"] is False
-    assert summary["generate_stage_entered"] is False
-    assert summary["provider_call_started"] is False
-    assert summary["bfcl_generate_executed"] is False
 
 
 def test_execute_with_pending_packet_fails_closed_before_env_provider_or_bfcl(tmp_path: Path) -> None:

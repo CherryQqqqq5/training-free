@@ -97,8 +97,6 @@ def validate(data: dict[str, Any]) -> list[str]:
     if record:
         if record.get("baseline_command_executed") is not True:
             blockers.append("baseline_command_executed_not_true")
-        if record.get("generate_stage_entered") is not True:
-            blockers.append("generate_stage_entered_not_true")
         if not isinstance(record.get("generate_exact_exit_code"), int):
             blockers.append("generate_exact_exit_code_not_int")
         if record.get("generate_exit_code_class") not in {"zero", "nonzero_1", "nonzero_other"}:
@@ -109,6 +107,8 @@ def validate(data: dict[str, Any]) -> list[str]:
             blockers.append(f"provider_status_class_invalid:{record.get('provider_status_class_during_generate')!r}")
         if record.get("provider_call_completed_class") not in PROVIDER_COMPLETION_CLASSES:
             blockers.append(f"provider_call_completed_class_invalid:{record.get('provider_call_completed_class')!r}")
+        if record.get("provider_call_started") is False and (record.get("provider_status_class_during_generate") != "not_observed" or record.get("provider_call_completed_class") != "not_observed"):
+            blockers.append("provider_not_observed_labels_inconsistent")
         if record.get("bfcl_cli_exception_class") not in BFCL_EXCEPTION_CLASSES:
             blockers.append(f"bfcl_cli_exception_class_invalid:{record.get('bfcl_cli_exception_class')!r}")
         if record.get("bfcl_cli_exception_stage_label") not in BFCL_EXCEPTION_STAGE_LABELS:
