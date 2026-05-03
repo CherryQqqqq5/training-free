@@ -26,7 +26,9 @@ TRACE_LABELS = {"not_observed", "trace_emitted", "trace_missing", "trace_deleted
 TRACE_COUNT_CLASSES = {"not_observed", "zero", "one", "multiple"}
 PROXY_PYTHON_LABELS = {"grc_python_env", "repo_venv", "caller_python"}
 PROXY_START_FAILURE_LABELS = {"proxy_import_or_process_exit", "proxy_config_startup_failed", "proxy_health_timeout", "none_observed", "unknown"}
-BACKCOMPAT_OPTIONAL_FIELDS = {"proxy_python_label", "proxy_start_failure_label"}
+PROXY_API_KEY_ENV_LABELS = {"CHUANGZHI_API_KEY", "NOVACODE_API_KEY", "unknown"}
+PROXY_API_KEY_OVERRIDE_LABELS = {"approved_chuangzhi_key_env", "none", "unknown"}
+BACKCOMPAT_OPTIONAL_FIELDS = {"proxy_python_label", "proxy_start_failure_label", "proxy_selected_api_key_env_label", "proxy_api_key_env_override_label"}
 FAILED_CHECK_LABELS = {"none_observed", "packet_not_approved", "output_artifact_exists", "proxy_start_failed", "local_proxy_request_failed", "provider_transport_error", "provider_non_2xx", "responses_envelope_malformed", "responses_function_call_missing", "raw_or_secret_leak", "temp_raw_cleanup_failed", "unknown"}
 FORBIDDEN_KEY_RE = re.compile(
     r"(^|_)(raw_(requests?|responses?|bod(y|ies)|contents?|headers?|logs?|traces?|prompts?|cases?|tool_args?|provider_payloads?)|provider_payload|endpoint_values?|key_values?|api_key_values?|secret_values?|full_urls?|prompt_text|case_content|trace_content|log_content|tool_argument_value|gold_value|reference_value|expected_value|scorer_diffs?|candidate_outputs?|huawei_claim|performance_claim)(_|$)",
@@ -66,6 +68,8 @@ def _scan(data: dict[str, Any]) -> list[str]:
             blockers.append(f"forbidden_key:{dotted}")
         if isinstance(value, str) and FORBIDDEN_VALUE_RE.search(value):
             if key == "route_model" and value == "gpt-4.1":
+                continue
+            if key == "proxy_selected_api_key_env_label" and value in PROXY_API_KEY_ENV_LABELS:
                 continue
             blockers.append(f"forbidden_value:{dotted}")
     return sorted(set(blockers))
@@ -141,6 +145,10 @@ def validate(data: dict[str, Any]) -> list[str]:
             blockers.append(f"proxy_python_label_invalid:{record.get('proxy_python_label')!r}")
         if record.get("proxy_start_failure_label") is not None and record.get("proxy_start_failure_label") not in PROXY_START_FAILURE_LABELS:
             blockers.append(f"proxy_start_failure_label_invalid:{record.get('proxy_start_failure_label')!r}")
+        if record.get("proxy_selected_api_key_env_label") is not None and record.get("proxy_selected_api_key_env_label") not in PROXY_API_KEY_ENV_LABELS:
+            blockers.append(f"proxy_selected_api_key_env_label_invalid:{record.get('proxy_selected_api_key_env_label')!r}")
+        if record.get("proxy_api_key_env_override_label") is not None and record.get("proxy_api_key_env_override_label") not in PROXY_API_KEY_OVERRIDE_LABELS:
+            blockers.append(f"proxy_api_key_env_override_label_invalid:{record.get('proxy_api_key_env_override_label')!r}")
         if record.get("http_status_class") not in HTTP_STATUS_CLASSES:
             blockers.append(f"http_status_class_invalid:{record.get('http_status_class')!r}")
         if record.get("provider_http_status_label") not in PROVIDER_HTTP_STATUS_LABELS:
@@ -183,6 +191,8 @@ def check(path: Path = DEFAULT_ARTIFACT) -> dict[str, Any]:
         "upstream_chat_route_label": record.get("upstream_chat_route_label") if isinstance(record, dict) else None,
         "proxy_python_label": record.get("proxy_python_label") if isinstance(record, dict) else None,
         "proxy_start_failure_label": record.get("proxy_start_failure_label") if isinstance(record, dict) else None,
+        "proxy_selected_api_key_env_label": record.get("proxy_selected_api_key_env_label") if isinstance(record, dict) else None,
+        "proxy_api_key_env_override_label": record.get("proxy_api_key_env_override_label") if isinstance(record, dict) else None,
         "http_status_class": record.get("http_status_class") if isinstance(record, dict) else None,
         "provider_http_status_label": record.get("provider_http_status_label") if isinstance(record, dict) else None,
         "responses_envelope_shape_label": record.get("responses_envelope_shape_label") if isinstance(record, dict) else None,

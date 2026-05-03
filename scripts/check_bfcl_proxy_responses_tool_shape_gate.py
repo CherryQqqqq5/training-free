@@ -17,6 +17,8 @@ REQUIRED_COMPACT_FIELDS = [
     "local_responses_path_selected",
     "proxy_python_label",
     "proxy_start_failure_label",
+    "proxy_selected_api_key_env_label",
+    "proxy_api_key_env_override_label",
     "upstream_provider_request_authorized",
     "upstream_provider_call_started",
     "upstream_chat_route_label",

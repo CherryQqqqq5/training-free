@@ -36,6 +36,8 @@ def _base_record(*, command_executed: bool = False) -> dict[str, Any]:
         "local_responses_path_selected": False,
         "proxy_python_label": _select_proxy_python()[1],
         "proxy_start_failure_label": "none_observed",
+        "proxy_selected_api_key_env_label": "CHUANGZHI_API_KEY",
+        "proxy_api_key_env_override_label": "approved_chuangzhi_key_env",
         "upstream_provider_request_authorized": False,
         "upstream_provider_call_started": False,
         "upstream_chat_route_label": "not_reached",
@@ -265,6 +267,7 @@ def _default_proxy_probe(temp_root: Path) -> dict[str, Any]:
     port = int(os.environ.get("GRC_PROXY_RESPONSES_TOOL_SHAPE_PORT", "8139"))
     env = dict(os.environ)
     env["PYTHONPATH"] = f"{REPO_ROOT / 'src'}{os.pathsep}{env.get('PYTHONPATH', '')}" if env.get("PYTHONPATH") else str(REPO_ROOT / "src")
+    env["GRC_UPSTREAM_API_KEY_ENV"] = "CHUANGZHI_API_KEY"
     proxy_python, proxy_python_label = _select_proxy_python()
     config_start_failure_label = _proxy_config_start_failure_label(env)
     if config_start_failure_label != "none_observed":
@@ -276,6 +279,8 @@ def _default_proxy_probe(temp_root: Path) -> dict[str, Any]:
             "trace_count": 0,
             "proxy_python_label": proxy_python_label,
             "proxy_start_failure_label": config_start_failure_label,
+            "proxy_selected_api_key_env_label": "CHUANGZHI_API_KEY",
+            "proxy_api_key_env_override_label": "approved_chuangzhi_key_env",
         }
     command = [
         proxy_python,
@@ -304,6 +309,8 @@ def _default_proxy_probe(temp_root: Path) -> dict[str, Any]:
                         "trace_count": 0,
                         "proxy_python_label": proxy_python_label,
                         "proxy_start_failure_label": "proxy_import_or_process_exit",
+                        "proxy_selected_api_key_env_label": "CHUANGZHI_API_KEY",
+                        "proxy_api_key_env_override_label": "approved_chuangzhi_key_env",
                     }
                 try:
                     urllib.request.urlopen(f"http://127.0.0.1:{port}/health", timeout=1).read()
@@ -319,6 +326,8 @@ def _default_proxy_probe(temp_root: Path) -> dict[str, Any]:
                     "trace_count": 0,
                     "proxy_python_label": proxy_python_label,
                     "proxy_start_failure_label": "proxy_health_timeout",
+                    "proxy_selected_api_key_env_label": "CHUANGZHI_API_KEY",
+                    "proxy_api_key_env_override_label": "approved_chuangzhi_key_env",
                 }
             status, payload, parse_label = _post_json(f"http://127.0.0.1:{port}/v1/responses", _responses_payload())
             return {
@@ -329,6 +338,8 @@ def _default_proxy_probe(temp_root: Path) -> dict[str, Any]:
                 "trace_count": len(list(trace_dir.glob("*.json"))),
                 "proxy_python_label": proxy_python_label,
                 "proxy_start_failure_label": "none_observed",
+                "proxy_selected_api_key_env_label": "CHUANGZHI_API_KEY",
+                "proxy_api_key_env_override_label": "approved_chuangzhi_key_env",
             }
         finally:
             if proc.poll() is None:
@@ -382,6 +393,12 @@ def execute_proxy_responses_tool_shape(
         proxy_start_failure_label = observation.get("proxy_start_failure_label")
         if proxy_start_failure_label in {"proxy_import_or_process_exit", "proxy_config_startup_failed", "proxy_health_timeout", "none_observed", "unknown"}:
             record["proxy_start_failure_label"] = str(proxy_start_failure_label)
+        proxy_selected_api_key_env_label = observation.get("proxy_selected_api_key_env_label")
+        if proxy_selected_api_key_env_label in {"CHUANGZHI_API_KEY", "NOVACODE_API_KEY", "unknown"}:
+            record["proxy_selected_api_key_env_label"] = str(proxy_selected_api_key_env_label)
+        proxy_api_key_env_override_label = observation.get("proxy_api_key_env_override_label")
+        if proxy_api_key_env_override_label in {"approved_chuangzhi_key_env", "none", "unknown"}:
+            record["proxy_api_key_env_override_label"] = str(proxy_api_key_env_override_label)
         record["proxy_started"] = bool(observation.get("proxy_started"))
         if not record["proxy_started"]:
             if record["proxy_start_failure_label"] == "none_observed":

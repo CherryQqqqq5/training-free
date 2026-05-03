@@ -103,6 +103,7 @@ def test_default_proxy_probe_classifies_missing_base_url_before_process_start(tm
 
 def test_default_proxy_probe_classifies_early_process_exit_without_raw_log(tmp_path: Path, monkeypatch) -> None:
     commands: list[list[str]] = []
+    captured_env: dict[str, str] = {}
     monkeypatch.setenv("GRC_PYTHON", "/tmp/synthetic-grc-python")
     monkeypatch.setenv("GRC_UPSTREAM_BASE_URL", "https://provider.invalid/v1")
 
@@ -118,6 +119,7 @@ def test_default_proxy_probe_classifies_early_process_exit_without_raw_log(tmp_p
 
     def fake_popen(command, **kwargs):
         commands.append(command)
+        captured_env.update(kwargs.get("env") or {})
         return ExitedProcess()
 
     monkeypatch.setattr(runner.subprocess, "Popen", fake_popen)
@@ -126,6 +128,10 @@ def test_default_proxy_probe_classifies_early_process_exit_without_raw_log(tmp_p
     assert observation["proxy_started"] is False
     assert observation["proxy_python_label"] == "grc_python_env"
     assert observation["proxy_start_failure_label"] == "proxy_import_or_process_exit"
+    assert observation["proxy_selected_api_key_env_label"] == "CHUANGZHI_API_KEY"
+    assert observation["proxy_api_key_env_override_label"] == "approved_chuangzhi_key_env"
+    assert "GRC_UPSTREAM_API_KEY_ENV" in captured_env
+    assert captured_env["GRC_UPSTREAM_API_KEY_ENV"] == "CHUANGZHI_API_KEY"
     assert "raw" not in json.dumps(observation, sort_keys=True)
 
 
@@ -152,6 +158,8 @@ def test_default_proxy_probe_classifies_health_timeout(tmp_path: Path, monkeypat
     assert observation["proxy_started"] is False
     assert observation["proxy_python_label"] == "grc_python_env"
     assert observation["proxy_start_failure_label"] == "proxy_health_timeout"
+    assert observation["proxy_selected_api_key_env_label"] == "CHUANGZHI_API_KEY"
+    assert observation["proxy_api_key_env_override_label"] == "approved_chuangzhi_key_env"
     assert proc.terminated is True
 
 
@@ -239,6 +247,8 @@ def test_dry_run_does_not_source_profile_or_execute_proxy_provider() -> None:
     assert "/cephfs/qiuyn/.profile" not in rendered
     assert "endpoint_value" not in rendered
     assert "api_key_value" not in rendered
+    assert "proxy_selected_api_key_env_label" in rendered
+    assert "CHUANGZHI_API_KEY" in rendered
 
 
 def test_pending_execute_fails_closed_before_proxy_or_provider(tmp_path: Path) -> None:
@@ -288,6 +298,8 @@ def test_mocked_proxy_success_returns_responses_function_call_labels(tmp_path: P
     assert summary["trace_count_class"] == "one"
     assert summary["proxy_python_label"] in {"grc_python_env", "repo_venv", "caller_python"}
     assert summary["proxy_start_failure_label"] == "none_observed"
+    assert summary["proxy_selected_api_key_env_label"] == "CHUANGZHI_API_KEY"
+    assert summary["proxy_api_key_env_override_label"] == "approved_chuangzhi_key_env"
     assert summary["raw_temp_outputs_removed"] is True
     assert summary["bfcl_generate_started"] is False
     assert summary["bfcl_evaluate_started"] is False
@@ -347,6 +359,12 @@ def test_artifact_checker_rejects_raw_leaks_and_downstream_flags(tmp_path: Path)
     mutated = copy.deepcopy(data)
     mutated["records"][0]["proxy_start_failure_label"] = "proxy_log_contains_error"
     assert any("proxy_start_failure_label_invalid" in blocker for blocker in validate_artifact(mutated))
+    mutated = copy.deepcopy(data)
+    mutated["records"][0]["proxy_selected_api_key_env_label"] = "sk-" + "A" * 32
+    assert any("proxy_selected_api_key_env_label_invalid" in blocker or "forbidden_value" in blocker for blocker in validate_artifact(mutated))
+    mutated = copy.deepcopy(data)
+    mutated["records"][0]["proxy_api_key_env_override_label"] = "key_value_override"
+    assert any("proxy_api_key_env_override_label_invalid" in blocker for blocker in validate_artifact(mutated))
     mutated = copy.deepcopy(data)
     mutated["records"][0]["raw_temp_outputs_removed"] = False
     assert any("raw_temp_outputs_removed_not_true" in blocker for blocker in validate_artifact(mutated))
