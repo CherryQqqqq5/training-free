@@ -66,13 +66,14 @@ def test_explicit_error_and_mixed_success_error_replay_as_protocol_error() -> No
     assert structured["classifier_status_replayed"] == "protocol_error"
 
 
-def test_materialized_protocol_error_shape_label_replays_protocol_error_mapping() -> None:
+def test_materialized_protocol_error_shape_label_replays_as_generated_after_patch() -> None:
     variant = _variants(build_report())["materialized_protocol_error_shape_label"]
     assert variant["protocol_error_indicator_detected"] is False
     assert variant["protocol_error_indicator_source_label"] == "shape_label_contains_error"
     assert variant["materialized_shape_label_replayed"] == "protocol_error_shape"
-    assert variant["classifier_status_replayed"] == "protocol_error"
-    assert variant["protocol_status_label_replayed"] == "protocol_error"
+    assert variant["classifier_status_replayed"] == "generated"
+    assert variant["protocol_status_label_replayed"] == "generated"
+    assert variant["false_protocol_error_on_nonempty_decode"] is False
 
 
 def test_committed_packet_and_artifact_pass_checker() -> None:

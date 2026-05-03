@@ -69,6 +69,24 @@ def _decoded_execution_result_output_count(value: Any) -> int:
     return sum(1 for item in value if _execution_list_item_has_shape(item))
 
 
+def _decoded_execution_shape_label_count(value: Any) -> int:
+    if isinstance(value, dict):
+        count = 0
+        shape_label = value.get("decoded_output_shape_label") or value.get("bfcl_decode_output_shape_label")
+        if shape_label in {"execution_list_nonempty", "nonempty_execution_list"}:
+            decoded_count = value.get("decoded_output_count") or value.get("bfcl_decode_output_count")
+            count = decoded_count if isinstance(decoded_count, int) and decoded_count > 0 else 1
+        for child in value.values():
+            count = max(count, _decoded_execution_shape_label_count(child))
+        return count
+    if isinstance(value, list):
+        count = 0
+        for child in value:
+            count = max(count, _decoded_execution_shape_label_count(child))
+        return count
+    return 0
+
+
 def _entry_has_protocol_error_indicator(value: Any) -> bool:
     if isinstance(value, dict):
         for key, child in value.items():
@@ -99,6 +117,7 @@ def _preserve_decoded_execution_output_shape_entry(entry: Any) -> Any:
     decoded_count = max(
         _decoded_execution_output_count(entry.get("inference_log")),
         _decoded_execution_result_output_count(entry.get("result")),
+        _decoded_execution_shape_label_count(entry),
     )
     if decoded_count <= 0:
         return entry
