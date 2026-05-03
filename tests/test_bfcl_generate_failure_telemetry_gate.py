@@ -4,7 +4,12 @@ import copy
 import json
 from pathlib import Path
 
-from scripts.check_bfcl_generate_failure_telemetry_artifact import check as check_artifact
+from scripts.check_bfcl_generate_failure_telemetry_artifact import (
+    DEFAULT_ARTIFACT as DEFAULT_TELEMETRY_ARTIFACT,
+    OPTIONAL_PREGENERATE_SUBSTAGE_FIELDS,
+    check as check_artifact,
+    validate as validate_artifact,
+)
 from scripts.check_bfcl_generate_failure_telemetry_gate import (
     DEFAULT_PACKET,
     REQUIRED_COMPACT_FIELDS,
@@ -323,3 +328,32 @@ def test_approved_execute_path_records_generate_nonzero_without_raw_output(tmp_p
     assert summary["stop_gate_triggered"] == "bfcl_generate_exit_nonzero"
     assert summary["suspected_generate_failure_stage"] == "bfcl_generate_nonzero_exit"
     assert summary["raw_outputs_removed"] is True
+
+
+
+def test_generate_failure_artifact_checker_accepts_optional_pregenerate_substage_labels() -> None:
+    data = json.loads(DEFAULT_TELEMETRY_ARTIFACT.read_text(encoding="utf-8"))
+    record = data["records"][0]
+    record.update(
+        {
+            "config_source_exit_class": "ok",
+            "env_default_expansion_class": "ok",
+            "category_arg_assembly_shape": "single_comma_joined_test_category_argument",
+            "category_arg_validation_result": "accepted_by_static_shape",
+            "bfcl_cli_import_probe_class_without_generate": "not_run_by_design",
+            "bfcl_cli_argument_probe_class_without_generate": "not_run_by_design",
+            "pre_generate_marker_boundary_class": "after_preflight_before_bfcl_generate",
+            "last_started_stage": "preflight",
+            "last_completed_stage": "preflight",
+            "suspected_pregenerate_failure_substage": "category_arg_validation_or_command_setup",
+        }
+    )
+    assert set(OPTIONAL_PREGENERATE_SUBSTAGE_FIELDS).issubset(record)
+    assert validate_artifact(data) == []
+
+
+def test_generate_failure_artifact_checker_rejects_invalid_optional_pregenerate_label() -> None:
+    data = json.loads(DEFAULT_TELEMETRY_ARTIFACT.read_text(encoding="utf-8"))
+    data["records"][0]["category_arg_validation_result"] = "raw_prompt"
+    blockers = validate_artifact(data)
+    assert any("category_arg_validation_result_invalid" in blocker for blocker in blockers)

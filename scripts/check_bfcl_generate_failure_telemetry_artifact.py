@@ -21,6 +21,23 @@ PROVIDER_STATUS_CLASSES = {"2xx", "3xx", "4xx", "5xx", "timeout", "proxy_unreach
 PROVIDER_COMPLETION_CLASSES = {"completed_2xx", "completed_non2xx", "timeout", "connection_error", "not_observed", "unknown_compact"}
 BFCL_EXCEPTION_CLASSES = {"command_config_error", "import_error", "runtime_exception", "timeout", "result_path_error", "proxy_or_provider_error", "unknown_nonzero", "none_observed"}
 BFCL_EXCEPTION_STAGE_LABELS = {"generate_command_setup", "proxy_request", "result_materialization", "unknown_generate", "none_observed"}
+OPTIONAL_PREGENERATE_SUBSTAGE_FIELDS = [
+    "config_source_exit_class",
+    "env_default_expansion_class",
+    "category_arg_assembly_shape",
+    "category_arg_validation_result",
+    "bfcl_cli_import_probe_class_without_generate",
+    "bfcl_cli_argument_probe_class_without_generate",
+    "pre_generate_marker_boundary_class",
+    "last_started_stage",
+    "last_completed_stage",
+    "suspected_pregenerate_failure_substage",
+]
+GENERIC_PREGENERATE_CLASSES = {"ok", "nonzero", "missing", "not_inspected", "not_observed", "unknown_compact"}
+CATEGORY_ARG_VALIDATION_CLASSES = {"accepted_by_static_shape", "rejected_by_static_shape", "not_validated_without_execution", "unknown_compact"}
+IMPORT_PROBE_CLASSES = {"importable_without_generate", "import_error", "not_run_by_design", "unknown_compact"}
+ARG_PROBE_CLASSES = {"argparse_ok_without_generate", "argparse_error_without_generate", "not_run_by_design", "unknown_compact"}
+ALLOWED_RECORD_FIELDS = set(REQUIRED_COMPACT_FIELDS) | set(OPTIONAL_PREGENERATE_SUBSTAGE_FIELDS)
 FORBIDDEN_KEY_RE = re.compile(
     r"(^|_)(raw_prompts?|raw_bfcl_case_content|raw_cases?|raw_commands?|raw_provider_requests?|raw_provider_responses?|raw_response_headers?|raw_logs?|raw_traces?|raw_model_output_text|raw_tool_args?|raw_result_trees?|endpoint_values?|key_values?|api_key_values?|secret_values?|scorer_diffs?|candidate_outputs?|provider_payload_value|prompt_text|case_content|trace_content|log_content|tool_argument_value|gold_value|reference_value|expected_value)(_|$)",
     re.IGNORECASE,
@@ -89,7 +106,7 @@ def validate(data: dict[str, Any]) -> list[str]:
     else:
         record = records[0]
     missing = [field for field in REQUIRED_COMPACT_FIELDS if field not in record]
-    extra = [field for field in record if field not in REQUIRED_COMPACT_FIELDS]
+    extra = [field for field in record if field not in ALLOWED_RECORD_FIELDS]
     if missing:
         blockers.append(f"missing_required_fields:{missing!r}")
     if extra:
@@ -129,6 +146,22 @@ def validate(data: dict[str, Any]) -> list[str]:
             blockers.append("stop_gate_triggered_missing")
         if not record.get("suspected_generate_failure_stage"):
             blockers.append("suspected_generate_failure_stage_missing")
+        for field in OPTIONAL_PREGENERATE_SUBSTAGE_FIELDS:
+            if field in record and not isinstance(record.get(field), str):
+                blockers.append(f"optional_pregenerate_field_not_string:{field}")
+        if record.get("config_source_exit_class") is not None and record.get("config_source_exit_class") not in GENERIC_PREGENERATE_CLASSES:
+            blockers.append(f"config_source_exit_class_invalid:{record.get('config_source_exit_class')!r}")
+        if record.get("env_default_expansion_class") is not None and record.get("env_default_expansion_class") not in GENERIC_PREGENERATE_CLASSES:
+            blockers.append(f"env_default_expansion_class_invalid:{record.get('env_default_expansion_class')!r}")
+        if record.get("category_arg_validation_result") is not None and record.get("category_arg_validation_result") not in CATEGORY_ARG_VALIDATION_CLASSES:
+            blockers.append(f"category_arg_validation_result_invalid:{record.get('category_arg_validation_result')!r}")
+        if record.get("bfcl_cli_import_probe_class_without_generate") is not None and record.get("bfcl_cli_import_probe_class_without_generate") not in IMPORT_PROBE_CLASSES:
+            blockers.append(f"bfcl_cli_import_probe_class_without_generate_invalid:{record.get('bfcl_cli_import_probe_class_without_generate')!r}")
+        if record.get("bfcl_cli_argument_probe_class_without_generate") is not None and record.get("bfcl_cli_argument_probe_class_without_generate") not in ARG_PROBE_CLASSES:
+            blockers.append(f"bfcl_cli_argument_probe_class_without_generate_invalid:{record.get('bfcl_cli_argument_probe_class_without_generate')!r}")
+        for field in ("category_arg_assembly_shape", "pre_generate_marker_boundary_class", "last_started_stage", "last_completed_stage", "suspected_pregenerate_failure_substage"):
+            if field in record and not str(record.get(field)).strip():
+                blockers.append(f"optional_pregenerate_field_empty:{field}")
     blockers.extend(_scan(data))
     return sorted(set(blockers))
 
