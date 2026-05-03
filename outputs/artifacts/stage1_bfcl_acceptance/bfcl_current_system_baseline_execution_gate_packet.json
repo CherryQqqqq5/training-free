@@ -1,0 +1,167 @@
+{
+  "api_key_env_names": [
+    "NOVACODE_API_KEY",
+    "OPENAI_API_KEY"
+  ],
+  "approval_status": "pending",
+  "artifact_kind": "bfcl_current_system_baseline_execution_gate_packet",
+  "authorized": false,
+  "bfcl_data_version": "pinned_by_evaluator_checkout",
+  "bfcl_evaluate_authorized": false,
+  "bfcl_evaluator_checkout": "f7cf735",
+  "bfcl_generate_authorized": false,
+  "bfcl_model_alias": "gpt-4o-mini-2024-07-18-FC",
+  "bfcl_version": "v4",
+  "candidate_jsonl_authorized": false,
+  "candidate_pool_ready": false,
+  "candidate_runtime_activation_authorized": false,
+  "candidate_scope_status": "inert_not_activated",
+  "candidate_specs_activated": false,
+  "candidates_inert": true,
+  "case_scope_protocol": {
+    "case_selection": "full_default_cases_for_listed_categories_pending_future_execution_approval",
+    "categories": [
+      "simple",
+      "multiple",
+      "parallel",
+      "parallel_multiple",
+      "multi_turn_base",
+      "multi_turn_miss_func",
+      "multi_turn_miss_param",
+      "multi_turn_long_context"
+    ],
+    "run_ids_manifest_required": false,
+    "scope_kind": "baseline_freeze_categories_from_configs",
+    "split_label": "bfcl_v4_pinned_by_evaluator_checkout"
+  },
+  "claim_policy": {
+    "baseline_current_system_measurement_only": true,
+    "not_3pp_claim": true,
+    "not_candidate_comparison": true,
+    "not_huawei_readiness": true,
+    "not_performance_evidence": true,
+    "not_sota_claim": true
+  },
+  "compact_manifest_schema": {
+    "raw_outputs_committed": false,
+    "required_fields": [
+      "measurement_kind",
+      "target_commit",
+      "route_profile",
+      "route_model",
+      "evaluator_package",
+      "bfcl_version",
+      "case_scope_protocol",
+      "metrics_artifact",
+      "raw_outputs_committed",
+      "candidate_specs_activated",
+      "performance_claim_ready"
+    ]
+  },
+  "compact_metrics_schema": {
+    "performance_evidence": false,
+    "required_fields": [
+      "measurement_kind",
+      "overall_accuracy",
+      "subset_metrics",
+      "case_count",
+      "route_profile",
+      "route_model",
+      "scorer_feedback_used",
+      "candidate_runtime_activation_authorized",
+      "performance_evidence"
+    ]
+  },
+  "config_files": [
+    "configs/bfcl_eval_protocol.yaml",
+    "configs/runtime_bfcl_structured.yaml",
+    "configs/runtime.yaml",
+    "configs/bfcl_v4_phase1.env"
+  ],
+  "endpoint_env_names": [
+    "NOVACODE_BASE_URL",
+    "OPENAI_BASE_URL"
+  ],
+  "endpoint_key_policy": "env_names_only_no_values_committed",
+  "evaluator_package": "bfcl-eval==2025.12.17",
+  "fallback_allowed": false,
+  "full_baseline_authorized": false,
+  "gpt_4o_fallback_allowed": false,
+  "gpt_5_2_active": false,
+  "huawei_acceptance_ready": false,
+  "measurement_kind": "current_system_baseline_only",
+  "old_signed_model": "gpt-5.2",
+  "old_signed_model_status": "historical_superseded_inactive",
+  "openrouter_allowed": false,
+  "output_boundary_policy": {
+    "commit_candidate_outputs": false,
+    "commit_cases": false,
+    "commit_compact_manifest": true,
+    "commit_compact_metrics": true,
+    "commit_endpoint_or_key_values": false,
+    "commit_logs": false,
+    "commit_prompts": false,
+    "commit_provider_payloads": false,
+    "commit_result_trees": false,
+    "commit_scorer_diffs": false,
+    "commit_traces": false
+  },
+  "output_roots": {
+    "artifact_dir": "outputs/bfcl_v4/current_system_baseline/artifacts",
+    "bfcl_root": "outputs/bfcl_v4/current_system_baseline/bfcl",
+    "compact_manifest": "outputs/artifacts/stage1_bfcl_acceptance/bfcl_current_system_baseline_compact_manifest.json",
+    "compact_metrics": "outputs/artifacts/stage1_bfcl_acceptance/bfcl_current_system_baseline_compact_metrics.json",
+    "run_root": "outputs/bfcl_v4/current_system_baseline"
+  },
+  "performance_evidence": false,
+  "provider_call_authorized": false,
+  "provider_profile": "Chuangzhi/Novacode",
+  "route_model": "gpt-4.1",
+  "route_profile": "novacode",
+  "runner_command_template": [
+    "set +x",
+    "set -a",
+    "source /cephfs/qiuyn/.profile >/dev/null 2>&1",
+    "set +a",
+    "GRC_UPSTREAM_PROFILE=novacode",
+    "GRC_UPSTREAM_MODEL=gpt-4.1",
+    "GRC_BFCL_TEST_CATEGORY=simple,multiple,parallel,parallel_multiple,multi_turn_base,multi_turn_miss_func,multi_turn_miss_param,multi_turn_long_context",
+    "GRC_BFCL_USE_RUN_IDS=0",
+    "GRC_BFCL_CLEAN_RUN=1",
+    "GRC_BFCL_NUM_THREADS=1",
+    "scripts/run_bfcl_v4_baseline.sh",
+    "${GRC_BFCL_MODEL:-gpt-4o-mini-2024-07-18-FC}",
+    "outputs/bfcl_v4/current_system_baseline",
+    "8011",
+    "${GRC_BFCL_TEST_CATEGORY}",
+    "configs/runtime_bfcl_structured.yaml",
+    "rules/baseline_empty"
+  ],
+  "runner_paths": [
+    "scripts/run_bfcl_v4_baseline.sh",
+    "scripts/run_bfcl_cli.py",
+    "scripts/aggregate_bfcl_metrics.py",
+    "scripts/write_run_manifest.py"
+  ],
+  "scorer_authorized": false,
+  "scorer_feedback_enabled": false,
+  "scorer_feedback_isolation": "baseline_feedback_may_not_update_implementation_or_candidate_without_later_gate",
+  "sota_3pp_claim_ready": false,
+  "source_generate_smoke_artifact": "outputs/artifacts/stage1_bfcl_acceptance/bfcl_exact_8id_generate_smoke_after_classifier_patch_compact.json",
+  "source_readiness_packet": "outputs/artifacts/stage1_bfcl_acceptance/bfcl_measurement_readiness_gate_packet.json",
+  "source_readiness_summary": "outputs/artifacts/stage1_bfcl_acceptance/bfcl_measurement_readiness_summary.json",
+  "stop_gates": [
+    "route_drift",
+    "candidate_activation",
+    "raw_or_secret_leak",
+    "manifest_mismatch",
+    "scorer_feedback_contamination",
+    "missing_metrics_or_manifest",
+    "output_boundary_failure",
+    "fallback_or_openrouter_enabled",
+    "active_gpt_5_2_route"
+  ],
+  "target_commit_current_head_mismatch_justification": "gate_artifact_commit_may_follow_frozen_target_without_behavior_or_execution_change",
+  "target_commit_for_measurement": "221e2b7c16247cb1886de4e3c6b38ea02c8b7bc8",
+  "target_commit_source": "current_reviewed_head_at_gate_creation"
+}
