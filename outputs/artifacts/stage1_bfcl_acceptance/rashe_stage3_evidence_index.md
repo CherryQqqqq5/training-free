@@ -7,6 +7,7 @@ Status: docs-only compact evidence chain. This file is an index of existing comp
 - source diagnostics root: `outputs/artifacts/stage1_bfcl_acceptance/rashe_source_diagnostics_compact`
 - source diagnostics commit: `cc21c96b70ab51c2bf586c0e79cdde3838dcb05d`
 - compact source cases: `160`
+- total_source_cases: `160`
 - candidate proposer approval packet: `outputs/artifacts/stage1_bfcl_acceptance/rashe_candidate_proposer_approval_packet.json`
 - candidate proposals root: `outputs/artifacts/stage1_bfcl_acceptance/rashe_candidate_proposals`
 - router proposer replay packet: `outputs/artifacts/stage1_bfcl_acceptance/rashe_offline_router_proposer_replay_packet.json`
@@ -31,6 +32,6 @@ Disallowed seed skills: `bfcl_web_search_decomposition`, `bfcl_memory_retrieve_b
 
 ## Boundaries
 
-All execution and downstream flags remain false: provider calls, BFCL generate/evaluate, scorer, full baseline, candidate JSONL, candidate pool, candidate activation, dev/holdout material, performance evidence, SOTA claim, Huawei acceptance, and raw output persistence.
+All execution, authorization, readiness, and downstream flags remain false: provider calls authorized/executed, BFCL generate/evaluate authorized/executed, scorer authorized/executed, full baseline, candidate JSONL authorized/created, candidate pool ready/created, candidate activation, dev/holdout material, performance evidence, SOTA claim, Huawei acceptance, and raw output persistence.
 
 Next phase boundary: `future_separate_dev_scorer_approval_request_required`.
