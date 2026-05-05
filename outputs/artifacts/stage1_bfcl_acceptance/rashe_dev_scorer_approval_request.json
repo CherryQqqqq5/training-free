@@ -1,0 +1,88 @@
+{
+  "approval_status": "pending",
+  "artifact_kind": "rashe_dev_scorer_approval_request",
+  "authorized": false,
+  "bfcl_evaluate_authorized": false,
+  "bfcl_generate_authorized": false,
+  "candidate_activation_authorized": false,
+  "candidate_jsonl_authorized": false,
+  "candidate_pool_ready": false,
+  "candidate_proposals_root": "outputs/artifacts/stage1_bfcl_acceptance/rashe_candidate_proposals",
+  "candidate_proposer_approval_packet": "outputs/artifacts/stage1_bfcl_acceptance/rashe_candidate_proposer_approval_packet.json",
+  "checker_results": {
+    "artifact_boundary": {
+      "blockers": [],
+      "command": "PYTHONPATH=.:src .venv/bin/python scripts/check_artifact_boundary.py",
+      "status": "passed"
+    },
+    "candidate_proposer_ready": {
+      "blockers": [],
+      "command": "PYTHONPATH=.:src .venv/bin/python scripts/check_rashe_candidate_proposer_ready.py --compact --strict",
+      "status": "passed"
+    },
+    "offline_router_proposer_replay": {
+      "blockers": [],
+      "command": "PYTHONPATH=.:src .venv/bin/python scripts/check_rashe_offline_router_proposer_replay.py --compact --strict",
+      "status": "passed"
+    }
+  },
+  "dev_holdout_authorized": false,
+  "disallowed_seed_skills": [
+    "bfcl_web_search_decomposition",
+    "bfcl_memory_retrieve_before_answer",
+    "bfcl_parser_feedback_retry"
+  ],
+  "execution_packet": false,
+  "existing_readiness_modified": false,
+  "fail_closed_categories": [
+    "agentic_web_search",
+    "agentic_memory"
+  ],
+  "full_baseline_authorized": false,
+  "future_prerequisites": [
+    "same_provider_model_protocol_freeze",
+    "candidate_path_no_leakage_audit",
+    "dev_holdout_split_policy",
+    "planned_baseline_candidate_commands_frozen",
+    "cost_latency_regression_gates",
+    "stop_loss_rules",
+    "raw_output_cleanup_compact_manifest_policy",
+    "explicit_separate_approval_required_before_execution"
+  ],
+  "huawei_acceptance_ready": false,
+  "offline_router_proposer_replay_report": "outputs/artifacts/stage1_bfcl_acceptance/rashe_offline_router_proposer_replay.json",
+  "performance_evidence": false,
+  "provider_calls_authorized": false,
+  "raw_outputs_committed": false,
+  "readiness_changed": false,
+  "request_kind": "pending_request_template_only",
+  "request_scope": "future_dev_scorer_approval_request_only",
+  "requested_future_scope": "dev_scorer_approval_request_only_not_authorized",
+  "required_future_approvals": [
+    "separate_dev_scorer_approval",
+    "scorer_no_leakage_gate",
+    "candidate_materialization_boundary",
+    "dev_holdout_split_policy"
+  ],
+  "scorer_authorized": false,
+  "scorer_execution_authorized": false,
+  "sota_3pp_claim_ready": false,
+  "source_diagnostics_commit": "cc21c96b70ab51c2bf586c0e79cdde3838dcb05d",
+  "source_diagnostics_root": "outputs/artifacts/stage1_bfcl_acceptance/rashe_source_diagnostics_compact",
+  "stage3_counts": {
+    "bfcl_hallucination_abstain": 40,
+    "bfcl_multi_turn_state_tracking": 80,
+    "no_spec_selected": 40,
+    "total_source_cases": 160
+  },
+  "stage3_evidence_index": "outputs/artifacts/stage1_bfcl_acceptance/rashe_stage3_evidence_index.json",
+  "stage3_evidence_kind": "routing_evidence_only",
+  "stop_loss_rules": [
+    "leakage_nonzero",
+    "disallowed_seed_skill_selected",
+    "stage3_index_or_replay_checker_fails",
+    "candidate_artifacts_drift_from_spec_only",
+    "provider_model_protocol_mismatch",
+    "any_raw_output_persistence"
+  ]
+}
