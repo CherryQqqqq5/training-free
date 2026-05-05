@@ -1,0 +1,51 @@
+{
+  "artifact_kind": "rashe_stage3_evidence_index",
+  "bfcl_evaluate_executed": false,
+  "bfcl_generate_executed": false,
+  "candidate_activation_authorized": false,
+  "candidate_jsonl_created": false,
+  "candidate_pool_created": false,
+  "candidate_proposals_root": "outputs/artifacts/stage1_bfcl_acceptance/rashe_candidate_proposals",
+  "candidate_proposer_approval_packet": "outputs/artifacts/stage1_bfcl_acceptance/rashe_candidate_proposer_approval_packet.json",
+  "checker_commands": [
+    "PYTHONPATH=.:src .venv/bin/python scripts/check_rashe_candidate_proposer_ready.py --compact --strict",
+    "PYTHONPATH=.:src .venv/bin/python scripts/check_rashe_offline_router_proposer_replay.py --compact --strict",
+    "PYTHONPATH=.:src .venv/bin/python scripts/check_artifact_boundary.py",
+    "PYTHONPATH=.:src .venv/bin/python - <<'PY' # JSON parse and consistency check"
+  ],
+  "checker_status": {
+    "check_artifact_boundary": "passed",
+    "check_rashe_candidate_proposer_ready": "passed",
+    "check_rashe_offline_router_proposer_replay": "passed",
+    "stage3_evidence_index_json_consistency": "passed"
+  },
+  "dev_holdout_material_used": false,
+  "disallowed_seed_skills": [
+    "bfcl_web_search_decomposition",
+    "bfcl_memory_retrieve_before_answer",
+    "bfcl_parser_feedback_retry"
+  ],
+  "fail_closed_categories": [
+    "agentic_web_search",
+    "agentic_memory"
+  ],
+  "full_baseline_executed": false,
+  "huawei_acceptance_ready": false,
+  "next_phase_boundary": "future_separate_dev_scorer_approval_request_required",
+  "performance_evidence": false,
+  "provider_calls_executed": false,
+  "raw_outputs_committed": false,
+  "router_proposer_replay_packet": "outputs/artifacts/stage1_bfcl_acceptance/rashe_offline_router_proposer_replay_packet.json",
+  "router_proposer_replay_report": "outputs/artifacts/stage1_bfcl_acceptance/rashe_offline_router_proposer_replay.json",
+  "scope": "docs_only_compact_evidence_chain",
+  "scorer_executed": false,
+  "selected_skill_counts": {
+    "bfcl_hallucination_abstain": 40,
+    "bfcl_multi_turn_state_tracking": 80,
+    "no_spec_selected": 40
+  },
+  "sota_3pp_claim_ready": false,
+  "source_diagnostics_commit": "cc21c96b70ab51c2bf586c0e79cdde3838dcb05d",
+  "source_diagnostics_root": "outputs/artifacts/stage1_bfcl_acceptance/rashe_source_diagnostics_compact",
+  "total_compact_source_cases": 160
+}
