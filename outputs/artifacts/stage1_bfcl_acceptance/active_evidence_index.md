@@ -63,6 +63,14 @@ Active RASHE docs:
 - `docs/stage1_rashe_v0_offline_skeleton_spec.md`
 - `docs/stage1_rashe_runtime_implementation_plan.md`
 
+## Active Diagnostic Evidence
+
+| evidence | role | commit | status | artifact |
+| --- | --- | --- | --- | --- |
+| `bfcl_proxy_preflight_failure_telemetry_local_stub_approved_v2` | sanitized no-provider local-stub proxy preflight telemetry | `ee084cebe7a7c4a57b60f42cce6e76355ccd3b2a` | `active_diagnostic_only` | `outputs/artifacts/stage1_bfcl_acceptance/bfcl_proxy_preflight_failure_telemetry_local_stub_approved_v2_compact.json` |
+
+This diagnostic evidence keeps provider, BFCL generate/evaluate, scorer, candidate, performance, and Huawei readiness lanes fail-closed. It is not BFCL performance evidence and does not change formal readiness.
+
 ## Readiness / Authorization
 
 All formal BFCL performance gates remain fail-closed:
