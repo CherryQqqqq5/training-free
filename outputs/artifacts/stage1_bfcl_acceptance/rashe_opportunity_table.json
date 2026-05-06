@@ -1,0 +1,132 @@
+{
+  "active_candidate_rule": "prefer multi-stratum behavior evidence; single-stratum signals remain watchlist unless reviewers approve a bounded exception",
+  "archive_index": "outputs/artifacts/stage1_bfcl_acceptance/rashe_evolution_archive/archive_index.json",
+  "artifact_kind": "rashe_opportunity_table",
+  "bfcl_category_role": "sampling_reporting_validation_strata_only",
+  "candidate_pool_ready": false,
+  "entries": [
+    {
+      "archive_entry": "bfcl_multi_turn_state_tracking_v0",
+      "behavior_cluster": "multi_turn_state_lost",
+      "category_coverage": [
+        "multi_turn_base",
+        "multi_turn_long_context",
+        "multi_turn_miss_func",
+        "multi_turn_miss_param"
+      ],
+      "category_coverage_count": 4,
+      "failure_mass": 80,
+      "fixability_prior": "medium_high",
+      "leakage_risk": "low",
+      "opportunity_score": 34.56,
+      "opportunity_score_terms": {
+        "category_coverage_factor": 1.0,
+        "failure_mass": 80,
+        "fixability_prior_factor": 0.8,
+        "low_leakage_risk_factor": 0.9,
+        "low_regression_risk_factor": 0.6
+      },
+      "recommended_action": "dev_smoke_candidate",
+      "recommended_evolution_subjects": [
+        "skill_metadata",
+        "router_policy",
+        "verifier_stop_condition"
+      ],
+      "regression_risk": "medium",
+      "status": "active_seed"
+    },
+    {
+      "archive_entry": "bfcl_hallucination_abstain_v0",
+      "behavior_cluster": "unsupported_or_irrelevant_answer",
+      "category_coverage": [
+        "hallucination",
+        "irrelevance"
+      ],
+      "category_coverage_count": 2,
+      "failure_mass": 40,
+      "fixability_prior": "medium_high",
+      "leakage_risk": "low",
+      "opportunity_score": 16.2,
+      "opportunity_score_terms": {
+        "category_coverage_factor": 0.75,
+        "failure_mass": 40,
+        "fixability_prior_factor": 0.8,
+        "low_leakage_risk_factor": 0.9,
+        "low_regression_risk_factor": 0.75
+      },
+      "recommended_action": "dev_smoke_candidate",
+      "recommended_evolution_subjects": [
+        "skill_metadata",
+        "router_policy",
+        "verifier_stop_condition"
+      ],
+      "regression_risk": "medium_low",
+      "status": "active_seed"
+    },
+    {
+      "archive_entry": "unresolved_web_search_memory_v0",
+      "behavior_cluster": "memory_retrieve_update_confusion",
+      "category_coverage": [
+        "agentic_memory"
+      ],
+      "category_coverage_count": 1,
+      "failure_mass": 20,
+      "fixability_prior": "medium",
+      "leakage_risk": "medium",
+      "opportunity_score": 1.94,
+      "opportunity_score_terms": {
+        "category_coverage_factor": 0.45,
+        "failure_mass": 20,
+        "fixability_prior_factor": 0.6,
+        "low_leakage_risk_factor": 0.6,
+        "low_regression_risk_factor": 0.6
+      },
+      "recommended_action": "watch_until_cross_category_evidence_or_reviewer_exception",
+      "recommended_evolution_subjects": [
+        "router_policy",
+        "verifier_stop_condition",
+        "proposal_policy"
+      ],
+      "regression_risk": "medium",
+      "status": "watch"
+    },
+    {
+      "archive_entry": "unresolved_web_search_memory_v0",
+      "behavior_cluster": "search_query_or_fetch_failure",
+      "category_coverage": [
+        "agentic_web_search"
+      ],
+      "category_coverage_count": 1,
+      "excluded_related_count": {
+        "answered_without_tool": 2
+      },
+      "failure_mass": 18,
+      "fixability_prior": "medium",
+      "leakage_risk": "medium",
+      "opportunity_score": 1.75,
+      "opportunity_score_terms": {
+        "category_coverage_factor": 0.45,
+        "failure_mass": 18,
+        "fixability_prior_factor": 0.6,
+        "low_leakage_risk_factor": 0.6,
+        "low_regression_risk_factor": 0.6
+      },
+      "recommended_action": "watch_until_cross_category_evidence_or_reviewer_exception",
+      "recommended_evolution_subjects": [
+        "router_policy",
+        "workflow_patch",
+        "verifier_stop_condition"
+      ],
+      "regression_risk": "medium",
+      "status": "watch"
+    }
+  ],
+  "not_bfcl_category_bound": true,
+  "opportunity_score_formula": "failure_mass * category_coverage_factor * fixability_prior * low_leakage_risk * low_regression_risk",
+  "performance_evidence": false,
+  "schema_version": "rashe_opportunity_table_v0",
+  "scorer_authorized": false,
+  "selection_mode": "behavior_first_bfcl_stratified",
+  "source_diagnostics_commit": "cc21c96b70ab51c2bf586c0e79cdde3838dcb05d",
+  "source_total_cases": 160
+}
