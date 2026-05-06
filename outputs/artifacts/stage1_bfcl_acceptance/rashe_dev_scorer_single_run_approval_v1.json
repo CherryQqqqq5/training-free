@@ -1,0 +1,210 @@
+{
+  "allowed_bfcl_categories": [
+    "multi_turn_base",
+    "multi_turn_long_context",
+    "multi_turn_miss_param",
+    "multi_turn_miss_func",
+    "hallucination",
+    "irrelevance"
+  ],
+  "allowed_future_approval_flips": [
+    {
+      "field": "approval_status",
+      "from_current": "pending",
+      "future_target": "approved_after_review"
+    },
+    {
+      "field": "authorized",
+      "from_current": false,
+      "future_target": true
+    },
+    {
+      "field": "provider_calls_authorized",
+      "from_current": false,
+      "future_target": true
+    },
+    {
+      "field": "bfcl_generate_authorized",
+      "from_current": false,
+      "future_target": true
+    },
+    {
+      "field": "bfcl_evaluate_authorized",
+      "from_current": false,
+      "future_target": true
+    },
+    {
+      "field": "scorer_authorized",
+      "from_current": false,
+      "future_target": true
+    },
+    {
+      "field": "scorer_execution_authorized",
+      "from_current": false,
+      "future_target": true
+    },
+    {
+      "field": "baseline_command_authorized",
+      "from_current": false,
+      "future_target": true
+    },
+    {
+      "field": "candidate_command_authorized",
+      "from_current": false,
+      "future_target": true
+    },
+    {
+      "field": "paired_comparison_command_authorized",
+      "from_current": false,
+      "future_target": true
+    },
+    {
+      "field": "cost_latency_report_command_authorized",
+      "from_current": false,
+      "future_target": true
+    },
+    {
+      "field": "regression_report_command_authorized",
+      "from_current": false,
+      "future_target": true
+    }
+  ],
+  "allowed_output_root": "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1",
+  "allowed_skills": [
+    "bfcl_multi_turn_state_tracking",
+    "bfcl_hallucination_abstain"
+  ],
+  "approval_flip_note": "review_list_only_no_flip_active_in_this_packet",
+  "approval_status": "pending",
+  "artifact_kind": "rashe_dev_scorer_single_run_approval_v1",
+  "authorized": false,
+  "baseline_command_authorized": false,
+  "baseline_rules_dir": "rules/baseline_empty",
+  "bfcl_evaluate_authorized": false,
+  "bfcl_generate_authorized": false,
+  "bfcl_model_alias": "gpt-4o-mini-2024-07-18-FC",
+  "blockers": [],
+  "candidate_activation_authorized": false,
+  "candidate_activation_mode": "in_memory_spec_only_no_jsonl_no_pool",
+  "candidate_command_authorized": false,
+  "candidate_jsonl_authorized": false,
+  "candidate_outputs_persisted": false,
+  "candidate_pool_ready": false,
+  "category_caps": {
+    "hallucination": 2,
+    "irrelevance": 2,
+    "multi_turn_base": 2,
+    "multi_turn_long_context": 2,
+    "multi_turn_miss_func": 2,
+    "multi_turn_miss_param": 2
+  },
+  "compact_manifest_required": true,
+  "cost_latency_report_command_authorized": false,
+  "dev_holdout_material_used": false,
+  "dev_smoke_only": true,
+  "disallowed_skills": [
+    "bfcl_web_search_decomposition",
+    "bfcl_memory_retrieve_before_answer",
+    "bfcl_parser_feedback_retry"
+  ],
+  "execution_started": false,
+  "fail_if_output_exists": true,
+  "forbidden_material_policy": {
+    "candidate_outputs_persisted": false,
+    "case_identifiers_persisted": false,
+    "gold_or_expected_values_persisted": false,
+    "provider_exchanges_persisted": false,
+    "raw_prompts_persisted": false,
+    "raw_traces_persisted": false,
+    "scorer_deltas_persisted": false,
+    "tool_argument_values_persisted": false
+  },
+  "fresh_output_paths_required": true,
+  "full_baseline_authorized": false,
+  "full_suite_authorized": false,
+  "holdout_authorized": false,
+  "huawei_acceptance_ready": false,
+  "linked_command_manifest": "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_scorer_command_manifest_v1.json",
+  "linked_command_manifest_sha256": "40d3e1752d69d20c5dfaeba7ab20b3406f46233f5a5ae60ce535a7995f4c1cca",
+  "linked_dev_manifest": "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_manifest_v1.json",
+  "linked_dev_manifest_sha256": "66b460f586e4cf60e68a513fc79a8ec1c78bd5e0393a0d4b62f370c4849e1179",
+  "linked_draft_execution_packet": "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_scorer_execution_packet_v1.json",
+  "linked_draft_execution_packet_sha256": "c042a2d2f46e4043bd89a200f4a27574b0d603739595b45ec46e22ef0253f988",
+  "max_attempts": 1,
+  "max_dev_cases": 12,
+  "measurement_kind": "bounded_dev_scorer_smoke_not_performance_claim",
+  "must_remain_false_fields": [
+    "provider_calls_authorized",
+    "bfcl_generate_authorized",
+    "bfcl_evaluate_authorized",
+    "scorer_authorized",
+    "scorer_execution_authorized",
+    "baseline_command_authorized",
+    "candidate_command_authorized",
+    "paired_comparison_command_authorized",
+    "cost_latency_report_command_authorized",
+    "regression_report_command_authorized",
+    "candidate_activation_authorized",
+    "candidate_jsonl_authorized",
+    "candidate_pool_ready",
+    "candidate_outputs_persisted",
+    "full_baseline_authorized",
+    "full_suite_authorized",
+    "holdout_authorized",
+    "dev_holdout_material_used",
+    "performance_evidence",
+    "performance_claim_allowed",
+    "sota_3pp_claim_ready",
+    "huawei_acceptance_ready",
+    "raw_outputs_committed"
+  ],
+  "not_final_performance_evidence": true,
+  "one_attempt_only": true,
+  "paired_comparison_command_authorized": false,
+  "performance_claim_allowed": false,
+  "performance_evidence": false,
+  "provider_calls_authorized": false,
+  "provider_model": "gpt-4.1",
+  "provider_profile": "novacode",
+  "raw_outputs_committed": false,
+  "raw_temp_cleanup_required": true,
+  "regression_report_command_authorized": false,
+  "request_kind": "exactly_one_bounded_dev_scorer_smoke_approval",
+  "required_output_paths": [
+    "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1/dev_smoke_manifest.json",
+    "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1/dev_smoke_aggregate_report.json",
+    "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1/paired/paired_comparison.json",
+    "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1/paired/acceptance_decision.json",
+    "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1/paired/cost_latency_report.json",
+    "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1/paired/regression_report.json"
+  ],
+  "required_records": [
+    "fixed_count",
+    "regressed_count",
+    "unchanged_count",
+    "candidate_only_failure_count",
+    "baseline_only_failure_count",
+    "cost_delta_bucket",
+    "latency_delta_bucket"
+  ],
+  "run_attempt_index": 1,
+  "runtime_config": "configs/runtime_bfcl_structured.yaml",
+  "same_provider_model_protocol_required": true,
+  "scorer_authorized": false,
+  "scorer_execution_authorized": false,
+  "sota_3pp_claim_ready": false,
+  "stage4_smoke_may_inform_next_stage_request": true,
+  "stop_loss_thresholds": {
+    "candidate_jsonl_created": false,
+    "candidate_pool_created": false,
+    "cost_delta_bucket_max": "small_increase_or_lower",
+    "disallowed_skill_selection_count": 0,
+    "holdout_or_full_suite_touched": false,
+    "latency_delta_bucket_max": "small_increase_or_lower",
+    "missing_paired_record_count": 0,
+    "provider_model_protocol_mismatch": false,
+    "raw_leakage_count": 0,
+    "regressed_count_max": 0
+  },
+  "temp_work_root": "/tmp/stage1_bfcl_rashe_dev_smoke_v1"
+}
