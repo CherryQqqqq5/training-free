@@ -1,0 +1,75 @@
+{
+  "allowed_evolution_subobjects": [
+    "router_policy",
+    "verifier_stop_condition",
+    "proposal_policy"
+  ],
+  "artifact_kind": "rashe_evolution_archive_entry",
+  "bfcl_category_role": "coverage_and_reporting_only",
+  "boundary_flags": {
+    "bfcl_evaluate_authorized": false,
+    "bfcl_generate_authorized": false,
+    "candidate_activation_authorized": false,
+    "candidate_jsonl_authorized": false,
+    "candidate_pool_ready": false,
+    "huawei_acceptance_ready": false,
+    "performance_evidence": false,
+    "provider_calls_authorized": false,
+    "scorer_authorized": false,
+    "sota_3pp_claim_ready": false
+  },
+  "candidate_interpretation": "unresolved opportunity cluster; not active until broader behavior evidence or reviewer approval",
+  "dev_score_status": "not_run",
+  "entry_id": "unresolved_web_search_memory_v0",
+  "entry_type": "watchlist_cluster",
+  "evolution_subject": "proposal_policy",
+  "feedback_slots": {
+    "cost_delta_pct": null,
+    "dev_accuracy_delta_pp": null,
+    "fixed_count": null,
+    "latency_delta_pct": null,
+    "leakage_count": null,
+    "regressed_count": null,
+    "target_bucket_reduction": null
+  },
+  "forbidden_inputs": [
+    "gold",
+    "expected",
+    "reference",
+    "scorer_diff",
+    "candidate_output",
+    "raw_trace",
+    "raw_case_id",
+    "raw_prompt",
+    "raw_payload",
+    "provider_exchange",
+    "tool_argument_values"
+  ],
+  "next_allowed_transition": "behavior_discovery_scan_before_active_candidate",
+  "not_bfcl_category_bound": true,
+  "schema_version": "rashe_archive_v0",
+  "source_evidence": {
+    "category_coverage": [
+      "agentic_web_search",
+      "agentic_memory"
+    ],
+    "compact_bucket_counts": {
+      "agentic_memory": {
+        "memory_not_retrieved": 9,
+        "memory_update_when_should_search": 11
+      },
+      "agentic_web_search": {
+        "answered_without_tool": 2,
+        "fetch_missing_after_search": 6,
+        "search_query_too_broad": 11,
+        "wrong_first_tool": 1
+      }
+    },
+    "evidence_kind": "compact_source_diagnostic_aggregate_only",
+    "primary_bucket_total": 40,
+    "source_diagnostics_commit": "cc21c96b70ab51c2bf586c0e79cdde3838dcb05d"
+  },
+  "split_merge_policy": "keep as watchlist until behavior discovery scan separates search and memory mechanisms",
+  "status": "watch",
+  "target_behavior_cluster": "search_query_or_fetch_failure_and_memory_retrieve_update_confusion"
+}

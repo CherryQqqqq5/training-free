@@ -1,0 +1,71 @@
+{
+  "allowed_evolution_subobjects": [
+    "skill_metadata",
+    "router_policy",
+    "verifier_stop_condition"
+  ],
+  "artifact_kind": "rashe_evolution_archive_entry",
+  "bfcl_category_role": "coverage_and_reporting_only",
+  "boundary_flags": {
+    "bfcl_evaluate_authorized": false,
+    "bfcl_generate_authorized": false,
+    "candidate_activation_authorized": false,
+    "candidate_jsonl_authorized": false,
+    "candidate_pool_ready": false,
+    "huawei_acceptance_ready": false,
+    "performance_evidence": false,
+    "provider_calls_authorized": false,
+    "scorer_authorized": false,
+    "sota_3pp_claim_ready": false
+  },
+  "candidate_interpretation": "seed safety candidate, not a final complete skill",
+  "dev_score_status": "not_run",
+  "entry_id": "bfcl_hallucination_abstain_v0",
+  "entry_type": "skill_metadata_candidate",
+  "evolution_subject": "skill_metadata",
+  "feedback_slots": {
+    "cost_delta_pct": null,
+    "dev_accuracy_delta_pp": null,
+    "fixed_count": null,
+    "latency_delta_pct": null,
+    "leakage_count": null,
+    "regressed_count": null,
+    "target_bucket_reduction": null
+  },
+  "forbidden_inputs": [
+    "gold",
+    "expected",
+    "reference",
+    "scorer_diff",
+    "candidate_output",
+    "raw_trace",
+    "raw_case_id",
+    "raw_prompt",
+    "raw_payload",
+    "provider_exchange",
+    "tool_argument_values"
+  ],
+  "next_allowed_transition": "bounded_dev_smoke_after_execution_packet",
+  "not_bfcl_category_bound": true,
+  "schema_version": "rashe_archive_v0",
+  "source_evidence": {
+    "category_coverage": [
+      "hallucination",
+      "irrelevance"
+    ],
+    "compact_bucket_counts": {
+      "hallucination": {
+        "unsupported_hallucinated_answer": 20
+      },
+      "irrelevance": {
+        "irrelevant_tool_call": 20
+      }
+    },
+    "evidence_kind": "compact_source_diagnostic_aggregate_only",
+    "primary_bucket_total": 40,
+    "source_diagnostics_commit": "cc21c96b70ab51c2bf586c0e79cdde3838dcb05d"
+  },
+  "split_merge_policy": "split_candidate_after_dev_feedback",
+  "status": "proposal_ready",
+  "target_behavior_cluster": "unsupported_or_irrelevant_answer"
+}
