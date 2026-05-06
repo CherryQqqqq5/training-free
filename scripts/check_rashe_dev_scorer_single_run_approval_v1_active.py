@@ -44,6 +44,9 @@ ALLOWED_FLIP_FIELDS = {
     "active_approval_state",
     "active_approval_scope",
     "activated_from_pending_packet",
+    "owner_approved_flip_fields",
+    "must_remain_false_fields",
+    "approval_flip_note",
 }
 AUTHORIZED_TRUE_FIELDS = [
     "authorized",
@@ -73,6 +76,21 @@ MUST_FALSE_FIELDS = [
     "sota_3pp_claim_ready",
     "huawei_acceptance_ready",
     "raw_outputs_committed",
+]
+OWNER_APPROVED_FLIP_FIELDS = [
+    "approval_status",
+    "authorized",
+    "provider_calls_authorized",
+    "bfcl_generate_authorized",
+    "bfcl_evaluate_authorized",
+    "scorer_authorized",
+    "scorer_execution_authorized",
+    "baseline_command_authorized",
+    "candidate_command_authorized",
+    "paired_comparison_command_authorized",
+    "cost_latency_report_command_authorized",
+    "regression_report_command_authorized",
+    "candidate_activation_authorized",
 ]
 IMMUTABLE_EXPECTED = {
     "one_attempt_only": True,
@@ -188,6 +206,15 @@ def validate_active(active: Dict[str, Any], pending: Dict[str, Any], *, check_ro
         blockers.append("active_approval_scope_invalid:%r" % active.get("active_approval_scope"))
     if active.get("activated_from_pending_packet") is not True:
         blockers.append("activated_from_pending_packet_not_true")
+    if active.get("owner_approved_flip_fields") != OWNER_APPROVED_FLIP_FIELDS:
+        blockers.append("owner_approved_flip_fields_invalid:%r" % active.get("owner_approved_flip_fields"))
+    if active.get("must_remain_false_fields") != MUST_FALSE_FIELDS:
+        blockers.append("must_remain_false_fields_invalid:%r" % active.get("must_remain_false_fields"))
+    overlap = set(active.get("owner_approved_flip_fields") or []) & set(active.get("must_remain_false_fields") or [])
+    if overlap:
+        blockers.append("owner_flip_fields_overlap_must_false:%r" % sorted(overlap))
+    if active.get("approval_flip_note") != "approval_flip_active_after_project_owner_review":
+        blockers.append("approval_flip_note_invalid:%r" % active.get("approval_flip_note"))
     for key in AUTHORIZED_TRUE_FIELDS:
         if active.get(key) is not True:
             blockers.append("%s_not_true:%r" % (key, active.get(key)))
@@ -253,6 +280,8 @@ def check(path: Path = DEFAULT_ACTIVE) -> Dict[str, Any]:
         "linked_pending_packet_passed": pending_summary.get("rashe_dev_scorer_single_run_approval_v1_passed"),
         "linked_draft_packet_passed": draft_summary.get("rashe_dev_scorer_execution_packet_v1_passed"),
         "linked_command_manifest_passed": command_summary.get("rashe_dev_scorer_command_manifest_v1_passed"),
+        "owner_approved_flip_fields": active.get("owner_approved_flip_fields"),
+        "must_remain_false_fields": active.get("must_remain_false_fields"),
         "blockers": blockers,
     }
 

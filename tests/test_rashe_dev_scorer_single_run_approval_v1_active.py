@@ -9,6 +9,7 @@ from scripts.check_rashe_dev_scorer_single_run_approval_v1_active import (
     DEFAULT_ACTIVE,
     IMMUTABLE_EXPECTED,
     MUST_FALSE_FIELDS,
+    OWNER_APPROVED_FLIP_FIELDS,
     PENDING_PACKET,
     REQUIRED_RECORDS,
     validate_active,
@@ -42,6 +43,10 @@ def test_active_approval_is_exactly_approved_not_started() -> None:
 def test_only_authorized_fields_are_true() -> None:
     active = _active()
     pending = _pending()
+    assert active["owner_approved_flip_fields"] == OWNER_APPROVED_FLIP_FIELDS
+    assert active["must_remain_false_fields"] == MUST_FALSE_FIELDS
+    assert not (set(active["owner_approved_flip_fields"]) & set(active["must_remain_false_fields"]))
+    assert active["approval_flip_note"] == "approval_flip_active_after_project_owner_review"
     for key in AUTHORIZED_TRUE_FIELDS:
         assert active[key] is True
         assert pending[key] is False
@@ -69,6 +74,22 @@ def test_unapproved_extra_flip_is_rejected() -> None:
     mutated["max_dev_cases"] = 30
     blockers = validate_active(mutated, pending, check_roots=False)
     assert any("max_dev_cases" in blocker for blocker in blockers)
+
+
+def test_must_remain_false_field_true_fails() -> None:
+    pending = _pending()
+    for key in MUST_FALSE_FIELDS:
+        active = _active()
+        active[key] = True
+        blockers = validate_active(active, pending, check_roots=False)
+        assert any(key in blocker for blocker in blockers)
+
+
+def test_stale_flip_note_wording_rejected() -> None:
+    active = _active()
+    active["approval_flip_note"] = "review_list_only_" + "no_flip_" + "active_in_this_packet"
+    blockers = validate_active(active, _pending(), check_roots=False)
+    assert any("approval_flip_note" in blocker for blocker in blockers)
 
 
 def test_hash_links_are_enforced() -> None:
