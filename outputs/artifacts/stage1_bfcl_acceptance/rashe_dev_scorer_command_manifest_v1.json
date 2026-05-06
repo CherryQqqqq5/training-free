@@ -1,0 +1,235 @@
+{
+  "allowed_bfcl_categories": [
+    "multi_turn_base",
+    "multi_turn_long_context",
+    "multi_turn_miss_param",
+    "multi_turn_miss_func",
+    "hallucination",
+    "irrelevance"
+  ],
+  "allowed_command_patterns": [
+    "bash scripts/run_bfcl_v4_baseline.sh gpt-4o-mini-2024-07-18-FC /tmp/stage1_bfcl_rashe_dev_smoke_v1/baseline 8131",
+    "bash scripts/run_bfcl_v4_patch.sh gpt-4o-mini-2024-07-18-FC /tmp/stage1_bfcl_rashe_dev_smoke_v1/candidate 8132",
+    "PYTHONPATH=.:src .venv/bin/python scripts/check_bfcl_paired_comparison.py --acceptance-root outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1/paired",
+    "PYTHONPATH=.:src .venv/bin/python scripts/check_rashe_dev_scorer_command_manifest_v1.py --require-report outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1/paired/cost_latency_report.json",
+    "PYTHONPATH=.:src .venv/bin/python scripts/check_rashe_dev_scorer_command_manifest_v1.py --require-report outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1/paired/regression_report.json",
+    "PYTHONPATH=.:src .venv/bin/python scripts/check_rashe_dev_scorer_execution_packet_v1.py --compact --strict",
+    "PYTHONPATH=.:src .venv/bin/python scripts/check_rashe_dev_scorer_command_manifest_v1.py --compact --strict",
+    "PYTHONPATH=.:src .venv/bin/python scripts/check_artifact_boundary.py"
+  ],
+  "allowed_outputs": [
+    "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1/dev_smoke_manifest.json",
+    "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1/dev_smoke_aggregate_report.json",
+    "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1/paired/paired_comparison.json",
+    "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1/paired/acceptance_decision.json",
+    "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1/paired/cost_latency_report.json",
+    "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1/paired/regression_report.json"
+  ],
+  "allowed_skills": [
+    "bfcl_multi_turn_state_tracking",
+    "bfcl_hallucination_abstain"
+  ],
+  "approval_status": "pending",
+  "artifact_kind": "rashe_dev_scorer_command_manifest_v1",
+  "authorized": false,
+  "blockers": [],
+  "command_templates": {
+    "baseline_dev_smoke": {
+      "command_id": "baseline_dev_smoke",
+      "command_kind": "baseline_command",
+      "execution_authorized_now": false,
+      "fresh_output_paths": [
+        "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1/baseline/artifacts/metrics.json",
+        "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1/baseline/artifacts/failure_summary.json",
+        "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1/baseline/artifacts/run_manifest.json"
+      ],
+      "template": [
+        "test",
+        0,
+        "=",
+        1,
+        "||",
+        "exit",
+        "2",
+        "&&",
+        "test",
+        0,
+        "=",
+        1,
+        "||",
+        "exit",
+        "2",
+        "&&",
+        "GRC_UPSTREAM_PROFILE=novacode",
+        "GRC_UPSTREAM_MODEL=gpt-4.1",
+        "GRC_BFCL_NUM_THREADS=1",
+        "GRC_BFCL_CLEAN_RUN=1",
+        "bash",
+        "scripts/run_bfcl_v4_baseline.sh",
+        "gpt-4o-mini-2024-07-18-FC",
+        "/tmp/stage1_bfcl_rashe_dev_smoke_v1/baseline",
+        "8131",
+        "multi_turn_base,multi_turn_long_context,multi_turn_miss_param,multi_turn_miss_func,hallucination,irrelevance",
+        "configs/runtime_bfcl_structured.yaml",
+        "rules/baseline_empty",
+        "/tmp/stage1_bfcl_rashe_dev_smoke_v1/baseline/traces",
+        "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1/baseline/artifacts"
+      ]
+    },
+    "candidate_dev_smoke": {
+      "candidate_activation_mode": "in_memory_spec_only_no_jsonl_no_pool",
+      "command_id": "candidate_dev_smoke",
+      "command_kind": "candidate_command",
+      "execution_authorized_now": false,
+      "fresh_output_paths": [
+        "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1/candidate/artifacts/metrics.json",
+        "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1/candidate/artifacts/failure_summary.json",
+        "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1/candidate/artifacts/run_manifest.json"
+      ],
+      "template": [
+        "test",
+        0,
+        "=",
+        1,
+        "||",
+        "exit",
+        "2",
+        "&&",
+        "test",
+        0,
+        "=",
+        1,
+        "||",
+        "exit",
+        "2",
+        "&&",
+        "GRC_UPSTREAM_PROFILE=novacode",
+        "GRC_UPSTREAM_MODEL=gpt-4.1",
+        "GRC_BFCL_NUM_THREADS=1",
+        "GRC_BFCL_CLEAN_RUN=1",
+        "RASHE_CANDIDATE_ACTIVATION_MODE=in_memory_spec_only_no_jsonl_no_pool",
+        "bash",
+        "scripts/run_bfcl_v4_patch.sh",
+        "gpt-4o-mini-2024-07-18-FC",
+        "/tmp/stage1_bfcl_rashe_dev_smoke_v1/candidate",
+        "8132",
+        "multi_turn_base,multi_turn_long_context,multi_turn_miss_param,multi_turn_miss_func,hallucination,irrelevance",
+        "configs/runtime_bfcl_structured.yaml",
+        "outputs/artifacts/stage1_bfcl_acceptance/rashe_candidate_proposals",
+        "/tmp/stage1_bfcl_rashe_dev_smoke_v1/candidate/traces",
+        "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1/candidate/artifacts",
+        "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1/baseline/artifacts/metrics.json"
+      ]
+    },
+    "checker_suite": {
+      "command_id": "checker_suite",
+      "command_kind": "checker_command",
+      "execution_authorized_now": false,
+      "template_set": [
+        [
+          "PYTHONPATH=.:src",
+          ".venv/bin/python",
+          "scripts/check_rashe_dev_scorer_execution_packet_v1.py",
+          "--compact",
+          "--strict"
+        ],
+        [
+          "PYTHONPATH=.:src",
+          ".venv/bin/python",
+          "scripts/check_rashe_dev_scorer_command_manifest_v1.py",
+          "--compact",
+          "--strict"
+        ],
+        [
+          "PYTHONPATH=.:src",
+          ".venv/bin/python",
+          "scripts/check_artifact_boundary.py"
+        ]
+      ]
+    },
+    "cost_latency_report_check": {
+      "command_id": "cost_latency_report_check",
+      "command_kind": "cost_latency_report_command",
+      "execution_authorized_now": false,
+      "required_report_paths": [
+        "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1/paired/cost_latency_report.json"
+      ],
+      "template": [
+        "PYTHONPATH=.:src",
+        ".venv/bin/python",
+        "scripts/check_rashe_dev_scorer_command_manifest_v1.py",
+        "--require-report",
+        "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1/paired/cost_latency_report.json",
+        "--compact",
+        "--strict"
+      ]
+    },
+    "paired_comparison_check": {
+      "command_id": "paired_comparison_check",
+      "command_kind": "paired_comparison_command",
+      "execution_authorized_now": false,
+      "required_report_paths": [
+        "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1/paired/paired_comparison.json",
+        "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1/paired/acceptance_decision.json"
+      ],
+      "template": [
+        "PYTHONPATH=.:src",
+        ".venv/bin/python",
+        "scripts/check_bfcl_paired_comparison.py",
+        "--acceptance-root",
+        "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1/paired",
+        "--provider-status",
+        "outputs/artifacts/stage1_bfcl_acceptance/bfcl_live_provider_preflight_chat_tool_shape_v5_compact.json",
+        "--compact",
+        "--strict"
+      ]
+    },
+    "regression_report_check": {
+      "command_id": "regression_report_check",
+      "command_kind": "regression_report_command",
+      "execution_authorized_now": false,
+      "required_report_paths": [
+        "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1/paired/regression_report.json"
+      ],
+      "template": [
+        "PYTHONPATH=.:src",
+        ".venv/bin/python",
+        "scripts/check_rashe_dev_scorer_command_manifest_v1.py",
+        "--require-report",
+        "outputs/artifacts/stage1_bfcl_acceptance/rashe_dev_smoke_v1/paired/regression_report.json",
+        "--compact",
+        "--strict"
+      ]
+    }
+  },
+  "compact_manifest_required": true,
+  "dev_smoke_only": true,
+  "disallowed_skills": [
+    "bfcl_web_search_decomposition",
+    "bfcl_memory_retrieve_before_answer",
+    "bfcl_parser_feedback_retry"
+  ],
+  "exact_commands_frozen": true,
+  "execution_started": false,
+  "fail_if_output_exists": true,
+  "fresh_output_paths_required": true,
+  "huawei_acceptance_ready": false,
+  "manifest_scope": "stage4_dev_scorer_smoke_command_draft_only",
+  "max_dev_cases": 12,
+  "measurement_kind": "dev_scorer_smoke_not_performance_claim",
+  "one_attempt_only": true,
+  "performance_claim_allowed": false,
+  "performance_evidence": false,
+  "raw_outputs_committed": false,
+  "raw_temp_cleanup_required": true,
+  "required_records": [
+    "fixed_count",
+    "regressed_count",
+    "unchanged_count",
+    "candidate_only_failure_count",
+    "baseline_only_failure_count",
+    "cost_delta_bucket",
+    "latency_delta_bucket"
+  ],
+  "sota_3pp_claim_ready": false
+}
