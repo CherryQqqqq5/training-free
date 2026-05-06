@@ -1,0 +1,67 @@
+{
+  "artifact_kind": "rashe_archive_evidence_index",
+  "blockers": [],
+  "boundary_flags": {
+    "bfcl_evaluate_executed": false,
+    "bfcl_generate_executed": false,
+    "candidate_activation_executed": false,
+    "candidate_jsonl_created": false,
+    "candidate_output_material_persisted": false,
+    "candidate_pool_created": false,
+    "dev_material_used": false,
+    "full_suite_executed": false,
+    "gold_expected_material_persisted": false,
+    "holdout_material_used": false,
+    "huawei_acceptance_ready": false,
+    "performance_evidence": false,
+    "provider_calls_executed": false,
+    "raw_material_persisted": false,
+    "scorer_delta_material_persisted": false,
+    "scorer_execution_executed": false,
+    "sota_3pp_claim_ready": false
+  },
+  "checker_status": {
+    "artifact_boundary_expected": "pass",
+    "rashe_evolution_archive_checker_expected": "pass"
+  },
+  "evidence_chain": [
+    {
+      "commit": "b83c3762",
+      "compact_label": "rashe_evolution_archive_protocol",
+      "evidence_role": "protocol_boundary"
+    },
+    {
+      "commit": "d706870b",
+      "compact_label": "rashe_evolution_archive_seed",
+      "evidence_role": "archive_artifacts"
+    },
+    {
+      "commit": "13a3d110",
+      "compact_label": "archive_backed_opportunity_table",
+      "evidence_role": "hypothesis_opportunity_table"
+    },
+    {
+      "commit": "e4ea7b53",
+      "compact_label": "rashe_evolution_archive_checker",
+      "evidence_role": "guardrail_checker_and_tests"
+    }
+  ],
+  "evidence_interpretation": {
+    "archive_backed_opportunity_evidence": true,
+    "behavior_evidence": false,
+    "candidate_research_prioritization_input": true,
+    "hypothesis_opportunity_table": true,
+    "performance_evidence": false,
+    "research_planning_signal": true,
+    "scorer_evidence": false
+  },
+  "linked_artifacts": {
+    "archive_index": "outputs/artifacts/stage1_bfcl_acceptance/rashe_evolution_archive/archive_index.json",
+    "checker": "scripts/check_rashe_evolution_archive.py",
+    "focused_test": "tests/test_rashe_evolution_archive.py",
+    "opportunity_table": "outputs/artifacts/stage1_bfcl_acceptance/rashe_evolution_archive/opportunity_table.json"
+  },
+  "schema_version": "rashe_archive_evidence_index_v1",
+  "scope": "docs_only_compact_evidence_map",
+  "status": "archive_backed_opportunity_evidence_index_only"
+}
