@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "artifact_kind": "abhe_execution_approval_schema",
+  "properties": {
+    "approval_scope": {
+      "const": "bounded_dev_smoke_only",
+      "type": "string"
+    },
+    "approval_status": {
+      "const": "approved",
+      "type": "string"
+    },
+    "approved_candidate_spec_hash": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "approved_case_count": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "approved_entry_ids": {
+      "items": {
+        "enum": [
+          "state_tracking_v0",
+          "hallucination_abstain_v0"
+        ],
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "approved_fresh_dev_slice_hash": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "approved_model": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "approved_protocol": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "approved_provider": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "approved_runner_manifest_hash": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "approved_runtime_config_path": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "authorized": {
+      "const": true,
+      "type": "boolean"
+    },
+    "full_suite_authorized": {
+      "const": false,
+      "type": "boolean"
+    },
+    "holdout_authorized": {
+      "const": false,
+      "type": "boolean"
+    },
+    "performance_claim_authorized": {
+      "const": false,
+      "type": "boolean"
+    },
+    "review_owner": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "approval_status",
+    "authorized",
+    "review_owner",
+    "approved_entry_ids",
+    "approved_fresh_dev_slice_hash",
+    "approved_case_count",
+    "approved_provider",
+    "approved_model",
+    "approved_protocol",
+    "approved_runtime_config_path",
+    "approved_runner_manifest_hash",
+    "approved_candidate_spec_hash",
+    "approval_scope",
+    "holdout_authorized",
+    "full_suite_authorized",
+    "performance_claim_authorized"
+  ],
+  "title": "ABHE execution approval packet schema",
+  "type": "object"
+}

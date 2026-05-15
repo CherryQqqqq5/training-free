@@ -52,8 +52,13 @@ ABHE is the active planning route. It is archive-based and behavior-level:
 - planner: `scripts/plan_abhe_next_evolution.py --write --compact --strict`
 - planner output: `outputs/artifacts/stage1_bfcl_acceptance/abhe_next_evolution_plan.json`
 - planning readiness: `outputs/artifacts/stage1_bfcl_acceptance/abhe_planning_ready.json`
+- review request: `outputs/artifacts/stage1_bfcl_acceptance/abhe_review_request.json`
+- execution approval schema: `outputs/artifacts/stage1_bfcl_acceptance/abhe_execution_approval.schema.json`
 - fresh dev slice request: `outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_request.json`
 - execution readiness: `outputs/artifacts/stage1_bfcl_acceptance/abhe_execution_readiness.json`
+- candidate spec drafts: `docs/stage1_abhe_state_tracking_candidate_spec_draft.md`, `docs/stage1_abhe_hallucination_abstain_candidate_spec_draft.md`
+- post-dev synthetic fixtures: `tests/fixtures/abhe_dev_feedback/`
+- state transition dry-run skeleton: `scripts/append_abhe_state_transition.py`
 
 The ABHE planner does not call a provider, run BFCL/model code, authorize scorer, generate candidates, or claim performance. It only chooses which archive entries should request a future fresh bounded dev smoke packet.
 

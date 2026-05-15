@@ -5,17 +5,23 @@ from __future__ import annotations
 
 import argparse
 import json
+from argparse import Namespace
 from pathlib import Path
 from typing import Any, Dict, List
 
+from scripts.append_abhe_state_transition import validate as validate_transition
 from scripts.check_abhe_archive_policy import check as check_archive_policy
+from scripts.check_abhe_candidate_spec_drafts import check as check_candidate_spec_drafts
 from scripts.check_abhe_dev_feedback import check as check_dev_feedback
 from scripts.check_abhe_dev_smoke_dry_run_manifest import check as check_dry_run_manifest
 from scripts.check_abhe_dev_smoke_packet import check as check_dev_smoke_packet
+from scripts.check_abhe_execution_approval_packet import check as check_execution_approval_packet
 from scripts.check_abhe_fresh_dev_slice_request import check as check_fresh_slice_request
 from scripts.check_abhe_no_leakage_boundary import DEFAULT_PATHS, check_paths
+from scripts.check_abhe_review_request import check as check_review_request
 from scripts.check_abhe_trace_cards import check as check_trace_cards
 from scripts.check_abhe_trace_extraction_packet import check as check_trace_packet
+from scripts.plan_abhe_post_dev_update import build_plan as build_post_dev_plan
 
 DEFAULT_OUTPUT = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_planning_ready.json")
 
@@ -32,6 +38,23 @@ def build_report() -> Dict[str, Any]:
     trace_cards = check_trace_cards()
     fresh_slice = check_fresh_slice_request()
     dry_run_manifest = check_dry_run_manifest()
+    review_request = check_review_request()
+    execution_approval = check_execution_approval_packet()
+    candidate_specs = check_candidate_spec_drafts()
+    post_dev_synthetic = build_post_dev_plan(synthetic_fixture_only=True)
+    transition_blockers = validate_transition(Namespace(
+        entry_id="state_tracking_v0",
+        from_status="proposal_ready",
+        to_status="dev_smoke_requested",
+        reason="planning_ready_dry_run",
+        dry_run=True,
+        write=False,
+    ))
+    transition_writer = {
+        "report_scope": "abhe_state_transition_dry_run_check",
+        "state_transition_dry_run_passed": not transition_blockers,
+        "blockers": transition_blockers,
+    }
     leakage_paths = [path for path in DEFAULT_PATHS if path != DEFAULT_OUTPUT]
     leakage = check_paths(leakage_paths)
 
@@ -52,6 +75,16 @@ def build_report() -> Dict[str, Any]:
         blockers.extend(_prefixed("fresh_slice_request", fresh_slice["blockers"]))
     if not dry_run_manifest["abhe_dev_smoke_dry_run_manifest_passed"]:
         blockers.extend(_prefixed("dry_run_manifest", dry_run_manifest["blockers"]))
+    if not review_request["abhe_review_request_passed"]:
+        blockers.extend(_prefixed("review_request", review_request["blockers"]))
+    if not execution_approval.get("schema_passed"):
+        blockers.extend(_prefixed("execution_approval_schema", [blocker for blocker in execution_approval["blockers"] if blocker != "execution_approval_packet_missing"]))
+    if not candidate_specs["abhe_candidate_spec_drafts_passed"]:
+        blockers.extend(_prefixed("candidate_specs", candidate_specs["blockers"]))
+    if not post_dev_synthetic.get("abhe_post_dev_update_plan_passed"):
+        blockers.extend(_prefixed("post_dev_synthetic", post_dev_synthetic["blockers"]))
+    if not transition_writer["state_transition_dry_run_passed"]:
+        blockers.extend(_prefixed("state_transition_writer", transition_writer["blockers"]))
 
     execution_authorized = False
     scorer_authorized = False
@@ -69,6 +102,12 @@ def build_report() -> Dict[str, Any]:
         "post_dev_feedback_contract_ready": dev_feedback["abhe_dev_feedback_check_passed"],
         "fresh_dev_slice_request_ready_for_review": fresh_slice["abhe_fresh_dev_slice_request_passed"],
         "dry_run_runner_materialized": dry_run_manifest["abhe_dev_smoke_dry_run_manifest_passed"],
+        "review_request_ready": review_request["abhe_review_request_passed"],
+        "execution_approval_schema_ready": execution_approval.get("schema_passed") is True,
+        "execution_approval_packet_present": execution_approval.get("packet_present") is True,
+        "candidate_spec_drafts_ready": candidate_specs["abhe_candidate_spec_drafts_passed"],
+        "post_dev_synthetic_planner_ready": post_dev_synthetic.get("abhe_post_dev_update_plan_passed") is True,
+        "state_transition_dry_run_ready": transition_writer["state_transition_dry_run_passed"],
         "no_leakage_boundary_passed": leakage["abhe_no_leakage_boundary_passed"],
         "execution_authorized": execution_authorized,
         "scorer_authorized": scorer_authorized,
@@ -81,7 +120,7 @@ def build_report() -> Dict[str, Any]:
         "candidate_pool_ready": False,
         "sota_3pp_claim_ready": False,
         "huawei_acceptance_ready": False,
-        "next_required_action": "request_trace_extraction_review_or_dev_smoke_review",
+        "next_required_action": "request_trace_extraction_review_or_dev_smoke_review_or_execution_approval_review",
         "component_paths": {
             "trace_packet": str(trace_packet["packet_path"]),
             "dev_smoke_packet": str(dev_smoke_packet["packet_path"]),
@@ -89,6 +128,8 @@ def build_report() -> Dict[str, Any]:
             "dev_feedback_schema": str(dev_feedback["schema_path"]),
             "fresh_dev_slice_request": str(fresh_slice["request_path"]),
             "dry_run_manifest": str(dry_run_manifest["manifest_path"]),
+            "review_request": str(review_request["request_path"]),
+            "execution_approval_schema": str(execution_approval["schema_path"]),
         },
         "component_summaries": {
             "archive_policy": archive,
@@ -98,6 +139,11 @@ def build_report() -> Dict[str, Any]:
             "dev_feedback": dev_feedback,
             "fresh_slice_request": fresh_slice,
             "dry_run_manifest": dry_run_manifest,
+            "review_request": review_request,
+            "execution_approval": execution_approval,
+            "candidate_specs": candidate_specs,
+            "post_dev_synthetic": post_dev_synthetic,
+            "state_transition_writer": transition_writer,
             "no_leakage": leakage,
         },
         "blockers": sorted(set(blockers)),

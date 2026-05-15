@@ -11,6 +11,7 @@ from typing import Any, Dict, List
 from scripts.check_abhe_dev_smoke_dry_run_manifest import check as check_dry_run_manifest
 from scripts.check_abhe_dev_smoke_packet import DEFAULT_PACKET as DEFAULT_DEV_SMOKE_PACKET
 from scripts.check_abhe_dev_smoke_packet import check as check_dev_smoke_packet
+from scripts.check_abhe_execution_approval_packet import check as check_execution_approval_packet
 from scripts.check_abhe_fresh_dev_slice_request import check as check_fresh_slice_request
 
 DEFAULT_OUTPUT = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_execution_readiness.json")
@@ -27,6 +28,7 @@ def build_report(dev_smoke_packet_path: Path = DEFAULT_DEV_SMOKE_PACKET) -> Dict
     fresh_slice = check_fresh_slice_request()
     dry_run_manifest = check_dry_run_manifest()
     dev_smoke_packet = check_dev_smoke_packet(dev_smoke_packet_path)
+    execution_approval = check_execution_approval_packet()
     packet = _load_json(dev_smoke_packet_path) if dev_smoke_packet_path.exists() else {}
 
     blockers: List[str] = []
@@ -36,6 +38,9 @@ def build_report(dev_smoke_packet_path: Path = DEFAULT_DEV_SMOKE_PACKET) -> Dict
         blockers.extend("dry_run_manifest:%s" % blocker for blocker in dry_run_manifest["blockers"])
     if not dev_smoke_packet["abhe_dev_smoke_packet_passed"]:
         blockers.extend("dev_smoke_packet:%s" % blocker for blocker in dev_smoke_packet["blockers"])
+    approval_missing = "execution_approval_packet_missing" in execution_approval.get("blockers", [])
+    if not execution_approval.get("schema_passed"):
+        blockers.extend("execution_approval:%s" % blocker for blocker in execution_approval["blockers"] if blocker != "execution_approval_packet_missing")
 
     if packet.get("runner_materialized") is not True:
         blockers.append("dry_run_runner_not_materialized")
@@ -49,12 +54,24 @@ def build_report(dev_smoke_packet_path: Path = DEFAULT_DEV_SMOKE_PACKET) -> Dict
         blockers.append("runtime_config_not_selected")
     if packet.get("scorer_authorized") is not True:
         blockers.append("scorer_authorization_false")
+    if approval_missing:
+        blockers.append("execution_approval_missing")
+
+    expected_fail_closed_blockers = {
+        "fresh_dev_slice_not_materialized",
+        "execution_approval_missing",
+        "candidate_rule_not_generated_or_authorized",
+        "runtime_config_not_selected",
+        "scorer_authorization_false",
+    }
+    execution_readiness_check_passed = expected_fail_closed_blockers.issubset(set(blockers)) and execution_approval.get("schema_passed") is True
 
     return {
         "report_scope": "abhe_execution_readiness",
         "artifact_kind": "abhe_execution_readiness",
         "schema_version": "abhe_execution_readiness_v0",
         "abhe_execution_ready": False if blockers else True,
+        "execution_readiness_check_passed": execution_readiness_check_passed,
         "planning_ready_is_not_execution_ready": True,
         "dry_run_runner_materialized": packet.get("runner_materialized") is True,
         "fresh_dev_slice_materialized": packet.get("fresh_slice_materialized") is True,
@@ -66,6 +83,7 @@ def build_report(dev_smoke_packet_path: Path = DEFAULT_DEV_SMOKE_PACKET) -> Dict
             "fresh_slice_request": fresh_slice,
             "dry_run_manifest": dry_run_manifest,
             "dev_smoke_packet": dev_smoke_packet,
+            "execution_approval": execution_approval,
         },
         "blockers": sorted(set(blockers)),
     }
@@ -95,7 +113,7 @@ def main(argv: Any = None) -> int:
             "blockers": ["load_failed:%s" % exc],
         }
     print(json.dumps(report, sort_keys=True) if args.compact else json.dumps(report, indent=2, sort_keys=True))
-    if args.strict and not report["abhe_execution_ready"]:
+    if args.strict and not report.get("execution_readiness_check_passed"):
         return 1
     return 0
 

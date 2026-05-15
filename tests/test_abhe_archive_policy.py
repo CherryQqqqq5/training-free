@@ -7,13 +7,16 @@ import sys
 from pathlib import Path
 
 from scripts.check_abhe_archive_policy import DEFAULT_ARCHIVE, DEFAULT_OPPORTUNITY, validate_archive
+from scripts.check_abhe_candidate_spec_drafts import check as check_candidate_specs
 from scripts.check_abhe_dev_feedback import validate_feedback, validate_schema
 from scripts.check_abhe_dev_smoke_dry_run_manifest import validate_manifest
 from scripts.check_abhe_dev_smoke_packet import validate_packet
+from scripts.check_abhe_execution_approval_packet import check as check_execution_approval_packet
 from scripts.check_abhe_execution_readiness import build_report as build_execution_readiness_report
 from scripts.check_abhe_fresh_dev_slice_request import validate_request as validate_fresh_slice_request
 from scripts.check_abhe_no_leakage_boundary import check_paths, scan_value
 from scripts.check_abhe_planning_ready import build_report
+from scripts.check_abhe_review_request import validate_request as validate_review_request
 from scripts.check_abhe_trace_cards import validate_card, validate_schema as validate_trace_card_schema
 from scripts.check_abhe_trace_extraction_packet import validate_packet as validate_trace_packet
 from scripts.plan_abhe_next_evolution import build_plan
@@ -241,10 +244,15 @@ def test_abhe_no_leakage_allows_negative_markdown_taxonomy() -> None:
 def test_abhe_no_leakage_default_paths_cover_abhe_docs_and_packets() -> None:
     summary = check_paths([
         Path("docs/stage1_abhe_fresh_dev_slice_boundary.md"),
+        Path("docs/stage1_abhe_approval_lanes.md"),
         Path("docs/stage1_abhe_trace_packet_boundary.md"),
         Path("docs/stage1_abhe_trace_card_contract.md"),
         Path("docs/stage1_abhe_post_dev_update_contract.md"),
         Path("docs/stage1_abhe_search_memory_watch_split_proposal.md"),
+        Path("docs/stage1_abhe_state_tracking_candidate_spec_draft.md"),
+        Path("docs/stage1_abhe_hallucination_abstain_candidate_spec_draft.md"),
+        Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_review_request.json"),
+        Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_execution_approval.schema.json"),
         Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_temporary_trace_extraction_packet.json"),
         Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_bounded_dev_smoke_execution_packet.json"),
         Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_request.json"),
@@ -260,6 +268,13 @@ def test_abhe_planning_ready_report_is_review_ready_not_execution_ready() -> Non
     assert report["trace_card_contract_ready"] is True
     assert report["dev_smoke_packet_ready_for_review"] is True
     assert report["post_dev_feedback_contract_ready"] is True
+    assert report["review_request_ready"] is True
+    assert report["execution_approval_schema_ready"] is True
+    assert report["execution_approval_packet_present"] is False
+    assert report["candidate_spec_drafts_ready"] is True
+    assert report["post_dev_synthetic_planner_ready"] is True
+    assert report["state_transition_dry_run_ready"] is True
+    assert report["next_required_action"] == "request_trace_extraction_review_or_dev_smoke_review_or_execution_approval_review"
     assert report["execution_authorized"] is False
     assert report["scorer_authorized"] is False
     assert report["performance_evidence"] is False
@@ -300,9 +315,33 @@ def test_abhe_dry_run_manifest_contract_rejects_execution_side_effects() -> None
     assert any("provider_calls_made_not_false" in blocker for blocker in validate_manifest(mutated))
 
 
+def test_abhe_review_request_is_request_only() -> None:
+    request = load(Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_review_request.json"))
+    assert validate_review_request(request) == []
+    mutated = copy.deepcopy(request)
+    mutated["authorized"] = True
+    assert any("authorized_not_false" in blocker for blocker in validate_review_request(mutated))
+
+
+def test_abhe_execution_approval_schema_ready_but_packet_missing_fail_closed() -> None:
+    summary = check_execution_approval_packet()
+    assert summary["schema_passed"] is True
+    assert summary["packet_present"] is False
+    assert "execution_approval_packet_missing" in summary["blockers"]
+
+
+def test_abhe_candidate_spec_drafts_are_review_docs_only() -> None:
+    summary = check_candidate_specs()
+    assert summary["abhe_candidate_spec_drafts_passed"] is True
+    assert summary["candidate_rule_generated"] is False
+    assert summary["candidate_yaml_generated"] is False
+    assert summary["candidate_jsonl_generated"] is False
+
+
 def test_abhe_execution_readiness_is_false_until_materialized_approval_chain_exists() -> None:
     report = build_execution_readiness_report()
     assert report["abhe_execution_ready"] is False
+    assert report["execution_readiness_check_passed"] is True
     assert report["dry_run_runner_materialized"] is True
     assert "fresh_dev_slice_not_materialized" in report["blockers"]
     assert "execution_approval_missing" in report["blockers"]

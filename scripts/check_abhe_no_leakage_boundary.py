@@ -17,12 +17,15 @@ DEFAULT_PATHS = [
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_next_evolution_plan.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_planning_ready.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_execution_readiness.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_review_request.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_execution_approval.schema.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_request.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_dev_smoke_dry_run_manifest.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_temporary_trace_extraction_packet.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_bounded_dev_smoke_execution_packet.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_trace_card.schema.json"),
     Path("docs/stage1_abhe_method_overview.md"),
+    Path("docs/stage1_abhe_approval_lanes.md"),
     Path("docs/stage1_abhe_transition_from_rashe.md"),
     Path("docs/stage1_abhe_archive_policy.md"),
     Path("docs/stage1_abhe_trace_packet_boundary.md"),
@@ -30,8 +33,16 @@ DEFAULT_PATHS = [
     Path("docs/stage1_abhe_fresh_dev_slice_boundary.md"),
     Path("docs/stage1_abhe_state_tracking_candidate_sketch.md"),
     Path("docs/stage1_abhe_hallucination_abstain_candidate_sketch.md"),
+    Path("docs/stage1_abhe_state_tracking_candidate_spec_draft.md"),
+    Path("docs/stage1_abhe_hallucination_abstain_candidate_spec_draft.md"),
     Path("docs/stage1_abhe_post_dev_update_contract.md"),
     Path("docs/stage1_abhe_search_memory_watch_split_proposal.md"),
+    Path("tests/fixtures/abhe_dev_feedback/dev_passed.json"),
+    Path("tests/fixtures/abhe_dev_feedback/narrow_router_requested.json"),
+    Path("tests/fixtures/abhe_dev_feedback/split_requested.json"),
+    Path("tests/fixtures/abhe_dev_feedback/demoted_no_mechanism_signal.json"),
+    Path("tests/fixtures/abhe_dev_feedback/demoted_regression_not_controlled.json"),
+    Path("tests/fixtures/abhe_dev_feedback/rejected_boundary_failure.json"),
 ]
 
 ALLOWED_KEY_NAMES = {
@@ -52,6 +63,11 @@ ALLOWED_KEY_NAMES = {
     "scorer_diff_allowed",
     "candidate_output_allowed",
     "raw_material_absent",
+    "approved_fresh_dev_slice_hash",
+    "approved_runner_manifest_hash",
+    "approved_candidate_spec_hash",
+    "fresh_dev_slice_hash",
+    "dev_run_id_hash",
 }
 
 FORBIDDEN_KEY_RE = re.compile(
