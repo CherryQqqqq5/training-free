@@ -94,17 +94,17 @@ The planner output is a request plan, not an execution packet and not validation
 
 ABHE artifacts must not contain:
 
-- raw prompt
-- raw trace
-- raw payload
-- provider exchange
-- raw case ID
-- gold answer
-- expected/reference answer
-- tool argument values
-- scorer diff
-- candidate output
-- API key, bearer token, endpoint value, or secret
+- forbidden raw prompt
+- forbidden raw trace
+- forbidden raw payload
+- forbidden provider exchange
+- forbidden raw case ID
+- forbidden gold answer
+- forbidden expected/reference answer
+- forbidden tool argument values
+- forbidden scorer diff
+- forbidden candidate output
+- forbidden API key, bearer token, endpoint value, or secret
 
 Allowed references are compact hashes, aggregate counts, category strata names, behavior cluster names, and paths to approved compact artifacts.
 
@@ -138,4 +138,3 @@ It must keep authorization and execution false:
 - `candidate_jsonl_authorized=false`
 - `candidate_pool_ready=false`
 - `performance_evidence=false`
-

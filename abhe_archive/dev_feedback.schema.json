@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "artifact_kind": "abhe_dev_feedback_schema",
+  "properties": {
+    "activation_precision": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "type": "number"
+    },
+    "activation_recall": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "type": "number"
+    },
+    "boundary_violation_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "candidate_pool_created": {
+      "const": false,
+      "type": "boolean"
+    },
+    "cost_delta_pct": {
+      "type": "number"
+    },
+    "dev_run_id_hash": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "entry_id": {
+      "enum": [
+        "state_tracking_v0",
+        "hallucination_abstain_v0"
+      ],
+      "type": "string"
+    },
+    "fixed_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "fresh_dev_slice_hash": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "full_suite_touched": {
+      "const": false,
+      "type": "boolean"
+    },
+    "holdout_touched": {
+      "const": false,
+      "type": "boolean"
+    },
+    "latency_delta_pct": {
+      "type": "number"
+    },
+    "leakage_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "net_fixed": {
+      "type": "integer"
+    },
+    "non_target_regression_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "provider_model_protocol_match": {
+      "const": true,
+      "type": "boolean"
+    },
+    "raw_material_absent": {
+      "const": true,
+      "type": "boolean"
+    },
+    "regressed_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "target_bucket_reduction": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "entry_id",
+    "dev_run_id_hash",
+    "fresh_dev_slice_hash",
+    "target_bucket_reduction",
+    "fixed_count",
+    "regressed_count",
+    "net_fixed",
+    "non_target_regression_count",
+    "activation_precision",
+    "activation_recall",
+    "cost_delta_pct",
+    "latency_delta_pct",
+    "leakage_count",
+    "boundary_violation_count",
+    "provider_model_protocol_match",
+    "raw_material_absent",
+    "candidate_pool_created",
+    "holdout_touched",
+    "full_suite_touched"
+  ],
+  "title": "ABHE dev feedback schema",
+  "type": "object"
+}

@@ -58,6 +58,8 @@ REQUIRED_STOP_LOSS = {
     "regression_cap_exceeded",
     "checker_failure",
 }
+ALLOWED_ENTRY_IDS = ["state_tracking_v0", "hallucination_abstain_v0"]
+DISALLOWED_WATCH_ENTRY_IDS = {"unresolved_search_memory_watch_v0"}
 
 
 def _load(path: Path) -> Dict[str, Any]:
@@ -82,8 +84,15 @@ def validate_packet(packet: Dict[str, Any]) -> List[str]:
     for key in sorted(FALSE_KEYS):
         if packet.get(key) is not False:
             blockers.append("packet_%s_not_false:%r" % (key, packet.get(key)))
-    if not isinstance(packet.get("entry_ids"), list) or not packet["entry_ids"]:
+    entry_ids = packet.get("entry_ids")
+    if not isinstance(entry_ids, list) or not entry_ids:
         blockers.append("packet_entry_ids_empty")
+    elif entry_ids != ALLOWED_ENTRY_IDS:
+        blockers.append("packet_entry_ids_must_match_proposal_ready_entries:%r" % entry_ids)
+    if isinstance(entry_ids, list):
+        disallowed = sorted(DISALLOWED_WATCH_ENTRY_IDS.intersection(set(entry_ids)))
+        if disallowed:
+            blockers.append("packet_watch_entries_must_not_enter_dev_smoke:%s" % ",".join(disallowed))
     if not packet.get("fresh_dev_slice_source"):
         blockers.append("packet_fresh_dev_slice_source_empty")
     stop_loss = set(packet.get("stop_loss_criteria") or [])
@@ -146,4 +155,3 @@ def main(argv: Any = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

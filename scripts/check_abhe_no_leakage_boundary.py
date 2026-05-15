@@ -15,6 +15,15 @@ DEFAULT_PATHS = [
     Path("abhe_archive/policy_config.yaml"),
     Path("abhe_archive/state_transitions.jsonl"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_next_evolution_plan.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_temporary_trace_extraction_packet.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_bounded_dev_smoke_execution_packet.json"),
+    Path("docs/stage1_abhe_method_overview.md"),
+    Path("docs/stage1_abhe_transition_from_rashe.md"),
+    Path("docs/stage1_abhe_archive_policy.md"),
+    Path("docs/stage1_abhe_trace_packet_boundary.md"),
+    Path("docs/stage1_abhe_state_tracking_candidate_sketch.md"),
+    Path("docs/stage1_abhe_hallucination_abstain_candidate_sketch.md"),
+    Path("docs/stage1_abhe_post_dev_update_contract.md"),
 ]
 
 ALLOWED_KEY_NAMES = {
@@ -27,6 +36,14 @@ ALLOWED_KEY_NAMES = {
     "candidate_activation_authorized",
     "source_evidence_count",
     "source_evidence_role",
+    "raw_prompt_allowed",
+    "raw_trace_allowed",
+    "raw_payload_allowed",
+    "raw_case_id_allowed",
+    "gold_expected_allowed",
+    "scorer_diff_allowed",
+    "candidate_output_allowed",
+    "raw_material_absent",
 }
 
 FORBIDDEN_KEY_RE = re.compile(
@@ -35,6 +52,22 @@ FORBIDDEN_KEY_RE = re.compile(
     r"tool_args?|tool_arguments?|scorer_diff|candidate_output|api_key|bearer_token|"
     r"endpoint_value)(_|$)",
     re.I,
+)
+
+NEGATIVE_BOUNDARY_CUES = (
+    "forbidden",
+    "must not",
+    "do not",
+    "does not",
+    "not allowed",
+    "not authorize",
+    "not include",
+    "not contain",
+    "absent",
+    "excluded",
+    "false",
+    "fail-closed",
+    "no raw",
 )
 FORBIDDEN_VALUE_RE = re.compile(
     ("s" + "k-" + r"[A-Za-z0-9_-]{16,}|bearer\s+|api key|secret|raw prompt|raw trace|"
@@ -106,6 +139,13 @@ def load_path(path: Path) -> Any:
         return _load_jsonl(path)
     if path.suffix in {".yaml", ".yml"}:
         return _load_yamlish(path)
+    if path.suffix == ".md":
+        return {
+            "markdown_lines": [
+                {"line_number": line_no, "text": line}
+                for line_no, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1)
+            ]
+        }
     return path.read_text(encoding="utf-8")
 
 
@@ -130,6 +170,8 @@ def scan_value(value: Any, *, label: str) -> List[str]:
             blockers.append("%s_forbidden_key:%s" % (label, dotted))
         if isinstance(child, str) and FORBIDDEN_VALUE_RE.search(child):
             if len(path) >= 2 and path[-2] in {"forbidden_fields", "risk_flags"}:
+                continue
+            if path and path[-1] == "text" and any(cue in child.lower() for cue in NEGATIVE_BOUNDARY_CUES):
                 continue
             blockers.append("%s_forbidden_value:%s" % (label, dotted))
     return sorted(set(blockers))
@@ -175,4 +217,3 @@ def main(argv: Any = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

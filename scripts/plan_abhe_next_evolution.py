@@ -46,7 +46,13 @@ def _load_feedback(root: Path) -> List[Dict[str, Any]]:
     return rows
 
 
-def build_plan(archive: Dict[str, Any], opportunity: Dict[str, Any], feedback_rows: List[Dict[str, Any]]) -> Dict[str, Any]:
+def build_plan(
+    archive: Dict[str, Any],
+    opportunity: Dict[str, Any],
+    feedback_rows: List[Dict[str, Any]],
+    archive_path: Path = DEFAULT_ARCHIVE,
+    opportunity_path: Path = DEFAULT_OPPORTUNITY,
+) -> Dict[str, Any]:
     blockers = validate_archive(archive, opportunity)
     if feedback_rows:
         blockers.append("dev_feedback_present_post_dev_planner_not_implemented")
@@ -77,8 +83,8 @@ def build_plan(archive: Dict[str, Any], opportunity: Dict[str, Any], feedback_ro
     plan = {
         "artifact_kind": "abhe_next_evolution_plan",
         "schema_version": "abhe_next_evolution_plan_v0",
-        "source_archive": str(DEFAULT_ARCHIVE),
-        "source_opportunity_table": str(DEFAULT_OPPORTUNITY),
+        "source_archive": str(archive_path),
+        "source_opportunity_table": str(opportunity_path),
         "source_evidence_role": "discovery_archive_seed_only",
         "does_not_call_provider": True,
         "does_not_call_bfcl_or_model": True,
@@ -103,6 +109,8 @@ def build_plan(archive: Dict[str, Any], opportunity: Dict[str, Any], feedback_ro
         ],
         "blockers": blockers,
     }
+    if feedback_rows:
+        plan["next_required_action"] = "run_check_abhe_dev_feedback_and_enable_post_dev_planner"
     plan.update(FALSE_AUTH_FLAGS)
     leakage_blockers = scan_value(plan, label="plan")
     plan["blockers"] = sorted(set(plan["blockers"] + leakage_blockers))
@@ -128,7 +136,7 @@ def main(argv: Any = None) -> int:
         archive = _load(args.archive_index)
         opportunity = _load(args.opportunity_table)
         feedback_rows = _load_feedback(args.dev_feedback_root)
-        plan = build_plan(archive, opportunity, feedback_rows)
+        plan = build_plan(archive, opportunity, feedback_rows, args.archive_index, args.opportunity_table)
         if args.write:
             write_plan(args.output, plan)
     except (OSError, ValueError, json.JSONDecodeError) as exc:
@@ -141,4 +149,3 @@ def main(argv: Any = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

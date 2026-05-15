@@ -112,4 +112,4 @@ L1 runtime behavior approval does not authorize source expansion, BFCL scorer, c
 
 `prepare_abhe_trace_and_bounded_dev_smoke_approval_packets`
 
-The current approval state allows only ABHE planning and L1 synthetic/default-disabled runtime behavior checks. Trace extraction and bounded dev smoke require separate approval packets. Source collection, candidate generation, scorer, performance evidence, SOTA/+3pp claims, and Huawei acceptance remain separate pending lanes.
+ABHE planning route is active and fail-closed; RASHE remains discovery predecessor. Trace extraction and bounded dev smoke require separate approval packets. Source collection, candidate generation, scorer, performance evidence, SOTA/+3pp claims, and Huawei acceptance remain pending/fail-closed.

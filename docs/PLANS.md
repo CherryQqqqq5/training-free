@@ -4,6 +4,8 @@
 
 Status: in progress.
 
+Current next patch: align active evidence wording and prepare ABHE approval packet drafts.
+
 Objective: migrate the active Stage-1 narrative from RASHE-as-method to ABHE as the behavior-level archive planning method, while retaining RASHE artifacts as discovery scaffold evidence.
 
 Plan:

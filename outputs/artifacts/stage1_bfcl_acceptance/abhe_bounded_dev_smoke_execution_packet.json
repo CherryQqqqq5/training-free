@@ -1,0 +1,54 @@
+{
+  "approval_status": "pending",
+  "artifact_kind": "abhe_bounded_dev_smoke_execution_packet",
+  "artifact_boundary": {
+    "compact_only": true,
+    "forbidden_fields_absent_required": true,
+    "raw_outputs_committed": false
+  },
+  "authorized": false,
+  "baseline_command_template": "PYTHONPATH=.:src .venv/bin/python scripts/run_abhe_dev_smoke.py --arm baseline --compact-only --fresh-dev-slice <approved_fresh_dev_slice>",
+  "bfcl_evaluate_authorized": false,
+  "bfcl_generate_authorized": false,
+  "candidate_command_template": "PYTHONPATH=.:src .venv/bin/python scripts/run_abhe_dev_smoke.py --arm candidate --compact-only --fresh-dev-slice <approved_fresh_dev_slice>",
+  "candidate_generation_authorized": false,
+  "candidate_jsonl_authorized": false,
+  "candidate_pool_ready": false,
+  "candidate_rule_path": "pending_review_no_candidate_rule_generated",
+  "case_list_hash": "pending_approved_fresh_dev_slice_hash",
+  "cost_latency_cap": {
+    "max_cost_usd": 0.0,
+    "max_latency_delta_pct": 0
+  },
+  "entry_ids": [
+    "state_tracking_v0",
+    "hallucination_abstain_v0"
+  ],
+  "execution_started": false,
+  "fresh_dev_slice_source": "pending_approved_fresh_dev_slice",
+  "huawei_acceptance_ready": false,
+  "model": "pending_approval",
+  "performance_evidence": false,
+  "protocol": "paired_fresh_bounded_dev_smoke_pending",
+  "provider": "pending_approval",
+  "provider_calls_authorized": false,
+  "regression_cap": {
+    "max_regressed_count": 0,
+    "max_regression_rate": 0.0
+  },
+  "runtime_config_path": "pending_review_no_runtime_config_selected",
+  "schema_version": "abhe_dev_smoke_packet_v0",
+  "scorer_authorized": false,
+  "sota_3pp_claim_ready": false,
+  "stop_loss_criteria": [
+    "raw_leakage",
+    "case_count_exceeds_cap",
+    "provider_model_protocol_mismatch",
+    "fresh_dev_slice_missing_or_reused",
+    "candidate_jsonl_or_pool_created",
+    "holdout_or_full_suite_touched",
+    "cost_or_latency_cap_exceeded",
+    "regression_cap_exceeded",
+    "checker_failure"
+  ]
+}
