@@ -51,6 +51,9 @@ ABHE is the active planning route. It is archive-based and behavior-level:
 - policy config: `abhe_archive/policy_config.yaml`
 - planner: `scripts/plan_abhe_next_evolution.py --write --compact --strict`
 - planner output: `outputs/artifacts/stage1_bfcl_acceptance/abhe_next_evolution_plan.json`
+- planning readiness: `outputs/artifacts/stage1_bfcl_acceptance/abhe_planning_ready.json`
+- fresh dev slice request: `outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_request.json`
+- execution readiness: `outputs/artifacts/stage1_bfcl_acceptance/abhe_execution_readiness.json`
 
 The ABHE planner does not call a provider, run BFCL/model code, authorize scorer, generate candidates, or claim performance. It only chooses which archive entries should request a future fresh bounded dev smoke packet.
 
@@ -61,6 +64,8 @@ Current ABHE decision:
 - `unresolved_search_memory_watch_v0`: watch; split or collect more compact diagnostics.
 
 The 160 compact source cases are discovery/archive-seeding evidence only. They are not candidate validation or improvement evidence.
+
+Current execution state: ABHE planning readiness is true, but execution readiness is false. The dry-run-only runner is materialized for manifest checks; the fresh dev slice, execution approval, candidate rule, runtime config, scorer authorization, and performance evidence remain absent/fail-closed.
 
 ## RASHE Predecessor Scaffold Gates
 

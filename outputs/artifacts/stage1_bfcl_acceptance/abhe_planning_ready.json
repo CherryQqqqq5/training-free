@@ -11,6 +11,8 @@
   "component_paths": {
     "dev_feedback_schema": "abhe_archive/dev_feedback.schema.json",
     "dev_smoke_packet": "outputs/artifacts/stage1_bfcl_acceptance/abhe_bounded_dev_smoke_execution_packet.json",
+    "dry_run_manifest": "outputs/artifacts/stage1_bfcl_acceptance/abhe_dev_smoke_dry_run_manifest.json",
+    "fresh_dev_slice_request": "outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_request.json",
     "trace_card_schema": "outputs/artifacts/stage1_bfcl_acceptance/abhe_trace_card.schema.json",
     "trace_packet": "outputs/artifacts/stage1_bfcl_acceptance/abhe_temporary_trace_extraction_packet.json"
   },
@@ -50,6 +52,32 @@
       "performance_evidence": false,
       "report_scope": "abhe_dev_smoke_packet_check"
     },
+    "dry_run_manifest": {
+      "abhe_dev_smoke_dry_run_manifest_passed": true,
+      "arm": "baseline",
+      "bfcl_evaluate_called": false,
+      "bfcl_generate_called": false,
+      "blockers": [],
+      "candidate_generated": false,
+      "manifest_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_dev_smoke_dry_run_manifest.json",
+      "manifest_present": true,
+      "performance_evidence": false,
+      "provider_calls_made": false,
+      "report_scope": "abhe_dev_smoke_dry_run_manifest_check",
+      "scorer_called": false
+    },
+    "fresh_slice_request": {
+      "abhe_fresh_dev_slice_request_passed": true,
+      "approval_status": "pending",
+      "authorized": false,
+      "blockers": [],
+      "performance_evidence": false,
+      "report_scope": "abhe_fresh_dev_slice_request_check",
+      "request_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_request.json",
+      "request_present": true,
+      "slice_materialized": false,
+      "source_160_compact_cases_reused_for_validation": false
+    },
     "no_leakage": {
       "abhe_no_leakage_boundary_passed": true,
       "blockers": [],
@@ -59,6 +87,9 @@
         "abhe_archive/policy_config.yaml",
         "abhe_archive/state_transitions.jsonl",
         "outputs/artifacts/stage1_bfcl_acceptance/abhe_next_evolution_plan.json",
+        "outputs/artifacts/stage1_bfcl_acceptance/abhe_execution_readiness.json",
+        "outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_request.json",
+        "outputs/artifacts/stage1_bfcl_acceptance/abhe_dev_smoke_dry_run_manifest.json",
         "outputs/artifacts/stage1_bfcl_acceptance/abhe_temporary_trace_extraction_packet.json",
         "outputs/artifacts/stage1_bfcl_acceptance/abhe_bounded_dev_smoke_execution_packet.json",
         "outputs/artifacts/stage1_bfcl_acceptance/abhe_trace_card.schema.json",
@@ -67,6 +98,7 @@
         "docs/stage1_abhe_archive_policy.md",
         "docs/stage1_abhe_trace_packet_boundary.md",
         "docs/stage1_abhe_trace_card_contract.md",
+        "docs/stage1_abhe_fresh_dev_slice_boundary.md",
         "docs/stage1_abhe_state_tracking_candidate_sketch.md",
         "docs/stage1_abhe_hallucination_abstain_candidate_sketch.md",
         "docs/stage1_abhe_post_dev_update_contract.md",
@@ -98,7 +130,9 @@
     }
   },
   "dev_smoke_packet_ready_for_review": true,
+  "dry_run_runner_materialized": true,
   "execution_authorized": false,
+  "fresh_dev_slice_request_ready_for_review": true,
   "huawei_acceptance_ready": false,
   "next_required_action": "request_trace_extraction_review_or_dev_smoke_review",
   "no_leakage_boundary_passed": true,

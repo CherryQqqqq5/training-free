@@ -8,7 +8,10 @@ from pathlib import Path
 
 from scripts.check_abhe_archive_policy import DEFAULT_ARCHIVE, DEFAULT_OPPORTUNITY, validate_archive
 from scripts.check_abhe_dev_feedback import validate_feedback, validate_schema
+from scripts.check_abhe_dev_smoke_dry_run_manifest import validate_manifest
 from scripts.check_abhe_dev_smoke_packet import validate_packet
+from scripts.check_abhe_execution_readiness import build_report as build_execution_readiness_report
+from scripts.check_abhe_fresh_dev_slice_request import validate_request as validate_fresh_slice_request
 from scripts.check_abhe_no_leakage_boundary import check_paths, scan_value
 from scripts.check_abhe_planning_ready import build_report
 from scripts.check_abhe_trace_cards import validate_card, validate_schema as validate_trace_card_schema
@@ -106,8 +109,8 @@ def test_abhe_dev_smoke_packet_checker_accepts_pending_draft_contract() -> None:
         "protocol": "bfcl_v4_paired_dev_smoke",
         "runtime_config_path": "configs/runtime_bfcl_skills.yaml",
         "candidate_rule_path": "future_approved_candidate_rule_path",
-        "runner_materialized": False,
-        "runner_status": "runner_not_yet_materialized",
+        "runner_materialized": True,
+        "runner_status": "dry_run_only_runner_materialized",
         "fresh_slice_materialized": False,
         "artifact_boundary": {
             "compact_only": True,
@@ -237,12 +240,14 @@ def test_abhe_no_leakage_allows_negative_markdown_taxonomy() -> None:
 
 def test_abhe_no_leakage_default_paths_cover_abhe_docs_and_packets() -> None:
     summary = check_paths([
+        Path("docs/stage1_abhe_fresh_dev_slice_boundary.md"),
         Path("docs/stage1_abhe_trace_packet_boundary.md"),
         Path("docs/stage1_abhe_trace_card_contract.md"),
         Path("docs/stage1_abhe_post_dev_update_contract.md"),
         Path("docs/stage1_abhe_search_memory_watch_split_proposal.md"),
         Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_temporary_trace_extraction_packet.json"),
         Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_bounded_dev_smoke_execution_packet.json"),
+        Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_request.json"),
         Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_trace_card.schema.json"),
     ])
     assert summary["abhe_no_leakage_boundary_passed"] is True
@@ -258,3 +263,49 @@ def test_abhe_planning_ready_report_is_review_ready_not_execution_ready() -> Non
     assert report["execution_authorized"] is False
     assert report["scorer_authorized"] is False
     assert report["performance_evidence"] is False
+
+
+def test_abhe_fresh_dev_slice_request_keeps_discovery_cases_out_of_validation() -> None:
+    request = load(Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_request.json"))
+    assert validate_fresh_slice_request(request) == []
+    mutated = copy.deepcopy(request)
+    mutated["source_160_compact_cases_reused_for_validation"] = True
+    assert any("source_160_compact_cases_reused_for_validation_not_false" in blocker for blocker in validate_fresh_slice_request(mutated))
+
+
+def test_abhe_dry_run_manifest_contract_rejects_execution_side_effects() -> None:
+    manifest = {
+        "artifact_kind": "abhe_dev_smoke_dry_run_manifest",
+        "schema_version": "abhe_dev_smoke_dry_run_manifest_v0",
+        "arm": "baseline",
+        "fresh_dev_slice": "pending_approved_fresh_dev_slice",
+        "dry_run": True,
+        "compact_only": True,
+        "no_provider": True,
+        "no_bfcl": True,
+        "no_scorer": True,
+        "provider_calls_made": False,
+        "bfcl_generate_called": False,
+        "bfcl_evaluate_called": False,
+        "scorer_called": False,
+        "candidate_generated": False,
+        "candidate_jsonl_created": False,
+        "performance_evidence": False,
+        "execution_authorized": False,
+        "runner_mode": "dry_run_only",
+    }
+    assert validate_manifest(manifest) == []
+    mutated = copy.deepcopy(manifest)
+    mutated["provider_calls_made"] = True
+    assert any("provider_calls_made_not_false" in blocker for blocker in validate_manifest(mutated))
+
+
+def test_abhe_execution_readiness_is_false_until_materialized_approval_chain_exists() -> None:
+    report = build_execution_readiness_report()
+    assert report["abhe_execution_ready"] is False
+    assert report["dry_run_runner_materialized"] is True
+    assert "fresh_dev_slice_not_materialized" in report["blockers"]
+    assert "execution_approval_missing" in report["blockers"]
+    assert "candidate_rule_not_generated_or_authorized" in report["blockers"]
+    assert "runtime_config_not_selected" in report["blockers"]
+    assert "scorer_authorization_false" in report["blockers"]
