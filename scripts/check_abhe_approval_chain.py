@@ -1,0 +1,134 @@
+#!/usr/bin/env python3
+"""Aggregate ABHE approval packets without treating missing approvals as planning failure."""
+
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+from typing import Any, Dict, List
+
+from scripts.check_abhe_candidate_spec_approval_packet import check as check_candidate_spec_approval
+from scripts.check_abhe_execution_approval_packet import check as check_execution_approval
+from scripts.check_abhe_execution_readiness import build_report as build_execution_readiness
+from scripts.check_abhe_fresh_dev_slice_approval_packet import check as check_fresh_slice_approval
+from scripts.check_abhe_review_request import check as check_review_request
+from scripts.check_abhe_trace_extraction_approval_packet import check as check_trace_approval
+
+DEFAULT_OUTPUT = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_approval_chain.json")
+EXPECTED_MISSING_APPROVAL_BLOCKERS = {
+    "trace_extraction_approval_packet_missing",
+    "fresh_dev_slice_approval_packet_missing",
+    "candidate_spec_approval_packet_missing",
+    "execution_approval_packet_missing",
+}
+
+
+def _prefix(prefix: str, blockers: List[str]) -> List[str]:
+    return ["%s:%s" % (prefix, blocker) for blocker in blockers]
+
+
+def _packet_approved(summary: Dict[str, Any]) -> bool:
+    return summary.get("packet_present") is True and summary.get("authorized") is True and not summary.get("blockers")
+
+
+def build_report() -> Dict[str, Any]:
+    review_request = check_review_request()
+    trace_approval = check_trace_approval()
+    fresh_slice_approval = check_fresh_slice_approval()
+    candidate_spec_approval = check_candidate_spec_approval()
+    execution_approval = check_execution_approval()
+    execution_readiness = build_execution_readiness()
+
+    blockers: List[str] = []
+    schema_blockers: List[str] = []
+
+    if not review_request.get("abhe_review_request_passed"):
+        blockers.extend(_prefix("review_request", review_request.get("blockers", [])))
+
+    approval_checks = {
+        "trace_extraction_approval": trace_approval,
+        "fresh_dev_slice_approval": fresh_slice_approval,
+        "candidate_spec_approval": candidate_spec_approval,
+        "execution_approval": execution_approval,
+    }
+    for name, summary in approval_checks.items():
+        for blocker in summary.get("blockers", []):
+            if blocker in EXPECTED_MISSING_APPROVAL_BLOCKERS:
+                blockers.append(blocker)
+            elif summary.get("schema_passed") is not True:
+                schema_blockers.append("%s:%s" % (name, blocker))
+            else:
+                blockers.append("%s:%s" % (name, blocker))
+
+    execution_schema_ok = execution_approval.get("schema_passed") is True
+    schema_ready = (
+        trace_approval.get("schema_passed") is True
+        and fresh_slice_approval.get("schema_passed") is True
+        and candidate_spec_approval.get("schema_passed") is True
+        and execution_schema_ok
+    )
+    approval_chain_ready = review_request.get("abhe_review_request_passed") is True and schema_ready and not schema_blockers
+
+    return {
+        "report_scope": "abhe_approval_chain",
+        "artifact_kind": "abhe_approval_chain",
+        "schema_version": "abhe_approval_chain_v0",
+        "abhe_approval_chain_ready_for_review": approval_chain_ready,
+        "trace_extraction_approved": _packet_approved(trace_approval),
+        "fresh_dev_slice_approved": _packet_approved(fresh_slice_approval),
+        "candidate_spec_approved": _packet_approved(candidate_spec_approval),
+        "execution_approved": _packet_approved(execution_approval),
+        "execution_ready": execution_readiness.get("abhe_execution_ready") is True,
+        "execution_authorized": False,
+        "trace_extraction_authorized": False,
+        "fresh_dev_slice_authorized": False,
+        "candidate_generation_authorized": False,
+        "scorer_authorized": False,
+        "performance_evidence": False,
+        "sota_3pp_claim_ready": False,
+        "huawei_acceptance_ready": False,
+        "component_summaries": {
+            "review_request": review_request,
+            "trace_extraction_approval": trace_approval,
+            "fresh_dev_slice_approval": fresh_slice_approval,
+            "candidate_spec_approval": candidate_spec_approval,
+            "execution_approval": execution_approval,
+            "execution_readiness": execution_readiness,
+        },
+        "blockers": sorted(set(blockers + schema_blockers)),
+        "expected_missing_approval_blockers": sorted(EXPECTED_MISSING_APPROVAL_BLOCKERS),
+        "next_required_action": "request_granular_approval_reviews",
+    }
+
+
+def write_report(output: Path, report: Dict[str, Any]) -> None:
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def main(argv: Any = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument("--write", action="store_true")
+    parser.add_argument("--compact", action="store_true")
+    parser.add_argument("--strict", action="store_true")
+    args = parser.parse_args(argv)
+    try:
+        report = build_report()
+        if args.write:
+            write_report(args.output, report)
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        report = {
+            "report_scope": "abhe_approval_chain",
+            "abhe_approval_chain_ready_for_review": False,
+            "blockers": ["load_failed:%s" % exc],
+        }
+    print(json.dumps(report, sort_keys=True) if args.compact else json.dumps(report, indent=2, sort_keys=True))
+    if args.strict and not report.get("abhe_approval_chain_ready_for_review"):
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

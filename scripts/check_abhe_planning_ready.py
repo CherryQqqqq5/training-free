@@ -10,16 +10,21 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 from scripts.append_abhe_state_transition import validate as validate_transition
+from scripts.check_abhe_approval_chain import build_report as build_approval_chain
 from scripts.check_abhe_archive_policy import check as check_archive_policy
+from scripts.check_abhe_candidate_spec_approval_packet import check as check_candidate_spec_approval_packet
 from scripts.check_abhe_candidate_spec_drafts import check as check_candidate_spec_drafts
 from scripts.check_abhe_dev_feedback import check as check_dev_feedback
 from scripts.check_abhe_dev_smoke_dry_run_manifest import check as check_dry_run_manifest
 from scripts.check_abhe_dev_smoke_packet import check as check_dev_smoke_packet
 from scripts.check_abhe_execution_approval_packet import check as check_execution_approval_packet
+from scripts.check_abhe_fresh_dev_slice_approval_packet import check as check_fresh_slice_approval_packet
 from scripts.check_abhe_fresh_dev_slice_request import check as check_fresh_slice_request
 from scripts.check_abhe_no_leakage_boundary import DEFAULT_PATHS, check_paths
+from scripts.check_abhe_review_bundle import check as check_review_bundle
 from scripts.check_abhe_review_request import check as check_review_request
 from scripts.check_abhe_trace_cards import check as check_trace_cards
+from scripts.check_abhe_trace_extraction_approval_packet import check as check_trace_extraction_approval_packet
 from scripts.check_abhe_trace_extraction_packet import check as check_trace_packet
 from scripts.plan_abhe_post_dev_update import build_plan as build_post_dev_plan
 
@@ -39,6 +44,9 @@ def build_report() -> Dict[str, Any]:
     fresh_slice = check_fresh_slice_request()
     dry_run_manifest = check_dry_run_manifest()
     review_request = check_review_request()
+    trace_extraction_approval = check_trace_extraction_approval_packet()
+    fresh_slice_approval = check_fresh_slice_approval_packet()
+    candidate_spec_approval = check_candidate_spec_approval_packet()
     execution_approval = check_execution_approval_packet()
     candidate_specs = check_candidate_spec_drafts()
     post_dev_synthetic = build_post_dev_plan(synthetic_fixture_only=True)
@@ -55,6 +63,8 @@ def build_report() -> Dict[str, Any]:
         "state_transition_dry_run_passed": not transition_blockers,
         "blockers": transition_blockers,
     }
+    approval_chain = build_approval_chain()
+    review_bundle = check_review_bundle()
     leakage_paths = [path for path in DEFAULT_PATHS if path != DEFAULT_OUTPUT]
     leakage = check_paths(leakage_paths)
 
@@ -77,6 +87,16 @@ def build_report() -> Dict[str, Any]:
         blockers.extend(_prefixed("dry_run_manifest", dry_run_manifest["blockers"]))
     if not review_request["abhe_review_request_passed"]:
         blockers.extend(_prefixed("review_request", review_request["blockers"]))
+    if not approval_chain.get("abhe_approval_chain_ready_for_review"):
+        blockers.extend(_prefixed("approval_chain", [blocker for blocker in approval_chain["blockers"] if not blocker.endswith("_approval_packet_missing")]))
+    if not review_bundle.get("abhe_review_bundle_ready"):
+        blockers.extend(_prefixed("review_bundle", review_bundle["blockers"]))
+    if not trace_extraction_approval.get("schema_passed"):
+        blockers.extend(_prefixed("trace_extraction_approval_schema", [blocker for blocker in trace_extraction_approval["blockers"] if blocker != "trace_extraction_approval_packet_missing"]))
+    if not fresh_slice_approval.get("schema_passed"):
+        blockers.extend(_prefixed("fresh_dev_slice_approval_schema", [blocker for blocker in fresh_slice_approval["blockers"] if blocker != "fresh_dev_slice_approval_packet_missing"]))
+    if not candidate_spec_approval.get("schema_passed"):
+        blockers.extend(_prefixed("candidate_spec_approval_schema", [blocker for blocker in candidate_spec_approval["blockers"] if blocker != "candidate_spec_approval_packet_missing"]))
     if not execution_approval.get("schema_passed"):
         blockers.extend(_prefixed("execution_approval_schema", [blocker for blocker in execution_approval["blockers"] if blocker != "execution_approval_packet_missing"]))
     if not candidate_specs["abhe_candidate_spec_drafts_passed"]:
@@ -103,6 +123,11 @@ def build_report() -> Dict[str, Any]:
         "fresh_dev_slice_request_ready_for_review": fresh_slice["abhe_fresh_dev_slice_request_passed"],
         "dry_run_runner_materialized": dry_run_manifest["abhe_dev_smoke_dry_run_manifest_passed"],
         "review_request_ready": review_request["abhe_review_request_passed"],
+        "review_bundle_ready": review_bundle.get("abhe_review_bundle_ready") is True,
+        "approval_chain_ready_for_review": approval_chain.get("abhe_approval_chain_ready_for_review") is True,
+        "trace_extraction_approval_schema_ready": trace_extraction_approval.get("schema_passed") is True,
+        "fresh_dev_slice_approval_schema_ready": fresh_slice_approval.get("schema_passed") is True,
+        "candidate_spec_approval_schema_ready": candidate_spec_approval.get("schema_passed") is True,
         "execution_approval_schema_ready": execution_approval.get("schema_passed") is True,
         "execution_approval_packet_present": execution_approval.get("packet_present") is True,
         "candidate_spec_drafts_ready": candidate_specs["abhe_candidate_spec_drafts_passed"],
@@ -120,7 +145,7 @@ def build_report() -> Dict[str, Any]:
         "candidate_pool_ready": False,
         "sota_3pp_claim_ready": False,
         "huawei_acceptance_ready": False,
-        "next_required_action": "request_trace_extraction_review_or_dev_smoke_review_or_execution_approval_review",
+        "next_required_action": "request_granular_approval_reviews",
         "component_paths": {
             "trace_packet": str(trace_packet["packet_path"]),
             "dev_smoke_packet": str(dev_smoke_packet["packet_path"]),
@@ -129,6 +154,11 @@ def build_report() -> Dict[str, Any]:
             "fresh_dev_slice_request": str(fresh_slice["request_path"]),
             "dry_run_manifest": str(dry_run_manifest["manifest_path"]),
             "review_request": str(review_request["request_path"]),
+            "review_bundle": "outputs/artifacts/stage1_bfcl_acceptance/abhe_review_bundle.json",
+            "approval_chain": "outputs/artifacts/stage1_bfcl_acceptance/abhe_approval_chain.json",
+            "trace_extraction_approval_schema": str(trace_extraction_approval["schema_path"]),
+            "fresh_dev_slice_approval_schema": str(fresh_slice_approval["schema_path"]),
+            "candidate_spec_approval_schema": str(candidate_spec_approval["schema_path"]),
             "execution_approval_schema": str(execution_approval["schema_path"]),
         },
         "component_summaries": {
@@ -140,6 +170,11 @@ def build_report() -> Dict[str, Any]:
             "fresh_slice_request": fresh_slice,
             "dry_run_manifest": dry_run_manifest,
             "review_request": review_request,
+            "review_bundle": review_bundle,
+            "approval_chain": approval_chain,
+            "trace_extraction_approval_schema": trace_extraction_approval,
+            "fresh_dev_slice_approval_schema": fresh_slice_approval,
+            "candidate_spec_approval_schema": candidate_spec_approval,
             "execution_approval": execution_approval,
             "candidate_specs": candidate_specs,
             "post_dev_synthetic": post_dev_synthetic,

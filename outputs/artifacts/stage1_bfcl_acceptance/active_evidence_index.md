@@ -52,8 +52,13 @@ ABHE is the active planning route. It is archive-based and behavior-level:
 - planner: `scripts/plan_abhe_next_evolution.py --write --compact --strict`
 - planner output: `outputs/artifacts/stage1_bfcl_acceptance/abhe_next_evolution_plan.json`
 - planning readiness: `outputs/artifacts/stage1_bfcl_acceptance/abhe_planning_ready.json`
+- review bundle: `outputs/artifacts/stage1_bfcl_acceptance/abhe_review_bundle.json`
+- approval chain: `outputs/artifacts/stage1_bfcl_acceptance/abhe_approval_chain.json`
 - review request: `outputs/artifacts/stage1_bfcl_acceptance/abhe_review_request.json`
 - execution approval schema: `outputs/artifacts/stage1_bfcl_acceptance/abhe_execution_approval.schema.json`
+- trace extraction approval schema: `outputs/artifacts/stage1_bfcl_acceptance/abhe_trace_extraction_approval.schema.json`
+- fresh dev slice approval schema: `outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_approval.schema.json`
+- candidate spec approval schema: `outputs/artifacts/stage1_bfcl_acceptance/abhe_candidate_spec_approval.schema.json`
 - fresh dev slice request: `outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_request.json`
 - execution readiness: `outputs/artifacts/stage1_bfcl_acceptance/abhe_execution_readiness.json`
 - candidate spec drafts: `docs/stage1_abhe_state_tracking_candidate_spec_draft.md`, `docs/stage1_abhe_hallucination_abstain_candidate_spec_draft.md`
@@ -70,7 +75,7 @@ Current ABHE decision:
 
 The 160 compact source cases are discovery/archive-seeding evidence only. They are not candidate validation or improvement evidence.
 
-Current execution state: ABHE planning readiness is true, but execution readiness is false. The dry-run-only runner is materialized for manifest checks; the fresh dev slice, execution approval, candidate rule, runtime config, scorer authorization, and performance evidence remain absent/fail-closed.
+Current execution state: ABHE planning readiness and approval-chain review bundle readiness are true, but execution readiness is false. The dry-run-only runner is materialized for manifest checks; trace extraction approval, fresh dev slice approval, candidate spec approval, execution approval, candidate rule, runtime config, scorer authorization, and performance evidence remain absent/fail-closed.
 
 ## RASHE Predecessor Scaffold Gates
 
@@ -120,6 +125,6 @@ L1 runtime behavior approval does not authorize source expansion, BFCL scorer, c
 
 ## Next Action
 
-`prepare_abhe_trace_and_bounded_dev_smoke_approval_packets`
+`request_granular_approval_reviews`
 
-ABHE planning route is active and fail-closed; RASHE remains discovery predecessor. Trace extraction and bounded dev smoke require separate approval packets. Source collection, candidate generation, scorer, performance evidence, SOTA/+3pp claims, and Huawei acceptance remain pending/fail-closed.
+ABHE approval-chain review bundle is ready for granular approval discussion; RASHE remains discovery predecessor. Trace extraction, fresh dev slice, candidate spec review, and bounded dev smoke execution each require separate approved packets. Source collection, candidate generation, scorer, performance evidence, SOTA/+3pp claims, and Huawei acceptance remain pending/fail-closed.

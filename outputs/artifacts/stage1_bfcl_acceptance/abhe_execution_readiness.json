@@ -3,13 +3,27 @@
   "artifact_kind": "abhe_execution_readiness",
   "blockers": [
     "candidate_rule_not_generated_or_authorized",
+    "candidate_spec_approval_missing",
     "execution_approval_missing",
+    "fresh_dev_slice_approval_missing",
     "fresh_dev_slice_not_materialized",
     "runtime_config_not_selected",
-    "scorer_authorization_false"
+    "scorer_authorization_false",
+    "trace_extraction_approval_missing"
   ],
   "candidate_generation_authorized": false,
   "component_summaries": {
+    "candidate_spec_approval": {
+      "abhe_candidate_spec_approval_packet_passed": false,
+      "blockers": [
+        "candidate_spec_approval_packet_missing"
+      ],
+      "packet_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_candidate_spec_approval_packet.json",
+      "packet_present": false,
+      "report_scope": "abhe_candidate_spec_approval_packet_check",
+      "schema_passed": true,
+      "schema_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_candidate_spec_approval.schema.json"
+    },
     "dev_smoke_packet": {
       "abhe_dev_smoke_packet_passed": true,
       "approval_status": "pending",
@@ -46,6 +60,17 @@
       "schema_passed": true,
       "schema_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_execution_approval.schema.json"
     },
+    "fresh_slice_approval": {
+      "abhe_fresh_dev_slice_approval_packet_passed": false,
+      "blockers": [
+        "fresh_dev_slice_approval_packet_missing"
+      ],
+      "packet_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_approval_packet.json",
+      "packet_present": false,
+      "report_scope": "abhe_fresh_dev_slice_approval_packet_check",
+      "schema_passed": true,
+      "schema_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_approval.schema.json"
+    },
     "fresh_slice_request": {
       "abhe_fresh_dev_slice_request_passed": true,
       "approval_status": "pending",
@@ -57,6 +82,17 @@
       "request_present": true,
       "slice_materialized": false,
       "source_160_compact_cases_reused_for_validation": false
+    },
+    "trace_extraction_approval": {
+      "abhe_trace_extraction_approval_packet_passed": false,
+      "blockers": [
+        "trace_extraction_approval_packet_missing"
+      ],
+      "packet_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_trace_extraction_approval_packet.json",
+      "packet_present": false,
+      "report_scope": "abhe_trace_extraction_approval_packet_check",
+      "schema_passed": true,
+      "schema_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_trace_extraction_approval.schema.json"
     }
   },
   "dry_run_runner_materialized": true,

@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "approval_scope": {
+      "const": "fresh_dev_slice_only"
+    },
+    "approval_status": {
+      "const": "approved"
+    },
+    "approved_case_count": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "approved_entry_ids": {
+      "items": {
+        "enum": [
+          "state_tracking_v0",
+          "hallucination_abstain_v0"
+        ],
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "approved_fresh_dev_slice_hash": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "archive_seed_source_excluded": {
+      "const": true
+    },
+    "authorized": {
+      "const": true
+    },
+    "performance_evidence": {
+      "const": false
+    },
+    "provider_calls_authorized": {
+      "const": false
+    },
+    "review_owner": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "scorer_authorized": {
+      "const": false
+    },
+    "source_160_compact_cases_reused_for_validation": {
+      "const": false
+    }
+  },
+  "required": [
+    "approval_status",
+    "authorized",
+    "review_owner",
+    "approved_fresh_dev_slice_hash",
+    "approved_case_count",
+    "approved_entry_ids",
+    "archive_seed_source_excluded",
+    "source_160_compact_cases_reused_for_validation",
+    "approval_scope",
+    "provider_calls_authorized",
+    "scorer_authorized",
+    "performance_evidence"
+  ],
+  "type": "object"
+}

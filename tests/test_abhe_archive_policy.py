@@ -252,7 +252,12 @@ def test_abhe_no_leakage_default_paths_cover_abhe_docs_and_packets() -> None:
         Path("docs/stage1_abhe_state_tracking_candidate_spec_draft.md"),
         Path("docs/stage1_abhe_hallucination_abstain_candidate_spec_draft.md"),
         Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_review_request.json"),
+        Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_review_bundle.json"),
+        Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_approval_chain.json"),
         Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_execution_approval.schema.json"),
+        Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_trace_extraction_approval.schema.json"),
+        Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_approval.schema.json"),
+        Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_candidate_spec_approval.schema.json"),
         Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_temporary_trace_extraction_packet.json"),
         Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_bounded_dev_smoke_execution_packet.json"),
         Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_request.json"),
@@ -269,12 +274,17 @@ def test_abhe_planning_ready_report_is_review_ready_not_execution_ready() -> Non
     assert report["dev_smoke_packet_ready_for_review"] is True
     assert report["post_dev_feedback_contract_ready"] is True
     assert report["review_request_ready"] is True
+    assert report["review_bundle_ready"] is True
+    assert report["approval_chain_ready_for_review"] is True
+    assert report["trace_extraction_approval_schema_ready"] is True
+    assert report["fresh_dev_slice_approval_schema_ready"] is True
+    assert report["candidate_spec_approval_schema_ready"] is True
     assert report["execution_approval_schema_ready"] is True
     assert report["execution_approval_packet_present"] is False
     assert report["candidate_spec_drafts_ready"] is True
     assert report["post_dev_synthetic_planner_ready"] is True
     assert report["state_transition_dry_run_ready"] is True
-    assert report["next_required_action"] == "request_trace_extraction_review_or_dev_smoke_review_or_execution_approval_review"
+    assert report["next_required_action"] == "request_granular_approval_reviews"
     assert report["execution_authorized"] is False
     assert report["scorer_authorized"] is False
     assert report["performance_evidence"] is False

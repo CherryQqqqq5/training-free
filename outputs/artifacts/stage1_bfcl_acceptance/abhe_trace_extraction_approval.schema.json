@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "approval_scope": {
+      "const": "trace_cards_only"
+    },
+    "approval_status": {
+      "const": "approved"
+    },
+    "approved_max_trace_card_count": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "approved_output_path": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "approved_target_entry_ids": {
+      "items": {
+        "enum": [
+          "state_tracking_v0",
+          "hallucination_abstain_v0"
+        ],
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "authorized": {
+      "const": true
+    },
+    "bfcl_evaluate_authorized": {
+      "const": false
+    },
+    "bfcl_generate_authorized": {
+      "const": false
+    },
+    "candidate_generation_authorized": {
+      "const": false
+    },
+    "performance_evidence": {
+      "const": false
+    },
+    "provider_calls_authorized": {
+      "const": false
+    },
+    "review_owner": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "scorer_authorized": {
+      "const": false
+    }
+  },
+  "required": [
+    "approval_status",
+    "authorized",
+    "review_owner",
+    "approved_output_path",
+    "approved_max_trace_card_count",
+    "approved_target_entry_ids",
+    "approval_scope",
+    "provider_calls_authorized",
+    "bfcl_generate_authorized",
+    "bfcl_evaluate_authorized",
+    "scorer_authorized",
+    "candidate_generation_authorized",
+    "performance_evidence"
+  ],
+  "type": "object"
+}

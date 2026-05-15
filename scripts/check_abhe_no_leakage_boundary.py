@@ -17,8 +17,13 @@ DEFAULT_PATHS = [
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_next_evolution_plan.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_planning_ready.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_execution_readiness.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_review_bundle.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_approval_chain.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_review_request.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_execution_approval.schema.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_trace_extraction_approval.schema.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_approval.schema.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_candidate_spec_approval.schema.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_request.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_dev_smoke_dry_run_manifest.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_temporary_trace_extraction_packet.json"),
@@ -26,6 +31,7 @@ DEFAULT_PATHS = [
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_trace_card.schema.json"),
     Path("docs/stage1_abhe_method_overview.md"),
     Path("docs/stage1_abhe_approval_lanes.md"),
+    Path("docs/stage1_abhe_review_bundle.md"),
     Path("docs/stage1_abhe_transition_from_rashe.md"),
     Path("docs/stage1_abhe_archive_policy.md"),
     Path("docs/stage1_abhe_trace_packet_boundary.md"),
@@ -68,6 +74,7 @@ ALLOWED_KEY_NAMES = {
     "approved_candidate_spec_hash",
     "fresh_dev_slice_hash",
     "dev_run_id_hash",
+    "expected_missing_approval_blockers",
 }
 
 FORBIDDEN_KEY_RE = re.compile(
