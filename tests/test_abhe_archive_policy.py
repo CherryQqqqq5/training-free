@@ -10,6 +10,8 @@ from scripts.check_abhe_archive_policy import DEFAULT_ARCHIVE, DEFAULT_OPPORTUNI
 from scripts.check_abhe_dev_feedback import validate_feedback, validate_schema
 from scripts.check_abhe_dev_smoke_packet import validate_packet
 from scripts.check_abhe_no_leakage_boundary import check_paths, scan_value
+from scripts.check_abhe_planning_ready import build_report
+from scripts.check_abhe_trace_cards import validate_card, validate_schema as validate_trace_card_schema
 from scripts.check_abhe_trace_extraction_packet import validate_packet as validate_trace_packet
 from scripts.plan_abhe_next_evolution import build_plan
 
@@ -104,6 +106,9 @@ def test_abhe_dev_smoke_packet_checker_accepts_pending_draft_contract() -> None:
         "protocol": "bfcl_v4_paired_dev_smoke",
         "runtime_config_path": "configs/runtime_bfcl_skills.yaml",
         "candidate_rule_path": "future_approved_candidate_rule_path",
+        "runner_materialized": False,
+        "runner_status": "runner_not_yet_materialized",
+        "fresh_slice_materialized": False,
         "artifact_boundary": {
             "compact_only": True,
             "raw_outputs_committed": False,
@@ -146,11 +151,15 @@ def test_abhe_trace_packet_checker_accepts_sanitized_draft_only_contract() -> No
     packet = {
         "artifact_kind": "abhe_temporary_trace_extraction_packet",
         "schema_version": "abhe_trace_extraction_packet_v0",
-        "approval_status": "draft",
+        "approval_status": "pending",
         "authorized": False,
         "execution_started": False,
         "target_entry_ids": ["state_tracking_v0", "hallucination_abstain_v0"],
         "allowed_output": "sanitized_trace_cards_only",
+        "requested_output_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_trace_cards.json",
+        "max_trace_card_count": {"state_tracking_v0": 6, "hallucination_abstain_v0": 4},
+        "source_artifact_boundary": "historical_compact_or_approved_source_only_no_raw_material",
+        "raw_material_absent_required": True,
         "raw_prompt_allowed": False,
         "raw_trace_allowed": False,
         "raw_payload_allowed": False,
@@ -166,6 +175,26 @@ def test_abhe_trace_packet_checker_accepts_sanitized_draft_only_contract() -> No
     mutated = copy.deepcopy(packet)
     mutated["raw_case_id_allowed"] = True
     assert any("raw_case_id_allowed_not_false" in blocker for blocker in validate_trace_packet(mutated))
+
+
+def test_abhe_trace_card_schema_and_card_contract() -> None:
+    schema = load(Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_trace_card.schema.json"))
+    assert validate_trace_card_schema(schema) == []
+    card = {
+        "trace_card_id": "state_tracking_trace_001",
+        "source_hash": "sha256:compact_source",
+        "entry_id": "state_tracking_v0",
+        "behavior_cluster": "multi_turn_state_lost",
+        "observed_failure_pattern": "state carryover dropped across turns",
+        "state_variable_lost": "selected_entity",
+        "turn_span_summary": "compact summary only",
+        "allowed_compact_evidence": ["archive_entry:state_tracking_v0"],
+        "forbidden_fields_absent": True,
+    }
+    assert validate_card(card, "card") == []
+    mutated = copy.deepcopy(card)
+    mutated.pop("state_variable_lost")
+    assert any("state_variable_lost_required" in blocker for blocker in validate_card(mutated, "card"))
 
 
 def test_abhe_dev_feedback_schema_and_record_contract() -> None:
@@ -209,8 +238,23 @@ def test_abhe_no_leakage_allows_negative_markdown_taxonomy() -> None:
 def test_abhe_no_leakage_default_paths_cover_abhe_docs_and_packets() -> None:
     summary = check_paths([
         Path("docs/stage1_abhe_trace_packet_boundary.md"),
+        Path("docs/stage1_abhe_trace_card_contract.md"),
         Path("docs/stage1_abhe_post_dev_update_contract.md"),
+        Path("docs/stage1_abhe_search_memory_watch_split_proposal.md"),
         Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_temporary_trace_extraction_packet.json"),
         Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_bounded_dev_smoke_execution_packet.json"),
+        Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_trace_card.schema.json"),
     ])
     assert summary["abhe_no_leakage_boundary_passed"] is True
+
+
+def test_abhe_planning_ready_report_is_review_ready_not_execution_ready() -> None:
+    report = build_report()
+    assert report["abhe_planning_ready"] is True
+    assert report["trace_packet_ready_for_review"] is True
+    assert report["trace_card_contract_ready"] is True
+    assert report["dev_smoke_packet_ready_for_review"] is True
+    assert report["post_dev_feedback_contract_ready"] is True
+    assert report["execution_authorized"] is False
+    assert report["scorer_authorized"] is False
+    assert report["performance_evidence"] is False

@@ -15,15 +15,19 @@ DEFAULT_PATHS = [
     Path("abhe_archive/policy_config.yaml"),
     Path("abhe_archive/state_transitions.jsonl"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_next_evolution_plan.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_planning_ready.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_temporary_trace_extraction_packet.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_bounded_dev_smoke_execution_packet.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_trace_card.schema.json"),
     Path("docs/stage1_abhe_method_overview.md"),
     Path("docs/stage1_abhe_transition_from_rashe.md"),
     Path("docs/stage1_abhe_archive_policy.md"),
     Path("docs/stage1_abhe_trace_packet_boundary.md"),
+    Path("docs/stage1_abhe_trace_card_contract.md"),
     Path("docs/stage1_abhe_state_tracking_candidate_sketch.md"),
     Path("docs/stage1_abhe_hallucination_abstain_candidate_sketch.md"),
     Path("docs/stage1_abhe_post_dev_update_contract.md"),
+    Path("docs/stage1_abhe_search_memory_watch_split_proposal.md"),
 ]
 
 ALLOWED_KEY_NAMES = {

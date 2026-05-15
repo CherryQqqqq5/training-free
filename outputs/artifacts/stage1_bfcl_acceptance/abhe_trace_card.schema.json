@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "artifact_kind": "abhe_trace_card_schema",
+  "properties": {
+    "allowed_compact_evidence": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "answerability_failure_kind": {
+      "type": "string"
+    },
+    "behavior_cluster": {
+      "type": "string"
+    },
+    "entry_id": {
+      "enum": [
+        "state_tracking_v0",
+        "hallucination_abstain_v0"
+      ],
+      "type": "string"
+    },
+    "forbidden_fields_absent": {
+      "const": true,
+      "type": "boolean"
+    },
+    "observed_failure_pattern": {
+      "type": "string"
+    },
+    "source_hash": {
+      "type": "string"
+    },
+    "state_variable_lost": {
+      "type": "string"
+    },
+    "trace_card_id": {
+      "type": "string"
+    },
+    "turn_span_summary": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "trace_card_id",
+    "source_hash",
+    "entry_id",
+    "behavior_cluster",
+    "observed_failure_pattern",
+    "turn_span_summary",
+    "allowed_compact_evidence",
+    "forbidden_fields_absent"
+  ],
+  "title": "ABHE sanitized trace card schema",
+  "type": "object"
+}

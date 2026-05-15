@@ -32,6 +32,9 @@ REQUIRED_FIELDS = {
     "cost_latency_cap",
     "regression_cap",
     "stop_loss_criteria",
+    "runner_materialized",
+    "runner_status",
+    "fresh_slice_materialized",
 }
 FALSE_KEYS = {
     "authorized",
@@ -46,6 +49,8 @@ FALSE_KEYS = {
     "performance_evidence",
     "sota_3pp_claim_ready",
     "huawei_acceptance_ready",
+    "runner_materialized",
+    "fresh_slice_materialized",
 }
 REQUIRED_STOP_LOSS = {
     "raw_leakage",
@@ -95,6 +100,12 @@ def validate_packet(packet: Dict[str, Any]) -> List[str]:
             blockers.append("packet_watch_entries_must_not_enter_dev_smoke:%s" % ",".join(disallowed))
     if not packet.get("fresh_dev_slice_source"):
         blockers.append("packet_fresh_dev_slice_source_empty")
+    if packet.get("runner_materialized") is not False:
+        blockers.append("packet_runner_materialized_not_false:%r" % packet.get("runner_materialized"))
+    if packet.get("fresh_slice_materialized") is not False:
+        blockers.append("packet_fresh_slice_materialized_not_false:%r" % packet.get("fresh_slice_materialized"))
+    if packet.get("runner_status") != "runner_not_yet_materialized":
+        blockers.append("packet_runner_status_invalid:%r" % packet.get("runner_status"))
     stop_loss = set(packet.get("stop_loss_criteria") or [])
     missing_stop_loss = sorted(REQUIRED_STOP_LOSS - stop_loss)
     if missing_stop_loss:

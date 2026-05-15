@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 from scripts.check_abhe_no_leakage_boundary import scan_value
+from scripts.check_abhe_trace_cards import check as check_trace_cards
 
 DEFAULT_PACKET = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_temporary_trace_extraction_packet.json")
 
@@ -30,6 +31,10 @@ REQUIRED_FIELDS = {
     "performance_evidence",
     "explanatory_evidence_only",
     "trace_cards_do_not_update_archive_status",
+    "requested_output_path",
+    "max_trace_card_count",
+    "source_artifact_boundary",
+    "raw_material_absent_required",
 }
 FALSE_KEYS = {
     "authorized",
@@ -76,6 +81,23 @@ def validate_packet(packet: Dict[str, Any]) -> List[str]:
         blockers.append("trace_packet_explanatory_evidence_only_not_true")
     if packet.get("trace_cards_do_not_update_archive_status") is not True:
         blockers.append("trace_packet_archive_status_guard_not_true")
+    if packet.get("raw_material_absent_required") is not True:
+        blockers.append("trace_packet_raw_material_absent_required_not_true")
+    if not packet.get("requested_output_path"):
+        blockers.append("trace_packet_requested_output_path_empty")
+    max_counts = packet.get("max_trace_card_count")
+    if not isinstance(max_counts, dict):
+        blockers.append("trace_packet_max_trace_card_count_not_object")
+    else:
+        if max_counts.get("state_tracking_v0") != 6:
+            blockers.append("trace_packet_state_tracking_card_cap_invalid:%r" % max_counts.get("state_tracking_v0"))
+        if max_counts.get("hallucination_abstain_v0") != 4:
+            blockers.append("trace_packet_hallucination_card_cap_invalid:%r" % max_counts.get("hallucination_abstain_v0"))
+    output_path = packet.get("requested_output_path")
+    if isinstance(output_path, str) and Path(output_path).exists():
+        trace_summary = check_trace_cards(cards_path=Path(output_path))
+        if not trace_summary["abhe_trace_cards_check_passed"]:
+            blockers.extend("trace_cards_%s" % blocker for blocker in trace_summary["blockers"])
     blockers.extend(scan_value(packet, label="trace_packet"))
     return sorted(set(blockers))
 
