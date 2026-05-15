@@ -1,0 +1,111 @@
+{
+  "archive_scope": "behavior_level_archive_not_bfcl_category_skill_mapping",
+  "archive_status": "seeded_from_rashe_discovery_predecessor",
+  "artifact_kind": "abhe_archive_index",
+  "bfcl_category_role": "sampling_reporting_validation_strata_only",
+  "bfcl_evaluate_authorized": false,
+  "bfcl_generate_authorized": false,
+  "candidate_activation_authorized": false,
+  "candidate_generation_authorized": false,
+  "candidate_jsonl_authorized": false,
+  "candidate_pool_ready": false,
+  "entries": [
+    {
+      "coverage_strata": [
+        "multi_turn_base",
+        "multi_turn_long_context",
+        "multi_turn_miss_func",
+        "multi_turn_miss_param"
+      ],
+      "dev_feedback_history": [],
+      "entry_id": "state_tracking_v0",
+      "legacy_rashe_entry_id": "bfcl_multi_turn_state_tracking_v0",
+      "mechanism_hypothesis": "The model loses or misbinds required state across turns, so a bounded state-tracking/router/stop-condition harness patch may reduce the target bucket.",
+      "recommended_action": "request_bounded_dev_smoke",
+      "risk_flags": [
+        "medium_regression_risk",
+        "requires_fresh_dev_slice",
+        "not_performance_evidence"
+      ],
+      "source_evidence_count": 80,
+      "state_transition_history": [
+        {
+          "from": "rashe_discovery_seed",
+          "reason": "four multi-turn strata share compact multi_turn_state_lost failure mass",
+          "to": "proposal_ready"
+        }
+      ],
+      "status": "proposal_ready",
+      "target_behavior_cluster": "multi_turn_state_lost"
+    },
+    {
+      "coverage_strata": [
+        "hallucination",
+        "irrelevance"
+      ],
+      "dev_feedback_history": [],
+      "entry_id": "hallucination_abstain_v0",
+      "legacy_rashe_entry_id": "bfcl_hallucination_abstain_v0",
+      "mechanism_hypothesis": "Unsupported, hallucinated, or irrelevant answers may be reduced with an abstain/evidence-boundary verifier candidate.",
+      "recommended_action": "request_bounded_dev_smoke",
+      "risk_flags": [
+        "false_abstain_risk",
+        "requires_fresh_dev_slice",
+        "not_performance_evidence"
+      ],
+      "source_evidence_count": 40,
+      "state_transition_history": [
+        {
+          "from": "rashe_discovery_seed",
+          "reason": "two abstention-safety strata share compact unsupported_or_irrelevant answer failure mass",
+          "to": "proposal_ready"
+        }
+      ],
+      "status": "proposal_ready",
+      "target_behavior_cluster": "unsupported_or_irrelevant_answer"
+    },
+    {
+      "coverage_strata": [
+        "agentic_web_search",
+        "agentic_memory"
+      ],
+      "dev_feedback_history": [],
+      "entry_id": "unresolved_search_memory_watch_v0",
+      "legacy_rashe_entry_id": "unresolved_web_search_memory_v0",
+      "mechanism_hypothesis": "The current evidence mixes search query/fetch failure with memory retrieve/update confusion and must be split before proposal readiness.",
+      "recommended_action": "split_or_collect_more_compact_diagnostics",
+      "risk_flags": [
+        "mixed_mechanism",
+        "single_stratum_child_clusters",
+        "diagnostics_only",
+        "not_scorer_ready"
+      ],
+      "source_evidence_count": 40,
+      "state_transition_history": [
+        {
+          "from": "rashe_discovery_seed",
+          "reason": "web-search and memory evidence remains mixed and under-supported for a single behavior candidate",
+          "to": "watch"
+        }
+      ],
+      "status": "watch",
+      "target_behavior_cluster": "search_query_or_fetch_failure_and_memory_retrieve_update_confusion"
+    }
+  ],
+  "huawei_acceptance_ready": false,
+  "not_bfcl_category_bound": true,
+  "performance_evidence": false,
+  "predecessor_artifacts": {
+    "rashe_archive_index": "outputs/artifacts/stage1_bfcl_acceptance/rashe_evolution_archive/archive_index.json",
+    "rashe_opportunity_table": "outputs/artifacts/stage1_bfcl_acceptance/rashe_opportunity_table.json",
+    "rashe_stage3_evidence_index": "outputs/artifacts/stage1_bfcl_acceptance/rashe_stage3_evidence_index.json"
+  },
+  "provider_calls_authorized": false,
+  "raw_material_persisted": false,
+  "schema_version": "abhe_archive_v0",
+  "scorer_authorized": false,
+  "source_evidence_role": "discovery_archive_seed_only",
+  "sota_3pp_claim_ready": false,
+  "total_compact_source_cases": 160
+}
+

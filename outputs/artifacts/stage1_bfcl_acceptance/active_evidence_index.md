@@ -12,9 +12,10 @@ This index is the active evidence entrypoint for Stage-1 BFCL. It records curren
 - runtime_behavior_approval_status: `approved`
 - runtime_behavior_scope: `synthetic_default_disabled_only`
 - provenance note: commit fields above are non-self-referential anchors. The current cleanup commit is intentionally represented as `see git HEAD`.
-- active route: `retrieval_augmented_skill_harness_evolution` (RASHE)
-- RASHE route approved: true
-- active route status: `rashe_offline_scaffold_complete_fail_closed_plus_l1_runtime_behavior_approved`
+- active route: `archive_based_behavior_harness_evolution` (ABHE)
+- predecessor route: `retrieval_augmented_skill_harness_evolution` (RASHE discovery scaffold)
+- RASHE route retained as predecessor: true
+- active route status: `abhe_planning_archive_policy_fail_closed`
 - no BFCL +3pp evidence yet: true
 
 ## Active Provider And Dataset Gates
@@ -41,7 +42,27 @@ Provider/dataset green status is technical preflight only. It does not authorize
 
 The legacy pre-runtime gate intentionally rejects approved runtime packets. The current post-runtime gate validates the approved L1 synthetic/default-disabled runtime behavior packet and keeps downstream lanes fail-closed.
 
-## RASHE Offline Scaffold Gates
+## ABHE Planning Route
+
+ABHE is the active planning route. It is archive-based and behavior-level:
+
+- archive: `abhe_archive/archive_index.json`
+- opportunity table: `abhe_archive/opportunity_table.json`
+- policy config: `abhe_archive/policy_config.yaml`
+- planner: `scripts/plan_abhe_next_evolution.py --write --compact --strict`
+- planner output: `outputs/artifacts/stage1_bfcl_acceptance/abhe_next_evolution_plan.json`
+
+The ABHE planner does not call a provider, run BFCL/model code, authorize scorer, generate candidates, or claim performance. It only chooses which archive entries should request a future fresh bounded dev smoke packet.
+
+Current ABHE decision:
+
+- `state_tracking_v0`: request bounded dev smoke.
+- `hallucination_abstain_v0`: request bounded dev smoke.
+- `unresolved_search_memory_watch_v0`: watch; split or collect more compact diagnostics.
+
+The 160 compact source cases are discovery/archive-seeding evidence only. They are not candidate validation or improvement evidence.
+
+## RASHE Predecessor Scaffold Gates
 
 | gate | status | active evidence |
 | --- | --- | --- |
@@ -52,7 +73,7 @@ The legacy pre-runtime gate intentionally rejects approved runtime packets. The 
 | proposer schema | `rashe_proposer_schema_passed=true` | `scripts/check_rashe_proposer_schema.py --compact --strict` |
 | offline evolution loop | `rashe_offline_evolution_loop_passed=true` | `scripts/check_rashe_evolution_loop.py --compact --strict` |
 
-Offline scaffold readiness remains evidence that the scaffold is present and fail-closed. It is not the source of runtime behavior authorization.
+Offline scaffold readiness remains evidence that the scaffold is present and fail-closed. It is not the active complete method, not a direct scorer route, and not the source of performance evidence.
 
 Active RASHE docs:
 
@@ -89,6 +110,6 @@ L1 runtime behavior approval does not authorize source expansion, BFCL scorer, c
 
 ## Next Action
 
-`prepare_downstream_approvals_before_source_candidate_scorer_performance`
+`prepare_abhe_trace_and_bounded_dev_smoke_approval_packets`
 
-The current approval state allows only L1 synthetic/default-disabled runtime behavior checks. Source collection, candidate generation, scorer, performance evidence, SOTA/+3pp claims, and Huawei acceptance remain separate pending lanes.
+The current approval state allows only ABHE planning and L1 synthetic/default-disabled runtime behavior checks. Trace extraction and bounded dev smoke require separate approval packets. Source collection, candidate generation, scorer, performance evidence, SOTA/+3pp claims, and Huawei acceptance remain separate pending lanes.

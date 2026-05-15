@@ -1,0 +1,77 @@
+{
+  "artifact_kind": "abhe_next_evolution_plan",
+  "bfcl_evaluate_authorized": false,
+  "bfcl_generate_authorized": false,
+  "blockers": [],
+  "candidate_activation_authorized": false,
+  "candidate_generation_authorized": false,
+  "candidate_jsonl_authorized": false,
+  "candidate_pool_ready": false,
+  "does_not_authorize_scorer": true,
+  "does_not_call_bfcl_or_model": true,
+  "does_not_call_provider": true,
+  "does_not_claim_performance": true,
+  "does_not_generate_candidate": true,
+  "forbidden_interpretations": [
+    "160_compact_cases_as_performance_improvement",
+    "bfcl_category_to_skill_mapping",
+    "rashe_as_current_complete_method",
+    "deterministic_argument_repair_as_active_next_step",
+    "search_memory_mixed_entry_direct_to_scorer"
+  ],
+  "huawei_acceptance_ready": false,
+  "next_required_packets": [
+    "temporary_trace_extraction_approval_packet",
+    "abhe_bounded_dev_smoke_execution_packet"
+  ],
+  "not_selected_actions": [],
+  "performance_evidence": false,
+  "provider_calls_authorized": false,
+  "requires_fresh_dev_slice": true,
+  "schema_version": "abhe_next_evolution_plan_v0",
+  "scorer_authorized": false,
+  "selected_actions": [
+    {
+      "action": "request_bounded_dev_smoke",
+      "coverage_strata": [
+        "multi_turn_base",
+        "multi_turn_long_context",
+        "multi_turn_miss_func",
+        "multi_turn_miss_param"
+      ],
+      "entry_id": "state_tracking_v0",
+      "reason": "high_failure_mass_cross_strata_clear_mechanism",
+      "source_evidence_count": 80,
+      "target_behavior_cluster": "multi_turn_state_lost"
+    },
+    {
+      "action": "request_bounded_dev_smoke",
+      "coverage_strata": [
+        "hallucination",
+        "irrelevance"
+      ],
+      "entry_id": "hallucination_abstain_v0",
+      "reason": "clear_target_bucket_low_cost_verifier_candidate",
+      "source_evidence_count": 40,
+      "target_behavior_cluster": "unsupported_or_irrelevant_answer"
+    }
+  ],
+  "sota_3pp_claim_ready": false,
+  "source_archive": "abhe_archive/archive_index.json",
+  "source_evidence_role": "discovery_archive_seed_only",
+  "source_opportunity_table": "abhe_archive/opportunity_table.json",
+  "trace_packet_is_separate_from_dev_smoke_packet": true,
+  "watch_actions": [
+    {
+      "action": "split_or_collect_more_compact_diagnostics",
+      "coverage_strata": [
+        "agentic_web_search",
+        "agentic_memory"
+      ],
+      "entry_id": "unresolved_search_memory_watch_v0",
+      "reason": "mixed_mechanism_single_or_unclear_strata",
+      "source_evidence_count": 40,
+      "target_behavior_cluster": "search_query_or_fetch_failure_and_memory_retrieve_update_confusion"
+    }
+  ]
+}

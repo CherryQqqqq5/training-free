@@ -1,0 +1,45 @@
+artifact_kind: abhe_policy_config
+schema_version: abhe_policy_config_v0
+method: archive_based_behavior_harness_evolution
+predecessor_route: RASHE
+predecessor_role: discovery_scaffold_only
+bfcl_category_role: sampling_reporting_validation_strata_only
+source_evidence_role: discovery_archive_seed_only
+required_planner_flags:
+  does_not_call_provider: true
+  does_not_call_bfcl_or_model: true
+  does_not_authorize_scorer: true
+  does_not_generate_candidate: true
+  does_not_claim_performance: true
+proposal_ready_action: request_bounded_dev_smoke
+watch_action: split_or_collect_more_compact_diagnostics
+forbidden_mainline_next_steps:
+  - deterministic_argument_repair
+  - tool_name_schema_normalization
+  - schema_retrieval_rerank
+  - memory_or_search_direct_dev_smoke
+  - scorer_without_execution_packet
+  - performance_claim_from_compact_evidence
+forbidden_fields:
+  - raw_prompt
+  - raw_trace
+  - raw_payload
+  - provider_exchange
+  - raw_case_id
+  - gold_answer
+  - expected_answer
+  - reference_answer
+  - tool_argument_values
+  - scorer_diff
+  - candidate_output
+  - api_key
+  - bearer_token
+  - endpoint_value
+state_transition_rules:
+  leakage_count_gt_0: rejected_boundary_failure
+  target_bucket_reduction_lte_0: demoted_no_mechanism_signal
+  fixed_count_lte_regressed_count: demoted_regression_not_controlled
+  high_non_target_regression: narrow_router_requested
+  mixed_strata_result: split_requested
+  target_bucket_down_fixed_gt_regressed_cost_ok: dev_passed
+
