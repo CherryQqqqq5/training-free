@@ -1,0 +1,58 @@
+{
+  "abhe_v0_candidate_specs_passed": true,
+  "artifact_kind": "abhe_v0_simple_candidate_specs",
+  "blockers": [],
+  "candidate_generation_authorized": false,
+  "candidate_jsonl_generated": false,
+  "candidate_pool_ready": false,
+  "candidate_rule_generated": false,
+  "candidate_yaml_generated": false,
+  "performance_evidence": false,
+  "schema_version": "abhe_v0_simple_candidate_specs_v0",
+  "specs": [
+    {
+      "activation_boundary": "multi_turn_only_state_carryover_evidence_required",
+      "candidate_type": "state_summary_injection",
+      "entry_id": "state_tracking_v0",
+      "materialized": false,
+      "non_target_exclusions": [
+        "single_turn",
+        "search_memory_watch",
+        "state_mutation"
+      ],
+      "primary_metrics": [
+        "target_bucket_reduction",
+        "fixed_count",
+        "regressed_count"
+      ],
+      "safety_metrics": [
+        "non_target_regression_count",
+        "latency_delta_pct",
+        "cost_delta_pct"
+      ],
+      "target_behavior_cluster": "multi_turn_state_lost"
+    },
+    {
+      "activation_boundary": "answerability_failure_only",
+      "candidate_type": "evidence_boundary_verifier",
+      "entry_id": "hallucination_abstain_v0",
+      "materialized": false,
+      "non_target_exclusions": [
+        "valid_actionable_tool_use",
+        "sufficient_evidence_cases"
+      ],
+      "primary_metrics": [
+        "target_bucket_reduction",
+        "false_abstain_count",
+        "fixed_count",
+        "regressed_count"
+      ],
+      "safety_metrics": [
+        "valid_tool_call_suppression_count",
+        "non_target_regression_count"
+      ],
+      "target_behavior_cluster": "unsupported_or_irrelevant_answer"
+    }
+  ],
+  "synthetic_dry_run_only": true
+}

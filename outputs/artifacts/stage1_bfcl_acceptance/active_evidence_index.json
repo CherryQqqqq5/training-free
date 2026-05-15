@@ -89,7 +89,14 @@
     "abhe_trace_extraction_approval_schema": "outputs/artifacts/stage1_bfcl_acceptance/abhe_trace_extraction_approval.schema.json",
     "abhe_fresh_dev_slice_approval_schema": "outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_approval.schema.json",
     "abhe_candidate_spec_approval_schema": "outputs/artifacts/stage1_bfcl_acceptance/abhe_candidate_spec_approval.schema.json",
-    "abhe_granular_approval_review_memo": "docs/stage1_abhe_granular_approval_review_memo.md"
+    "abhe_granular_approval_review_memo": "docs/stage1_abhe_granular_approval_review_memo.md",
+    "abhe_behavior_taxonomy_v0": "abhe_archive/behavior_taxonomy_v0.json",
+    "abhe_v0_simple_closed_loop_doc": "docs/stage1_abhe_v0_simple_closed_loop.md",
+    "abhe_v0_policy_score": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_policy_score.json",
+    "abhe_v0_simple_candidate_specs": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_simple_candidate_specs.json",
+    "abhe_v0_synthetic_fresh_dev_slice_manifest": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_synthetic_fresh_dev_slice_manifest.json",
+    "abhe_v0_synthetic_dev_feedback": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_synthetic_dev_feedback.json",
+    "abhe_v0_archive_transition_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_archive_transition_plan.json"
   },
   "active_provider": {
     "active_provider_evidence_only": [
@@ -143,7 +150,7 @@
     "blocker": "downstream_lanes_fail_closed",
     "dataset_is_current_blocker": false,
     "provider_is_current_blocker": false,
-    "summary": "ABHE granular approval review memo is ready for human review; execution remains fail-closed. Trace extraction, fresh dev slice, candidate spec, and bounded dev smoke execution each require separate approved packets. Source collection, candidate generation, scorer, performance evidence, SOTA/+3pp, and Huawei acceptance remain pending/fail-closed."
+    "summary": "ABHE-v0 synthetic closed-loop baseline is ready: taxonomy, policy score, non-executable candidate specs, synthetic dev feedback, and archive transition plan exist. Execution remains fail-closed; no provider, BFCL, scorer, real fresh dev slice, candidate materialization, archive update, or performance claim has occurred."
   },
   "default_branch_delivery_risk": {
     "base_handoff_commit": "eaafa624",
@@ -275,12 +282,19 @@
     "abhe_fresh_dev_slice_approved": false,
     "abhe_candidate_spec_approved": false,
     "abhe_execution_approved": false,
-    "abhe_granular_approval_review_memo_ready": true
+    "abhe_granular_approval_review_memo_ready": true,
+    "abhe_v0_simple_closed_loop_synthetic_ready": true,
+    "abhe_v0_selected_entries": [
+      "state_tracking_v0",
+      "hallucination_abstain_v0"
+    ],
+    "abhe_v0_paired_dev_smoke_executed": false,
+    "abhe_v0_archive_updated": false
   },
   "latest_hygiene_source_head": "b94855e0",
   "main_merge_completed": true,
   "negative_evidence_report": "docs/stage1_bfcl_negative_evidence_report.md",
-  "next_action": "human_review_granular_approval_lanes",
+  "next_action": "review_abhe_v0_synthetic_closed_loop_and_request_minimal_real_approval",
   "no_bfcl_3pp_evidence_yet": true,
   "non_self_referential_provenance": true,
   "optional_diagnostic_counter_fields": [

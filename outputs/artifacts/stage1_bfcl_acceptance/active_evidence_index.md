@@ -49,8 +49,15 @@ ABHE is the active planning route. It is archive-based and behavior-level:
 - archive: `abhe_archive/archive_index.json`
 - opportunity table: `abhe_archive/opportunity_table.json`
 - policy config: `abhe_archive/policy_config.yaml`
+- ABHE-v0 behavior taxonomy: `abhe_archive/behavior_taxonomy_v0.json`
 - planner: `scripts/plan_abhe_next_evolution.py --write --compact --strict`
 - planner output: `outputs/artifacts/stage1_bfcl_acceptance/abhe_next_evolution_plan.json`
+- ABHE-v0 simple closed-loop doc: `docs/stage1_abhe_v0_simple_closed_loop.md`
+- ABHE-v0 policy score: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_policy_score.json`
+- ABHE-v0 simple candidate specs: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_simple_candidate_specs.json`
+- ABHE-v0 synthetic fresh dev slice manifest: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_synthetic_fresh_dev_slice_manifest.json`
+- ABHE-v0 synthetic dev feedback: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_synthetic_dev_feedback.json`
+- ABHE-v0 archive transition plan: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_archive_transition_plan.json`
 - planning readiness: `outputs/artifacts/stage1_bfcl_acceptance/abhe_planning_ready.json`
 - review bundle: `outputs/artifacts/stage1_bfcl_acceptance/abhe_review_bundle.json`
 - approval chain: `outputs/artifacts/stage1_bfcl_acceptance/abhe_approval_chain.json`
@@ -76,7 +83,16 @@ Current ABHE decision:
 
 The 160 compact source cases are discovery/archive-seeding evidence only. They are not candidate validation or improvement evidence.
 
-Current execution state: ABHE planning readiness, approval-chain review bundle readiness, and the granular approval review memo are ready for human review, but execution readiness is false. The dry-run-only runner is materialized for manifest checks; trace extraction approval, fresh dev slice approval, candidate spec approval, execution approval, candidate rule, runtime config, scorer authorization, and performance evidence remain absent/fail-closed.
+Current execution state: ABHE planning readiness, approval-chain review bundle readiness, the granular approval review memo, and the ABHE-v0 synthetic closed-loop baseline are ready for human review, but execution readiness is false. The dry-run-only runner is materialized for manifest checks; trace extraction approval, fresh dev slice approval, candidate spec approval, execution approval, candidate rule, runtime config, scorer authorization, and performance evidence remain absent/fail-closed.
+
+ABHE-v0 synthetic closed-loop status:
+
+- taxonomy entries: 10 two-level behavior clusters
+- selected synthetic top-2 entries: `state_tracking_v0`, `hallucination_abstain_v0`
+- candidate specs: non-executable spec artifacts only
+- synthetic feedback: fixture-only, paired dev smoke not executed
+- archive transition plan: dry-run only, archive not updated
+- performance evidence: false
 
 ## RASHE Predecessor Scaffold Gates
 
@@ -126,6 +142,6 @@ L1 runtime behavior approval does not authorize source expansion, BFCL scorer, c
 
 ## Next Action
 
-`human_review_granular_approval_lanes`
+`review_abhe_v0_synthetic_closed_loop_and_request_minimal_real_approval`
 
-ABHE granular approval review memo is ready for human review; RASHE remains discovery predecessor. Trace extraction, fresh dev slice, candidate spec review, and bounded dev smoke execution each require separate approved packets. Source collection, candidate generation, scorer, performance evidence, SOTA/+3pp claims, and Huawei acceptance remain pending/fail-closed.
+ABHE-v0 synthetic closed-loop baseline is ready for human review; RASHE remains discovery predecessor. Trace extraction, fresh dev slice, candidate spec review, and bounded dev smoke execution each require separate approved packets. Source collection, candidate generation, scorer, real fresh dev slice materialization, archive mutation, performance evidence, SOTA/+3pp claims, and Huawei acceptance remain pending/fail-closed.
