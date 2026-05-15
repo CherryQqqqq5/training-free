@@ -54,6 +54,7 @@ ABHE is the active planning route. It is archive-based and behavior-level:
 - planning readiness: `outputs/artifacts/stage1_bfcl_acceptance/abhe_planning_ready.json`
 - review bundle: `outputs/artifacts/stage1_bfcl_acceptance/abhe_review_bundle.json`
 - approval chain: `outputs/artifacts/stage1_bfcl_acceptance/abhe_approval_chain.json`
+- granular approval review memo: `docs/stage1_abhe_granular_approval_review_memo.md`
 - review request: `outputs/artifacts/stage1_bfcl_acceptance/abhe_review_request.json`
 - execution approval schema: `outputs/artifacts/stage1_bfcl_acceptance/abhe_execution_approval.schema.json`
 - trace extraction approval schema: `outputs/artifacts/stage1_bfcl_acceptance/abhe_trace_extraction_approval.schema.json`
@@ -75,7 +76,7 @@ Current ABHE decision:
 
 The 160 compact source cases are discovery/archive-seeding evidence only. They are not candidate validation or improvement evidence.
 
-Current execution state: ABHE planning readiness and approval-chain review bundle readiness are true, but execution readiness is false. The dry-run-only runner is materialized for manifest checks; trace extraction approval, fresh dev slice approval, candidate spec approval, execution approval, candidate rule, runtime config, scorer authorization, and performance evidence remain absent/fail-closed.
+Current execution state: ABHE planning readiness, approval-chain review bundle readiness, and the granular approval review memo are ready for human review, but execution readiness is false. The dry-run-only runner is materialized for manifest checks; trace extraction approval, fresh dev slice approval, candidate spec approval, execution approval, candidate rule, runtime config, scorer authorization, and performance evidence remain absent/fail-closed.
 
 ## RASHE Predecessor Scaffold Gates
 
@@ -125,6 +126,6 @@ L1 runtime behavior approval does not authorize source expansion, BFCL scorer, c
 
 ## Next Action
 
-`request_granular_approval_reviews`
+`human_review_granular_approval_lanes`
 
-ABHE approval-chain review bundle is ready for granular approval discussion; RASHE remains discovery predecessor. Trace extraction, fresh dev slice, candidate spec review, and bounded dev smoke execution each require separate approved packets. Source collection, candidate generation, scorer, performance evidence, SOTA/+3pp claims, and Huawei acceptance remain pending/fail-closed.
+ABHE granular approval review memo is ready for human review; RASHE remains discovery predecessor. Trace extraction, fresh dev slice, candidate spec review, and bounded dev smoke execution each require separate approved packets. Source collection, candidate generation, scorer, performance evidence, SOTA/+3pp claims, and Huawei acceptance remain pending/fail-closed.
