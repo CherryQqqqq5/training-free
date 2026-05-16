@@ -40,6 +40,12 @@ def validate_adapter(adapter: Dict[str, Any]) -> List[str]:
             blockers.append(f"{key}_not_false")
     if adapter.get("raw_material_absent") is not True:
         blockers.append("raw_material_absent_not_true")
+    if adapter.get("entry_specific_activation_required") is not True:
+        blockers.append("entry_specific_activation_required_not_true")
+    if adapter.get("fallback_global_activation_allowed") is not False:
+        blockers.append("fallback_global_activation_allowed_not_false")
+    if adapter.get("runtime_context_source") != "runner_env_activation_entry_or_categories":
+        blockers.append("runtime_context_source_invalid")
     projections = adapter.get("runtime_projection")
     if not isinstance(projections, list):
         blockers.append("runtime_projection_not_list")

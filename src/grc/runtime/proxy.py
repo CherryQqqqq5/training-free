@@ -253,44 +253,66 @@ def _load_abhe_v0_runtime_candidate_adapter() -> Dict[str, Any] | None:
     return data
 
 
-def _abhe_v0_candidate_guidance(adapter: Dict[str, Any]) -> str:
-    fragments: list[str] = []
-    for projection in adapter.get("runtime_projection", []):
-        if not isinstance(projection, dict):
-            continue
-        entry_id = projection.get("entry_id")
-        candidate_type = projection.get("candidate_type")
-        if entry_id == "state_tracking_v0" and candidate_type == "state_summary_injection":
-            fragments.append(
-                "For selected multi-turn state carryover cases, preserve prior-turn entities, "
-                "constraints, and selected options when later turns refer back to them. "
-                "Do not mutate state, do not activate on single-turn cases, and do not activate "
-                "for search or memory watch behavior."
-            )
-        if entry_id == "hallucination_abstain_v0" and candidate_type == "evidence_boundary_verifier":
-            fragments.append(
-                "For selected answerability-boundary cases, do not fabricate unsupported or "
-                "irrelevant answers. If evidence or tool capability is insufficient, use an "
-                "insufficient-evidence boundary response. Do not suppress valid actionable tool calls, "
-                "and preserve false-abstain telemetry boundaries."
-            )
-    if not fragments:
-        return ""
-    return "ABHE-v0 bounded dev smoke candidate guidance. " + " ".join(fragments)
+
+def _abhe_v0_projection_guidance(projection: Dict[str, Any]) -> str:
+    entry_id = projection.get("entry_id")
+    candidate_type = projection.get("candidate_type")
+    if entry_id == "state_tracking_v0" and candidate_type == "state_summary_injection":
+        return (
+            "For selected multi-turn state carryover cases, preserve prior-turn entities, "
+            "constraints, and selected options when later turns refer back to them. "
+            "Do not mutate state, do not activate on single-turn cases, and do not activate "
+            "for search or memory watch behavior."
+        )
+    if entry_id == "hallucination_abstain_v0" and candidate_type == "evidence_boundary_verifier":
+        return (
+            "For selected answerability-boundary cases, do not fabricate unsupported or "
+            "irrelevant answers. If evidence or tool capability is insufficient, use an "
+            "insufficient-evidence boundary response. Do not suppress valid actionable tool calls, "
+            "and preserve false-abstain telemetry boundaries."
+        )
+    return ""
+
+
+def _abhe_v0_active_projection(adapter: Dict[str, Any]) -> tuple[Dict[str, Any] | None, str]:
+    projections = [projection for projection in adapter.get("runtime_projection", []) if isinstance(projection, dict)]
+    requested_entry = os.environ.get("ABHE_V0_RUNTIME_ACTIVATION_ENTRY", "").strip()
+    requested_categories = {
+        item.strip()
+        for item in os.environ.get("ABHE_V0_RUNTIME_ACTIVATION_CATEGORIES", "").split(",")
+        if item.strip()
+    }
+    if requested_entry:
+        for projection in projections:
+            if projection.get("entry_id") == requested_entry:
+                return projection, "entry_env_match"
+        return None, "entry_env_no_projection_match"
+    if requested_categories:
+        for projection in projections:
+            categories = set(projection.get("activation_categories") or [])
+            if categories.intersection(requested_categories):
+                return projection, "category_env_match"
+        return None, "category_env_no_projection_match"
+    return None, "bfcl_request_context_missing"
 
 
 def _apply_abhe_v0_adapter_guidance(chat_req_json: Dict[str, Any]) -> tuple[Dict[str, Any], list[str]]:
     adapter = _load_abhe_v0_runtime_candidate_adapter()
     if adapter is None:
         return chat_req_json, []
-    guidance = _abhe_v0_candidate_guidance(adapter)
-    if not guidance:
-        return chat_req_json, []
+    projection, reason = _abhe_v0_active_projection(adapter)
+    if projection is None:
+        return chat_req_json, [f"abhe_v0_runtime_candidate_adapter_guidance_skipped:{reason}"]
+    guidance_fragment = _abhe_v0_projection_guidance(projection)
+    if not guidance_fragment:
+        return chat_req_json, ["abhe_v0_runtime_candidate_adapter_guidance_skipped:empty_projection_guidance"]
     patched = dict(chat_req_json)
     messages = list(patched.get("messages") or [])
+    entry_id = str(projection.get("entry_id"))
+    guidance = "ABHE-v0 bounded dev smoke candidate guidance. " + guidance_fragment
     messages.insert(0, {"role": "developer", "content": guidance})
     patched["messages"] = messages
-    return patched, ["abhe_v0_runtime_candidate_adapter_guidance"]
+    return patched, [f"abhe_v0_runtime_candidate_adapter_guidance:{entry_id}"]
 
 def _chat_response_to_responses_payload(chat_json: Dict[str, Any]) -> Dict[str, Any]:
     choices = chat_json.get("choices", [])

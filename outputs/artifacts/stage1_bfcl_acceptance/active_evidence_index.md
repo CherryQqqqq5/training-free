@@ -78,6 +78,7 @@ ABHE is the active planning route. It is archive-based and behavior-level:
 - ABHE-v0 BFCL execution readiness: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_execution_readiness.json`
 - ABHE-v0 BFCL dry-run manifest: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_dry_run_manifest.json`
 - ABHE-v0 BFCL compact dev feedback schema: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_feedback.schema.json`
+- ABHE-v0 BFCL case delta analysis: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_case_delta_analysis.json`
 - ABHE-v0 BFCL archive transition plan: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_archive_transition_plan.json`
 - planning readiness: `outputs/artifacts/stage1_bfcl_acceptance/abhe_planning_ready.json`
 - review bundle: `outputs/artifacts/stage1_bfcl_acceptance/abhe_review_bundle.json`
@@ -182,7 +183,7 @@ L1 runtime behavior approval does not authorize source expansion, BFCL scorer, c
 
 ## Next Action
 
-`review_compact_dev_feedback_before_any_archive_write`
+`review_entry_specific_activation_rerun_and_redesign_candidates_before_any_archive_write`
 
 ABHE-v0 bounded dev smoke has completed in compact-only form under the approved 20-case fresh slice. RASHE remains discovery predecessor. Archive mutation, holdout/full-suite evaluation, performance evidence, SOTA/+3pp claims, and Huawei acceptance remain pending/fail-closed.
 
@@ -201,10 +202,13 @@ ABHE-v0 bounded dev smoke has completed in compact-only form under the approved 
 - provider/profile/model: `ToolCallingFunction/OpenAICompatible` / `toolcallingfunction` / `gpt-4.1`
 - selected_case_ids_hash: `sha256:8e28826895c76afd14fb2ec07550b871ea50df25c0666881dad39be86450991f`
 - scope: `bounded_dev_smoke_only`, 20 selected fresh BFCL cases
-- baseline compact: 6/20 selected cases, accuracy `0.3`
+- rerun mode: entry-specific candidate activation by archive entry/category group
+- baseline compact: 8/20 selected cases, accuracy `0.4`
 - candidate compact: 8/20 selected cases, accuracy `0.4`
-- compact dev feedback: `state_tracking_v0` fixed_count=2, regressed_count=0, target_bucket_reduction=2; `hallucination_abstain_v0` fixed_count=0, regressed_count=0, target_bucket_reduction=0
-- archive transition plan: dry-run only; `state_tracking_v0 -> dev_passed`, `hallucination_abstain_v0 -> demoted_no_mechanism_signal`
+- compact dev feedback: `state_tracking_v0` fixed_count=0, regressed_count=0, target_bucket_reduction=0; `hallucination_abstain_v0` fixed_count=0, regressed_count=0, target_bucket_reduction=0
+- case delta analysis: strict per-compact-case pairing is unavailable because 20 compact identifiers collapse to 7 BFCL scorer units; current paired delta is category-scorer-unit compact analysis
+- activation telemetry: entry-specific guidance detected, global guidance not detected
+- archive transition plan: dry-run only; `state_tracking_v0 -> demoted_no_mechanism_signal`, `hallucination_abstain_v0 -> demoted_no_mechanism_signal`
 - archive_updated: false
 - holdout_touched: false
 - full_suite_touched: false

@@ -28,6 +28,7 @@ from scripts.check_abhe_trace_extraction_approval_packet import check as check_t
 from scripts.check_abhe_trace_extraction_packet import check as check_trace_packet
 from scripts.plan_abhe_post_dev_update import build_plan as build_post_dev_plan
 from scripts.check_abhe_v0_bfcl_dev_feedback import check as check_bfcl_dev_feedback
+from scripts.check_abhe_v0_bfcl_case_delta_analysis import check as check_bfcl_case_delta
 from scripts.check_abhe_v0_bfcl_dev_smoke_approval_request import check as check_bfcl_dev_smoke_request
 from scripts.check_abhe_v0_bfcl_dev_smoke_result import check as check_bfcl_dev_smoke_result
 from scripts.check_abhe_v0_bfcl_execution_readiness import build_report as build_bfcl_execution_readiness
@@ -44,6 +45,13 @@ DEFAULT_OUTPUT = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_planning_re
 
 def _prefixed(prefix: str, blockers: List[str]) -> List[str]:
     return ["%s:%s" % (prefix, blocker) for blocker in blockers]
+
+
+def _summary(report: Dict[str, Any], keys: List[str]) -> Dict[str, Any]:
+    summary = {key: report.get(key) for key in keys if key in report}
+    if "blockers" in report:
+        summary["blockers"] = report.get("blockers", [])
+    return summary
 
 
 def build_report() -> Dict[str, Any]:
@@ -72,6 +80,7 @@ def build_report() -> Dict[str, Any]:
     bfcl_dev_smoke_result = check_bfcl_dev_smoke_result()
     bfcl_dev_feedback_schema = check_bfcl_dev_feedback(schema_only=True)
     bfcl_dev_feedback = check_bfcl_dev_feedback()
+    bfcl_case_delta = check_bfcl_case_delta()
     bfcl_archive_transition = build_bfcl_archive_transition(bfcl_synthetic_feedback(), synthetic_fixture_only=True)
     transition_blockers = validate_transition(Namespace(
         entry_id="state_tracking_v0",
@@ -152,6 +161,8 @@ def build_report() -> Dict[str, Any]:
         blockers.extend(_prefixed("bfcl_dev_feedback", bfcl_dev_feedback.get("blockers", [])))
     if not bfcl_archive_transition.get("abhe_v0_bfcl_archive_transition_plan_passed"):
         blockers.extend(_prefixed("bfcl_archive_transition", bfcl_archive_transition.get("blockers", [])))
+    if not bfcl_case_delta.get("abhe_v0_bfcl_case_delta_analysis_check_passed"):
+        blockers.extend(_prefixed("bfcl_case_delta_analysis", bfcl_case_delta.get("blockers", [])))
 
     execution_authorized = False
     scorer_authorized = False
@@ -193,6 +204,7 @@ def build_report() -> Dict[str, Any]:
         "abhe_v0_bfcl_dev_feedback_ready": bfcl_dev_feedback.get("abhe_v0_bfcl_dev_feedback_check_passed") is True,
         "abhe_v0_bfcl_dev_feedback_schema_ready": bfcl_dev_feedback_schema.get("abhe_v0_bfcl_dev_feedback_check_passed") is True,
         "abhe_v0_bfcl_archive_transition_ready": bfcl_archive_transition.get("abhe_v0_bfcl_archive_transition_plan_passed") is True,
+        "abhe_v0_bfcl_case_delta_analysis_ready": bfcl_case_delta.get("abhe_v0_bfcl_case_delta_analysis_check_passed") is True,
         "no_leakage_boundary_passed": leakage["abhe_no_leakage_boundary_passed"],
         "execution_authorized": execution_authorized,
         "scorer_authorized": scorer_authorized,
@@ -237,6 +249,7 @@ def build_report() -> Dict[str, Any]:
             "abhe_v0_bfcl_dev_smoke_dry_run_manifest": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_dry_run_manifest.json",
             "abhe_v0_bfcl_dev_smoke_result": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_result.json",
             "abhe_v0_bfcl_dev_feedback": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_feedback.json",
+            "abhe_v0_bfcl_case_delta_analysis": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_case_delta_analysis.json",
             "abhe_v0_bfcl_dev_feedback_schema": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_feedback.schema.json",
             "abhe_v0_bfcl_archive_transition_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_archive_transition_plan.json",
         },
@@ -268,6 +281,7 @@ def build_report() -> Dict[str, Any]:
             "abhe_v0_bfcl_dry_run_manifest": bfcl_dry_run_manifest,
             "abhe_v0_bfcl_dev_smoke_result": bfcl_dev_smoke_result,
             "abhe_v0_bfcl_dev_feedback": bfcl_dev_feedback,
+            "abhe_v0_bfcl_case_delta_analysis": bfcl_case_delta,
             "abhe_v0_bfcl_dev_feedback_schema": bfcl_dev_feedback_schema,
             "abhe_v0_bfcl_archive_transition": bfcl_archive_transition,
             "no_leakage": leakage,

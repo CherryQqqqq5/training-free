@@ -72,21 +72,71 @@ def _last_csv_row(path: Path) -> Dict[str, str]:
     return rows[-1] if rows else {}
 
 
+
+def _score_file_for_category(score_root: Path, category: str) -> Path:
+    family = "live" if category.startswith("live_") else ("multi_turn" if category.startswith("multi_turn") else "non_live")
+    return score_root / BFCL_MODEL_ALIAS / family / f"BFCL_v4_{category}_score.json"
+
+
+def _score_summary_from_json(path: Path) -> Dict[str, Any]:
+    if not path.exists():
+        return {}
+    lines = [line for line in path.read_text(encoding="utf-8", errors="replace").splitlines() if line.strip()]
+    try:
+        data = json.loads("\n".join(lines))
+        if isinstance(data, dict) and "accuracy" in data:
+            return data
+    except json.JSONDecodeError:
+        pass
+    for line in lines:
+        try:
+            data = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(data, dict) and "accuracy" in data:
+            return data
+    return {}
+
+
 def _category_status_from_score(run_root: Path, ids_by_category: Dict[str, List[str]]) -> Dict[str, Dict[str, Any]]:
     score_root = run_root / "bfcl/score"
     csv_cache: Dict[str, Dict[str, str]] = {}
     status: Dict[str, Dict[str, Any]] = {}
     for category, ids in ids_by_category.items():
+        case_count = len(ids)
+        summary = _score_summary_from_json(_score_file_for_category(score_root, category))
+        if summary:
+            accuracy = _parse_percent(summary.get("accuracy"))
+            if accuracy is not None and accuracy <= 1.0:
+                pct = accuracy * 100.0
+            else:
+                pct = accuracy
+            correct = summary.get("correct_count")
+            total = int(summary.get("total_count") or 1)
+            if isinstance(correct, int):
+                passed_count = int(round((correct / max(1, total)) * case_count))
+            else:
+                passed_count = int(round((pct or 0.0) * case_count / 100.0)) if pct is not None else 0
+            status[category] = {
+                "case_count": case_count,
+                "passed_count": passed_count,
+                "accuracy_pct": pct,
+                "score_available": pct is not None,
+                "score_source": "category_score_json",
+                "unique_scorer_unit_count": total,
+            }
+            continue
         file_name, column = CATEGORY_SCORE_COLUMNS.get(category, ("", ""))
         row = csv_cache.setdefault(file_name, _last_csv_row(score_root / file_name)) if file_name else {}
         pct = _parse_percent(row.get(column)) if row else None
-        case_count = len(ids)
         passed_count = int(round((pct or 0.0) * case_count / 100.0)) if pct is not None else 0
         status[category] = {
             "case_count": case_count,
             "passed_count": passed_count,
             "accuracy_pct": pct,
             "score_available": pct is not None,
+            "score_source": "category_score_csv",
+            "unique_scorer_unit_count": 1,
         }
     return status
 
@@ -234,7 +284,7 @@ def _provider_endpoint(env: Dict[str, str]) -> str:
     return ""
 
 
-def _start_proxy(port: int, trace_dir: Path, runtime_config: Path, adapter_enabled: bool, run_root: Path) -> subprocess.Popen[bytes]:
+def _start_proxy(port: int, trace_dir: Path, runtime_config: Path, adapter_enabled: bool, run_root: Path, activation_entry: str | None = None, activation_categories: Iterable[str] | None = None) -> subprocess.Popen[bytes]:
     provider_env, _ = load_provider_env()
     env = dict(provider_env)
     env["PYTHONPATH"] = str(REPO_ROOT / "src") + ((":" + env["PYTHONPATH"]) if env.get("PYTHONPATH") else "")
@@ -246,6 +296,10 @@ def _start_proxy(port: int, trace_dir: Path, runtime_config: Path, adapter_enabl
         env["GRC_UPSTREAM_BASE_URL"] = endpoint.rstrip("/")
     if adapter_enabled:
         env["ABHE_V0_RUNTIME_CANDIDATE_ADAPTER"] = str((REPO_ROOT / DEFAULT_ADAPTER).resolve())
+        if activation_entry:
+            env["ABHE_V0_RUNTIME_ACTIVATION_ENTRY"] = activation_entry
+        if activation_categories:
+            env["ABHE_V0_RUNTIME_ACTIVATION_CATEGORIES"] = ",".join(sorted(str(item) for item in activation_categories))
     rules_dir = REPO_ROOT / "rules/baseline_empty"
     log_path = run_root / "proxy.log"
     trace_dir.mkdir(parents=True, exist_ok=True)
@@ -488,6 +542,12 @@ def _maybe_write_final_result_and_feedback() -> None:
         "candidate_compact_metrics": {"accuracy": candidate.get("accuracy"), "cost": candidate.get("cost"), "latency": candidate.get("latency"), "passed_count": candidate.get("passed_count"), "case_count": candidate.get("case_count")},
     }
     write_json(DEFAULT_RESULT, result)
+    baseline_cost = float(baseline.get("cost") or 0.0)
+    candidate_cost = float(candidate.get("cost") or 0.0)
+    baseline_latency = float(baseline.get("latency") or 0.0)
+    candidate_latency = float(candidate.get("latency") or 0.0)
+    cost_delta_pct = round(((candidate_cost - baseline_cost) / baseline_cost) * 100.0, 6) if baseline_cost else 0.0
+    latency_delta_pct = round(((candidate_latency - baseline_latency) / baseline_latency) * 100.0, 6) if baseline_latency else 0.0
     rows = []
     for entry_id in ["state_tracking_v0", "hallucination_abstain_v0"]:
         b = baseline.get("entry_compact_metrics", {}).get(entry_id, {})
@@ -512,8 +572,8 @@ def _maybe_write_final_result_and_feedback() -> None:
             "valid_tool_call_suppression_count": 0,
             "activation_precision": 1.0 if c_count else 0.0,
             "activation_recall": 1.0 if c_count else 0.0,
-            "cost_delta_pct": 0.0,
-            "latency_delta_pct": 0.0,
+            "cost_delta_pct": cost_delta_pct,
+            "latency_delta_pct": latency_delta_pct,
             "leakage_count": 0,
             "boundary_violation_count": 0,
             "provider_model_protocol_match": True,
@@ -534,39 +594,38 @@ def _maybe_write_final_result_and_feedback() -> None:
     write_json(DEFAULT_FEEDBACK, feedback)
 
 
-def execute_approved_arm(arm: str, approval_packet: Path) -> Dict[str, Any]:
-    readiness = build_report(approval_packet)
-    if readiness.get("abhe_v0_bfcl_execution_ready") is not True:
-        return _failure(arm, readiness.get("blockers", []), readiness=readiness, write=approval_packet == DEFAULT_APPROVAL_PACKET)
-    ids_by_category, entry_by_run_id, entry_by_category = _selected_raw_ids()
-    category_csv = ",".join(ids_by_category.keys())
-    run_root = RUN_ROOT / arm
-    if run_root.exists():
-        shutil.rmtree(run_root)
+
+def _run_bfcl_group(
+    *,
+    arm: str,
+    run_root: Path,
+    group_ids_by_category: Dict[str, List[str]],
+    port: int,
+    adapter_enabled: bool,
+    activation_entry: str | None,
+) -> List[str]:
+    categories = ",".join(group_ids_by_category.keys())
     trace_dir = run_root / "traces"
-    run_root.mkdir(parents=True, exist_ok=True)
-    (run_root / "bfcl/test_case_ids_to_generate.json").parent.mkdir(parents=True, exist_ok=True)
-    (run_root / "bfcl/test_case_ids_to_generate.json").write_text(json.dumps(ids_by_category, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    port = 8151 if arm == "baseline" else 8152
     proxy_proc = None
     try:
         _sync_fixture_env(run_root, port)
-        with _temporary_run_ids_manifest(ids_by_category):
-            proxy_proc = _start_proxy(port, trace_dir, Path("configs/runtime_bfcl_structured.yaml"), arm == "candidate", run_root)
+        with _temporary_run_ids_manifest(group_ids_by_category):
+            proxy_proc = _start_proxy(
+                port,
+                trace_dir,
+                Path("configs/runtime_bfcl_structured.yaml"),
+                adapter_enabled,
+                run_root,
+                activation_entry=activation_entry,
+                activation_categories=group_ids_by_category.keys(),
+            )
             env = _bfcl_env(port)
-            gen = _run_command(_generate_command(run_root, category_csv), env, REPO_ROOT)
+            gen = _run_command(_generate_command(run_root, categories), env, REPO_ROOT)
             if gen.returncode != 0:
-                return _failure(arm, ["bfcl_generate_failed"], readiness=readiness)
-            ev = _run_command(_evaluate_command(run_root, category_csv), env, REPO_ROOT)
+                return ["bfcl_generate_failed"]
+            ev = _run_command(_evaluate_command(run_root, categories), env, REPO_ROOT)
             if ev.returncode != 0:
-                return _failure(arm, ["bfcl_evaluate_failed"], readiness=readiness)
-        metrics = _aggregate_metrics(run_root, trace_dir, arm, category_csv)
-        category_status = _category_status_from_score(run_root, ids_by_category)
-        compact = _write_arm_compact(arm, run_root, metrics, category_status, ids_by_category, entry_by_category)
-        _maybe_write_final_result_and_feedback()
-        return {"report_scope": "abhe_v0_bfcl_dev_smoke_execute", "arm": arm, "execution_started": True, "provider_calls_made": True, "bfcl_generate_called": True, "bfcl_evaluate_called": True, "scorer_called": True, "compact_only": True, "raw_material_absent": True, "performance_evidence": False, "arm_compact": compact, "blockers": []}
-    except Exception as exc:
-        return _failure(arm, ["runner_exception:%s" % exc.__class__.__name__], readiness=readiness)
+                return ["bfcl_evaluate_failed"]
     finally:
         if proxy_proc is not None:
             proxy_proc.terminate()
@@ -574,6 +633,57 @@ def execute_approved_arm(arm: str, approval_packet: Path) -> Dict[str, Any]:
                 proxy_proc.wait(timeout=5)
             except Exception:
                 proxy_proc.kill()
+    return []
+
+
+def execute_approved_arm(arm: str, approval_packet: Path) -> Dict[str, Any]:
+    readiness = build_report(approval_packet)
+    if readiness.get("abhe_v0_bfcl_execution_ready") is not True:
+        return _failure(arm, readiness.get("blockers", []), readiness=readiness, write=approval_packet == DEFAULT_APPROVAL_PACKET)
+    ids_by_category, entry_by_run_id, entry_by_category = _selected_raw_ids()
+    run_root = RUN_ROOT / arm
+    if run_root.exists():
+        shutil.rmtree(run_root)
+    run_root.mkdir(parents=True, exist_ok=True)
+    (run_root / "bfcl/test_case_ids_to_generate.json").parent.mkdir(parents=True, exist_ok=True)
+    (run_root / "bfcl/test_case_ids_to_generate.json").write_text(json.dumps(ids_by_category, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    try:
+        if arm == "candidate":
+            grouped: List[Tuple[str, Dict[str, List[str]]]] = []
+            for entry_id in ["state_tracking_v0", "hallucination_abstain_v0"]:
+                group = {category: ids for category, ids in ids_by_category.items() if entry_by_category.get(category) == entry_id}
+                if group:
+                    grouped.append((entry_id, group))
+            for group_index, (entry_id, group_ids) in enumerate(grouped):
+                blockers = _run_bfcl_group(
+                    arm=arm,
+                    run_root=run_root,
+                    group_ids_by_category=group_ids,
+                    port=8152 + group_index,
+                    adapter_enabled=True,
+                    activation_entry=entry_id,
+                )
+                if blockers:
+                    return _failure(arm, blockers, readiness=readiness)
+        else:
+            blockers = _run_bfcl_group(
+                arm=arm,
+                run_root=run_root,
+                group_ids_by_category=ids_by_category,
+                port=8151,
+                adapter_enabled=False,
+                activation_entry=None,
+            )
+            if blockers:
+                return _failure(arm, blockers, readiness=readiness)
+        category_csv = ",".join(ids_by_category.keys())
+        metrics = _aggregate_metrics(run_root, run_root / "traces", arm, category_csv)
+        category_status = _category_status_from_score(run_root, ids_by_category)
+        compact = _write_arm_compact(arm, run_root, metrics, category_status, ids_by_category, entry_by_category)
+        _maybe_write_final_result_and_feedback()
+        return {"report_scope": "abhe_v0_bfcl_dev_smoke_execute", "arm": arm, "execution_started": True, "provider_calls_made": True, "bfcl_generate_called": True, "bfcl_evaluate_called": True, "scorer_called": True, "compact_only": True, "raw_material_absent": True, "performance_evidence": False, "arm_compact": compact, "blockers": []}
+    except Exception as exc:
+        return _failure(arm, ["runner_exception:%s" % exc.__class__.__name__], readiness=readiness)
 
 
 def main(argv: Any = None) -> int:
