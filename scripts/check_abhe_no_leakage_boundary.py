@@ -37,6 +37,12 @@ DEFAULT_PATHS = [
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_dry_run_manifest.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_approval_packet.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_execution_failure.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_candidate_adapter.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_provider_preflight.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_baseline_arm_compact.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_candidate_arm_compact.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_result.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_feedback.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_feedback.schema.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_archive_transition_plan.json"),
     Path("docs/stage1_abhe_v0_bfcl_fresh_dev_slice.md"),
@@ -126,11 +132,43 @@ ALLOWED_KEY_NAMES = {
     "provider_env_status",
     "api_key_env_set",
     "expected_api_key_env",
+    "profile_loaded",
+    "profile_source_checked",
+    "endpoint_env_present",
+    "api_key_env_present",
     "endpoint_env_status",
     "endpoint_env_candidates",
     "provider_api_key_env_missing",
+    "adapter_ready",
+    "scorer_called",
+    "bfcl_evaluate_called",
+    "bfcl_generate_called",
+    "provider_calls_made",
+    "runtime_config_path",
+    "fresh_slice_manifest_path",
+    "candidate_artifact_path",
+    "provider_preflight_path",
+    "provider_preflight_passed",
+    "provider_preflight_summary",
+    "candidate_jsonl_generated",
+    "candidate_yaml_generated",
+    "candidate_rule_generated",
+    "runtime_projection",
+    "runtime_guidance_fragment_id",
+    "preflight_status_code_class",
+    "preflight_error_class",
+    "endpoint_env_status_redacted",
+    "endpoint_value_persisted",
+    "secret_values_persisted",
     "provider_endpoint_env_missing",
     "raw_material_absent",
+}
+
+OPTIONAL_DEFAULT_PATHS = {
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_baseline_arm_compact.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_candidate_arm_compact.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_result.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_feedback.json"),
 }
 
 FORBIDDEN_KEY_RE = re.compile(
@@ -269,7 +307,7 @@ def check_paths(paths: List[Path]) -> Dict[str, Any]:
     checked = []
     for path in paths:
         if not path.exists():
-            if path.name == "abhe_next_evolution_plan.json":
+            if path.name == "abhe_next_evolution_plan.json" or path in OPTIONAL_DEFAULT_PATHS:
                 continue
             blockers.append("missing_path:%s" % path)
             continue

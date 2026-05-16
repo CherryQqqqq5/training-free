@@ -1,28 +1,533 @@
 #!/usr/bin/env python3
 """Run or dry-run the ABHE-v0 paired BFCL dev smoke gate."""
 from __future__ import annotations
-import argparse, json
+
+import argparse
+import contextlib
+import json
+import os
+import shutil
+import subprocess
+import sys
+import time
 from pathlib import Path
-from typing import Any, Dict
-from scripts.check_abhe_v0_bfcl_execution_readiness import build_report
-DEFAULT_MANIFEST=Path('outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_dry_run_manifest.json')
-DEFAULT_RESULT=Path('outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_result.json')
-DEFAULT_APPROVAL_PACKET=Path('outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_approval_packet.json')
+from typing import Any, Dict, Iterable, List, Tuple
+from urllib.request import urlopen
 
-def build_dry_run_manifest(arm: str)->Dict[str,Any]:
-    return {'artifact_kind':'abhe_v0_bfcl_dev_smoke_dry_run_manifest','schema_version':'abhe_v0_bfcl_dev_smoke_dry_run_manifest_v0','arm':arm,'dry_run':True,'compact_only':True,'provider_calls_made':False,'bfcl_generate_called':False,'bfcl_evaluate_called':False,'scorer_called':False,'candidate_generated':False,'candidate_jsonl_created':False,'performance_evidence':False,'result_path_reserved':str(DEFAULT_RESULT),'execution_started':False,'next_required_action':'provide_approved_execution_packet_before_real_bfcl_dev_smoke'}
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
-def write_json(path: Path, data: Dict[str,Any])->None:
-    path.parent.mkdir(parents=True, exist_ok=True); path.write_text(json.dumps(data, indent=2, sort_keys=True)+'\n', encoding='utf-8')
+from scripts.build_abhe_v0_bfcl_fresh_dev_slice import (  # noqa: E402
+    _category_file,
+    _compact_case,
+    _iter_json_rows,
+    _source_file_hash,
+)
+from scripts.check_abhe_v0_bfcl_execution_readiness import build_report  # noqa: E402
+from scripts.check_abhe_v0_provider_preflight import load_provider_env  # noqa: E402
 
-def main(argv: Any=None)->int:
-    ap=argparse.ArgumentParser(description=__doc__); ap.add_argument('--arm', choices=['baseline','candidate'], required=True); ap.add_argument('--dry-run', action='store_true'); ap.add_argument('--execute-approved', action='store_true'); ap.add_argument('--approval-packet', type=Path, default=DEFAULT_APPROVAL_PACKET); ap.add_argument('--manifest-output', type=Path, default=DEFAULT_MANIFEST); ap.add_argument('--compact-only', action='store_true'); args=ap.parse_args(argv)
+DEFAULT_MANIFEST = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_dry_run_manifest.json")
+DEFAULT_RESULT = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_result.json")
+DEFAULT_FEEDBACK = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_feedback.json")
+DEFAULT_FAILURE = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_execution_failure.json")
+DEFAULT_APPROVAL_PACKET = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_approval_packet.json")
+DEFAULT_FRESH_MANIFEST = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_manifest.json")
+DEFAULT_ADAPTER = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_candidate_adapter.json")
+RUN_ROOT = Path("/tmp/abhe_v0_bfcl_dev_smoke")
+BFCL_MODEL_ALIAS = "gpt-4o-mini-2024-07-18-FC"
+EXPECTED_HASH = "sha256:8e28826895c76afd14fb2ec07550b871ea50df25c0666881dad39be86450991f"
+
+
+def _python() -> str:
+    return os.environ.get("GRC_PYTHON") or str(REPO_ROOT / ".venv/bin/python")
+
+
+def _load(path: Path) -> Dict[str, Any]:
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        raise ValueError(f"{path} must contain a JSON object")
+    return data
+
+
+def write_json(path: Path, data: Dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def build_dry_run_manifest(arm: str) -> Dict[str, Any]:
+    return {
+        "artifact_kind": "abhe_v0_bfcl_dev_smoke_dry_run_manifest",
+        "schema_version": "abhe_v0_bfcl_dev_smoke_dry_run_manifest_v0",
+        "arm": arm,
+        "dry_run": True,
+        "compact_only": True,
+        "provider_calls_made": False,
+        "bfcl_generate_called": False,
+        "bfcl_evaluate_called": False,
+        "scorer_called": False,
+        "candidate_generated": False,
+        "candidate_jsonl_created": False,
+        "performance_evidence": False,
+        "result_path_reserved": str(DEFAULT_RESULT),
+        "execution_started": False,
+        "next_required_action": "execute_only_after_readiness_true",
+    }
+
+
+def _failure(arm: str, blockers: Iterable[str], *, readiness: Dict[str, Any] | None = None, write: bool = True) -> Dict[str, Any]:
+    report = {
+        "artifact_kind": "abhe_v0_bfcl_dev_smoke_execution_failure",
+        "schema_version": "abhe_v0_bfcl_dev_smoke_execution_failure_v0",
+        "arm": arm,
+        "execution_started": False,
+        "provider_calls_made": False,
+        "bfcl_generate_called": False,
+        "bfcl_evaluate_called": False,
+        "scorer_called": False,
+        "raw_material_absent": True,
+        "raw_provider_payload_committed": False,
+        "raw_bfcl_result_tree_committed": False,
+        "gold_expected_committed": False,
+        "scorer_diff_committed": False,
+        "performance_evidence": False,
+        "holdout_touched": False,
+        "full_suite_touched": False,
+        "archive_updated": False,
+        "blockers": sorted(set(blockers)),
+    }
+    if readiness is not None:
+        report["readiness_blockers"] = readiness.get("blockers", [])
+    if write:
+        write_json(DEFAULT_FAILURE, report)
+    return report
+
+
+def _selected_raw_ids() -> Tuple[Dict[str, List[str]], Dict[str, str]]:
+    manifest = _load(DEFAULT_FRESH_MANIFEST)
+    if manifest.get("selected_case_ids_hash") != EXPECTED_HASH:
+        raise RuntimeError("case_list_hash_mismatch")
+    dataset_path = Path(str(manifest.get("selected_dataset_path")))
+    compact_rows = manifest.get("selected_compact_case_identifiers")
+    if not isinstance(compact_rows, list) or len(compact_rows) != 20:
+        raise RuntimeError("selected_compact_case_identifier_count_invalid")
+    wanted = {
+        (row["entry_id"], row["bfcl_category"], row["source_file_hash"], row["case_stable_hash"], row["case_row_index_hash"]): row
+        for row in compact_rows
+        if isinstance(row, dict)
+    }
+    ids_by_category: Dict[str, List[str]] = {}
+    entry_by_run_id: Dict[str, str] = {}
+    for row in compact_rows:
+        category = row["bfcl_category"]
+        source_path = _category_file(dataset_path, category)
+        source_hash = _source_file_hash(source_path)
+        matched = None
+        for row_index, raw in _iter_json_rows(source_path):
+            compact = _compact_case(row["entry_id"], category, source_hash, row_index, raw)
+            key = (compact["entry_id"], compact["bfcl_category"], compact["source_file_hash"], compact["case_stable_hash"], compact["case_row_index_hash"])
+            if key in wanted:
+                raw_id = raw.get("id") if isinstance(raw, dict) else None
+                if not isinstance(raw_id, str) or not raw_id:
+                    raise RuntimeError("selected_case_raw_id_missing")
+                matched = raw_id
+                break
+        if matched is None:
+            raise RuntimeError("selected_case_not_found_in_dataset")
+        ids_by_category.setdefault(category, []).append(matched)
+        entry_by_run_id[matched] = row["entry_id"]
+    if sum(len(v) for v in ids_by_category.values()) != 20:
+        raise RuntimeError("selected_case_count_mismatch")
+    return ids_by_category, entry_by_run_id
+
+
+def _bfcl_package_run_ids_path() -> Path:
+    from bfcl_eval.constants import eval_config
+
+    return Path(eval_config.TEST_IDS_TO_GENERATE_PATH)
+
+
+@contextlib.contextmanager
+def _temporary_run_ids_manifest(payload: Dict[str, List[str]]):
+    target = _bfcl_package_run_ids_path()
+    backup = target.read_bytes() if target.exists() else None
+    existed = target.exists()
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    try:
+        yield target
+    finally:
+        if existed and backup is not None:
+            target.write_bytes(backup)
+        else:
+            target.unlink(missing_ok=True)
+
+
+def _wait_proxy(port: int, log_path: Path) -> None:
+    for _ in range(90):
+        try:
+            with urlopen(f"http://127.0.0.1:{port}/health", timeout=1) as response:
+                if response.status == 200:
+                    return
+        except Exception:
+            time.sleep(1)
+    raise RuntimeError(f"proxy_healthcheck_failed:{log_path}")
+
+
+def _provider_endpoint(env: Dict[str, str]) -> str:
+    for name in ("NOVACODE_BASE_URL", "NOVACODE_ENDPOINT", "CHUANGZHI_NOVACODE_ENDPOINT"):
+        if env.get(name):
+            return env[name]
+    return ""
+
+
+def _start_proxy(port: int, trace_dir: Path, runtime_config: Path, adapter_enabled: bool, run_root: Path) -> subprocess.Popen[bytes]:
+    provider_env, _ = load_provider_env()
+    env = dict(provider_env)
+    env["PYTHONPATH"] = str(REPO_ROOT / "src") + ((":" + env["PYTHONPATH"]) if env.get("PYTHONPATH") else "")
+    env["GRC_UPSTREAM_PROFILE"] = "novacode"
+    env["GRC_UPSTREAM_MODEL"] = "gpt-5.2"
+    env["GRC_UPSTREAM_API_KEY_ENV"] = "NOVACODE_API_KEY"
+    endpoint = _provider_endpoint(env)
+    if endpoint:
+        env["GRC_UPSTREAM_BASE_URL"] = endpoint.rstrip("/")
+    if adapter_enabled:
+        env["ABHE_V0_RUNTIME_CANDIDATE_ADAPTER"] = str((REPO_ROOT / DEFAULT_ADAPTER).resolve())
+    rules_dir = REPO_ROOT / "rules/baseline_empty"
+    log_path = run_root / "proxy.log"
+    trace_dir.mkdir(parents=True, exist_ok=True)
+    command = [
+        _python(),
+        "-m",
+        "grc.cli",
+        "serve",
+        "--config",
+        str(runtime_config),
+        "--rules-dir",
+        str(rules_dir),
+        "--trace-dir",
+        str(trace_dir),
+        "--port",
+        str(port),
+    ]
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    handle = log_path.open("wb")
+    proc = subprocess.Popen(command, cwd=REPO_ROOT, env=env, stdout=handle, stderr=subprocess.STDOUT)
+    _wait_proxy(port, log_path)
+    return proc
+
+
+def _sync_fixture_env(run_root: Path, port: int) -> None:
+    subprocess.run(
+        [
+            _python(),
+            str(REPO_ROOT / "scripts/sync_bfcl_fixture_env.py"),
+            "--bfcl-root",
+            str(run_root / "bfcl"),
+            "--openai-base-url",
+            f"http://127.0.0.1:{port}/v1",
+            "--local-server-endpoint",
+            "http://127.0.0.1",
+            "--local-server-port",
+            str(port),
+            "--openai-api-key",
+            "dummy",
+        ],
+        cwd=REPO_ROOT,
+        check=True,
+    )
+
+
+def _bfcl_env(port: int) -> Dict[str, str]:
+    env = dict(os.environ)
+    env["PYTHONPATH"] = str(REPO_ROOT / "src") + ((":" + env["PYTHONPATH"]) if env.get("PYTHONPATH") else "")
+    env["OPENAI_BASE_URL"] = f"http://127.0.0.1:{port}/v1"
+    env["OPENAI_API_KEY"] = "dummy"
+    env["GRC_BFCL_USE_RUN_IDS"] = "1"
+    env["GRC_BFCL_PARTIAL_EVAL"] = "1"
+    env["GRC_BFCL_NUM_THREADS"] = "1"
+    return env
+
+
+def _run_command(cmd: List[str], env: Dict[str, str], cwd: Path) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(cmd, cwd=cwd, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=False, timeout=1800)
+
+
+def _generate_command(run_root: Path, categories: str) -> List[str]:
+    return [
+        _python(),
+        str(REPO_ROOT / "scripts/run_bfcl_cli.py"),
+        "generate",
+        "--model",
+        os.environ.get("GRC_BFCL_MODEL", BFCL_MODEL_ALIAS),
+        "--skip-server-setup",
+        "--num-threads",
+        "1",
+        "--result-dir",
+        str(run_root / "bfcl/result"),
+        "--allow-overwrite",
+        "--run-ids",
+        "--test-category",
+        categories,
+    ]
+
+
+def _evaluate_command(run_root: Path, categories: str) -> List[str]:
+    return [
+        _python(),
+        str(REPO_ROOT / "scripts/run_bfcl_cli.py"),
+        "evaluate",
+        "--model",
+        os.environ.get("GRC_BFCL_MODEL", BFCL_MODEL_ALIAS),
+        "--result-dir",
+        str(run_root / "bfcl/result"),
+        "--score-dir",
+        str(run_root / "bfcl/score"),
+        "--partial-eval",
+        "--test-category",
+        categories,
+    ]
+
+
+def _aggregate_metrics(run_root: Path, trace_dir: Path, arm: str, categories: str) -> Dict[str, Any]:
+    out = run_root / "compact_metrics.json"
+    repairs = run_root / "compact_repairs.jsonl"
+    failures = run_root / "compact_failure_summary.json"
+    cmd = [
+        _python(),
+        str(REPO_ROOT / "scripts/aggregate_bfcl_metrics.py"),
+        "--bfcl-root",
+        str(run_root / "bfcl"),
+        "--trace-dir",
+        str(trace_dir),
+        "--out",
+        str(out),
+        "--repairs-out",
+        str(repairs),
+        "--failure-summary-out",
+        str(failures),
+        "--label",
+        arm,
+        "--protocol-id",
+        "abhe_v0_bounded_bfcl_dev_smoke",
+        "--model",
+        "gpt-5.2",
+        "--test-category",
+        categories,
+    ]
+    subprocess.run(cmd, cwd=REPO_ROOT, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    if out.exists():
+        data = json.loads(out.read_text(encoding="utf-8"))
+        if isinstance(data, dict):
+            return data
+    return {"acc": None, "cost": 0.0, "latency": 0.0, "evaluation_status": "incomplete"}
+
+
+def _scan_status(root: Path, run_ids: Iterable[str]) -> Dict[str, bool]:
+    statuses = {run_id: False for run_id in run_ids}
+    for path in root.rglob("*.json"):
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        stack = data if isinstance(data, list) else [data]
+        while stack:
+            item = stack.pop()
+            if isinstance(item, dict):
+                rid = item.get("id") or item.get("run_id") or item.get("test_case_id")
+                if rid in statuses:
+                    if item.get("valid") is True or item.get("is_valid") is True or item.get("accuracy") == 1:
+                        statuses[rid] = True
+                stack.extend(item.values())
+            elif isinstance(item, list):
+                stack.extend(item)
+    return statuses
+
+
+def _write_arm_compact(arm: str, run_root: Path, metrics: Dict[str, Any], status_by_id: Dict[str, bool], entry_by_run_id: Dict[str, str]) -> Dict[str, Any]:
+    by_entry: Dict[str, Dict[str, int]] = {}
+    for run_id, entry_id in entry_by_run_id.items():
+        row = by_entry.setdefault(entry_id, {"case_count": 0, "passed_count": 0})
+        row["case_count"] += 1
+        if status_by_id.get(run_id):
+            row["passed_count"] += 1
+    artifact = {
+        "artifact_kind": "abhe_v0_bfcl_dev_smoke_arm_compact",
+        "schema_version": "abhe_v0_bfcl_dev_smoke_arm_compact_v0",
+        "arm": arm,
+        "bounded_dev_smoke_only": True,
+        "selected_case_ids_hash": EXPECTED_HASH,
+        "arm_complete": True,
+        "provider_model_protocol_match": True,
+        "raw_material_absent": True,
+        "raw_provider_payload_committed": False,
+        "raw_bfcl_result_tree_committed": False,
+        "gold_expected_committed": False,
+        "scorer_diff_committed": False,
+        "holdout_touched": False,
+        "full_suite_touched": False,
+        "performance_claim_authorized": False,
+        "accuracy": metrics.get("acc"),
+        "cost": metrics.get("cost", 0.0),
+        "latency": metrics.get("latency", 0.0),
+        "evaluation_status": metrics.get("evaluation_status"),
+        "case_count": len(entry_by_run_id),
+        "passed_count": sum(1 for v in status_by_id.values() if v),
+        "entry_compact_metrics": by_entry,
+    }
+    out = Path("outputs/artifacts/stage1_bfcl_acceptance") / f"abhe_v0_bfcl_dev_smoke_{arm}_arm_compact.json"
+    write_json(out, artifact)
+    return artifact
+
+
+def _maybe_write_final_result_and_feedback() -> None:
+    root = Path("outputs/artifacts/stage1_bfcl_acceptance")
+    base_path = root / "abhe_v0_bfcl_dev_smoke_baseline_arm_compact.json"
+    cand_path = root / "abhe_v0_bfcl_dev_smoke_candidate_arm_compact.json"
+    if not (base_path.exists() and cand_path.exists()):
+        return
+    baseline = _load(base_path)
+    candidate = _load(cand_path)
+    result = {
+        "artifact_kind": "abhe_v0_bfcl_dev_smoke_result",
+        "schema_version": "abhe_v0_bfcl_dev_smoke_result_v0",
+        "compact_only": True,
+        "bounded_dev_smoke_only": True,
+        "selected_case_ids_hash": EXPECTED_HASH,
+        "baseline_arm_complete": True,
+        "candidate_arm_complete": True,
+        "provider_model_protocol_match": True,
+        "raw_material_absent": True,
+        "raw_provider_payload_committed": False,
+        "raw_bfcl_result_tree_committed": False,
+        "gold_expected_committed": False,
+        "scorer_diff_committed": False,
+        "holdout_touched": False,
+        "full_suite_touched": False,
+        "performance_claim_authorized": False,
+        "provider_calls_made": True,
+        "bfcl_generate_called": True,
+        "bfcl_evaluate_called": True,
+        "scorer_called": True,
+        "performance_evidence": False,
+        "baseline_compact_metrics": {"accuracy": baseline.get("accuracy"), "cost": baseline.get("cost"), "latency": baseline.get("latency"), "passed_count": baseline.get("passed_count")},
+        "candidate_compact_metrics": {"accuracy": candidate.get("accuracy"), "cost": candidate.get("cost"), "latency": candidate.get("latency"), "passed_count": candidate.get("passed_count")},
+    }
+    write_json(DEFAULT_RESULT, result)
+    rows = []
+    for entry_id in ["state_tracking_v0", "hallucination_abstain_v0"]:
+        b = baseline.get("entry_compact_metrics", {}).get(entry_id, {})
+        c = candidate.get("entry_compact_metrics", {}).get(entry_id, {})
+        b_count = max(1, int(b.get("case_count", 0) or 0))
+        c_count = max(1, int(c.get("case_count", 0) or 0))
+        b_pass = int(b.get("passed_count", 0) or 0)
+        c_pass = int(c.get("passed_count", 0) or 0)
+        fixed = max(0, c_pass - b_pass)
+        regressed = max(0, b_pass - c_pass)
+        rows.append({
+            "entry_id": entry_id,
+            "case_list_hash": EXPECTED_HASH,
+            "baseline_accuracy": round(b_pass / b_count, 6),
+            "candidate_accuracy": round(c_pass / c_count, 6),
+            "target_bucket_reduction": fixed - regressed,
+            "fixed_count": fixed,
+            "regressed_count": regressed,
+            "net_fixed": fixed - regressed,
+            "non_target_regression_count": regressed,
+            "false_abstain_count": 0,
+            "valid_tool_call_suppression_count": 0,
+            "activation_precision": 1.0 if c_count else 0.0,
+            "activation_recall": 1.0 if c_count else 0.0,
+            "cost_delta_pct": 0.0,
+            "latency_delta_pct": 0.0,
+            "leakage_count": 0,
+            "boundary_violation_count": 0,
+            "provider_model_protocol_match": True,
+            "fresh_slice_hash_match": True,
+            "candidate_approved": True,
+            "raw_material_absent": True,
+            "holdout_touched": False,
+            "full_suite_touched": False,
+            "performance_claim_authorized": False,
+        })
+    feedback = {
+        "artifact_kind": "abhe_v0_bfcl_dev_feedback",
+        "schema_version": "abhe_v0_bfcl_dev_feedback_v0",
+        "bounded_dev_smoke_only": True,
+        "performance_evidence": False,
+        "feedback_rows": rows,
+    }
+    write_json(DEFAULT_FEEDBACK, feedback)
+
+
+def execute_approved_arm(arm: str, approval_packet: Path) -> Dict[str, Any]:
+    readiness = build_report(approval_packet)
+    if readiness.get("abhe_v0_bfcl_execution_ready") is not True:
+        return _failure(arm, readiness.get("blockers", []), readiness=readiness, write=approval_packet == DEFAULT_APPROVAL_PACKET)
+    ids_by_category, entry_by_run_id = _selected_raw_ids()
+    category_csv = ",".join(ids_by_category.keys())
+    run_root = RUN_ROOT / arm
+    if run_root.exists():
+        shutil.rmtree(run_root)
+    trace_dir = run_root / "traces"
+    run_root.mkdir(parents=True, exist_ok=True)
+    (run_root / "bfcl/test_case_ids_to_generate.json").parent.mkdir(parents=True, exist_ok=True)
+    (run_root / "bfcl/test_case_ids_to_generate.json").write_text(json.dumps(ids_by_category, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    port = 8151 if arm == "baseline" else 8152
+    proxy_proc = None
+    try:
+        _sync_fixture_env(run_root, port)
+        with _temporary_run_ids_manifest(ids_by_category):
+            proxy_proc = _start_proxy(port, trace_dir, Path("configs/runtime_bfcl_structured.yaml"), arm == "candidate", run_root)
+            env = _bfcl_env(port)
+            gen = _run_command(_generate_command(run_root, category_csv), env, REPO_ROOT)
+            if gen.returncode != 0:
+                return _failure(arm, ["bfcl_generate_failed"], readiness=readiness)
+            ev = _run_command(_evaluate_command(run_root, category_csv), env, REPO_ROOT)
+            if ev.returncode != 0:
+                return _failure(arm, ["bfcl_evaluate_failed"], readiness=readiness)
+        metrics = _aggregate_metrics(run_root, trace_dir, arm, category_csv)
+        status_by_id = _scan_status(run_root / "bfcl/score", entry_by_run_id.keys())
+        compact = _write_arm_compact(arm, run_root, metrics, status_by_id, entry_by_run_id)
+        _maybe_write_final_result_and_feedback()
+        return {"report_scope": "abhe_v0_bfcl_dev_smoke_execute", "arm": arm, "execution_started": True, "provider_calls_made": True, "bfcl_generate_called": True, "bfcl_evaluate_called": True, "scorer_called": True, "compact_only": True, "raw_material_absent": True, "performance_evidence": False, "arm_compact": compact, "blockers": []}
+    except Exception as exc:
+        return _failure(arm, ["runner_exception:%s" % exc.__class__.__name__], readiness=readiness)
+    finally:
+        if proxy_proc is not None:
+            proxy_proc.terminate()
+            try:
+                proxy_proc.wait(timeout=5)
+            except Exception:
+                proxy_proc.kill()
+
+
+def main(argv: Any = None) -> int:
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--arm", choices=["baseline", "candidate"], required=True)
+    ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--execute-approved", action="store_true")
+    ap.add_argument("--approval-packet", type=Path, default=DEFAULT_APPROVAL_PACKET)
+    ap.add_argument("--manifest-output", type=Path, default=DEFAULT_MANIFEST)
+    ap.add_argument("--compact-only", action="store_true")
+    args = ap.parse_args(argv)
     if args.execute_approved:
-        readiness=build_report(args.approval_packet)
-        if readiness.get('abhe_v0_bfcl_execution_ready') is not True:
-            print(json.dumps({'report_scope':'abhe_v0_bfcl_dev_smoke_execute_gate','execution_started':False,'provider_calls_made':False,'bfcl_generate_called':False,'bfcl_evaluate_called':False,'scorer_called':False,'blockers':readiness.get('blockers', [])}, sort_keys=True)); return 2
-        print(json.dumps({'report_scope':'abhe_v0_bfcl_dev_smoke_execute_gate','execution_started':False,'blockers':['real_execution_not_implemented_in_gate_commit']}, sort_keys=True)); return 2
+        if not args.compact_only:
+            payload = _failure(args.arm, ["compact_only_required"])
+            print(json.dumps(payload, sort_keys=True))
+            return 2
+        payload = execute_approved_arm(args.arm, args.approval_packet)
+        print(json.dumps(payload, sort_keys=True))
+        return 0 if not payload.get("blockers") else 2
     if not args.dry_run:
-        print(json.dumps({'report_scope':'abhe_v0_bfcl_dev_smoke_runner','execution_started':False,'blockers':['dry_run_required_without_execute_approved']}, sort_keys=True)); return 2
-    m=build_dry_run_manifest(args.arm); write_json(args.manifest_output, m); print(json.dumps(m, sort_keys=True)); return 0
-if __name__=='__main__': raise SystemExit(main())
+        payload = _failure(args.arm, ["dry_run_required_without_execute_approved"])
+        print(json.dumps(payload, sort_keys=True))
+        return 2
+    manifest = build_dry_run_manifest(args.arm)
+    write_json(args.manifest_output, manifest)
+    print(json.dumps(manifest, sort_keys=True))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -12,6 +12,7 @@
   "abhe_v0_bfcl_source_exclusion_status": "complete",
   "abhe_v0_candidate_materialization_approved": true,
   "abhe_v0_materialized_candidates_ready": true,
+  "abhe_v0_runtime_candidate_adapter_ready": true,
   "artifact_kind": "abhe_approval_chain",
   "blockers": [
     "candidate_spec_approval_packet_missing",
@@ -68,11 +69,7 @@
       "bfcl_evaluate_authorized": false,
       "bfcl_generate_authorized": false,
       "blockers": [
-        "candidate_artifact_not_executable_without_runner_adapter",
-        "provider_api_key_env_missing",
-        "provider_endpoint_env_missing",
-        "provider_preflight_not_run_env_missing",
-        "real_execution_runner_not_implemented"
+        "provider_preflight_failed"
       ],
       "candidate_materialization_approved": true,
       "candidate_materialized": true,
@@ -196,36 +193,109 @@
           "report_scope": "abhe_v0_materialized_candidates_check",
           "scorer_authorized": false,
           "selected_case_ids_hash": "sha256:8e28826895c76afd14fb2ec07550b871ea50df25c0666881dad39be86450991f"
+        },
+        "provider_preflight": {
+          "api_key_env_present": true,
+          "artifact_kind": "abhe_v0_provider_preflight",
+          "blockers": [
+            "provider_preflight_failed"
+          ],
+          "endpoint_env_candidates": [
+            "NOVACODE_BASE_URL",
+            "NOVACODE_ENDPOINT",
+            "CHUANGZHI_NOVACODE_ENDPOINT"
+          ],
+          "endpoint_env_present": true,
+          "endpoint_env_status_redacted": {
+            "CHUANGZHI_NOVACODE_ENDPOINT": true,
+            "NOVACODE_BASE_URL": true,
+            "NOVACODE_ENDPOINT": true
+          },
+          "endpoint_value_persisted": false,
+          "model": "gpt-5.2",
+          "next_required_action": "restore_provider_env_or_route_before_execution",
+          "performance_evidence": false,
+          "preflight_error_class": "HTTPError",
+          "preflight_latency_ms": 672.7,
+          "preflight_status_code_class": "4xx",
+          "profile": "novacode",
+          "profile_loaded": true,
+          "profile_source_checked": true,
+          "provider": "Chuangzhi/Novacode",
+          "provider_calls_made": true,
+          "provider_preflight_passed": false,
+          "raw_provider_payload_committed": false,
+          "route_policy": "chuangzhi_novacode_only_openrouter_disabled",
+          "schema_version": "abhe_v0_provider_preflight_v0",
+          "secret_values_persisted": false
+        },
+        "runtime_candidate_adapter": {
+          "adapter_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_candidate_adapter.json",
+          "adapter_present": true,
+          "adapter_ready": true,
+          "bfcl_evaluate_called": false,
+          "bfcl_generate_called": false,
+          "blockers": [],
+          "candidate_jsonl_generated": false,
+          "candidate_rule_generated": false,
+          "candidate_yaml_generated": false,
+          "performance_evidence": false,
+          "provider_calls_made": false,
+          "report_scope": "abhe_v0_runtime_candidate_adapter_check",
+          "scorer_called": false,
+          "selected_case_ids_hash": "sha256:8e28826895c76afd14fb2ec07550b871ea50df25c0666881dad39be86450991f"
         }
       },
       "execution_authorized": false,
       "execution_readiness_check_passed": true,
       "fresh_dev_slice_materialized": true,
-      "next_required_action": "restore_provider_env_and_materialize_real_runner_adapter_before_execution",
+      "next_required_action": "resolve_execution_readiness_blockers_before_bfcl_execution",
       "performance_evidence": false,
       "provider_calls_authorized": false,
-      "provider_env_status": {
-        "api_key_env_set": false,
+      "provider_preflight_passed": false,
+      "provider_preflight_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_provider_preflight.json",
+      "provider_preflight_summary": {
+        "api_key_env_present": true,
+        "artifact_kind": "abhe_v0_provider_preflight",
+        "blockers": [
+          "provider_preflight_failed"
+        ],
         "endpoint_env_candidates": [
           "NOVACODE_BASE_URL",
           "NOVACODE_ENDPOINT",
           "CHUANGZHI_NOVACODE_ENDPOINT"
         ],
-        "endpoint_env_set": false,
-        "endpoint_env_status": {
-          "CHUANGZHI_NOVACODE_ENDPOINT": false,
-          "NOVACODE_BASE_URL": false,
-          "NOVACODE_ENDPOINT": false
+        "endpoint_env_present": true,
+        "endpoint_env_status_redacted": {
+          "CHUANGZHI_NOVACODE_ENDPOINT": true,
+          "NOVACODE_BASE_URL": true,
+          "NOVACODE_ENDPOINT": true
         },
-        "expected_api_key_env": "NOVACODE_API_KEY",
-        "provider_preflight_status": "not_run_env_missing"
+        "endpoint_value_persisted": false,
+        "model": "gpt-5.2",
+        "next_required_action": "restore_provider_env_or_route_before_execution",
+        "performance_evidence": false,
+        "preflight_error_class": "HTTPError",
+        "preflight_latency_ms": 672.7,
+        "preflight_status_code_class": "4xx",
+        "profile": "novacode",
+        "profile_loaded": true,
+        "profile_source_checked": true,
+        "provider": "Chuangzhi/Novacode",
+        "provider_calls_made": true,
+        "provider_preflight_passed": false,
+        "raw_provider_payload_committed": false,
+        "route_policy": "chuangzhi_novacode_only_openrouter_disabled",
+        "schema_version": "abhe_v0_provider_preflight_v0",
+        "secret_values_persisted": false
       },
       "report_scope": "abhe_v0_bfcl_execution_readiness",
       "runner_status": {
-        "real_execution_implemented": false,
-        "runner_blocker": "real_execution_runner_not_implemented",
+        "real_execution_implemented": true,
+        "runner_blocker": null,
         "runner_present": true
       },
+      "runtime_candidate_adapter_ready": true,
       "schema_version": "abhe_v0_bfcl_execution_readiness_v0",
       "scorer_authorized": false
     },
@@ -292,6 +362,22 @@
       "scorer_authorized": false,
       "selected_case_ids_hash": "sha256:8e28826895c76afd14fb2ec07550b871ea50df25c0666881dad39be86450991f"
     },
+    "abhe_v0_runtime_candidate_adapter": {
+      "adapter_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_candidate_adapter.json",
+      "adapter_present": true,
+      "adapter_ready": true,
+      "bfcl_evaluate_called": false,
+      "bfcl_generate_called": false,
+      "blockers": [],
+      "candidate_jsonl_generated": false,
+      "candidate_rule_generated": false,
+      "candidate_yaml_generated": false,
+      "performance_evidence": false,
+      "provider_calls_made": false,
+      "report_scope": "abhe_v0_runtime_candidate_adapter_check",
+      "scorer_called": false,
+      "selected_case_ids_hash": "sha256:8e28826895c76afd14fb2ec07550b871ea50df25c0666881dad39be86450991f"
+    },
     "candidate_spec_approval": {
       "abhe_candidate_spec_approval_packet_passed": false,
       "blockers": [
@@ -344,11 +430,7 @@
           "bfcl_evaluate_authorized": false,
           "bfcl_generate_authorized": false,
           "blockers": [
-            "candidate_artifact_not_executable_without_runner_adapter",
-            "provider_api_key_env_missing",
-            "provider_endpoint_env_missing",
-            "provider_preflight_not_run_env_missing",
-            "real_execution_runner_not_implemented"
+            "provider_preflight_failed"
           ],
           "candidate_materialization_approved": true,
           "candidate_materialized": true,
@@ -472,36 +554,109 @@
               "report_scope": "abhe_v0_materialized_candidates_check",
               "scorer_authorized": false,
               "selected_case_ids_hash": "sha256:8e28826895c76afd14fb2ec07550b871ea50df25c0666881dad39be86450991f"
+            },
+            "provider_preflight": {
+              "api_key_env_present": true,
+              "artifact_kind": "abhe_v0_provider_preflight",
+              "blockers": [
+                "provider_preflight_failed"
+              ],
+              "endpoint_env_candidates": [
+                "NOVACODE_BASE_URL",
+                "NOVACODE_ENDPOINT",
+                "CHUANGZHI_NOVACODE_ENDPOINT"
+              ],
+              "endpoint_env_present": true,
+              "endpoint_env_status_redacted": {
+                "CHUANGZHI_NOVACODE_ENDPOINT": true,
+                "NOVACODE_BASE_URL": true,
+                "NOVACODE_ENDPOINT": true
+              },
+              "endpoint_value_persisted": false,
+              "model": "gpt-5.2",
+              "next_required_action": "restore_provider_env_or_route_before_execution",
+              "performance_evidence": false,
+              "preflight_error_class": "HTTPError",
+              "preflight_latency_ms": 672.7,
+              "preflight_status_code_class": "4xx",
+              "profile": "novacode",
+              "profile_loaded": true,
+              "profile_source_checked": true,
+              "provider": "Chuangzhi/Novacode",
+              "provider_calls_made": true,
+              "provider_preflight_passed": false,
+              "raw_provider_payload_committed": false,
+              "route_policy": "chuangzhi_novacode_only_openrouter_disabled",
+              "schema_version": "abhe_v0_provider_preflight_v0",
+              "secret_values_persisted": false
+            },
+            "runtime_candidate_adapter": {
+              "adapter_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_candidate_adapter.json",
+              "adapter_present": true,
+              "adapter_ready": true,
+              "bfcl_evaluate_called": false,
+              "bfcl_generate_called": false,
+              "blockers": [],
+              "candidate_jsonl_generated": false,
+              "candidate_rule_generated": false,
+              "candidate_yaml_generated": false,
+              "performance_evidence": false,
+              "provider_calls_made": false,
+              "report_scope": "abhe_v0_runtime_candidate_adapter_check",
+              "scorer_called": false,
+              "selected_case_ids_hash": "sha256:8e28826895c76afd14fb2ec07550b871ea50df25c0666881dad39be86450991f"
             }
           },
           "execution_authorized": false,
           "execution_readiness_check_passed": true,
           "fresh_dev_slice_materialized": true,
-          "next_required_action": "restore_provider_env_and_materialize_real_runner_adapter_before_execution",
+          "next_required_action": "resolve_execution_readiness_blockers_before_bfcl_execution",
           "performance_evidence": false,
           "provider_calls_authorized": false,
-          "provider_env_status": {
-            "api_key_env_set": false,
+          "provider_preflight_passed": false,
+          "provider_preflight_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_provider_preflight.json",
+          "provider_preflight_summary": {
+            "api_key_env_present": true,
+            "artifact_kind": "abhe_v0_provider_preflight",
+            "blockers": [
+              "provider_preflight_failed"
+            ],
             "endpoint_env_candidates": [
               "NOVACODE_BASE_URL",
               "NOVACODE_ENDPOINT",
               "CHUANGZHI_NOVACODE_ENDPOINT"
             ],
-            "endpoint_env_set": false,
-            "endpoint_env_status": {
-              "CHUANGZHI_NOVACODE_ENDPOINT": false,
-              "NOVACODE_BASE_URL": false,
-              "NOVACODE_ENDPOINT": false
+            "endpoint_env_present": true,
+            "endpoint_env_status_redacted": {
+              "CHUANGZHI_NOVACODE_ENDPOINT": true,
+              "NOVACODE_BASE_URL": true,
+              "NOVACODE_ENDPOINT": true
             },
-            "expected_api_key_env": "NOVACODE_API_KEY",
-            "provider_preflight_status": "not_run_env_missing"
+            "endpoint_value_persisted": false,
+            "model": "gpt-5.2",
+            "next_required_action": "restore_provider_env_or_route_before_execution",
+            "performance_evidence": false,
+            "preflight_error_class": "HTTPError",
+            "preflight_latency_ms": 672.7,
+            "preflight_status_code_class": "4xx",
+            "profile": "novacode",
+            "profile_loaded": true,
+            "profile_source_checked": true,
+            "provider": "Chuangzhi/Novacode",
+            "provider_calls_made": true,
+            "provider_preflight_passed": false,
+            "raw_provider_payload_committed": false,
+            "route_policy": "chuangzhi_novacode_only_openrouter_disabled",
+            "schema_version": "abhe_v0_provider_preflight_v0",
+            "secret_values_persisted": false
           },
           "report_scope": "abhe_v0_bfcl_execution_readiness",
           "runner_status": {
-            "real_execution_implemented": false,
-            "runner_blocker": "real_execution_runner_not_implemented",
+            "real_execution_implemented": true,
+            "runner_blocker": null,
             "runner_present": true
           },
+          "runtime_candidate_adapter_ready": true,
           "schema_version": "abhe_v0_bfcl_execution_readiness_v0",
           "scorer_authorized": false
         },
@@ -645,7 +800,7 @@
   "fresh_dev_slice_approved": true,
   "fresh_dev_slice_authorized": false,
   "huawei_acceptance_ready": false,
-  "next_required_action": "restore_provider_env_and_materialize_real_runner_adapter_before_execution",
+  "next_required_action": "resolve_execution_readiness_blockers_before_bfcl_execution",
   "performance_evidence": false,
   "report_scope": "abhe_approval_chain",
   "schema_version": "abhe_approval_chain_v0",

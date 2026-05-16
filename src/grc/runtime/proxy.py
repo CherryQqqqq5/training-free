@@ -232,6 +232,66 @@ def _responses_tool_choice_to_chat_tool_choice(
         return tool_choice
     return None
 
+
+
+def _load_abhe_v0_runtime_candidate_adapter() -> Dict[str, Any] | None:
+    adapter_path = os.environ.get("ABHE_V0_RUNTIME_CANDIDATE_ADAPTER")
+    if not adapter_path:
+        return None
+    try:
+        data = json.loads(Path(adapter_path).read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    if not isinstance(data, dict) or data.get("adapter_ready") is not True:
+        return None
+    if data.get("candidate_jsonl_generated") is not False:
+        return None
+    if data.get("candidate_rule_generated") is not False:
+        return None
+    if data.get("candidate_yaml_generated") is not False:
+        return None
+    return data
+
+
+def _abhe_v0_candidate_guidance(adapter: Dict[str, Any]) -> str:
+    fragments: list[str] = []
+    for projection in adapter.get("runtime_projection", []):
+        if not isinstance(projection, dict):
+            continue
+        entry_id = projection.get("entry_id")
+        candidate_type = projection.get("candidate_type")
+        if entry_id == "state_tracking_v0" and candidate_type == "state_summary_injection":
+            fragments.append(
+                "For selected multi-turn state carryover cases, preserve prior-turn entities, "
+                "constraints, and selected options when later turns refer back to them. "
+                "Do not mutate state, do not activate on single-turn cases, and do not activate "
+                "for search or memory watch behavior."
+            )
+        if entry_id == "hallucination_abstain_v0" and candidate_type == "evidence_boundary_verifier":
+            fragments.append(
+                "For selected answerability-boundary cases, do not fabricate unsupported or "
+                "irrelevant answers. If evidence or tool capability is insufficient, use an "
+                "insufficient-evidence boundary response. Do not suppress valid actionable tool calls, "
+                "and preserve false-abstain telemetry boundaries."
+            )
+    if not fragments:
+        return ""
+    return "ABHE-v0 bounded dev smoke candidate guidance. " + " ".join(fragments)
+
+
+def _apply_abhe_v0_adapter_guidance(chat_req_json: Dict[str, Any]) -> tuple[Dict[str, Any], list[str]]:
+    adapter = _load_abhe_v0_runtime_candidate_adapter()
+    if adapter is None:
+        return chat_req_json, []
+    guidance = _abhe_v0_candidate_guidance(adapter)
+    if not guidance:
+        return chat_req_json, []
+    patched = dict(chat_req_json)
+    messages = list(patched.get("messages") or [])
+    messages.insert(0, {"role": "developer", "content": guidance})
+    patched["messages"] = messages
+    return patched, ["abhe_v0_runtime_candidate_adapter_guidance"]
+
 def _chat_response_to_responses_payload(chat_json: Dict[str, Any]) -> Dict[str, Any]:
     choices = chat_json.get("choices", [])
     message = choices[0].get("message", {}) if choices and isinstance(choices[0], dict) else {}
@@ -356,7 +416,9 @@ def create_app(config_path: str, rules_dir: str, trace_dir: str) -> FastAPI:
     @app.post("/v1/chat/completions")
     async def chat_completions(request: Request) -> JSONResponse:
         original_req_json = await request.json()
-        req_json, request_patches = engine.apply_request(original_req_json)
+        adapter_req_json, adapter_patches = _apply_abhe_v0_adapter_guidance(original_req_json)
+        req_json, request_patches = engine.apply_request(adapter_req_json)
+        request_patches = list(request_patches) + adapter_patches
 
         if upstream_model:
             req_json["model"] = upstream_model
@@ -432,7 +494,9 @@ def create_app(config_path: str, rules_dir: str, trace_dir: str) -> FastAPI:
             req_json = chat_req_json
             request_patches = []
         else:
-            req_json, request_patches = engine.apply_request(chat_req_json)
+            adapter_chat_req_json, adapter_patches = _apply_abhe_v0_adapter_guidance(chat_req_json)
+            req_json, request_patches = engine.apply_request(adapter_chat_req_json)
+            request_patches = list(request_patches) + adapter_patches
         if upstream_model:
             req_json["model"] = upstream_model
 

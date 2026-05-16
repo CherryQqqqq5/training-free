@@ -185,3 +185,13 @@ L1 runtime behavior approval does not authorize source expansion, BFCL scorer, c
 `restore_provider_env_and_materialize_real_runner_adapter_before_execution`
 
 ABHE-v0 synthetic closed-loop baseline is ready for human review; RASHE remains discovery predecessor. Bounded dev smoke execution still requires a separate approved packet. Source collection, candidate generation, scorer, archive mutation, performance evidence, SOTA/+3pp claims, and Huawei acceptance remain pending/fail-closed.
+
+
+## ABHE-v0 execution adapter update
+
+- Runtime candidate adapter: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_candidate_adapter.json`
+- Provider preflight: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_provider_preflight.json`
+- Execution failure report: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_execution_failure.json`
+- Current blocker: `provider_preflight_failed` with redacted 4xx status.
+- BFCL execution started: false. Provider/BFCL/scorer calls for dev smoke: false after readiness gate.
+- `abhe_v0_bfcl_execution_ready=false`, `performance_evidence=false`, `holdout_touched=false`, `full_suite_touched=false`, `archive_updated=false`.

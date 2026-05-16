@@ -35,6 +35,7 @@ from scripts.check_abhe_v0_bfcl_fresh_dev_slice import check as check_bfcl_fresh
 from scripts.check_abhe_v0_bfcl_fresh_slice_review import check as check_bfcl_fresh_slice_review
 from scripts.check_abhe_v0_candidate_materialization_plan import check as check_bfcl_candidate_materialization
 from scripts.check_abhe_v0_materialized_candidates import check as check_bfcl_materialized_candidates
+from scripts.check_abhe_v0_runtime_candidate_adapter import check as check_bfcl_runtime_candidate_adapter
 from scripts.plan_abhe_v0_bfcl_archive_transition import build_plan as build_bfcl_archive_transition
 from scripts.plan_abhe_v0_bfcl_archive_transition import synthetic_feedback as bfcl_synthetic_feedback
 
@@ -64,6 +65,7 @@ def build_report() -> Dict[str, Any]:
     bfcl_fresh_slice_review = check_bfcl_fresh_slice_review()
     bfcl_candidate_materialization = check_bfcl_candidate_materialization()
     bfcl_materialized_candidates = check_bfcl_materialized_candidates()
+    bfcl_runtime_candidate_adapter = check_bfcl_runtime_candidate_adapter()
     bfcl_dev_smoke_request = check_bfcl_dev_smoke_request()
     bfcl_execution_readiness = build_bfcl_execution_readiness()
     bfcl_dry_run_manifest = check_bfcl_dev_smoke_result(dry_run_manifest=True)
@@ -132,6 +134,8 @@ def build_report() -> Dict[str, Any]:
         blockers.extend(_prefixed("bfcl_candidate_materialization", bfcl_candidate_materialization.get("blockers", [])))
     if not bfcl_materialized_candidates.get("abhe_v0_materialized_candidates_check_passed"):
         blockers.extend(_prefixed("bfcl_materialized_candidates", bfcl_materialized_candidates.get("blockers", [])))
+    if not bfcl_runtime_candidate_adapter.get("adapter_ready"):
+        blockers.extend(_prefixed("bfcl_runtime_candidate_adapter", bfcl_runtime_candidate_adapter.get("blockers", [])))
     if not bfcl_dev_smoke_request.get("abhe_v0_bfcl_dev_smoke_approval_request_passed"):
         blockers.extend(_prefixed("bfcl_dev_smoke_request", bfcl_dev_smoke_request.get("blockers", [])))
     if not bfcl_execution_readiness.get("execution_readiness_check_passed"):
@@ -175,6 +179,7 @@ def build_report() -> Dict[str, Any]:
         "abhe_v0_candidate_materialization_plan_ready": bfcl_candidate_materialization.get("abhe_v0_candidate_materialization_plan_check_passed") is True,
         "abhe_v0_candidate_materialization_approved": bfcl_materialized_candidates.get("candidate_materialization_approved") is True,
         "abhe_v0_materialized_candidates_ready": bfcl_materialized_candidates.get("abhe_v0_materialized_candidates_check_passed") is True,
+        "abhe_v0_runtime_candidate_adapter_ready": bfcl_runtime_candidate_adapter.get("adapter_ready") is True,
         "abhe_v0_bfcl_dev_smoke_request_ready": bfcl_dev_smoke_request.get("abhe_v0_bfcl_dev_smoke_approval_request_passed") is True,
         "abhe_v0_bfcl_execution_ready": bfcl_execution_readiness.get("abhe_v0_bfcl_execution_ready") is True,
         "abhe_v0_bfcl_dry_run_manifest_ready": bfcl_dry_run_manifest.get("abhe_v0_bfcl_dev_smoke_result_check_passed") is True,
@@ -218,6 +223,8 @@ def build_report() -> Dict[str, Any]:
             "abhe_v0_bfcl_dev_smoke_approval_request": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_approval_request.json",
             "abhe_v0_bfcl_dev_smoke_approval_packet": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_approval_packet.json",
             "abhe_v0_bfcl_dev_smoke_execution_failure": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_execution_failure.json",
+            "abhe_v0_runtime_candidate_adapter": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_candidate_adapter.json",
+            "abhe_v0_provider_preflight": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_provider_preflight.json",
             "abhe_v0_bfcl_execution_readiness": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_execution_readiness.json",
             "abhe_v0_bfcl_dev_smoke_dry_run_manifest": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_dry_run_manifest.json",
             "abhe_v0_bfcl_dev_feedback_schema": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_feedback.schema.json",
@@ -245,6 +252,7 @@ def build_report() -> Dict[str, Any]:
             "abhe_v0_bfcl_fresh_slice_review": bfcl_fresh_slice_review,
             "abhe_v0_candidate_materialization": bfcl_candidate_materialization,
             "abhe_v0_materialized_candidates": bfcl_materialized_candidates,
+            "abhe_v0_runtime_candidate_adapter": bfcl_runtime_candidate_adapter,
             "abhe_v0_bfcl_dev_smoke_request": bfcl_dev_smoke_request,
             "abhe_v0_bfcl_execution_readiness": bfcl_execution_readiness,
             "abhe_v0_bfcl_dry_run_manifest": bfcl_dry_run_manifest,

@@ -19,6 +19,7 @@ from scripts.check_abhe_v0_bfcl_dev_smoke_approval_packet import check as check_
 from scripts.check_abhe_v0_bfcl_execution_readiness import build_report as build_bfcl_execution_readiness
 from scripts.check_abhe_v0_bfcl_fresh_slice_review import check as check_bfcl_fresh_slice_review
 from scripts.check_abhe_v0_materialized_candidates import check as check_bfcl_materialized_candidates
+from scripts.check_abhe_v0_runtime_candidate_adapter import check as check_bfcl_runtime_candidate_adapter
 
 DEFAULT_OUTPUT = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_approval_chain.json")
 BFCL_DATASET_SELECTION_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dataset_path_selection.json")
@@ -53,6 +54,7 @@ def build_report() -> Dict[str, Any]:
     bfcl_execution_readiness = build_bfcl_execution_readiness()
     bfcl_fresh_slice_review = check_bfcl_fresh_slice_review()
     bfcl_materialized_candidates = check_bfcl_materialized_candidates()
+    bfcl_runtime_candidate_adapter = check_bfcl_runtime_candidate_adapter()
     bfcl_dataset_selection = json.loads(BFCL_DATASET_SELECTION_PATH.read_text(encoding="utf-8")) if BFCL_DATASET_SELECTION_PATH.exists() else {}
     bfcl_fresh_slice_review_artifact = json.loads(BFCL_FRESH_SLICE_REVIEW_PATH.read_text(encoding="utf-8")) if BFCL_FRESH_SLICE_REVIEW_PATH.exists() else {}
     bfcl_source_exclusion_proof = json.loads(BFCL_SOURCE_EXCLUSION_PROOF_PATH.read_text(encoding="utf-8")) if BFCL_SOURCE_EXCLUSION_PROOF_PATH.exists() else {}
@@ -112,6 +114,7 @@ def build_report() -> Dict[str, Any]:
         "abhe_v0_bfcl_selected_case_ids_hash": bfcl_fresh_slice_manifest.get("selected_case_ids_hash"),
         "abhe_v0_candidate_materialization_approved": bfcl_materialized_candidates.get("candidate_materialization_approved") is True,
         "abhe_v0_materialized_candidates_ready": bfcl_materialized_candidates.get("abhe_v0_materialized_candidates_check_passed") is True,
+        "abhe_v0_runtime_candidate_adapter_ready": bfcl_runtime_candidate_adapter.get("adapter_ready") is True,
         "execution_authorized": False,
         "trace_extraction_authorized": False,
         "fresh_dev_slice_authorized": False,
@@ -132,6 +135,7 @@ def build_report() -> Dict[str, Any]:
             "abhe_v0_bfcl_execution_readiness": bfcl_execution_readiness,
             "abhe_v0_bfcl_fresh_slice_review": bfcl_fresh_slice_review,
             "abhe_v0_materialized_candidates": bfcl_materialized_candidates,
+            "abhe_v0_runtime_candidate_adapter": bfcl_runtime_candidate_adapter,
         },
         "blockers": sorted(set(blockers + schema_blockers)),
         "expected_missing_approval_blockers": sorted(EXPECTED_MISSING_APPROVAL_BLOCKERS),

@@ -9,20 +9,23 @@ from scripts.check_abhe_v0_candidate_materialization_plan import validate_plan a
 from scripts.check_abhe_v0_materialized_candidates import check as check_materialized_candidates
 from scripts.plan_abhe_v0_bfcl_archive_transition import build_plan as build_transition_plan
 
-def test_fresh_slice_materialized_but_execution_readiness_stays_false() -> None:
+def test_fresh_slice_materialized_and_runtime_adapter_gate_is_fail_closed_or_ready() -> None:
     plan=build_fresh_slice_plan(); assert plan['fresh_dev_slice_materialized'] is True
-    readiness=build_execution_readiness(); assert readiness['execution_readiness_check_passed'] is True; assert readiness['abhe_v0_bfcl_execution_ready'] is False
+    readiness=build_execution_readiness(); assert readiness['execution_readiness_check_passed'] is True
     assert 'bfcl_fresh_dev_slice_not_materialized' not in readiness['blockers']
     assert 'candidate_materialization_not_approved' not in readiness['blockers']
     assert 'candidate_not_materialized' not in readiness['blockers']
     assert 'dev_smoke_approval_missing' not in readiness['blockers']
     assert 'scorer_authorization_false' not in readiness['blockers']
-    assert 'provider_api_key_env_missing' in readiness['blockers']
-    assert 'provider_endpoint_env_missing' in readiness['blockers']
-    assert 'real_execution_runner_not_implemented' in readiness['blockers']
+    assert 'real_execution_runner_not_implemented' not in readiness['blockers']
+    assert 'candidate_artifact_not_executable_without_runner_adapter' not in readiness['blockers']
+    if readiness['abhe_v0_bfcl_execution_ready'] is False:
+        assert readiness['blockers']
+        assert any(blocker.startswith('provider_') for blocker in readiness['blockers'])
 
-def test_runner_cannot_execute_without_approval_packet() -> None:
-    result=subprocess.run([sys.executable,'scripts/run_abhe_v0_bfcl_dev_smoke.py','--execute-approved','--approval-packet','outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_approval_packet.json','--arm','baseline','--compact-only'], text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+def test_runner_cannot_execute_without_approval_packet(tmp_path: Path) -> None:
+    missing_packet=tmp_path/'missing_approval_packet.json'
+    result=subprocess.run([sys.executable,'scripts/run_abhe_v0_bfcl_dev_smoke.py','--execute-approved','--approval-packet',str(missing_packet),'--arm','baseline','--compact-only'], text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     assert result.returncode != 0; payload=json.loads(result.stdout); assert payload['execution_started'] is False; assert payload['provider_calls_made'] is False; assert payload['bfcl_generate_called'] is False; assert payload['bfcl_evaluate_called'] is False; assert payload['scorer_called'] is False
 
 def test_dry_run_runner_does_not_call_provider_bfcl_or_scorer(tmp_path: Path) -> None:

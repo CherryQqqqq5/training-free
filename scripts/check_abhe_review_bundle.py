@@ -31,6 +31,7 @@ from scripts.check_abhe_v0_bfcl_fresh_dev_slice import check as check_bfcl_fresh
 from scripts.check_abhe_v0_bfcl_fresh_slice_review import check as check_bfcl_fresh_slice_review
 from scripts.check_abhe_v0_candidate_materialization_plan import check as check_bfcl_candidate_materialization
 from scripts.check_abhe_v0_materialized_candidates import check as check_bfcl_materialized_candidates
+from scripts.check_abhe_v0_runtime_candidate_adapter import check as check_bfcl_runtime_candidate_adapter
 from scripts.plan_abhe_v0_bfcl_archive_transition import build_plan as build_bfcl_archive_transition
 from scripts.plan_abhe_v0_bfcl_archive_transition import synthetic_feedback as bfcl_synthetic_feedback
 
@@ -41,6 +42,8 @@ BFCL_FRESH_SLICE_REVIEW_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/ab
 BFCL_SOURCE_EXCLUSION_PROOF_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_source_exclusion_proof.json")
 BFCL_FRESH_SLICE_MANIFEST_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_manifest.json")
 BFCL_FAILURE_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_execution_failure.json")
+BFCL_RUNTIME_ADAPTER_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_candidate_adapter.json")
+BFCL_PROVIDER_PREFLIGHT_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_provider_preflight.json")
 FORCED_FALSE_FIELDS = {
     "execution_authorized",
     "trace_extraction_authorized",
@@ -91,6 +94,8 @@ def build_bundle() -> Dict[str, Any]:
     bfcl_fresh_slice_review = check_bfcl_fresh_slice_review()
     bfcl_candidate_materialization = check_bfcl_candidate_materialization()
     bfcl_materialized_candidates = check_bfcl_materialized_candidates()
+    bfcl_runtime_candidate_adapter = check_bfcl_runtime_candidate_adapter()
+    bfcl_provider_preflight = _load_json(BFCL_PROVIDER_PREFLIGHT_PATH)
     bfcl_dev_smoke_request = check_bfcl_dev_smoke_request()
     bfcl_dev_smoke_approval = check_bfcl_dev_smoke_approval_packet()
     bfcl_execution_readiness = build_bfcl_execution_readiness()
@@ -148,6 +153,8 @@ def build_bundle() -> Dict[str, Any]:
         "abhe_v0_candidate_materialization_plan_ready": bfcl_candidate_materialization.get("abhe_v0_candidate_materialization_plan_check_passed") is True,
         "abhe_v0_candidate_materialization_approved": bfcl_materialized_candidates.get("candidate_materialization_approved") is True,
         "abhe_v0_materialized_candidates_ready": bfcl_materialized_candidates.get("abhe_v0_materialized_candidates_check_passed") is True,
+        "abhe_v0_runtime_candidate_adapter_ready": bfcl_runtime_candidate_adapter.get("adapter_ready") is True,
+        "abhe_v0_provider_preflight_passed": bfcl_provider_preflight.get("provider_preflight_passed") is True,
         "abhe_v0_bfcl_dev_smoke_request_ready": bfcl_dev_smoke_request.get("abhe_v0_bfcl_dev_smoke_approval_request_passed") is True,
         "abhe_v0_bfcl_dev_smoke_approval_packet_ready": bfcl_dev_smoke_approval.get("approval_packet_passed") is True,
         "abhe_v0_bfcl_execution_failure_present": not bool(bfcl_execution_failure.get("artifact_missing")),
@@ -189,6 +196,8 @@ def build_bundle() -> Dict[str, Any]:
             "abhe_v0_bfcl_dev_smoke_approval_request": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_approval_request.json",
             "abhe_v0_bfcl_dev_smoke_approval_packet": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_approval_packet.json",
             "abhe_v0_bfcl_dev_smoke_execution_failure": str(BFCL_FAILURE_PATH),
+            "abhe_v0_runtime_candidate_adapter": str(BFCL_RUNTIME_ADAPTER_PATH),
+            "abhe_v0_provider_preflight": str(BFCL_PROVIDER_PREFLIGHT_PATH),
             "abhe_v0_bfcl_execution_readiness": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_execution_readiness.json",
             "abhe_v0_bfcl_dev_feedback_schema": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_feedback.schema.json",
             "abhe_v0_bfcl_archive_transition_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_archive_transition_plan.json",
@@ -210,6 +219,8 @@ def build_bundle() -> Dict[str, Any]:
             "abhe_v0_bfcl_fresh_slice_review": bfcl_fresh_slice_review,
             "abhe_v0_candidate_materialization": bfcl_candidate_materialization,
             "abhe_v0_materialized_candidates": bfcl_materialized_candidates,
+            "abhe_v0_runtime_candidate_adapter": bfcl_runtime_candidate_adapter,
+            "abhe_v0_provider_preflight": bfcl_provider_preflight,
             "abhe_v0_bfcl_dev_smoke_request": bfcl_dev_smoke_request,
             "abhe_v0_bfcl_dev_smoke_approval_packet": bfcl_dev_smoke_approval,
             "abhe_v0_bfcl_dev_smoke_execution_failure": bfcl_execution_failure,
