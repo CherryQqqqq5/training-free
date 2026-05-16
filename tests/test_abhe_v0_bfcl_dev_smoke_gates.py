@@ -8,9 +8,9 @@ from scripts.check_abhe_v0_bfcl_execution_readiness import build_report as build
 from scripts.check_abhe_v0_candidate_materialization_plan import validate_plan as validate_candidate_plan
 from scripts.plan_abhe_v0_bfcl_archive_transition import build_plan as build_transition_plan
 
-def test_fresh_slice_not_materialized_keeps_execution_readiness_false() -> None:
-    plan=build_fresh_slice_plan(); assert plan['fresh_dev_slice_materialized'] is False
-    readiness=build_execution_readiness(); assert readiness['execution_readiness_check_passed'] is True; assert readiness['abhe_v0_bfcl_execution_ready'] is False; assert 'bfcl_fresh_dev_slice_not_materialized' in readiness['blockers']
+def test_fresh_slice_materialized_but_execution_readiness_stays_false() -> None:
+    plan=build_fresh_slice_plan(); assert plan['fresh_dev_slice_materialized'] is True
+    readiness=build_execution_readiness(); assert readiness['execution_readiness_check_passed'] is True; assert readiness['abhe_v0_bfcl_execution_ready'] is False; assert 'bfcl_fresh_dev_slice_not_materialized' not in readiness['blockers']; assert 'dev_smoke_approval_missing' in readiness['blockers']; assert 'scorer_authorization_false' in readiness['blockers']
 
 def test_runner_cannot_execute_without_approval_packet() -> None:
     result=subprocess.run([sys.executable,'scripts/run_abhe_v0_bfcl_dev_smoke.py','--execute-approved','--approval-packet','outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_approval_packet.json','--arm','baseline','--compact-only'], text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)

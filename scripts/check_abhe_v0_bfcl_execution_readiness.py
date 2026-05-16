@@ -10,8 +10,8 @@ from scripts.check_abhe_v0_bfcl_fresh_slice_review import check as check_fresh_s
 from scripts.check_abhe_v0_candidate_materialization_plan import check as check_candidate_plan
 DEFAULT_OUTPUT=Path('outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_execution_readiness.json')
 DEFAULT_APPROVAL_PACKET=Path('outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_approval_packet.json')
-REQUIRED_BLOCKERS={'bfcl_fresh_dev_slice_not_materialized','candidate_materialization_not_approved','candidate_not_materialized','dev_smoke_approval_missing','provider_model_protocol_not_approved','runtime_config_not_selected','scorer_authorization_false'}
-OPTIONAL_BLOCKERS={'source_exclusion_proof_not_computed'}
+REQUIRED_BLOCKERS={'candidate_materialization_not_approved','candidate_not_materialized','dev_smoke_approval_missing','provider_model_protocol_not_approved','runtime_config_not_selected','scorer_authorization_false'}
+OPTIONAL_BLOCKERS={'source_exclusion_proof_not_computed','bfcl_fresh_dev_slice_not_materialized'}
 
 def _load(path: Path)->Dict[str,Any]:
     data=json.loads(path.read_text(encoding='utf-8'))

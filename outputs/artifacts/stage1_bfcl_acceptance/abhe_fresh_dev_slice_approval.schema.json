@@ -9,7 +9,7 @@
       "const": "approved"
     },
     "approved_case_count": {
-      "minimum": 1,
+      "const": 20,
       "type": "integer"
     },
     "approved_entry_ids": {
@@ -20,19 +20,47 @@
         ],
         "type": "string"
       },
-      "minItems": 1,
+      "maxItems": 2,
+      "minItems": 2,
       "type": "array",
       "uniqueItems": true
     },
     "approved_fresh_dev_slice_hash": {
-      "minLength": 1,
+      "pattern": "^sha256:[0-9a-f]{64}$",
       "type": "string"
     },
     "archive_seed_source_excluded": {
       "const": true
     },
+    "artifact_kind": {
+      "const": "abhe_fresh_dev_slice_approval_packet"
+    },
     "authorized": {
       "const": true
+    },
+    "bfcl_evaluate_authorized": {
+      "const": false
+    },
+    "bfcl_generate_authorized": {
+      "const": false
+    },
+    "candidate_generation_authorized": {
+      "const": false
+    },
+    "candidate_materialization_authorized": {
+      "const": false
+    },
+    "execution_authorized": {
+      "const": false
+    },
+    "full_suite_authorized": {
+      "const": false
+    },
+    "holdout_authorized": {
+      "const": false
+    },
+    "huawei_acceptance_ready": {
+      "const": false
     },
     "performance_evidence": {
       "const": false
@@ -44,7 +72,13 @@
       "minLength": 1,
       "type": "string"
     },
+    "schema_version": {
+      "const": "abhe_fresh_dev_slice_approval_packet_v0"
+    },
     "scorer_authorized": {
+      "const": false
+    },
+    "sota_3pp_claim_ready": {
       "const": false
     },
     "source_160_compact_cases_reused_for_validation": {
@@ -52,18 +86,29 @@
     }
   },
   "required": [
+    "artifact_kind",
+    "schema_version",
     "approval_status",
     "authorized",
     "review_owner",
+    "approval_scope",
     "approved_fresh_dev_slice_hash",
     "approved_case_count",
     "approved_entry_ids",
     "archive_seed_source_excluded",
     "source_160_compact_cases_reused_for_validation",
-    "approval_scope",
     "provider_calls_authorized",
+    "bfcl_generate_authorized",
+    "bfcl_evaluate_authorized",
     "scorer_authorized",
-    "performance_evidence"
+    "candidate_generation_authorized",
+    "candidate_materialization_authorized",
+    "execution_authorized",
+    "performance_evidence",
+    "holdout_authorized",
+    "full_suite_authorized",
+    "sota_3pp_claim_ready",
+    "huawei_acceptance_ready"
   ],
   "type": "object"
 }

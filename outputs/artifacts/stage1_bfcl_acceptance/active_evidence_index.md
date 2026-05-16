@@ -59,6 +59,8 @@ ABHE is the active planning route. It is archive-based and behavior-level:
 - ABHE-v0 synthetic dev feedback: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_synthetic_dev_feedback.json`
 - ABHE-v0 archive transition plan: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_archive_transition_plan.json`
 - ABHE-v0 BFCL fresh dev slice plan: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_plan.json`
+- ABHE-v0 BFCL fresh dev slice manifest: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_manifest.json`
+- ABHE fresh dev slice approval packet: `outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_approval_packet.json`
 - ABHE-v0 BFCL dataset path review: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dataset_path_review.json`
 - ABHE-v0 BFCL dataset path selection: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dataset_path_selection.json`
 - ABHE-v0 BFCL category review: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_category_review.json`
@@ -109,11 +111,11 @@ ABHE-v0 synthetic closed-loop status:
 
 ABHE-v0 BFCL dev smoke gate status:
 
-- fresh BFCL dev slice plan: present, not materialized
+- fresh BFCL dev slice compact manifest: materialized under fresh-dev-slice-only approval
 - dataset path selection: `.venv/lib/python3.10/site-packages/bfcl_eval/data` approved for hash/overlap proof only
 - category review: present, proposed top-2 strata only
 - source exclusion proof: `complete` with overlap_count=0; discovery compact source count is 160
-- proposed selected case ids hash: `sha256:f5480e5c90895d4a9cca8c01eb2cb612ff2088c2a2adf912b2fc543aac15a28a`; fresh slice materialization remains false
+- selected case ids hash: `sha256:f5480e5c90895d4a9cca8c01eb2cb612ff2088c2a2adf912b2fc543aac15a28a`; fresh slice compact manifest materialized; BFCL execution remains false
 - candidate materialization plan: present, no candidate rule/YAML/JSONL generated
 - dev smoke approval request: pending and not authorized
 - dry-run runner manifest: present; provider, BFCL generate/evaluate, and scorer flags are false
@@ -169,6 +171,6 @@ L1 runtime behavior approval does not authorize source expansion, BFCL scorer, c
 
 ## Next Action
 
-`review_proposed_case_ids_hash_and_overlap_proof_then_optionally_approve_fresh_slice_materialization_only`
+`review_candidate_materialization_plan_without_bfcl_execution`
 
 ABHE-v0 synthetic closed-loop baseline is ready for human review; RASHE remains discovery predecessor. Trace extraction, fresh dev slice, candidate spec review, and bounded dev smoke execution each require separate approved packets. Source collection, candidate generation, scorer, real fresh dev slice materialization, archive mutation, performance evidence, SOTA/+3pp claims, and Huawei acceptance remain pending/fail-closed.

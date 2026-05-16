@@ -30,18 +30,29 @@ def trace_approval_packet() -> dict:
 
 def fresh_slice_approval_packet() -> dict:
     return {
+        "artifact_kind": "abhe_fresh_dev_slice_approval_packet",
+        "schema_version": "abhe_fresh_dev_slice_approval_packet_v0",
         "approval_status": "approved",
         "authorized": True,
         "review_owner": "reviewer",
-        "approved_fresh_dev_slice_hash": "sha256:fresh-slice-review-placeholder",
+        "approved_fresh_dev_slice_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         "approved_case_count": 20,
         "approved_entry_ids": ["state_tracking_v0", "hallucination_abstain_v0"],
         "archive_seed_source_excluded": True,
         "source_160_compact_cases_reused_for_validation": False,
         "approval_scope": "fresh_dev_slice_only",
         "provider_calls_authorized": False,
+        "bfcl_generate_authorized": False,
+        "bfcl_evaluate_authorized": False,
         "scorer_authorized": False,
+        "candidate_generation_authorized": False,
+        "candidate_materialization_authorized": False,
+        "execution_authorized": False,
         "performance_evidence": False,
+        "holdout_authorized": False,
+        "full_suite_authorized": False,
+        "sota_3pp_claim_ready": False,
+        "huawei_acceptance_ready": False,
     }
 
 
@@ -92,12 +103,14 @@ def test_review_bundle_passes() -> None:
     assert bundle["performance_evidence"] is False
 
 
-def test_approval_chain_records_missing_approval_packets() -> None:
+def test_approval_chain_records_remaining_missing_approval_packets() -> None:
     report = build_approval_chain()
     assert report["abhe_approval_chain_ready_for_review"] is True
-    assert set(EXPECTED_MISSING_APPROVAL_BLOCKERS).issubset(set(report["blockers"]))
+    remaining_expected = set(EXPECTED_MISSING_APPROVAL_BLOCKERS) - {"fresh_dev_slice_approval_packet_missing"}
+    assert remaining_expected.issubset(set(report["blockers"]))
+    assert "fresh_dev_slice_approval_packet_missing" not in report["blockers"]
     assert report["trace_extraction_approved"] is False
-    assert report["fresh_dev_slice_approved"] is False
+    assert report["fresh_dev_slice_approved"] is True
     assert report["candidate_spec_approved"] is False
     assert report["execution_approved"] is False
     assert report["performance_evidence"] is False
@@ -116,7 +129,7 @@ def test_execution_readiness_stays_false() -> None:
     assert report["execution_readiness_check_passed"] is True
     assert report["abhe_execution_ready"] is False
     assert "trace_extraction_approval_missing" in report["blockers"]
-    assert "fresh_dev_slice_approval_missing" in report["blockers"]
+    assert "fresh_dev_slice_approval_missing" not in report["blockers"]
     assert "candidate_spec_approval_missing" in report["blockers"]
     assert "execution_approval_missing" in report["blockers"]
 

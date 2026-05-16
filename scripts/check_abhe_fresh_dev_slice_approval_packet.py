@@ -13,24 +13,44 @@ from scripts.check_abhe_no_leakage_boundary import scan_value
 DEFAULT_SCHEMA = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_approval.schema.json")
 DEFAULT_PACKET = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_approval_packet.json")
 REQUIRED_FIELDS = {
+    "artifact_kind",
+    "schema_version",
     "approval_status",
     "authorized",
     "review_owner",
+    "approval_scope",
     "approved_fresh_dev_slice_hash",
     "approved_case_count",
     "approved_entry_ids",
     "archive_seed_source_excluded",
     "source_160_compact_cases_reused_for_validation",
-    "approval_scope",
     "provider_calls_authorized",
+    "bfcl_generate_authorized",
+    "bfcl_evaluate_authorized",
     "scorer_authorized",
+    "candidate_generation_authorized",
+    "candidate_materialization_authorized",
+    "execution_authorized",
     "performance_evidence",
+    "holdout_authorized",
+    "full_suite_authorized",
+    "sota_3pp_claim_ready",
+    "huawei_acceptance_ready",
 }
 FALSE_KEYS = {
     "source_160_compact_cases_reused_for_validation",
     "provider_calls_authorized",
+    "bfcl_generate_authorized",
+    "bfcl_evaluate_authorized",
     "scorer_authorized",
+    "candidate_generation_authorized",
+    "candidate_materialization_authorized",
+    "execution_authorized",
     "performance_evidence",
+    "holdout_authorized",
+    "full_suite_authorized",
+    "sota_3pp_claim_ready",
+    "huawei_acceptance_ready",
 }
 
 
@@ -57,10 +77,13 @@ def validate_schema(schema: Dict[str, Any]) -> List[str]:
     if missing:
         blockers.append("fresh_dev_slice_approval_schema_properties_missing:%s" % ",".join(missing))
     consts: Dict[str, Any] = {
+        "artifact_kind": "abhe_fresh_dev_slice_approval_packet",
+        "schema_version": "abhe_fresh_dev_slice_approval_packet_v0",
         "approval_status": "approved",
         "authorized": True,
         "archive_seed_source_excluded": True,
         "approval_scope": "fresh_dev_slice_only",
+        "approved_case_count": 20,
     }
     consts.update({key: False for key in FALSE_KEYS})
     for key, expected in consts.items():
@@ -76,6 +99,10 @@ def validate_packet(packet: Dict[str, Any]) -> List[str]:
     if missing:
         blockers.append("fresh_dev_slice_approval_packet_required_fields_missing:%s" % ",".join(missing))
         return blockers
+    if packet.get("artifact_kind") != "abhe_fresh_dev_slice_approval_packet":
+        blockers.append("fresh_dev_slice_approval_packet_artifact_kind_invalid:%r" % packet.get("artifact_kind"))
+    if packet.get("schema_version") != "abhe_fresh_dev_slice_approval_packet_v0":
+        blockers.append("fresh_dev_slice_approval_packet_schema_version_invalid:%r" % packet.get("schema_version"))
     if packet.get("approval_status") != "approved":
         blockers.append("fresh_dev_slice_approval_packet_status_not_approved:%r" % packet.get("approval_status"))
     if packet.get("authorized") is not True:
@@ -84,6 +111,12 @@ def validate_packet(packet: Dict[str, Any]) -> List[str]:
         blockers.append("fresh_dev_slice_approval_packet_scope_invalid:%r" % packet.get("approval_scope"))
     if packet.get("archive_seed_source_excluded") is not True:
         blockers.append("fresh_dev_slice_approval_packet_archive_seed_source_excluded_not_true:%r" % packet.get("archive_seed_source_excluded"))
+    if packet.get("approved_case_count") != 20:
+        blockers.append("fresh_dev_slice_approval_packet_approved_case_count_not_20:%r" % packet.get("approved_case_count"))
+    if set(packet.get("approved_entry_ids", [])) != {"state_tracking_v0", "hallucination_abstain_v0"}:
+        blockers.append("fresh_dev_slice_approval_packet_approved_entry_ids_invalid:%r" % packet.get("approved_entry_ids"))
+    if not isinstance(packet.get("approved_fresh_dev_slice_hash"), str) or not packet["approved_fresh_dev_slice_hash"].startswith("sha256:"):
+        blockers.append("fresh_dev_slice_approval_packet_hash_invalid:%r" % packet.get("approved_fresh_dev_slice_hash"))
     for key in sorted(FALSE_KEYS):
         if packet.get(key) is not False:
             blockers.append("fresh_dev_slice_approval_packet_%s_not_false:%r" % (key, packet.get(key)))

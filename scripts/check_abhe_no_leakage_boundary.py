@@ -22,6 +22,7 @@ DEFAULT_PATHS = [
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_synthetic_dev_feedback.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_archive_transition_plan.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_plan.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_manifest.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dataset_path_review.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dataset_path_selection.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_category_review.json"),
@@ -45,6 +46,7 @@ DEFAULT_PATHS = [
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_execution_approval.schema.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_trace_extraction_approval.schema.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_approval.schema.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_approval_packet.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_candidate_spec_approval.schema.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_request.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_dev_smoke_dry_run_manifest.json"),
@@ -75,6 +77,8 @@ DEFAULT_PATHS = [
 ]
 
 ALLOWED_KEY_NAMES = {
+    "selected_case_ids_hash",
+    "selected_compact_case_identifiers",
     "selected_dataset_path",
     "proposed_selected_case_ids_hash",
     "source_file_hash",

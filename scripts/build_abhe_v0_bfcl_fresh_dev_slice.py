@@ -14,6 +14,7 @@ DEFAULT_DATASET_REVIEW = ARTIFACT_ROOT / 'abhe_v0_bfcl_dataset_path_review.json'
 DEFAULT_CATEGORY_REVIEW = ARTIFACT_ROOT / 'abhe_v0_bfcl_category_review.json'
 DEFAULT_SLICE_REVIEW = ARTIFACT_ROOT / 'abhe_v0_bfcl_fresh_dev_slice_review.json'
 DEFAULT_EXCLUSION_PROOF = ARTIFACT_ROOT / 'abhe_v0_bfcl_source_exclusion_proof.json'
+DEFAULT_MANIFEST = ARTIFACT_ROOT / 'abhe_v0_bfcl_fresh_dev_slice_manifest.json'
 DEFAULT_SELECTED_DATASET_PATH = Path('.venv/lib/python3.10/site-packages/bfcl_eval/data')
 DISCOVERY_ROOT = ARTIFACT_ROOT / 'rashe_source_inputs_compact'
 TARGET_ENTRIES = ['state_tracking_v0', 'hallucination_abstain_v0']
@@ -257,7 +258,8 @@ def write_review_artifacts(result: Dict[str, Any]) -> None:
             'proposed_compact_case_identifiers': cases,
             'case_count_by_entry': {entry: sum(1 for item in cases if item['entry_id'] == entry) for entry in TARGET_ENTRIES},
             'case_count_by_category': {cat: sum(1 for item in cases if item['bfcl_category'] == cat) for cats in APPROVED_STRATA.values() for cat in cats},
-            'fresh_dev_slice_materialized': False,
+            'fresh_dev_slice_materialized': materialized,
+        'fresh_dev_slice_manifest_path': str(DEFAULT_MANIFEST) if materialized else 'pending_until_materialized',
             'authorized': False,
             'raw_cases_persisted': False,
             'gold_expected_persisted': False,
@@ -298,10 +300,21 @@ def build_plan(*, bfcl_dataset_path: Optional[Path] = None, approval_packet: Pat
     if not approval_authorized:
         execution_blockers.append('fresh_dev_slice_approval_missing')
     selected_hash = 'pending_until_reviewer_selects_dataset_path'
+    materialized_hash = 'pending_until_materialized'
+    materialized = False
+    selected_count = None
     proof_status = 'pending_until_review_artifacts_built'
     if DEFAULT_SLICE_REVIEW.exists():
         try:
             selected_hash = _load_json(DEFAULT_SLICE_REVIEW).get('proposed_selected_case_ids_hash', selected_hash)
+        except Exception:
+            pass
+    if DEFAULT_MANIFEST.exists():
+        try:
+            manifest = _load_json(DEFAULT_MANIFEST)
+            materialized = manifest.get('fresh_dev_slice_materialized') is True
+            materialized_hash = manifest.get('selected_case_ids_hash', materialized_hash)
+            selected_count = manifest.get('selected_case_count')
         except Exception:
             pass
     if DEFAULT_EXCLUSION_PROOF.exists():
@@ -315,7 +328,8 @@ def build_plan(*, bfcl_dataset_path: Optional[Path] = None, approval_packet: Pat
         'approval_required': True,
         'approval_packet_path': str(approval_packet),
         'approval_authorized': approval_authorized,
-        'fresh_dev_slice_materialized': False,
+        'fresh_dev_slice_materialized': materialized,
+        'fresh_dev_slice_manifest_path': str(DEFAULT_MANIFEST) if materialized else 'pending_until_materialized',
         'source_dataset': 'BFCL',
         'selected_dataset_path': str(selected_path),
         'bfcl_dataset_path_status': 'present' if dataset_available else 'missing',
@@ -326,8 +340,9 @@ def build_plan(*, bfcl_dataset_path: Optional[Path] = None, approval_packet: Pat
         'proposed_case_count_per_entry': APPROVED_CASE_COUNT,
         'source_160_compact_cases_reused_for_validation': False,
         'archive_seed_source_excluded': True,
-        'selected_case_ids_hash': 'pending_until_materialized',
+        'selected_case_ids_hash': materialized_hash if materialized else 'pending_until_materialized',
         'proposed_selected_case_ids_hash': selected_hash,
+        'selected_case_count': selected_count if materialized else 'pending_until_materialized',
         'source_exclusion_proof_status': proof_status,
         'selected_case_ids_hash_immutable_after_materialization': True,
         'raw_material_persisted': False,
@@ -339,8 +354,8 @@ def build_plan(*, bfcl_dataset_path: Optional[Path] = None, approval_packet: Pat
         'performance_evidence': False,
         'holdout_touched': False,
         'full_suite_touched': False,
-        'execution_blockers': sorted(set(execution_blockers)),
-        'next_required_action': 'request_fresh_dev_slice_materialization_approval_after_hash_review',
+        'execution_blockers': [] if materialized and approval_authorized else sorted(set(execution_blockers)),
+        'next_required_action': 'request_candidate_materialization_review_without_bfcl_execution' if materialized else 'request_fresh_dev_slice_materialization_approval_after_hash_review',
     }
     plan['blockers'] = scan_value(plan, label='abhe_v0_bfcl_fresh_dev_slice_plan')
     plan['abhe_v0_bfcl_fresh_dev_slice_plan_passed'] = not plan['blockers']

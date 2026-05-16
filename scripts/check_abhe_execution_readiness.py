@@ -79,7 +79,6 @@ def build_report(dev_smoke_packet_path: Path = DEFAULT_DEV_SMOKE_PACKET) -> Dict
 
     expected_fail_closed_blockers = {
         "trace_extraction_approval_missing",
-        "fresh_dev_slice_approval_missing",
         "candidate_spec_approval_missing",
         "fresh_dev_slice_not_materialized",
         "execution_approval_missing",

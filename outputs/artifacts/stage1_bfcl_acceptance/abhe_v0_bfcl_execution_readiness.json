@@ -4,7 +4,6 @@
   "approval_packet_present": false,
   "artifact_kind": "abhe_v0_bfcl_execution_readiness",
   "blockers": [
-    "bfcl_fresh_dev_slice_not_materialized",
     "candidate_materialization_not_approved",
     "candidate_not_materialized",
     "dev_smoke_approval_missing",
@@ -37,16 +36,17 @@
     },
     "fresh_slice": {
       "abhe_v0_bfcl_fresh_dev_slice_check_passed": true,
+      "approval_packet_passed": true,
       "archive_seed_source_excluded": true,
       "blockers": [],
-      "execution_blockers": [
-        "fresh_dev_slice_approval_missing"
-      ],
-      "fresh_dev_slice_materialized": false,
+      "execution_blockers": [],
+      "fresh_dev_slice_materialized": true,
+      "manifest_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_manifest.json",
+      "manifest_present": true,
       "plan_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_plan.json",
       "plan_present": true,
       "report_scope": "abhe_v0_bfcl_fresh_dev_slice_check",
-      "selected_case_ids_hash": "pending_until_materialized",
+      "selected_case_ids_hash": "sha256:8e28826895c76afd14fb2ec07550b871ea50df25c0666881dad39be86450991f",
       "source_160_compact_cases_reused_for_validation": false
     },
     "fresh_slice_review": {
@@ -92,7 +92,7 @@
   },
   "execution_authorized": false,
   "execution_readiness_check_passed": true,
-  "fresh_dev_slice_materialized": false,
+  "fresh_dev_slice_materialized": true,
   "performance_evidence": false,
   "report_scope": "abhe_v0_bfcl_execution_readiness",
   "schema_version": "abhe_v0_bfcl_execution_readiness_v0",

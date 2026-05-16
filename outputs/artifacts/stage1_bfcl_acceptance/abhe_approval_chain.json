@@ -2,15 +2,16 @@
   "abhe_approval_chain_ready_for_review": true,
   "abhe_v0_bfcl_candidate_case_hash_count": 20,
   "abhe_v0_bfcl_execution_ready": false,
+  "abhe_v0_bfcl_fresh_slice_materialized": true,
   "abhe_v0_bfcl_overlap_count": 0,
   "abhe_v0_bfcl_proposed_selected_case_ids_hash": "sha256:8e28826895c76afd14fb2ec07550b871ea50df25c0666881dad39be86450991f",
+  "abhe_v0_bfcl_selected_case_ids_hash": "sha256:8e28826895c76afd14fb2ec07550b871ea50df25c0666881dad39be86450991f",
   "abhe_v0_bfcl_selected_dataset_path": ".venv/lib/python3.10/site-packages/bfcl_eval/data",
   "abhe_v0_bfcl_source_exclusion_status": "complete",
   "artifact_kind": "abhe_approval_chain",
   "blockers": [
     "candidate_spec_approval_packet_missing",
     "execution_approval_packet_missing",
-    "fresh_dev_slice_approval_packet_missing",
     "trace_extraction_approval_packet_missing"
   ],
   "candidate_generation_authorized": false,
@@ -32,7 +33,6 @@
       "approval_packet_present": false,
       "artifact_kind": "abhe_v0_bfcl_execution_readiness",
       "blockers": [
-        "bfcl_fresh_dev_slice_not_materialized",
         "candidate_materialization_not_approved",
         "candidate_not_materialized",
         "dev_smoke_approval_missing",
@@ -65,16 +65,17 @@
         },
         "fresh_slice": {
           "abhe_v0_bfcl_fresh_dev_slice_check_passed": true,
+          "approval_packet_passed": true,
           "archive_seed_source_excluded": true,
           "blockers": [],
-          "execution_blockers": [
-            "fresh_dev_slice_approval_missing"
-          ],
-          "fresh_dev_slice_materialized": false,
+          "execution_blockers": [],
+          "fresh_dev_slice_materialized": true,
+          "manifest_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_manifest.json",
+          "manifest_present": true,
           "plan_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_plan.json",
           "plan_present": true,
           "report_scope": "abhe_v0_bfcl_fresh_dev_slice_check",
-          "selected_case_ids_hash": "pending_until_materialized",
+          "selected_case_ids_hash": "sha256:8e28826895c76afd14fb2ec07550b871ea50df25c0666881dad39be86450991f",
           "source_160_compact_cases_reused_for_validation": false
         },
         "fresh_slice_review": {
@@ -120,7 +121,7 @@
       },
       "execution_authorized": false,
       "execution_readiness_check_passed": true,
-      "fresh_dev_slice_materialized": false,
+      "fresh_dev_slice_materialized": true,
       "performance_evidence": false,
       "report_scope": "abhe_v0_bfcl_execution_readiness",
       "schema_version": "abhe_v0_bfcl_execution_readiness_v0",
@@ -195,7 +196,6 @@
         "candidate_rule_not_generated_or_authorized",
         "candidate_spec_approval_missing",
         "execution_approval_missing",
-        "fresh_dev_slice_approval_missing",
         "fresh_dev_slice_not_materialized",
         "runtime_config_not_selected",
         "scorer_authorization_false",
@@ -209,7 +209,6 @@
           "approval_packet_present": false,
           "artifact_kind": "abhe_v0_bfcl_execution_readiness",
           "blockers": [
-            "bfcl_fresh_dev_slice_not_materialized",
             "candidate_materialization_not_approved",
             "candidate_not_materialized",
             "dev_smoke_approval_missing",
@@ -242,16 +241,17 @@
             },
             "fresh_slice": {
               "abhe_v0_bfcl_fresh_dev_slice_check_passed": true,
+              "approval_packet_passed": true,
               "archive_seed_source_excluded": true,
               "blockers": [],
-              "execution_blockers": [
-                "fresh_dev_slice_approval_missing"
-              ],
-              "fresh_dev_slice_materialized": false,
+              "execution_blockers": [],
+              "fresh_dev_slice_materialized": true,
+              "manifest_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_manifest.json",
+              "manifest_present": true,
               "plan_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_plan.json",
               "plan_present": true,
               "report_scope": "abhe_v0_bfcl_fresh_dev_slice_check",
-              "selected_case_ids_hash": "pending_until_materialized",
+              "selected_case_ids_hash": "sha256:8e28826895c76afd14fb2ec07550b871ea50df25c0666881dad39be86450991f",
               "source_160_compact_cases_reused_for_validation": false
             },
             "fresh_slice_review": {
@@ -297,7 +297,7 @@
           },
           "execution_authorized": false,
           "execution_readiness_check_passed": true,
-          "fresh_dev_slice_materialized": false,
+          "fresh_dev_slice_materialized": true,
           "performance_evidence": false,
           "report_scope": "abhe_v0_bfcl_execution_readiness",
           "schema_version": "abhe_v0_bfcl_execution_readiness_v0",
@@ -351,12 +351,13 @@
           "schema_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_execution_approval.schema.json"
         },
         "fresh_slice_approval": {
-          "abhe_fresh_dev_slice_approval_packet_passed": false,
-          "blockers": [
-            "fresh_dev_slice_approval_packet_missing"
-          ],
+          "abhe_fresh_dev_slice_approval_packet_passed": true,
+          "approval_scope": "fresh_dev_slice_only",
+          "approval_status": "approved",
+          "authorized": true,
+          "blockers": [],
           "packet_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_approval_packet.json",
-          "packet_present": false,
+          "packet_present": true,
           "report_scope": "abhe_fresh_dev_slice_approval_packet_check",
           "schema_passed": true,
           "schema_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_approval.schema.json"
@@ -396,12 +397,13 @@
       "scorer_authorized": false
     },
     "fresh_dev_slice_approval": {
-      "abhe_fresh_dev_slice_approval_packet_passed": false,
-      "blockers": [
-        "fresh_dev_slice_approval_packet_missing"
-      ],
+      "abhe_fresh_dev_slice_approval_packet_passed": true,
+      "approval_scope": "fresh_dev_slice_only",
+      "approval_status": "approved",
+      "authorized": true,
+      "blockers": [],
       "packet_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_approval_packet.json",
-      "packet_present": false,
+      "packet_present": true,
       "report_scope": "abhe_fresh_dev_slice_approval_packet_check",
       "schema_passed": true,
       "schema_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_approval.schema.json"
@@ -438,7 +440,7 @@
     "fresh_dev_slice_approval_packet_missing",
     "trace_extraction_approval_packet_missing"
   ],
-  "fresh_dev_slice_approved": false,
+  "fresh_dev_slice_approved": true,
   "fresh_dev_slice_authorized": false,
   "huawei_acceptance_ready": false,
   "next_required_action": "request_granular_approval_reviews",

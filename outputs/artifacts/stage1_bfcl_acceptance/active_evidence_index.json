@@ -2,15 +2,34 @@
   "abhe_planning_ready": true,
   "abhe_v0_bfcl_execution_ready": false,
   "abhe_v0_bfcl_fresh_slice_review_status": {
-    "authorized_for": "fresh_slice_hash_and_overlap_proof_only",
-    "candidate_case_hash_count": 20,
-    "case_keys_persisted": true,
+    "approval_scope": "fresh_dev_slice_only",
+    "approved_fresh_dev_slice_hash": "sha256:8e28826895c76afd14fb2ec07550b871ea50df25c0666881dad39be86450991f",
+    "case_count_by_category": {
+      "irrelevance": 4,
+      "live_irrelevance": 3,
+      "live_relevance": 3,
+      "multi_turn_base": 3,
+      "multi_turn_long_context": 3,
+      "multi_turn_miss_func": 2,
+      "multi_turn_miss_param": 2
+    },
+    "case_count_by_entry": {
+      "hallucination_abstain_v0": 10,
+      "state_tracking_v0": 10
+    },
     "execution_ready": false,
-    "fresh_dev_slice_materialized": false,
-    "overlap_check_status": "complete",
-    "overlap_count": 0,
+    "fresh_dev_slice_materialized": true,
     "performance_evidence": false,
-    "proposed_selected_case_ids_hash": "sha256:8e28826895c76afd14fb2ec07550b871ea50df25c0666881dad39be86450991f",
+    "remaining_execution_blockers": [
+      "candidate_materialization_not_approved",
+      "candidate_not_materialized",
+      "dev_smoke_approval_missing",
+      "provider_model_protocol_not_approved",
+      "runtime_config_not_selected",
+      "scorer_authorization_false"
+    ],
+    "selected_case_count": 20,
+    "selected_case_ids_hash": "sha256:8e28826895c76afd14fb2ec07550b871ea50df25c0666881dad39be86450991f",
     "selected_dataset_path": ".venv/lib/python3.10/site-packages/bfcl_eval/data"
   },
   "active_diagnostic_evidence": {
@@ -41,6 +60,7 @@
     "abhe_dev_smoke_dry_run_manifest": "outputs/artifacts/stage1_bfcl_acceptance/abhe_dev_smoke_dry_run_manifest.json",
     "abhe_execution_approval_schema": "outputs/artifacts/stage1_bfcl_acceptance/abhe_execution_approval.schema.json",
     "abhe_execution_readiness": "outputs/artifacts/stage1_bfcl_acceptance/abhe_execution_readiness.json",
+    "abhe_fresh_dev_slice_approval_packet": "outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_approval_packet.json",
     "abhe_fresh_dev_slice_approval_schema": "outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_approval.schema.json",
     "abhe_fresh_dev_slice_boundary_doc": "docs/stage1_abhe_fresh_dev_slice_boundary.md",
     "abhe_fresh_dev_slice_request": "outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_request.json",
@@ -67,6 +87,7 @@
     "abhe_v0_bfcl_dev_smoke_request_doc": "docs/stage1_abhe_v0_bfcl_dev_smoke_request.md",
     "abhe_v0_bfcl_execution_readiness": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_execution_readiness.json",
     "abhe_v0_bfcl_fresh_dev_slice_doc": "docs/stage1_abhe_v0_bfcl_fresh_dev_slice.md",
+    "abhe_v0_bfcl_fresh_dev_slice_manifest": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_manifest.json",
     "abhe_v0_bfcl_fresh_dev_slice_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_plan.json",
     "abhe_v0_bfcl_fresh_dev_slice_review": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_review.json",
     "abhe_v0_bfcl_fresh_slice_review_memo": "docs/stage1_abhe_v0_bfcl_fresh_slice_review_memo.md",
@@ -177,10 +198,10 @@
     "source_collection_authorized": false
   },
   "current_blocker": {
-    "blocker": "abhe_v0_bfcl_fresh_slice_materialization_not_approved",
-    "dataset_is_current_blocker": false,
-    "fresh_slice_materialization_is_current_blocker": true,
-    "summary": "ABHE-v0 BFCL dataset path, strata, compact proposed case identifiers, selected hash, and source exclusion proof are prepared for review. Fresh slice materialization, BFCL execution, scorer, candidate materialization, and performance evidence remain fail-closed."
+    "blocker": "abhe_v0_bfcl_candidate_materialization_not_approved",
+    "candidate_materialization_is_current_blocker": true,
+    "fresh_slice_materialization_is_current_blocker": false,
+    "summary": "ABHE-v0 BFCL fresh dev slice compact manifest is materialized under fresh-slice-only approval. Candidate materialization, dev smoke execution approval, provider/model/protocol, runtime config, scorer, archive update, and performance evidence remain fail-closed."
   },
   "default_branch_delivery_risk": {
     "base_handoff_commit": "eaafa624",
@@ -251,7 +272,7 @@
     }
   ],
   "formal_bfcl_performance_ready": false,
-  "fresh_dev_slice_materialized": false,
+  "fresh_dev_slice_materialized": true,
   "generated_at_utc": "2026-04-30T16:52:36Z",
   "handoff_commit": "eaafa624",
   "historical_self_referential_fields": {
@@ -325,7 +346,7 @@
   "latest_hygiene_source_head": "b94855e0",
   "main_merge_completed": true,
   "negative_evidence_report": "docs/stage1_bfcl_negative_evidence_report.md",
-  "next_action": "review_proposed_case_ids_hash_and_overlap_proof_then_optionally_approve_fresh_slice_materialization_only",
+  "next_action": "review_candidate_materialization_plan_without_bfcl_execution",
   "no_bfcl_3pp_evidence_yet": true,
   "non_self_referential_provenance": true,
   "optional_diagnostic_counter_fields": [

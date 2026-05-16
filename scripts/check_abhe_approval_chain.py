@@ -22,6 +22,7 @@ DEFAULT_OUTPUT = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_approval_ch
 BFCL_DATASET_SELECTION_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dataset_path_selection.json")
 BFCL_FRESH_SLICE_REVIEW_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_review.json")
 BFCL_SOURCE_EXCLUSION_PROOF_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_source_exclusion_proof.json")
+BFCL_FRESH_SLICE_MANIFEST_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_manifest.json")
 EXPECTED_MISSING_APPROVAL_BLOCKERS = {
     "trace_extraction_approval_packet_missing",
     "fresh_dev_slice_approval_packet_missing",
@@ -51,6 +52,7 @@ def build_report() -> Dict[str, Any]:
     bfcl_dataset_selection = json.loads(BFCL_DATASET_SELECTION_PATH.read_text(encoding="utf-8")) if BFCL_DATASET_SELECTION_PATH.exists() else {}
     bfcl_fresh_slice_review_artifact = json.loads(BFCL_FRESH_SLICE_REVIEW_PATH.read_text(encoding="utf-8")) if BFCL_FRESH_SLICE_REVIEW_PATH.exists() else {}
     bfcl_source_exclusion_proof = json.loads(BFCL_SOURCE_EXCLUSION_PROOF_PATH.read_text(encoding="utf-8")) if BFCL_SOURCE_EXCLUSION_PROOF_PATH.exists() else {}
+    bfcl_fresh_slice_manifest = json.loads(BFCL_FRESH_SLICE_MANIFEST_PATH.read_text(encoding="utf-8")) if BFCL_FRESH_SLICE_MANIFEST_PATH.exists() else {}
 
     blockers: List[str] = []
     schema_blockers: List[str] = []
@@ -100,6 +102,8 @@ def build_report() -> Dict[str, Any]:
         "abhe_v0_bfcl_source_exclusion_status": bfcl_source_exclusion_proof.get("overlap_check_status"),
         "abhe_v0_bfcl_overlap_count": bfcl_source_exclusion_proof.get("overlap_count"),
         "abhe_v0_bfcl_candidate_case_hash_count": bfcl_source_exclusion_proof.get("candidate_case_hash_count"),
+        "abhe_v0_bfcl_fresh_slice_materialized": bfcl_fresh_slice_manifest.get("fresh_dev_slice_materialized") is True,
+        "abhe_v0_bfcl_selected_case_ids_hash": bfcl_fresh_slice_manifest.get("selected_case_ids_hash"),
         "execution_authorized": False,
         "trace_extraction_authorized": False,
         "fresh_dev_slice_authorized": False,
