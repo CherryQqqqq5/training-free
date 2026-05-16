@@ -595,6 +595,34 @@ def _maybe_write_final_result_and_feedback() -> None:
 
 
 
+def _append_eval_warning(run_root: Path, warning: Dict[str, Any]) -> None:
+    path = run_root / "compact_evaluation_warnings.jsonl"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(warning, sort_keys=True) + "\n")
+
+
+def _group_score_summaries_available(run_root: Path, categories: Iterable[str]) -> bool:
+    score_root = run_root / "bfcl/score"
+    for category in categories:
+        summary = _score_summary_from_json(_score_file_for_category(score_root, category))
+        if not summary or _parse_percent(summary.get("accuracy")) is None:
+            return False
+    return True
+
+
+def _compact_process_tail_hash(proc: subprocess.CompletedProcess[str]) -> Dict[str, Any]:
+    joined = "\n".join([proc.stdout or "", proc.stderr or ""]).strip()
+    tail = joined[-4000:]
+    import hashlib
+
+    return {
+        "returncode": proc.returncode,
+        "tail_sha256": "sha256:" + hashlib.sha256(tail.encode("utf-8", errors="replace")).hexdigest(),
+        "tail_length": len(tail),
+    }
+
+
 def _run_bfcl_group(
     *,
     arm: str,
@@ -622,10 +650,29 @@ def _run_bfcl_group(
             env = _bfcl_env(port)
             gen = _run_command(_generate_command(run_root, categories), env, REPO_ROOT)
             if gen.returncode != 0:
-                return ["bfcl_generate_failed"]
+                _append_eval_warning(run_root, {
+                    "warning_kind": "bfcl_generate_failed",
+                    "categories": sorted(group_ids_by_category.keys()),
+                    "process": _compact_process_tail_hash(gen),
+                })
+                return ["bfcl_generate_failed:%s" % categories]
             ev = _run_command(_evaluate_command(run_root, categories), env, REPO_ROOT)
             if ev.returncode != 0:
-                return ["bfcl_evaluate_failed"]
+                if _group_score_summaries_available(run_root, group_ids_by_category.keys()):
+                    _append_eval_warning(run_root, {
+                        "warning_kind": "bfcl_leaderboard_aggregation_failed_after_category_score",
+                        "categories": sorted(group_ids_by_category.keys()),
+                        "process": _compact_process_tail_hash(ev),
+                        "category_scores_available": True,
+                        "raw_material_absent": True,
+                    })
+                else:
+                    _append_eval_warning(run_root, {
+                        "warning_kind": "bfcl_evaluate_failed_without_category_score",
+                        "categories": sorted(group_ids_by_category.keys()),
+                        "process": _compact_process_tail_hash(ev),
+                    })
+                    return ["bfcl_evaluate_failed:%s" % categories]
     finally:
         if proxy_proc is not None:
             proxy_proc.terminate()
@@ -650,10 +697,15 @@ def execute_approved_arm(arm: str, approval_packet: Path) -> Dict[str, Any]:
     try:
         if arm == "candidate":
             grouped: List[Tuple[str, Dict[str, List[str]]]] = []
-            for entry_id in ["state_tracking_v0", "hallucination_abstain_v0"]:
-                group = {category: ids for category, ids in ids_by_category.items() if entry_by_category.get(category) == entry_id}
-                if group:
-                    grouped.append((entry_id, group))
+            state_group = {category: ids for category, ids in ids_by_category.items() if entry_by_category.get(category) == "state_tracking_v0"}
+            if state_group:
+                grouped.append(("state_tracking_v0", state_group))
+            for category, ids in ids_by_category.items():
+                if entry_by_category.get(category) == "hallucination_abstain_v0":
+                    # Run relevance/irrelevance categories separately so the runtime
+                    # adapter can apply no-tool boundaries only where scorer semantics
+                    # require no function call, while keeping live_relevance callable.
+                    grouped.append(("hallucination_abstain_v0", {category: ids}))
             for group_index, (entry_id, group_ids) in enumerate(grouped):
                 blockers = _run_bfcl_group(
                     arm=arm,

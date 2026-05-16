@@ -66,6 +66,8 @@ def build_adapter(
             "non_target_exclusions": ["valid_actionable_tool_use", "sufficient_evidence_cases"],
             "runtime_guidance_fragment_id": "evidence_boundary_verifier_compact_fragment_v0",
             "valid_actionable_tool_use_guard": True,
+            "runtime_tool_choice_boundary_categories": ["irrelevance", "live_irrelevance"],
+            "live_relevance_tool_call_guarded": True,
             "false_abstain_telemetry_required": True,
             "telemetry_required": candidate_rows.get("hallucination_abstain_v0", {}).get("telemetry_required", []),
         },

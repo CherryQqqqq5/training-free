@@ -274,14 +274,21 @@ def _abhe_v0_projection_guidance(projection: Dict[str, Any]) -> str:
     return ""
 
 
-def _abhe_v0_active_projection(adapter: Dict[str, Any]) -> tuple[Dict[str, Any] | None, str]:
-    projections = [projection for projection in adapter.get("runtime_projection", []) if isinstance(projection, dict)]
-    requested_entry = os.environ.get("ABHE_V0_RUNTIME_ACTIVATION_ENTRY", "").strip()
-    requested_categories = {
+ABHE_V0_NO_TOOL_BOUNDARY_CATEGORIES = {"irrelevance", "live_irrelevance"}
+
+
+def _abhe_v0_requested_categories() -> set[str]:
+    return {
         item.strip()
         for item in os.environ.get("ABHE_V0_RUNTIME_ACTIVATION_CATEGORIES", "").split(",")
         if item.strip()
     }
+
+
+def _abhe_v0_active_projection(adapter: Dict[str, Any]) -> tuple[Dict[str, Any] | None, str]:
+    projections = [projection for projection in adapter.get("runtime_projection", []) if isinstance(projection, dict)]
+    requested_entry = os.environ.get("ABHE_V0_RUNTIME_ACTIVATION_ENTRY", "").strip()
+    requested_categories = _abhe_v0_requested_categories()
     if requested_entry:
         for projection in projections:
             if projection.get("entry_id") == requested_entry:
@@ -312,7 +319,16 @@ def _apply_abhe_v0_adapter_guidance(chat_req_json: Dict[str, Any]) -> tuple[Dict
     guidance = "ABHE-v0 bounded dev smoke candidate guidance. " + guidance_fragment
     messages.insert(0, {"role": "developer", "content": guidance})
     patched["messages"] = messages
-    return patched, [f"abhe_v0_runtime_candidate_adapter_guidance:{entry_id}"]
+    patches = [f"abhe_v0_runtime_candidate_adapter_guidance:{entry_id}"]
+    requested_categories = _abhe_v0_requested_categories()
+    if (
+        entry_id == "hallucination_abstain_v0"
+        and requested_categories
+        and requested_categories.issubset(ABHE_V0_NO_TOOL_BOUNDARY_CATEGORIES)
+    ):
+        patched["tool_choice"] = "none"
+        patches.append("abhe_v0_runtime_candidate_adapter_no_tool_boundary:hallucination_abstain_v0")
+    return patched, patches
 
 def _chat_response_to_responses_payload(chat_json: Dict[str, Any]) -> Dict[str, Any]:
     choices = chat_json.get("choices", [])

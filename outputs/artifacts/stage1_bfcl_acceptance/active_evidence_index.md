@@ -79,6 +79,10 @@ ABHE is the active planning route. It is archive-based and behavior-level:
 - ABHE-v0 BFCL dry-run manifest: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_dry_run_manifest.json`
 - ABHE-v0 BFCL compact dev feedback schema: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_feedback.schema.json`
 - ABHE-v0 BFCL case delta analysis: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_case_delta_analysis.json`
+
+- ABHE-v0 BFCL real trace analysis: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_real_trace_analysis.json`
+- ABHE-v0 BFCL bounded dev smoke compact result: baseline 8/20, candidate 17/20; archive_updated=false; performance_evidence=false; holdout/full_suite untouched.
+- ABHE-v0 BFCL case delta: strict scorer-unit fixed=3, scaled compact fixed=9, regressed=0; strict per-compact-case pairing remains unavailable because 20 compact identifiers collapse to 7 scorer units.
 - ABHE-v0 BFCL archive transition plan: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_archive_transition_plan.json`
 - planning readiness: `outputs/artifacts/stage1_bfcl_acceptance/abhe_planning_ready.json`
 - review bundle: `outputs/artifacts/stage1_bfcl_acceptance/abhe_review_bundle.json`

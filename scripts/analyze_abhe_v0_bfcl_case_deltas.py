@@ -237,6 +237,8 @@ def build_analysis(
     strict_regressed = sum(1 for row in category_rows if row["delta"] == "regressed")
     scaled_fixed = sum(int(row["selected_compact_case_count"]) for row in category_rows if row["delta"] == "fixed")
     scaled_regressed = sum(int(row["selected_compact_case_count"]) for row in category_rows if row["delta"] == "regressed")
+    state_fixed_categories = sorted(row["bfcl_category"] for row in category_rows if row["entry_id"] == "state_tracking_v0" and row["delta"] == "fixed")
+    hallucination_fixed_categories = sorted(row["bfcl_category"] for row in category_rows if row["entry_id"] == "hallucination_abstain_v0" and row["delta"] == "fixed")
     unique_units = sorted({h for row in category_rows for h in row.get("scorer_unit_hashes", [])})
     selected_count = len(compact_rows)
     patch_counts = _trace_patch_counts(candidate_root)
@@ -254,8 +256,8 @@ def build_analysis(
         "strict_scorer_unit_regressed_count": strict_regressed,
         "scaled_compact_fixed_count": scaled_fixed,
         "scaled_compact_regressed_count": scaled_regressed,
-        "state_tracking_signal_summary": "weak_positive_from_multi_turn_miss_param_only" if any(row["bfcl_category"] == "multi_turn_miss_param" and row["delta"] == "fixed" for row in category_rows) else "no_state_tracking_fixed_scorer_unit",
-        "hallucination_abstain_signal_summary": "no_mechanism_signal" if all(row["delta"] != "fixed" for row in category_rows if row["entry_id"] == "hallucination_abstain_v0") else "has_fixed_scorer_unit",
+        "state_tracking_signal_summary": "fixed_categories:" + ",".join(state_fixed_categories) if state_fixed_categories else "no_state_tracking_fixed_scorer_unit",
+        "hallucination_abstain_signal_summary": "fixed_categories:" + ",".join(hallucination_fixed_categories) if hallucination_fixed_categories else "no_mechanism_signal",
         "candidate_activation_telemetry": {
             "candidate_patch_counts": patch_counts,
             "global_guidance_detected": any(key == "abhe_v0_runtime_candidate_adapter_guidance" for key in patch_counts),

@@ -69,6 +69,10 @@ def validate_adapter(adapter: Dict[str, Any]) -> List[str]:
         blockers.append("hallucination_activation_scope_invalid")
     if hallucination.get("valid_actionable_tool_use_guard") is not True:
         blockers.append("hallucination_valid_tool_guard_not_true")
+    if set(hallucination.get("runtime_tool_choice_boundary_categories") or []) != {"irrelevance", "live_irrelevance"}:
+        blockers.append("hallucination_no_tool_boundary_categories_invalid")
+    if hallucination.get("live_relevance_tool_call_guarded") is not True:
+        blockers.append("hallucination_live_relevance_guard_missing")
     if hallucination.get("false_abstain_telemetry_required") is not True:
         blockers.append("hallucination_false_abstain_telemetry_missing")
     if adapter.get("adapter_ready") is not True:

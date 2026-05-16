@@ -44,6 +44,7 @@ DEFAULT_PATHS = [
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_result.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_feedback.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_case_delta_analysis.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_real_trace_analysis.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_feedback.schema.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_archive_transition_plan.json"),
     Path("docs/stage1_abhe_v0_bfcl_fresh_dev_slice.md"),
@@ -180,6 +181,7 @@ OPTIONAL_DEFAULT_PATHS = {
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_result.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_feedback.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_case_delta_analysis.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_real_trace_analysis.json"),
 }
 
 FORBIDDEN_KEY_RE = re.compile(
