@@ -15,6 +15,7 @@ from scripts.check_abhe_fresh_dev_slice_approval_packet import check as check_fr
 from scripts.check_abhe_review_request import check as check_review_request
 from scripts.check_abhe_trace_extraction_approval_packet import check as check_trace_approval
 from scripts.check_abhe_v0_bfcl_dev_smoke_approval_request import check as check_bfcl_dev_smoke_request
+from scripts.check_abhe_v0_bfcl_dev_smoke_approval_packet import check as check_bfcl_dev_smoke_approval_packet
 from scripts.check_abhe_v0_bfcl_execution_readiness import build_report as build_bfcl_execution_readiness
 from scripts.check_abhe_v0_bfcl_fresh_slice_review import check as check_bfcl_fresh_slice_review
 from scripts.check_abhe_v0_materialized_candidates import check as check_bfcl_materialized_candidates
@@ -48,6 +49,7 @@ def build_report() -> Dict[str, Any]:
     execution_approval = check_execution_approval()
     execution_readiness = build_execution_readiness()
     bfcl_dev_smoke_request = check_bfcl_dev_smoke_request()
+    bfcl_dev_smoke_approval = check_bfcl_dev_smoke_approval_packet()
     bfcl_execution_readiness = build_bfcl_execution_readiness()
     bfcl_fresh_slice_review = check_bfcl_fresh_slice_review()
     bfcl_materialized_candidates = check_bfcl_materialized_candidates()
@@ -98,6 +100,8 @@ def build_report() -> Dict[str, Any]:
         "candidate_spec_approved": _packet_approved(candidate_spec_approval),
         "execution_approved": _packet_approved(execution_approval),
         "execution_ready": execution_readiness.get("abhe_execution_ready") is True,
+        "abhe_v0_bfcl_dev_smoke_approved": bfcl_dev_smoke_approval.get("approval_packet_passed") is True,
+        "abhe_v0_bfcl_dev_smoke_approval_scope": bfcl_dev_smoke_approval.get("approval_scope"),
         "abhe_v0_bfcl_execution_ready": bfcl_execution_readiness.get("abhe_v0_bfcl_execution_ready") is True,
         "abhe_v0_bfcl_selected_dataset_path": bfcl_dataset_selection.get("selected_dataset_path"),
         "abhe_v0_bfcl_proposed_selected_case_ids_hash": bfcl_fresh_slice_review_artifact.get("proposed_selected_case_ids_hash"),
@@ -124,13 +128,14 @@ def build_report() -> Dict[str, Any]:
             "execution_approval": execution_approval,
             "execution_readiness": execution_readiness,
             "abhe_v0_bfcl_dev_smoke_request": bfcl_dev_smoke_request,
+            "abhe_v0_bfcl_dev_smoke_approval_packet": bfcl_dev_smoke_approval,
             "abhe_v0_bfcl_execution_readiness": bfcl_execution_readiness,
             "abhe_v0_bfcl_fresh_slice_review": bfcl_fresh_slice_review,
             "abhe_v0_materialized_candidates": bfcl_materialized_candidates,
         },
         "blockers": sorted(set(blockers + schema_blockers)),
         "expected_missing_approval_blockers": sorted(EXPECTED_MISSING_APPROVAL_BLOCKERS),
-        "next_required_action": "request_granular_approval_reviews",
+        "next_required_action": bfcl_execution_readiness.get("next_required_action") or "request_granular_approval_reviews",
     }
 
 

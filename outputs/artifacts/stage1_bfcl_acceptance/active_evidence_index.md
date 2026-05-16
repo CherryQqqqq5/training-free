@@ -71,6 +71,10 @@ ABHE is the active planning route. It is archive-based and behavior-level:
 - ABHE-v0 candidate materialization approval packet: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_candidate_materialization_approval_packet.json`
 - ABHE-v0 materialized candidates: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_materialized_candidates.json`
 - ABHE-v0 BFCL dev smoke approval request: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_approval_request.json`
+
+- ABHE-v0 BFCL dev smoke approval packet: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_approval_packet.json`
+- ABHE-v0 BFCL dev smoke approval checker: `scripts/check_abhe_v0_bfcl_dev_smoke_approval_packet.py`
+- ABHE-v0 BFCL dev smoke execution failure report: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_execution_failure.json`
 - ABHE-v0 BFCL execution readiness: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_execution_readiness.json`
 - ABHE-v0 BFCL dry-run manifest: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_dry_run_manifest.json`
 - ABHE-v0 BFCL compact dev feedback schema: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_feedback.schema.json`
@@ -122,7 +126,11 @@ ABHE-v0 BFCL dev smoke gate status:
 - materialized candidates: `state_tracking_v0` state summary injection and `hallucination_abstain_v0` evidence boundary verifier; no candidate rule/YAML/JSONL generated
 - dev smoke approval request: pending and not authorized
 - dry-run runner manifest: present; provider, BFCL generate/evaluate, and scorer flags are false
-- execution readiness: false; remaining blockers are dev smoke approval, provider/model/protocol, runtime config, and scorer authorization
+- execution approval packet: present and structurally valid for `bounded_dev_smoke_only`
+- approved provider/model/protocol: `Chuangzhi/Novacode` / `novacode` / `gpt-5.2` / `bfcl_v4_abhe_v0_bounded_paired_dev_smoke`
+- approved runtime config path: `configs/runtime_bfcl_structured.yaml`
+- execution readiness: false; remaining blockers are provider env/preflight missing and real runner/candidate adapter not implemented
+- execution failure report: compact, no provider/BFCL/scorer calls made, no result/dev feedback fabricated
 - archive transition plan: dry-run only, archive not updated
 - performance evidence: false
 
@@ -174,6 +182,6 @@ L1 runtime behavior approval does not authorize source expansion, BFCL scorer, c
 
 ## Next Action
 
-`request_bounded_dev_smoke_execution_approval_review`
+`restore_provider_env_and_materialize_real_runner_adapter_before_execution`
 
 ABHE-v0 synthetic closed-loop baseline is ready for human review; RASHE remains discovery predecessor. Bounded dev smoke execution still requires a separate approved packet. Source collection, candidate generation, scorer, archive mutation, performance evidence, SOTA/+3pp claims, and Huawei acceptance remain pending/fail-closed.

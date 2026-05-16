@@ -1,5 +1,28 @@
 {
   "abhe_planning_ready": true,
+  "abhe_v0_bfcl_dev_smoke_approval_status": {
+    "approval_packet_passed": true,
+    "approval_packet_present": true,
+    "approval_scope": "bounded_dev_smoke_only",
+    "approved_model": "gpt-5.2",
+    "approved_profile": "novacode",
+    "approved_protocol": "bfcl_v4_abhe_v0_bounded_paired_dev_smoke",
+    "approved_provider": "Chuangzhi/Novacode",
+    "approved_runtime_config_path": "configs/runtime_bfcl_structured.yaml",
+    "archive_update_authorized": false,
+    "bounded_dev_smoke_only": true,
+    "full_suite_authorized": false,
+    "holdout_authorized": false,
+    "performance_claim_authorized": false,
+    "selected_case_ids_hash": "sha256:8e28826895c76afd14fb2ec07550b871ea50df25c0666881dad39be86450991f"
+  },
+  "abhe_v0_bfcl_execution_blockers": [
+    "candidate_artifact_not_executable_without_runner_adapter",
+    "provider_api_key_env_missing",
+    "provider_endpoint_env_missing",
+    "provider_preflight_not_run_env_missing",
+    "real_execution_runner_not_implemented"
+  ],
   "abhe_v0_bfcl_execution_ready": false,
   "abhe_v0_bfcl_fresh_slice_review_status": {
     "approval_scope": "fresh_dev_slice_only",
@@ -86,8 +109,11 @@
     "abhe_v0_bfcl_dataset_path_review": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dataset_path_review.json",
     "abhe_v0_bfcl_dataset_path_selection": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dataset_path_selection.json",
     "abhe_v0_bfcl_dev_feedback_schema": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_feedback.schema.json",
+    "abhe_v0_bfcl_dev_smoke_approval_checker": "scripts/check_abhe_v0_bfcl_dev_smoke_approval_packet.py",
+    "abhe_v0_bfcl_dev_smoke_approval_packet": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_approval_packet.json",
     "abhe_v0_bfcl_dev_smoke_approval_request": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_approval_request.json",
     "abhe_v0_bfcl_dev_smoke_dry_run_manifest": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_dry_run_manifest.json",
+    "abhe_v0_bfcl_dev_smoke_execution_failure": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_execution_failure.json",
     "abhe_v0_bfcl_dev_smoke_request_doc": "docs/stage1_abhe_v0_bfcl_dev_smoke_request.md",
     "abhe_v0_bfcl_execution_readiness": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_execution_readiness.json",
     "abhe_v0_bfcl_fresh_dev_slice_doc": "docs/stage1_abhe_v0_bfcl_fresh_dev_slice.md",
@@ -180,14 +206,17 @@
   "active_route": "archive_based_behavior_harness_evolution",
   "active_route_predecessor": "retrieval_augmented_skill_harness_evolution",
   "active_route_short_name": "ABHE",
-  "active_route_status": "abhe_v0_bfcl_dev_smoke_gates_fail_closed",
+  "active_route_status": "abhe_v0_bfcl_dev_smoke_conditionally_approved_but_execution_blocked",
+  "archive_updated": false,
   "base_handoff_commit": "eaafa624",
   "batch2_provenance": {
     "artifact_commit": "6e3a1e63",
     "note": "Generation code head and compact artifact commit may differ and are not readiness claims.",
     "source_collection_code_head": "fa4156d0"
   },
-  "branch": "main",
+  "bfcl_evaluate_authorized": false,
+  "bfcl_generate_authorized": false,
+  "branch": "stage1-bfcl-performance-sprint",
   "candidate_generation_authorized": false,
   "candidate_materialization_approved": true,
   "candidate_materialized": true,
@@ -206,10 +235,16 @@
     "source_collection_authorized": false
   },
   "current_blocker": {
-    "blocker": "abhe_v0_bfcl_dev_smoke_execution_not_approved",
-    "candidate_materialization_is_current_blocker": false,
-    "fresh_slice_materialization_is_current_blocker": false,
-    "summary": "ABHE-v0 minimal compact candidates are materialized under candidate-materialization-only approval. Dev smoke execution approval, provider/model/protocol, runtime config, scorer, archive update, and performance evidence remain fail-closed."
+    "blocker": "abhe_v0_bfcl_execution_readiness_blocked",
+    "blockers": [
+      "candidate_artifact_not_executable_without_runner_adapter",
+      "provider_api_key_env_missing",
+      "provider_endpoint_env_missing",
+      "provider_preflight_not_run_env_missing",
+      "real_execution_runner_not_implemented"
+    ],
+    "failure_report": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_execution_failure.json",
+    "summary": "ABHE-v0 bounded dev smoke approval packet is present and structurally valid, but execution readiness remains false because provider environment/preflight and the real runner/candidate adapter are not executable in the current server environment."
   },
   "default_branch_delivery_risk": {
     "base_handoff_commit": "eaafa624",
@@ -279,8 +314,10 @@
       "reason": "superseded by Chuangzhi/Novacode gpt-5.2 green route and excluded from active Stage-1 claim"
     }
   ],
+  "execution_authorized": false,
   "formal_bfcl_performance_ready": false,
   "fresh_dev_slice_materialized": true,
+  "full_suite_touched": false,
   "generated_at_utc": "2026-04-30T16:52:36Z",
   "handoff_commit": "eaafa624",
   "historical_self_referential_fields": {
@@ -292,6 +329,7 @@
     "previous_index_artifact_commit": "61611b98",
     "previous_latest_branch_head_observed": "61611b98"
   },
+  "holdout_touched": false,
   "huawei_acceptance_ready": false,
   "hygiene_patch_commit": "27e36c25",
   "index_schema_version": "stage1_active_evidence_v2",
@@ -323,6 +361,14 @@
     "abhe_trace_extraction_approved": false,
     "abhe_trace_extraction_authorized": false,
     "abhe_v0_archive_updated": false,
+    "abhe_v0_bfcl_dev_smoke_approved_but_not_executed": true,
+    "abhe_v0_bfcl_execution_blockers": [
+      "candidate_artifact_not_executable_without_runner_adapter",
+      "provider_api_key_env_missing",
+      "provider_endpoint_env_missing",
+      "provider_preflight_not_run_env_missing",
+      "real_execution_runner_not_implemented"
+    ],
     "abhe_v0_bfcl_execution_ready": false,
     "abhe_v0_candidate_jsonl_generated": false,
     "abhe_v0_candidate_materialization_approved": true,
@@ -360,7 +406,7 @@
   "latest_hygiene_source_head": "b94855e0",
   "main_merge_completed": true,
   "negative_evidence_report": "docs/stage1_bfcl_negative_evidence_report.md",
-  "next_action": "request_bounded_dev_smoke_execution_approval_review",
+  "next_action": "restore_provider_env_and_materialize_real_runner_adapter_before_execution",
   "no_bfcl_3pp_evidence_yet": true,
   "non_self_referential_provenance": true,
   "optional_diagnostic_counter_fields": [
@@ -640,6 +686,7 @@
     }
   ],
   "provider_artifact_commit_note": "Provider artifact commits such as d39a954d are original evidence creation commits only, not the current branch checkpoint.",
+  "provider_calls_authorized": false,
   "rashe_offline_scaffold": {
     "artifact_paths": {
       "evolution_loop_schema": "outputs/artifacts/stage1_bfcl_acceptance/rashe_v0/evolution_loop.schema.json",

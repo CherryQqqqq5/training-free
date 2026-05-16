@@ -284,7 +284,7 @@ def test_abhe_planning_ready_report_is_review_ready_not_execution_ready() -> Non
     assert report["candidate_spec_drafts_ready"] is True
     assert report["post_dev_synthetic_planner_ready"] is True
     assert report["state_transition_dry_run_ready"] is True
-    assert report["next_required_action"] == "request_granular_approval_reviews"
+    assert report["next_required_action"] == "restore_provider_env_and_materialize_real_runner_adapter_before_execution"
     assert report["execution_authorized"] is False
     assert report["scorer_authorized"] is False
     assert report["performance_evidence"] is False
