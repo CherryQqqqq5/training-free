@@ -16,6 +16,7 @@ from scripts.check_abhe_review_request import check as check_review_request
 from scripts.check_abhe_trace_extraction_approval_packet import check as check_trace_approval
 from scripts.check_abhe_v0_bfcl_dev_smoke_approval_request import check as check_bfcl_dev_smoke_request
 from scripts.check_abhe_v0_bfcl_execution_readiness import build_report as build_bfcl_execution_readiness
+from scripts.check_abhe_v0_bfcl_fresh_slice_review import check as check_bfcl_fresh_slice_review
 
 DEFAULT_OUTPUT = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_approval_chain.json")
 EXPECTED_MISSING_APPROVAL_BLOCKERS = {
@@ -43,6 +44,7 @@ def build_report() -> Dict[str, Any]:
     execution_readiness = build_execution_readiness()
     bfcl_dev_smoke_request = check_bfcl_dev_smoke_request()
     bfcl_execution_readiness = build_bfcl_execution_readiness()
+    bfcl_fresh_slice_review = check_bfcl_fresh_slice_review()
 
     blockers: List[str] = []
     schema_blockers: List[str] = []
@@ -104,6 +106,7 @@ def build_report() -> Dict[str, Any]:
             "execution_readiness": execution_readiness,
             "abhe_v0_bfcl_dev_smoke_request": bfcl_dev_smoke_request,
             "abhe_v0_bfcl_execution_readiness": bfcl_execution_readiness,
+            "abhe_v0_bfcl_fresh_slice_review": bfcl_fresh_slice_review,
         },
         "blockers": sorted(set(blockers + schema_blockers)),
         "expected_missing_approval_blockers": sorted(EXPECTED_MISSING_APPROVAL_BLOCKERS),

@@ -32,6 +32,7 @@ from scripts.check_abhe_v0_bfcl_dev_smoke_approval_request import check as check
 from scripts.check_abhe_v0_bfcl_dev_smoke_result import check as check_bfcl_dev_smoke_result
 from scripts.check_abhe_v0_bfcl_execution_readiness import build_report as build_bfcl_execution_readiness
 from scripts.check_abhe_v0_bfcl_fresh_dev_slice import check as check_bfcl_fresh_slice
+from scripts.check_abhe_v0_bfcl_fresh_slice_review import check as check_bfcl_fresh_slice_review
 from scripts.check_abhe_v0_candidate_materialization_plan import check as check_bfcl_candidate_materialization
 from scripts.plan_abhe_v0_bfcl_archive_transition import build_plan as build_bfcl_archive_transition
 from scripts.plan_abhe_v0_bfcl_archive_transition import synthetic_feedback as bfcl_synthetic_feedback
@@ -59,6 +60,7 @@ def build_report() -> Dict[str, Any]:
     candidate_specs = check_candidate_spec_drafts()
     post_dev_synthetic = build_post_dev_plan(synthetic_fixture_only=True)
     bfcl_fresh_slice = check_bfcl_fresh_slice()
+    bfcl_fresh_slice_review = check_bfcl_fresh_slice_review()
     bfcl_candidate_materialization = check_bfcl_candidate_materialization()
     bfcl_dev_smoke_request = check_bfcl_dev_smoke_request()
     bfcl_execution_readiness = build_bfcl_execution_readiness()
@@ -122,6 +124,8 @@ def build_report() -> Dict[str, Any]:
         blockers.extend(_prefixed("state_transition_writer", transition_writer["blockers"]))
     if not bfcl_fresh_slice.get("abhe_v0_bfcl_fresh_dev_slice_check_passed"):
         blockers.extend(_prefixed("bfcl_fresh_slice", bfcl_fresh_slice.get("blockers", [])))
+    if not bfcl_fresh_slice_review.get("abhe_v0_bfcl_fresh_slice_review_passed"):
+        blockers.extend(_prefixed("bfcl_fresh_slice_review", bfcl_fresh_slice_review.get("blockers", [])))
     if not bfcl_candidate_materialization.get("abhe_v0_candidate_materialization_plan_check_passed"):
         blockers.extend(_prefixed("bfcl_candidate_materialization", bfcl_candidate_materialization.get("blockers", [])))
     if not bfcl_dev_smoke_request.get("abhe_v0_bfcl_dev_smoke_approval_request_passed"):
@@ -163,6 +167,7 @@ def build_report() -> Dict[str, Any]:
         "post_dev_synthetic_planner_ready": post_dev_synthetic.get("abhe_post_dev_update_plan_passed") is True,
         "state_transition_dry_run_ready": transition_writer["state_transition_dry_run_passed"],
         "abhe_v0_bfcl_fresh_slice_plan_ready": bfcl_fresh_slice.get("abhe_v0_bfcl_fresh_dev_slice_check_passed") is True,
+        "abhe_v0_bfcl_fresh_slice_review_ready": bfcl_fresh_slice_review.get("abhe_v0_bfcl_fresh_slice_review_passed") is True,
         "abhe_v0_candidate_materialization_plan_ready": bfcl_candidate_materialization.get("abhe_v0_candidate_materialization_plan_check_passed") is True,
         "abhe_v0_bfcl_dev_smoke_request_ready": bfcl_dev_smoke_request.get("abhe_v0_bfcl_dev_smoke_approval_request_passed") is True,
         "abhe_v0_bfcl_execution_ready": bfcl_execution_readiness.get("abhe_v0_bfcl_execution_ready") is True,
@@ -197,6 +202,10 @@ def build_report() -> Dict[str, Any]:
             "candidate_spec_approval_schema": str(candidate_spec_approval["schema_path"]),
             "execution_approval_schema": str(execution_approval["schema_path"]),
             "abhe_v0_bfcl_fresh_dev_slice_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_plan.json",
+            "abhe_v0_bfcl_dataset_path_review": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dataset_path_review.json",
+            "abhe_v0_bfcl_category_review": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_category_review.json",
+            "abhe_v0_bfcl_fresh_dev_slice_review": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_review.json",
+            "abhe_v0_bfcl_source_exclusion_proof": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_source_exclusion_proof.json",
             "abhe_v0_candidate_materialization_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_candidate_materialization_plan.json",
             "abhe_v0_bfcl_dev_smoke_approval_request": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_approval_request.json",
             "abhe_v0_bfcl_execution_readiness": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_execution_readiness.json",
@@ -223,6 +232,7 @@ def build_report() -> Dict[str, Any]:
             "post_dev_synthetic": post_dev_synthetic,
             "state_transition_writer": transition_writer,
             "abhe_v0_bfcl_fresh_slice": bfcl_fresh_slice,
+            "abhe_v0_bfcl_fresh_slice_review": bfcl_fresh_slice_review,
             "abhe_v0_candidate_materialization": bfcl_candidate_materialization,
             "abhe_v0_bfcl_dev_smoke_request": bfcl_dev_smoke_request,
             "abhe_v0_bfcl_execution_readiness": bfcl_execution_readiness,
