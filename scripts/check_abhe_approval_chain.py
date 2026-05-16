@@ -19,6 +19,9 @@ from scripts.check_abhe_v0_bfcl_execution_readiness import build_report as build
 from scripts.check_abhe_v0_bfcl_fresh_slice_review import check as check_bfcl_fresh_slice_review
 
 DEFAULT_OUTPUT = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_approval_chain.json")
+BFCL_DATASET_SELECTION_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dataset_path_selection.json")
+BFCL_FRESH_SLICE_REVIEW_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_review.json")
+BFCL_SOURCE_EXCLUSION_PROOF_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_source_exclusion_proof.json")
 EXPECTED_MISSING_APPROVAL_BLOCKERS = {
     "trace_extraction_approval_packet_missing",
     "fresh_dev_slice_approval_packet_missing",
@@ -45,6 +48,9 @@ def build_report() -> Dict[str, Any]:
     bfcl_dev_smoke_request = check_bfcl_dev_smoke_request()
     bfcl_execution_readiness = build_bfcl_execution_readiness()
     bfcl_fresh_slice_review = check_bfcl_fresh_slice_review()
+    bfcl_dataset_selection = json.loads(BFCL_DATASET_SELECTION_PATH.read_text(encoding="utf-8")) if BFCL_DATASET_SELECTION_PATH.exists() else {}
+    bfcl_fresh_slice_review_artifact = json.loads(BFCL_FRESH_SLICE_REVIEW_PATH.read_text(encoding="utf-8")) if BFCL_FRESH_SLICE_REVIEW_PATH.exists() else {}
+    bfcl_source_exclusion_proof = json.loads(BFCL_SOURCE_EXCLUSION_PROOF_PATH.read_text(encoding="utf-8")) if BFCL_SOURCE_EXCLUSION_PROOF_PATH.exists() else {}
 
     blockers: List[str] = []
     schema_blockers: List[str] = []
@@ -89,6 +95,11 @@ def build_report() -> Dict[str, Any]:
         "execution_approved": _packet_approved(execution_approval),
         "execution_ready": execution_readiness.get("abhe_execution_ready") is True,
         "abhe_v0_bfcl_execution_ready": bfcl_execution_readiness.get("abhe_v0_bfcl_execution_ready") is True,
+        "abhe_v0_bfcl_selected_dataset_path": bfcl_dataset_selection.get("selected_dataset_path"),
+        "abhe_v0_bfcl_proposed_selected_case_ids_hash": bfcl_fresh_slice_review_artifact.get("proposed_selected_case_ids_hash"),
+        "abhe_v0_bfcl_source_exclusion_status": bfcl_source_exclusion_proof.get("overlap_check_status"),
+        "abhe_v0_bfcl_overlap_count": bfcl_source_exclusion_proof.get("overlap_count"),
+        "abhe_v0_bfcl_candidate_case_hash_count": bfcl_source_exclusion_proof.get("candidate_case_hash_count"),
         "execution_authorized": False,
         "trace_extraction_authorized": False,
         "fresh_dev_slice_authorized": False,

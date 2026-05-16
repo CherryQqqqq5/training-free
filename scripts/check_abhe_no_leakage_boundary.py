@@ -23,6 +23,7 @@ DEFAULT_PATHS = [
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_archive_transition_plan.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_plan.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dataset_path_review.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dataset_path_selection.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_category_review.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_review.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_source_exclusion_proof.json"),
@@ -74,6 +75,12 @@ DEFAULT_PATHS = [
 ]
 
 ALLOWED_KEY_NAMES = {
+    "selected_dataset_path",
+    "proposed_selected_case_ids_hash",
+    "source_file_hash",
+    "case_row_index_hash",
+    "case_stable_hash",
+    "case_identifier_hash",
     "forbidden_fields",
     "forbidden_mainline_next_steps",
     "raw_material_persisted",

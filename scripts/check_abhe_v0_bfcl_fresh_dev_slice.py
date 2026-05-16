@@ -26,14 +26,17 @@ def validate_plan(plan: Dict[str, Any]) -> List[str]:
     if plan.get('raw_material_absent') is not True: b.append('raw_material_absent_not_true')
     if not plan.get('selected_case_ids_hash'): b.append('selected_case_ids_hash_missing')
     if plan.get('fresh_dev_slice_materialized') is False and plan.get('selected_case_ids_hash')!='pending_until_materialized': b.append('selected_case_ids_hash_should_be_pending_before_materialization')
+    proposed=plan.get('proposed_selected_case_ids_hash')
+    if proposed and proposed != 'pending_until_reviewer_selects_dataset_path' and not str(proposed).startswith('sha256:'): b.append('proposed_selected_case_ids_hash_invalid')
     b.extend(scan_value(plan, label='abhe_v0_bfcl_fresh_dev_slice_plan'))
     return sorted(set(b))
 
 def check(path: Path = DEFAULT_OUTPUT) -> Dict[str, Any]:
     if not path.exists(): return {'report_scope':'abhe_v0_bfcl_fresh_dev_slice_check','plan_path':str(path),'plan_present':False,'abhe_v0_bfcl_fresh_dev_slice_check_passed':False,'blockers':['fresh_dev_slice_plan_missing']}
     plan=_load(path); blockers=validate_plan(plan); eb=list(plan.get('execution_blockers', []))
-    expected={'bfcl_dataset_path_missing','fresh_dev_slice_approval_missing'}
-    passed = not blockers and expected.issubset(set(eb)) and plan.get('fresh_dev_slice_materialized') is False
+    required={'fresh_dev_slice_approval_missing'}
+    allowed={'bfcl_dataset_path_missing','fresh_dev_slice_approval_missing'}
+    passed = not blockers and required.issubset(set(eb)) and set(eb).issubset(allowed) and plan.get('fresh_dev_slice_materialized') is False
     return {'report_scope':'abhe_v0_bfcl_fresh_dev_slice_check','plan_path':str(path),'plan_present':True,'abhe_v0_bfcl_fresh_dev_slice_check_passed':passed,'fresh_dev_slice_materialized':plan.get('fresh_dev_slice_materialized') is True,'selected_case_ids_hash':plan.get('selected_case_ids_hash'),'source_160_compact_cases_reused_for_validation':plan.get('source_160_compact_cases_reused_for_validation'),'archive_seed_source_excluded':plan.get('archive_seed_source_excluded'),'execution_blockers':sorted(set(eb)),'blockers':blockers}
 
 def main(argv: Any=None) -> int:

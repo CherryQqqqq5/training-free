@@ -3,10 +3,23 @@
   "approval_authorized": false,
   "approval_packet_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_fresh_dev_slice_approval_packet.json",
   "approval_required": true,
+  "approved_strata": {
+    "hallucination_abstain_v0": [
+      "irrelevance",
+      "live_irrelevance",
+      "live_relevance"
+    ],
+    "state_tracking_v0": [
+      "multi_turn_base",
+      "multi_turn_long_context",
+      "multi_turn_miss_func",
+      "multi_turn_miss_param"
+    ]
+  },
   "archive_seed_source_excluded": true,
   "artifact_kind": "abhe_v0_bfcl_fresh_dev_slice_plan",
-  "bfcl_dataset_path_hash": "pending_until_dataset_path_reviewed",
-  "bfcl_dataset_path_status": "missing",
+  "bfcl_dataset_path_hash": "sha256:3862ebe2fca1848b82ad78666dbcec520c1dd89943efd5224c7d9d46a70ef644",
+  "bfcl_dataset_path_status": "present",
   "bfcl_evaluate_called": false,
   "bfcl_generate_called": false,
   "blockers": [],
@@ -15,22 +28,30 @@
     "hallucination_abstain_v0"
   ],
   "execution_blockers": [
-    "bfcl_dataset_path_missing",
     "fresh_dev_slice_approval_missing"
   ],
   "fresh_dev_slice_materialized": false,
   "full_suite_touched": false,
   "holdout_touched": false,
-  "next_required_action": "request_fresh_dev_slice_approval_and_dataset_path_review",
+  "next_required_action": "request_fresh_dev_slice_materialization_approval_after_hash_review",
   "performance_evidence": false,
+  "proposed_case_count_per_entry": {
+    "hallucination_abstain_v0": 10,
+    "state_tracking_v0": 10
+  },
+  "proposed_selected_case_ids_hash": "sha256:8e28826895c76afd14fb2ec07550b871ea50df25c0666881dad39be86450991f",
   "provider_calls_made": false,
   "raw_material_absent": true,
   "raw_material_persisted": false,
+  "review_artifact_build_blockers": [],
+  "review_artifact_build_status": "complete",
   "schema_version": "abhe_v0_bfcl_fresh_dev_slice_plan_v0",
   "scorer_called": false,
   "selected_case_ids_hash": "pending_until_materialized",
   "selected_case_ids_hash_immutable_after_materialization": true,
+  "selected_dataset_path": ".venv/lib/python3.10/site-packages/bfcl_eval/data",
   "source_160_compact_cases_reused_for_validation": false,
   "source_dataset": "BFCL",
+  "source_exclusion_proof_status": "complete",
   "target_case_count_per_entry": "10_to_20"
 }

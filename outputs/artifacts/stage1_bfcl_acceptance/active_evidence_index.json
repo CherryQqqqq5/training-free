@@ -1,6 +1,18 @@
 {
   "abhe_planning_ready": true,
   "abhe_v0_bfcl_execution_ready": false,
+  "abhe_v0_bfcl_fresh_slice_review_status": {
+    "authorized_for": "fresh_slice_hash_and_overlap_proof_only",
+    "candidate_case_hash_count": 20,
+    "case_keys_persisted": true,
+    "execution_ready": false,
+    "fresh_dev_slice_materialized": false,
+    "overlap_check_status": "complete",
+    "overlap_count": 0,
+    "performance_evidence": false,
+    "proposed_selected_case_ids_hash": "sha256:8e28826895c76afd14fb2ec07550b871ea50df25c0666881dad39be86450991f",
+    "selected_dataset_path": ".venv/lib/python3.10/site-packages/bfcl_eval/data"
+  },
   "active_diagnostic_evidence": {
     "bfcl_proxy_preflight_failure_telemetry_local_stub_approved_v2": {
       "artifact_path": "outputs/artifacts/stage1_bfcl_acceptance/bfcl_proxy_preflight_failure_telemetry_local_stub_approved_v2_compact.json",
@@ -48,6 +60,7 @@
     "abhe_v0_bfcl_archive_transition_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_archive_transition_plan.json",
     "abhe_v0_bfcl_category_review": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_category_review.json",
     "abhe_v0_bfcl_dataset_path_review": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dataset_path_review.json",
+    "abhe_v0_bfcl_dataset_path_selection": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dataset_path_selection.json",
     "abhe_v0_bfcl_dev_feedback_schema": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_feedback.schema.json",
     "abhe_v0_bfcl_dev_smoke_approval_request": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_approval_request.json",
     "abhe_v0_bfcl_dev_smoke_dry_run_manifest": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_dry_run_manifest.json",
@@ -57,6 +70,7 @@
     "abhe_v0_bfcl_fresh_dev_slice_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_plan.json",
     "abhe_v0_bfcl_fresh_dev_slice_review": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_review.json",
     "abhe_v0_bfcl_fresh_slice_review_memo": "docs/stage1_abhe_v0_bfcl_fresh_slice_review_memo.md",
+    "abhe_v0_bfcl_proposed_compact_case_identifiers": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_review.json",
     "abhe_v0_bfcl_source_exclusion_proof": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_source_exclusion_proof.json",
     "abhe_v0_candidate_materialization_doc": "docs/stage1_abhe_v0_candidate_materialization.md",
     "abhe_v0_candidate_materialization_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_candidate_materialization_plan.json",
@@ -163,10 +177,10 @@
     "source_collection_authorized": false
   },
   "current_blocker": {
-    "blocker": "abhe_v0_bfcl_fresh_slice_review_pending_human_selection",
-    "dataset_is_current_blocker": true,
-    "provider_is_current_blocker": false,
-    "summary": "ABHE-v0 BFCL fresh slice review artifacts are prepared fail-closed. Reviewer must select the BFCL dataset path and approve fresh slice materialization before any case list hash can be finalized; execution remains false."
+    "blocker": "abhe_v0_bfcl_fresh_slice_materialization_not_approved",
+    "dataset_is_current_blocker": false,
+    "fresh_slice_materialization_is_current_blocker": true,
+    "summary": "ABHE-v0 BFCL dataset path, strata, compact proposed case identifiers, selected hash, and source exclusion proof are prepared for review. Fresh slice materialization, BFCL execution, scorer, candidate materialization, and performance evidence remain fail-closed."
   },
   "default_branch_delivery_risk": {
     "base_handoff_commit": "eaafa624",
@@ -311,7 +325,7 @@
   "latest_hygiene_source_head": "b94855e0",
   "main_merge_completed": true,
   "negative_evidence_report": "docs/stage1_bfcl_negative_evidence_report.md",
-  "next_action": "review_select_bfcl_dataset_path",
+  "next_action": "review_proposed_case_ids_hash_and_overlap_proof_then_optionally_approve_fresh_slice_materialization_only",
   "no_bfcl_3pp_evidence_yet": true,
   "non_self_referential_provenance": true,
   "optional_diagnostic_counter_fields": [

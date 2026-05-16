@@ -34,6 +34,9 @@ from scripts.plan_abhe_v0_bfcl_archive_transition import synthetic_feedback as b
 
 DEFAULT_OUTPUT = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_review_bundle.json")
 PLANNING_READY_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_planning_ready.json")
+BFCL_DATASET_SELECTION_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dataset_path_selection.json")
+BFCL_FRESH_SLICE_REVIEW_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_review.json")
+BFCL_SOURCE_EXCLUSION_PROOF_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_source_exclusion_proof.json")
 FORCED_FALSE_FIELDS = {
     "execution_authorized",
     "trace_extraction_authorized",
@@ -88,6 +91,9 @@ def build_bundle() -> Dict[str, Any]:
     bfcl_dry_run_manifest = check_bfcl_dev_smoke_result(dry_run_manifest=True)
     bfcl_dev_feedback_schema = check_bfcl_dev_feedback(schema_only=True)
     bfcl_archive_transition = build_bfcl_archive_transition(bfcl_synthetic_feedback(), synthetic_fixture_only=True)
+    bfcl_dataset_selection = _load_json(BFCL_DATASET_SELECTION_PATH)
+    bfcl_fresh_slice_review_artifact = _load_json(BFCL_FRESH_SLICE_REVIEW_PATH)
+    bfcl_source_exclusion_proof = _load_json(BFCL_SOURCE_EXCLUSION_PROOF_PATH)
     transition_blockers = validate_transition(Namespace(
         entry_id="state_tracking_v0",
         from_status="proposal_ready",
@@ -124,6 +130,11 @@ def build_bundle() -> Dict[str, Any]:
         "state_transition_dry_run_writer_ready": transition_writer["state_transition_dry_run_passed"],
         "abhe_v0_bfcl_fresh_slice_plan_ready": bfcl_fresh_slice.get("abhe_v0_bfcl_fresh_dev_slice_check_passed") is True,
         "abhe_v0_bfcl_fresh_slice_review_ready": bfcl_fresh_slice_review.get("abhe_v0_bfcl_fresh_slice_review_passed") is True,
+        "abhe_v0_bfcl_selected_dataset_path": bfcl_dataset_selection.get("selected_dataset_path"),
+        "abhe_v0_bfcl_proposed_selected_case_ids_hash": bfcl_fresh_slice_review_artifact.get("proposed_selected_case_ids_hash"),
+        "abhe_v0_bfcl_source_exclusion_status": bfcl_source_exclusion_proof.get("overlap_check_status"),
+        "abhe_v0_bfcl_overlap_count": bfcl_source_exclusion_proof.get("overlap_count"),
+        "abhe_v0_bfcl_candidate_case_hash_count": bfcl_source_exclusion_proof.get("candidate_case_hash_count"),
         "abhe_v0_candidate_materialization_plan_ready": bfcl_candidate_materialization.get("abhe_v0_candidate_materialization_plan_check_passed") is True,
         "abhe_v0_bfcl_dev_smoke_request_ready": bfcl_dev_smoke_request.get("abhe_v0_bfcl_dev_smoke_approval_request_passed") is True,
         "abhe_v0_bfcl_execution_ready": bfcl_execution_readiness.get("abhe_v0_bfcl_execution_ready") is True,
@@ -153,6 +164,7 @@ def build_bundle() -> Dict[str, Any]:
             "approval_chain": "outputs/artifacts/stage1_bfcl_acceptance/abhe_approval_chain.json",
             "abhe_v0_bfcl_fresh_dev_slice_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_plan.json",
             "abhe_v0_bfcl_dataset_path_review": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dataset_path_review.json",
+            "abhe_v0_bfcl_dataset_path_selection": str(BFCL_DATASET_SELECTION_PATH),
             "abhe_v0_bfcl_category_review": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_category_review.json",
             "abhe_v0_bfcl_fresh_dev_slice_review": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_review.json",
             "abhe_v0_bfcl_source_exclusion_proof": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_source_exclusion_proof.json",

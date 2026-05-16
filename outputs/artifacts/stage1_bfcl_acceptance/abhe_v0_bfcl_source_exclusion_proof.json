@@ -1,58 +1,26 @@
 {
   "archive_seed_source_excluded": true,
   "artifact_kind": "abhe_v0_bfcl_source_exclusion_proof",
-  "blockers": [
-    "bfcl_dataset_path_not_selected"
-  ],
-  "candidate_case_hash_count": 0,
+  "blockers": [],
+  "candidate_case_hash_count": 20,
+  "candidate_case_hash_rule": "sha256 over compact case key fields plus row-window fallback hash; raw BFCL case content is not persisted.",
+  "discovery_source_file_counts": {
+    "agentic_memory.jsonl": 20,
+    "agentic_web_search.jsonl": 20,
+    "hallucination.jsonl": 20,
+    "irrelevance.jsonl": 20,
+    "multi_turn_base.jsonl": 20,
+    "multi_turn_long_context.jsonl": 20,
+    "multi_turn_miss_func.jsonl": 20,
+    "multi_turn_miss_param.jsonl": 20
+  },
   "discovery_source_hash_count": 160,
-  "discovery_source_summary": [
-    {
-      "compact_source_file": "outputs/artifacts/stage1_bfcl_acceptance/rashe_source_inputs_compact/agentic_memory.jsonl",
-      "file_path_hash": "sha256:f882eb10b9483ade7de935b00ee5d8195f17ab2b9cbe1e47bcbae5418a548eab",
-      "line_count": 20
-    },
-    {
-      "compact_source_file": "outputs/artifacts/stage1_bfcl_acceptance/rashe_source_inputs_compact/agentic_web_search.jsonl",
-      "file_path_hash": "sha256:379274520031b8570183385033062130496714e2f66af1f2df8bf82799732de2",
-      "line_count": 20
-    },
-    {
-      "compact_source_file": "outputs/artifacts/stage1_bfcl_acceptance/rashe_source_inputs_compact/hallucination.jsonl",
-      "file_path_hash": "sha256:43e768daec87e3db62ef66d36806ec9e91973ac227b706713a3b7afd444f1c57",
-      "line_count": 20
-    },
-    {
-      "compact_source_file": "outputs/artifacts/stage1_bfcl_acceptance/rashe_source_inputs_compact/irrelevance.jsonl",
-      "file_path_hash": "sha256:d5c11328e94492943b9bba2854ef1de95d9309c84c56d16341063ac127e0e471",
-      "line_count": 20
-    },
-    {
-      "compact_source_file": "outputs/artifacts/stage1_bfcl_acceptance/rashe_source_inputs_compact/multi_turn_base.jsonl",
-      "file_path_hash": "sha256:6b1f3f1208e1c6f61d30259402f01e3c6272c1c599395cf179616c13aa9eaae2",
-      "line_count": 20
-    },
-    {
-      "compact_source_file": "outputs/artifacts/stage1_bfcl_acceptance/rashe_source_inputs_compact/multi_turn_long_context.jsonl",
-      "file_path_hash": "sha256:c05ab949a5feb3d0944f660307fdc077af57afb56d3149e6198c569bbdd9f599",
-      "line_count": 20
-    },
-    {
-      "compact_source_file": "outputs/artifacts/stage1_bfcl_acceptance/rashe_source_inputs_compact/multi_turn_miss_func.jsonl",
-      "file_path_hash": "sha256:a915ffb9b084c400429529713d25c2263f33171cee2203a1f8a3b034ec1c66b5",
-      "line_count": 20
-    },
-    {
-      "compact_source_file": "outputs/artifacts/stage1_bfcl_acceptance/rashe_source_inputs_compact/multi_turn_miss_param.jsonl",
-      "file_path_hash": "sha256:e586eee86a34b6287bc6ed87a125d8ef36d10178e6f4df815e8b5be7b300be50",
-      "line_count": 20
-    }
-  ],
-  "hash_rule_description": "After reviewer selects dataset path, compute sha256 over compact entry id, category, and stable compact identifier or row hash. Non-compact fields remain excluded by policy and checker.",
-  "next_required_action": "select_dataset_path_before_overlap_check",
-  "overlap_check_status": "blocked",
-  "overlap_count": null,
+  "hash_rule_description": "Discovery compact rows are compared with proposed BFCL compact case hashes and category row-window hashes; only compact hashes are persisted.",
+  "next_required_action": "review_overlap_count_before_fresh_slice_materialization_approval",
+  "overlap_check_status": "complete",
+  "overlap_count": 0,
   "overlap_hashes": [],
+  "performance_evidence": false,
   "raw_material_persisted": false,
   "schema_version": "abhe_v0_bfcl_source_exclusion_proof_v0",
   "source_160_compact_cases_reused_for_validation": false
