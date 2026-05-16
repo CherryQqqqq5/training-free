@@ -69,7 +69,9 @@ def build_report() -> Dict[str, Any]:
     bfcl_dev_smoke_request = check_bfcl_dev_smoke_request()
     bfcl_execution_readiness = build_bfcl_execution_readiness()
     bfcl_dry_run_manifest = check_bfcl_dev_smoke_result(dry_run_manifest=True)
+    bfcl_dev_smoke_result = check_bfcl_dev_smoke_result()
     bfcl_dev_feedback_schema = check_bfcl_dev_feedback(schema_only=True)
+    bfcl_dev_feedback = check_bfcl_dev_feedback()
     bfcl_archive_transition = build_bfcl_archive_transition(bfcl_synthetic_feedback(), synthetic_fixture_only=True)
     transition_blockers = validate_transition(Namespace(
         entry_id="state_tracking_v0",
@@ -144,6 +146,10 @@ def build_report() -> Dict[str, Any]:
         blockers.extend(_prefixed("bfcl_dry_run_manifest", bfcl_dry_run_manifest.get("blockers", [])))
     if not bfcl_dev_feedback_schema.get("abhe_v0_bfcl_dev_feedback_check_passed"):
         blockers.extend(_prefixed("bfcl_dev_feedback_schema", bfcl_dev_feedback_schema.get("blockers", [])))
+    if not bfcl_dev_smoke_result.get("abhe_v0_bfcl_dev_smoke_result_check_passed"):
+        blockers.extend(_prefixed("bfcl_dev_smoke_result", bfcl_dev_smoke_result.get("blockers", [])))
+    if not bfcl_dev_feedback.get("abhe_v0_bfcl_dev_feedback_check_passed"):
+        blockers.extend(_prefixed("bfcl_dev_feedback", bfcl_dev_feedback.get("blockers", [])))
     if not bfcl_archive_transition.get("abhe_v0_bfcl_archive_transition_plan_passed"):
         blockers.extend(_prefixed("bfcl_archive_transition", bfcl_archive_transition.get("blockers", [])))
 
@@ -183,6 +189,8 @@ def build_report() -> Dict[str, Any]:
         "abhe_v0_bfcl_dev_smoke_request_ready": bfcl_dev_smoke_request.get("abhe_v0_bfcl_dev_smoke_approval_request_passed") is True,
         "abhe_v0_bfcl_execution_ready": bfcl_execution_readiness.get("abhe_v0_bfcl_execution_ready") is True,
         "abhe_v0_bfcl_dry_run_manifest_ready": bfcl_dry_run_manifest.get("abhe_v0_bfcl_dev_smoke_result_check_passed") is True,
+        "abhe_v0_bfcl_dev_smoke_result_ready": bfcl_dev_smoke_result.get("abhe_v0_bfcl_dev_smoke_result_check_passed") is True,
+        "abhe_v0_bfcl_dev_feedback_ready": bfcl_dev_feedback.get("abhe_v0_bfcl_dev_feedback_check_passed") is True,
         "abhe_v0_bfcl_dev_feedback_schema_ready": bfcl_dev_feedback_schema.get("abhe_v0_bfcl_dev_feedback_check_passed") is True,
         "abhe_v0_bfcl_archive_transition_ready": bfcl_archive_transition.get("abhe_v0_bfcl_archive_transition_plan_passed") is True,
         "no_leakage_boundary_passed": leakage["abhe_no_leakage_boundary_passed"],
@@ -197,7 +205,7 @@ def build_report() -> Dict[str, Any]:
         "candidate_pool_ready": False,
         "sota_3pp_claim_ready": False,
         "huawei_acceptance_ready": False,
-        "next_required_action": bfcl_execution_readiness.get("next_required_action") or "request_granular_approval_reviews",
+        "next_required_action": ("review_compact_dev_feedback_before_any_archive_write" if bfcl_dev_smoke_result.get("abhe_v0_bfcl_dev_smoke_result_check_passed") and bfcl_dev_feedback.get("abhe_v0_bfcl_dev_feedback_check_passed") else (bfcl_execution_readiness.get("next_required_action") or "request_granular_approval_reviews")),
         "component_paths": {
             "trace_packet": str(trace_packet["packet_path"]),
             "dev_smoke_packet": str(dev_smoke_packet["packet_path"]),
@@ -227,6 +235,8 @@ def build_report() -> Dict[str, Any]:
             "abhe_v0_provider_preflight": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_provider_preflight.json",
             "abhe_v0_bfcl_execution_readiness": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_execution_readiness.json",
             "abhe_v0_bfcl_dev_smoke_dry_run_manifest": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_dry_run_manifest.json",
+            "abhe_v0_bfcl_dev_smoke_result": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_result.json",
+            "abhe_v0_bfcl_dev_feedback": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_feedback.json",
             "abhe_v0_bfcl_dev_feedback_schema": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_feedback.schema.json",
             "abhe_v0_bfcl_archive_transition_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_archive_transition_plan.json",
         },
@@ -256,6 +266,8 @@ def build_report() -> Dict[str, Any]:
             "abhe_v0_bfcl_dev_smoke_request": bfcl_dev_smoke_request,
             "abhe_v0_bfcl_execution_readiness": bfcl_execution_readiness,
             "abhe_v0_bfcl_dry_run_manifest": bfcl_dry_run_manifest,
+            "abhe_v0_bfcl_dev_smoke_result": bfcl_dev_smoke_result,
+            "abhe_v0_bfcl_dev_feedback": bfcl_dev_feedback,
             "abhe_v0_bfcl_dev_feedback_schema": bfcl_dev_feedback_schema,
             "abhe_v0_bfcl_archive_transition": bfcl_archive_transition,
             "no_leakage": leakage,

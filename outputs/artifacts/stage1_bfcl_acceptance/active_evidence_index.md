@@ -20,10 +20,10 @@ This index is the active evidence entrypoint for Stage-1 BFCL. It records curren
 
 ## Active Provider And Dataset Gates
 
-- provider: Chuangzhi/Novacode
-- profile: `novacode`
-- model: `gpt-5.2`
-- expected env: `NOVACODE_API_KEY`
+- provider: ToolCallingFunction/OpenAICompatible
+- profile: `toolcallingfunction`
+- model: `gpt-4.1`
+- expected env: `TOOLCALLINGFUNCTION_API_KEY`
 - OpenRouter: disabled / excluded
 - provider green technical preflight: true
 - dataset/export gates: green from existing tracked evidence
@@ -182,16 +182,30 @@ L1 runtime behavior approval does not authorize source expansion, BFCL scorer, c
 
 ## Next Action
 
-`restore_provider_env_and_materialize_real_runner_adapter_before_execution`
+`review_compact_dev_feedback_before_any_archive_write`
 
-ABHE-v0 synthetic closed-loop baseline is ready for human review; RASHE remains discovery predecessor. Bounded dev smoke execution still requires a separate approved packet. Source collection, candidate generation, scorer, archive mutation, performance evidence, SOTA/+3pp claims, and Huawei acceptance remain pending/fail-closed.
+ABHE-v0 bounded dev smoke has completed in compact-only form under the approved 20-case fresh slice. RASHE remains discovery predecessor. Archive mutation, holdout/full-suite evaluation, performance evidence, SOTA/+3pp claims, and Huawei acceptance remain pending/fail-closed.
 
 
 ## ABHE-v0 execution adapter update
 
 - Runtime candidate adapter: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_candidate_adapter.json`
 - Provider preflight: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_provider_preflight.json`
-- Execution failure report: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_execution_failure.json`
-- Current blocker: `provider_preflight_failed` with redacted 4xx status.
-- BFCL execution started: false. Provider/BFCL/scorer calls for dev smoke: false after readiness gate.
-- `abhe_v0_bfcl_execution_ready=false`, `performance_evidence=false`, `holdout_touched=false`, `full_suite_touched=false`, `archive_updated=false`.
+- Superseded failure report: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_execution_failure.json`
+- Current blocker: none for the approved bounded dev smoke; next gate is human review of compact dev feedback before any archive write.
+- BFCL execution started: true for bounded dev smoke only. Holdout/full suite: false.
+- `abhe_v0_bfcl_execution_ready=true`, `performance_evidence=false`, `holdout_touched=false`, `full_suite_touched=false`, `archive_updated=false`.
+
+## ABHE-v0 Bounded Dev Smoke Result
+
+- provider/profile/model: `ToolCallingFunction/OpenAICompatible` / `toolcallingfunction` / `gpt-4.1`
+- selected_case_ids_hash: `sha256:8e28826895c76afd14fb2ec07550b871ea50df25c0666881dad39be86450991f`
+- scope: `bounded_dev_smoke_only`, 20 selected fresh BFCL cases
+- baseline compact: 6/20 selected cases, accuracy `0.3`
+- candidate compact: 8/20 selected cases, accuracy `0.4`
+- compact dev feedback: `state_tracking_v0` fixed_count=2, regressed_count=0, target_bucket_reduction=2; `hallucination_abstain_v0` fixed_count=0, regressed_count=0, target_bucket_reduction=0
+- archive transition plan: dry-run only; `state_tracking_v0 -> dev_passed`, `hallucination_abstain_v0 -> demoted_no_mechanism_signal`
+- archive_updated: false
+- holdout_touched: false
+- full_suite_touched: false
+- performance/+3pp/SOTA/Huawei claim: false

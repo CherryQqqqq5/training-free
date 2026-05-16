@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run a redacted ABHE-v0 provider preflight for the approved Novacode route."""
+"""Run a redacted ABHE-v0 provider preflight for the approved toolcallingfunction route."""
 from __future__ import annotations
 
 import argparse
@@ -17,18 +17,18 @@ from scripts.check_abhe_no_leakage_boundary import scan_value
 
 DEFAULT_OUTPUT = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_provider_preflight.json")
 PROFILE_PATH = Path("/cephfs/qiuyn/.profile")
-API_KEY_ENV = "NOVACODE_API_KEY"
-ENDPOINT_ENVS = ["NOVACODE_BASE_URL", "NOVACODE_ENDPOINT", "CHUANGZHI_NOVACODE_ENDPOINT"]
-EXPECTED_PROVIDER = "Chuangzhi/Novacode"
-EXPECTED_PROFILE = "novacode"
-EXPECTED_MODEL = "gpt-5.2"
-EXPECTED_ROUTE_POLICY = "chuangzhi_novacode_only_openrouter_disabled"
+API_KEY_ENV = "TOOLCALLINGFUNCTION_API_KEY"
+ENDPOINT_ENVS = ["TOOLCALLINGFUNCTION_BASE_URL", "FC_BASE_URL", "NOVACODE_BASE_URL", "NOVACODE_ENDPOINT", "CHUANGZHI_NOVACODE_ENDPOINT"]
+EXPECTED_PROVIDER = "ToolCallingFunction/OpenAICompatible"
+EXPECTED_PROFILE = "toolcallingfunction"
+EXPECTED_MODEL = "gpt-4.1"
+EXPECTED_ROUTE_POLICY = "toolcallingfunction_openai_compatible_only_openrouter_disabled"
 
 
 def _read_profile_env() -> Dict[str, str]:
     if not PROFILE_PATH.exists():
         return {}
-    names = [API_KEY_ENV, *ENDPOINT_ENVS, "OPENAI_API_KEY"]
+    names = [API_KEY_ENV, *ENDPOINT_ENVS, "FC_API_KEY", "TOOLCALLINGFUNCTION_MODEL", "OPENAI_API_KEY"]
     py = "import os,json; names=%r; print(json.dumps({n: os.environ.get(n, '') for n in names}))" % names
     cmd = ["bash", "-lc", "set +x; source /cephfs/qiuyn/.profile >/dev/null 2>&1 || true; %s -c %s" % (sys.executable, json.dumps(py))]
     result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True, check=False)

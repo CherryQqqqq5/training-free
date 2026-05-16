@@ -20,11 +20,11 @@ DEFAULT_OUTPUT = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_exe
 DEFAULT_APPROVAL_PACKET = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_approval_packet.json")
 DEFAULT_PROVIDER_PREFLIGHT = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_provider_preflight.json")
 DEFAULT_RUNNER = Path("scripts/run_abhe_v0_bfcl_dev_smoke.py")
-EXPECTED_PROVIDER = "Chuangzhi/Novacode"
-EXPECTED_PROFILE = "novacode"
-EXPECTED_MODEL = "gpt-5.2"
-EXPECTED_PROTOCOL = "bfcl_v4_abhe_v0_bounded_paired_dev_smoke"
-EXPECTED_ROUTE_POLICY = "chuangzhi_novacode_only_openrouter_disabled"
+EXPECTED_PROVIDER = "ToolCallingFunction/OpenAICompatible"
+EXPECTED_PROFILE = "toolcallingfunction"
+EXPECTED_MODEL = "gpt-4.1"
+EXPECTED_PROTOCOL = "bfcl_v4_abhe_v0_bounded_paired_dev_smoke_toolcallingfunction"
+EXPECTED_ROUTE_POLICY = "toolcallingfunction_openai_compatible_only_openrouter_disabled"
 FAIL_CLOSED_ALLOWED_BLOCKERS = {
     "dev_smoke_approval_missing",
     "provider_model_protocol_not_approved",

@@ -91,6 +91,7 @@ def build_report() -> Dict[str, Any]:
         and execution_schema_ok
     )
     approval_chain_ready = review_request.get("abhe_review_request_passed") is True and schema_ready and not schema_blockers
+    bfcl_dev_smoke_executed = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_result.json").exists() and Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_feedback.json").exists()
 
     return {
         "report_scope": "abhe_approval_chain",
@@ -105,6 +106,7 @@ def build_report() -> Dict[str, Any]:
         "abhe_v0_bfcl_dev_smoke_approved": bfcl_dev_smoke_approval.get("approval_packet_passed") is True,
         "abhe_v0_bfcl_dev_smoke_approval_scope": bfcl_dev_smoke_approval.get("approval_scope"),
         "abhe_v0_bfcl_execution_ready": bfcl_execution_readiness.get("abhe_v0_bfcl_execution_ready") is True,
+        "abhe_v0_bfcl_dev_smoke_executed": bfcl_dev_smoke_executed,
         "abhe_v0_bfcl_selected_dataset_path": bfcl_dataset_selection.get("selected_dataset_path"),
         "abhe_v0_bfcl_proposed_selected_case_ids_hash": bfcl_fresh_slice_review_artifact.get("proposed_selected_case_ids_hash"),
         "abhe_v0_bfcl_source_exclusion_status": bfcl_source_exclusion_proof.get("overlap_check_status"),
@@ -139,7 +141,7 @@ def build_report() -> Dict[str, Any]:
         },
         "blockers": sorted(set(blockers + schema_blockers)),
         "expected_missing_approval_blockers": sorted(EXPECTED_MISSING_APPROVAL_BLOCKERS),
-        "next_required_action": bfcl_execution_readiness.get("next_required_action") or "request_granular_approval_reviews",
+        "next_required_action": ("review_compact_dev_feedback_before_any_archive_write" if bfcl_dev_smoke_executed else (bfcl_execution_readiness.get("next_required_action") or "request_granular_approval_reviews")),
     }
 
 

@@ -22,17 +22,17 @@ runtime_policy:
   true_empty_response_status: preserve_empty_distinguishable_from_no_tool_text
   bfcl_measurement_responses_to_chat_tool_choice_normalization: true
 upstream:
-  active_profile: novacode
+  active_profile: toolcallingfunction
   base_url: ENV_ONLY_OPENAI_COMPATIBLE_BASE_URL
-  api_key_env: OPENAI_API_KEY
+  api_key_env: TOOLCALLINGFUNCTION_API_KEY
   model: gpt-4.1
   profiles:
-    novacode:
-      base_url_env: NOVACODE_BASE_URL
-      base_url: ENV_ONLY_NOVACODE_BASE_URL
-      api_key_env: NOVACODE_API_KEY
+    toolcallingfunction:
+      base_url_env: TOOLCALLINGFUNCTION_BASE_URL
+      base_url: ENV_ONLY_TOOLCALLINGFUNCTION_BASE_URL
+      api_key_env: TOOLCALLINGFUNCTION_API_KEY
       model: gpt-4.1
-      provider_profile: Chuangzhi/Novacode
+      provider_profile: ToolCallingFunction/OpenAICompatible
       fallback_allowed: false
       gpt_4o_fallback_allowed: false
       endpoint_env_only: true
@@ -47,4 +47,4 @@ upstream:
   api_key_value_committed: false
   endpoint_env_only: true
   api_key_env_only: true
-  base_url_env: NOVACODE_BASE_URL
+  base_url_env: TOOLCALLINGFUNCTION_BASE_URL

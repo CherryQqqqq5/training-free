@@ -20,11 +20,11 @@ DEFAULT_FRESH_MANIFEST = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_
 DEFAULT_CANDIDATES = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_materialized_candidates.json")
 EXPECTED_HASH = "sha256:8e28826895c76afd14fb2ec07550b871ea50df25c0666881dad39be86450991f"
 EXPECTED_ENTRIES = ["state_tracking_v0", "hallucination_abstain_v0"]
-EXPECTED_PROVIDER = "Chuangzhi/Novacode"
-EXPECTED_PROFILE = "novacode"
-EXPECTED_MODEL = "gpt-5.2"
-EXPECTED_ROUTE_POLICY = "chuangzhi_novacode_only_openrouter_disabled"
-EXPECTED_PROTOCOL = "bfcl_v4_abhe_v0_bounded_paired_dev_smoke"
+EXPECTED_PROVIDER = "ToolCallingFunction/OpenAICompatible"
+EXPECTED_PROFILE = "toolcallingfunction"
+EXPECTED_MODEL = "gpt-4.1"
+EXPECTED_ROUTE_POLICY = "toolcallingfunction_openai_compatible_only_openrouter_disabled"
+EXPECTED_PROTOCOL = "bfcl_v4_abhe_v0_bounded_paired_dev_smoke_toolcallingfunction"
 EXPECTED_SCOPE = "bounded_dev_smoke_only"
 REQUIRED_STOP_LOSS = {
     "provider_preflight_failed",
