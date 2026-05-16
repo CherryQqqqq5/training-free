@@ -1,0 +1,56 @@
+{
+  "abhe_v0_candidate_materialization_plan_passed": true,
+  "approval_required": true,
+  "artifact_kind": "abhe_v0_candidate_materialization_plan",
+  "blockers": [],
+  "candidate_generation_authorized": false,
+  "candidate_jsonl_generated": false,
+  "candidate_materialized": false,
+  "candidate_plans": [
+    {
+      "boundary": {
+        "multi_turn_only": true,
+        "no_mutation": true,
+        "search_memory_watch_excluded": true,
+        "single_turn_excluded": true,
+        "state_carryover_evidence_required": true
+      },
+      "candidate_type": "state_summary_injection",
+      "entry_id": "state_tracking_v0",
+      "materialized": false,
+      "patch_mode": "runtime_prompt_or_context_injection_or_config_only_guidance",
+      "target_behavior_cluster": "multi_turn_state_lost"
+    },
+    {
+      "boundary": {
+        "answerability_failure_only": true,
+        "false_abstain_tracked": true,
+        "must_not_suppress_valid_tool_calls": true,
+        "valid_actionable_tool_use_case_excluded": true
+      },
+      "candidate_type": "evidence_boundary_verifier",
+      "entry_id": "hallucination_abstain_v0",
+      "materialized": false,
+      "patch_mode": "verifier_or_evidence_boundary_guidance",
+      "target_behavior_cluster": "unsupported_or_irrelevant_answer"
+    }
+  ],
+  "candidate_rule_generated": false,
+  "candidate_spec_approval_required": true,
+  "candidate_yaml_generated": false,
+  "execution_approval_required": true,
+  "forbidden_without_approval": [
+    "candidate_rule",
+    "candidate_yaml",
+    "candidate_jsonl",
+    "candidate_pool",
+    "provider_call",
+    "bfcl_generate",
+    "bfcl_evaluate",
+    "scorer"
+  ],
+  "materialization_status": "plan_only_not_materialized",
+  "next_required_action": "request_candidate_spec_and_execution_approval_before_materialization",
+  "performance_evidence": false,
+  "schema_version": "abhe_v0_candidate_materialization_plan_v0"
+}

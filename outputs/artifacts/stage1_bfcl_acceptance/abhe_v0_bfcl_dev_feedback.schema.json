@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "artifact_kind": {
+      "const": "abhe_v0_bfcl_dev_feedback"
+    },
+    "bounded_dev_smoke_only": {
+      "const": true
+    },
+    "feedback_rows": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "activation_precision": {},
+          "activation_recall": {},
+          "baseline_accuracy": {},
+          "boundary_violation_count": {},
+          "candidate_accuracy": {},
+          "candidate_approved": {},
+          "case_list_hash": {},
+          "cost_delta_pct": {},
+          "entry_id": {},
+          "false_abstain_count": {},
+          "fixed_count": {},
+          "fresh_slice_hash_match": {},
+          "full_suite_touched": {},
+          "holdout_touched": {},
+          "latency_delta_pct": {},
+          "leakage_count": {},
+          "net_fixed": {},
+          "non_target_regression_count": {},
+          "performance_claim_authorized": {},
+          "provider_model_protocol_match": {},
+          "raw_material_absent": {},
+          "regressed_count": {},
+          "target_bucket_reduction": {},
+          "valid_tool_call_suppression_count": {}
+        },
+        "required": [
+          "entry_id",
+          "case_list_hash",
+          "baseline_accuracy",
+          "candidate_accuracy",
+          "target_bucket_reduction",
+          "fixed_count",
+          "regressed_count",
+          "net_fixed",
+          "non_target_regression_count",
+          "false_abstain_count",
+          "valid_tool_call_suppression_count",
+          "activation_precision",
+          "activation_recall",
+          "cost_delta_pct",
+          "latency_delta_pct",
+          "leakage_count",
+          "boundary_violation_count",
+          "provider_model_protocol_match",
+          "fresh_slice_hash_match",
+          "candidate_approved",
+          "raw_material_absent",
+          "holdout_touched",
+          "full_suite_touched",
+          "performance_claim_authorized"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "performance_evidence": {
+      "const": false
+    },
+    "schema_version": {
+      "const": "abhe_v0_bfcl_dev_feedback_v0"
+    }
+  },
+  "required": [
+    "artifact_kind",
+    "schema_version",
+    "bounded_dev_smoke_only",
+    "performance_evidence",
+    "feedback_rows"
+  ],
+  "title": "ABHE-v0 BFCL compact dev feedback",
+  "type": "object"
+}

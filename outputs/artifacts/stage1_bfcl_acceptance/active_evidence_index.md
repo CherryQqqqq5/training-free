@@ -58,6 +58,13 @@ ABHE is the active planning route. It is archive-based and behavior-level:
 - ABHE-v0 synthetic fresh dev slice manifest: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_synthetic_fresh_dev_slice_manifest.json`
 - ABHE-v0 synthetic dev feedback: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_synthetic_dev_feedback.json`
 - ABHE-v0 archive transition plan: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_archive_transition_plan.json`
+- ABHE-v0 BFCL fresh dev slice plan: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_plan.json`
+- ABHE-v0 candidate materialization plan: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_candidate_materialization_plan.json`
+- ABHE-v0 BFCL dev smoke approval request: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_approval_request.json`
+- ABHE-v0 BFCL execution readiness: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_execution_readiness.json`
+- ABHE-v0 BFCL dry-run manifest: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_dry_run_manifest.json`
+- ABHE-v0 BFCL compact dev feedback schema: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_feedback.schema.json`
+- ABHE-v0 BFCL archive transition plan: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_archive_transition_plan.json`
 - planning readiness: `outputs/artifacts/stage1_bfcl_acceptance/abhe_planning_ready.json`
 - review bundle: `outputs/artifacts/stage1_bfcl_acceptance/abhe_review_bundle.json`
 - approval chain: `outputs/artifacts/stage1_bfcl_acceptance/abhe_approval_chain.json`
@@ -91,6 +98,17 @@ ABHE-v0 synthetic closed-loop status:
 - selected synthetic top-2 entries: `state_tracking_v0`, `hallucination_abstain_v0`
 - candidate specs: non-executable spec artifacts only
 - synthetic feedback: fixture-only, paired dev smoke not executed
+- archive transition plan: dry-run only, archive not updated
+- performance evidence: false
+
+ABHE-v0 BFCL dev smoke gate status:
+
+- fresh BFCL dev slice plan: present, not materialized
+- selected case list hash: pending until materialization
+- candidate materialization plan: present, no candidate rule/YAML/JSONL generated
+- dev smoke approval request: pending and not authorized
+- dry-run runner manifest: present; provider, BFCL generate/evaluate, and scorer flags are false
+- execution readiness: false
 - archive transition plan: dry-run only, archive not updated
 - performance evidence: false
 
@@ -142,6 +160,6 @@ L1 runtime behavior approval does not authorize source expansion, BFCL scorer, c
 
 ## Next Action
 
-`review_abhe_v0_synthetic_closed_loop_and_request_minimal_real_approval`
+`request_abhe_v0_bfcl_dev_smoke_approval_after_fresh_slice_and_candidate_materialization_review`
 
 ABHE-v0 synthetic closed-loop baseline is ready for human review; RASHE remains discovery predecessor. Trace extraction, fresh dev slice, candidate spec review, and bounded dev smoke execution each require separate approved packets. Source collection, candidate generation, scorer, real fresh dev slice materialization, archive mutation, performance evidence, SOTA/+3pp claims, and Huawei acceptance remain pending/fail-closed.

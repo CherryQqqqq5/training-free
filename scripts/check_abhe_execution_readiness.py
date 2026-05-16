@@ -16,6 +16,7 @@ from scripts.check_abhe_execution_approval_packet import check as check_executio
 from scripts.check_abhe_fresh_dev_slice_approval_packet import check as check_fresh_slice_approval_packet
 from scripts.check_abhe_fresh_dev_slice_request import check as check_fresh_slice_request
 from scripts.check_abhe_trace_extraction_approval_packet import check as check_trace_extraction_approval_packet
+from scripts.check_abhe_v0_bfcl_execution_readiness import build_report as build_bfcl_execution_readiness
 
 DEFAULT_OUTPUT = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_execution_readiness.json")
 
@@ -36,6 +37,7 @@ def build_report(dev_smoke_packet_path: Path = DEFAULT_DEV_SMOKE_PACKET) -> Dict
     candidate_spec_approval = check_candidate_spec_approval_packet()
     execution_approval = check_execution_approval_packet()
     packet = _load_json(dev_smoke_packet_path) if dev_smoke_packet_path.exists() else {}
+    bfcl_execution_readiness = build_bfcl_execution_readiness()
 
     blockers: List[str] = []
     if not fresh_slice["abhe_fresh_dev_slice_request_passed"]:
@@ -107,6 +109,7 @@ def build_report(dev_smoke_packet_path: Path = DEFAULT_DEV_SMOKE_PACKET) -> Dict
         "performance_evidence": False,
         "candidate_generation_authorized": packet.get("candidate_generation_authorized") is True,
         "component_summaries": {
+            "abhe_v0_bfcl_execution_readiness": bfcl_execution_readiness,
             "fresh_slice_request": fresh_slice,
             "dry_run_manifest": dry_run_manifest,
             "dev_smoke_packet": dev_smoke_packet,
