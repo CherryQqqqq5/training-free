@@ -37,6 +37,8 @@ from scripts.check_abhe_v0_bfcl_fresh_slice_review import check as check_bfcl_fr
 from scripts.check_abhe_v0_candidate_materialization_plan import check as check_bfcl_candidate_materialization
 from scripts.check_abhe_v0_materialized_candidates import check as check_bfcl_materialized_candidates
 from scripts.check_abhe_v0_runtime_candidate_adapter import check as check_bfcl_runtime_candidate_adapter
+from scripts.check_abhe_v0_bfcl_same_slice_rerun_stability import check as check_bfcl_same_slice_stability
+from scripts.check_abhe_v0_expanded_dev_smoke_request import check as check_bfcl_expanded_dev_smoke_request
 from scripts.plan_abhe_v0_bfcl_archive_transition import build_plan as build_bfcl_archive_transition
 from scripts.plan_abhe_v0_bfcl_archive_transition import synthetic_feedback as bfcl_synthetic_feedback
 
@@ -81,6 +83,8 @@ def build_report() -> Dict[str, Any]:
     bfcl_dev_feedback_schema = check_bfcl_dev_feedback(schema_only=True)
     bfcl_dev_feedback = check_bfcl_dev_feedback()
     bfcl_case_delta = check_bfcl_case_delta()
+    bfcl_same_slice_stability = check_bfcl_same_slice_stability()
+    bfcl_expanded_dev_smoke_request = check_bfcl_expanded_dev_smoke_request()
     bfcl_archive_transition = build_bfcl_archive_transition(bfcl_synthetic_feedback(), synthetic_fixture_only=True)
     transition_blockers = validate_transition(Namespace(
         entry_id="state_tracking_v0",
@@ -163,6 +167,10 @@ def build_report() -> Dict[str, Any]:
         blockers.extend(_prefixed("bfcl_archive_transition", bfcl_archive_transition.get("blockers", [])))
     if not bfcl_case_delta.get("abhe_v0_bfcl_case_delta_analysis_check_passed"):
         blockers.extend(_prefixed("bfcl_case_delta_analysis", bfcl_case_delta.get("blockers", [])))
+    if not bfcl_same_slice_stability.get("same_slice_rerun_stability_check_passed"):
+        blockers.extend(_prefixed("bfcl_same_slice_stability", bfcl_same_slice_stability.get("blockers", [])))
+    if not bfcl_expanded_dev_smoke_request.get("abhe_v0_expanded_dev_smoke_request_passed"):
+        blockers.extend(_prefixed("bfcl_expanded_dev_smoke_request", bfcl_expanded_dev_smoke_request.get("blockers", [])))
 
     execution_authorized = False
     scorer_authorized = False
@@ -205,6 +213,8 @@ def build_report() -> Dict[str, Any]:
         "abhe_v0_bfcl_dev_feedback_schema_ready": bfcl_dev_feedback_schema.get("abhe_v0_bfcl_dev_feedback_check_passed") is True,
         "abhe_v0_bfcl_archive_transition_ready": bfcl_archive_transition.get("abhe_v0_bfcl_archive_transition_plan_passed") is True,
         "abhe_v0_bfcl_case_delta_analysis_ready": bfcl_case_delta.get("abhe_v0_bfcl_case_delta_analysis_check_passed") is True,
+        "abhe_v0_bfcl_same_slice_rerun_stability_ready": bfcl_same_slice_stability.get("same_slice_rerun_stability_check_passed") is True,
+        "abhe_v0_expanded_dev_smoke_request_ready": bfcl_expanded_dev_smoke_request.get("abhe_v0_expanded_dev_smoke_request_passed") is True,
         "no_leakage_boundary_passed": leakage["abhe_no_leakage_boundary_passed"],
         "execution_authorized": execution_authorized,
         "scorer_authorized": scorer_authorized,
@@ -217,7 +227,7 @@ def build_report() -> Dict[str, Any]:
         "candidate_pool_ready": False,
         "sota_3pp_claim_ready": False,
         "huawei_acceptance_ready": False,
-        "next_required_action": ("review_compact_dev_feedback_before_any_archive_write" if bfcl_dev_smoke_result.get("abhe_v0_bfcl_dev_smoke_result_check_passed") and bfcl_dev_feedback.get("abhe_v0_bfcl_dev_feedback_check_passed") else (bfcl_execution_readiness.get("next_required_action") or "request_granular_approval_reviews")),
+        "next_required_action": "request_expanded_40_60_case_dev_smoke_not_full_bfcl",
         "component_paths": {
             "trace_packet": str(trace_packet["packet_path"]),
             "dev_smoke_packet": str(dev_smoke_packet["packet_path"]),
@@ -251,6 +261,8 @@ def build_report() -> Dict[str, Any]:
             "abhe_v0_bfcl_dev_feedback": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_feedback.json",
             "abhe_v0_bfcl_case_delta_analysis": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_case_delta_analysis.json",
             "abhe_v0_bfcl_dev_feedback_schema": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_feedback.schema.json",
+            "abhe_v0_bfcl_same_slice_rerun_stability": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_same_slice_rerun_stability.json",
+            "abhe_v0_expanded_dev_smoke_request": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_expanded_dev_smoke_request.json",
             "abhe_v0_bfcl_archive_transition_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_archive_transition_plan.json",
         },
         "component_summaries": {
@@ -283,6 +295,8 @@ def build_report() -> Dict[str, Any]:
             "abhe_v0_bfcl_dev_feedback": bfcl_dev_feedback,
             "abhe_v0_bfcl_case_delta_analysis": bfcl_case_delta,
             "abhe_v0_bfcl_dev_feedback_schema": bfcl_dev_feedback_schema,
+            "abhe_v0_bfcl_same_slice_rerun_stability": bfcl_same_slice_stability,
+            "abhe_v0_expanded_dev_smoke_request": bfcl_expanded_dev_smoke_request,
             "abhe_v0_bfcl_archive_transition": bfcl_archive_transition,
             "no_leakage": leakage,
         },

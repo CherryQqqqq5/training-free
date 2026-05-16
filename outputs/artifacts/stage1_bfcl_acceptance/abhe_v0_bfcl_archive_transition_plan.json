@@ -3,14 +3,54 @@
   "archive_updated": false,
   "artifact_kind": "abhe_v0_bfcl_archive_transition_plan",
   "blockers": [],
+  "bounded_dev_smoke_only": true,
   "does_not_update_archive": true,
   "full_suite_touched": false,
   "holdout_touched": false,
-  "next_required_action": "review_compact_dev_feedback_before_any_archive_write",
+  "next_required_action": "request_expanded_40_60_case_dev_smoke_not_full_bfcl",
   "performance_evidence": false,
+  "planned_sublane_transitions": [
+    {
+      "bfcl_category": "multi_turn_long_context",
+      "entry_id": "state_tracking_v0",
+      "observed_delta": "fixed",
+      "recommended_action": "retain_for_expanded_dev_verification",
+      "sublane_id": "multi_turn_long_context_state_carryover_v0"
+    },
+    {
+      "bfcl_category": "multi_turn_miss_func",
+      "entry_id": "state_tracking_v0",
+      "observed_delta": "unchanged_fail",
+      "recommended_action": "narrow_or_redesign_before_claiming_state_tracking_generalization",
+      "sublane_id": "multi_turn_miss_func_state_tool_availability_v0"
+    },
+    {
+      "bfcl_category": "irrelevance",
+      "entry_id": "hallucination_abstain_v0",
+      "observed_delta": "fixed",
+      "recommended_action": "retain_for_expanded_dev_verification",
+      "sublane_id": "irrelevance_no_tool_boundary_v0"
+    },
+    {
+      "bfcl_category": "live_irrelevance",
+      "entry_id": "hallucination_abstain_v0",
+      "observed_delta": "fixed",
+      "recommended_action": "split_requested_and_verify_on_expanded_dev_before_dev_passed",
+      "signal_changed_between_runs": true,
+      "sublane_id": "live_irrelevance_boundary_v0"
+    },
+    {
+      "bfcl_category": "live_relevance",
+      "entry_id": "hallucination_abstain_v0",
+      "observed_delta": "unchanged_pass",
+      "recommended_action": "guard_retained_no_false_abstain_signal",
+      "sublane_id": "live_relevance_guard_v0"
+    }
+  ],
   "planned_transitions": [
     {
       "archive_updated": false,
+      "bounded_dev_only": true,
       "does_not_update_archive": true,
       "entry_id": "state_tracking_v0",
       "from_status": "proposal_ready",
@@ -19,13 +59,20 @@
     },
     {
       "archive_updated": false,
+      "bounded_dev_only": true,
       "does_not_update_archive": true,
       "entry_id": "hallucination_abstain_v0",
       "from_status": "proposal_ready",
       "source": "compact_bfcl_dev_feedback",
-      "to_status": "dev_passed"
+      "to_status": "split_requested"
     }
   ],
+  "same_slice_rerun_stability_passed": true,
+  "scaled_compact_fixed_count": 10,
+  "scaled_compact_regressed_count": 0,
   "schema_version": "abhe_v0_bfcl_archive_transition_plan_v0",
+  "strict_per_compact_case_paired_available": false,
+  "strict_scorer_unit_fixed_count": 3,
+  "strict_scorer_unit_regressed_count": 0,
   "synthetic_fixture_only": false
 }

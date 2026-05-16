@@ -45,6 +45,12 @@ DEFAULT_PATHS = [
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_feedback.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_case_delta_analysis.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_real_trace_analysis.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_same_slice_prior_snapshot.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_same_slice_rerun_trace_analysis.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_same_slice_rerun_case_delta_analysis.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_same_slice_rerun_stability.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_expanded_dev_smoke_request.json"),
+    Path("docs/stage1_abhe_v0_expanded_dev_smoke_request.md"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_feedback.schema.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_archive_transition_plan.json"),
     Path("docs/stage1_abhe_v0_bfcl_fresh_dev_slice.md"),
@@ -182,6 +188,12 @@ OPTIONAL_DEFAULT_PATHS = {
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_feedback.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_case_delta_analysis.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_real_trace_analysis.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_same_slice_prior_snapshot.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_same_slice_rerun_trace_analysis.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_same_slice_rerun_case_delta_analysis.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_same_slice_rerun_stability.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_expanded_dev_smoke_request.json"),
+    Path("docs/stage1_abhe_v0_expanded_dev_smoke_request.md"),
 }
 
 FORBIDDEN_KEY_RE = re.compile(

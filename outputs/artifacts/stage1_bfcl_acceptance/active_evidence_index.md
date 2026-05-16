@@ -217,3 +217,18 @@ ABHE-v0 bounded dev smoke has completed in compact-only form under the approved 
 - holdout_touched: false
 - full_suite_touched: false
 - performance/+3pp/SOTA/Huawei claim: false
+
+## ABHE-v0 Same-Slice Rerun And Expanded Dev Request
+
+- same-slice prior snapshot: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_same_slice_prior_snapshot.json`
+- same-slice rerun trace analysis: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_same_slice_rerun_trace_analysis.json`
+- same-slice rerun case delta analysis: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_same_slice_rerun_case_delta_analysis.json`
+- same-slice rerun stability: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_same_slice_rerun_stability.json`
+- expanded dev smoke request: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_expanded_dev_smoke_request.json`
+- expanded dev smoke request doc: `docs/stage1_abhe_v0_expanded_dev_smoke_request.md`
+
+Same-slice rerun result: baseline 8/20, candidate 18/20, strict scorer-unit fixed=3, scaled compact fixed=10, scaled compact regressed=0. This is bounded dev-smoke evidence only. It supports requesting an expanded 40-60 case dev smoke; it does not support full BFCL, holdout, +3pp, SOTA, Huawei acceptance, or archive mutation.
+
+Archive transition remains dry-run only. Current split interpretation: `state_tracking_v0 -> dev_passed` as a bounded-dev signal requiring expanded verification; `hallucination_abstain_v0 -> split_requested`, with `irrelevance_no_tool_boundary_v0` retained for expanded verification, `live_irrelevance_boundary_v0` requiring split verification because the signal changed between runs, and `live_relevance_guard_v0` retained as a no-false-abstain guard.
+
+Next action: `request_expanded_40_60_case_dev_smoke_not_full_bfcl`.

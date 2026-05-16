@@ -1,5 +1,12 @@
 {
   "abhe_planning_ready": true,
+  "abhe_v0_bfcl_archive_transition_status": {
+    "archive_updated": false,
+    "hallucination_abstain_v0": "split_requested",
+    "live_irrelevance_boundary_v0": "signal_changed_between_runs_requires_expanded_dev_verification",
+    "performance_evidence": false,
+    "state_tracking_v0": "dev_passed_bounded_dev_signal_requires_expanded_dev_verification"
+  },
   "abhe_v0_bfcl_case_delta_status": {
     "case_delta_analysis_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_case_delta_analysis.json",
     "entry_specific_guidance_detected": true,
@@ -150,6 +157,16 @@
   },
   "abhe_v0_bfcl_execution_blockers": [],
   "abhe_v0_bfcl_execution_ready": true,
+  "abhe_v0_bfcl_expanded_dev_smoke_request_status": {
+    "approval_status": "pending",
+    "authorized": false,
+    "fresh_dev_slice_materialized": false,
+    "full_suite_authorized": false,
+    "holdout_authorized": false,
+    "performance_evidence": false,
+    "requested_total_case_count_range": "40_to_60",
+    "selected_case_ids_hash": "pending_until_expanded_slice_materialized"
+  },
   "abhe_v0_bfcl_fresh_slice_review_status": {
     "approval_scope": "fresh_dev_slice_only",
     "approved_fresh_dev_slice_hash": "sha256:8e28826895c76afd14fb2ec07550b871ea50df25c0666881dad39be86450991f",
@@ -195,6 +212,19 @@
       "baseline": 55,
       "candidate": 58
     }
+  },
+  "abhe_v0_bfcl_same_slice_rerun_status": {
+    "baseline_passed_count": 8,
+    "bounded_dev_smoke_only": true,
+    "candidate_passed_count": 18,
+    "full_suite_touched": false,
+    "holdout_touched": false,
+    "performance_evidence": false,
+    "same_slice_rerun_stability_passed": true,
+    "scaled_compact_fixed_count": 10,
+    "scaled_compact_regressed_count": 0,
+    "selected_case_ids_hash": "sha256:8e28826895c76afd14fb2ec07550b871ea50df25c0666881dad39be86450991f",
+    "strict_scorer_unit_fixed_count": 3
   },
   "active_diagnostic_evidence": {
     "bfcl_proxy_preflight_failure_telemetry_local_stub_approved_v2": {
@@ -265,10 +295,16 @@
     "abhe_v0_bfcl_fresh_slice_review_memo": "docs/stage1_abhe_v0_bfcl_fresh_slice_review_memo.md",
     "abhe_v0_bfcl_proposed_compact_case_identifiers": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_review.json",
     "abhe_v0_bfcl_real_trace_analysis": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_real_trace_analysis.json",
+    "abhe_v0_bfcl_same_slice_prior_snapshot": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_same_slice_prior_snapshot.json",
+    "abhe_v0_bfcl_same_slice_rerun_case_delta_analysis": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_same_slice_rerun_case_delta_analysis.json",
+    "abhe_v0_bfcl_same_slice_rerun_stability": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_same_slice_rerun_stability.json",
+    "abhe_v0_bfcl_same_slice_rerun_trace_analysis": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_same_slice_rerun_trace_analysis.json",
     "abhe_v0_bfcl_source_exclusion_proof": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_source_exclusion_proof.json",
     "abhe_v0_candidate_materialization_approval_packet": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_candidate_materialization_approval_packet.json",
     "abhe_v0_candidate_materialization_doc": "docs/stage1_abhe_v0_candidate_materialization.md",
     "abhe_v0_candidate_materialization_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_candidate_materialization_plan.json",
+    "abhe_v0_expanded_dev_smoke_request": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_expanded_dev_smoke_request.json",
+    "abhe_v0_expanded_dev_smoke_request_doc": "docs/stage1_abhe_v0_expanded_dev_smoke_request.md",
     "abhe_v0_materialized_candidates": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_materialized_candidates.json",
     "abhe_v0_policy_score": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_policy_score.json",
     "abhe_v0_provider_preflight": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_provider_preflight.json",
@@ -478,12 +514,12 @@
   "index_updated_for_evidence_through_commit": "61611b98",
   "index_updated_for_evidence_through_commit_note": "61611b98 is the latest referenced evidence/documentation commit indexed here: it added the negative evidence report and aligned performance readiness. Later provenance-only commits are intentionally not recorded as current index commits to avoid self-referential churn.",
   "latest_committed_cleanup": "see git HEAD",
-  "latest_conclusion": "ABHE-v0 bounded 20-case BFCL dev smoke completed with compact positive signal; not full BFCL, not holdout, not performance claim.",
+  "latest_conclusion": "ABHE-v0 same-slice rerun is stable enough for expanded dev review, not full BFCL. Baseline 8/20, candidate 18/20, strict scorer-unit fixed=3, scaled compact fixed=10, regressed=0; live_irrelevance signal changed between runs and requires split/expanded verification.",
   "latest_hygiene_source_head": "b94855e0",
   "main_merge_completed": true,
   "negative_evidence_report": "docs/stage1_bfcl_negative_evidence_report.md",
   "next_action": "Fix approved Novacode provider/model/protocol preflight or revise approval packet, then rerun execution readiness before any BFCL execution.",
-  "next_required_action": "review_compact_dev_feedback_and_request_full_bfcl_dataset_approval_packet_before_any_full_run",
+  "next_required_action": "request_expanded_40_60_case_dev_smoke_not_full_bfcl",
   "no_bfcl_3pp_evidence_yet": true,
   "non_self_referential_provenance": true,
   "optional_diagnostic_counter_fields": [

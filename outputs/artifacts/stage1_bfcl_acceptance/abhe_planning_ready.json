@@ -10,8 +10,10 @@
   "abhe_v0_bfcl_execution_ready": true,
   "abhe_v0_bfcl_fresh_slice_plan_ready": true,
   "abhe_v0_bfcl_fresh_slice_review_ready": true,
+  "abhe_v0_bfcl_same_slice_rerun_stability_ready": true,
   "abhe_v0_candidate_materialization_approved": true,
   "abhe_v0_candidate_materialization_plan_ready": true,
+  "abhe_v0_expanded_dev_smoke_request_ready": true,
   "abhe_v0_materialized_candidates_ready": true,
   "abhe_v0_runtime_candidate_adapter_ready": true,
   "approval_chain_ready_for_review": true,
@@ -40,9 +42,11 @@
     "abhe_v0_bfcl_execution_readiness": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_execution_readiness.json",
     "abhe_v0_bfcl_fresh_dev_slice_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_plan.json",
     "abhe_v0_bfcl_fresh_dev_slice_review": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_review.json",
+    "abhe_v0_bfcl_same_slice_rerun_stability": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_same_slice_rerun_stability.json",
     "abhe_v0_bfcl_source_exclusion_proof": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_source_exclusion_proof.json",
     "abhe_v0_candidate_materialization_approval_packet": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_candidate_materialization_approval_packet.json",
     "abhe_v0_candidate_materialization_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_candidate_materialization_plan.json",
+    "abhe_v0_expanded_dev_smoke_request": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_expanded_dev_smoke_request.json",
     "abhe_v0_materialized_candidates": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_materialized_candidates.json",
     "abhe_v0_provider_preflight": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_provider_preflight.json",
     "abhe_v0_runtime_candidate_adapter": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_candidate_adapter.json",
@@ -66,14 +70,17 @@
       "archive_updated": false,
       "artifact_kind": "abhe_v0_bfcl_archive_transition_plan",
       "blockers": [],
+      "bounded_dev_smoke_only": true,
       "does_not_update_archive": true,
       "full_suite_touched": false,
       "holdout_touched": false,
-      "next_required_action": "review_compact_dev_feedback_before_any_archive_write",
+      "next_required_action": "request_expanded_40_60_case_dev_smoke_not_full_bfcl",
       "performance_evidence": false,
+      "planned_sublane_transitions": [],
       "planned_transitions": [
         {
           "archive_updated": false,
+          "bounded_dev_only": true,
           "does_not_update_archive": true,
           "entry_id": "state_tracking_v0",
           "from_status": "proposal_ready",
@@ -82,6 +89,7 @@
         },
         {
           "archive_updated": false,
+          "bounded_dev_only": true,
           "does_not_update_archive": true,
           "entry_id": "hallucination_abstain_v0",
           "from_status": "proposal_ready",
@@ -89,7 +97,13 @@
           "to_status": "dev_passed"
         }
       ],
+      "same_slice_rerun_stability_passed": null,
+      "scaled_compact_fixed_count": null,
+      "scaled_compact_regressed_count": null,
       "schema_version": "abhe_v0_bfcl_archive_transition_plan_v0",
+      "strict_per_compact_case_paired_available": null,
+      "strict_scorer_unit_fixed_count": null,
+      "strict_scorer_unit_regressed_count": null,
       "synthetic_fixture_only": true
     },
     "abhe_v0_bfcl_case_delta_analysis": {
@@ -101,7 +115,7 @@
       "global_guidance_detected": false,
       "performance_evidence": false,
       "report_scope": "abhe_v0_bfcl_case_delta_analysis_check",
-      "scaled_compact_fixed_count": 9,
+      "scaled_compact_fixed_count": 10,
       "strict_per_compact_case_paired_available": false,
       "strict_scorer_unit_fixed_count": 3,
       "unique_bfcl_scorer_unit_count": 7
@@ -460,6 +474,16 @@
       "performance_evidence": false,
       "report_scope": "abhe_v0_bfcl_fresh_slice_review_check"
     },
+    "abhe_v0_bfcl_same_slice_rerun_stability": {
+      "artifact_present": true,
+      "baseline_passed_count_abs_delta": 0,
+      "blockers": [],
+      "candidate_passed_count_abs_delta": 1,
+      "performance_evidence": false,
+      "report_scope": "abhe_v0_bfcl_same_slice_rerun_stability_check",
+      "same_slice_rerun_stability_check_passed": true,
+      "same_slice_rerun_stable": true
+    },
     "abhe_v0_candidate_materialization": {
       "abhe_v0_candidate_materialization_plan_check_passed": true,
       "blockers": [],
@@ -470,6 +494,17 @@
       "plan_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_candidate_materialization_plan.json",
       "plan_present": true,
       "report_scope": "abhe_v0_candidate_materialization_plan_check"
+    },
+    "abhe_v0_expanded_dev_smoke_request": {
+      "abhe_v0_expanded_dev_smoke_request_passed": true,
+      "approval_status": "pending",
+      "artifact_present": true,
+      "authorized": false,
+      "blockers": [],
+      "performance_evidence": false,
+      "report_scope": "abhe_v0_expanded_dev_smoke_request_check",
+      "requested_total_case_count_max": 60,
+      "requested_total_case_count_min": 40
     },
     "abhe_v0_materialized_candidates": {
       "abhe_v0_materialized_candidates_check_passed": true,
@@ -1472,6 +1507,12 @@
         "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_feedback.json",
         "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_case_delta_analysis.json",
         "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_real_trace_analysis.json",
+        "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_same_slice_prior_snapshot.json",
+        "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_same_slice_rerun_trace_analysis.json",
+        "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_same_slice_rerun_case_delta_analysis.json",
+        "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_same_slice_rerun_stability.json",
+        "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_expanded_dev_smoke_request.json",
+        "docs/stage1_abhe_v0_expanded_dev_smoke_request.md",
         "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_feedback.schema.json",
         "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_archive_transition_plan.json",
         "docs/stage1_abhe_v0_bfcl_fresh_dev_slice.md",
@@ -1595,11 +1636,13 @@
       "abhe_v0_bfcl_fresh_slice_review_ready": true,
       "abhe_v0_bfcl_overlap_count": 0,
       "abhe_v0_bfcl_proposed_selected_case_ids_hash": "sha256:8e28826895c76afd14fb2ec07550b871ea50df25c0666881dad39be86450991f",
+      "abhe_v0_bfcl_same_slice_rerun_stability_ready": true,
       "abhe_v0_bfcl_selected_case_ids_hash": "sha256:8e28826895c76afd14fb2ec07550b871ea50df25c0666881dad39be86450991f",
       "abhe_v0_bfcl_selected_dataset_path": ".venv/lib/python3.10/site-packages/bfcl_eval/data",
       "abhe_v0_bfcl_source_exclusion_status": "complete",
       "abhe_v0_candidate_materialization_approved": true,
       "abhe_v0_candidate_materialization_plan_ready": true,
+      "abhe_v0_expanded_dev_smoke_request_ready": true,
       "abhe_v0_materialized_candidates_ready": true,
       "abhe_v0_provider_preflight_passed": true,
       "abhe_v0_runtime_candidate_adapter_ready": true,
@@ -1610,7 +1653,7 @@
       "bundle_is_performance_evidence": false,
       "candidate_generation_authorized": false,
       "candidate_spec_drafts_ready": true,
-      "commit": "535b4cb311bb9beb3f6d0fd7dfe629ac021e42ab",
+      "commit": "39767c8a6b00bb44648dc594026e499f0cd8d695",
       "component_paths": {
         "abhe_v0_bfcl_archive_transition_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_archive_transition_plan.json",
         "abhe_v0_bfcl_case_delta_analysis": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_case_delta_analysis.json",
@@ -1627,9 +1670,11 @@
         "abhe_v0_bfcl_fresh_dev_slice_manifest": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_manifest.json",
         "abhe_v0_bfcl_fresh_dev_slice_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_plan.json",
         "abhe_v0_bfcl_fresh_dev_slice_review": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_review.json",
+        "abhe_v0_bfcl_same_slice_rerun_stability": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_same_slice_rerun_stability.json",
         "abhe_v0_bfcl_source_exclusion_proof": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_source_exclusion_proof.json",
         "abhe_v0_candidate_materialization_approval_packet": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_candidate_materialization_approval_packet.json",
         "abhe_v0_candidate_materialization_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_candidate_materialization_plan.json",
+        "abhe_v0_expanded_dev_smoke_request": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_expanded_dev_smoke_request.json",
         "abhe_v0_materialized_candidates": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_materialized_candidates.json",
         "abhe_v0_provider_preflight": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_provider_preflight.json",
         "abhe_v0_runtime_candidate_adapter": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_candidate_adapter.json",
@@ -1650,14 +1695,17 @@
           "archive_updated": false,
           "artifact_kind": "abhe_v0_bfcl_archive_transition_plan",
           "blockers": [],
+          "bounded_dev_smoke_only": true,
           "does_not_update_archive": true,
           "full_suite_touched": false,
           "holdout_touched": false,
-          "next_required_action": "review_compact_dev_feedback_before_any_archive_write",
+          "next_required_action": "request_expanded_40_60_case_dev_smoke_not_full_bfcl",
           "performance_evidence": false,
+          "planned_sublane_transitions": [],
           "planned_transitions": [
             {
               "archive_updated": false,
+              "bounded_dev_only": true,
               "does_not_update_archive": true,
               "entry_id": "state_tracking_v0",
               "from_status": "proposal_ready",
@@ -1666,6 +1714,7 @@
             },
             {
               "archive_updated": false,
+              "bounded_dev_only": true,
               "does_not_update_archive": true,
               "entry_id": "hallucination_abstain_v0",
               "from_status": "proposal_ready",
@@ -1673,7 +1722,13 @@
               "to_status": "dev_passed"
             }
           ],
+          "same_slice_rerun_stability_passed": null,
+          "scaled_compact_fixed_count": null,
+          "scaled_compact_regressed_count": null,
           "schema_version": "abhe_v0_bfcl_archive_transition_plan_v0",
+          "strict_per_compact_case_paired_available": null,
+          "strict_scorer_unit_fixed_count": null,
+          "strict_scorer_unit_regressed_count": null,
           "synthetic_fixture_only": true
         },
         "abhe_v0_bfcl_case_delta_analysis": {
@@ -1683,7 +1738,7 @@
           "entry_specific_guidance_detected": true,
           "global_guidance_detected": false,
           "performance_evidence": false,
-          "scaled_compact_fixed_count": 9,
+          "scaled_compact_fixed_count": 10,
           "strict_per_compact_case_paired_available": false,
           "strict_scorer_unit_fixed_count": 3,
           "unique_bfcl_scorer_unit_count": 7
@@ -2087,6 +2142,16 @@
           "performance_evidence": false,
           "report_scope": "abhe_v0_bfcl_fresh_slice_review_check"
         },
+        "abhe_v0_bfcl_same_slice_rerun_stability": {
+          "artifact_present": true,
+          "baseline_passed_count_abs_delta": 0,
+          "blockers": [],
+          "candidate_passed_count_abs_delta": 1,
+          "performance_evidence": false,
+          "report_scope": "abhe_v0_bfcl_same_slice_rerun_stability_check",
+          "same_slice_rerun_stability_check_passed": true,
+          "same_slice_rerun_stable": true
+        },
         "abhe_v0_candidate_materialization": {
           "abhe_v0_candidate_materialization_plan_check_passed": true,
           "blockers": [],
@@ -2097,6 +2162,17 @@
           "plan_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_candidate_materialization_plan.json",
           "plan_present": true,
           "report_scope": "abhe_v0_candidate_materialization_plan_check"
+        },
+        "abhe_v0_expanded_dev_smoke_request": {
+          "abhe_v0_expanded_dev_smoke_request_passed": true,
+          "approval_status": "pending",
+          "artifact_present": true,
+          "authorized": false,
+          "blockers": [],
+          "performance_evidence": false,
+          "report_scope": "abhe_v0_expanded_dev_smoke_request_check",
+          "requested_total_case_count_max": 60,
+          "requested_total_case_count_min": 40
         },
         "abhe_v0_materialized_candidates": {
           "abhe_v0_materialized_candidates_check_passed": true,
@@ -3512,7 +3588,7 @@
       "fresh_dev_slice_authorized": false,
       "fresh_dev_slice_request_ready": true,
       "huawei_acceptance_ready": false,
-      "next_required_action": "review_compact_dev_feedback_before_any_archive_write",
+      "next_required_action": "request_expanded_40_60_case_dev_smoke_not_full_bfcl",
       "no_leakage_status": true,
       "performance_evidence": false,
       "planning_readiness_ready": true,
@@ -3585,7 +3661,7 @@
   "fresh_dev_slice_approval_schema_ready": true,
   "fresh_dev_slice_request_ready_for_review": true,
   "huawei_acceptance_ready": false,
-  "next_required_action": "review_compact_dev_feedback_before_any_archive_write",
+  "next_required_action": "request_expanded_40_60_case_dev_smoke_not_full_bfcl",
   "no_leakage_boundary_passed": true,
   "performance_evidence": false,
   "post_dev_feedback_contract_ready": true,

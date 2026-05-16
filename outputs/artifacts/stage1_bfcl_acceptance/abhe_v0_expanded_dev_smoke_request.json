@@ -1,0 +1,95 @@
+{
+  "approval_status": "pending",
+  "archive_update_authorized": false,
+  "artifact_kind": "abhe_v0_expanded_dev_smoke_request",
+  "authorized": false,
+  "bfcl_evaluate_authorized": false,
+  "bfcl_generate_authorized": false,
+  "bounded_dev_smoke_only": true,
+  "case_count_caps_by_category": {
+    "irrelevance": {
+      "max": 10,
+      "min": 5
+    },
+    "live_irrelevance": {
+      "max": 10,
+      "min": 5
+    },
+    "live_relevance": {
+      "max": 10,
+      "min": 5
+    },
+    "multi_turn_base": {
+      "max": 10,
+      "min": 5
+    },
+    "multi_turn_long_context": {
+      "max": 10,
+      "min": 5
+    },
+    "multi_turn_miss_func": {
+      "max": 10,
+      "min": 5
+    },
+    "multi_turn_miss_param": {
+      "max": 10,
+      "min": 5
+    }
+  },
+  "execution_started": false,
+  "fresh_dev_slice_materialized": false,
+  "full_suite_authorized": false,
+  "holdout_authorized": false,
+  "huawei_acceptance_ready": false,
+  "next_required_action": "human_review_expanded_dev_smoke_request_before_materialization_or_execution",
+  "performance_claim_authorized": false,
+  "performance_evidence": false,
+  "preconditions": [
+    "same_slice_rerun_stability",
+    "same_provider_model_protocol",
+    "entry_specific_adapter_activation",
+    "sanitized_trace_analysis_available",
+    "source_exclusion_proof_required"
+  ],
+  "provider_calls_authorized": false,
+  "raw_material_absent_required": true,
+  "requested_entries": [
+    "state_tracking_v0",
+    "hallucination_abstain_v0"
+  ],
+  "requested_strata_by_entry": {
+    "hallucination_abstain_v0": [
+      "irrelevance",
+      "live_irrelevance",
+      "live_relevance"
+    ],
+    "state_tracking_v0": [
+      "multi_turn_base",
+      "multi_turn_long_context",
+      "multi_turn_miss_func",
+      "multi_turn_miss_param"
+    ]
+  },
+  "requested_total_case_count_max": 60,
+  "requested_total_case_count_min": 40,
+  "schema_version": "abhe_v0_expanded_dev_smoke_request_v0",
+  "scope": "expanded_dev_smoke_request_only_not_full_bfcl",
+  "scorer_authorized": false,
+  "selected_case_ids_hash": "pending_until_expanded_slice_materialized",
+  "sota_3pp_claim_ready": false,
+  "source_160_compact_cases_reused_for_validation": false,
+  "source_exclusion_proof_required": true,
+  "stop_loss": [
+    "new_selected_case_ids_hash_missing",
+    "source_overlap_nonzero",
+    "provider_model_protocol_mismatch",
+    "entry_specific_activation_missing",
+    "raw_leakage",
+    "any_compact_regression_detected",
+    "false_abstain_detected",
+    "valid_tool_call_suppression_detected",
+    "cost_delta_pct_over_5",
+    "latency_delta_pct_over_20",
+    "holdout_or_full_suite_attempted"
+  ]
+}

@@ -33,6 +33,8 @@ from scripts.check_abhe_v0_bfcl_fresh_slice_review import check as check_bfcl_fr
 from scripts.check_abhe_v0_candidate_materialization_plan import check as check_bfcl_candidate_materialization
 from scripts.check_abhe_v0_materialized_candidates import check as check_bfcl_materialized_candidates
 from scripts.check_abhe_v0_runtime_candidate_adapter import check as check_bfcl_runtime_candidate_adapter
+from scripts.check_abhe_v0_bfcl_same_slice_rerun_stability import check as check_bfcl_same_slice_stability
+from scripts.check_abhe_v0_expanded_dev_smoke_request import check as check_bfcl_expanded_dev_smoke_request
 from scripts.plan_abhe_v0_bfcl_archive_transition import build_plan as build_bfcl_archive_transition
 from scripts.plan_abhe_v0_bfcl_archive_transition import synthetic_feedback as bfcl_synthetic_feedback
 
@@ -112,6 +114,8 @@ def build_bundle() -> Dict[str, Any]:
     bfcl_dev_feedback_schema = check_bfcl_dev_feedback(schema_only=True)
     bfcl_dev_feedback = check_bfcl_dev_feedback()
     bfcl_case_delta = check_bfcl_case_delta()
+    bfcl_same_slice_stability = check_bfcl_same_slice_stability()
+    bfcl_expanded_dev_smoke_request = check_bfcl_expanded_dev_smoke_request()
     bfcl_archive_transition = build_bfcl_archive_transition(bfcl_synthetic_feedback(), synthetic_fixture_only=True)
     bfcl_dataset_selection = _load_json(BFCL_DATASET_SELECTION_PATH)
     bfcl_fresh_slice_review_artifact = _load_json(BFCL_FRESH_SLICE_REVIEW_PATH)
@@ -176,6 +180,8 @@ def build_bundle() -> Dict[str, Any]:
         "abhe_v0_bfcl_dev_feedback_schema_ready": bfcl_dev_feedback_schema.get("abhe_v0_bfcl_dev_feedback_check_passed") is True,
         "abhe_v0_bfcl_archive_transition_ready": bfcl_archive_transition.get("abhe_v0_bfcl_archive_transition_plan_passed") is True,
         "abhe_v0_bfcl_case_delta_analysis_ready": bfcl_case_delta.get("abhe_v0_bfcl_case_delta_analysis_check_passed") is True,
+        "abhe_v0_bfcl_same_slice_rerun_stability_ready": bfcl_same_slice_stability.get("same_slice_rerun_stability_check_passed") is True,
+        "abhe_v0_expanded_dev_smoke_request_ready": bfcl_expanded_dev_smoke_request.get("abhe_v0_expanded_dev_smoke_request_passed") is True,
         "approval_chain_ready_for_review": approval_chain.get("abhe_approval_chain_ready_for_review") is True,
         "no_leakage_status": leakage.get("abhe_no_leakage_boundary_passed") is True,
         "execution_authorized": False,
@@ -218,6 +224,8 @@ def build_bundle() -> Dict[str, Any]:
             "abhe_v0_bfcl_case_delta_analysis": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_case_delta_analysis.json",
             "abhe_v0_bfcl_dev_feedback_schema": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_feedback.schema.json",
             "abhe_v0_bfcl_archive_transition_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_archive_transition_plan.json",
+            "abhe_v0_bfcl_same_slice_rerun_stability": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_same_slice_rerun_stability.json",
+            "abhe_v0_expanded_dev_smoke_request": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_expanded_dev_smoke_request.json",
         },
         "component_summaries": {
             "planning_ready": _summary(planning_ready, [
@@ -263,11 +271,13 @@ def build_bundle() -> Dict[str, Any]:
                 "performance_evidence",
             ]),
             "abhe_v0_bfcl_dev_feedback_schema": bfcl_dev_feedback_schema,
+            "abhe_v0_bfcl_same_slice_rerun_stability": bfcl_same_slice_stability,
+            "abhe_v0_expanded_dev_smoke_request": bfcl_expanded_dev_smoke_request,
             "abhe_v0_bfcl_archive_transition": bfcl_archive_transition,
             "no_leakage": _summary(leakage, ["abhe_no_leakage_boundary_passed", "report_scope"]),
         },
         "commit": _current_commit(),
-        "next_required_action": ("review_compact_dev_feedback_before_any_archive_write" if bfcl_dev_smoke_result.get("abhe_v0_bfcl_dev_smoke_result_check_passed") and bfcl_dev_feedback.get("abhe_v0_bfcl_dev_feedback_check_passed") else (bfcl_execution_readiness.get("next_required_action") or "request_granular_approval_reviews")),
+        "next_required_action": "request_expanded_40_60_case_dev_smoke_not_full_bfcl",
     }
     blockers = validate_bundle(bundle)
     bundle["abhe_review_bundle_ready"] = not blockers
@@ -307,6 +317,8 @@ def validate_bundle(bundle: Dict[str, Any]) -> List[str]:
         "abhe_v0_bfcl_dev_smoke_approval_packet_ready",
         "abhe_v0_bfcl_dry_run_manifest_ready",
         "abhe_v0_bfcl_dev_feedback_schema_ready",
+        "abhe_v0_bfcl_same_slice_rerun_stability_ready",
+        "abhe_v0_expanded_dev_smoke_request_ready",
         "abhe_v0_bfcl_archive_transition_ready",
         "approval_chain_ready_for_review",
         "no_leakage_status",
