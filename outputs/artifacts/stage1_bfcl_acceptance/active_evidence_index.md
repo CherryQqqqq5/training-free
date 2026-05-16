@@ -68,6 +68,8 @@ ABHE is the active planning route. It is archive-based and behavior-level:
 - ABHE-v0 BFCL source exclusion proof: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_source_exclusion_proof.json`
 - ABHE-v0 BFCL fresh slice review memo: `docs/stage1_abhe_v0_bfcl_fresh_slice_review_memo.md`
 - ABHE-v0 candidate materialization plan: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_candidate_materialization_plan.json`
+- ABHE-v0 candidate materialization approval packet: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_candidate_materialization_approval_packet.json`
+- ABHE-v0 materialized candidates: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_materialized_candidates.json`
 - ABHE-v0 BFCL dev smoke approval request: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_approval_request.json`
 - ABHE-v0 BFCL execution readiness: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_execution_readiness.json`
 - ABHE-v0 BFCL dry-run manifest: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_dry_run_manifest.json`
@@ -98,7 +100,7 @@ Current ABHE decision:
 
 The 160 compact source cases are discovery/archive-seeding evidence only. They are not candidate validation or improvement evidence.
 
-Current execution state: ABHE planning readiness, approval-chain review bundle readiness, the granular approval review memo, and the ABHE-v0 synthetic closed-loop baseline are ready for human review, but execution readiness is false. The dry-run-only runner is materialized for manifest checks; trace extraction approval, fresh dev slice approval, candidate spec approval, execution approval, candidate rule, runtime config, scorer authorization, and performance evidence remain absent/fail-closed.
+Current execution state: ABHE planning readiness, approval-chain review bundle readiness, the granular approval review memo, and the ABHE-v0 synthetic closed-loop baseline are ready for human review, but execution readiness is false. The fresh BFCL dev slice and minimal compact candidates are materialized under their own narrow approvals. The dry-run-only runner is materialized for manifest checks; dev smoke execution approval, provider/model/protocol approval, runtime config, scorer authorization, archive update, and performance evidence remain absent/fail-closed.
 
 ABHE-v0 synthetic closed-loop status:
 
@@ -115,11 +117,12 @@ ABHE-v0 BFCL dev smoke gate status:
 - dataset path selection: `.venv/lib/python3.10/site-packages/bfcl_eval/data` approved for hash/overlap proof only
 - category review: present, proposed top-2 strata only
 - source exclusion proof: `complete` with overlap_count=0; discovery compact source count is 160
-- selected case ids hash: `sha256:f5480e5c90895d4a9cca8c01eb2cb612ff2088c2a2adf912b2fc543aac15a28a`; fresh slice compact manifest materialized; BFCL execution remains false
-- candidate materialization plan: present, no candidate rule/YAML/JSONL generated
+- selected case ids hash: `sha256:8e28826895c76afd14fb2ec07550b871ea50df25c0666881dad39be86450991f`; fresh slice compact manifest materialized; BFCL execution remains false
+- candidate materialization plan: present; minimal compact candidates materialized under candidate-materialization-only approval
+- materialized candidates: `state_tracking_v0` state summary injection and `hallucination_abstain_v0` evidence boundary verifier; no candidate rule/YAML/JSONL generated
 - dev smoke approval request: pending and not authorized
 - dry-run runner manifest: present; provider, BFCL generate/evaluate, and scorer flags are false
-- execution readiness: false
+- execution readiness: false; remaining blockers are dev smoke approval, provider/model/protocol, runtime config, and scorer authorization
 - archive transition plan: dry-run only, archive not updated
 - performance evidence: false
 
@@ -171,6 +174,6 @@ L1 runtime behavior approval does not authorize source expansion, BFCL scorer, c
 
 ## Next Action
 
-`review_candidate_materialization_plan_without_bfcl_execution`
+`request_bounded_dev_smoke_execution_approval_review`
 
-ABHE-v0 synthetic closed-loop baseline is ready for human review; RASHE remains discovery predecessor. Trace extraction, fresh dev slice, candidate spec review, and bounded dev smoke execution each require separate approved packets. Source collection, candidate generation, scorer, real fresh dev slice materialization, archive mutation, performance evidence, SOTA/+3pp claims, and Huawei acceptance remain pending/fail-closed.
+ABHE-v0 synthetic closed-loop baseline is ready for human review; RASHE remains discovery predecessor. Bounded dev smoke execution still requires a separate approved packet. Source collection, candidate generation, scorer, archive mutation, performance evidence, SOTA/+3pp claims, and Huawei acceptance remain pending/fail-closed.

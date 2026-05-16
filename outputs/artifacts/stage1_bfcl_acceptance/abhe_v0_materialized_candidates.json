@@ -1,0 +1,62 @@
+{
+  "artifact_kind": "abhe_v0_materialized_candidates",
+  "bfcl_evaluate_authorized": false,
+  "bfcl_generate_authorized": false,
+  "candidate_jsonl_generated": false,
+  "candidate_materialized": true,
+  "candidate_pool_ready": false,
+  "candidate_rule_generated": false,
+  "candidate_yaml_generated": false,
+  "candidates": [
+    {
+      "activation_boundary": "multi_turn_only_state_carryover_evidence_required",
+      "candidate_type": "state_summary_injection",
+      "entry_id": "state_tracking_v0",
+      "guidance_contract": {
+        "no_state_mutation": true,
+        "preserve_prior_constraints": true,
+        "preserve_prior_turn_entities": true,
+        "reuse_selected_options_when_referenced": true
+      },
+      "materialized": true,
+      "non_target_exclusions": [
+        "single_turn",
+        "search_memory_watch",
+        "state_mutation"
+      ],
+      "telemetry_required": [
+        "state_summary_activated",
+        "state_reference_detected",
+        "non_target_exclusion_reason"
+      ]
+    },
+    {
+      "activation_boundary": "answerability_failure_only",
+      "candidate_type": "evidence_boundary_verifier",
+      "entry_id": "hallucination_abstain_v0",
+      "guidance_contract": {
+        "do_not_fabricate_without_evidence": true,
+        "do_not_suppress_valid_tool_calls": true,
+        "insufficient_evidence_boundary_allowed": true,
+        "track_false_abstain": true
+      },
+      "materialized": true,
+      "non_target_exclusions": [
+        "valid_actionable_tool_use",
+        "sufficient_evidence_cases"
+      ],
+      "telemetry_required": [
+        "evidence_boundary_checked",
+        "abstain_decision",
+        "false_abstain_candidate",
+        "valid_tool_call_suppression_guard"
+      ]
+    }
+  ],
+  "execution_authorized": false,
+  "performance_evidence": false,
+  "provider_calls_authorized": false,
+  "schema_version": "abhe_v0_materialized_candidates_v0",
+  "scorer_authorized": false,
+  "selected_case_ids_hash": "sha256:8e28826895c76afd14fb2ec07550b871ea50df25c0666881dad39be86450991f"
+}

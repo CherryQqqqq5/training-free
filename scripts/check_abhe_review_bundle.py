@@ -29,6 +29,7 @@ from scripts.check_abhe_v0_bfcl_execution_readiness import build_report as build
 from scripts.check_abhe_v0_bfcl_fresh_dev_slice import check as check_bfcl_fresh_slice
 from scripts.check_abhe_v0_bfcl_fresh_slice_review import check as check_bfcl_fresh_slice_review
 from scripts.check_abhe_v0_candidate_materialization_plan import check as check_bfcl_candidate_materialization
+from scripts.check_abhe_v0_materialized_candidates import check as check_bfcl_materialized_candidates
 from scripts.plan_abhe_v0_bfcl_archive_transition import build_plan as build_bfcl_archive_transition
 from scripts.plan_abhe_v0_bfcl_archive_transition import synthetic_feedback as bfcl_synthetic_feedback
 
@@ -87,6 +88,7 @@ def build_bundle() -> Dict[str, Any]:
     bfcl_fresh_slice = check_bfcl_fresh_slice()
     bfcl_fresh_slice_review = check_bfcl_fresh_slice_review()
     bfcl_candidate_materialization = check_bfcl_candidate_materialization()
+    bfcl_materialized_candidates = check_bfcl_materialized_candidates()
     bfcl_dev_smoke_request = check_bfcl_dev_smoke_request()
     bfcl_execution_readiness = build_bfcl_execution_readiness()
     bfcl_dry_run_manifest = check_bfcl_dev_smoke_result(dry_run_manifest=True)
@@ -140,6 +142,8 @@ def build_bundle() -> Dict[str, Any]:
         "abhe_v0_bfcl_fresh_slice_materialized": bfcl_fresh_slice_manifest.get("fresh_dev_slice_materialized") is True,
         "abhe_v0_bfcl_selected_case_ids_hash": bfcl_fresh_slice_manifest.get("selected_case_ids_hash"),
         "abhe_v0_candidate_materialization_plan_ready": bfcl_candidate_materialization.get("abhe_v0_candidate_materialization_plan_check_passed") is True,
+        "abhe_v0_candidate_materialization_approved": bfcl_materialized_candidates.get("candidate_materialization_approved") is True,
+        "abhe_v0_materialized_candidates_ready": bfcl_materialized_candidates.get("abhe_v0_materialized_candidates_check_passed") is True,
         "abhe_v0_bfcl_dev_smoke_request_ready": bfcl_dev_smoke_request.get("abhe_v0_bfcl_dev_smoke_approval_request_passed") is True,
         "abhe_v0_bfcl_execution_ready": bfcl_execution_readiness.get("abhe_v0_bfcl_execution_ready") is True,
         "abhe_v0_bfcl_dry_run_manifest_ready": bfcl_dry_run_manifest.get("abhe_v0_bfcl_dev_smoke_result_check_passed") is True,
@@ -174,6 +178,8 @@ def build_bundle() -> Dict[str, Any]:
             "abhe_v0_bfcl_fresh_dev_slice_review": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_fresh_dev_slice_review.json",
             "abhe_v0_bfcl_source_exclusion_proof": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_source_exclusion_proof.json",
             "abhe_v0_candidate_materialization_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_candidate_materialization_plan.json",
+            "abhe_v0_candidate_materialization_approval_packet": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_candidate_materialization_approval_packet.json",
+            "abhe_v0_materialized_candidates": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_materialized_candidates.json",
             "abhe_v0_bfcl_dev_smoke_approval_request": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_approval_request.json",
             "abhe_v0_bfcl_execution_readiness": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_execution_readiness.json",
             "abhe_v0_bfcl_dev_feedback_schema": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_feedback.schema.json",
@@ -195,6 +201,7 @@ def build_bundle() -> Dict[str, Any]:
             "abhe_v0_bfcl_fresh_slice": bfcl_fresh_slice,
             "abhe_v0_bfcl_fresh_slice_review": bfcl_fresh_slice_review,
             "abhe_v0_candidate_materialization": bfcl_candidate_materialization,
+            "abhe_v0_materialized_candidates": bfcl_materialized_candidates,
             "abhe_v0_bfcl_dev_smoke_request": bfcl_dev_smoke_request,
             "abhe_v0_bfcl_execution_readiness": bfcl_execution_readiness,
             "abhe_v0_bfcl_dry_run_manifest": bfcl_dry_run_manifest,
@@ -238,6 +245,7 @@ def validate_bundle(bundle: Dict[str, Any]) -> List[str]:
         "abhe_v0_bfcl_fresh_slice_plan_ready",
         "abhe_v0_bfcl_fresh_slice_review_ready",
         "abhe_v0_candidate_materialization_plan_ready",
+        "abhe_v0_materialized_candidates_ready",
         "abhe_v0_bfcl_dev_smoke_request_ready",
         "abhe_v0_bfcl_dry_run_manifest_ready",
         "abhe_v0_bfcl_dev_feedback_schema_ready",

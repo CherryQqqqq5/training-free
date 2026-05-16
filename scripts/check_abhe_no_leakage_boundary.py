@@ -30,6 +30,8 @@ DEFAULT_PATHS = [
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_source_exclusion_proof.json"),
     Path("docs/stage1_abhe_v0_bfcl_fresh_slice_review_memo.md"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_candidate_materialization_plan.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_candidate_materialization_approval_packet.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_materialized_candidates.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_approval_request.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_execution_readiness.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_dry_run_manifest.json"),
