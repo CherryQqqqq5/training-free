@@ -13,6 +13,8 @@
       "candidate_type": "state_summary_injection",
       "entry_id": "state_tracking_v0",
       "guidance_contract": {
+        "continue_after_tool_observation_when_action_pending": true,
+        "finalize_only_after_required_tool_actions_complete": true,
         "no_state_mutation": true,
         "preserve_prior_constraints": true,
         "preserve_prior_turn_entities": true,
@@ -27,7 +29,9 @@
       "telemetry_required": [
         "state_summary_activated",
         "state_reference_detected",
-        "non_target_exclusion_reason"
+        "non_target_exclusion_reason",
+        "post_tool_continuation_checked",
+        "pending_action_after_tool_observation"
       ]
     },
     {

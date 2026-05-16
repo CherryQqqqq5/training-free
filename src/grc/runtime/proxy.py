@@ -260,7 +260,11 @@ def _abhe_v0_projection_guidance(projection: Dict[str, Any]) -> str:
     if entry_id == "state_tracking_v0" and candidate_type == "state_summary_injection":
         return (
             "For selected multi-turn state carryover cases, preserve prior-turn entities, "
-            "constraints, and selected options when later turns refer back to them. "
+            "constraints, selected options, and tool-observed state across turns. After any "
+            "tool observation, check whether the current user turn still has an executable "
+            "pending action or prerequisite action; continue with the needed tool call instead "
+            "of ending with a prose summary when the tool set can satisfy the request. Only "
+            "finalize once required tool actions are complete or no available tool can proceed. "
             "Do not mutate state, do not activate on single-turn cases, and do not activate "
             "for search or memory watch behavior."
         )

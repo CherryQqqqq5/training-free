@@ -1,0 +1,115 @@
+{
+  "abhe_v0_expanded_bfcl_failure_analysis_passed": true,
+  "algorithmic_recommendations": [
+    {
+      "entry_id": "state_tracking_v0",
+      "priority": 1,
+      "reason": "expanded dev shows zero state_tracking improvement while compact traces show post-tool continuation/prose-summary failures",
+      "recommendation": "replace_soft_state_summary_only_guidance_with_post_tool_continuation_controller"
+    },
+    {
+      "entry_id": "hallucination_abstain_v0",
+      "priority": 2,
+      "reason": "expanded dev fixed relevance/irrelevance compact units without false-abstain regression, but the cluster mixes no-tool and valid-tool-call behavior",
+      "recommendation": "promote_no_tool_boundary_as_relevance_boundary_candidate_and split live relevance guard"
+    },
+    {
+      "entry_id": "state_tracking_v0",
+      "priority": 3,
+      "reason": "multi-turn BFCL uses all-or-nothing state checks, so aggregate pass counts need mechanism labels before claims",
+      "recommendation": "add scorer-unit-level compact pairing before larger expansion"
+    }
+  ],
+  "archive_updated": false,
+  "artifact_kind": "abhe_v0_expanded_bfcl_failure_analysis",
+  "blockers": [],
+  "compact_only": true,
+  "does_not_update_archive": true,
+  "entry_effect_summary": {
+    "hallucination_abstain_v0": {
+      "baseline_accuracy": 0.333333,
+      "candidate_accuracy": 1.0,
+      "effect_label": "strong_expanded_dev_signal_but_should_split_for_precision",
+      "fixed_count": 12,
+      "likely_effective_mechanism": "entry_specific_no_tool_boundary_for_irrelevance_and_live_irrelevance",
+      "recommended_archive_action": "split_or_conditional_dev_passed",
+      "recommended_child_clusters": [
+        "irrelevance_no_tool_boundary_v0",
+        "live_irrelevance_no_tool_boundary_v0",
+        "live_relevance_guard_v0"
+      ],
+      "regressed_count": 0,
+      "target_bucket_reduction": 12
+    },
+    "state_tracking_v0": {
+      "baseline_accuracy": 0.0,
+      "candidate_accuracy": 0.0,
+      "effect_label": "no_expanded_dev_signal",
+      "fixed_count": 0,
+      "likely_failure_mechanism": "post_tool_continuation_or_instance_state_mismatch_not_fixed_by_state_summary_guidance",
+      "recommended_archive_action": "split_requested",
+      "recommended_child_clusters": [
+        "post_tool_continuation_failure_v0",
+        "multi_turn_state_binding_v0",
+        "multi_turn_missing_function_recovery_v0"
+      ],
+      "regressed_count": 0,
+      "target_bucket_reduction": 0
+    }
+  },
+  "expanded_dev_smoke_only": true,
+  "full_suite_touched": false,
+  "gold_expected_committed": false,
+  "headline_metrics": {
+    "baseline_accuracy": 0.142857,
+    "baseline_case_count": 42,
+    "baseline_passed_count": 6,
+    "candidate_accuracy": 0.428571,
+    "candidate_case_count": 42,
+    "candidate_passed_count": 18,
+    "net_compact_pass_delta": 12
+  },
+  "holdout_touched": false,
+  "next_required_action": "run_state_continuation_refinement_as_bounded_dev_diagnostic_only",
+  "overfit_controls": {
+    "do_not_use_prompt_literals": true,
+    "evaluator_target_conditions_forbidden": true,
+    "next_eval_should_use_same_slice_diagnostic_then_new_fresh_slice_before_claim": true,
+    "raw_case_identifier_allowlists_forbidden": true,
+    "refine_by_behavior_cluster_not_case": true
+  },
+  "performance_claim_authorized": false,
+  "performance_evidence": false,
+  "raw_bfcl_result_tree_committed": false,
+  "raw_material_absent": true,
+  "raw_provider_payload_committed": false,
+  "schema_version": "abhe_v0_expanded_bfcl_failure_analysis_v0",
+  "scorer_diff_committed": false,
+  "selected_case_ids_hash": "sha256:e4819b4c639b7fea383ccbe1c73e1591418cce61aceee0ce9a31af21ed2cffe2",
+  "source_artifacts": {
+    "feedback": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_expanded_bfcl_dev_feedback.json",
+    "result": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_expanded_bfcl_dev_smoke_result.json",
+    "trace_analysis": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_expanded_bfcl_trace_analysis.json"
+  },
+  "trace_signal_summary": {
+    "all_trace_entry_counts": {
+      "hallucination_abstain_v0": 3,
+      "state_tracking_v0": 111
+    },
+    "all_trace_pattern_counts": {
+      "answerability_boundary_checked_without_proxy_issue": 1,
+      "irrelevance_no_tool_boundary_applied": 2,
+      "post_tool_prose_summary_after_tool_observation": 29,
+      "state_tracking_guidance_applied_without_proxy_issue": 82
+    },
+    "diagnostic_interpretation": {
+      "relevance_boundary": "no-tool boundary is the strongest observed mechanism and should remain entry-specific",
+      "state_tracking": "state guidance was applied frequently, but compact traces still show post-tool prose summaries and state mismatch symptoms"
+    },
+    "sanitized_trace_card_count": 20,
+    "trace_counts_by_arm": {
+      "baseline": 57,
+      "candidate": 57
+    }
+  }
+}

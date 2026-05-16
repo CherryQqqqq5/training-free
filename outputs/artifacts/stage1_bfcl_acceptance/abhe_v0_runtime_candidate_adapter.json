@@ -32,18 +32,22 @@
       "activation_scope": "selected_fresh_dev_slice_only",
       "candidate_type": "state_summary_injection",
       "entry_id": "state_tracking_v0",
+      "finalize_only_after_required_tool_actions_complete": true,
       "no_state_mutation": true,
       "non_target_exclusions": [
         "single_turn",
         "search_memory_watch",
         "state_mutation"
       ],
-      "runtime_guidance_fragment_id": "state_summary_injection_compact_fragment_v0",
+      "post_tool_continuation_guard": true,
+      "runtime_guidance_fragment_id": "state_summary_injection_plus_post_tool_continuation_compact_fragment_v1",
       "search_memory_watch_excluded": true,
       "telemetry_required": [
         "state_summary_activated",
         "state_reference_detected",
-        "non_target_exclusion_reason"
+        "non_target_exclusion_reason",
+        "post_tool_continuation_checked",
+        "pending_action_after_tool_observation"
       ]
     },
     {

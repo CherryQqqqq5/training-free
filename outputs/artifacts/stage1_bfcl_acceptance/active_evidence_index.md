@@ -232,3 +232,13 @@ Same-slice rerun result: baseline 8/20, candidate 18/20, strict scorer-unit fixe
 Archive transition remains dry-run only. Current split interpretation: `state_tracking_v0 -> dev_passed` as a bounded-dev signal requiring expanded verification; `hallucination_abstain_v0 -> split_requested`, with `irrelevance_no_tool_boundary_v0` retained for expanded verification, `live_irrelevance_boundary_v0` requiring split verification because the signal changed between runs, and `live_relevance_guard_v0` retained as a no-false-abstain guard.
 
 Next action: `request_expanded_40_60_case_dev_smoke_not_full_bfcl`.
+
+## ABHE-v0 Expanded BFCL Dev Smoke
+
+- Scope: expanded bounded dev smoke only; not full BFCL, not holdout, not performance evidence.
+- Selected hash: `sha256:e4819b4c639b7fea383ccbe1c73e1591418cce61aceee0ce9a31af21ed2cffe2`
+- Result progression: baseline `6/42`, candidate v1 `18/42`, candidate v2 `30/42`.
+- `state_tracking_v0`: v2 improved to `12/24`, but `multi_turn_long_context` and `multi_turn_miss_param` remain failed; recommended action is narrow/split, not broad archive promotion.
+- `hallucination_abstain_v0`: `18/18` on expanded relevance/no-tool strata; recommended action is split into relevance boundary child lanes before any broader claim.
+- Artifacts: `abhe_v0_expanded_bfcl_failure_analysis.json`, `abhe_v0_expanded_bfcl_refinement_comparison.json`, `abhe_v0_expanded_bfcl_trace_analysis_v2.json`.
+- Guardrails: `archive_updated=false`, `holdout_touched=false`, `full_suite_touched=false`, `performance_evidence=false`.

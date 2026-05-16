@@ -38,6 +38,7 @@ DEFAULT_ADAPTER = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime
 RUN_ROOT = Path("/tmp/abhe_v0_bfcl_dev_smoke")
 BFCL_MODEL_ALIAS = "gpt-4o-mini-2024-07-18-FC"
 EXPECTED_HASH = "sha256:8e28826895c76afd14fb2ec07550b871ea50df25c0666881dad39be86450991f"
+EXPECTED_CASE_COUNT = int(os.environ.get("ABHE_V0_EXPECTED_CASE_COUNT", "20"))
 
 CATEGORY_SCORE_COLUMNS = {
     "multi_turn_base": ("data_overall.csv", "Multi Turn Base"),
@@ -211,7 +212,7 @@ def _selected_raw_ids() -> Tuple[Dict[str, List[str]], Dict[str, str], Dict[str,
         raise RuntimeError("case_list_hash_mismatch")
     dataset_path = Path(str(manifest.get("selected_dataset_path")))
     compact_rows = manifest.get("selected_compact_case_identifiers")
-    if not isinstance(compact_rows, list) or len(compact_rows) != 20:
+    if not isinstance(compact_rows, list) or len(compact_rows) != EXPECTED_CASE_COUNT:
         raise RuntimeError("selected_compact_case_identifier_count_invalid")
     wanted = {
         (row["entry_id"], row["bfcl_category"], row["source_file_hash"], row["case_stable_hash"], row["case_row_index_hash"]): row
@@ -240,7 +241,7 @@ def _selected_raw_ids() -> Tuple[Dict[str, List[str]], Dict[str, str], Dict[str,
         ids_by_category.setdefault(category, []).append(matched)
         entry_by_run_id[f"{category}:{matched}"] = row["entry_id"]
         entry_by_category[category] = row["entry_id"]
-    if sum(len(v) for v in ids_by_category.values()) != 20:
+    if sum(len(v) for v in ids_by_category.values()) != EXPECTED_CASE_COUNT:
         raise RuntimeError("selected_case_count_mismatch")
     return ids_by_category, entry_by_run_id, entry_by_category
 
@@ -484,7 +485,7 @@ def _write_arm_compact(
         "arm": arm,
         "bounded_dev_smoke_only": True,
         "selected_case_ids_hash": EXPECTED_HASH,
-        "arm_complete": not missing_scores and total_cases == 20,
+        "arm_complete": not missing_scores and total_cases == EXPECTED_CASE_COUNT,
         "provider_model_protocol_match": True,
         "raw_material_absent": True,
         "raw_provider_payload_committed": False,
@@ -498,7 +499,7 @@ def _write_arm_compact(
         "bfcl_reported_overall_accuracy_pct": metrics.get("acc"),
         "cost": metrics.get("cost", 0.0),
         "latency": metrics.get("latency", 0.0),
-        "evaluation_status": "complete" if not missing_scores and total_cases == 20 else "incomplete",
+        "evaluation_status": "complete" if not missing_scores and total_cases == EXPECTED_CASE_COUNT else "incomplete",
         "score_missing_categories": missing_scores,
         "case_count": total_cases,
         "passed_count": total_passed,

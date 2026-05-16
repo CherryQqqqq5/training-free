@@ -195,6 +195,7 @@ def main(argv: Any = None) -> int:
     parser.add_argument("--candidate-trace-root", type=Path, default=DEFAULT_CANDIDATE_TRACE_ROOT)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--max-cards", type=int, default=12)
+    parser.add_argument("--selected-case-ids-hash", default=EXPECTED_HASH)
     parser.add_argument("--write", action="store_true")
     parser.add_argument("--compact", action="store_true")
     parser.add_argument("--strict", action="store_true")
@@ -205,6 +206,7 @@ def main(argv: Any = None) -> int:
             candidate_trace_root=args.candidate_trace_root,
             max_cards=args.max_cards,
         )
+        analysis["selected_case_ids_hash"] = args.selected_case_ids_hash
         if args.write:
             write_analysis(args.output, analysis)
     except (OSError, ValueError, json.JSONDecodeError) as exc:
