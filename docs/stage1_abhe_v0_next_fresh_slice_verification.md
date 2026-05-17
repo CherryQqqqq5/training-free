@@ -50,8 +50,12 @@ The new balanced slice contains 54 compact identifiers with zero overlap against
 
 ## Evidence Boundary
 
-The paired matrix is scorer-unit/category-level plus hash-only compact rows. Strict per-compact-case pass/fail is not available from the safe committed artifacts because BFCL selected compact identifiers can collapse into category scorer units. No raw prompts, gold answers, scorer diffs, provider payloads, or raw BFCL result trees are committed.
+The paired matrix is scorer-unit/category-level plus hash-only compact rows. Strict per-compact-case pass/fail is not available from the safe committed artifacts because BFCL selected compact identifiers can collapse into category scorer units. Disallowed benchmark/provider materials are absent from committed artifacts.
 
 ## Next Step
 
 Do not proceed to full BFCL yet. The next useful step is a targeted redesign of `missing_param_epistemic_gate_v0`, using separately approved sanitized trace extraction for failed `multi_turn_miss_param` scorer units, followed by another fresh residual stress dev smoke. Archive changes should remain dry-run until independent verification exists.
+
+## Sanitized Trace Audit
+
+A sanitized audit sampled real trace files under `/tmp/abhe_v0_next_dev_smoke/balanced_verification` and persisted only field-presence counts, patch-marker counts, and hashed trace filenames in `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_next_trace_audit.json`. Disallowed benchmark/provider materials are absent from the committed audit.

@@ -263,6 +263,7 @@ def build_report() -> Dict[str, Any]:
             "abhe_v0_bfcl_dev_feedback_schema": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_feedback.schema.json",
             "abhe_v0_bfcl_same_slice_rerun_stability": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_same_slice_rerun_stability.json",
             "abhe_v0_expanded_dev_smoke_request": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_expanded_dev_smoke_request.json",
+            "abhe_v0_next_trace_audit": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_next_trace_audit.json",
             "abhe_v0_bfcl_archive_transition_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_archive_transition_plan.json",
         },
         "component_summaries": {

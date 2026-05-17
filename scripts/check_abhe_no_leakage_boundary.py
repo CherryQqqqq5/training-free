@@ -84,6 +84,7 @@ DEFAULT_PATHS = [
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_next_runtime_candidate_adapter_both.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_next_paired_case_matrix.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_next_failure_analysis.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_next_trace_audit.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_next_archive_transition_dry_run.json"),
     Path("docs/stage1_abhe_v0_next_fresh_slice_verification.md"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_feedback.schema.json"),

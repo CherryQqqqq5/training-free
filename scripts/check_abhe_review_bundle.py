@@ -47,6 +47,7 @@ BFCL_FRESH_SLICE_MANIFEST_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/
 BFCL_FAILURE_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_dev_smoke_execution_failure.json")
 BFCL_RUNTIME_ADAPTER_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_candidate_adapter.json")
 BFCL_PROVIDER_PREFLIGHT_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_provider_preflight.json")
+BFCL_NEXT_TRACE_AUDIT_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_next_trace_audit.json")
 FORCED_FALSE_FIELDS = {
     "execution_authorized",
     "trace_extraction_authorized",
@@ -122,6 +123,7 @@ def build_bundle() -> Dict[str, Any]:
     bfcl_source_exclusion_proof = _load_json(BFCL_SOURCE_EXCLUSION_PROOF_PATH)
     bfcl_fresh_slice_manifest = _load_json(BFCL_FRESH_SLICE_MANIFEST_PATH)
     bfcl_execution_failure = _load_json(BFCL_FAILURE_PATH)
+    bfcl_next_trace_audit = _load_json(BFCL_NEXT_TRACE_AUDIT_PATH)
     transition_blockers = validate_transition(Namespace(
         entry_id="state_tracking_v0",
         from_status="proposal_ready",
@@ -182,6 +184,7 @@ def build_bundle() -> Dict[str, Any]:
         "abhe_v0_bfcl_case_delta_analysis_ready": bfcl_case_delta.get("abhe_v0_bfcl_case_delta_analysis_check_passed") is True,
         "abhe_v0_bfcl_same_slice_rerun_stability_ready": bfcl_same_slice_stability.get("same_slice_rerun_stability_check_passed") is True,
         "abhe_v0_expanded_dev_smoke_request_ready": bfcl_expanded_dev_smoke_request.get("abhe_v0_expanded_dev_smoke_request_passed") is True,
+        "abhe_v0_next_trace_audit_ready": bfcl_next_trace_audit.get("artifact_kind") == "abhe_v0_next_trace_audit",
         "approval_chain_ready_for_review": approval_chain.get("abhe_approval_chain_ready_for_review") is True,
         "no_leakage_status": leakage.get("abhe_no_leakage_boundary_passed") is True,
         "execution_authorized": False,
@@ -226,6 +229,7 @@ def build_bundle() -> Dict[str, Any]:
             "abhe_v0_bfcl_archive_transition_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_archive_transition_plan.json",
             "abhe_v0_bfcl_same_slice_rerun_stability": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_same_slice_rerun_stability.json",
             "abhe_v0_expanded_dev_smoke_request": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_expanded_dev_smoke_request.json",
+            "abhe_v0_next_trace_audit": str(BFCL_NEXT_TRACE_AUDIT_PATH),
         },
         "component_summaries": {
             "planning_ready": _summary(planning_ready, [
@@ -273,6 +277,15 @@ def build_bundle() -> Dict[str, Any]:
             "abhe_v0_bfcl_dev_feedback_schema": bfcl_dev_feedback_schema,
             "abhe_v0_bfcl_same_slice_rerun_stability": bfcl_same_slice_stability,
             "abhe_v0_expanded_dev_smoke_request": bfcl_expanded_dev_smoke_request,
+            "abhe_v0_next_trace_audit": _summary(bfcl_next_trace_audit, [
+                "artifact_kind",
+                "bounded_dev_smoke_only",
+                "trace_content_committed",
+                "prompt_literal_committed",
+                "performance_evidence",
+                "holdout_touched",
+                "full_suite_touched",
+            ]),
             "abhe_v0_bfcl_archive_transition": bfcl_archive_transition,
             "no_leakage": _summary(leakage, ["abhe_no_leakage_boundary_passed", "report_scope"]),
         },
