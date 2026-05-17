@@ -1,0 +1,108 @@
+from scripts.abhe_v0_runtime_slot_controller import (
+    prerequisite_lookup_planner_v0,
+    prior_tool_observation_slot_binder_v0,
+    required_arg_schema_reader_v0,
+    runtime_slot_controller_v2,
+    valid_tool_call_guard_v0,
+)
+from scripts.run_abhe_v0_runtime_slot_micro_harness import build as build_micro
+from scripts.build_abhe_v0_runtime_slot_controller_diagnostic import build as build_diagnostic
+
+
+def _tool(name="book", required=None, types=None):
+    required = required or ["city", "date", "party_size"]
+    types = types or {"city": "string", "date": "string", "party_size": "integer"}
+    return {
+        "type": "function",
+        "function": {
+            "name": name,
+            "parameters": {
+                "type": "object",
+                "properties": {slot: {"type": types.get(slot, "string")} for slot in required},
+                "required": required,
+            },
+        },
+    }
+
+
+def test_required_arg_schema_reader_reads_wrapper_schema():
+    read = required_arg_schema_reader_v0(_tool())
+    assert read["required_arg_count"] == 3
+    assert read["required_args"] == ["city", "date", "party_size"]
+    assert read["property_type_by_arg"]["party_size"] == "integer"
+
+
+def test_valid_tool_call_guard_allows_complete_call_without_blocking():
+    read = required_arg_schema_reader_v0(_tool())
+    guard = valid_tool_call_guard_v0({"arguments": {"city": "x", "date": "y", "party_size": 2}}, read)
+    assert guard["tool_call_valid"] is True
+    assert guard["allow_without_rewrite"] is True
+    assert guard["would_block_valid_tool_call"] is False
+
+
+def test_valid_tool_call_guard_detects_missing_and_incompatible_args():
+    read = required_arg_schema_reader_v0(_tool())
+    guard = valid_tool_call_guard_v0({"arguments": {"city": "x", "party_size": "two"}}, read)
+    assert guard["tool_call_valid"] is False
+    assert guard["missing_required_args"] == ["date"]
+    assert guard["incompatible_required_args"] == ["party_size"]
+
+
+def test_prior_tool_observation_slot_binder_binds_only_unambiguous_compatible_source():
+    read = required_arg_schema_reader_v0(_tool())
+    bind = prior_tool_observation_slot_binder_v0(
+        read,
+        {"arguments": {"city": "x", "date": "y"}},
+        [{"source_type": "prior_tool_observation", "values": {"party_size": 2}}],
+    )
+    assert bind["bound_slot_sources"] == {"party_size": "prior_tool_observation"}
+    assert bind["ambiguous_slots"] == []
+
+
+def test_prior_tool_observation_slot_binder_refuses_ambiguous_source():
+    read = required_arg_schema_reader_v0(_tool(required=["city"]))
+    bind = prior_tool_observation_slot_binder_v0(
+        read,
+        {"arguments": {}},
+        [
+            {"source_type": "prior_confirmed_selection", "values": {"city": "a"}},
+            {"source_type": "prior_tool_observation", "values": {"city": "b"}},
+        ],
+    )
+    assert bind["bound_slot_sources"] == {}
+    assert bind["ambiguous_slots"] == ["city"]
+
+
+def test_prerequisite_lookup_planner_plans_only_available_lookup():
+    plan = prerequisite_lookup_planner_v0(
+        ["city", "date"],
+        [_tool(name="lookup_city", required=["landmark"])],
+        {"city": "lookup_city", "date": "lookup_date"},
+    )
+    assert plan["planned_lookup_by_slot"] == {"city": "lookup_city"}
+    assert plan["unrecoverable_slots"] == ["date"]
+    assert plan["ask_or_insufficient_required"] is True
+
+
+def test_runtime_slot_controller_v2_decisions():
+    tool = _tool()
+    assert runtime_slot_controller_v2(tool, {"arguments": {"city": "x", "date": "y", "party_size": 2}}, [], [], {})["decision"] == "allow_valid_tool_call"
+    assert runtime_slot_controller_v2(tool, {"arguments": {"city": "x", "date": "y"}}, [{"source_type": "prior_tool_observation", "values": {"party_size": 2}}], [], {})["decision"] == "bind_recovered_slots_then_call"
+    assert runtime_slot_controller_v2(tool, {"arguments": {"date": "y", "party_size": 2}}, [], [_tool(name="lookup_city", required=["landmark"])], {"city": "lookup_city"})["decision"] == "call_prerequisite_lookup"
+
+
+def test_runtime_slot_micro_harness_passes_and_stays_non_executing():
+    report = build_micro()
+    assert report["micro_harness_passed"] is True
+    assert report["fixture_count"] == 50
+    assert report["provider_calls_made"] is False
+    assert report["scorer_called"] is False
+    assert report["performance_evidence"] is False
+
+
+def test_runtime_slot_controller_diagnostic_keeps_bfcl_rerun_blocked_until_integration():
+    report = build_diagnostic()
+    assert report["phase_b_micro_harness_ready"] is True
+    assert report["phase_c_bfcl_rerun_ready"] is False
+    assert "runtime_slot_controller_v2_not_integrated_into_proxy_request_response_path" in report["phase_c_blockers"]
+    assert report["performance_evidence"] is False

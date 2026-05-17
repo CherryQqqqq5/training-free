@@ -270,3 +270,13 @@ Status: bounded dev smoke only. Frozen v2 generalizes on the new fresh balanced 
 - Trace taxonomy: `abhe_v0_missing_param_trace_taxonomy_audit_v0.json` sampled 36 real trace files and persisted hash-only semantic labels. The v1 controller reduces several sampled labels but does not move the scorer unit.
 - Archive transition remains dry-run only: `archive_updated=false`, `performance_evidence=false`, `holdout_touched=false`, `full_suite_touched=false`.
 - Next action: do not expand to full BFCL; redesign missing-param as an actual runtime/tool-call slot controller or split into lower-level child mechanisms such as prior-tool-observation slot binding, required-argument schema reading, prerequisite lookup planning, and valid-tool-call guarding.
+
+
+## ABHE-v0 Runtime Slot Controller Diagnostic
+
+- Scope: offline counterfactual slot audit plus synthetic runtime micro-harness only; not BFCL rerun, not full BFCL, not holdout, not performance evidence.
+- Micro-harness: 50 compact fixtures passed across schema reader, valid tool-call guard, slot binder, lookup planner, ambiguity controls, and unrecoverable controls.
+- Counterfactual audit: 15 hash-only trace rows show bindable slot signals; lookup-needed count is 0.
+- Phase C status: blocked because `runtime_slot_controller_v2` is not yet integrated into the real proxy request/response path.
+- Current conclusion: v2 is promising for runtime integration, but running BFCL now would only retest guidance-level behavior.
+- Guardrails: `provider_calls_made=false`, `bfcl_generate_called=false`, `bfcl_evaluate_called=false`, `scorer_called=false`, `performance_evidence=false`, `archive_updated=false`.
