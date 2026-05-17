@@ -258,16 +258,37 @@ def _abhe_v0_projection_guidance(projection: Dict[str, Any]) -> str:
     entry_id = projection.get("entry_id")
     candidate_type = projection.get("candidate_type")
     if entry_id == "state_tracking_v0" and candidate_type == "state_summary_injection":
-        return (
-            "For selected multi-turn state carryover cases, preserve prior-turn entities, "
-            "constraints, selected options, and tool-observed state across turns. After any "
-            "tool observation, check whether the current user turn still has an executable "
-            "pending action or prerequisite action; continue with the needed tool call instead "
-            "of ending with a prose summary when the tool set can satisfy the request. Only "
-            "finalize once required tool actions are complete or no available tool can proceed. "
-            "Do not mutate state, do not activate on single-turn cases, and do not activate "
-            "for search or memory watch behavior."
-        )
+        fragments = [
+            (
+                "For selected multi-turn state carryover cases, preserve prior-turn entities, "
+                "constraints, selected options, and tool-observed state across turns. After any "
+                "tool observation, check whether the current user turn still has an executable "
+                "pending action or prerequisite action; continue with the needed tool call instead "
+                "of ending with a prose summary when the tool set can satisfy the request. Only "
+                "finalize once required tool actions are complete or no available tool can proceed. "
+                "Do not mutate state, do not activate on single-turn cases, and do not activate "
+                "for search or memory watch behavior."
+            )
+        ]
+        if projection.get("missing_param_epistemic_gate_v0") is True:
+            fragments.append(
+                "When a required function argument appears missing, first check prior-turn state, "
+                "then prior tool-observed state, then whether an available tool can recover the "
+                "slot. Bind a known slot instead of asking again. Use a prerequisite lookup tool "
+                "when recovery is possible. Ask or return insufficient information only when the "
+                "slot is genuinely unknown and not tool-recoverable. Do not hallucinate required "
+                "arguments and do not suppress valid tool calls whose required arguments are known."
+            )
+        if projection.get("long_context_state_retrieval_v0") is True:
+            fragments.append(
+                "For long-context state dependencies, read before write: identify the relevant "
+                "prior entity, selected option, active constraint, and latest tool-observed state "
+                "before issuing a tool call or final answer. Resolve entity references against the "
+                "latest user intent or confirmed selection, prefer latest valid state over stale "
+                "state, filter tool results by active state, and treat unresolved state as unknown "
+                "rather than guessing."
+            )
+        return " ".join(fragments)
     if entry_id == "hallucination_abstain_v0" and candidate_type == "evidence_boundary_verifier":
         return (
             "For selected answerability-boundary cases, do not fabricate unsupported or "

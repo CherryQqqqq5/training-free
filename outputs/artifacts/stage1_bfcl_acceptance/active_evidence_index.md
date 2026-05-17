@@ -242,3 +242,17 @@ Next action: `request_expanded_40_60_case_dev_smoke_not_full_bfcl`.
 - `hallucination_abstain_v0`: `18/18` on expanded relevance/no-tool strata; recommended action is split into relevance boundary child lanes before any broader claim.
 - Artifacts: `abhe_v0_expanded_bfcl_failure_analysis.json`, `abhe_v0_expanded_bfcl_refinement_comparison.json`, `abhe_v0_expanded_bfcl_trace_analysis_v2.json`.
 - Guardrails: `archive_updated=false`, `holdout_touched=false`, `full_suite_touched=false`, `performance_evidence=false`.
+
+
+## ABHE-v0 Next Fresh-Slice Verification
+
+- `abhe_v0_next_fresh_slice_plan`: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_next_fresh_slice_plan.json`
+- `abhe_v0_next_fresh_slice_manifest`: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_next_fresh_slice_manifest.json`
+- `abhe_v0_next_source_exclusion_proof`: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_next_source_exclusion_proof.json`
+- `abhe_v0_next_candidate_specs`: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_next_candidate_specs.json`
+- `abhe_v0_next_dev_smoke_result`: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_next_dev_smoke_result.json`
+- `abhe_v0_next_paired_case_matrix`: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_next_paired_case_matrix.json`
+- `abhe_v0_next_failure_analysis`: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_next_failure_analysis.json`
+- `abhe_v0_next_archive_transition_dry_run`: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_next_archive_transition_dry_run.json`
+
+Status: bounded dev smoke only. Frozen v2 generalizes on the new fresh balanced slice; missing-param child has no independent signal; long-context child caused a non-target regression in its single arm. `performance_evidence=false`, `holdout_touched=false`, `full_suite_touched=false`, `archive_updated=false`.

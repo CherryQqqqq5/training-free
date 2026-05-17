@@ -1,0 +1,46 @@
+{
+  "adapter_ready": true,
+  "arm": "both",
+  "artifact_kind": "abhe_v0_next_runtime_candidate_adapter",
+  "bfcl_evaluate_called": false,
+  "bfcl_generate_called": false,
+  "candidate_jsonl_generated": false,
+  "candidate_rule_generated": false,
+  "candidate_yaml_generated": false,
+  "performance_evidence": false,
+  "provider_calls_made": false,
+  "runtime_projection": [
+    {
+      "activation_categories": [
+        "multi_turn_base",
+        "multi_turn_long_context",
+        "multi_turn_miss_func",
+        "multi_turn_miss_param"
+      ],
+      "candidate_type": "state_summary_injection",
+      "entry_id": "state_tracking_v0",
+      "long_context_state_retrieval_v0": true,
+      "missing_param_epistemic_gate_v0": true,
+      "no_state_mutation": true,
+      "post_tool_continuation_guard_v0": true,
+      "runtime_guidance_fragment_id": "state_tracking_both_compact_fragment_v0",
+      "search_memory_watch_excluded": true
+    },
+    {
+      "activation_categories": [
+        "irrelevance",
+        "live_irrelevance",
+        "live_relevance"
+      ],
+      "candidate_type": "evidence_boundary_verifier",
+      "entry_id": "hallucination_abstain_v0",
+      "false_abstain_guard": true,
+      "no_tool_boundary_v0": true,
+      "runtime_guidance_fragment_id": "no_tool_boundary_v0_frozen_regression_fragment",
+      "valid_tool_call_suppression_guard": true
+    }
+  ],
+  "schema_version": "abhe_v0_next_runtime_candidate_adapter_v0",
+  "scorer_called": false,
+  "selected_case_ids_hash": "sha256:60a84139847bdb7448fdd1322e3b5f82dc6b6b0f3aaaf073c6a81b6bbc8cc16d"
+}

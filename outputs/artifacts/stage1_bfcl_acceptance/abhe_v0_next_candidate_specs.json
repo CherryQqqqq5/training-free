@@ -1,0 +1,128 @@
+{
+  "archive_update_authorized": false,
+  "arm_definitions": {
+    "baseline": [],
+    "both": [
+      "post_tool_continuation_guard_v0",
+      "no_tool_boundary_v0",
+      "missing_param_epistemic_gate_v0",
+      "long_context_state_retrieval_v0"
+    ],
+    "frozen_v2": [
+      "post_tool_continuation_guard_v0",
+      "no_tool_boundary_v0"
+    ],
+    "long_context_retrieval": [
+      "post_tool_continuation_guard_v0",
+      "no_tool_boundary_v0",
+      "long_context_state_retrieval_v0"
+    ],
+    "missing_param_gate": [
+      "post_tool_continuation_guard_v0",
+      "no_tool_boundary_v0",
+      "missing_param_epistemic_gate_v0"
+    ]
+  },
+  "artifact_kind": "abhe_v0_next_candidate_specs",
+  "blockers": [],
+  "bounded_dev_smoke_only": true,
+  "candidate_jsonl_generated": false,
+  "candidate_pool_ready": false,
+  "candidate_rule_generated": false,
+  "candidate_yaml_generated": false,
+  "frozen_mechanisms": [
+    {
+      "mechanism_id": "post_tool_continuation_guard_v0",
+      "not_tuned_on_old_expanded_slice": true,
+      "status": "frozen_protocol_invariant",
+      "target_substrata": [
+        "multi_turn_base",
+        "multi_turn_miss_func"
+      ],
+      "validation_role": "generalization_guard"
+    },
+    {
+      "mechanism_id": "no_tool_boundary_v0",
+      "not_tuned_on_old_expanded_slice": true,
+      "status": "frozen_regression_suite",
+      "target_substrata": [
+        "irrelevance",
+        "live_irrelevance",
+        "live_relevance"
+      ],
+      "validation_role": "false_abstain_and_valid_tool_guard"
+    }
+  ],
+  "full_suite_touched": false,
+  "gold_expected_committed": false,
+  "holdout_touched": false,
+  "new_child_mechanisms": [
+    {
+      "candidate_type": "epistemic_slot_gate_compact_guidance",
+      "mechanism_contract": [
+        "check_prior_turn_state_before_asking",
+        "check_prior_tool_observed_state_before_asking",
+        "use_available_lookup_tool_when_slot_is_recoverable",
+        "ask_or_insufficient_only_when_slot_is_unknown_and_not_recoverable",
+        "do_not_hallucinate_required_arguments",
+        "do_not_suppress_valid_tool_calls_when_required_arguments_are_available"
+      ],
+      "mechanism_id": "missing_param_epistemic_gate_v0",
+      "negative_controls": [
+        "slot_already_exists_in_prior_turn",
+        "slot_exists_in_prior_tool_result",
+        "slot_tool_recoverable",
+        "slot_unrecoverable",
+        "valid_tool_call_has_all_required_arguments"
+      ],
+      "primary_success_signal": "improves_multi_turn_miss_param_vs_frozen_v2_on_fresh_slice",
+      "secondary_safety_signals": {
+        "false_ask_count": "strict_threshold",
+        "hallucinated_param_count": 0,
+        "non_target_regression_count": 0,
+        "valid_tool_call_suppression_count": 0
+      },
+      "target_substratum": "multi_turn_miss_param"
+    },
+    {
+      "candidate_type": "long_context_state_resolution_compact_guidance",
+      "mechanism_contract": [
+        "read_before_write",
+        "resolve_entity_references_against_latest_user_intent_or_confirmed_selection",
+        "prefer_latest_valid_state_over_stale_state",
+        "filter_tool_results_by_active_state",
+        "do_not_guess_state_from_long_context_when_unresolved"
+      ],
+      "mechanism_id": "long_context_state_retrieval_v0",
+      "negative_controls": [
+        "two_similar_entities_only_one_active",
+        "old_state_later_overwritten",
+        "tool_result_has_irrelevant_candidates",
+        "indirect_reference_to_prior_selected_option",
+        "state_absent_must_not_guess"
+      ],
+      "primary_success_signal": "improves_multi_turn_long_context_vs_frozen_v2_on_fresh_slice",
+      "secondary_safety_signals": {
+        "entity_misbind_count": 0,
+        "non_target_regression_count": 0,
+        "stale_state_use_count": 0,
+        "unsupported_state_guess_count": 0
+      },
+      "target_substratum": "multi_turn_long_context"
+    }
+  ],
+  "overfit_guard_controls": {
+    "bfcl_category_specific_trigger_rules_used": false,
+    "case_identifier_hash_allowlists_used": false,
+    "evaluator_target_condition_rules_used": false,
+    "prompt_literal_conditions_used": false,
+    "same_expanded_slice_tuning_used": false
+  },
+  "performance_evidence": false,
+  "raw_bfcl_result_tree_committed": false,
+  "raw_material_absent": true,
+  "raw_provider_payload_committed": false,
+  "schema_version": "abhe_v0_next_candidate_specs_v0",
+  "scorer_diff_committed": false,
+  "selected_case_ids_hash": "sha256:60a84139847bdb7448fdd1322e3b5f82dc6b6b0f3aaaf073c6a81b6bbc8cc16d"
+}
