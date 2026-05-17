@@ -18,6 +18,7 @@ from grc.runtime.policy_executor import (
     partition_matching_rules,
 )
 from grc.runtime.sanitizer import sanitize_tool_call
+from grc.runtime.slot_controller import runtime_slot_controller_enabled, runtime_slot_controller_v2_apply
 from grc.runtime.validator import validate_tool_arguments
 from grc.types import (
     DecisionPolicySpec,
@@ -2340,6 +2341,21 @@ class RuleEngine:
                     for repair in contextual_repairs:
                         repair["tool_name"] = name
                     all_repairs.extend(contextual_repairs)
+
+                if runtime_slot_controller_enabled(request_patches):
+                    patched_args, slot_repairs, slot_telemetry = runtime_slot_controller_v2_apply(
+                        request_json=request_json,
+                        tool_name=str(name),
+                        schema=schema,
+                        args=args,
+                    )
+                    if slot_repairs:
+                        args = patched_args
+                        repaired["function"]["arguments"] = json.dumps(args, ensure_ascii=False)
+                        tool_calls[index] = repaired
+                        all_repairs.extend(slot_repairs)
+                    if slot_telemetry.get("missing_required_arg_count_before"):
+                        validation.policy_hits.append("abhe_runtime_slot_controller_v2")
 
                 contract = self._verification_contract(rule_hits)
                 issues = validate_tool_arguments(

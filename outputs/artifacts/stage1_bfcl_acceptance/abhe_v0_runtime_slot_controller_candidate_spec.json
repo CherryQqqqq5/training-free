@@ -1,0 +1,49 @@
+{
+  "activation_boundary": {
+    "bfcl_category_specific_trigger_rule": false,
+    "case_identifier_allowlist": false,
+    "required_slot_missing_or_uncertain": true,
+    "tool_call_state_cases": true
+  },
+  "archive_update_authorized": false,
+  "artifact_kind": "abhe_v0_missing_param_slot_recovery_candidate_spec",
+  "blockers": [],
+  "candidate_jsonl_generated": false,
+  "candidate_rule_generated": false,
+  "candidate_type": "runtime_slot_controller_v2",
+  "candidate_yaml_generated": false,
+  "controller_contract": [
+    "build_required_slot_ledger_for_intended_tool_action",
+    "bind_slot_from_current_user_turn_when_present",
+    "bind_slot_from_prior_confirmed_selection_when_present",
+    "bind_slot_from_prior_tool_observation_when_present",
+    "call_prerequisite_lookup_tool_when_slot_is_tool_recoverable",
+    "ask_or_insufficient_only_when_slot_absent_not_inferable_not_tool_recoverable",
+    "do_not_block_valid_tool_call_when_required_slots_are_available",
+    "do_not_hallucinate_required_argument_values"
+  ],
+  "mechanism_id": "runtime_slot_controller_v2",
+  "negative_controls": [
+    "slot_already_exists_in_prior_turn_must_not_ask_again",
+    "slot_exists_in_prior_tool_observation_must_bind_not_ask",
+    "slot_tool_recoverable_must_explore_not_immediate_ask",
+    "slot_unrecoverable_must_ask_or_insufficient_not_hallucinate",
+    "valid_tool_call_has_all_required_args_must_not_be_blocked"
+  ],
+  "performance_evidence": false,
+  "primary_metrics": [
+    "multi_turn_miss_param_delta_vs_frozen_v2",
+    "target_bucket_reduction"
+  ],
+  "safety_metrics": [
+    "false_ask_count",
+    "hallucinated_param_count",
+    "valid_tool_call_suppression_count",
+    "non_target_regression_count"
+  ],
+  "schema_version": "abhe_v0_missing_param_slot_recovery_candidate_spec_v0",
+  "selected_case_ids_hash": "sha256:9b26ba3d24c54562f6a5058877a24f15d2e4ef71ee9ea781bcae168307f7d14c",
+  "supersedes": "missing_param_slot_recovery_controller_v1",
+  "target_substratum": "multi_turn_miss_param",
+  "training_free": true
+}

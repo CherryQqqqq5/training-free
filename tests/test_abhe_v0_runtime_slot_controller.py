@@ -100,9 +100,82 @@ def test_runtime_slot_micro_harness_passes_and_stays_non_executing():
     assert report["performance_evidence"] is False
 
 
-def test_runtime_slot_controller_diagnostic_keeps_bfcl_rerun_blocked_until_integration():
+def test_runtime_slot_controller_diagnostic_reports_phase_c_boundary():
     report = build_diagnostic()
     assert report["phase_b_micro_harness_ready"] is True
-    assert report["phase_c_bfcl_rerun_ready"] is False
-    assert "runtime_slot_controller_v2_not_integrated_into_proxy_request_response_path" in report["phase_c_blockers"]
     assert report["performance_evidence"] is False
+    if report.get("phase_c_bfcl_rerun_completed"):
+        assert report["phase_c_bfcl_rerun_ready"] is True
+        assert report["next_required_action"] in {"confirm_mechanism_with_actual_bind_repairs_before_promotion", "review_runtime_slot_controller_v2_for_promotion"}
+    else:
+        assert report["phase_c_bfcl_rerun_ready"] is False
+        assert "runtime_slot_controller_v2_not_integrated_into_proxy_request_response_path" in report["phase_c_blockers"]
+
+
+
+def _chat_tool(required=None, types=None):
+    return _tool(name="book_table", required=required, types=types)
+
+
+def _tool_call(args):
+    import json
+    return {
+        "id": "call_1",
+        "type": "function",
+        "function": {"name": "book_table", "arguments": json.dumps(args, ensure_ascii=False)},
+    }
+
+
+def _engine(tmp_path):
+    from grc.runtime.engine import RuleEngine
+    return RuleEngine(str(tmp_path), runtime_policy={})
+
+
+def test_engine_runtime_slot_controller_binds_missing_arg_from_structured_tool_observation(tmp_path):
+    import json
+    from grc.runtime.slot_controller import ABHE_RUNTIME_SLOT_CONTROLLER_PATCH
+
+    request = {
+        "messages": [{"role": "tool", "tool_call_id": "prior", "content": json.dumps({"party_size": 2})}],
+        "tools": [_chat_tool()],
+    }
+    response = {"choices": [{"message": {"tool_calls": [_tool_call({"city": "c", "date": "d"})]}}]}
+    final, repairs, validation = _engine(tmp_path).apply_response(request, response, request_patches=[ABHE_RUNTIME_SLOT_CONTROLLER_PATCH])
+    final_args = json.loads(final["choices"][0]["message"]["tool_calls"][0]["function"]["arguments"])
+    assert final_args["party_size"] == 2
+    assert not validation.issues
+    assert any(repair.get("kind") == "abhe_runtime_slot_controller_v2_bind_required_slot" for repair in repairs)
+    assert all("value" not in repair for repair in repairs if repair.get("kind") == "abhe_runtime_slot_controller_v2_bind_required_slot")
+    assert "abhe_runtime_slot_controller_v2" in validation.policy_hits
+
+
+def test_engine_runtime_slot_controller_does_not_rewrite_valid_tool_call(tmp_path):
+    import json
+    from grc.runtime.slot_controller import ABHE_RUNTIME_SLOT_CONTROLLER_PATCH
+
+    request = {"messages": [], "tools": [_chat_tool()]}
+    response = {"choices": [{"message": {"tool_calls": [_tool_call({"city": "c", "date": "d", "party_size": 2})]}}]}
+    final, repairs, validation = _engine(tmp_path).apply_response(request, response, request_patches=[ABHE_RUNTIME_SLOT_CONTROLLER_PATCH])
+    final_args = json.loads(final["choices"][0]["message"]["tool_calls"][0]["function"]["arguments"])
+    assert final_args == {"city": "c", "date": "d", "party_size": 2}
+    assert not repairs
+    assert not validation.issues
+
+
+def test_engine_runtime_slot_controller_refuses_ambiguous_binding(tmp_path):
+    import json
+    from grc.runtime.slot_controller import ABHE_RUNTIME_SLOT_CONTROLLER_PATCH
+
+    request = {
+        "messages": [
+            {"role": "tool", "tool_call_id": "one", "content": json.dumps({"party_size": 2})},
+            {"role": "tool", "tool_call_id": "two", "content": json.dumps({"party_size": 3})},
+        ],
+        "tools": [_chat_tool()],
+    }
+    response = {"choices": [{"message": {"tool_calls": [_tool_call({"city": "c", "date": "d"})]}}]}
+    final, repairs, validation = _engine(tmp_path).apply_response(request, response, request_patches=[ABHE_RUNTIME_SLOT_CONTROLLER_PATCH])
+    final_args = json.loads(final["choices"][0]["message"]["tool_calls"][0]["function"]["arguments"])
+    assert "party_size" not in final_args
+    assert not any(repair.get("kind") == "abhe_runtime_slot_controller_v2_bind_required_slot" for repair in repairs)
+    assert validation.issues

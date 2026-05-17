@@ -359,6 +359,8 @@ def _apply_abhe_v0_adapter_guidance(chat_req_json: Dict[str, Any]) -> tuple[Dict
     messages.insert(0, {"role": "developer", "content": guidance})
     patched["messages"] = messages
     patches = [f"abhe_v0_runtime_candidate_adapter_guidance:{entry_id}"]
+    if projection.get("runtime_slot_controller_v2") is True:
+        patches.append("abhe_v0_runtime_slot_controller_v2:enabled")
     requested_categories = _abhe_v0_requested_categories()
     if (
         entry_id == "hallucination_abstain_v0"

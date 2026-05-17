@@ -280,3 +280,14 @@ Status: bounded dev smoke only. Frozen v2 generalizes on the new fresh balanced 
 - Phase C status: blocked because `runtime_slot_controller_v2` is not yet integrated into the real proxy request/response path.
 - Current conclusion: v2 is promising for runtime integration, but running BFCL now would only retest guidance-level behavior.
 - Guardrails: `provider_calls_made=false`, `bfcl_generate_called=false`, `bfcl_evaluate_called=false`, `scorer_called=false`, `performance_evidence=false`, `archive_updated=false`.
+## ABHE-v0 runtime slot controller residual diagnostic
+
+- Result: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_residual_dev_smoke_result.json`
+- Failure analysis: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_residual_failure_analysis.json`
+- Sanitized trace audit: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_sanitized_trace_audit.json`
+- Analysis doc: `docs/stage1_abhe_v0_runtime_slot_controller_residual_analysis.md`
+- Bounded result: baseline 10/48, conditional_frozen_v2 10/48, runtime_slot_controller_v2 34/48.
+- Target delta: multi_turn_miss_param +24 vs conditional_frozen_v2.
+- Mechanism boundary: slot_bind_repair_count=0, so score-positive signal is not yet attributed to actual runtime slot binding.
+- Hard boundary: holdout_touched=false, full_suite_touched=false, archive_updated=false, performance_evidence=false.
+- Next required action: confirm mechanism with actual bind repairs before archive promotion.
