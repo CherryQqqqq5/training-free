@@ -256,3 +256,17 @@ Next action: `request_expanded_40_60_case_dev_smoke_not_full_bfcl`.
 - `abhe_v0_next_archive_transition_dry_run`: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_next_archive_transition_dry_run.json`
 
 Status: bounded dev smoke only. Frozen v2 generalizes on the new fresh balanced slice; missing-param child has no independent signal; long-context child caused a non-target regression in its single arm. `performance_evidence=false`, `holdout_touched=false`, `full_suite_touched=false`, `archive_updated=false`.
+
+
+## ABHE-v0 Miss-Param Residual Stress
+
+- Scope: targeted bounded dev smoke for `multi_turn_miss_param` residual mechanism diagnosis; not full BFCL, not holdout, not performance evidence.
+- Selected hash: `sha256:5066fc313ed0e589c1acaabb43a1254c957e18ab8cecc79a87cce491607e6109`.
+- Slice size: 68 compact identifiers; category mix is `multi_turn_miss_param=36`, `multi_turn_miss_func=8`, `multi_turn_base=6`, `multi_turn_long_context=6`, `irrelevance=6`, `live_irrelevance=6`.
+- Source exclusion: overlap count `0`; raw/gold/scorer/provider materials are not persisted.
+- Arm metrics: baseline `6/68`, frozen_v2 `12/68`, slot_recovery_v1 `12/68`.
+- Target result: `multi_turn_miss_param` remains `0/36` for all arms; slot_recovery_v1 has `+0` versus frozen_v2.
+- Regression controls: no-tool controls remain `12/12` for frozen_v2 and slot_recovery_v1; this is still scorer-unit/category-level compact evidence, not strict per-compact-case pass/fail.
+- Trace taxonomy: `abhe_v0_missing_param_trace_taxonomy_audit_v0.json` sampled 36 real trace files and persisted hash-only semantic labels. The v1 controller reduces several sampled labels but does not move the scorer unit.
+- Archive transition remains dry-run only: `archive_updated=false`, `performance_evidence=false`, `holdout_touched=false`, `full_suite_touched=false`.
+- Next action: do not expand to full BFCL; redesign missing-param as an actual runtime/tool-call slot controller or split into lower-level child mechanisms such as prior-tool-observation slot binding, required-argument schema reading, prerequisite lookup planning, and valid-tool-call guarding.

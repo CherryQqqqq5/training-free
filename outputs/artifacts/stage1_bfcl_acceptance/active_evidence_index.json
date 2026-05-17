@@ -247,6 +247,117 @@
     "v2_net_delta_vs_baseline": 24,
     "v2_net_delta_vs_v1": 12
   },
+  "abhe_v0_miss_param_residual_stress_status": {
+    "archive_transition_dry_run_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_miss_param_residual_archive_transition_dry_run.json",
+    "archive_transition_status": {
+      "archive_updated": false,
+      "does_not_update_archive": true
+    },
+    "archive_updated": false,
+    "arm_compact_metrics": {
+      "baseline": {
+        "accuracy": 0.088235,
+        "case_count": 68,
+        "cost": 0.0,
+        "latency": 12863.284893035889,
+        "passed_count": 6
+      },
+      "frozen_v2": {
+        "accuracy": 0.176471,
+        "case_count": 68,
+        "cost": 0.0,
+        "latency": 16367.518587112427,
+        "passed_count": 12
+      },
+      "slot_recovery_v1": {
+        "accuracy": 0.176471,
+        "case_count": 68,
+        "cost": 0.0,
+        "latency": 19565.314245224,
+        "passed_count": 12
+      }
+    },
+    "arms": [
+      "baseline",
+      "frozen_v2",
+      "slot_recovery_v1"
+    ],
+    "case_count_by_category": {
+      "irrelevance": 6,
+      "live_irrelevance": 6,
+      "multi_turn_base": 6,
+      "multi_turn_long_context": 6,
+      "multi_turn_miss_func": 8,
+      "multi_turn_miss_param": 36
+    },
+    "failure_analysis_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_miss_param_residual_failure_analysis.json",
+    "failure_summary": {
+      "baseline_passed_count": 6,
+      "false_ask_count": 0,
+      "fixed_count": 0,
+      "frozen_v2_delta_vs_baseline": 6,
+      "frozen_v2_passed_count": 12,
+      "hallucinated_param_count": 0,
+      "multi_turn_miss_param_delta_vs_frozen_v2": 0,
+      "non_target_regression_count": 0,
+      "regressed_count": 0,
+      "slot_recovery_v1_delta_vs_frozen_v2": 0,
+      "slot_recovery_v1_passed_count": 12,
+      "target_bucket_reduction": 0,
+      "valid_tool_call_suppression_count": 0
+    },
+    "full_suite_touched": false,
+    "holdout_touched": false,
+    "interpretation": "slot_recovery_v1 has no independent scorer-unit signal on multi_turn_miss_param; sanitized taxonomy shows small label reductions but not enough to move the BFCL compact scorer unit.",
+    "overlap_count": 0,
+    "paired_case_matrix_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_miss_param_residual_paired_case_matrix.json",
+    "performance_evidence": false,
+    "recommended_next_action": "redesign_as_runtime_tool_call_slot_controller_or_split_into_lower_level_child_mechanisms_before_any_larger_expansion",
+    "scope": "bounded_miss_param_residual_stress_dev_smoke_only",
+    "selected_case_count": 68,
+    "selected_case_ids_hash": "sha256:5066fc313ed0e589c1acaabb43a1254c957e18ab8cecc79a87cce491607e6109",
+    "source_exclusion_status": "complete",
+    "trace_taxonomy_counts_by_arm": {
+      "baseline": {
+        "asked_when_slot_recoverable": 0,
+        "hallucinated_required_argument": 0,
+        "premature_final_after_partial_state": 4,
+        "required_slot_missing_before_tool_call": 1,
+        "slot_present_in_prior_tool_observation_not_bound": 4,
+        "slot_present_in_prior_turn_not_bound": 5,
+        "slot_tool_recoverable_but_lookup_not_called": 0,
+        "valid_tool_call_suppressed": 1,
+        "wrong_argument_key_or_alias": 0,
+        "wrong_argument_value_bound": 0
+      },
+      "frozen_v2": {
+        "asked_when_slot_recoverable": 0,
+        "hallucinated_required_argument": 0,
+        "premature_final_after_partial_state": 4,
+        "required_slot_missing_before_tool_call": 1,
+        "slot_present_in_prior_tool_observation_not_bound": 4,
+        "slot_present_in_prior_turn_not_bound": 5,
+        "slot_tool_recoverable_but_lookup_not_called": 0,
+        "valid_tool_call_suppressed": 1,
+        "wrong_argument_key_or_alias": 0,
+        "wrong_argument_value_bound": 0
+      },
+      "slot_recovery_v1": {
+        "asked_when_slot_recoverable": 0,
+        "hallucinated_required_argument": 0,
+        "premature_final_after_partial_state": 3,
+        "required_slot_missing_before_tool_call": 0,
+        "slot_present_in_prior_tool_observation_not_bound": 3,
+        "slot_present_in_prior_turn_not_bound": 3,
+        "slot_tool_recoverable_but_lookup_not_called": 0,
+        "valid_tool_call_suppressed": 0,
+        "wrong_argument_key_or_alias": 0,
+        "wrong_argument_value_bound": 0
+      }
+    },
+    "trace_taxonomy_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_missing_param_trace_taxonomy_audit_v0.json",
+    "trace_taxonomy_sampled_trace_count": 36
+  },
   "abhe_v0_next_fresh_slice_verification": {
     "analysis_resolution": "scorer_unit_category_level_with_hash_only_compact_rows",
     "archive_updated": false,

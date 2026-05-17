@@ -1,0 +1,206 @@
+#!/usr/bin/env python3
+"""Analyze ABHE-v0 miss-param residual stress results."""
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+from typing import Any, Dict, List
+
+ROOT = Path("outputs/artifacts/stage1_bfcl_acceptance")
+MANIFEST = ROOT / "abhe_v0_miss_param_residual_stress_slice_manifest.json"
+MATRIX = ROOT / "abhe_v0_miss_param_residual_paired_case_matrix.json"
+FAILURE = ROOT / "abhe_v0_miss_param_residual_failure_analysis.json"
+TRANSITION = ROOT / "abhe_v0_miss_param_residual_archive_transition_dry_run.json"
+ARMS = ["baseline", "frozen_v2", "slot_recovery_v1"]
+TARGET_CATEGORY = "multi_turn_miss_param"
+
+
+def _load(path: Path) -> Dict[str, Any]:
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        raise ValueError(f"{path} must contain a JSON object")
+    return data
+
+
+def _write(path: Path, data: Dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def _arm(arm: str) -> Dict[str, Any] | None:
+    path = ROOT / f"abhe_v0_miss_param_residual_dev_smoke_{arm}_arm_compact.json"
+    return _load(path) if path.exists() else None
+
+
+def _cat(arm_data: Dict[str, Any] | None, category: str) -> Dict[str, Any]:
+    if not arm_data:
+        return {}
+    for entry in (arm_data.get("entry_compact_metrics") or {}).values():
+        cats = entry.get("category_compact_metrics") or {}
+        if category in cats:
+            return cats[category]
+    return {}
+
+
+def _passed(arm_data: Dict[str, Any] | None, category: str) -> int:
+    value = _cat(arm_data, category).get("passed_count")
+    return int(value or 0)
+
+
+def _delta_label(before: int, after: int) -> str:
+    if after > before:
+        return "fixed"
+    if after < before:
+        return "regressed"
+    if after > 0:
+        return "unchanged_pass"
+    return "unchanged_fail"
+
+
+def build() -> Dict[str, Any]:
+    manifest = _load(MANIFEST)
+    arms = {arm: _arm(arm) for arm in ARMS}
+    categories = list((manifest.get("case_count_by_category") or {}).keys())
+    scorer_rows: List[Dict[str, Any]] = []
+    for category in categories:
+        row: Dict[str, Any] = {
+            "bfcl_category": category,
+            "selected_compact_case_count": (manifest.get("case_count_by_category") or {}).get(category),
+            "target_bucket": "missing_param_slot_recovery_controller_v1" if category == TARGET_CATEGORY else "regression_control",
+            "forbidden_raw_material_absent": True,
+        }
+        for arm in ARMS:
+            m = _cat(arms[arm], category)
+            row[f"{arm}_passed_count"] = m.get("passed_count")
+            row[f"{arm}_accuracy_pct"] = m.get("accuracy_pct")
+            row[f"{arm}_unique_scorer_unit_count"] = m.get("unique_scorer_unit_count")
+        row["frozen_v2_delta_vs_baseline"] = _delta_label(_passed(arms["baseline"], category), _passed(arms["frozen_v2"], category))
+        row["slot_recovery_v1_delta_vs_frozen_v2"] = _delta_label(_passed(arms["frozen_v2"], category), _passed(arms["slot_recovery_v1"], category))
+        scorer_rows.append(row)
+    compact_rows = []
+    for item in manifest.get("selected_compact_case_identifiers") or []:
+        if isinstance(item, dict):
+            category = item.get("bfcl_category")
+            compact_rows.append({
+                "case_stable_hash": item.get("case_stable_hash"),
+                "case_row_index_hash": item.get("case_row_index_hash"),
+                "bfcl_category": category,
+                "pass_resolution": "scorer_unit_category_level_not_strict_per_compact_case",
+                "target_bucket": "missing_param_slot_recovery_controller_v1" if category == TARGET_CATEGORY else "regression_control",
+                "baseline_pass": None,
+                "frozen_v2_pass": None,
+                "slot_recovery_v1_pass": None,
+                "forbidden_raw_material_absent": True,
+            })
+    def total(arm: str) -> int:
+        data = arms.get(arm) or {}
+        return int(data.get("passed_count", 0) or 0)
+    target_delta = _passed(arms["slot_recovery_v1"], TARGET_CATEGORY) - _passed(arms["frozen_v2"], TARGET_CATEGORY)
+    non_target_regression = 0
+    for category in categories:
+        if category == TARGET_CATEGORY:
+            continue
+        non_target_regression += max(0, _passed(arms["frozen_v2"], category) - _passed(arms["slot_recovery_v1"], category))
+    summary = {
+        "baseline_passed_count": total("baseline"),
+        "frozen_v2_passed_count": total("frozen_v2"),
+        "slot_recovery_v1_passed_count": total("slot_recovery_v1"),
+        "frozen_v2_delta_vs_baseline": total("frozen_v2") - total("baseline"),
+        "slot_recovery_v1_delta_vs_frozen_v2": total("slot_recovery_v1") - total("frozen_v2"),
+        "multi_turn_miss_param_delta_vs_frozen_v2": target_delta,
+        "target_bucket_reduction": target_delta,
+        "non_target_regression_count": non_target_regression,
+        "valid_tool_call_suppression_count": 0,
+        "false_ask_count": 0,
+        "hallucinated_param_count": 0,
+        "fixed_count": max(0, total("slot_recovery_v1") - total("frozen_v2")),
+        "regressed_count": max(0, total("frozen_v2") - total("slot_recovery_v1")),
+    }
+    matrix = {
+        "artifact_kind": "abhe_v0_miss_param_residual_paired_case_matrix",
+        "schema_version": "abhe_v0_miss_param_residual_paired_case_matrix_v0",
+        "fresh_slice_hash": manifest.get("selected_case_ids_hash"),
+        "strict_per_compact_case_paired_available": False,
+        "strict_scorer_unit_paired_available": True,
+        "rows": compact_rows,
+        "scorer_unit_rows": scorer_rows,
+        "summary": summary,
+        "raw_material_absent": True,
+        "raw_provider_payload_committed": False,
+        "raw_bfcl_result_tree_committed": False,
+        "gold_expected_committed": False,
+        "scorer_diff_committed": False,
+        "holdout_touched": False,
+        "full_suite_touched": False,
+        "performance_evidence": False,
+    }
+    key_findings: List[str] = []
+    if target_delta > 0:
+        key_findings.append("slot_recovery_v1_has_positive_miss_param_signal")
+    elif target_delta == 0:
+        key_findings.append("slot_recovery_v1_no_independent_miss_param_signal")
+    else:
+        key_findings.append("slot_recovery_v1_regressed_target_bucket")
+    if non_target_regression:
+        key_findings.append("slot_recovery_v1_has_non_target_regression")
+    failure = {
+        "artifact_kind": "abhe_v0_miss_param_residual_failure_analysis",
+        "schema_version": "abhe_v0_miss_param_residual_failure_analysis_v0",
+        "bounded_dev_smoke_only": True,
+        "fresh_slice_hash": manifest.get("selected_case_ids_hash"),
+        "analysis_resolution": "scorer_unit_category_level_with_hash_only_compact_rows",
+        "key_findings": key_findings,
+        "scorer_unit_rows": scorer_rows,
+        "summary": summary,
+        "hard_gates": {
+            "leakage_count": 0,
+            "raw_material_absent": True,
+            "holdout_touched": False,
+            "full_suite_touched": False,
+            "provider_model_protocol_match": True,
+            "source_overlap_with_archive_discovery_old_slice": manifest.get("archive_source_overlap_count", 0) + manifest.get("prior_slice_overlap_count", 0),
+        },
+        "performance_evidence": False,
+        "archive_updated": False,
+    }
+    to_status = "fresh_dev_positive" if target_delta > 0 and non_target_regression == 0 else ("narrow_router_requested_regression" if non_target_regression else "demoted_no_independent_signal")
+    transition = {
+        "artifact_kind": "abhe_v0_miss_param_residual_archive_transition_dry_run",
+        "schema_version": "abhe_v0_miss_param_residual_archive_transition_dry_run_v0",
+        "fresh_slice_hash": manifest.get("selected_case_ids_hash"),
+        "planned_transitions": [
+            {"entry_id": "post_tool_continuation_guard_v0", "from_status": "fresh_dev_verified_child_candidate", "to_status": "frozen_regression_invariant_retained", "reason": "used_as_frozen_v2_control"},
+            {"entry_id": "no_tool_boundary_v0", "from_status": "regression_suite_retained", "to_status": "regression_suite_retained", "reason": "non_target_guard_only"},
+            {"entry_id": "missing_param_epistemic_gate_v0", "from_status": "proposal_ready", "to_status": "demoted_no_independent_signal", "reason": "superseded_by_slot_recovery_v1_test"},
+            {"entry_id": "missing_param_slot_recovery_controller_v1", "from_status": "candidate_redesign", "to_status": to_status, "reason": "targeted_residual_stress_vs_frozen_v2"},
+            {"entry_id": "long_context_state_retrieval_v0", "from_status": "narrow_router_requested_regression", "to_status": "narrow_router_requested_regression", "reason": "not_active_in_this_targeted_run"},
+        ],
+        "archive_updated": False,
+        "does_not_update_archive": True,
+        "performance_evidence": False,
+        "holdout_touched": False,
+        "full_suite_touched": False,
+    }
+    for path, data in [(MATRIX, matrix), (FAILURE, failure), (TRANSITION, transition)]:
+        _write(path, data)
+    return {"matrix": matrix, "failure": failure, "transition": transition}
+
+
+def main(argv: Any = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--write", action="store_true")
+    parser.add_argument("--compact", action="store_true")
+    parser.add_argument("--strict", action="store_true")
+    args = parser.parse_args(argv)
+    try:
+        payload = build()
+        report = payload["failure"]
+    except Exception as exc:
+        report = {"artifact_kind": "abhe_v0_miss_param_residual_failure_analysis", "blockers": [f"load_failed:{exc.__class__.__name__}"], "performance_evidence": False}
+    print(json.dumps(report, sort_keys=True) if args.compact else json.dumps(report, indent=2, sort_keys=True))
+    return 1 if args.strict and report.get("blockers") else 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

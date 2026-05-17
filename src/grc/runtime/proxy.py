@@ -279,6 +279,20 @@ def _abhe_v0_projection_guidance(projection: Dict[str, Any]) -> str:
                 "slot is genuinely unknown and not tool-recoverable. Do not hallucinate required "
                 "arguments and do not suppress valid tool calls whose required arguments are known."
             )
+        if projection.get("missing_param_slot_recovery_controller_v1") is True:
+            fragments.append(
+                "Missing-parameter residual controller: before a tool call or final answer, keep a "
+                "required-slot ledger for the currently intended tool action. For each missing "
+                "required slot, resolve in this order: current user turn, prior confirmed selection, "
+                "prior tool observation, then an available prerequisite lookup or exploration tool. "
+                "If the slot is recoverable by available tools, call the prerequisite tool instead "
+                "of finalizing or asking immediately. If a required slot is already available, bind "
+                "it and do not ask again. If all required slots are present, do not block the valid "
+                "tool call. If a slot is absent, not inferable, and not tool-recoverable, ask for "
+                "that slot or return an insufficient-information boundary. Do not invent required "
+                "argument values, do not change the selected function merely because a slot is hard "
+                "to recover, and do not activate no-tool behavior for valid tool-call cases."
+            )
         if projection.get("long_context_state_retrieval_v0") is True:
             fragments.append(
                 "For long-context state dependencies, read before write: identify the relevant "
