@@ -185,6 +185,16 @@ All formal BFCL performance gates remain fail-closed:
 
 L1 runtime behavior approval does not authorize source expansion, BFCL scorer, candidate pool, dev/holdout split, paired comparison, full-suite run, SOTA/+3pp claim, or Huawei acceptance claim.
 
+
+
+## ABHE-v0 Runtime Slot Controller Bindability Audit v1
+
+- Artifact: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_bindability_audit_v1.json`
+- Scope: compact bindability audit only; no provider, BFCL generate/evaluate, scorer, holdout, or full suite.
+- Result: target traces = 7; runtime marker present = 7; slot bind repairs = 0; slot policy hits = 0; bindable missing-required-arg rows = 0.
+- Interpretation: direct slot-binding causality remains unsupported. The target traces are either no-tool-call finals or provider-generated/unrepaired tool calls with no missing required argument at the post-response repair point.
+- Current next-step authorization: fail-closed for provider/BFCL/scorer/archive/performance. Next action is `design_pre_generation_or_post_decode_observability_for_provider_generated_valid_calls_before_bfcl_rerun`.
+
 ## Next Action
 
 `review_entry_specific_activation_rerun_and_redesign_candidates_before_any_archive_write`

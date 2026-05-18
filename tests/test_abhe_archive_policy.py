@@ -284,7 +284,7 @@ def test_abhe_planning_ready_report_is_review_ready_not_execution_ready() -> Non
     assert report["candidate_spec_drafts_ready"] is True
     assert report["post_dev_synthetic_planner_ready"] is True
     assert report["state_transition_dry_run_ready"] is True
-    assert report["next_required_action"] in {"restore_provider_env_and_materialize_real_runner_adapter_before_execution", "resolve_execution_readiness_blockers_before_bfcl_execution", "review_compact_dev_feedback_before_any_archive_write", "request_expanded_40_60_case_dev_smoke_not_full_bfcl", "instrument_why_target_bfcl_requests_do_not_present_bindable_missing_slots_before_next_bfcl_run"}
+    assert report["next_required_action"] in {"restore_provider_env_and_materialize_real_runner_adapter_before_execution", "resolve_execution_readiness_blockers_before_bfcl_execution", "review_compact_dev_feedback_before_any_archive_write", "request_expanded_40_60_case_dev_smoke_not_full_bfcl", "instrument_why_target_bfcl_requests_do_not_present_bindable_missing_slots_before_next_bfcl_run", "design_pre_generation_or_post_decode_observability_for_provider_generated_valid_calls_before_bfcl_rerun"}
     assert report["execution_authorized"] is False
     assert report["scorer_authorized"] is False
     assert report["performance_evidence"] is False

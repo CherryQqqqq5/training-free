@@ -53,6 +53,7 @@ RUNTIME_SLOT_RESIDUAL_FAILURE_PATH = Path("outputs/artifacts/stage1_bfcl_accepta
 RUNTIME_SLOT_RESIDUAL_AUDIT_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_sanitized_trace_audit.json")
 RUNTIME_SLOT_CAUSALITY_AUDIT_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_causality_audit.json")
 RUNTIME_SLOT_PATH_REPLAY_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_path_replay.json")
+RUNTIME_SLOT_BINDABILITY_AUDIT_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_bindability_audit_v1.json")
 RUNTIME_SLOT_RESIDUAL_TRANSITION_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_archive_transition_dry_run.json")
 FORCED_FALSE_FIELDS = {
     "execution_authorized",
@@ -135,6 +136,7 @@ def build_bundle() -> Dict[str, Any]:
     runtime_slot_residual_audit = _load_json(RUNTIME_SLOT_RESIDUAL_AUDIT_PATH)
     runtime_slot_causality_audit = _load_json(RUNTIME_SLOT_CAUSALITY_AUDIT_PATH)
     runtime_slot_path_replay = _load_json(RUNTIME_SLOT_PATH_REPLAY_PATH)
+    runtime_slot_bindability_audit = _load_json(RUNTIME_SLOT_BINDABILITY_AUDIT_PATH)
     runtime_slot_residual_transition = _load_json(RUNTIME_SLOT_RESIDUAL_TRANSITION_PATH)
     transition_blockers = validate_transition(Namespace(
         entry_id="state_tracking_v0",
@@ -210,7 +212,7 @@ def build_bundle() -> Dict[str, Any]:
         "abhe_v0_runtime_slot_residual_performance_evidence": runtime_slot_residual_failure.get("performance_evidence") is True,
         "abhe_v0_runtime_slot_residual_target_delta": (runtime_slot_residual_failure.get("summary") or {}).get("multi_turn_miss_param_delta_vs_conditional_frozen_v2"),
         "abhe_v0_runtime_slot_residual_bind_repair_count": (runtime_slot_residual_failure.get("summary") or {}).get("slot_bind_repair_count"),
-        "abhe_v0_runtime_slot_residual_next_required_action": "instrument_why_target_bfcl_requests_do_not_present_bindable_missing_slots_before_next_bfcl_run",
+        "abhe_v0_runtime_slot_residual_next_required_action": "design_pre_generation_or_post_decode_observability_for_provider_generated_valid_calls_before_bfcl_rerun",
         "approval_chain_ready_for_review": approval_chain.get("abhe_approval_chain_ready_for_review") is True,
         "no_leakage_status": leakage.get("abhe_no_leakage_boundary_passed") is True,
         "execution_authorized": False,
@@ -349,7 +351,7 @@ def build_bundle() -> Dict[str, Any]:
             "no_leakage": _summary(leakage, ["abhe_no_leakage_boundary_passed", "report_scope"]),
         },
         "commit": _current_commit(),
-        "next_required_action": "instrument_why_target_bfcl_requests_do_not_present_bindable_missing_slots_before_next_bfcl_run",
+        "next_required_action": "design_pre_generation_or_post_decode_observability_for_provider_generated_valid_calls_before_bfcl_rerun",
     }
     blockers = validate_bundle(bundle)
     bundle["abhe_review_bundle_ready"] = not blockers

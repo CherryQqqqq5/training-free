@@ -227,7 +227,7 @@ def build_report() -> Dict[str, Any]:
         "candidate_pool_ready": False,
         "sota_3pp_claim_ready": False,
         "huawei_acceptance_ready": False,
-        "next_required_action": "instrument_why_target_bfcl_requests_do_not_present_bindable_missing_slots_before_next_bfcl_run",
+        "next_required_action": "design_pre_generation_or_post_decode_observability_for_provider_generated_valid_calls_before_bfcl_rerun",
         "component_paths": {
             "trace_packet": str(trace_packet["packet_path"]),
             "dev_smoke_packet": str(dev_smoke_packet["packet_path"]),

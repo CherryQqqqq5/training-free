@@ -253,6 +253,18 @@ ALLOWED_KEY_NAMES = {
     "secret_values_persisted",
     "provider_endpoint_env_missing",
     "raw_material_absent",
+    "raw_payload_schema_not_matched_subtyping_audit",
+    "raw_payload_schema_not_matched_subtyping_audit_json",
+    "raw_payload_schema_not_matched_subtyping_audit_md",
+    "raw_payload_schema_not_matched_subtyping_audit_code_head",
+    "raw_payload_schema_not_matched_failure_count",
+    "endpoint_value_redacted",
+    "expected_env",
+    "scorer_or_gold_audit_started",
+    "uses_scorer_or_gold",
+    "uses_scorer_or_gold_scope",
+    "expected_values_emitted",
+    "gold_text_emitted",
 }
 
 OPTIONAL_DEFAULT_PATHS = {
