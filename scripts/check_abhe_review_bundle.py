@@ -38,6 +38,7 @@ from scripts.check_abhe_v0_expanded_dev_smoke_request import check as check_bfcl
 from scripts.check_abhe_v0_runtime_slot_observability_plan import check as check_runtime_slot_observability_plan
 from scripts.check_abhe_v0_runtime_slot_observability_fixture import check as check_runtime_slot_observability_fixture
 from scripts.check_abhe_v0_runtime_slot_observability_review import check as check_runtime_slot_observability_review
+from scripts.check_abhe_v0_runtime_slot_scorer_unit_diagnostic import check as check_runtime_slot_scorer_unit_diagnostic
 from scripts.plan_abhe_v0_bfcl_archive_transition import build_plan as build_bfcl_archive_transition
 from scripts.plan_abhe_v0_bfcl_archive_transition import synthetic_feedback as bfcl_synthetic_feedback
 
@@ -57,6 +58,7 @@ RUNTIME_SLOT_RESIDUAL_AUDIT_PATH = Path("outputs/artifacts/stage1_bfcl_acceptanc
 RUNTIME_SLOT_CAUSALITY_AUDIT_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_causality_audit.json")
 RUNTIME_SLOT_PATH_REPLAY_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_path_replay.json")
 RUNTIME_SLOT_BINDABILITY_AUDIT_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_bindability_audit_v1.json")
+RUNTIME_SLOT_SCORER_UNIT_DIAGNOSTIC_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_scorer_unit_diagnostic.json")
 RUNTIME_SLOT_OBSERVABILITY_PLAN_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_observability_plan.json")
 RUNTIME_SLOT_OBSERVABILITY_FIXTURE_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_observability_fixture.json")
 RUNTIME_SLOT_OBSERVABILITY_REVIEW_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_observability_review.json")
@@ -143,6 +145,8 @@ def build_bundle() -> Dict[str, Any]:
     runtime_slot_causality_audit = _load_json(RUNTIME_SLOT_CAUSALITY_AUDIT_PATH)
     runtime_slot_path_replay = _load_json(RUNTIME_SLOT_PATH_REPLAY_PATH)
     runtime_slot_bindability_audit = _load_json(RUNTIME_SLOT_BINDABILITY_AUDIT_PATH)
+    runtime_slot_scorer_unit_diagnostic = _load_json(RUNTIME_SLOT_SCORER_UNIT_DIAGNOSTIC_PATH)
+    runtime_slot_scorer_unit_check = check_runtime_slot_scorer_unit_diagnostic()
     runtime_slot_observability_plan = check_runtime_slot_observability_plan()
     runtime_slot_observability_fixture = check_runtime_slot_observability_fixture()
     runtime_slot_observability_review = check_runtime_slot_observability_review()
@@ -221,7 +225,10 @@ def build_bundle() -> Dict[str, Any]:
         "abhe_v0_runtime_slot_residual_performance_evidence": runtime_slot_residual_failure.get("performance_evidence") is True,
         "abhe_v0_runtime_slot_residual_target_delta": (runtime_slot_residual_failure.get("summary") or {}).get("multi_turn_miss_param_delta_vs_conditional_frozen_v2"),
         "abhe_v0_runtime_slot_residual_bind_repair_count": (runtime_slot_residual_failure.get("summary") or {}).get("slot_bind_repair_count"),
-        "abhe_v0_runtime_slot_residual_next_required_action": (runtime_slot_residual_failure.get("measurement_diagnosis") or {}).get("next_required_action") or "build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl",
+        "abhe_v0_runtime_slot_residual_next_required_action": runtime_slot_scorer_unit_diagnostic.get("next_required_action") or (runtime_slot_residual_failure.get("measurement_diagnosis") or {}).get("next_required_action") or "build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl",
+        "abhe_v0_runtime_slot_scorer_unit_diagnostic_ready": runtime_slot_scorer_unit_check.get("scorer_unit_diagnostic_check_passed") is True,
+        "abhe_v0_runtime_slot_target_collapse_factor": runtime_slot_scorer_unit_check.get("target_compact_to_scorer_unit_collapse_factor"),
+        "abhe_v0_runtime_slot_more_bfcl_before_alignment_recommended": runtime_slot_scorer_unit_check.get("more_bfcl_before_alignment_recommended"),
         "abhe_v0_runtime_slot_residual_measurement_diagnosis": runtime_slot_residual_failure.get("measurement_diagnosis"),
         "abhe_v0_runtime_slot_observability_plan_ready": runtime_slot_observability_plan.get("observability_plan_check_passed") is True,
         "abhe_v0_runtime_slot_observability_fixture_ready": runtime_slot_observability_fixture.get("observability_fixture_check_passed") is True,
@@ -373,7 +380,7 @@ def build_bundle() -> Dict[str, Any]:
             "no_leakage": _summary(leakage, ["abhe_no_leakage_boundary_passed", "report_scope"]),
         },
         "commit": _current_commit(),
-        "next_required_action": (runtime_slot_residual_failure.get("measurement_diagnosis") or {}).get("next_required_action") or "build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl",
+        "next_required_action": runtime_slot_scorer_unit_diagnostic.get("next_required_action") or (runtime_slot_residual_failure.get("measurement_diagnosis") or {}).get("next_required_action") or "build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl",
     }
     blockers = validate_bundle(bundle)
     bundle["abhe_review_bundle_ready"] = not blockers

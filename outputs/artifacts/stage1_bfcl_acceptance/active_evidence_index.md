@@ -367,3 +367,15 @@ Status: bounded dev smoke only. Frozen v2 generalizes on the new fresh balanced 
 - Measurement caveat: 24 target compact identifiers collapse to 1 BFCL scorer unit and 8 trace artifacts; strict per-compact-case pairing remains unavailable.
 - Current next action: `build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl`.
 - Boundaries: `performance_evidence=false`, `archive_updated=false`, `holdout_touched=false`, `full_suite_touched=false`.
+
+
+### ABHE-v0 Runtime Slot Scorer-Unit Diagnostic
+
+- Artifact: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_scorer_unit_diagnostic.json`
+- Scope: offline compact diagnostic only; no provider, no BFCL generate/evaluate, no scorer.
+- Target category: `multi_turn_miss_param`.
+- Target compact identifiers: 24; minimum scorer units observed: 1; collapse factor: 24.0.
+- Strict per-compact-case pairing available: `false`.
+- More BFCL before scorer-unit alignment recommended: `false`.
+- Current next action: `implement_scorer_unit_aligned_result_parser_or_slice_before_more_bfcl`.
+- Boundaries: `performance_evidence=false`, `archive_updated=false`, `holdout_touched=false`, `full_suite_touched=false`.
