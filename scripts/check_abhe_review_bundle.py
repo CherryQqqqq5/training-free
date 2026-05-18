@@ -51,6 +51,7 @@ BFCL_NEXT_TRACE_AUDIT_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe
 RUNTIME_SLOT_RESIDUAL_RESULT_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_residual_dev_smoke_result.json")
 RUNTIME_SLOT_RESIDUAL_FAILURE_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_residual_failure_analysis.json")
 RUNTIME_SLOT_RESIDUAL_AUDIT_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_sanitized_trace_audit.json")
+RUNTIME_SLOT_CAUSALITY_AUDIT_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_causality_audit.json")
 RUNTIME_SLOT_RESIDUAL_TRANSITION_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_archive_transition_dry_run.json")
 FORCED_FALSE_FIELDS = {
     "execution_authorized",
@@ -131,6 +132,7 @@ def build_bundle() -> Dict[str, Any]:
     runtime_slot_residual_result = _load_json(RUNTIME_SLOT_RESIDUAL_RESULT_PATH)
     runtime_slot_residual_failure = _load_json(RUNTIME_SLOT_RESIDUAL_FAILURE_PATH)
     runtime_slot_residual_audit = _load_json(RUNTIME_SLOT_RESIDUAL_AUDIT_PATH)
+    runtime_slot_causality_audit = _load_json(RUNTIME_SLOT_CAUSALITY_AUDIT_PATH)
     runtime_slot_residual_transition = _load_json(RUNTIME_SLOT_RESIDUAL_TRANSITION_PATH)
     transition_blockers = validate_transition(Namespace(
         entry_id="state_tracking_v0",
@@ -197,10 +199,13 @@ def build_bundle() -> Dict[str, Any]:
         "abhe_v0_runtime_slot_residual_failure_analysis_ready": runtime_slot_residual_failure.get("artifact_kind") == "abhe_v0_runtime_slot_controller_residual_failure_analysis",
         "abhe_v0_runtime_slot_residual_trace_audit_ready": runtime_slot_residual_audit.get("artifact_kind") == "abhe_v0_runtime_slot_controller_sanitized_trace_audit",
         "abhe_v0_runtime_slot_residual_archive_updated": runtime_slot_residual_transition.get("archive_updated") is True,
+        "abhe_v0_runtime_slot_causality_audit_ready": runtime_slot_causality_audit.get("artifact_kind") == "abhe_v0_runtime_slot_controller_causality_audit",
+        "abhe_v0_runtime_slot_binder_causality_confirmed": runtime_slot_causality_audit.get("binder_causality_confirmed") is True,
+        "abhe_v0_runtime_slot_causality_assessment": runtime_slot_causality_audit.get("overall_assessment"),
         "abhe_v0_runtime_slot_residual_performance_evidence": runtime_slot_residual_failure.get("performance_evidence") is True,
         "abhe_v0_runtime_slot_residual_target_delta": (runtime_slot_residual_failure.get("summary") or {}).get("multi_turn_miss_param_delta_vs_conditional_frozen_v2"),
         "abhe_v0_runtime_slot_residual_bind_repair_count": (runtime_slot_residual_failure.get("summary") or {}).get("slot_bind_repair_count"),
-        "abhe_v0_runtime_slot_residual_next_required_action": "confirm_mechanism_with_actual_bind_repairs_before_promotion",
+        "abhe_v0_runtime_slot_residual_next_required_action": "run_no_provider_proxy_fixture_and_same_request_noop_replay_before_promoting_runtime_slot_controller_v2",
         "approval_chain_ready_for_review": approval_chain.get("abhe_approval_chain_ready_for_review") is True,
         "no_leakage_status": leakage.get("abhe_no_leakage_boundary_passed") is True,
         "execution_authorized": False,
@@ -249,6 +254,7 @@ def build_bundle() -> Dict[str, Any]:
             "abhe_v0_runtime_slot_controller_residual_dev_smoke_result": str(RUNTIME_SLOT_RESIDUAL_RESULT_PATH),
             "abhe_v0_runtime_slot_controller_residual_failure_analysis": str(RUNTIME_SLOT_RESIDUAL_FAILURE_PATH),
             "abhe_v0_runtime_slot_controller_sanitized_trace_audit": str(RUNTIME_SLOT_RESIDUAL_AUDIT_PATH),
+            "abhe_v0_runtime_slot_controller_causality_audit": str(RUNTIME_SLOT_CAUSALITY_AUDIT_PATH),
             "abhe_v0_runtime_slot_controller_archive_transition_dry_run": str(RUNTIME_SLOT_RESIDUAL_TRANSITION_PATH),
         },
         "component_summaries": {
@@ -316,12 +322,21 @@ def build_bundle() -> Dict[str, Any]:
                 "holdout_touched",
                 "full_suite_touched",
             ]),
+            "abhe_v0_runtime_slot_causality_audit": _summary(runtime_slot_causality_audit, [
+                "artifact_kind",
+                "binder_causality_confirmed",
+                "overall_assessment",
+                "next_required_action",
+                "performance_evidence",
+                "holdout_touched",
+                "full_suite_touched",
+            ]),
             "abhe_v0_runtime_slot_residual_archive_transition": runtime_slot_residual_transition,
             "abhe_v0_bfcl_archive_transition": bfcl_archive_transition,
             "no_leakage": _summary(leakage, ["abhe_no_leakage_boundary_passed", "report_scope"]),
         },
         "commit": _current_commit(),
-        "next_required_action": "request_expanded_40_60_case_dev_smoke_not_full_bfcl",
+        "next_required_action": "run_no_provider_proxy_fixture_and_same_request_noop_replay_before_promoting_runtime_slot_controller_v2",
     }
     blockers = validate_bundle(bundle)
     bundle["abhe_review_bundle_ready"] = not blockers

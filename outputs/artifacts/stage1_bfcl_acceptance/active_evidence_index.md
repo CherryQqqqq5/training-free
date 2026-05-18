@@ -291,3 +291,18 @@ Status: bounded dev smoke only. Frozen v2 generalizes on the new fresh balanced 
 - Mechanism boundary: slot_bind_repair_count=0, so score-positive signal is not yet attributed to actual runtime slot binding.
 - Hard boundary: holdout_touched=false, full_suite_touched=false, archive_updated=false, performance_evidence=false.
 - Next required action: confirm mechanism with actual bind repairs before archive promotion.
+
+## ABHE-v0 Runtime Slot Controller Causality Audit
+
+- artifact: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_causality_audit.json`
+- scope: bounded residual dev-smoke trace audit only; not full BFCL, not holdout, not performance evidence.
+- target category: `multi_turn_miss_param`
+- target scorer-unit delta: runtime_slot_controller_v2 improved from conditional 0 to 24 compact selected cases at category/scorer-unit level.
+- binder causality confirmed: false.
+- runtime slot bind repair count: 0.
+- runtime slot policy hit count: 0.
+- runtime marker no-op count: 41 across runtime traces, including 7/7 target traces.
+- target developer-guidance hash equals conditional arm: true.
+- interpretation: score-positive diagnostic remains real, but direct slot-binding causality is not supported by observed trace telemetry. Runtime marker / validator path effects, provider variability, and scorer-unit aggregation remain plausible.
+- next required action: `run_no_provider_proxy_fixture_and_same_request_noop_replay_before_promoting_runtime_slot_controller_v2`.
+- archive_updated=false; holdout_touched=false; full_suite_touched=false; performance_evidence=false.

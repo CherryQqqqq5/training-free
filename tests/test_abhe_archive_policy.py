@@ -284,7 +284,7 @@ def test_abhe_planning_ready_report_is_review_ready_not_execution_ready() -> Non
     assert report["candidate_spec_drafts_ready"] is True
     assert report["post_dev_synthetic_planner_ready"] is True
     assert report["state_transition_dry_run_ready"] is True
-    assert report["next_required_action"] in {"restore_provider_env_and_materialize_real_runner_adapter_before_execution", "resolve_execution_readiness_blockers_before_bfcl_execution", "review_compact_dev_feedback_before_any_archive_write", "request_expanded_40_60_case_dev_smoke_not_full_bfcl"}
+    assert report["next_required_action"] in {"restore_provider_env_and_materialize_real_runner_adapter_before_execution", "resolve_execution_readiness_blockers_before_bfcl_execution", "review_compact_dev_feedback_before_any_archive_write", "request_expanded_40_60_case_dev_smoke_not_full_bfcl", "run_no_provider_proxy_fixture_and_same_request_noop_replay_before_promoting_runtime_slot_controller_v2"}
     assert report["execution_authorized"] is False
     assert report["scorer_authorized"] is False
     assert report["performance_evidence"] is False

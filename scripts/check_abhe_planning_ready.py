@@ -227,7 +227,7 @@ def build_report() -> Dict[str, Any]:
         "candidate_pool_ready": False,
         "sota_3pp_claim_ready": False,
         "huawei_acceptance_ready": False,
-        "next_required_action": "request_expanded_40_60_case_dev_smoke_not_full_bfcl",
+        "next_required_action": "run_no_provider_proxy_fixture_and_same_request_noop_replay_before_promoting_runtime_slot_controller_v2",
         "component_paths": {
             "trace_packet": str(trace_packet["packet_path"]),
             "dev_smoke_packet": str(dev_smoke_packet["packet_path"]),
