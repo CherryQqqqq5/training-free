@@ -379,3 +379,15 @@ Status: bounded dev smoke only. Frozen v2 generalizes on the new fresh balanced 
 - More BFCL before scorer-unit alignment recommended: `false`.
 - Current next action: `implement_scorer_unit_aligned_result_parser_or_slice_before_more_bfcl`.
 - Boundaries: `performance_evidence=false`, `archive_updated=false`, `holdout_touched=false`, `full_suite_touched=false`.
+
+
+### ABHE-v0 Runtime Slot Scorer-Unit Matrix
+
+- Artifact: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_scorer_unit_matrix.json`
+- Scope: offline score JSONL shape parser only; no provider, no BFCL generate/evaluate, no scorer.
+- Target category: `multi_turn_miss_param`.
+- Target compact identifiers: 24; score records: 1; compact-to-score-record factor: 24.0.
+- Strict per-compact-case pairing available: `false`.
+- More BFCL before scorer-unit alignment recommended: `false`.
+- Current next action: `redesign_residual_slice_at_scorer_unit_level_or_enable_per_turn_scoring_before_more_bfcl`.
+- Boundaries: `performance_evidence=false`, `archive_updated=false`, `holdout_touched=false`, `full_suite_touched=false`.

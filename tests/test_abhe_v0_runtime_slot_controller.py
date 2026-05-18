@@ -249,3 +249,17 @@ def test_runtime_slot_scorer_unit_diagnostic_artifact_passes():
     assert report["scorer_unit_diagnostic_check_passed"] is True
     assert report["target_strict_per_compact_case_pairing_available"] is False
     assert report["performance_evidence"] is False
+
+
+def test_runtime_slot_scorer_unit_matrix_artifact_passes():
+    from scripts.build_abhe_v0_runtime_slot_scorer_unit_matrix import build
+    from scripts.check_abhe_v0_runtime_slot_scorer_unit_matrix import check
+
+    artifact = build()
+    assert artifact["performance_evidence"] is False
+    assert artifact["summary"]["target_score_record_count"] == 1
+    assert artifact["summary"]["target_compact_to_score_record_factor"] > 1
+    report = check()
+    assert report["scorer_unit_matrix_check_passed"] is True
+    assert report["target_strict_per_compact_case_pairing_available"] is False
+    assert report["performance_evidence"] is False
