@@ -263,3 +263,21 @@ def test_runtime_slot_scorer_unit_matrix_artifact_passes():
     assert report["scorer_unit_matrix_check_passed"] is True
     assert report["target_strict_per_compact_case_pairing_available"] is False
     assert report["performance_evidence"] is False
+
+
+def test_runtime_slot_per_selected_id_matrix_artifact_passes():
+    from scripts.build_abhe_v0_runtime_slot_per_selected_id_matrix import build
+    from scripts.check_abhe_v0_runtime_slot_per_selected_id_matrix import check
+
+    artifact = build()
+    assert artifact["performance_evidence"] is False
+    assert artifact["summary"]["selected_row_count"] == 48
+    assert artifact["summary"]["target_selected_compact_case_count"] == 24
+    assert artifact["summary"]["target_unique_scorer_unit_count"] == 1
+    assert artifact["summary"]["target_per_selected_id_pass_available"] is False
+    assert artifact["summary"]["target_pass_is_scorer_unit_inherited"] is True
+    report = check()
+    assert report["per_selected_id_matrix_check_passed"] is True
+    assert report["target_per_selected_id_pass_available"] is False
+    assert report["target_pass_is_scorer_unit_inherited"] is True
+    assert report["performance_evidence"] is False

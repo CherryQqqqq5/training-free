@@ -391,3 +391,17 @@ Status: bounded dev smoke only. Frozen v2 generalizes on the new fresh balanced 
 - More BFCL before scorer-unit alignment recommended: `false`.
 - Current next action: `redesign_residual_slice_at_scorer_unit_level_or_enable_per_turn_scoring_before_more_bfcl`.
 - Boundaries: `performance_evidence=false`, `archive_updated=false`, `holdout_touched=false`, `full_suite_touched=false`.
+
+
+## ABHE-v0 Runtime Slot Per-Selected-ID Matrix
+
+- artifact: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_per_selected_id_matrix.json`
+- target category: `multi_turn_miss_param`
+- selected compact identifiers: 24
+- unique scorer units: 1
+- compact-to-scorer-unit factor: 24.0
+- per-selected-id pass available: false
+- pass labels are scorer-unit inherited: true
+- performance_evidence: false
+- holdout/full_suite touched: false
+- next_required_action: `build_scorer_unit_distinct_residual_slice_or_enable_true_per_turn_scoring_before_more_bfcl`
