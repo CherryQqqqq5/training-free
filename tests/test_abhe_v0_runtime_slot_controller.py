@@ -201,3 +201,26 @@ def test_runtime_slot_controller_bindability_audit_artifact_passes():
     assert report["bindable_missing_required_arg_row_count"] == 0
     assert report["mechanism_promotion_allowed"] is False
     assert report["performance_evidence"] is False
+
+
+def test_runtime_slot_observability_plan_artifact_passes():
+    from scripts.check_abhe_v0_runtime_slot_observability_plan import check
+
+    report = check()
+    assert report["observability_plan_check_passed"] is True
+    assert report["observability_plan_ready"] is True
+    assert report["bfcl_rerun_authorized_by_this_plan"] is False
+    assert report["performance_evidence"] is False
+    assert report["next_required_action"] == "implement_pre_generation_post_decode_observability_no_provider_fixture_before_bfcl_rerun"
+
+
+def test_runtime_slot_observability_fixture_artifact_passes():
+    from scripts.check_abhe_v0_runtime_slot_observability_fixture import check
+
+    report = check()
+    assert report["observability_fixture_check_passed"] is True
+    assert report["fixture_count"] == 4
+    assert report["bind_repair_rows"] == 1
+    assert report["provider_generated_valid_call_proxy_rows"] == 1
+    assert report["no_tool_final_response_rows"] == 1
+    assert report["performance_evidence"] is False

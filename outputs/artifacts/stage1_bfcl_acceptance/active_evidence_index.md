@@ -193,7 +193,7 @@ L1 runtime behavior approval does not authorize source expansion, BFCL scorer, c
 - Scope: compact bindability audit only; no provider, BFCL generate/evaluate, scorer, holdout, or full suite.
 - Result: target traces = 7; runtime marker present = 7; slot bind repairs = 0; slot policy hits = 0; bindable missing-required-arg rows = 0.
 - Interpretation: direct slot-binding causality remains unsupported. The target traces are either no-tool-call finals or provider-generated/unrepaired tool calls with no missing required argument at the post-response repair point.
-- Current next-step authorization: fail-closed for provider/BFCL/scorer/archive/performance. Next action is `design_pre_generation_or_post_decode_observability_for_provider_generated_valid_calls_before_bfcl_rerun`.
+- Current next-step authorization: fail-closed for provider/BFCL/scorer/archive/performance. Next action is `implement_pre_generation_post_decode_observability_no_provider_fixture_before_bfcl_rerun`.
 
 ## Next Action
 
@@ -330,3 +330,21 @@ Status: bounded dev smoke only. Frozen v2 generalizes on the new fresh balanced 
 - interpretation: the runtime path can bind in a controlled no-provider fixture, but existing BFCL target traces do not present bindable missing slots to the controller. Mechanism promotion remains blocked.
 - next required action: `instrument_why_target_bfcl_requests_do_not_present_bindable_missing_slots_before_next_bfcl_run`.
 - archive_updated=false; holdout_touched=false; full_suite_touched=false; performance_evidence=false.
+
+
+## ABHE-v0 Runtime Slot Observability Plan
+
+- Artifact: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_observability_plan.json`
+- Doc: `docs/stage1_abhe_v0_runtime_slot_observability_plan.md`
+- Status: review-plan only; BFCL rerun is not authorized by this plan.
+- Boundary: no provider calls, no BFCL generate/evaluate, no scorer, no raw prompts, no raw argument values, no provider payloads, no scorer diff, no performance evidence.
+- Next required action: `implement_pre_generation_post_decode_observability_no_provider_fixture_before_bfcl_rerun`
+
+
+## ABHE-v0 Runtime Slot Observability Fixture
+
+- Artifact: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_observability_fixture.json`
+- Doc: `docs/stage1_abhe_v0_runtime_slot_observability_fixture.md`
+- Status: no-provider synthetic fixture passed. It distinguishes bind repair, provider-generated-valid-call proxy, no-tool final response, and ambiguous no-bind cases.
+- Boundary: no provider calls, no BFCL generate/evaluate, no scorer, no raw prompts, no raw argument values, no provider payloads, no scorer diff, no performance evidence.
+- Next required action: `review_observability_fixture_before_any_bfcl_rerun`
