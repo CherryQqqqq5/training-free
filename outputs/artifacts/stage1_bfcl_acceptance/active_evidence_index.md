@@ -347,4 +347,13 @@ Status: bounded dev smoke only. Frozen v2 generalizes on the new fresh balanced 
 - Doc: `docs/stage1_abhe_v0_runtime_slot_observability_fixture.md`
 - Status: no-provider synthetic fixture passed. It distinguishes bind repair, provider-generated-valid-call proxy, no-tool final response, and ambiguous no-bind cases.
 - Boundary: no provider calls, no BFCL generate/evaluate, no scorer, no raw prompts, no raw argument values, no provider payloads, no scorer diff, no performance evidence.
-- Next required action: `review_observability_fixture_before_any_bfcl_rerun`
+- Next required action: `request_bounded_bfcl_rerun_approval_with_observability_enabled`
+
+
+## ABHE-v0 Runtime Slot Observability Review
+
+- Artifact: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_observability_review.json`
+- Doc: `docs/stage1_abhe_v0_runtime_slot_observability_review.md`
+- Status: observability fixture review passed; this is not BFCL rerun approval.
+- Boundary: no provider calls, no BFCL generate/evaluate, no scorer, no raw prompts, no raw argument values, no provider payloads, no scorer diff, no performance evidence.
+- Next required action: `request_bounded_bfcl_rerun_approval_with_observability_enabled`

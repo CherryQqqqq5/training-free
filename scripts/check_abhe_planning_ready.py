@@ -41,6 +41,7 @@ from scripts.check_abhe_v0_bfcl_same_slice_rerun_stability import check as check
 from scripts.check_abhe_v0_expanded_dev_smoke_request import check as check_bfcl_expanded_dev_smoke_request
 from scripts.check_abhe_v0_runtime_slot_observability_plan import check as check_runtime_slot_observability_plan
 from scripts.check_abhe_v0_runtime_slot_observability_fixture import check as check_runtime_slot_observability_fixture
+from scripts.check_abhe_v0_runtime_slot_observability_review import check as check_runtime_slot_observability_review
 from scripts.plan_abhe_v0_bfcl_archive_transition import build_plan as build_bfcl_archive_transition
 from scripts.plan_abhe_v0_bfcl_archive_transition import synthetic_feedback as bfcl_synthetic_feedback
 
@@ -89,6 +90,7 @@ def build_report() -> Dict[str, Any]:
     bfcl_expanded_dev_smoke_request = check_bfcl_expanded_dev_smoke_request()
     runtime_slot_observability_plan = check_runtime_slot_observability_plan()
     runtime_slot_observability_fixture = check_runtime_slot_observability_fixture()
+    runtime_slot_observability_review = check_runtime_slot_observability_review()
     bfcl_archive_transition = build_bfcl_archive_transition(bfcl_synthetic_feedback(), synthetic_fixture_only=True)
     transition_blockers = validate_transition(Namespace(
         entry_id="state_tracking_v0",
@@ -179,6 +181,8 @@ def build_report() -> Dict[str, Any]:
         blockers.extend(_prefixed("runtime_slot_observability_plan", runtime_slot_observability_plan.get("blockers", [])))
     if not runtime_slot_observability_fixture.get("observability_fixture_check_passed"):
         blockers.extend(_prefixed("runtime_slot_observability_fixture", runtime_slot_observability_fixture.get("blockers", [])))
+    if not runtime_slot_observability_review.get("observability_review_check_passed"):
+        blockers.extend(_prefixed("runtime_slot_observability_review", runtime_slot_observability_review.get("blockers", [])))
 
     execution_authorized = False
     scorer_authorized = False
@@ -225,6 +229,7 @@ def build_report() -> Dict[str, Any]:
         "abhe_v0_expanded_dev_smoke_request_ready": bfcl_expanded_dev_smoke_request.get("abhe_v0_expanded_dev_smoke_request_passed") is True,
         "abhe_v0_runtime_slot_observability_plan_ready": runtime_slot_observability_plan.get("observability_plan_check_passed") is True,
         "abhe_v0_runtime_slot_observability_fixture_ready": runtime_slot_observability_fixture.get("observability_fixture_check_passed") is True,
+        "abhe_v0_runtime_slot_observability_review_ready": runtime_slot_observability_review.get("observability_review_check_passed") is True,
         "no_leakage_boundary_passed": leakage["abhe_no_leakage_boundary_passed"],
         "execution_authorized": execution_authorized,
         "scorer_authorized": scorer_authorized,
@@ -237,7 +242,7 @@ def build_report() -> Dict[str, Any]:
         "candidate_pool_ready": False,
         "sota_3pp_claim_ready": False,
         "huawei_acceptance_ready": False,
-        "next_required_action": "review_observability_fixture_before_any_bfcl_rerun",
+        "next_required_action": "request_bounded_bfcl_rerun_approval_with_observability_enabled",
         "component_paths": {
             "trace_packet": str(trace_packet["packet_path"]),
             "dev_smoke_packet": str(dev_smoke_packet["packet_path"]),
@@ -277,6 +282,7 @@ def build_report() -> Dict[str, Any]:
             "abhe_v0_bfcl_archive_transition_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_archive_transition_plan.json",
             "abhe_v0_runtime_slot_observability_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_observability_plan.json",
             "abhe_v0_runtime_slot_observability_fixture": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_observability_fixture.json",
+            "abhe_v0_runtime_slot_observability_review": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_observability_review.json",
         },
         "component_summaries": {
             "archive_policy": archive,
@@ -313,6 +319,7 @@ def build_report() -> Dict[str, Any]:
             "abhe_v0_bfcl_archive_transition": bfcl_archive_transition,
             "abhe_v0_runtime_slot_observability_plan": runtime_slot_observability_plan,
             "abhe_v0_runtime_slot_observability_fixture": runtime_slot_observability_fixture,
+            "abhe_v0_runtime_slot_observability_review": runtime_slot_observability_review,
             "no_leakage": leakage,
         },
         "blockers": sorted(set(blockers)),

@@ -37,6 +37,7 @@ from scripts.check_abhe_v0_bfcl_same_slice_rerun_stability import check as check
 from scripts.check_abhe_v0_expanded_dev_smoke_request import check as check_bfcl_expanded_dev_smoke_request
 from scripts.check_abhe_v0_runtime_slot_observability_plan import check as check_runtime_slot_observability_plan
 from scripts.check_abhe_v0_runtime_slot_observability_fixture import check as check_runtime_slot_observability_fixture
+from scripts.check_abhe_v0_runtime_slot_observability_review import check as check_runtime_slot_observability_review
 from scripts.plan_abhe_v0_bfcl_archive_transition import build_plan as build_bfcl_archive_transition
 from scripts.plan_abhe_v0_bfcl_archive_transition import synthetic_feedback as bfcl_synthetic_feedback
 
@@ -58,6 +59,7 @@ RUNTIME_SLOT_PATH_REPLAY_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/a
 RUNTIME_SLOT_BINDABILITY_AUDIT_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_bindability_audit_v1.json")
 RUNTIME_SLOT_OBSERVABILITY_PLAN_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_observability_plan.json")
 RUNTIME_SLOT_OBSERVABILITY_FIXTURE_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_observability_fixture.json")
+RUNTIME_SLOT_OBSERVABILITY_REVIEW_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_observability_review.json")
 RUNTIME_SLOT_RESIDUAL_TRANSITION_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_archive_transition_dry_run.json")
 FORCED_FALSE_FIELDS = {
     "execution_authorized",
@@ -143,6 +145,7 @@ def build_bundle() -> Dict[str, Any]:
     runtime_slot_bindability_audit = _load_json(RUNTIME_SLOT_BINDABILITY_AUDIT_PATH)
     runtime_slot_observability_plan = check_runtime_slot_observability_plan()
     runtime_slot_observability_fixture = check_runtime_slot_observability_fixture()
+    runtime_slot_observability_review = check_runtime_slot_observability_review()
     runtime_slot_residual_transition = _load_json(RUNTIME_SLOT_RESIDUAL_TRANSITION_PATH)
     transition_blockers = validate_transition(Namespace(
         entry_id="state_tracking_v0",
@@ -222,6 +225,8 @@ def build_bundle() -> Dict[str, Any]:
         "abhe_v0_runtime_slot_observability_plan_ready": runtime_slot_observability_plan.get("observability_plan_check_passed") is True,
         "abhe_v0_runtime_slot_observability_fixture_ready": runtime_slot_observability_fixture.get("observability_fixture_check_passed") is True,
         "abhe_v0_runtime_slot_observability_fixture_bind_repair_rows": runtime_slot_observability_fixture.get("bind_repair_rows"),
+        "abhe_v0_runtime_slot_observability_review_ready": runtime_slot_observability_review.get("observability_review_check_passed") is True,
+        "abhe_v0_runtime_slot_observability_review_next_required_action": runtime_slot_observability_review.get("next_required_action"),
         "abhe_v0_runtime_slot_observability_plan_next_required_action": runtime_slot_observability_plan.get("next_required_action"),
         "approval_chain_ready_for_review": approval_chain.get("abhe_approval_chain_ready_for_review") is True,
         "no_leakage_status": leakage.get("abhe_no_leakage_boundary_passed") is True,
@@ -275,6 +280,7 @@ def build_bundle() -> Dict[str, Any]:
             "abhe_v0_runtime_slot_controller_path_replay": str(RUNTIME_SLOT_PATH_REPLAY_PATH),
             "abhe_v0_runtime_slot_observability_plan": str(RUNTIME_SLOT_OBSERVABILITY_PLAN_PATH),
             "abhe_v0_runtime_slot_observability_fixture": str(RUNTIME_SLOT_OBSERVABILITY_FIXTURE_PATH),
+            "abhe_v0_runtime_slot_observability_review": str(RUNTIME_SLOT_OBSERVABILITY_REVIEW_PATH),
             "abhe_v0_runtime_slot_controller_archive_transition_dry_run": str(RUNTIME_SLOT_RESIDUAL_TRANSITION_PATH),
         },
         "component_summaries": {
@@ -360,12 +366,13 @@ def build_bundle() -> Dict[str, Any]:
             ]),
             "abhe_v0_runtime_slot_observability_plan": runtime_slot_observability_plan,
             "abhe_v0_runtime_slot_observability_fixture": runtime_slot_observability_fixture,
+            "abhe_v0_runtime_slot_observability_review": runtime_slot_observability_review,
             "abhe_v0_runtime_slot_residual_archive_transition": runtime_slot_residual_transition,
             "abhe_v0_bfcl_archive_transition": bfcl_archive_transition,
             "no_leakage": _summary(leakage, ["abhe_no_leakage_boundary_passed", "report_scope"]),
         },
         "commit": _current_commit(),
-        "next_required_action": "review_observability_fixture_before_any_bfcl_rerun",
+        "next_required_action": "request_bounded_bfcl_rerun_approval_with_observability_enabled",
     }
     blockers = validate_bundle(bundle)
     bundle["abhe_review_bundle_ready"] = not blockers
@@ -410,6 +417,7 @@ def validate_bundle(bundle: Dict[str, Any]) -> List[str]:
         "abhe_v0_bfcl_archive_transition_ready",
         "abhe_v0_runtime_slot_observability_plan_ready",
         "abhe_v0_runtime_slot_observability_fixture_ready",
+        "abhe_v0_runtime_slot_observability_review_ready",
         "approval_chain_ready_for_review",
         "no_leakage_status",
     ]

@@ -224,3 +224,14 @@ def test_runtime_slot_observability_fixture_artifact_passes():
     assert report["provider_generated_valid_call_proxy_rows"] == 1
     assert report["no_tool_final_response_rows"] == 1
     assert report["performance_evidence"] is False
+
+
+def test_runtime_slot_observability_review_artifact_passes():
+    from scripts.check_abhe_v0_runtime_slot_observability_review import check
+
+    report = check()
+    assert report["observability_review_check_passed"] is True
+    assert report["observability_review_passed"] is True
+    assert report["bfcl_rerun_authorized"] is False
+    assert report["performance_evidence"] is False
+    assert report["next_required_action"] == "request_bounded_bfcl_rerun_approval_with_observability_enabled"
