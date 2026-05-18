@@ -306,3 +306,17 @@ Status: bounded dev smoke only. Frozen v2 generalizes on the new fresh balanced 
 - interpretation: score-positive diagnostic remains real, but direct slot-binding causality is not supported by observed trace telemetry. Runtime marker / validator path effects, provider variability, and scorer-unit aggregation remain plausible.
 - next required action: `run_no_provider_proxy_fixture_and_same_request_noop_replay_before_promoting_runtime_slot_controller_v2`.
 - archive_updated=false; holdout_touched=false; full_suite_touched=false; performance_evidence=false.
+
+## ABHE-v0 Runtime Slot Controller Path Replay
+
+- artifact: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_path_replay.json`
+- scope: no-provider proxy fixture and same-request no-op replay only.
+- proxy fixture runtime path confirmed: true.
+- proxy fixture slot bind repair count: 1.
+- same-request target trace replay count: 7.
+- same-request runtime slot bind repair count: 0.
+- same-request runtime slot policy hit count: 0.
+- same-request argument keyset changed count: 0.
+- interpretation: the runtime path can bind in a controlled no-provider fixture, but existing BFCL target traces do not present bindable missing slots to the controller. Mechanism promotion remains blocked.
+- next required action: `instrument_why_target_bfcl_requests_do_not_present_bindable_missing_slots_before_next_bfcl_run`.
+- archive_updated=false; holdout_touched=false; full_suite_touched=false; performance_evidence=false.

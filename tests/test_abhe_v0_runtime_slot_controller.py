@@ -179,3 +179,13 @@ def test_engine_runtime_slot_controller_refuses_ambiguous_binding(tmp_path):
     assert "party_size" not in final_args
     assert not any(repair.get("kind") == "abhe_runtime_slot_controller_v2_bind_required_slot" for repair in repairs)
     assert validation.issues
+
+
+def test_runtime_slot_controller_path_replay_artifact_passes():
+    from scripts.check_abhe_v0_runtime_slot_controller_path_replay import check
+
+    report = check()
+    assert report["path_replay_check_passed"] is True
+    assert report["proxy_fixture_runtime_path_confirmed"] is True
+    assert report["same_request_noop_replay_confirmed"] is True
+    assert report["performance_evidence"] is False
