@@ -242,7 +242,7 @@ def build_report() -> Dict[str, Any]:
         "candidate_pool_ready": False,
         "sota_3pp_claim_ready": False,
         "huawei_acceptance_ready": False,
-        "next_required_action": "request_bounded_bfcl_rerun_approval_with_observability_enabled",
+        "next_required_action": review_bundle.get("next_required_action") or "build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl",
         "component_paths": {
             "trace_packet": str(trace_packet["packet_path"]),
             "dev_smoke_packet": str(dev_smoke_packet["packet_path"]),

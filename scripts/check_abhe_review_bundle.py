@@ -221,7 +221,8 @@ def build_bundle() -> Dict[str, Any]:
         "abhe_v0_runtime_slot_residual_performance_evidence": runtime_slot_residual_failure.get("performance_evidence") is True,
         "abhe_v0_runtime_slot_residual_target_delta": (runtime_slot_residual_failure.get("summary") or {}).get("multi_turn_miss_param_delta_vs_conditional_frozen_v2"),
         "abhe_v0_runtime_slot_residual_bind_repair_count": (runtime_slot_residual_failure.get("summary") or {}).get("slot_bind_repair_count"),
-        "abhe_v0_runtime_slot_residual_next_required_action": "implement_pre_generation_post_decode_observability_no_provider_fixture_before_bfcl_rerun",
+        "abhe_v0_runtime_slot_residual_next_required_action": (runtime_slot_residual_failure.get("measurement_diagnosis") or {}).get("next_required_action") or "build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl",
+        "abhe_v0_runtime_slot_residual_measurement_diagnosis": runtime_slot_residual_failure.get("measurement_diagnosis"),
         "abhe_v0_runtime_slot_observability_plan_ready": runtime_slot_observability_plan.get("observability_plan_check_passed") is True,
         "abhe_v0_runtime_slot_observability_fixture_ready": runtime_slot_observability_fixture.get("observability_fixture_check_passed") is True,
         "abhe_v0_runtime_slot_observability_fixture_bind_repair_rows": runtime_slot_observability_fixture.get("bind_repair_rows"),
@@ -372,7 +373,7 @@ def build_bundle() -> Dict[str, Any]:
             "no_leakage": _summary(leakage, ["abhe_no_leakage_boundary_passed", "report_scope"]),
         },
         "commit": _current_commit(),
-        "next_required_action": "request_bounded_bfcl_rerun_approval_with_observability_enabled",
+        "next_required_action": (runtime_slot_residual_failure.get("measurement_diagnosis") or {}).get("next_required_action") or "build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl",
     }
     blockers = validate_bundle(bundle)
     bundle["abhe_review_bundle_ready"] = not blockers

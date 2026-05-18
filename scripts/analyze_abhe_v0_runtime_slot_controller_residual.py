@@ -101,8 +101,14 @@ def build() -> Dict[str, Any]:
     audit = _load(TRACE_AUDIT) if TRACE_AUDIT.exists() else {}
     audit_summary = audit.get("summary") if isinstance(audit.get("summary"), dict) else {}
     runtime_audit = audit_summary.get("runtime_slot_controller_v2") if isinstance(audit_summary.get("runtime_slot_controller_v2"), dict) else {}
+    runtime_categories = runtime_audit.get("category_summary") if isinstance(runtime_audit.get("category_summary"), dict) else {}
+    target_runtime_audit = runtime_categories.get(TARGET_CATEGORY) if isinstance(runtime_categories.get(TARGET_CATEGORY), dict) else {}
     slot_bind_repair_count = int(runtime_audit.get("slot_bind_repair_count") or 0)
     controller_enabled_patch_count = int(runtime_audit.get("slot_controller_enabled_patch_count") or 0)
+    target_missing_required_before_repair = int(target_runtime_audit.get("post_decode_missing_required_arg_count_before_repair") or 0)
+    target_provider_valid_proxy_count = int(target_runtime_audit.get("post_decode_provider_generated_valid_call_proxy_count") or 0)
+    target_argument_keyset_changed_count = int(target_runtime_audit.get("post_response_argument_keyset_changed_by_repair_count") or 0)
+    target_sampled_trace_count = int(target_runtime_audit.get("sampled_artifact_count") or 0)
     non_target_regression = 0
     for category in categories:
         if category == TARGET_CATEGORY:
@@ -124,6 +130,10 @@ def build() -> Dict[str, Any]:
         "slot_controller_enabled_patch_count": controller_enabled_patch_count,
         "fixed_count": max(0, total("runtime_slot_controller_v2") - total("conditional_frozen_v2")),
         "regressed_count": max(0, total("conditional_frozen_v2") - total("runtime_slot_controller_v2")),
+        "target_post_decode_missing_required_arg_count_before_repair": target_missing_required_before_repair,
+        "target_provider_generated_valid_call_proxy_count": target_provider_valid_proxy_count,
+        "target_argument_keyset_changed_by_repair_count": target_argument_keyset_changed_count,
+        "target_sampled_trace_artifact_count": target_sampled_trace_count,
     }
     matrix = {
         "artifact_kind": "abhe_v0_runtime_slot_controller_residual_paired_case_matrix",
@@ -154,6 +164,31 @@ def build() -> Dict[str, Any]:
         key_findings.append("runtime_slot_controller_v2_regressed_target_bucket")
     if non_target_regression:
         key_findings.append("runtime_slot_controller_v2_has_non_target_regression")
+    if target_missing_required_before_repair == 0:
+        key_findings.append("target_traces_do_not_present_missing_required_args_before_repair")
+    if slot_bind_repair_count == 0 and controller_enabled_patch_count > 0:
+        key_findings.append("runtime_slot_controller_v2_enabled_but_noop_on_target_traces")
+    target_cat = _cat(arms.get("runtime_slot_controller_v2"), TARGET_CATEGORY)
+    measurement_diagnosis = {
+        "selected_compact_case_count": manifest.get("selected_case_count"),
+        "target_selected_compact_case_count": (manifest.get("case_count_by_category") or {}).get(TARGET_CATEGORY),
+        "target_unique_scorer_unit_count": target_cat.get("unique_scorer_unit_count"),
+        "target_sampled_trace_artifact_count": target_sampled_trace_count,
+        "strict_per_compact_case_paired_available": False,
+        "strict_scorer_unit_paired_available": True,
+        "target_post_decode_missing_required_arg_count_before_repair": target_missing_required_before_repair,
+        "target_provider_generated_valid_call_proxy_count": target_provider_valid_proxy_count,
+        "target_argument_keyset_changed_by_repair_count": target_argument_keyset_changed_count,
+        "runtime_slot_bind_repair_count": slot_bind_repair_count,
+        "runtime_slot_controller_enabled_patch_count": controller_enabled_patch_count,
+        "root_cause_hypotheses": [
+            "selected_compact_rows_collapse_to_few_bfcl_scorer_units",
+            "miss_param_failure_not_exposed_as_missing_required_argument_in_post_decode_traces",
+            "runtime_slot_controller_v2_marker_is_noop_without_bindable_missing_slots",
+            "remaining_failures_include_post_tool_or_function_shape_semantics_not_slot_binding",
+        ],
+        "next_required_action": "build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl",
+    }
     failure = {
         "artifact_kind": "abhe_v0_runtime_slot_controller_residual_failure_analysis",
         "schema_version": "abhe_v0_runtime_slot_controller_residual_failure_analysis_v0",
@@ -163,6 +198,7 @@ def build() -> Dict[str, Any]:
         "key_findings": key_findings,
         "scorer_unit_rows": scorer_rows,
         "summary": summary,
+        "measurement_diagnosis": measurement_diagnosis,
         "hard_gates": {
             "leakage_count": 0,
             "raw_material_absent": True,
@@ -193,6 +229,7 @@ def build() -> Dict[str, Any]:
         ],
         "archive_updated": False,
         "does_not_update_archive": True,
+        "next_required_action": "build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl",
         "performance_evidence": False,
         "holdout_touched": False,
         "full_suite_touched": False,

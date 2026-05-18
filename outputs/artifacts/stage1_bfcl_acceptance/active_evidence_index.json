@@ -436,37 +436,29 @@
     "artifact_kind": "abhe_v0_runtime_slot_controller_bindability_audit_v1",
     "artifact_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_bindability_audit_v1.json",
     "bindable_missing_required_arg_row_count": 0,
-    "direct_slot_binding_causality_supported": false,
+    "direct_slot_binding_causality_supported": null,
     "full_suite_touched": false,
     "holdout_touched": false,
     "mechanism_promotion_allowed": false,
-    "next_required_action": "implement_pre_generation_post_decode_observability_no_provider_fixture_before_bfcl_rerun",
+    "next_required_action": "build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl",
     "performance_evidence": false,
-    "runtime_marker_present_count": 7,
     "slot_bind_repair_count": 0,
-    "slot_policy_hit_count": 0,
     "target_category": "multi_turn_miss_param",
-    "target_trace_row_count": 7
+    "target_trace_row_count": 8
   },
   "abhe_v0_runtime_slot_controller_causality_status": {
     "binder_causality_confirmed": false,
     "causality_audit_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_causality_audit.json",
-    "developer_guidance_hash_equal_for_target": true,
     "full_suite_touched": false,
     "holdout_touched": false,
-    "next_required_action": "run_no_provider_proxy_fixture_and_same_request_noop_replay_before_promoting_runtime_slot_controller_v2",
-    "overall_assessment": "score_gain_real_but_binder_causality_not_confirmed",
+    "next_required_action": "build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl",
+    "overall_assessment": "no_confirmed_target_score_gain",
     "performance_evidence": false,
-    "raw_material_absent": true,
-    "runtime_existing_validator_repair_present_count": 3,
-    "runtime_marker_noop_count": 41,
-    "runtime_provider_generated_valid_call_proxy_count": 27,
+    "runtime_marker_noop_count": 42,
+    "runtime_provider_generated_valid_call_proxy_count": 23,
     "runtime_slot_bind_repair_count": 0,
-    "runtime_slot_policy_hit_count": 0,
-    "runtime_trace_artifact_count": 43,
     "scorer_unit_aggregation_caveat": "category_level_single_scorer_unit_for_target",
-    "target_primary_assessment": "score_positive_but_direct_slot_bind_causality_not_supported",
-    "target_score_delta_vs_conditional_frozen_v2": 24
+    "target_score_delta_vs_conditional_frozen_v2": 0
   },
   "abhe_v0_runtime_slot_controller_diagnostic_status": {
     "archive_updated": false,
@@ -545,37 +537,58 @@
     "archive_updated": false,
     "arm_compact_metrics": {
       "baseline": {
-        "accuracy": 0.208333,
+        "accuracy": 0.125,
         "case_count": 48,
         "cost": 0.0,
-        "latency": 12067.674179077148,
-        "passed_count": 10
+        "latency": 30047.43676185608,
+        "passed_count": 6
       },
       "conditional_frozen_v2": {
-        "accuracy": 0.208333,
+        "accuracy": 0.083333,
         "case_count": 48,
         "cost": 0.0,
-        "latency": 13464.820547103882,
-        "passed_count": 10
+        "latency": 22351.49179458618,
+        "passed_count": 4
       },
       "runtime_slot_controller_v2": {
-        "accuracy": 0.708333,
+        "accuracy": 0.083333,
         "case_count": 48,
         "cost": 0.0,
-        "latency": 13756.236448287964,
-        "passed_count": 34
+        "latency": 21513.773260116577,
+        "passed_count": 4
       }
     },
-    "controller_enabled_patch_count": 41,
+    "controller_enabled_patch_count": 42,
     "full_suite_touched": false,
     "holdout_touched": false,
-    "mechanism_attribution": "unconfirmed_score_positive_no_bind_repair_observed",
-    "next_required_action": "confirm_mechanism_with_actual_bind_repairs_before_promotion",
+    "measurement_diagnosis": {
+      "next_required_action": "build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl",
+      "root_cause_hypotheses": [
+        "selected_compact_rows_collapse_to_few_bfcl_scorer_units",
+        "miss_param_failure_not_exposed_as_missing_required_argument_in_post_decode_traces",
+        "runtime_slot_controller_v2_marker_is_noop_without_bindable_missing_slots",
+        "remaining_failures_include_post_tool_or_function_shape_semantics_not_slot_binding"
+      ],
+      "runtime_slot_bind_repair_count": 0,
+      "runtime_slot_controller_enabled_patch_count": 42,
+      "selected_compact_case_count": 48,
+      "strict_per_compact_case_paired_available": false,
+      "strict_scorer_unit_paired_available": true,
+      "target_argument_keyset_changed_by_repair_count": 0,
+      "target_post_decode_missing_required_arg_count_before_repair": 0,
+      "target_provider_generated_valid_call_proxy_count": 5,
+      "target_sampled_trace_artifact_count": 8,
+      "target_selected_compact_case_count": 24,
+      "target_unique_scorer_unit_count": 1
+    },
+    "mechanism_attribution": "no_independent_score_signal_no_bind_repair_observed",
+    "next_required_action": "build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl",
     "performance_evidence": false,
     "selected_case_count": 48,
     "selected_case_ids_hash": "sha256:9b26ba3d24c54562f6a5058877a24f15d2e4ef71ee9ea781bcae168307f7d14c",
     "slot_bind_repair_count": 0,
-    "target_delta_vs_conditional_frozen_v2": 24
+    "target_delta_vs_conditional_frozen_v2": 0,
+    "target_post_decode_missing_required_arg_count_before_repair": 0
   },
   "abhe_v0_runtime_slot_observability_fixture_status": {
     "artifact_kind": "abhe_v0_runtime_slot_observability_fixture",
@@ -957,12 +970,12 @@
   "index_updated_for_evidence_through_commit": "61611b98",
   "index_updated_for_evidence_through_commit_note": "61611b98 is the latest referenced evidence/documentation commit indexed here: it added the negative evidence report and aligned performance readiness. Later provenance-only commits are intentionally not recorded as current index commits to avoid self-referential churn.",
   "latest_committed_cleanup": "see git HEAD",
-  "latest_conclusion": "ABHE-v0 same-slice rerun is stable enough for expanded dev review, not full BFCL. Baseline 8/20, candidate 18/20, strict scorer-unit fixed=3, scaled compact fixed=10, regressed=0; live_irrelevance signal changed between runs and requires split/expanded verification.",
+  "latest_conclusion": "runtime_slot_controller_v2_no_independent_miss_param_signal; scorer-unit aligned residual diagnostic required before more BFCL",
   "latest_hygiene_source_head": "b94855e0",
   "main_merge_completed": true,
   "negative_evidence_report": "docs/stage1_bfcl_negative_evidence_report.md",
-  "next_action": "request_bounded_bfcl_rerun_approval_with_observability_enabled",
-  "next_required_action": "request_bounded_bfcl_rerun_approval_with_observability_enabled",
+  "next_action": "build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl",
+  "next_required_action": "build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl",
   "no_bfcl_3pp_evidence_yet": true,
   "non_self_referential_provenance": true,
   "optional_diagnostic_counter_fields": [

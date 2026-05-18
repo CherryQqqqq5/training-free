@@ -193,7 +193,7 @@ L1 runtime behavior approval does not authorize source expansion, BFCL scorer, c
 - Scope: compact bindability audit only; no provider, BFCL generate/evaluate, scorer, holdout, or full suite.
 - Result: target traces = 7; runtime marker present = 7; slot bind repairs = 0; slot policy hits = 0; bindable missing-required-arg rows = 0.
 - Interpretation: direct slot-binding causality remains unsupported. The target traces are either no-tool-call finals or provider-generated/unrepaired tool calls with no missing required argument at the post-response repair point.
-- Current next-step authorization: fail-closed for provider/BFCL/scorer/archive/performance. Next action is `implement_pre_generation_post_decode_observability_no_provider_fixture_before_bfcl_rerun`.
+- Current next-step authorization: fail-closed for provider/BFCL/scorer/archive/performance. Next action is `build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl`.
 
 ## Next Action
 
@@ -338,7 +338,7 @@ Status: bounded dev smoke only. Frozen v2 generalizes on the new fresh balanced 
 - Doc: `docs/stage1_abhe_v0_runtime_slot_observability_plan.md`
 - Status: review-plan only; BFCL rerun is not authorized by this plan.
 - Boundary: no provider calls, no BFCL generate/evaluate, no scorer, no raw prompts, no raw argument values, no provider payloads, no scorer diff, no performance evidence.
-- Next required action: `implement_pre_generation_post_decode_observability_no_provider_fixture_before_bfcl_rerun`
+- Next required action: `build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl`
 
 
 ## ABHE-v0 Runtime Slot Observability Fixture
@@ -347,7 +347,7 @@ Status: bounded dev smoke only. Frozen v2 generalizes on the new fresh balanced 
 - Doc: `docs/stage1_abhe_v0_runtime_slot_observability_fixture.md`
 - Status: no-provider synthetic fixture passed. It distinguishes bind repair, provider-generated-valid-call proxy, no-tool final response, and ambiguous no-bind cases.
 - Boundary: no provider calls, no BFCL generate/evaluate, no scorer, no raw prompts, no raw argument values, no provider payloads, no scorer diff, no performance evidence.
-- Next required action: `request_bounded_bfcl_rerun_approval_with_observability_enabled`
+- Next required action: `build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl`
 
 
 ## ABHE-v0 Runtime Slot Observability Review
@@ -356,4 +356,14 @@ Status: bounded dev smoke only. Frozen v2 generalizes on the new fresh balanced 
 - Doc: `docs/stage1_abhe_v0_runtime_slot_observability_review.md`
 - Status: observability fixture review passed; this is not BFCL rerun approval.
 - Boundary: no provider calls, no BFCL generate/evaluate, no scorer, no raw prompts, no raw argument values, no provider payloads, no scorer diff, no performance evidence.
-- Next required action: `request_bounded_bfcl_rerun_approval_with_observability_enabled`
+- Next required action: `build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl`
+
+
+### ABHE-v0 Runtime Slot Observability Rerun (Current)
+
+- Bounded residual BFCL rerun completed with observability-derived compact audit only.
+- Result: baseline 6/48, conditional_frozen_v2 4/48, runtime_slot_controller_v2 4/48.
+- Target `multi_turn_miss_param`: 0 delta vs conditional_frozen_v2; slot bind repair count 0.
+- Measurement caveat: 24 target compact identifiers collapse to 1 BFCL scorer unit and 8 trace artifacts; strict per-compact-case pairing remains unavailable.
+- Current next action: `build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl`.
+- Boundaries: `performance_evidence=false`, `archive_updated=false`, `holdout_touched=false`, `full_suite_touched=false`.
