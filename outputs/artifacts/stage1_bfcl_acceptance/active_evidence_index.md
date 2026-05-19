@@ -537,3 +537,24 @@ Status: bounded dev smoke only. Frozen v2 generalizes on the new fresh balanced 
 - provider_calls_made / bfcl_generate_called / bfcl_evaluate_called / scorer_called: `false`
 - performance_evidence: `false`
 - next_required_action: `request_reduced_batch_retry_approval_packet_after_provider_stability_preflight_and_dry_run_review`
+
+
+### ABHE runtime-slot dataset extraction audit
+
+- Path: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_dataset_extraction_audit.json`
+- Scope: offline BFCL dataset extraction audit only; no provider, BFCL generate/evaluate, or scorer.
+- Target category: `multi_turn_miss_param`.
+- Dataset unique scorer-unit count for target: 200.
+- Reduced batch selected count: 6, with one-to-one run-id mapping confirmed by counts only.
+- Dataset-only audit does not provide true per-selected or per-turn scoring labels; scorer output contract remains required.
+- `performance_evidence=false`, `holdout_touched=false`, `full_suite_touched=false`.
+
+
+### ABHE runtime-slot reduced batch alignment ledger
+
+- Path: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_reduced_batch_alignment_ledger.json`
+- Scope: offline dataset-side scorer-unit alignment only; no provider, BFCL generate/evaluate, or scorer.
+- Reduced hash: `sha256:aa341bfc1d78a406f9f3a25967a03d88849dc42fc64e49625eae1993f33ddece`.
+- Selected count: 6; mapped run-id count: 6; unique run-id count: 6; duplicate count: 0.
+- The ledger does not persist raw run ids or raw run-id hashes and does not provide per-selected/per-turn scorer labels.
+- `performance_evidence=false`, `holdout_touched=false`, `full_suite_touched=false`.

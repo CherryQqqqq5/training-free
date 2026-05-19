@@ -484,3 +484,53 @@ def test_runtime_slot_reduced_batch_runner_dry_run_stays_non_executing(tmp_path)
     assert check_report["reduced_batch_dry_run_manifest_passed"] is True
     assert check_report["provider_calls_made"] is False
     assert check_report["performance_evidence"] is False
+
+
+def test_runtime_slot_dataset_extraction_audit_artifact_passes():
+    from pathlib import Path
+    from scripts.build_abhe_v0_runtime_slot_dataset_extraction_audit import OUTPUT, build
+    from scripts.check_abhe_v0_runtime_slot_dataset_extraction_audit import check
+
+    before = Path(OUTPUT).read_text(encoding="utf-8")
+    artifact = build()
+    assert Path(OUTPUT).read_text(encoding="utf-8") == before
+    assert artifact["dataset_extraction_audit_ready"] is True
+    assert artifact["authorized"] is False
+    assert artifact["target_category"] == "multi_turn_miss_param"
+    assert artifact["target_dataset_unique_scorer_unit_count"] >= artifact["target_requested_distinct_count"]
+    assert artifact["reduced_batch_manifest_mapping"]["mapping_one_to_one"] is True
+    assert artifact["reduced_batch_manifest_mapping"]["selected_case_count"] == 6
+    assert artifact["true_per_selected_id_scoring_available_from_dataset_only"] is False
+    assert artifact["scorer_output_contract_still_required"] is True
+    assert artifact["performance_evidence"] is False
+    report = check()
+    assert report["dataset_extraction_audit_check_passed"] is True
+    assert report["dataset_extraction_audit_ready"] is True
+    assert report["reduced_batch_selected_case_count"] == 6
+    assert report["performance_evidence"] is False
+
+
+def test_runtime_slot_reduced_batch_alignment_ledger_artifact_passes():
+    from pathlib import Path
+    from scripts.build_abhe_v0_runtime_slot_reduced_batch_alignment_ledger import OUTPUT, build
+    from scripts.check_abhe_v0_runtime_slot_reduced_batch_alignment_ledger import check
+
+    before = Path(OUTPUT).read_text(encoding="utf-8")
+    artifact = build()
+    assert Path(OUTPUT).read_text(encoding="utf-8") == before
+    assert artifact["alignment_ledger_ready"] is True
+    assert artifact["authorized"] is False
+    assert artifact["approved_packet_present"] is False
+    assert artifact["selected_case_count"] == 6
+    assert artifact["mapped_run_id_count"] == 6
+    assert artifact["unique_run_id_count"] == 6
+    assert artifact["duplicate_run_id_count"] == 0
+    assert artifact["per_selected_valid_labels_available"] is False
+    assert artifact["performance_evidence"] is False
+    assert all("case_identifier_hash" not in row for row in artifact["rows"])
+    assert all("scorer_unit_hash" not in row for row in artifact["rows"])
+    report = check()
+    assert report["alignment_ledger_check_passed"] is True
+    assert report["alignment_ledger_ready"] is True
+    assert report["selected_case_count"] == 6
+    assert report["performance_evidence"] is False

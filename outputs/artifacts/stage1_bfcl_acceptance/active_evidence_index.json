@@ -632,6 +632,19 @@
     "target_post_decode_missing_required_arg_count_before_repair": 0,
     "target_selected_scorer_unit_count": 24
   },
+  "abhe_v0_runtime_slot_dataset_extraction_audit_status": {
+    "dataset_extraction_audit_ready": true,
+    "path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_dataset_extraction_audit.json",
+    "performance_evidence": false,
+    "reduced_batch_mapping_one_to_one": true,
+    "reduced_batch_selected_case_count": 6,
+    "scorer_output_contract_still_required": true,
+    "target_category": "multi_turn_miss_param",
+    "target_dataset_unique_scorer_unit_count": 200,
+    "target_requested_distinct_count": 24,
+    "true_per_selected_id_scoring_available_from_dataset_only": false,
+    "true_per_turn_scoring_available_from_dataset_only": false
+  },
   "abhe_v0_runtime_slot_distinct_rerun_approval_status": {
     "approval_scope": "scorer_unit_distinct_bounded_residual_dev_smoke_only",
     "approval_status": "approved",
@@ -877,6 +890,18 @@
     "target_per_selected_id_pass_available": false,
     "target_selected_compact_case_count": 24,
     "target_unique_scorer_unit_count": 1
+  },
+  "abhe_v0_runtime_slot_reduced_batch_alignment_ledger_status": {
+    "alignment_ledger_ready": true,
+    "duplicate_run_id_count": 0,
+    "mapped_run_id_count": 6,
+    "path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_reduced_batch_alignment_ledger.json",
+    "per_selected_valid_labels_available": false,
+    "per_turn_valid_labels_available": false,
+    "performance_evidence": false,
+    "selected_case_count": 6,
+    "selected_case_ids_hash": "sha256:aa341bfc1d78a406f9f3a25967a03d88849dc42fc64e49625eae1993f33ddece",
+    "unique_run_id_count": 6
   },
   "abhe_v0_runtime_slot_reduced_batch_dry_run_status": {
     "artifact": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_reduced_batch_retry_dry_run_manifest.json",
@@ -1167,12 +1192,14 @@
     "abhe_v0_runtime_slot_controller_sanitized_trace_audit": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_sanitized_trace_audit.json",
     "abhe_v0_runtime_slot_controller_scorer_unit_distinct_slice_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_scorer_unit_distinct_slice_plan.json",
     "abhe_v0_runtime_slot_controller_scoring_contract_audit": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_scoring_contract_audit.json",
+    "abhe_v0_runtime_slot_dataset_extraction_audit": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_dataset_extraction_audit.json",
     "abhe_v0_runtime_slot_observability_fixture": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_observability_fixture.json",
     "abhe_v0_runtime_slot_observability_fixture_doc": "docs/stage1_abhe_v0_runtime_slot_observability_fixture.md",
     "abhe_v0_runtime_slot_observability_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_observability_plan.json",
     "abhe_v0_runtime_slot_observability_plan_doc": "docs/stage1_abhe_v0_runtime_slot_observability_plan.md",
     "abhe_v0_runtime_slot_observability_review": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_observability_review.json",
     "abhe_v0_runtime_slot_observability_review_doc": "docs/stage1_abhe_v0_runtime_slot_observability_review.md",
+    "abhe_v0_runtime_slot_reduced_batch_alignment_ledger": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_reduced_batch_alignment_ledger.json",
     "abhe_v0_simple_candidate_specs": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_simple_candidate_specs.json",
     "abhe_v0_simple_closed_loop_doc": "docs/stage1_abhe_v0_simple_closed_loop.md",
     "abhe_v0_synthetic_dev_feedback": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_synthetic_dev_feedback.json",
@@ -1410,7 +1437,7 @@
   "main_merge_completed": true,
   "negative_evidence_report": "docs/stage1_bfcl_negative_evidence_report.md",
   "next_action": "request_reduced_batch_retry_approval_packet_after_provider_stability_preflight_and_dry_run_review",
-  "next_required_action": "request_reduced_batch_retry_approval_packet_after_provider_stability_preflight_and_dry_run_review",
+  "next_required_action": "review_reduced_batch_alignment_ledger_then_request_retry_approval_if_provider_stable",
   "no_bfcl_3pp_evidence_yet": true,
   "non_self_referential_provenance": true,
   "optional_diagnostic_counter_fields": [

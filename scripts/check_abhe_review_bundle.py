@@ -51,6 +51,8 @@ from scripts.check_abhe_v0_runtime_slot_retry_stabilization_plan import check as
 from scripts.check_abhe_v0_runtime_slot_reduced_batch_retry_request import check as check_runtime_slot_reduced_batch_retry_request
 from scripts.check_abhe_v0_runtime_slot_reduced_batch_slice_manifest import check as check_runtime_slot_reduced_batch_slice_manifest
 from scripts.check_abhe_v0_runtime_slot_reduced_batch_dry_run_manifest import check as check_runtime_slot_reduced_batch_dry_run_manifest
+from scripts.check_abhe_v0_runtime_slot_dataset_extraction_audit import check as check_runtime_slot_dataset_extraction_audit
+from scripts.check_abhe_v0_runtime_slot_reduced_batch_alignment_ledger import check as check_runtime_slot_reduced_batch_alignment_ledger
 from scripts.plan_abhe_v0_bfcl_archive_transition import build_plan as build_bfcl_archive_transition
 from scripts.plan_abhe_v0_bfcl_archive_transition import synthetic_feedback as bfcl_synthetic_feedback
 
@@ -88,6 +90,8 @@ RUNTIME_SLOT_RETRY_STABILIZATION_PLAN_PATH = Path("outputs/artifacts/stage1_bfcl
 RUNTIME_SLOT_REDUCED_BATCH_RETRY_REQUEST_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_reduced_batch_retry_request.json")
 RUNTIME_SLOT_REDUCED_BATCH_SLICE_MANIFEST_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_reduced_batch_slice_manifest.json")
 RUNTIME_SLOT_REDUCED_BATCH_DRY_RUN_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_reduced_batch_retry_dry_run_manifest.json")
+RUNTIME_SLOT_DATASET_EXTRACTION_AUDIT_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_dataset_extraction_audit.json")
+RUNTIME_SLOT_REDUCED_BATCH_ALIGNMENT_LEDGER_PATH = Path('outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_reduced_batch_alignment_ledger.json')
 RUNTIME_SLOT_OBSERVABILITY_PLAN_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_observability_plan.json")
 RUNTIME_SLOT_OBSERVABILITY_FIXTURE_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_observability_fixture.json")
 RUNTIME_SLOT_OBSERVABILITY_REVIEW_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_observability_review.json")
@@ -192,6 +196,8 @@ def build_bundle() -> Dict[str, Any]:
     runtime_slot_reduced_batch_retry_request = _load_json(RUNTIME_SLOT_REDUCED_BATCH_RETRY_REQUEST_PATH)
     runtime_slot_reduced_batch_slice_manifest = _load_json(RUNTIME_SLOT_REDUCED_BATCH_SLICE_MANIFEST_PATH)
     runtime_slot_reduced_batch_dry_run = _load_json(RUNTIME_SLOT_REDUCED_BATCH_DRY_RUN_PATH)
+    runtime_slot_dataset_extraction_audit = _load_json(RUNTIME_SLOT_DATASET_EXTRACTION_AUDIT_PATH)
+    runtime_slot_reduced_batch_alignment_ledger = _load_json(RUNTIME_SLOT_REDUCED_BATCH_ALIGNMENT_LEDGER_PATH)
     runtime_slot_scorer_unit_check = check_runtime_slot_scorer_unit_diagnostic()
     runtime_slot_scorer_unit_matrix_check = check_runtime_slot_scorer_unit_matrix()
     runtime_slot_per_selected_id_matrix_check = check_runtime_slot_per_selected_id_matrix()
@@ -205,6 +211,8 @@ def build_bundle() -> Dict[str, Any]:
     runtime_slot_reduced_batch_retry_request_check = check_runtime_slot_reduced_batch_retry_request()
     runtime_slot_reduced_batch_slice_manifest_check = check_runtime_slot_reduced_batch_slice_manifest()
     runtime_slot_reduced_batch_dry_run_check = check_runtime_slot_reduced_batch_dry_run_manifest()
+    runtime_slot_dataset_extraction_audit_check = check_runtime_slot_dataset_extraction_audit()
+    runtime_slot_reduced_batch_alignment_ledger_check = check_runtime_slot_reduced_batch_alignment_ledger()
     runtime_slot_observability_plan = check_runtime_slot_observability_plan()
     runtime_slot_observability_fixture = check_runtime_slot_observability_fixture()
     runtime_slot_observability_review = check_runtime_slot_observability_review()
@@ -313,6 +321,10 @@ def build_bundle() -> Dict[str, Any]:
         "abhe_v0_runtime_slot_reduced_batch_retry_request_ready": runtime_slot_reduced_batch_retry_request_check.get("reduced_batch_retry_request_passed") is True,
         "abhe_v0_runtime_slot_reduced_batch_slice_manifest_ready": runtime_slot_reduced_batch_slice_manifest_check.get("reduced_batch_slice_manifest_passed") is True,
         "abhe_v0_runtime_slot_reduced_batch_dry_run_ready": runtime_slot_reduced_batch_dry_run_check.get("reduced_batch_dry_run_manifest_passed") is True,
+        "abhe_v0_runtime_slot_dataset_extraction_audit_ready": runtime_slot_dataset_extraction_audit_check.get("dataset_extraction_audit_check_passed") is True,
+        "abhe_v0_runtime_slot_dataset_target_unique_scorer_unit_count": runtime_slot_dataset_extraction_audit_check.get("target_dataset_unique_scorer_unit_count"),
+        'abhe_v0_runtime_slot_reduced_batch_alignment_ledger_ready': runtime_slot_reduced_batch_alignment_ledger_check.get('alignment_ledger_check_passed') is True,
+        'abhe_v0_runtime_slot_reduced_batch_alignment_ledger_unique_count': runtime_slot_reduced_batch_alignment_ledger_check.get('unique_run_id_count'),
         "abhe_v0_runtime_slot_reduced_batch_selected_case_ids_hash": runtime_slot_reduced_batch_slice_manifest_check.get("selected_case_ids_hash"),
         "abhe_v0_runtime_slot_reduced_batch_selected_case_count": runtime_slot_reduced_batch_slice_manifest_check.get("selected_case_count"),
         "abhe_v0_runtime_slot_reduced_batch_retry_next_required_action": runtime_slot_reduced_batch_slice_manifest_check.get("next_required_action") or runtime_slot_reduced_batch_retry_request_check.get("next_required_action"),
@@ -502,12 +514,14 @@ def build_bundle() -> Dict[str, Any]:
             "abhe_v0_runtime_slot_reduced_batch_retry_request": runtime_slot_reduced_batch_retry_request_check,
             "abhe_v0_runtime_slot_reduced_batch_slice_manifest": runtime_slot_reduced_batch_slice_manifest_check,
             "abhe_v0_runtime_slot_reduced_batch_dry_run": runtime_slot_reduced_batch_dry_run_check,
+            "abhe_v0_runtime_slot_dataset_extraction_audit": runtime_slot_dataset_extraction_audit_check,
+            "abhe_v0_runtime_slot_reduced_batch_alignment_ledger": runtime_slot_reduced_batch_alignment_ledger_check,
             "abhe_v0_runtime_slot_residual_archive_transition": runtime_slot_residual_transition,
             "abhe_v0_bfcl_archive_transition": bfcl_archive_transition,
             "no_leakage": _summary(leakage, ["abhe_no_leakage_boundary_passed", "report_scope"]),
         },
         "commit": _current_commit(),
-        "next_required_action": runtime_slot_reduced_batch_dry_run_check.get("next_required_action") or runtime_slot_reduced_batch_slice_manifest_check.get("next_required_action") or runtime_slot_reduced_batch_retry_request_check.get("next_required_action") or runtime_slot_retry_stabilization_plan_check.get("next_required_action") or runtime_slot_distinct_rerun_failure_check.get("next_required_action") or runtime_slot_run_id_mapping_audit.get("next_required_action") or runtime_slot_alignment_sidecar.get("next_required_action") or runtime_slot_score_output_contract_gap_audit.get("next_required_action") or (runtime_slot_residual_failure.get("measurement_diagnosis") or {}).get("next_required_action") or runtime_slot_scorer_unit_matrix.get("next_required_action") or runtime_slot_per_selected_id_matrix.get("next_required_action") or runtime_slot_scorer_unit_diagnostic.get("next_required_action") or runtime_slot_scorer_unit_distinct_slice.get("next_required_action") or runtime_slot_distinct_rerun_request.get("next_required_action") or "build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl",
+        "next_required_action": runtime_slot_reduced_batch_alignment_ledger_check.get("next_required_action") or runtime_slot_dataset_extraction_audit_check.get("next_required_action") or runtime_slot_reduced_batch_dry_run_check.get("next_required_action") or runtime_slot_reduced_batch_slice_manifest_check.get("next_required_action") or runtime_slot_reduced_batch_retry_request_check.get("next_required_action") or runtime_slot_retry_stabilization_plan_check.get("next_required_action") or runtime_slot_distinct_rerun_failure_check.get("next_required_action") or runtime_slot_run_id_mapping_audit.get("next_required_action") or runtime_slot_alignment_sidecar.get("next_required_action") or runtime_slot_score_output_contract_gap_audit.get("next_required_action") or (runtime_slot_residual_failure.get("measurement_diagnosis") or {}).get("next_required_action") or runtime_slot_scorer_unit_matrix.get("next_required_action") or runtime_slot_per_selected_id_matrix.get("next_required_action") or runtime_slot_scorer_unit_diagnostic.get("next_required_action") or runtime_slot_scorer_unit_distinct_slice.get("next_required_action") or runtime_slot_distinct_rerun_request.get("next_required_action") or "build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl",
     }
     blockers = validate_bundle(bundle)
     bundle["abhe_review_bundle_ready"] = not blockers
@@ -559,6 +573,7 @@ def validate_bundle(bundle: Dict[str, Any]) -> List[str]:
         "abhe_v0_runtime_slot_run_id_mapping_audit_ready",
         "abhe_v0_runtime_slot_scorer_unit_distinct_slice_ready",
         "abhe_v0_runtime_slot_distinct_rerun_request_ready",
+        "abhe_v0_runtime_slot_reduced_batch_alignment_ledger_ready",
         "approval_chain_ready_for_review",
         "no_leakage_status",
     ]
