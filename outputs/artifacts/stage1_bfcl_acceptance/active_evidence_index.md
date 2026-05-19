@@ -405,3 +405,18 @@ Status: bounded dev smoke only. Frozen v2 generalizes on the new fresh balanced 
 - performance_evidence: false
 - holdout/full_suite touched: false
 - next_required_action: `build_scorer_unit_distinct_residual_slice_or_enable_true_per_turn_scoring_before_more_bfcl`
+
+
+## ABHE-v0 Runtime Slot Scorer-Unit Distinct Slice Gate
+
+- artifact: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_scorer_unit_distinct_slice_plan.json`
+- selected compact identifiers: 48
+- target category: `multi_turn_miss_param`
+- target selected compact identifiers: 24
+- target unique scorer units: 24
+- target compact-to-scorer-unit factor: 1.0
+- archive/prior overlap count: 0
+- true per-selected-id scoring enabled: false
+- performance_evidence: false
+- holdout/full_suite touched: false
+- next_required_action: `approve_bounded_rerun_only_after_true_per_selected_or_distinct_scorer_unit_output_gate`

@@ -125,6 +125,7 @@ DEFAULT_PATHS = [
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_scorer_unit_diagnostic.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_scorer_unit_matrix.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_per_selected_id_matrix.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_scorer_unit_distinct_slice_plan.json"),
     Path("docs/stage1_abhe_v0_runtime_slot_controller_residual_analysis.md"),
     Path("docs/stage1_abhe_v0_runtime_slot_controller_path_replay.md"),
     Path("docs/stage1_abhe_v0_runtime_slot_controller_causality_audit.md"),
