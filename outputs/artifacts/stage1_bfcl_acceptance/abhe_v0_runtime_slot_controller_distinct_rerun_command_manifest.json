@@ -1,0 +1,50 @@
+{
+  "approval_scope": "scorer_unit_distinct_bounded_residual_dev_smoke_only",
+  "approved_approval_packet_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_approval_packet.json",
+  "approved_arms": [
+    "baseline",
+    "conditional_frozen_v2",
+    "runtime_slot_controller_v2"
+  ],
+  "approved_manifest_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_scorer_unit_distinct_slice_plan.json",
+  "approved_selected_case_count": 48,
+  "approved_selected_case_ids_hash": "sha256:9b26ba3d24c54562f6a5058877a24f15d2e4ef71ee9ea781bcae168307f7d14c",
+  "archive_update_authorized": false,
+  "artifact_kind": "abhe_v0_runtime_slot_controller_distinct_rerun_command_manifest",
+  "commands": [
+    {
+      "arm": "baseline",
+      "command": "PYTHONPATH=.:src .venv/bin/python scripts/run_abhe_v0_runtime_slot_controller_residual_dev_smoke.py --execute-approved --approval-packet outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_approval_packet.json --arm baseline --manifest outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_scorer_unit_distinct_slice_plan.json --compact-only",
+      "compact_output_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_baseline_arm_compact.json"
+    },
+    {
+      "arm": "conditional_frozen_v2",
+      "command": "PYTHONPATH=.:src .venv/bin/python scripts/run_abhe_v0_runtime_slot_controller_residual_dev_smoke.py --execute-approved --approval-packet outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_approval_packet.json --arm conditional_frozen_v2 --manifest outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_scorer_unit_distinct_slice_plan.json --compact-only",
+      "compact_output_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_conditional_frozen_v2_arm_compact.json"
+    },
+    {
+      "arm": "runtime_slot_controller_v2",
+      "command": "PYTHONPATH=.:src .venv/bin/python scripts/run_abhe_v0_runtime_slot_controller_residual_dev_smoke.py --execute-approved --approval-packet outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_approval_packet.json --arm runtime_slot_controller_v2 --manifest outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_scorer_unit_distinct_slice_plan.json --compact-only",
+      "compact_output_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_runtime_slot_controller_v2_arm_compact.json"
+    }
+  ],
+  "compact_only": true,
+  "full_suite_touched": false,
+  "gold_expected_committed": false,
+  "holdout_touched": false,
+  "performance_claim_authorized": false,
+  "performance_evidence": false,
+  "post_run_validation_commands": [
+    "PYTHONPATH=.:src .venv/bin/python scripts/analyze_abhe_v0_runtime_slot_controller_residual.py --write --compact --strict",
+    "PYTHONPATH=.:src .venv/bin/python scripts/audit_abhe_v0_runtime_slot_controller_traces.py --write --compact --strict",
+    "PYTHONPATH=.:src .venv/bin/python scripts/build_abhe_v0_runtime_slot_scorer_unit_matrix.py --write --compact --strict",
+    "PYTHONPATH=.:src .venv/bin/python scripts/build_abhe_v0_runtime_slot_per_selected_id_matrix.py --write --compact --strict"
+  ],
+  "raw_bfcl_result_tree_committed": false,
+  "raw_material_absent": true,
+  "raw_provider_payload_committed": false,
+  "schema_version": "abhe_v0_runtime_slot_controller_distinct_rerun_command_manifest_v0",
+  "scorer_diff_committed": false,
+  "single_run_per_arm": true,
+  "tmux_required": true
+}
