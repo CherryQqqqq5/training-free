@@ -21,7 +21,7 @@ DEFAULT_OUTPUT = ROOT / "abhe_v0_runtime_slot_controller_alignment_sidecar.json"
 DEFAULT_RUN_ROOT = Path("/tmp/abhe_v0_runtime_slot_controller_residual_dev_smoke")
 MODEL_ALIAS = "gpt-4o-mini-2024-07-18-FC"
 ARMS = ["baseline", "conditional_frozen_v2", "runtime_slot_controller_v2"]
-NEXT_ACTION = "request_bounded_rerun_with_compact_alignment_sidecar_enabled"
+NEXT_ACTION = "fix_score_output_contract_or_enable_true_per_selected_or_per_turn_scoring_before_more_bfcl"
 FALSE_FIELDS = [
     "provider_calls_made",
     "bfcl_generate_called",
@@ -197,6 +197,7 @@ def build(
         "run_scope": "offline_compact_alignment_sidecar_contract_only_no_provider_no_bfcl_no_scorer",
         "manifest_path": str(manifest_path),
         "run_root_checked": str(run_root),
+        "selected_case_ids_hash": manifest.get("selected_case_ids_hash"),
         "bounded_dev_smoke_only": True,
         "compact_only": True,
         "summary": summary,

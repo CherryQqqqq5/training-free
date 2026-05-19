@@ -10,7 +10,7 @@ from typing import Any, Dict, List
 from scripts.check_abhe_no_leakage_boundary import scan_value
 
 DEFAULT_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_alignment_sidecar.json")
-EXPECTED_ACTION = "request_bounded_rerun_with_compact_alignment_sidecar_enabled"
+EXPECTED_ACTION = "fix_score_output_contract_or_enable_true_per_selected_or_per_turn_scoring_before_more_bfcl"
 FORBIDDEN_TRUE = [
     "provider_calls_made",
     "bfcl_generate_called",
@@ -55,6 +55,10 @@ def validate(data: Dict[str, Any]) -> List[str]:
     arm_count = int(summary.get("arm_count") or 0)
     if selected_count <= 0 or arm_count <= 0:
         blockers.append("selected_or_arm_count_missing")
+    if not isinstance(data.get("selected_case_ids_hash"), str) or not data["selected_case_ids_hash"].startswith("sha256:"):
+        blockers.append("selected_case_ids_hash_missing_or_invalid")
+    if data.get("selected_case_ids_hash") != summary.get("selected_case_ids_hash"):
+        blockers.append("selected_case_ids_hash_summary_mismatch")
     if len(rows) != selected_count * arm_count:
         blockers.append(f"row_count_mismatch:{len(rows)}")
     required = {"arm", "selected_index", "selected_case_identifier_hash", "scorer_unit_hash", "bfcl_category", "score_record_seen_for_selected_id", "result_record_seen_for_selected_id", "per_selected_valid_label_available", "per_turn_valid_labels_available", "raw_material_absent"}
@@ -98,6 +102,7 @@ def check(path: Path = DEFAULT_PATH) -> Dict[str, Any]:
         "artifact_path": str(path),
         "alignment_sidecar_check_passed": not blockers,
         "alignment_sidecar_ready": summary.get("alignment_sidecar_ready") is True,
+        "selected_case_ids_hash": data.get("selected_case_ids_hash") or summary.get("selected_case_ids_hash"),
         "selected_count": summary.get("selected_count"),
         "row_count": summary.get("row_count"),
         "per_selected_valid_labels_available": summary.get("per_selected_valid_labels_available"),

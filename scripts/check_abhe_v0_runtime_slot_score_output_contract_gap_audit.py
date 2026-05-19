@@ -10,7 +10,7 @@ from typing import Any, Dict, List
 from scripts.check_abhe_no_leakage_boundary import scan_value
 
 DEFAULT = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_score_output_contract_gap_audit.json")
-NEXT_ACTION = "instrument_runner_scorer_to_emit_compact_alignment_sidecar_before_more_bfcl"
+NEXT_ACTION = "fix_score_output_contract_or_enable_true_per_selected_or_per_turn_scoring_before_more_bfcl"
 FALSE_FIELDS = [
     "provider_calls_made",
     "bfcl_generate_called",

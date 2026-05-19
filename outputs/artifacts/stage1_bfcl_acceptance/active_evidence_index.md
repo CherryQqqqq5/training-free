@@ -454,7 +454,7 @@ Status: bounded dev smoke only. Frozen v2 generalizes on the new fresh balanced 
 - Per-selected labels recoverable: false
 - Per-turn labels recoverable: false
 - More BFCL before contract fix recommended: false
-- Current next action: `instrument_runner_scorer_to_emit_compact_alignment_sidecar_before_more_bfcl`
+- Current next action: `fix_score_output_contract_or_enable_true_per_selected_or_per_turn_scoring_before_more_bfcl`
 - Boundary: compact-only diagnostic; provider/BFCL/scorer are not authorized for further runs; performance_evidence=false; holdout/full suite untouched.
 
 ### ABHE-v0 Runtime Slot Alignment Sidecar
@@ -465,4 +465,16 @@ Status: bounded dev smoke only. Frozen v2 generalizes on the new fresh balanced 
 - per_selected_valid_labels_available: false
 - per_turn_valid_labels_available: false
 - performance_evidence: false
-- next_required_action: `request_bounded_rerun_with_compact_alignment_sidecar_enabled`
+- next_required_action: `fix_score_output_contract_or_enable_true_per_selected_or_per_turn_scoring_before_more_bfcl`
+
+## ABHE-v0 Runtime Slot Sidecar Rerun Final Status
+
+- Result: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_result.json`
+- Alignment sidecar: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_alignment_sidecar.json`
+- selected_case_ids_hash: `sha256:9b26ba3d24c54562f6a5058877a24f15d2e4ef71ee9ea781bcae168307f7d14c`
+- Arms: baseline 4/48, conditional_frozen_v2 10/48, runtime_slot_controller_v2 4/48.
+- Target `multi_turn_miss_param`: delta vs conditional_frozen_v2 = 0; target_bucket_reduction = 0; slot_bind_repair_count = 0.
+- Non-target regression vs conditional_frozen_v2: 6 compact passes.
+- Sidecar rows: 144 across 3 arms; per-selected labels available: `false`; per-turn labels available: `false`.
+- Next required action: `fix_score_output_contract_or_enable_true_per_selected_or_per_turn_scoring_before_more_bfcl`.
+- Boundaries: `performance_evidence=false`, `archive_updated=false`, `holdout_touched=false`, `full_suite_touched=false`; no raw prompt/gold/scorer diff/provider payload/BFCL result tree is committed.

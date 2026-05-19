@@ -357,6 +357,7 @@ def test_runtime_slot_alignment_sidecar_artifact_passes():
     artifact = build(write=False)
     assert Path(DEFAULT_OUTPUT).read_text(encoding="utf-8") == before
     assert artifact["performance_evidence"] is False
+    assert artifact["selected_case_ids_hash"] == artifact["summary"]["selected_case_ids_hash"]
     assert artifact["summary"]["alignment_sidecar_ready"] is True
     assert artifact["summary"]["selected_count"] == 48
     assert artifact["summary"]["row_count"] == 144
@@ -365,4 +366,5 @@ def test_runtime_slot_alignment_sidecar_artifact_passes():
     report = check()
     assert report["alignment_sidecar_check_passed"] is True
     assert report["alignment_sidecar_ready"] is True
+    assert report["selected_case_ids_hash"] == artifact["selected_case_ids_hash"]
     assert report["performance_evidence"] is False

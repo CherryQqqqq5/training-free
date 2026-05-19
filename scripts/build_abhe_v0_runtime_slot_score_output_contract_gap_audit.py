@@ -22,7 +22,7 @@ RUN_ROOT = Path("/tmp/abhe_v0_runtime_slot_controller_residual_dev_smoke")
 MODEL_ALIAS = "gpt-4o-mini-2024-07-18-FC"
 ARMS = ["baseline", "conditional_frozen_v2", "runtime_slot_controller_v2"]
 TARGET_CATEGORY = "multi_turn_miss_param"
-NEXT_ACTION = "instrument_runner_scorer_to_emit_compact_alignment_sidecar_before_more_bfcl"
+NEXT_ACTION = "fix_score_output_contract_or_enable_true_per_selected_or_per_turn_scoring_before_more_bfcl"
 MISSING_CONTRACT_FIELDS = [
     "selected_case_identifier_hash",
     "selected_index",

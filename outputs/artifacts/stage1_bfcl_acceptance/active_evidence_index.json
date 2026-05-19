@@ -433,13 +433,37 @@
   },
   "abhe_v0_runtime_slot_alignment_sidecar_status": {
     "alignment_sidecar_ready": true,
+    "arm_summaries": {
+      "baseline": {
+        "per_selected_valid_label_available": false,
+        "per_turn_valid_labels_available": false,
+        "result_record_seen_count": 6,
+        "score_record_seen_count": 5,
+        "selected_count": 48
+      },
+      "conditional_frozen_v2": {
+        "per_selected_valid_label_available": false,
+        "per_turn_valid_labels_available": false,
+        "result_record_seen_count": 6,
+        "score_record_seen_count": 4,
+        "selected_count": 48
+      },
+      "runtime_slot_controller_v2": {
+        "per_selected_valid_label_available": false,
+        "per_turn_valid_labels_available": false,
+        "result_record_seen_count": 6,
+        "score_record_seen_count": 5,
+        "selected_count": 48
+      }
+    },
     "artifact": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_alignment_sidecar.json",
     "more_bfcl_without_sidecar_recommended": false,
-    "next_required_action": "request_bounded_rerun_with_compact_alignment_sidecar_enabled",
+    "next_required_action": "fix_score_output_contract_or_enable_true_per_selected_or_per_turn_scoring_before_more_bfcl",
     "per_selected_valid_labels_available": false,
     "per_turn_valid_labels_available": false,
     "performance_evidence": false,
     "row_count": 144,
+    "selected_case_ids_hash": "sha256:9b26ba3d24c54562f6a5058877a24f15d2e4ef71ee9ea781bcae168307f7d14c",
     "selected_count": 48
   },
   "abhe_v0_runtime_slot_controller_bindability_audit_status": {
@@ -659,21 +683,21 @@
         "accuracy": 0.083333,
         "case_count": 48,
         "cost": 0.0,
-        "latency": 17657.47657775879,
+        "latency": 41933.33734512329,
         "passed_count": 4
       },
       "conditional_frozen_v2": {
         "accuracy": 0.208333,
         "case_count": 48,
         "cost": 0.0,
-        "latency": 15646.786918640137,
+        "latency": 127249.49246406555,
         "passed_count": 10
       },
       "runtime_slot_controller_v2": {
         "accuracy": 0.083333,
         "case_count": 48,
         "cost": 0.0,
-        "latency": 25327.0703125,
+        "latency": 82535.07586775208,
         "passed_count": 4
       }
     },
@@ -1156,7 +1180,7 @@
     "raw_provider_payload_committed": false,
     "summary": "ABHE-v0 runner adapter and runtime candidate adapter are implemented, but approved bounded BFCL dev smoke remains fail-closed because Novacode provider preflight returned a redacted 4xx status. No BFCL generate/evaluate/scorer execution was started."
   },
-  "current_execution_gate": "blocked_pending_compact_score_output_alignment_sidecar",
+  "current_execution_gate": "blocked_pending_true_per_selected_or_per_turn_scoring_contract",
   "current_next_step_authorization": {
     "archive_update_authorized": false,
     "bfcl_evaluate_authorized": false,
@@ -1267,7 +1291,7 @@
   "main_merge_completed": true,
   "negative_evidence_report": "docs/stage1_bfcl_negative_evidence_report.md",
   "next_action": "build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl",
-  "next_required_action": "request_bounded_rerun_with_compact_alignment_sidecar_enabled",
+  "next_required_action": "fix_score_output_contract_or_enable_true_per_selected_or_per_turn_scoring_before_more_bfcl",
   "no_bfcl_3pp_evidence_yet": true,
   "non_self_referential_provenance": true,
   "optional_diagnostic_counter_fields": [
