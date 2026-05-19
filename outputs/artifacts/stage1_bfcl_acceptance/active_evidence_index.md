@@ -420,3 +420,17 @@ Status: bounded dev smoke only. Frozen v2 generalizes on the new fresh balanced 
 - performance_evidence: false
 - holdout/full_suite touched: false
 - next_required_action: `approve_bounded_rerun_only_after_true_per_selected_or_distinct_scorer_unit_output_gate`
+
+
+## ABHE-v0 Runtime Slot Distinct Rerun Request
+
+- request: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_request.json`
+- dry-run manifest: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_dry_run_manifest.json`
+- approval_status: pending
+- authorized: false
+- runner manifest compatible: true
+- selected_case_ids_hash: `sha256:9b26ba3d24c54562f6a5058877a24f15d2e4ef71ee9ea781bcae168307f7d14c`
+- target compact-to-scorer-unit factor: 1.0
+- provider/BFCL/scorer authorized: false
+- performance_evidence: false
+- next_required_action: `request_explicit_distinct_residual_bounded_rerun_approval`

@@ -11,7 +11,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 from scripts.build_abhe_v0_bfcl_fresh_dev_slice import (
     _category_file,
@@ -45,7 +45,7 @@ def _write(path: Path, data: Dict[str, Any]) -> None:
     path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
-def _raw_id(raw: Any) -> str | None:
+def _raw_id(raw: Any) -> Optional[str]:
     if not isinstance(raw, dict):
         return None
     value = raw.get("id")
@@ -188,7 +188,6 @@ def build(dataset_path: Path = DEFAULT_DATASET) -> Dict[str, Any]:
     if leakage_blockers:
         report["blockers"] = sorted(set(report["blockers"] + leakage_blockers))
         report["scorer_unit_distinct_slice_ready"] = False
-    _write(OUTPUT, report)
     return report
 
 
@@ -201,6 +200,8 @@ def main(argv: Any = None) -> int:
     args = parser.parse_args(argv)
     try:
         report = build(args.dataset_path)
+        if args.write:
+            _write(OUTPUT, report)
     except Exception as exc:
         report = {
             "artifact_kind": "abhe_v0_runtime_slot_controller_scorer_unit_distinct_slice_plan",

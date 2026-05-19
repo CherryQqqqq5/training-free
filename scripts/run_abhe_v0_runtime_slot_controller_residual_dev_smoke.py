@@ -58,16 +58,16 @@ def _failure(arm: str, blockers: List[str]) -> Dict[str, Any]:
     return data
 
 
-def _configure() -> Dict[str, Any]:
-    if not (MANIFEST.exists() and SPEC.exists()):
+def _configure(manifest_path: Path = MANIFEST, run_root: Path = RUN_ROOT) -> Dict[str, Any]:
+    if not (manifest_path.exists() and SPEC.exists()):
         raise RuntimeError("miss_param_manifest_or_spec_missing")
-    manifest = _load(MANIFEST)
+    manifest = _load(manifest_path)
     selected_hash = str(manifest["selected_case_ids_hash"])
     case_count = int(manifest["selected_case_count"])
-    base.DEFAULT_FRESH_MANIFEST = MANIFEST
+    base.DEFAULT_FRESH_MANIFEST = manifest_path
     base.EXPECTED_HASH = selected_hash
     base.EXPECTED_CASE_COUNT = case_count
-    base.RUN_ROOT = RUN_ROOT
+    base.RUN_ROOT = run_root
     return {"manifest": manifest, "selected_hash": selected_hash, "case_count": case_count}
 
 
@@ -197,17 +197,17 @@ def _write_result(selected_hash: str) -> None:
     _write(RESULT, result)
 
 
-def execute_arm(arm: str) -> Dict[str, Any]:
+def execute_arm(arm: str, manifest_path: Path = MANIFEST, run_root_override: Path = RUN_ROOT) -> Dict[str, Any]:
     if arm not in ARMS:
         return _failure(arm, ["arm_invalid"])
     try:
-        cfg = _configure()
+        cfg = _configure(manifest_path, run_root_override)
         selected_hash = cfg["selected_hash"]
         case_count = cfg["case_count"]
         ids_by_category, _, entry_by_category = base._selected_raw_ids()
     except Exception as exc:
         return _failure(arm, [f"configure_failed:{exc.__class__.__name__}"])
-    run_root = RUN_ROOT / arm
+    run_root = run_root_override / arm
     if run_root.exists():
         shutil.rmtree(run_root)
     run_root.mkdir(parents=True, exist_ok=True)
@@ -240,17 +240,63 @@ def execute_arm(arm: str) -> Dict[str, Any]:
         return _failure(arm, [f"runner_exception:{exc.__class__.__name__}"])
 
 
+
+def dry_run_arm(arm: str, manifest_path: Path = MANIFEST) -> Dict[str, Any]:
+    if arm not in ARMS:
+        return _failure(arm, ["arm_invalid"])
+    try:
+        cfg = _configure(manifest_path, RUN_ROOT)
+        ids_by_category, _, entry_by_category = base._selected_raw_ids()
+    except Exception as exc:
+        return _failure(arm, [f"dry_run_configure_failed:{exc.__class__.__name__}"])
+    category_counts = {category: len(ids) for category, ids in ids_by_category.items()}
+    manifest = {
+        "artifact_kind": "abhe_v0_runtime_slot_controller_distinct_rerun_dry_run_manifest",
+        "schema_version": "abhe_v0_runtime_slot_controller_distinct_rerun_dry_run_manifest_v0",
+        "arm": arm,
+        "dry_run": True,
+        "manifest_path": str(manifest_path),
+        "selected_case_ids_hash": cfg["selected_hash"],
+        "selected_case_count": cfg["case_count"],
+        "category_counts": category_counts,
+        "entry_by_category": entry_by_category,
+        "runner_manifest_compatible": sum(category_counts.values()) == cfg["case_count"],
+        "execution_started": False,
+        "provider_calls_made": False,
+        "bfcl_generate_called": False,
+        "bfcl_evaluate_called": False,
+        "scorer_called": False,
+        "raw_material_absent": True,
+        "raw_provider_payload_committed": False,
+        "raw_bfcl_result_tree_committed": False,
+        "gold_expected_committed": False,
+        "scorer_diff_committed": False,
+        "holdout_touched": False,
+        "full_suite_touched": False,
+        "archive_updated": False,
+        "performance_evidence": False,
+        "blockers": [] if sum(category_counts.values()) == cfg["case_count"] else ["runner_case_count_mismatch"],
+    }
+    _write(ROOT / "abhe_v0_runtime_slot_controller_distinct_rerun_dry_run_manifest.json", manifest)
+    return manifest
+
 def main(argv: Any = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--arm", choices=ARMS, required=True)
+    parser.add_argument("--manifest", type=Path, default=MANIFEST)
     parser.add_argument("--execute-approved", action="store_true")
+    parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--compact-only", action="store_true")
     args = parser.parse_args(argv)
+    if args.dry_run:
+        payload = dry_run_arm(args.arm, args.manifest)
+        print(json.dumps(payload, sort_keys=True))
+        return 0 if not payload.get("blockers") else 2
     if not args.execute_approved or not args.compact_only:
         payload = _failure(args.arm, ["execute_approved_and_compact_only_required"])
         print(json.dumps(payload, sort_keys=True))
         return 2
-    payload = execute_arm(args.arm)
+    payload = execute_arm(args.arm, args.manifest)
     print(json.dumps(payload, sort_keys=True))
     return 0 if not payload.get("blockers") else 2
 

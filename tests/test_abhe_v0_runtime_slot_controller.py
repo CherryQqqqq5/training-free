@@ -300,3 +300,28 @@ def test_runtime_slot_scorer_unit_distinct_slice_artifact_passes():
     assert report["scorer_unit_distinct_slice_check_passed"] is True
     assert report["target_compact_to_scorer_unit_factor"] == 1.0
     assert report["performance_evidence"] is False
+
+
+def test_runtime_slot_distinct_rerun_request_artifact_passes():
+    from scripts.check_abhe_v0_runtime_slot_distinct_rerun_request import check
+
+    report = check()
+    assert report["distinct_rerun_request_passed"] is True
+    assert report["authorized"] is False
+    assert report["runner_manifest_compatible"] is True
+    assert report["target_compact_to_scorer_unit_factor"] == 1.0
+    assert report["performance_evidence"] is False
+
+
+def test_runtime_slot_distinct_runner_dry_run_stays_non_executing():
+    from pathlib import Path
+    from scripts.run_abhe_v0_runtime_slot_controller_residual_dev_smoke import dry_run_arm
+
+    report = dry_run_arm("baseline", Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_scorer_unit_distinct_slice_plan.json"))
+    assert report["runner_manifest_compatible"] is True
+    assert report["selected_case_count"] == 48
+    assert report["provider_calls_made"] is False
+    assert report["bfcl_generate_called"] is False
+    assert report["bfcl_evaluate_called"] is False
+    assert report["scorer_called"] is False
+    assert report["performance_evidence"] is False

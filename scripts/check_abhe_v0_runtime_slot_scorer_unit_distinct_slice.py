@@ -9,6 +9,16 @@ from typing import Any, Dict, List
 
 DEFAULT = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_scorer_unit_distinct_slice_plan.json")
 TARGET_CATEGORY = "multi_turn_miss_param"
+EXPECTED_COUNTS = {
+    "multi_turn_miss_param": 24,
+    "multi_turn_miss_func": 6,
+    "multi_turn_base": 6,
+    "multi_turn_long_context": 4,
+    "irrelevance": 4,
+    "live_irrelevance": 4,
+}
+EXPECTED_TOTAL = 48
+EXPECTED_NEXT_ACTION = "approve_bounded_rerun_only_after_true_per_selected_or_distinct_scorer_unit_output_gate"
 FALSE_FIELDS = [
     "prompt_literal_committed",
     "argument_values_committed",
@@ -42,6 +52,22 @@ def validate(data: Dict[str, Any]) -> List[str]:
         blockers.append("schema_version_invalid")
     if data.get("raw_material_absent") is not True:
         blockers.append("raw_material_absent_not_true")
+    if data.get("run_scope") != "offline_dataset_hash_selection_only_no_provider_no_bfcl_no_scorer":
+        blockers.append("run_scope_invalid")
+    if data.get("bounded_dev_smoke_only") is not True:
+        blockers.append("bounded_dev_smoke_only_not_true")
+    if data.get("selected_case_count") != EXPECTED_TOTAL:
+        blockers.append("selected_case_count_invalid")
+    if data.get("overlap_check_status") != "complete":
+        blockers.append("overlap_check_status_not_complete")
+    if data.get("source_160_compact_cases_reused_for_validation") is not False:
+        blockers.append("source_160_reused_not_false")
+    if data.get("archive_seed_source_excluded") is not True:
+        blockers.append("archive_seed_source_excluded_not_true")
+    if data.get("old_dev_slices_excluded") is not True:
+        blockers.append("old_dev_slices_excluded_not_true")
+    if data.get("next_required_action") != EXPECTED_NEXT_ACTION:
+        blockers.append("next_required_action_invalid")
     if data.get("scorer_unit_distinct_slice_ready") is not True:
         blockers.append("scorer_unit_distinct_slice_not_ready")
     if data.get("true_per_selected_id_scoring_enabled") is not False:
@@ -71,6 +97,11 @@ def validate(data: Dict[str, Any]) -> List[str]:
         by_category.setdefault(str(row.get("bfcl_category")), set()).add(str(unit_hash))
     case_counts = data.get("case_count_by_category") if isinstance(data.get("case_count_by_category"), dict) else {}
     scorer_counts = data.get("scorer_unit_count_by_category") if isinstance(data.get("scorer_unit_count_by_category"), dict) else {}
+    if case_counts != EXPECTED_COUNTS:
+        blockers.append("case_count_by_category_invalid")
+    for category, expected in EXPECTED_COUNTS.items():
+        if int(case_counts.get(category) or 0) != expected:
+            blockers.append(f"category_count_invalid:{category}")
     for category, count in case_counts.items():
         if int(count or 0) != int(scorer_counts.get(category) or -1):
             blockers.append(f"category_scorer_unit_count_mismatch:{category}")
@@ -78,6 +109,10 @@ def validate(data: Dict[str, Any]) -> List[str]:
             blockers.append(f"category_selected_unit_hash_count_mismatch:{category}")
     if data.get("target_category") != TARGET_CATEGORY:
         blockers.append("target_category_invalid")
+    if data.get("target_selected_compact_case_count") != 24:
+        blockers.append("target_selected_compact_case_count_invalid")
+    if data.get("target_unique_scorer_unit_count") != 24:
+        blockers.append("target_unique_scorer_unit_count_invalid")
     if data.get("target_compact_to_scorer_unit_factor") != 1.0:
         blockers.append("target_compact_to_scorer_unit_factor_not_one")
     for item in data.get("blockers") or []:
