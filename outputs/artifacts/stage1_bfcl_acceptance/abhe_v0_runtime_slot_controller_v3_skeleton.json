@@ -22,7 +22,7 @@
   "huawei_acceptance_ready": false,
   "sota_3pp_claim_ready": false,
   "source_fixture_path": "tests/fixtures/abhe_runtime_slot_controller_v3_skeleton/cases.json",
-  "source_fixture_sha256": "sha256:2ea2dc684c3fe9ff10e2a6041ebee55ccefd421da82a021aa341230e758f139b",
+  "source_fixture_sha256": "sha256:99667788f22f8b88d787c39f16b51196b930df1c3c915022305e6db8e9fbec5a",
   "cases": [
     {
       "case_id_synthetic": "skeleton_case_complete_valid",
@@ -173,23 +173,167 @@
       ],
       "planner_ask_or_insufficient_required": true,
       "would_block_valid_tool_call": false
+    },
+    {
+      "case_id_synthetic": "skeleton_case_incompatible_type_recovered_by_source",
+      "expected_decision_class": "bind_recovered_slots_then_call",
+      "observed_decision_class": "bind_recovered_slots_then_call",
+      "decision_matches_expectation": true,
+      "schema_reader_required_arg_count": 3,
+      "schema_reader_required_args": [
+        "city",
+        "date",
+        "party_size"
+      ],
+      "guard_tool_call_valid": false,
+      "guard_missing_required_args": [],
+      "guard_incompatible_required_args": [
+        "party_size"
+      ],
+      "binder_bindable_count": 1,
+      "binder_bound_slot_sources": {
+        "party_size": "prior_tool_observation"
+      },
+      "binder_ambiguous_slots": [],
+      "binder_missing_after_bind": [],
+      "binder_entity_ambiguity_detected": false,
+      "planner_lookup_needed_count": 0,
+      "planner_planned_lookup_by_slot": {},
+      "planner_unrecoverable_slots": [],
+      "planner_ask_or_insufficient_required": false,
+      "would_block_valid_tool_call": false
+    },
+    {
+      "case_id_synthetic": "skeleton_case_partial_bind_one_source_one_lookup",
+      "expected_decision_class": "call_prerequisite_lookup",
+      "observed_decision_class": "call_prerequisite_lookup",
+      "decision_matches_expectation": true,
+      "schema_reader_required_arg_count": 3,
+      "schema_reader_required_args": [
+        "city",
+        "date",
+        "party_size"
+      ],
+      "guard_tool_call_valid": false,
+      "guard_missing_required_args": [
+        "date",
+        "party_size"
+      ],
+      "guard_incompatible_required_args": [],
+      "binder_bindable_count": 1,
+      "binder_bound_slot_sources": {
+        "date": "prior_tool_observation"
+      },
+      "binder_ambiguous_slots": [],
+      "binder_missing_after_bind": [
+        "party_size"
+      ],
+      "binder_entity_ambiguity_detected": false,
+      "planner_lookup_needed_count": 1,
+      "planner_planned_lookup_by_slot": {
+        "party_size": "get_party_size"
+      },
+      "planner_unrecoverable_slots": [],
+      "planner_ask_or_insufficient_required": false,
+      "would_block_valid_tool_call": false
+    },
+    {
+      "case_id_synthetic": "skeleton_case_zero_required_args",
+      "expected_decision_class": "allow_valid_tool_call",
+      "observed_decision_class": "allow_valid_tool_call",
+      "decision_matches_expectation": true,
+      "schema_reader_required_arg_count": 0,
+      "schema_reader_required_args": [],
+      "guard_tool_call_valid": true,
+      "guard_missing_required_args": [],
+      "guard_incompatible_required_args": [],
+      "binder_bindable_count": 0,
+      "binder_bound_slot_sources": {},
+      "binder_ambiguous_slots": [],
+      "binder_missing_after_bind": [],
+      "binder_entity_ambiguity_detected": false,
+      "planner_lookup_needed_count": 0,
+      "planner_planned_lookup_by_slot": {},
+      "planner_unrecoverable_slots": [],
+      "planner_ask_or_insufficient_required": false,
+      "would_block_valid_tool_call": false
+    },
+    {
+      "case_id_synthetic": "skeleton_case_three_source_ambiguity",
+      "expected_decision_class": "ask_or_insufficient_due_ambiguity",
+      "observed_decision_class": "ask_or_insufficient_due_ambiguity",
+      "decision_matches_expectation": true,
+      "schema_reader_required_arg_count": 3,
+      "schema_reader_required_args": [
+        "city",
+        "date",
+        "party_size"
+      ],
+      "guard_tool_call_valid": false,
+      "guard_missing_required_args": [
+        "party_size"
+      ],
+      "guard_incompatible_required_args": [],
+      "binder_bindable_count": 0,
+      "binder_bound_slot_sources": {},
+      "binder_ambiguous_slots": [
+        "party_size"
+      ],
+      "binder_missing_after_bind": [],
+      "binder_entity_ambiguity_detected": true,
+      "planner_lookup_needed_count": 0,
+      "planner_planned_lookup_by_slot": {},
+      "planner_unrecoverable_slots": [
+        "party_size"
+      ],
+      "planner_ask_or_insufficient_required": true,
+      "would_block_valid_tool_call": false
+    },
+    {
+      "case_id_synthetic": "skeleton_case_array_arg_bound_from_source",
+      "expected_decision_class": "bind_recovered_slots_then_call",
+      "observed_decision_class": "bind_recovered_slots_then_call",
+      "decision_matches_expectation": true,
+      "schema_reader_required_arg_count": 3,
+      "schema_reader_required_args": [
+        "city",
+        "date",
+        "guests"
+      ],
+      "guard_tool_call_valid": false,
+      "guard_missing_required_args": [
+        "guests"
+      ],
+      "guard_incompatible_required_args": [],
+      "binder_bindable_count": 1,
+      "binder_bound_slot_sources": {
+        "guests": "prior_tool_observation"
+      },
+      "binder_ambiguous_slots": [],
+      "binder_missing_after_bind": [],
+      "binder_entity_ambiguity_detected": false,
+      "planner_lookup_needed_count": 0,
+      "planner_planned_lookup_by_slot": {},
+      "planner_unrecoverable_slots": [],
+      "planner_ask_or_insufficient_required": false,
+      "would_block_valid_tool_call": false
     }
   ],
   "summary": {
-    "total_cases": 5,
-    "decisions_matching_expectation": 5,
+    "total_cases": 10,
+    "decisions_matching_expectation": 10,
     "decisions_by_class": {
-      "allow_valid_tool_call": 1,
+      "allow_valid_tool_call": 2,
       "ask_or_insufficient": 1,
-      "ask_or_insufficient_due_ambiguity": 1,
-      "bind_recovered_slots_then_call": 1,
-      "call_prerequisite_lookup": 1
+      "ask_or_insufficient_due_ambiguity": 2,
+      "bind_recovered_slots_then_call": 3,
+      "call_prerequisite_lookup": 2
     },
     "any_would_block_valid_tool_call": false,
-    "binder_bound_slot_total": 1,
-    "binder_ambiguous_slot_total": 1,
-    "planner_lookup_needed_total": 1,
-    "planner_unrecoverable_slot_total": 3
+    "binder_bound_slot_total": 4,
+    "binder_ambiguous_slot_total": 2,
+    "planner_lookup_needed_total": 2,
+    "planner_unrecoverable_slot_total": 4
   },
   "blockers": []
 }

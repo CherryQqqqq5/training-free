@@ -108,10 +108,13 @@ def _scan_forbidden(obj, path="$"):
 
 
 def test_builder_emits_compact_summary():
+    # Fixture v1 has 10 synthetic cases (5 original + 5 added in P6
+    # for incompatible-type / partial-bind / zero-required-args /
+    # three-source-ambiguity / array-type coverage).
     s = _run_builder(False)
     assert s["abhe_v0_runtime_slot_controller_v3_skeleton_passed"] is True
-    assert s["total_cases"] == 5
-    assert s["decisions_matching_expectation"] == 5
+    assert s["total_cases"] == 10
+    assert s["decisions_matching_expectation"] == 10
     assert s["runtime_wired_into_proxy"] is False
     assert s["blockers"] == []
 
@@ -207,3 +210,108 @@ def test_fixture_not_raw_material():
     assert fx.get("raw_material_absent") is True
     assert fx.get("prompt_literal_committed") is False
     assert fx.get("gold_expected_committed") is False
+
+
+# ---------------------------------------------------------------------------
+# P6 — additional coverage for new fixture cases (v1):
+#   - incompatible-type recovered by source
+#   - partial-bind (one source + one lookup)
+#   - zero required args
+#   - three-source ambiguity (stress variant)
+#   - array-type required arg bound from source
+# ---------------------------------------------------------------------------
+
+def _get_case(art, case_id):
+    matches = [c for c in art["cases"] if c["case_id_synthetic"] == case_id]
+    assert len(matches) == 1, f"missing or duplicate case:{case_id}"
+    return matches[0]
+
+
+def test_incompatible_type_path_routes_through_binder():
+    """Guard marks incompatible required arg; binder substitutes a
+    compatible-type value from sources; final decision is bind_recovered."""
+    art = json.loads(OUT.read_text(encoding="utf-8"))
+    c = _get_case(art, "skeleton_case_incompatible_type_recovered_by_source")
+    assert c["guard_tool_call_valid"] is False
+    assert "party_size" in c["guard_incompatible_required_args"]
+    assert c["binder_bindable_count"] == 1
+    assert c["binder_bound_slot_sources"].get("party_size") == "prior_tool_observation"
+    assert c["observed_decision_class"] == "bind_recovered_slots_then_call"
+
+
+def test_partial_bind_one_source_one_lookup_picks_lookup():
+    """When binder has 1 bind + planner has 1 lookup-needed, planner wins
+    per v2 decision priority (lookup before bind)."""
+    art = json.loads(OUT.read_text(encoding="utf-8"))
+    c = _get_case(art, "skeleton_case_partial_bind_one_source_one_lookup")
+    assert c["binder_bindable_count"] == 1
+    assert c["binder_bound_slot_sources"].get("date") == "prior_tool_observation"
+    assert c["planner_lookup_needed_count"] == 1
+    assert c["planner_planned_lookup_by_slot"].get("party_size") == "get_party_size"
+    assert c["observed_decision_class"] == "call_prerequisite_lookup"
+
+
+def test_zero_required_args_short_circuits_to_allow():
+    art = json.loads(OUT.read_text(encoding="utf-8"))
+    c = _get_case(art, "skeleton_case_zero_required_args")
+    assert c["schema_reader_required_arg_count"] == 0
+    assert c["guard_tool_call_valid"] is True
+    assert c["binder_bindable_count"] == 0
+    assert c["planner_lookup_needed_count"] == 0
+    assert c["observed_decision_class"] == "allow_valid_tool_call"
+
+
+def test_three_source_ambiguity_still_detected():
+    """N>=2 distinct compatible sources for same slot -> ambiguous."""
+    art = json.loads(OUT.read_text(encoding="utf-8"))
+    c = _get_case(art, "skeleton_case_three_source_ambiguity")
+    assert c["binder_entity_ambiguity_detected"] is True
+    assert "party_size" in c["binder_ambiguous_slots"]
+    assert c["observed_decision_class"] == "ask_or_insufficient_due_ambiguity"
+
+
+def test_array_type_required_arg_bindable_from_source():
+    art = json.loads(OUT.read_text(encoding="utf-8"))
+    c = _get_case(art, "skeleton_case_array_arg_bound_from_source")
+    assert "guests" in c["schema_reader_required_args"]
+    assert c["binder_bindable_count"] == 1
+    assert c["binder_bound_slot_sources"].get("guests") == "prior_tool_observation"
+    assert c["observed_decision_class"] == "bind_recovered_slots_then_call"
+
+
+def test_summary_counts_match_expanded_fixture():
+    art = json.loads(OUT.read_text(encoding="utf-8"))
+    s = art["summary"]
+    assert s["total_cases"] == 10
+    assert s["decisions_matching_expectation"] == 10
+    # Expected distribution after P6 fixture expansion:
+    #   allow_valid_tool_call: 2 (complete_valid + zero_required_args)
+    #   bind_recovered_slots_then_call: 3 (single_source + incompatible_type + array)
+    #   ask_or_insufficient_due_ambiguity: 2 (two_source + three_source)
+    #   call_prerequisite_lookup: 2 (lookup + partial_bind_with_lookup)
+    #   ask_or_insufficient: 1 (unrecoverable)
+    assert s["decisions_by_class"]["allow_valid_tool_call"] == 2
+    assert s["decisions_by_class"]["bind_recovered_slots_then_call"] == 3
+    assert s["decisions_by_class"]["ask_or_insufficient_due_ambiguity"] == 2
+    assert s["decisions_by_class"]["call_prerequisite_lookup"] == 2
+    assert s["decisions_by_class"]["ask_or_insufficient"] == 1
+
+
+def test_fixture_v1_marker():
+    fx = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    assert fx.get("fixture_version") == "v1"
+    assert len(fx["cases"]) == 10
+
+
+def test_all_synthetic_args_are_redacted_placeholders():
+    """No real BFCL prompts/values; all string args are REDACTED_SYN
+    placeholders (asserts no real material crept into the fixture)."""
+    fx = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    for case in fx["cases"]:
+        for arg_val in (case.get("tool_call") or {}).get("arguments", {}).values():
+            if isinstance(arg_val, str):
+                assert "REDACTED_SYN" in arg_val, f"non_placeholder_string_arg:{arg_val}"
+            elif isinstance(arg_val, list):
+                for x in arg_val:
+                    if isinstance(x, str):
+                        assert "REDACTED_SYN" in x, f"non_placeholder_string_list_item:{x}"

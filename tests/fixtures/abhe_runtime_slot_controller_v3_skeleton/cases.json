@@ -1,7 +1,7 @@
 {
   "fixture_kind": "abhe_runtime_slot_controller_v3_skeleton_cases",
-  "fixture_version": "v0",
-  "fixture_purpose": "deterministic synthetic cases for v3 composer skeleton; not BFCL traces, not provider responses, not gold/expected",
+  "fixture_version": "v1",
+  "fixture_purpose": "deterministic synthetic cases for v3 composer skeleton; not BFCL traces, not provider responses, not gold/expected; v1 adds incompatible-type, partial-bind, zero-required-args, three-source-ambiguity, and array-type variants",
   "raw_material_absent": true,
   "prompt_literal_committed": false,
   "gold_expected_committed": false,
@@ -11,8 +11,39 @@
     {
       "case_id_synthetic": "skeleton_case_complete_valid",
       "expected_decision_class": "allow_valid_tool_call",
-      "tool": {"type":"function","function":{"name":"book","parameters":{"type":"object","properties":{"city":{"type":"string"},"date":{"type":"string"},"party_size":{"type":"integer"}},"required":["city","date","party_size"]}}},
-      "tool_call": {"name":"book","arguments":{"city":"REDACTED_SYN","date":"REDACTED_SYN","party_size":2}},
+      "tool": {
+        "type": "function",
+        "function": {
+          "name": "book",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "city": {
+                "type": "string"
+              },
+              "date": {
+                "type": "string"
+              },
+              "party_size": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "city",
+              "date",
+              "party_size"
+            ]
+          }
+        }
+      },
+      "tool_call": {
+        "name": "book",
+        "arguments": {
+          "city": "REDACTED_SYN",
+          "date": "REDACTED_SYN",
+          "party_size": 2
+        }
+      },
       "sources": [],
       "available_tools": [],
       "recoverability_map": {}
@@ -20,20 +51,97 @@
     {
       "case_id_synthetic": "skeleton_case_missing_bindable_single_source",
       "expected_decision_class": "bind_recovered_slots_then_call",
-      "tool": {"type":"function","function":{"name":"book","parameters":{"type":"object","properties":{"city":{"type":"string"},"date":{"type":"string"},"party_size":{"type":"integer"}},"required":["city","date","party_size"]}}},
-      "tool_call": {"name":"book","arguments":{"city":"REDACTED_SYN","date":"REDACTED_SYN"}},
-      "sources": [{"source_type":"prior_tool_observation","values":{"party_size":2}}],
+      "tool": {
+        "type": "function",
+        "function": {
+          "name": "book",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "city": {
+                "type": "string"
+              },
+              "date": {
+                "type": "string"
+              },
+              "party_size": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "city",
+              "date",
+              "party_size"
+            ]
+          }
+        }
+      },
+      "tool_call": {
+        "name": "book",
+        "arguments": {
+          "city": "REDACTED_SYN",
+          "date": "REDACTED_SYN"
+        }
+      },
+      "sources": [
+        {
+          "source_type": "prior_tool_observation",
+          "values": {
+            "party_size": 2
+          }
+        }
+      ],
       "available_tools": [],
       "recoverability_map": {}
     },
     {
       "case_id_synthetic": "skeleton_case_missing_ambiguous_two_sources",
       "expected_decision_class": "ask_or_insufficient_due_ambiguity",
-      "tool": {"type":"function","function":{"name":"book","parameters":{"type":"object","properties":{"city":{"type":"string"},"date":{"type":"string"},"party_size":{"type":"integer"}},"required":["city","date","party_size"]}}},
-      "tool_call": {"name":"book","arguments":{"city":"REDACTED_SYN","date":"REDACTED_SYN"}},
+      "tool": {
+        "type": "function",
+        "function": {
+          "name": "book",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "city": {
+                "type": "string"
+              },
+              "date": {
+                "type": "string"
+              },
+              "party_size": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "city",
+              "date",
+              "party_size"
+            ]
+          }
+        }
+      },
+      "tool_call": {
+        "name": "book",
+        "arguments": {
+          "city": "REDACTED_SYN",
+          "date": "REDACTED_SYN"
+        }
+      },
       "sources": [
-        {"source_type":"prior_tool_observation","values":{"party_size":2}},
-        {"source_type":"user_utterance_inferred","values":{"party_size":4}}
+        {
+          "source_type": "prior_tool_observation",
+          "values": {
+            "party_size": 2
+          }
+        },
+        {
+          "source_type": "user_utterance_inferred",
+          "values": {
+            "party_size": 4
+          }
+        }
       ],
       "available_tools": [],
       "recoverability_map": {}
@@ -41,18 +149,324 @@
     {
       "case_id_synthetic": "skeleton_case_missing_recoverable_via_lookup",
       "expected_decision_class": "call_prerequisite_lookup",
-      "tool": {"type":"function","function":{"name":"book","parameters":{"type":"object","properties":{"city":{"type":"string"},"date":{"type":"string"},"party_size":{"type":"integer"}},"required":["city","date","party_size"]}}},
-      "tool_call": {"name":"book","arguments":{"city":"REDACTED_SYN","date":"REDACTED_SYN"}},
+      "tool": {
+        "type": "function",
+        "function": {
+          "name": "book",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "city": {
+                "type": "string"
+              },
+              "date": {
+                "type": "string"
+              },
+              "party_size": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "city",
+              "date",
+              "party_size"
+            ]
+          }
+        }
+      },
+      "tool_call": {
+        "name": "book",
+        "arguments": {
+          "city": "REDACTED_SYN",
+          "date": "REDACTED_SYN"
+        }
+      },
       "sources": [],
-      "available_tools": [{"type":"function","function":{"name":"get_party_size","parameters":{"type":"object","properties":{}}}}],
-      "recoverability_map": {"party_size":"get_party_size"}
+      "available_tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_party_size",
+            "parameters": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        }
+      ],
+      "recoverability_map": {
+        "party_size": "get_party_size"
+      }
     },
     {
       "case_id_synthetic": "skeleton_case_missing_unrecoverable",
       "expected_decision_class": "ask_or_insufficient",
-      "tool": {"type":"function","function":{"name":"book","parameters":{"type":"object","properties":{"city":{"type":"string"},"date":{"type":"string"},"party_size":{"type":"integer"}},"required":["city","date","party_size"]}}},
-      "tool_call": {"name":"book","arguments":{"city":"REDACTED_SYN"}},
+      "tool": {
+        "type": "function",
+        "function": {
+          "name": "book",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "city": {
+                "type": "string"
+              },
+              "date": {
+                "type": "string"
+              },
+              "party_size": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "city",
+              "date",
+              "party_size"
+            ]
+          }
+        }
+      },
+      "tool_call": {
+        "name": "book",
+        "arguments": {
+          "city": "REDACTED_SYN"
+        }
+      },
       "sources": [],
+      "available_tools": [],
+      "recoverability_map": {}
+    },
+    {
+      "case_id_synthetic": "skeleton_case_incompatible_type_recovered_by_source",
+      "expected_decision_class": "bind_recovered_slots_then_call",
+      "tool": {
+        "type": "function",
+        "function": {
+          "name": "book",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "city": {
+                "type": "string"
+              },
+              "date": {
+                "type": "string"
+              },
+              "party_size": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "city",
+              "date",
+              "party_size"
+            ]
+          }
+        }
+      },
+      "tool_call": {
+        "name": "book",
+        "arguments": {
+          "city": "REDACTED_SYN",
+          "date": "REDACTED_SYN",
+          "party_size": "REDACTED_SYN_BAD_TYPE"
+        }
+      },
+      "sources": [
+        {
+          "source_type": "prior_tool_observation",
+          "values": {
+            "party_size": 2
+          }
+        }
+      ],
+      "available_tools": [],
+      "recoverability_map": {}
+    },
+    {
+      "case_id_synthetic": "skeleton_case_partial_bind_one_source_one_lookup",
+      "expected_decision_class": "call_prerequisite_lookup",
+      "tool": {
+        "type": "function",
+        "function": {
+          "name": "book",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "city": {
+                "type": "string"
+              },
+              "date": {
+                "type": "string"
+              },
+              "party_size": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "city",
+              "date",
+              "party_size"
+            ]
+          }
+        }
+      },
+      "tool_call": {
+        "name": "book",
+        "arguments": {
+          "city": "REDACTED_SYN"
+        }
+      },
+      "sources": [
+        {
+          "source_type": "prior_tool_observation",
+          "values": {
+            "date": "REDACTED_SYN"
+          }
+        }
+      ],
+      "available_tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_party_size",
+            "parameters": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        }
+      ],
+      "recoverability_map": {
+        "party_size": "get_party_size"
+      }
+    },
+    {
+      "case_id_synthetic": "skeleton_case_zero_required_args",
+      "expected_decision_class": "allow_valid_tool_call",
+      "tool": {
+        "type": "function",
+        "function": {
+          "name": "ping",
+          "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          }
+        }
+      },
+      "tool_call": {
+        "name": "ping",
+        "arguments": {}
+      },
+      "sources": [],
+      "available_tools": [],
+      "recoverability_map": {}
+    },
+    {
+      "case_id_synthetic": "skeleton_case_three_source_ambiguity",
+      "expected_decision_class": "ask_or_insufficient_due_ambiguity",
+      "tool": {
+        "type": "function",
+        "function": {
+          "name": "book",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "city": {
+                "type": "string"
+              },
+              "date": {
+                "type": "string"
+              },
+              "party_size": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "city",
+              "date",
+              "party_size"
+            ]
+          }
+        }
+      },
+      "tool_call": {
+        "name": "book",
+        "arguments": {
+          "city": "REDACTED_SYN",
+          "date": "REDACTED_SYN"
+        }
+      },
+      "sources": [
+        {
+          "source_type": "prior_tool_observation",
+          "values": {
+            "party_size": 2
+          }
+        },
+        {
+          "source_type": "user_utterance_inferred",
+          "values": {
+            "party_size": 4
+          }
+        },
+        {
+          "source_type": "session_state_snapshot",
+          "values": {
+            "party_size": 6
+          }
+        }
+      ],
+      "available_tools": [],
+      "recoverability_map": {}
+    },
+    {
+      "case_id_synthetic": "skeleton_case_array_arg_bound_from_source",
+      "expected_decision_class": "bind_recovered_slots_then_call",
+      "tool": {
+        "type": "function",
+        "function": {
+          "name": "reserve",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "city": {
+                "type": "string"
+              },
+              "date": {
+                "type": "string"
+              },
+              "guests": {
+                "type": "array"
+              }
+            },
+            "required": [
+              "city",
+              "date",
+              "guests"
+            ]
+          }
+        }
+      },
+      "tool_call": {
+        "name": "reserve",
+        "arguments": {
+          "city": "REDACTED_SYN",
+          "date": "REDACTED_SYN"
+        }
+      },
+      "sources": [
+        {
+          "source_type": "prior_tool_observation",
+          "values": {
+            "guests": [
+              "REDACTED_SYN_A",
+              "REDACTED_SYN_B"
+            ]
+          }
+        }
+      ],
       "available_tools": [],
       "recoverability_map": {}
     }
