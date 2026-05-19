@@ -420,3 +420,24 @@ def test_runtime_slot_retry_stabilization_plan_artifact_passes():
     assert report["authorized"] is False
     assert report["performance_evidence"] is False
     assert report["next_required_action"] == "request_reduced_batch_retry_approval_after_provider_stability_preflight"
+
+def test_runtime_slot_reduced_batch_retry_request_artifact_passes():
+    from pathlib import Path
+    from scripts.build_abhe_v0_runtime_slot_reduced_batch_retry_request import OUTPUT, build
+    from scripts.check_abhe_v0_runtime_slot_reduced_batch_retry_request import check
+
+    before = Path(OUTPUT).read_text(encoding="utf-8")
+    artifact = build()
+    assert Path(OUTPUT).read_text(encoding="utf-8") == before
+    assert artifact["authorized"] is False
+    assert artifact["selected_case_count"] == 6
+    assert artifact["target_category"] == "multi_turn_miss_param"
+    assert artifact["requested_arms"] == ["baseline"]
+    assert artifact["performance_evidence"] is False
+    report = check()
+    assert report["reduced_batch_retry_request_passed"] is True
+    assert report["authorized"] is False
+    assert report["selected_case_count"] == 6
+    assert report["target_category"] == "multi_turn_miss_param"
+    assert report["performance_evidence"] is False
+    assert report["next_required_action"] == "request_reduced_batch_retry_approval_packet_with_fresh_run_root"

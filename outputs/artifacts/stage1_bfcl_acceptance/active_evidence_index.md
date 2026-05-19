@@ -514,3 +514,15 @@ Status: bounded dev smoke only. Frozen v2 generalizes on the new fresh balanced 
 - authorized / provider / BFCL / scorer: `false`
 - holdout/full suite/archive/performance evidence: `false`
 - next_required_action: `request_reduced_batch_retry_approval_after_provider_stability_preflight`
+
+## ABHE-v0 Runtime Slot Reduced-Batch Retry Request
+
+- Artifact: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_reduced_batch_retry_request.json`
+- Status: pending review only, not approved.
+- Parent selected hash: `sha256:9b26ba3d24c54562f6a5058877a24f15d2e4ef71ee9ea781bcae168307f7d14c`
+- Reduced batch hash: `sha256:aa341bfc1d78a406f9f3a25967a03d88849dc42fc64e49625eae1993f33ddece`
+- Proposed first batch: baseline only, `multi_turn_miss_param`, 6 selected compact identifiers.
+- Fresh run root required: `true`
+- authorized / provider / BFCL / scorer: `false`
+- holdout/full suite/archive/performance evidence: `false`
+- next_required_action: `request_reduced_batch_retry_approval_packet_with_fresh_run_root`

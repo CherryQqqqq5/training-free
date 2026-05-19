@@ -54,6 +54,8 @@
   "abhe_v0_runtime_slot_path_replay_ready": true,
   "abhe_v0_runtime_slot_per_selected_id_matrix_ready": true,
   "abhe_v0_runtime_slot_proxy_fixture_confirmed": true,
+  "abhe_v0_runtime_slot_reduced_batch_retry_next_required_action": "request_reduced_batch_retry_approval_packet_with_fresh_run_root",
+  "abhe_v0_runtime_slot_reduced_batch_retry_request_ready": true,
   "abhe_v0_runtime_slot_residual_archive_updated": false,
   "abhe_v0_runtime_slot_residual_bind_repair_count": 0,
   "abhe_v0_runtime_slot_residual_failure_analysis_ready": true,
@@ -110,7 +112,7 @@
   "bundle_is_performance_evidence": false,
   "candidate_generation_authorized": false,
   "candidate_spec_drafts_ready": true,
-  "commit": "3d2b04c8bd5ddb3cbd4615b9ee2dd44ccf99716a",
+  "commit": "636649b8dfb7ac620ab4c39b3aca62a55bd19ea1",
   "component_paths": {
     "abhe_v0_bfcl_archive_transition_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_archive_transition_plan.json",
     "abhe_v0_bfcl_case_delta_analysis": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_case_delta_analysis.json",
@@ -147,6 +149,7 @@
     "abhe_v0_runtime_slot_controller_distinct_rerun_result": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_result.json",
     "abhe_v0_runtime_slot_controller_path_replay": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_path_replay.json",
     "abhe_v0_runtime_slot_controller_per_selected_id_matrix": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_per_selected_id_matrix.json",
+    "abhe_v0_runtime_slot_controller_reduced_batch_retry_request": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_reduced_batch_retry_request.json",
     "abhe_v0_runtime_slot_controller_residual_dev_smoke_result": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_residual_dev_smoke_result.json",
     "abhe_v0_runtime_slot_controller_residual_failure_analysis": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_residual_failure_analysis.json",
     "abhe_v0_runtime_slot_controller_retry_stabilization_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_retry_stabilization_plan.json",
@@ -4116,6 +4119,22 @@
       "target_selected_scorer_unit_count": 24,
       "target_unique_scorer_unit_count": 1
     },
+    "abhe_v0_runtime_slot_reduced_batch_retry_request": {
+      "artifact_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_reduced_batch_retry_request.json",
+      "authorized": false,
+      "blockers": [],
+      "next_required_action": "request_reduced_batch_retry_approval_packet_with_fresh_run_root",
+      "parent_selected_case_ids_hash": "sha256:9b26ba3d24c54562f6a5058877a24f15d2e4ef71ee9ea781bcae168307f7d14c",
+      "performance_evidence": false,
+      "reduced_batch_case_ids_hash": "sha256:aa341bfc1d78a406f9f3a25967a03d88849dc42fc64e49625eae1993f33ddece",
+      "reduced_batch_retry_request_passed": true,
+      "report_scope": "abhe_v0_runtime_slot_controller_reduced_batch_retry_request_check",
+      "requested_arms": [
+        "baseline"
+      ],
+      "selected_case_count": 6,
+      "target_category": "multi_turn_miss_param"
+    },
     "abhe_v0_runtime_slot_residual_archive_transition": {
       "archive_updated": false,
       "artifact_kind": "abhe_v0_runtime_slot_controller_archive_transition_dry_run",
@@ -6490,7 +6509,7 @@
   "fresh_dev_slice_authorized": false,
   "fresh_dev_slice_request_ready": true,
   "huawei_acceptance_ready": false,
-  "next_required_action": "request_reduced_batch_retry_approval_after_provider_stability_preflight",
+  "next_required_action": "request_reduced_batch_retry_approval_packet_with_fresh_run_root",
   "no_leakage_status": true,
   "performance_evidence": false,
   "planning_readiness_ready": true,
