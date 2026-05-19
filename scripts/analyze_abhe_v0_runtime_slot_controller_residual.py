@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 ROOT = Path("outputs/artifacts/stage1_bfcl_acceptance")
-MANIFEST = ROOT / "abhe_v0_runtime_slot_controller_residual_stress_slice_manifest.json"
+MANIFEST = ROOT / "abhe_v0_runtime_slot_controller_scorer_unit_distinct_slice_plan.json"
 MATRIX = ROOT / "abhe_v0_runtime_slot_controller_residual_paired_case_matrix.json"
 FAILURE = ROOT / "abhe_v0_runtime_slot_controller_residual_failure_analysis.json"
 TRANSITION = ROOT / "abhe_v0_runtime_slot_controller_archive_transition_dry_run.json"
@@ -30,6 +30,9 @@ def _write(path: Path, data: Dict[str, Any]) -> None:
 
 
 def _arm(arm: str) -> Dict[str, Any] | None:
+    distinct_path = ROOT / f"abhe_v0_runtime_slot_controller_distinct_rerun_{arm}_arm_compact.json"
+    if distinct_path.exists():
+        return _load(distinct_path)
     path = ROOT / f"abhe_v0_runtime_slot_controller_residual_dev_smoke_{arm}_arm_compact.json"
     return _load(path) if path.exists() else None
 
@@ -169,10 +172,14 @@ def build() -> Dict[str, Any]:
     if slot_bind_repair_count == 0 and controller_enabled_patch_count > 0:
         key_findings.append("runtime_slot_controller_v2_enabled_but_noop_on_target_traces")
     target_cat = _cat(arms.get("runtime_slot_controller_v2"), TARGET_CATEGORY)
+    selected_scorer_units_by_category = manifest.get("scorer_unit_count_by_category") if isinstance(manifest.get("scorer_unit_count_by_category"), dict) else {}
+    target_observed_score_record_count = target_cat.get("unique_scorer_unit_count")
     measurement_diagnosis = {
         "selected_compact_case_count": manifest.get("selected_case_count"),
         "target_selected_compact_case_count": (manifest.get("case_count_by_category") or {}).get(TARGET_CATEGORY),
-        "target_unique_scorer_unit_count": target_cat.get("unique_scorer_unit_count"),
+        "target_selected_scorer_unit_count": int(selected_scorer_units_by_category.get(TARGET_CATEGORY) or manifest.get("target_unique_scorer_unit_count") or 0),
+        "target_observed_score_record_count": target_observed_score_record_count,
+        "target_unique_scorer_unit_count": target_observed_score_record_count,
         "target_sampled_trace_artifact_count": target_sampled_trace_count,
         "strict_per_compact_case_paired_available": False,
         "strict_scorer_unit_paired_available": True,
@@ -182,12 +189,12 @@ def build() -> Dict[str, Any]:
         "runtime_slot_bind_repair_count": slot_bind_repair_count,
         "runtime_slot_controller_enabled_patch_count": controller_enabled_patch_count,
         "root_cause_hypotheses": [
-            "selected_compact_rows_collapse_to_few_bfcl_scorer_units",
+            "selected_distinct_scorer_units_collapse_to_category_level_score_records",
             "miss_param_failure_not_exposed_as_missing_required_argument_in_post_decode_traces",
             "runtime_slot_controller_v2_marker_is_noop_without_bindable_missing_slots",
             "remaining_failures_include_post_tool_or_function_shape_semantics_not_slot_binding",
         ],
-        "next_required_action": "build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl",
+        "next_required_action": "fix_score_output_contract_or_enable_true_per_selected_or_per_turn_scoring_before_more_bfcl",
     }
     failure = {
         "artifact_kind": "abhe_v0_runtime_slot_controller_residual_failure_analysis",
@@ -229,7 +236,7 @@ def build() -> Dict[str, Any]:
         ],
         "archive_updated": False,
         "does_not_update_archive": True,
-        "next_required_action": "build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl",
+        "next_required_action": "fix_score_output_contract_or_enable_true_per_selected_or_per_turn_scoring_before_more_bfcl",
         "performance_evidence": False,
         "holdout_touched": False,
         "full_suite_touched": False,

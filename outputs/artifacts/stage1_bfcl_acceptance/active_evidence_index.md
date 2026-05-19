@@ -389,7 +389,7 @@ Status: bounded dev smoke only. Frozen v2 generalizes on the new fresh balanced 
 - Target compact identifiers: 24; score records: 1; compact-to-score-record factor: 24.0.
 - Strict per-compact-case pairing available: `false`.
 - More BFCL before scorer-unit alignment recommended: `false`.
-- Current next action: `redesign_residual_slice_at_scorer_unit_level_or_enable_per_turn_scoring_before_more_bfcl`.
+- Current next action: `fix_score_output_contract_or_enable_true_per_selected_or_per_turn_scoring_before_more_bfcl`.
 - Boundaries: `performance_evidence=false`, `archive_updated=false`, `holdout_touched=false`, `full_suite_touched=false`.
 
 
@@ -398,13 +398,14 @@ Status: bounded dev smoke only. Frozen v2 generalizes on the new fresh balanced 
 - artifact: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_per_selected_id_matrix.json`
 - target category: `multi_turn_miss_param`
 - selected compact identifiers: 24
-- unique scorer units: 1
-- compact-to-scorer-unit factor: 24.0
+- selected scorer-unit candidates: 24
+- observed target score records: 1
+- compact-to-observed-score-record factor: 24.0
 - per-selected-id pass available: false
 - pass labels are scorer-unit inherited: true
 - performance_evidence: false
 - holdout/full_suite touched: false
-- next_required_action: `build_scorer_unit_distinct_residual_slice_or_enable_true_per_turn_scoring_before_more_bfcl`
+- next_required_action: `fix_score_output_contract_or_enable_true_per_selected_or_per_turn_scoring_before_more_bfcl`
 
 
 ## ABHE-v0 Runtime Slot Scorer-Unit Distinct Slice Gate
@@ -426,11 +427,23 @@ Status: bounded dev smoke only. Frozen v2 generalizes on the new fresh balanced 
 
 - request: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_request.json`
 - dry-run manifest: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_dry_run_manifest.json`
-- approval_status: pending
-- authorized: false
+- approval_status: approved for completed bounded rerun
+- authorized: true for this completed bounded rerun only
 - runner manifest compatible: true
 - selected_case_ids_hash: `sha256:9b26ba3d24c54562f6a5058877a24f15d2e4ef71ee9ea781bcae168307f7d14c`
 - target compact-to-scorer-unit factor: 1.0
-- provider/BFCL/scorer authorized: false
+- provider/BFCL/scorer were scoped to this completed bounded rerun only
 - performance_evidence: false
-- next_required_action: `request_explicit_distinct_residual_bounded_rerun_approval`
+- next_required_action: `build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl`
+
+
+## ABHE-v0 Runtime Slot Distinct Rerun Result
+
+- Result: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_result.json`
+- Scoring contract audit: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_scoring_contract_audit.json`
+- Arms: baseline 4/48, conditional_frozen_v2 10/48, runtime_slot_controller_v2 4/48.
+- Target `multi_turn_miss_param`: 0 delta vs conditional_frozen_v2; target_bucket_reduction=0; slot_bind_repair_count=0.
+- Non-target regression: runtime_slot_controller_v2 regressed 6 compact passes vs conditional_frozen_v2.
+- Contract finding: the slice selected 24 target scorer-unit candidates, but the current compact score output exposes only 1 target score record; do not interpret target movement as true per-selected-id or per-turn pass/fail.
+- Current next action: `fix_score_output_contract_or_enable_true_per_selected_or_per_turn_scoring_before_more_bfcl`; do not run more BFCL before score-output contract alignment.
+- Boundaries: `performance_evidence=false`, `archive_updated=false`, `holdout_touched=false`, `full_suite_touched=false`.

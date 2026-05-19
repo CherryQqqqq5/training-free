@@ -12,12 +12,12 @@ from scripts.check_abhe_no_leakage_boundary import scan_value
 
 ROOT = Path("outputs/artifacts/stage1_bfcl_acceptance")
 RUN_ROOT = Path("/tmp/abhe_v0_runtime_slot_controller_residual_dev_smoke")
-MANIFEST = ROOT / "abhe_v0_runtime_slot_controller_residual_stress_slice_manifest.json"
+MANIFEST = ROOT / "abhe_v0_runtime_slot_controller_scorer_unit_distinct_slice_plan.json"
 OUTPUT = ROOT / "abhe_v0_runtime_slot_controller_scorer_unit_matrix.json"
 MODEL_ALIAS = "gpt-4o-mini-2024-07-18-FC"
 ARMS = ["baseline", "conditional_frozen_v2", "runtime_slot_controller_v2"]
 TARGET_CATEGORY = "multi_turn_miss_param"
-NEXT_ACTION = "redesign_residual_slice_at_scorer_unit_level_or_enable_per_turn_scoring_before_more_bfcl"
+NEXT_ACTION = "fix_score_output_contract_or_enable_true_per_selected_or_per_turn_scoring_before_more_bfcl"
 
 
 def _hash_text(value: str) -> str:
@@ -130,15 +130,23 @@ def build() -> Dict[str, Any]:
             "raw_material_absent": True,
         })
     target = next((row for row in category_rows if row["bfcl_category"] == TARGET_CATEGORY), {})
+    selected_scorer_units_by_category = manifest.get("scorer_unit_count_by_category") if isinstance(manifest.get("scorer_unit_count_by_category"), dict) else {}
+    target_selected_scorer_units = int(selected_scorer_units_by_category.get(TARGET_CATEGORY) or manifest.get("target_unique_scorer_unit_count") or 0)
+    target_observed_score_records = int(target.get("score_record_count") or 0)
     summary = {
         "selected_case_ids_hash": manifest.get("selected_case_ids_hash"),
         "selected_compact_case_count": manifest.get("selected_case_count"),
+        "observed_score_record_row_count": len(rows),
         "scorer_unit_row_count": len(rows),
         "target_category": TARGET_CATEGORY,
         "target_selected_compact_case_count": target.get("selected_compact_case_count"),
-        "target_score_record_count": target.get("score_record_count"),
+        "target_selected_scorer_unit_count": target_selected_scorer_units,
+        "target_observed_score_record_count": target_observed_score_records,
+        "target_score_record_count": target_observed_score_records,
+        "target_compact_to_observed_score_record_factor": target.get("compact_to_score_record_factor"),
         "target_compact_to_score_record_factor": target.get("compact_to_score_record_factor"),
         "target_strict_per_compact_case_pairing_available": target.get("strict_per_compact_case_pairing_available"),
+        "target_true_per_selected_or_per_turn_scoring_available": False,
         "more_bfcl_before_alignment_recommended": False,
     }
     report: Dict[str, Any] = {

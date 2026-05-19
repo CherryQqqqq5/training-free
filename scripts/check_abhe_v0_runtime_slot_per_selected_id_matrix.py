@@ -49,8 +49,10 @@ def validate(data: Dict[str, Any]) -> List[str]:
         blockers.append("selected_row_count_missing")
     if int(summary.get("per_turn_shape_row_count") or 0) <= 0:
         blockers.append("per_turn_shape_row_count_missing")
-    if int(summary.get("target_unique_scorer_unit_count") or 0) <= 0:
-        blockers.append("target_unique_scorer_unit_count_missing")
+    if int(summary.get("target_selected_scorer_unit_count") or summary.get("target_unique_scorer_unit_count") or 0) <= 0:
+        blockers.append("target_selected_scorer_unit_count_missing")
+    if int(summary.get("target_observed_score_record_count") or 0) <= 0:
+        blockers.append("target_observed_score_record_count_missing")
     if summary.get("target_per_selected_id_pass_available") is not False:
         blockers.append("target_per_selected_pass_not_marked_unavailable")
     if summary.get("target_pass_is_scorer_unit_inherited") is not True:
@@ -101,7 +103,10 @@ def check(path: Path = DEFAULT) -> Dict[str, Any]:
         "selected_row_count": summary.get("selected_row_count"),
         "per_turn_shape_row_count": summary.get("per_turn_shape_row_count"),
         "target_selected_compact_case_count": summary.get("target_selected_compact_case_count"),
+        "target_selected_scorer_unit_count": summary.get("target_selected_scorer_unit_count"),
+        "target_observed_score_record_count": summary.get("target_observed_score_record_count"),
         "target_unique_scorer_unit_count": summary.get("target_unique_scorer_unit_count"),
+        "target_compact_to_observed_score_record_factor": summary.get("target_compact_to_observed_score_record_factor"),
         "target_compact_to_scorer_unit_factor": summary.get("target_compact_to_scorer_unit_factor"),
         "target_per_selected_id_pass_available": summary.get("target_per_selected_id_pass_available"),
         "target_pass_is_scorer_unit_inherited": summary.get("target_pass_is_scorer_unit_inherited"),

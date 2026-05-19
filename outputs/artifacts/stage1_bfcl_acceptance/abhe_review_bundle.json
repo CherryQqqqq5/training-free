@@ -30,7 +30,10 @@
   "abhe_v0_runtime_slot_binder_causality_confirmed": false,
   "abhe_v0_runtime_slot_causality_assessment": "no_confirmed_target_score_gain",
   "abhe_v0_runtime_slot_causality_audit_ready": true,
+  "abhe_v0_runtime_slot_distinct_rerun_approval_present": true,
+  "abhe_v0_runtime_slot_distinct_rerun_command_manifest_present": true,
   "abhe_v0_runtime_slot_distinct_rerun_request_ready": true,
+  "abhe_v0_runtime_slot_distinct_rerun_result_ready": true,
   "abhe_v0_runtime_slot_distinct_rerun_runner_compatible": true,
   "abhe_v0_runtime_slot_distinct_slice_hash": "sha256:9b26ba3d24c54562f6a5058877a24f15d2e4ef71ee9ea781bcae168307f7d14c",
   "abhe_v0_runtime_slot_distinct_slice_target_units": 24,
@@ -48,26 +51,28 @@
   "abhe_v0_runtime_slot_residual_bind_repair_count": 0,
   "abhe_v0_runtime_slot_residual_failure_analysis_ready": true,
   "abhe_v0_runtime_slot_residual_measurement_diagnosis": {
-    "next_required_action": "build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl",
+    "next_required_action": "fix_score_output_contract_or_enable_true_per_selected_or_per_turn_scoring_before_more_bfcl",
     "root_cause_hypotheses": [
-      "selected_compact_rows_collapse_to_few_bfcl_scorer_units",
+      "selected_distinct_scorer_units_collapse_to_category_level_score_records",
       "miss_param_failure_not_exposed_as_missing_required_argument_in_post_decode_traces",
       "runtime_slot_controller_v2_marker_is_noop_without_bindable_missing_slots",
       "remaining_failures_include_post_tool_or_function_shape_semantics_not_slot_binding"
     ],
     "runtime_slot_bind_repair_count": 0,
-    "runtime_slot_controller_enabled_patch_count": 42,
+    "runtime_slot_controller_enabled_patch_count": 31,
     "selected_compact_case_count": 48,
     "strict_per_compact_case_paired_available": false,
     "strict_scorer_unit_paired_available": true,
     "target_argument_keyset_changed_by_repair_count": 0,
+    "target_observed_score_record_count": 1,
     "target_post_decode_missing_required_arg_count_before_repair": 0,
     "target_provider_generated_valid_call_proxy_count": 5,
     "target_sampled_trace_artifact_count": 8,
     "target_selected_compact_case_count": 24,
+    "target_selected_scorer_unit_count": 24,
     "target_unique_scorer_unit_count": 1
   },
-  "abhe_v0_runtime_slot_residual_next_required_action": "redesign_residual_slice_at_scorer_unit_level_or_enable_per_turn_scoring_before_more_bfcl",
+  "abhe_v0_runtime_slot_residual_next_required_action": "fix_score_output_contract_or_enable_true_per_selected_or_per_turn_scoring_before_more_bfcl",
   "abhe_v0_runtime_slot_residual_performance_evidence": false,
   "abhe_v0_runtime_slot_residual_result_ready": true,
   "abhe_v0_runtime_slot_residual_target_delta": 0,
@@ -76,11 +81,14 @@
   "abhe_v0_runtime_slot_scorer_unit_diagnostic_ready": true,
   "abhe_v0_runtime_slot_scorer_unit_distinct_slice_ready": true,
   "abhe_v0_runtime_slot_scorer_unit_matrix_ready": true,
+  "abhe_v0_runtime_slot_scoring_contract_audit_ready": true,
   "abhe_v0_runtime_slot_target_collapse_factor": 24.0,
   "abhe_v0_runtime_slot_target_compact_to_score_record_factor": 24.0,
+  "abhe_v0_runtime_slot_target_observed_score_record_count": 1,
   "abhe_v0_runtime_slot_target_pass_is_scorer_unit_inherited": true,
   "abhe_v0_runtime_slot_target_per_selected_id_pass_available": false,
   "abhe_v0_runtime_slot_target_score_record_count": 1,
+  "abhe_v0_runtime_slot_target_selected_scorer_unit_count": 24,
   "approval_chain_ready_for_review": true,
   "artifact_kind": "abhe_review_bundle",
   "blockers": [],
@@ -88,7 +96,7 @@
   "bundle_is_performance_evidence": false,
   "candidate_generation_authorized": false,
   "candidate_spec_drafts_ready": true,
-  "commit": "90750f1ee01b22009d76624788095aa2a432044d",
+  "commit": "ccde1382046b749eef819c01e45763373f6a3818",
   "component_paths": {
     "abhe_v0_bfcl_archive_transition_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_archive_transition_plan.json",
     "abhe_v0_bfcl_case_delta_analysis": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_bfcl_case_delta_analysis.json",
@@ -116,14 +124,18 @@
     "abhe_v0_runtime_candidate_adapter": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_candidate_adapter.json",
     "abhe_v0_runtime_slot_controller_archive_transition_dry_run": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_archive_transition_dry_run.json",
     "abhe_v0_runtime_slot_controller_causality_audit": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_causality_audit.json",
+    "abhe_v0_runtime_slot_controller_distinct_rerun_approval_packet": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_approval_packet.json",
+    "abhe_v0_runtime_slot_controller_distinct_rerun_command_manifest": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_command_manifest.json",
     "abhe_v0_runtime_slot_controller_distinct_rerun_dry_run_manifest": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_dry_run_manifest.json",
     "abhe_v0_runtime_slot_controller_distinct_rerun_request": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_request.json",
+    "abhe_v0_runtime_slot_controller_distinct_rerun_result": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_result.json",
     "abhe_v0_runtime_slot_controller_path_replay": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_path_replay.json",
     "abhe_v0_runtime_slot_controller_per_selected_id_matrix": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_per_selected_id_matrix.json",
     "abhe_v0_runtime_slot_controller_residual_dev_smoke_result": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_residual_dev_smoke_result.json",
     "abhe_v0_runtime_slot_controller_residual_failure_analysis": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_residual_failure_analysis.json",
     "abhe_v0_runtime_slot_controller_sanitized_trace_audit": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_sanitized_trace_audit.json",
     "abhe_v0_runtime_slot_controller_scorer_unit_distinct_slice_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_scorer_unit_distinct_slice_plan.json",
+    "abhe_v0_runtime_slot_controller_scoring_contract_audit": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_scoring_contract_audit.json",
     "abhe_v0_runtime_slot_observability_fixture": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_observability_fixture.json",
     "abhe_v0_runtime_slot_observability_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_observability_plan.json",
     "abhe_v0_runtime_slot_observability_review": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_observability_review.json",
@@ -451,7 +463,7 @@
           "next_required_action": "check_execution_readiness",
           "performance_evidence": false,
           "preflight_error_class": null,
-          "preflight_latency_ms": 3681.018,
+          "preflight_latency_ms": 3026.315,
           "preflight_status_code_class": "2xx",
           "profile": "toolcallingfunction",
           "profile_loaded": true,
@@ -513,7 +525,7 @@
         "next_required_action": "check_execution_readiness",
         "performance_evidence": false,
         "preflight_error_class": null,
-        "preflight_latency_ms": 3681.018,
+        "preflight_latency_ms": 3026.315,
         "preflight_status_code_class": "2xx",
         "profile": "toolcallingfunction",
         "profile_loaded": true,
@@ -679,7 +691,7 @@
       "next_required_action": "check_execution_readiness",
       "performance_evidence": false,
       "preflight_error_class": null,
-      "preflight_latency_ms": 3681.018,
+      "preflight_latency_ms": 3026.315,
       "preflight_status_code_class": "2xx",
       "profile": "toolcallingfunction",
       "profile_loaded": true,
@@ -716,6 +728,17 @@
       "holdout_touched": false,
       "next_required_action": "run_no_provider_proxy_fixture_and_same_request_noop_replay_before_promoting_runtime_slot_controller_v2",
       "overall_assessment": "no_confirmed_target_score_gain",
+      "performance_evidence": false
+    },
+    "abhe_v0_runtime_slot_distinct_rerun_approval": {
+      "approval_scope": "scorer_unit_distinct_bounded_residual_dev_smoke_only",
+      "approval_status": "approved",
+      "authorized": true,
+      "full_suite_authorized": false,
+      "holdout_authorized": false,
+      "performance_evidence": false
+    },
+    "abhe_v0_runtime_slot_distinct_rerun_command_manifest": {
       "performance_evidence": false
     },
     "abhe_v0_runtime_slot_distinct_rerun_dry_run": {
@@ -861,6 +884,18 @@
       "selected_case_ids_hash": "sha256:9b26ba3d24c54562f6a5058877a24f15d2e4ef71ee9ea781bcae168307f7d14c",
       "target_compact_to_scorer_unit_factor": 1.0
     },
+    "abhe_v0_runtime_slot_distinct_rerun_result": {
+      "archive_updated": false,
+      "arms_complete": {
+        "baseline": true,
+        "conditional_frozen_v2": true,
+        "runtime_slot_controller_v2": true
+      },
+      "full_suite_touched": false,
+      "holdout_touched": false,
+      "performance_evidence": false,
+      "selected_case_ids_hash": "sha256:9b26ba3d24c54562f6a5058877a24f15d2e4ef71ee9ea781bcae168307f7d14c"
+    },
     "abhe_v0_runtime_slot_observability_fixture": {
       "artifact_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_observability_fixture.json",
       "bind_repair_rows": 1,
@@ -914,49 +949,67 @@
       "category_summaries": [
         {
           "bfcl_category": "irrelevance",
+          "compact_to_observed_score_record_factor": 4.0,
           "compact_to_scorer_unit_factor": 4.0,
+          "observed_score_record_count": 1,
           "raw_material_absent": true,
           "selected_compact_case_count": 4,
+          "selected_scorer_unit_count": 4,
           "strict_per_selected_id_pairing_available": false,
           "unique_scorer_unit_count": 1
         },
         {
           "bfcl_category": "live_irrelevance",
+          "compact_to_observed_score_record_factor": 4.0,
           "compact_to_scorer_unit_factor": 4.0,
+          "observed_score_record_count": 1,
           "raw_material_absent": true,
           "selected_compact_case_count": 4,
+          "selected_scorer_unit_count": 4,
           "strict_per_selected_id_pairing_available": false,
           "unique_scorer_unit_count": 1
         },
         {
           "bfcl_category": "multi_turn_base",
+          "compact_to_observed_score_record_factor": 6.0,
           "compact_to_scorer_unit_factor": 6.0,
+          "observed_score_record_count": 1,
           "raw_material_absent": true,
           "selected_compact_case_count": 6,
+          "selected_scorer_unit_count": 6,
           "strict_per_selected_id_pairing_available": false,
           "unique_scorer_unit_count": 1
         },
         {
           "bfcl_category": "multi_turn_long_context",
+          "compact_to_observed_score_record_factor": 4.0,
           "compact_to_scorer_unit_factor": 4.0,
+          "observed_score_record_count": 1,
           "raw_material_absent": true,
           "selected_compact_case_count": 4,
+          "selected_scorer_unit_count": 4,
           "strict_per_selected_id_pairing_available": false,
           "unique_scorer_unit_count": 1
         },
         {
           "bfcl_category": "multi_turn_miss_func",
+          "compact_to_observed_score_record_factor": 6.0,
           "compact_to_scorer_unit_factor": 6.0,
+          "observed_score_record_count": 1,
           "raw_material_absent": true,
           "selected_compact_case_count": 6,
+          "selected_scorer_unit_count": 6,
           "strict_per_selected_id_pairing_available": false,
           "unique_scorer_unit_count": 1
         },
         {
           "bfcl_category": "multi_turn_miss_param",
+          "compact_to_observed_score_record_factor": 24.0,
           "compact_to_scorer_unit_factor": 24.0,
+          "observed_score_record_count": 1,
           "raw_material_absent": true,
           "selected_compact_case_count": 24,
+          "selected_scorer_unit_count": 24,
           "strict_per_selected_id_pairing_available": false,
           "unique_scorer_unit_count": 1
         }
@@ -964,7 +1017,7 @@
       "full_suite_touched": false,
       "gold_expected_committed": false,
       "holdout_touched": false,
-      "next_required_action": "build_scorer_unit_distinct_residual_slice_or_enable_true_per_turn_scoring_before_more_bfcl",
+      "next_required_action": "fix_score_output_contract_or_enable_true_per_selected_or_per_turn_scoring_before_more_bfcl",
       "per_turn_shape_rows": [
         {
           "arm": "baseline",
@@ -1225,7 +1278,7 @@
           "per_turn_pass_available": false,
           "raw_material_absent": true,
           "scorer_unit_hash": "sha256:82e48127c3a1a785d9712c96b661c9d7e64e415cff3d42e347a1aa6c961250bd",
-          "scorer_unit_valid": null,
+          "scorer_unit_valid": false,
           "selected_id_mapping_available": false,
           "selected_id_mapping_blocker": "bfcl_output_turns_do_not_expose_selected_compact_identifier",
           "turn_index_proxy": 0
@@ -1237,7 +1290,7 @@
           "per_turn_pass_available": false,
           "raw_material_absent": true,
           "scorer_unit_hash": "sha256:82e48127c3a1a785d9712c96b661c9d7e64e415cff3d42e347a1aa6c961250bd",
-          "scorer_unit_valid": null,
+          "scorer_unit_valid": false,
           "selected_id_mapping_available": false,
           "selected_id_mapping_blocker": "bfcl_output_turns_do_not_expose_selected_compact_identifier",
           "turn_index_proxy": 1
@@ -1249,7 +1302,7 @@
           "per_turn_pass_available": false,
           "raw_material_absent": true,
           "scorer_unit_hash": "sha256:82e48127c3a1a785d9712c96b661c9d7e64e415cff3d42e347a1aa6c961250bd",
-          "scorer_unit_valid": false,
+          "scorer_unit_valid": null,
           "selected_id_mapping_available": false,
           "selected_id_mapping_blocker": "bfcl_output_turns_do_not_expose_selected_compact_identifier",
           "turn_index_proxy": 0
@@ -1261,7 +1314,7 @@
           "per_turn_pass_available": false,
           "raw_material_absent": true,
           "scorer_unit_hash": "sha256:82e48127c3a1a785d9712c96b661c9d7e64e415cff3d42e347a1aa6c961250bd",
-          "scorer_unit_valid": false,
+          "scorer_unit_valid": null,
           "selected_id_mapping_available": false,
           "selected_id_mapping_blocker": "bfcl_output_turns_do_not_expose_selected_compact_identifier",
           "turn_index_proxy": 1
@@ -1297,7 +1350,7 @@
           "per_turn_pass_available": false,
           "raw_material_absent": true,
           "scorer_unit_hash": "sha256:aec30dd74ab1be75bea71f75de1bac178a98b661e694930e9d1748070a264e5d",
-          "scorer_unit_valid": false,
+          "scorer_unit_valid": null,
           "selected_id_mapping_available": false,
           "selected_id_mapping_blocker": "bfcl_output_turns_do_not_expose_selected_compact_identifier",
           "turn_index_proxy": 0
@@ -1309,7 +1362,7 @@
           "per_turn_pass_available": false,
           "raw_material_absent": true,
           "scorer_unit_hash": "sha256:aec30dd74ab1be75bea71f75de1bac178a98b661e694930e9d1748070a264e5d",
-          "scorer_unit_valid": false,
+          "scorer_unit_valid": null,
           "selected_id_mapping_available": false,
           "selected_id_mapping_blocker": "bfcl_output_turns_do_not_expose_selected_compact_identifier",
           "turn_index_proxy": 1
@@ -1321,7 +1374,7 @@
           "per_turn_pass_available": false,
           "raw_material_absent": true,
           "scorer_unit_hash": "sha256:aec30dd74ab1be75bea71f75de1bac178a98b661e694930e9d1748070a264e5d",
-          "scorer_unit_valid": false,
+          "scorer_unit_valid": null,
           "selected_id_mapping_available": false,
           "selected_id_mapping_blocker": "bfcl_output_turns_do_not_expose_selected_compact_identifier",
           "turn_index_proxy": 2
@@ -1605,22 +1658,6 @@
         {
           "arm": "baseline",
           "bfcl_category": "multi_turn_base",
-          "error_type_class": "missing_score_record",
-          "inference_log_count": 5,
-          "model_result_decoded_turn_count": null,
-          "prompt_question_turn_count": null,
-          "raw_material_absent": true,
-          "result_record_present": true,
-          "result_turn_count": 2,
-          "score_record_present": false,
-          "scorer_unit_hash": "sha256:82e48127c3a1a785d9712c96b661c9d7e64e415cff3d42e347a1aa6c961250bd",
-          "scorer_unit_valid": null,
-          "selected_compact_case_count": 6,
-          "strict_per_selected_id_result_available": false
-        },
-        {
-          "arm": "conditional_frozen_v2",
-          "bfcl_category": "multi_turn_base",
           "error_type_class": "multi_turn:instance_state_mismatch",
           "inference_log_count": 5,
           "model_result_decoded_turn_count": 2,
@@ -1631,6 +1668,22 @@
           "score_record_present": true,
           "scorer_unit_hash": "sha256:82e48127c3a1a785d9712c96b661c9d7e64e415cff3d42e347a1aa6c961250bd",
           "scorer_unit_valid": false,
+          "selected_compact_case_count": 6,
+          "strict_per_selected_id_result_available": false
+        },
+        {
+          "arm": "conditional_frozen_v2",
+          "bfcl_category": "multi_turn_base",
+          "error_type_class": "missing_score_record",
+          "inference_log_count": 5,
+          "model_result_decoded_turn_count": null,
+          "prompt_question_turn_count": null,
+          "raw_material_absent": true,
+          "result_record_present": true,
+          "result_turn_count": 2,
+          "score_record_present": false,
+          "scorer_unit_hash": "sha256:82e48127c3a1a785d9712c96b661c9d7e64e415cff3d42e347a1aa6c961250bd",
+          "scorer_unit_valid": null,
           "selected_compact_case_count": 6,
           "strict_per_selected_id_result_available": false
         },
@@ -1653,16 +1706,16 @@
         {
           "arm": "baseline",
           "bfcl_category": "multi_turn_long_context",
-          "error_type_class": "multi_turn:execution_response_mismatch",
+          "error_type_class": "missing_score_record",
           "inference_log_count": 7,
-          "model_result_decoded_turn_count": 3,
-          "prompt_question_turn_count": 3,
+          "model_result_decoded_turn_count": null,
+          "prompt_question_turn_count": null,
           "raw_material_absent": true,
           "result_record_present": true,
           "result_turn_count": 3,
-          "score_record_present": true,
+          "score_record_present": false,
           "scorer_unit_hash": "sha256:aec30dd74ab1be75bea71f75de1bac178a98b661e694930e9d1748070a264e5d",
-          "scorer_unit_valid": false,
+          "scorer_unit_valid": null,
           "selected_compact_case_count": 4,
           "strict_per_selected_id_result_available": false
         },
@@ -2819,14 +2872,14 @@
         {
           "arm_outcomes": {
             "baseline": {
-              "error_type_class": "missing_score_record",
-              "inherited_not_independent": true,
-              "scorer_unit_valid": null
-            },
-            "conditional_frozen_v2": {
               "error_type_class": "multi_turn:instance_state_mismatch",
               "inherited_not_independent": true,
               "scorer_unit_valid": false
+            },
+            "conditional_frozen_v2": {
+              "error_type_class": "missing_score_record",
+              "inherited_not_independent": true,
+              "scorer_unit_valid": null
             },
             "runtime_slot_controller_v2": {
               "error_type_class": "multi_turn:instance_state_mismatch",
@@ -2853,14 +2906,14 @@
         {
           "arm_outcomes": {
             "baseline": {
-              "error_type_class": "missing_score_record",
-              "inherited_not_independent": true,
-              "scorer_unit_valid": null
-            },
-            "conditional_frozen_v2": {
               "error_type_class": "multi_turn:instance_state_mismatch",
               "inherited_not_independent": true,
               "scorer_unit_valid": false
+            },
+            "conditional_frozen_v2": {
+              "error_type_class": "missing_score_record",
+              "inherited_not_independent": true,
+              "scorer_unit_valid": null
             },
             "runtime_slot_controller_v2": {
               "error_type_class": "multi_turn:instance_state_mismatch",
@@ -2887,14 +2940,14 @@
         {
           "arm_outcomes": {
             "baseline": {
-              "error_type_class": "missing_score_record",
-              "inherited_not_independent": true,
-              "scorer_unit_valid": null
-            },
-            "conditional_frozen_v2": {
               "error_type_class": "multi_turn:instance_state_mismatch",
               "inherited_not_independent": true,
               "scorer_unit_valid": false
+            },
+            "conditional_frozen_v2": {
+              "error_type_class": "missing_score_record",
+              "inherited_not_independent": true,
+              "scorer_unit_valid": null
             },
             "runtime_slot_controller_v2": {
               "error_type_class": "multi_turn:instance_state_mismatch",
@@ -2921,14 +2974,14 @@
         {
           "arm_outcomes": {
             "baseline": {
-              "error_type_class": "missing_score_record",
-              "inherited_not_independent": true,
-              "scorer_unit_valid": null
-            },
-            "conditional_frozen_v2": {
               "error_type_class": "multi_turn:instance_state_mismatch",
               "inherited_not_independent": true,
               "scorer_unit_valid": false
+            },
+            "conditional_frozen_v2": {
+              "error_type_class": "missing_score_record",
+              "inherited_not_independent": true,
+              "scorer_unit_valid": null
             },
             "runtime_slot_controller_v2": {
               "error_type_class": "multi_turn:instance_state_mismatch",
@@ -2955,14 +3008,14 @@
         {
           "arm_outcomes": {
             "baseline": {
-              "error_type_class": "missing_score_record",
-              "inherited_not_independent": true,
-              "scorer_unit_valid": null
-            },
-            "conditional_frozen_v2": {
               "error_type_class": "multi_turn:instance_state_mismatch",
               "inherited_not_independent": true,
               "scorer_unit_valid": false
+            },
+            "conditional_frozen_v2": {
+              "error_type_class": "missing_score_record",
+              "inherited_not_independent": true,
+              "scorer_unit_valid": null
             },
             "runtime_slot_controller_v2": {
               "error_type_class": "multi_turn:instance_state_mismatch",
@@ -2989,14 +3042,14 @@
         {
           "arm_outcomes": {
             "baseline": {
-              "error_type_class": "missing_score_record",
-              "inherited_not_independent": true,
-              "scorer_unit_valid": null
-            },
-            "conditional_frozen_v2": {
               "error_type_class": "multi_turn:instance_state_mismatch",
               "inherited_not_independent": true,
               "scorer_unit_valid": false
+            },
+            "conditional_frozen_v2": {
+              "error_type_class": "missing_score_record",
+              "inherited_not_independent": true,
+              "scorer_unit_valid": null
             },
             "runtime_slot_controller_v2": {
               "error_type_class": "multi_turn:instance_state_mismatch",
@@ -3023,9 +3076,9 @@
         {
           "arm_outcomes": {
             "baseline": {
-              "error_type_class": "multi_turn:execution_response_mismatch",
+              "error_type_class": "missing_score_record",
               "inherited_not_independent": true,
-              "scorer_unit_valid": false
+              "scorer_unit_valid": null
             },
             "conditional_frozen_v2": {
               "error_type_class": "multi_turn:execution_response_mismatch",
@@ -3057,9 +3110,9 @@
         {
           "arm_outcomes": {
             "baseline": {
-              "error_type_class": "multi_turn:execution_response_mismatch",
+              "error_type_class": "missing_score_record",
               "inherited_not_independent": true,
-              "scorer_unit_valid": false
+              "scorer_unit_valid": null
             },
             "conditional_frozen_v2": {
               "error_type_class": "multi_turn:execution_response_mismatch",
@@ -3091,9 +3144,9 @@
         {
           "arm_outcomes": {
             "baseline": {
-              "error_type_class": "multi_turn:execution_response_mismatch",
+              "error_type_class": "missing_score_record",
               "inherited_not_independent": true,
-              "scorer_unit_valid": false
+              "scorer_unit_valid": null
             },
             "conditional_frozen_v2": {
               "error_type_class": "multi_turn:execution_response_mismatch",
@@ -3125,9 +3178,9 @@
         {
           "arm_outcomes": {
             "baseline": {
-              "error_type_class": "multi_turn:execution_response_mismatch",
+              "error_type_class": "missing_score_record",
               "inherited_not_independent": true,
-              "scorer_unit_valid": false
+              "scorer_unit_valid": null
             },
             "conditional_frozen_v2": {
               "error_type_class": "multi_turn:execution_response_mismatch",
@@ -3431,6 +3484,7 @@
       ],
       "summary": {
         "more_bfcl_before_alignment_recommended": false,
+        "observed_score_record_row_count": 18,
         "per_turn_shape_row_count": 44,
         "scorer_unit_row_count": 18,
         "selected_case_ids_hash": "sha256:9b26ba3d24c54562f6a5058877a24f15d2e4ef71ee9ea781bcae168307f7d14c",
@@ -3438,10 +3492,14 @@
         "selected_row_count": 48,
         "strict_per_selected_id_pairing_available": false,
         "target_category": "multi_turn_miss_param",
+        "target_compact_to_observed_score_record_factor": 24.0,
         "target_compact_to_scorer_unit_factor": 24.0,
+        "target_observed_score_record_count": 1,
         "target_pass_is_scorer_unit_inherited": true,
         "target_per_selected_id_pass_available": false,
         "target_selected_compact_case_count": 24,
+        "target_selected_scorer_unit_count": 24,
+        "target_true_per_selected_or_per_turn_scoring_available": false,
         "target_unique_scorer_unit_count": 1
       },
       "trace_shape_summaries": {
@@ -3461,7 +3519,7 @@
           "safe_trace_fields_only": true,
           "trace_file_count": 1,
           "trace_file_hashes": [
-            "sha256:47810cec344832b92eff2198a731bcca2ab7c8cdc90ce3d64bb6550d416cfd5f"
+            "sha256:cee3d8259bfc4599c3b7a15de3136d274691a9cd5cc1429cc5b01183fdd17ddd"
           ],
           "trace_hash_sample_truncated": false
         },
@@ -3481,7 +3539,7 @@
           "safe_trace_fields_only": true,
           "trace_file_count": 1,
           "trace_file_hashes": [
-            "sha256:c4bbbf37d6696aaac435d6658717b7daa9c5e498e38ce0a56f25984a1fd91492"
+            "sha256:a7984ece049d4d97878d6e1f7a73f388b3f8ff6f468ccee44974051a5c11f7d1"
           ],
           "trace_hash_sample_truncated": false
         },
@@ -3490,40 +3548,44 @@
             "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)": 2
           },
           "issue_count": 2,
-          "latency_present_count": 11,
+          "latency_present_count": 17,
           "policy_hit_count": 0,
           "raw_material_absent": true,
-          "repair_kind_counts": {},
+          "repair_kind_counts": {
+            "resolve_contextual_string_arg": 4
+          },
           "request_patch_counts": {
-            "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.": 11,
-            "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.": 11,
-            "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.": 11,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: Meeting notes and project details., USR002, No user is currently logged in.": 1,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: USR002, No user is currently logged in., Meeting notes and project details.": 1,
+            "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.": 17,
+            "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.": 17,
+            "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.": 17,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: ./initial_directory/notes": 1,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: ./initial_directory/notes, USR002": 5,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: Meeting notes and project details., No user is currently logged in.": 1,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: USR002": 1,
             "prompt_injector:Known explicit context values you can reuse exactly if relevant: initial_directory": 2,
             "prompt_injector:Known explicit context values you can reuse exactly if relevant: initial_directory, notes, other_file.txt": 1,
             "prompt_injector:Known explicit context values you can reuse exactly if relevant: initial_directory, notes, other_file.txt, Meeting notes and project details.": 1,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: initial_directory, notes, other_file.txt, Meeting notes and project details., USR002": 1,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: initial_directory, notes, other_file.txt, Meeting notes and project details., USR002, No user is currently logged in.": 2,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: notes, other_file.txt, Meeting notes and project details., USR002, No user is currently logged in.": 1,
-            "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.": 11
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: initial_directory, notes, other_file.txt, Meeting notes and project details., No user is currently logged in.": 3,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: notes, other_file.txt, Meeting notes and project details., No user is currently logged in.": 1,
+            "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.": 17
           },
           "safe_trace_fields_only": true,
-          "trace_file_count": 11,
+          "trace_file_count": 17,
           "trace_file_hashes": [
-            "sha256:8bb6279029d1436fbfbaaf5c3904db962ff6903b001597860d593467f6fa2a0a",
-            "sha256:b2853bfcc192e14fcd620aece8cfbbadcd4e85b4dc5d6c1025f50f1c61f59416",
-            "sha256:710c0260b0ad7e45f218999c11c9b9f74f467a47136ad61ea00ea861f3327f06",
-            "sha256:aba20f2c7b8eda672c72116dfc37e9d25d6e8d86dc62e845abef5ba219df47a7",
-            "sha256:9b3e3bfadd5baacdf800dcdc739b1a98422b1698156fb88926bec3311e2ca3ed",
-            "sha256:b7f61e1cb240cf30549d1c54f8b35048f2628a9ddf12cd245b0dbec458840fcf",
-            "sha256:7b6fdb08e38b3e9ef9813171ad797600f26c2488033270656c9c234954ed53ff",
-            "sha256:a3c760fdecf3cc355b77fe5e8c71278f41a37f22f7d893aced7df66760d17592",
-            "sha256:cb8892543bae4c3fe7d9b1de4e0e3858ab5b9bf05ec888ebe152e9ca6e3934ab",
-            "sha256:bf5c14b363fca64910306ef5e023a7df19a2c00033d9cc632bf622120cbb2d2d",
-            "sha256:74592c157a41981a7f87ec9871d6130d85c16713bcc93a602abac4e0adf76078"
+            "sha256:5b62d356bbdfded603d90bd9633c8e17922a3c4fe84f4d3a02ff087664113550",
+            "sha256:0011f38c2322bbf48e5dc3a956e8111dbb405d3b409eeb76350a61d9f650a086",
+            "sha256:1195008fd34162f18628d4e9017f7e2980b8747e672a25d2abb23388dc1a5c12",
+            "sha256:f25a5626a057cbc9ec02b53b84a8a60c1fbe03ec82a9886f4ae257ca9847ffca",
+            "sha256:ca53b5c6d073d8d7b74a4055cb960cc6f51e41f60e2a06f5c051fadfc9ac173f",
+            "sha256:b1eb547c4826f5e4fcb9502b9986e2071d8d233d053a108108b028a9c0cbe146",
+            "sha256:0203961aff5b8036602511eca724c4b448204c57eef0de9c0f60009650dfa865",
+            "sha256:7e1a49ade2b239e474c7ae1e128baace11e61bfb4c3984bdd7b31b4a4866b340",
+            "sha256:1205a75f156681d6f2d1543d053178a345cb2814f2a9ec6eee3a32a8b53f19f4",
+            "sha256:2bc11b5783da37817c942d102e08b705f26dc8434df0438b00f763952a2d8b89",
+            "sha256:93d1f7b733dd2971de0dc247617d2123188f7c15edde2a8f388d98b45611b436",
+            "sha256:62d4aa8579c87fa069c6efe94cbc8520e8f662858295769b6e8bcd6371f30dbb"
           ],
-          "trace_hash_sample_truncated": false
+          "trace_hash_sample_truncated": true
         },
         "baseline:multi_turn_long_context": {
           "failure_label_counts": {
@@ -3540,65 +3602,65 @@
             "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.": 7,
             "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.": 7,
             "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.": 7,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: ./student_record.txt, student_record.txt, 91.67": 1,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: ./student_record.txt, ./image_344822349461074042.jpg, ./image_8219547643081662353.jpg, ./image_5421509146842474663.jpg, ./image_185391401034246046.jpg, ./image_6824007961180780019.jpg, ./image_2994974694593273051.jpg, ./image_2537728455072851196.jpg": 1,
             "prompt_injector:Known explicit context values you can reuse exactly if relevant: find": 1,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: find, ./student_record.txt": 1,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: find, ./student_record.txt, student_record.txt": 3,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: find, ./student_record.txt, student_record.txt, 91.67": 1,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: find, ./student_record.txt, ./image_344822349461074042.jpg, ./image_8219547643081662353.jpg, ./image_5421509146842474663.jpg, ./image_185391401034246046.jpg, ./image_6824007961180780019.jpg, ./image_2994974694593273051.jpg": 5,
             "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.": 7
           },
           "safe_trace_fields_only": true,
           "trace_file_count": 7,
           "trace_file_hashes": [
-            "sha256:42bda9f9fde3a743f5dcb45e76173b7e5b765d10797e314b39e363caf02a866e",
-            "sha256:87606eb81c0b94682811ae387b1329db48f61e446c59f09419b36a13b153faa7",
-            "sha256:302997edb02c1549056bb6d2cd1ce30ff1db8161dc90b62fe97c12f268bb47f3",
-            "sha256:a3ffb1d54ef877510c939f5dccc6fc8b30f0464f75aa19e88917c6f59956290d",
-            "sha256:d7164987595a0e02121a799818f6951704e035ce64e2e6942557ce564cbc91fd",
-            "sha256:d601db23e95e59cb4bf047d2e8607bd0a7c1e43c55d7ae246eccea91169dd740",
-            "sha256:e729cf149cd4c2ff53f74d386a29cded3a7b9abb2c9f9df7f02c6a21fe5d5286"
+            "sha256:e3736d389ce7ada770fbd0fc6337a58c18de50d37474aaf9e662e8a3cfd3c442",
+            "sha256:175aa1b1ccdcf0641faae656c8d0da601c154812bb694b89280ade9749d4eab2",
+            "sha256:208a4e80510d6bd8512df07415af403a3cd5c9ce93487fd140646198fba9a569",
+            "sha256:327b4ed1d105796b6f56c43a14b9877d18dc1517ffebff7f66dec6d350b715c1",
+            "sha256:dd11ff86367c8799869db4523563179c73250d247dddfdb3a0d9c2b287cdb83d",
+            "sha256:99b181314837d04d85178e92ed1aaa1e2a6c9e18209f777b58ecb14e557850a0",
+            "sha256:c1289488b886044d2845c1e8044ded53598fdb094b84650a9acb0f7894267a52"
           ],
           "trace_hash_sample_truncated": false
         },
         "baseline:multi_turn_miss_func": {
           "failure_label_counts": {
-            "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)": 4
+            "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)": 2,
+            "(POST_TOOL,CLARIFICATION_REQUEST)": 2,
+            "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)": 8
           },
-          "issue_count": 4,
-          "latency_present_count": 13,
+          "issue_count": 12,
+          "latency_present_count": 39,
           "policy_hit_count": 0,
           "raw_material_absent": true,
           "repair_kind_counts": {},
           "request_patch_counts": {
-            "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.": 13,
-            "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.": 13,
-            "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.": 13,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: Lectures, Notes2023.txt": 12,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: Notes2023.txt, Lectures, characters": 1,
-            "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.": 13
+            "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.": 39,
+            "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.": 39,
+            "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.": 39,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: Lectures, Notes2023.txt": 34,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: Notes2023.txt, Lectures": 2,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: Notes2023.txt, Lectures, characters": 3,
+            "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.": 39
           },
           "safe_trace_fields_only": true,
-          "trace_file_count": 13,
+          "trace_file_count": 39,
           "trace_file_hashes": [
-            "sha256:f3b9ac8e097651b81a68a96cff842e5a3a0fc0995bb1e2e4f217d2dc67e7b0f0",
-            "sha256:068fd9390ac6e758b92ce6858cbe7ede090a206c576e01a1f36aa4b0d6e5aae6",
-            "sha256:43f72be84412b1ddcdbf56b3a5108b63a68e27e0a9aa4a1ca497d77acd13e1ee",
-            "sha256:497c7a551a6e8b0176e4056d47b5260648dbe1586a8bd66a56f3764d17d2ddda",
-            "sha256:7863454fc140623cdd55e247eb1605afc59929d57837a5fd66a33a6ecb41cd55",
-            "sha256:1cbf695d26fc954707b1ab19500d1f2925f96feff33d43d7b9941b3b5af26250",
-            "sha256:04c8406c53ea3c4665fe97cbdac06a9385529d46258660c32f9df499ac2956a9",
-            "sha256:7d66910515d003802d84b9a232ecf7a2a0c2464e997422ceff7578c20a5b97b9",
-            "sha256:53887ca7176889925a3881d27ee36a3b1b84455f2479a16207516b7b3e328d14",
-            "sha256:e200857288585d1aacbfe241a7c3978e9b7a9c1c791d97ffa9c13f10402d2e0b",
-            "sha256:f8f573a5f9f5d7fa7fe81fa6e3b1d8fc6cb6bdbd0a238c95964cbe64a05c65ef",
-            "sha256:009d4271e88580b6454de73fae20bec721fd0fee3e765659c7764ca2d5fc3381"
+            "sha256:32365517506dce4b24c365a8f90813ad966ea26372d60bde7fc909658ae84d4c",
+            "sha256:fc59a97e0f9af9090c619149b623ef831479ec1dc304f38db55f07fcfb072ad7",
+            "sha256:8a63a6180f96292ba8081d8c6ae6e5c1f35f1b768e158aaeed0c5479ee91d09a",
+            "sha256:ef695a7dea77b8cac7b6b0d7a2dee4881686aea8a65d90876b733467c9386925",
+            "sha256:78835430a71a0130a0965a27358306b7b1377ab961a9eeefe444edc272b46887",
+            "sha256:d4eadb937f54e73f276a00b95209502688402d38d7a915fea97c170fb157eb6f",
+            "sha256:c5049f622ed3ce86eb5d02a97890a142bb1ef2732db409c6f55b6681f7075077",
+            "sha256:dede22202601e0bbf43167099d7cfedf6af69392689f813f5cddc69b07b49405",
+            "sha256:5455451a06f831392aac5bec1796028bc55041d7a5a263a6e32c1784a2f36dbe",
+            "sha256:857339153dc4fb86d8ee8c041a0fd6f2902770b86b63b7c569b9d092b69b243f",
+            "sha256:f2fb96897424c2d6b770f7d52bd8f2baa3b9df49448d23282b4f855dc2b2555e",
+            "sha256:ad3c0c4c56f94abddb3adfc84cff91234758b3cd6058bf6b64fb7caf0aecc1a2"
           ],
           "trace_hash_sample_truncated": true
         },
         "baseline:multi_turn_miss_param": {
           "failure_label_counts": {
-            "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)": 1,
-            "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)": 2
+            "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)": 3
           },
           "issue_count": 3,
           "latency_present_count": 7,
@@ -3609,23 +3671,22 @@
             "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.": 7,
             "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.": 7,
             "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.": 7,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: locked": 2,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: locked, pressed, fitness_reader, #TireCheck, #CarMaintenance": 1,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: locked, pressed, fitness_reader, #TireCheck, #CarMaintenance, running": 1,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: locked, pressed, fitness_reader, #TireCheck, #CarMaintenance, running, mike53": 1,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: pressed, fitness_reader, #TireCheck, #CarMaintenance, running, mike53, #CarCare, #TireHealth": 1,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: locked": 3,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: locked, fitness_reader, #ImpeccableCondition, #TireCare, #ReadyToRoll": 1,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: locked, fitness_reader, #ImpeccableCondition, #TireCare, #ReadyToRoll, mike53": 1,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: locked, fitness_reader, #ImpeccableCondition, #TireCare, #ReadyToRoll, mike53, #CarCare, #TireHealth": 1,
             "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.": 7
           },
           "safe_trace_fields_only": true,
           "trace_file_count": 7,
           "trace_file_hashes": [
-            "sha256:f8b8f14fea8c313cbc875291a35a5c043fbd2f3ad7331c5b994187a56fcd1f63",
-            "sha256:710661b9743e4dab191d31c3d17a588f3c796d3b4e7116de2757c29a22bf313c",
-            "sha256:1634109de52944c3018033a7185931b7496e926f77030ed0f54ea8b86bea53e7",
-            "sha256:f26da950b6d37ae96f33366a9f9291e2c7a0290a85e937d5a33c06261d8b79d8",
-            "sha256:b00159aed47aaf47ae7148e81331ff64cb9366ac5bfdd5f35165d52f8ff0071f",
-            "sha256:b079b05a180eb1c315f7ce336ebd4d859c6233da37f2e030be88d57d9c7d7f05",
-            "sha256:0602986676584b95eca7bbe6a88c1dea37f95d2b37c84ffc5f4d636e25216351"
+            "sha256:cf451b867def005e68714b5558a756edd68abffa542e54308fc962c4b4f5167a",
+            "sha256:6142e6e06e178d6c172eb91662361ad2a3507ab242d449772ff2bfb542ff4301",
+            "sha256:f8fc698bb571dcfcca855edd88139883b43e16db0b6d88f08d105682d36f22cd",
+            "sha256:a47d79df7b5f55cb0e53bb7e990d5880c3d2ca297fbf6ad97fbe602eb91011d7",
+            "sha256:1f0270fc7efd14445213deb6a2e23c047e314e592cd534f1961473db2646c9fa",
+            "sha256:c5d7e3e4225948aacecdcefe78c90ef1c52c534617fb79adac5391863d51db32",
+            "sha256:4fa0d48820d7976a67c70c16c1320f6407f89910d8e34331a85914f043554a95"
           ],
           "trace_hash_sample_truncated": false
         },
@@ -3649,7 +3710,7 @@
           "safe_trace_fields_only": true,
           "trace_file_count": 1,
           "trace_file_hashes": [
-            "sha256:492ee6684b13cc3f4455184b5c0a5f6cb751f99bdc2b10ba3bf82c674cab9200"
+            "sha256:438fa85e4801ee046a528ef4607eb5c6d9f7b15422124a6b545eed58891fa9b7"
           ],
           "trace_hash_sample_truncated": false
         },
@@ -3671,129 +3732,99 @@
           "safe_trace_fields_only": true,
           "trace_file_count": 1,
           "trace_file_hashes": [
-            "sha256:8f8280f4af3d1aa3a0c0f93d888d2ab25f32f1e46d414c7d2e6998b9f66662aa"
+            "sha256:f7ed457255f4e5fb62c287d005b69a0697f99037e1eb2dfed044eec229eb1b8d"
           ],
           "trace_hash_sample_truncated": false
         },
         "conditional_frozen_v2:multi_turn_base": {
           "failure_label_counts": {
-            "(POST_TOOL,CLARIFICATION_REQUEST)": 1,
-            "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)": 1
-          },
-          "issue_count": 2,
-          "latency_present_count": 17,
-          "policy_hit_count": 0,
-          "raw_material_absent": true,
-          "repair_kind_counts": {
-            "resolve_contextual_string_arg": 4
-          },
-          "request_patch_counts": {
-            "abhe_v0_runtime_candidate_adapter_guidance:state_tracking_v0": 17,
-            "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.": 17,
-            "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.": 17,
-            "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.": 17,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: ./initial_directory/notes": 6,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: ./initial_directory/notes, notes, initial_directory/notes": 1,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: ./initial_directory/notes, notes, initial_directory/notes, initial_directory": 2,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: ./initial_directory/notes, notes, initial_directory/notes, initial_directory, other_file.txt": 1,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: ./initial_directory/notes, notes, initial_directory/notes, initial_directory, other_file.txt, Meeting notes and project details.": 1,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: ./initial_directory/notes, notes, initial_directory/notes, initial_directory, other_file.txt, Meeting notes and project details., USR002": 1,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: Meeting notes and project details., USR002, No user is currently logged in.": 1,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: initial_directory, notes, other_file.txt, Meeting notes and project details., USR002, No user is currently logged in.": 2,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: notes, other_file.txt, Meeting notes and project details., USR002, No user is currently logged in.": 1,
-            "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.": 17
-          },
-          "safe_trace_fields_only": true,
-          "trace_file_count": 17,
-          "trace_file_hashes": [
-            "sha256:12e1dfff4cff105219ba3b5cf49faf70a905d495f6bd5715e9f4c02a7ab03202",
-            "sha256:748f27c28501ab0b5910b0ee6013d2803029207c15c571af9f4f90b168da806a",
-            "sha256:4763c5a9038aaddc75559cfcc059762a902007a31965df9a336c01327d929b41",
-            "sha256:d27580bfe3af35bda818eb498c5e7742e34c4928a484a623ed2a153994ab3a67",
-            "sha256:0c21fbbf59a1c835b0e303569eab4161a099db0ba9bb325dab07648da8ab9d22",
-            "sha256:43e49f93988a6f397179404f6dab2582cb98f011f8e91fec1e34279588ed49d7",
-            "sha256:80edd2166c87b0b3d9f7db71ec390a36742caf399b211c4cf5b07b67db600ddb",
-            "sha256:c18207dc634b4168b67c14faead43a58be862f34fce95c867042115af22eacdf",
-            "sha256:66cccd8c3ddda1fdf1d82c56021a34bd15d8e748aa935d5f8db0652dad38fe27",
-            "sha256:cb03d73f43dfcfede0689da655d2cccac7c8addc4ea319ac35489321422acf3d",
-            "sha256:29627bdff7c3aae0db0a9771173491be9375f76aeea688d28731f2990af5778e",
-            "sha256:2ca67375cdaf64f7ac8a50729de7874a1140717fad6222bda56a5e3ed406d465"
-          ],
-          "trace_hash_sample_truncated": true
-        },
-        "conditional_frozen_v2:multi_turn_long_context": {
-          "failure_label_counts": {
-            "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)": 1,
             "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)": 2
           },
-          "issue_count": 3,
-          "latency_present_count": 9,
-          "policy_hit_count": 0,
-          "raw_material_absent": true,
-          "repair_kind_counts": {
-            "resolve_contextual_string_arg": 5
-          },
-          "request_patch_counts": {
-            "abhe_v0_runtime_candidate_adapter_guidance:state_tracking_v0": 9,
-            "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.": 9,
-            "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.": 9,
-            "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.": 9,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: find": 2,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: find, student record, student_record.txt": 4,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: student record, student_record.txt": 3,
-            "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.": 9
-          },
-          "safe_trace_fields_only": true,
-          "trace_file_count": 9,
-          "trace_file_hashes": [
-            "sha256:1ad854d2888011cf69881a95516ab713eb066a03bb6af5296ca8ce383fb57540",
-            "sha256:5e75bf9527bbac63468b6a19bf3d9025d7ac16ad5be7fd8ea8b2ff6f307a7d1e",
-            "sha256:22d228307f436468ee8e44ba6e314d77d3c93663bcd27b67dca594905b0e9d8f",
-            "sha256:2cd95164490e8ebbab30d61923987d4446897754a2d0410083c2e6ac2ac9fa23",
-            "sha256:d271caa529b3638dc48d4dd9a4a1b2640c78c6fe52368a722bb05a23e54fee33",
-            "sha256:e47eec421cf45c1a3e64fd2230461de9c7a080cd1599861e9468636ac803227c",
-            "sha256:5efc1a8ae2841466cb0cabfa70ae8a71e72b419ef869cb6f52f45556199bd4c5",
-            "sha256:0957930bc7a135d08ec3aea588d41188226df116cefd6ecad4091776e2a84979",
-            "sha256:4c157b7e90191d34fed437dfad4314014d507dfedbcffa4d6aac01a94f9f7f63"
-          ],
-          "trace_hash_sample_truncated": false
-        },
-        "conditional_frozen_v2:multi_turn_miss_func": {
-          "failure_label_counts": {
-            "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)": 1,
-            "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)": 3
-          },
-          "issue_count": 4,
-          "latency_present_count": 13,
+          "issue_count": 2,
+          "latency_present_count": 11,
           "policy_hit_count": 0,
           "raw_material_absent": true,
           "repair_kind_counts": {},
           "request_patch_counts": {
-            "abhe_v0_runtime_candidate_adapter_guidance:state_tracking_v0": 13,
-            "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.": 13,
-            "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.": 13,
-            "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.": 13,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: Lectures, Notes2023.txt": 12,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: Notes2023.txt, Lectures, characters": 1,
-            "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.": 13
+            "abhe_v0_runtime_candidate_adapter_guidance:state_tracking_v0": 11,
+            "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.": 11,
+            "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.": 11,
+            "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.": 11,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: Meeting notes and project details., USR002, No user is currently logged in.": 1,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: USR002, No user is currently logged in.": 1,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: initial_directory": 2,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: initial_directory, notes, other_file.txt": 1,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: initial_directory, notes, other_file.txt, Meeting notes and project details.": 1,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: initial_directory, notes, other_file.txt, Meeting notes and project details., USR002": 1,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: initial_directory, notes, other_file.txt, Meeting notes and project details., USR002, No user is currently logged in.": 2,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: notes, other_file.txt, Meeting notes and project details., USR002, No user is currently logged in.": 1,
+            "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.": 11
           },
           "safe_trace_fields_only": true,
-          "trace_file_count": 13,
+          "trace_file_count": 11,
           "trace_file_hashes": [
-            "sha256:acaca3fe1d037baaa82d4311c9a273a0b7b531f2628a5365b99c69ac4548b7b0",
-            "sha256:60dd50ed992d610b0dd1838ed9cac38d3f9c6d6086a6d9b20a216e197f3d72f1",
-            "sha256:609dc61ff96849cbacefa932541f74c090b0b258f5c6493fb7e59d6d1b62a922",
-            "sha256:b408528c7cb0ba69e7b59e868be43c14400ec52edbdaacaaee4370987d31d6fc",
-            "sha256:e815db73471b0e21816e99d5477ed2ce290fc09ab2556c0f996c0dc84d9e1f83",
-            "sha256:c9ab8a7c09b3f33b72c45b56bc103cff244b632eb19f2db13a60a5c33fcee3ff",
-            "sha256:756f6af4379ec7b0590fe005c6b1b158e08b518c51f14137ec63a5e96b734de9",
-            "sha256:96c030a725f8cea5ab37af9140d4693d77333fe28e6555c63063cfc19b9d316a",
-            "sha256:b6794d7b24bf75b3ca962aa9aba6ac93ad30da99e984ad2bc713af6531ecd49e",
-            "sha256:6772e0b5764f3d8755e29fc0c08e09a2f4332659fb98ec1eb458120a0fbbda12",
-            "sha256:d19c5590cb6f6f15f7ada0c488e290a44cb83d1addce8fe018612ab1a41950ff",
-            "sha256:33863be1d9192dd8a7e0f8691ceb4e57bde52d040373700e709ae60ffd4cdf82"
+            "sha256:f706202e40540fde919a069b3800845f4d4139466c1ffd36673fc05e6a42f18f",
+            "sha256:cfcd7289072bd8ffec6e2c0d6fed23b8fc49a035711d59924507ce5be3adcf9a",
+            "sha256:b9670cb6199edb3e6f34cfcab29f620638d1eed985e438adcba1bba579137bbc",
+            "sha256:43d2dbae0b111e656702b5e4dbc56457ee62b3cd08b78805c8eb42670b37367e",
+            "sha256:d2828ec91e6152c024b1c993ca174a657e43b9c41dbcac1ec3b7174ba42a8110",
+            "sha256:4cdec41a66006c1c02cb8be7446b211c51ad2504494dac114a02c9796908a232",
+            "sha256:479f884b0175353e463927a9d9cfdc89b67cc9c8a65fe2b2f49423f38221a8e7",
+            "sha256:3f6fc7efbe03d432e5e04cf9f26cd86ef67412b6c9d8fce8623270d05579fd90",
+            "sha256:acf4c0e555925d600dc158fe1221b8926c1d0629b986390954f43a1117723193",
+            "sha256:c0c27402020993c0d67ea95b0f03ee5f8b0f3034bd2e4b296d1e6f926655b163",
+            "sha256:2ebe004085b147c29910918961ae67809bce5c3978d1eee1648c71cf24f78bf9"
           ],
-          "trace_hash_sample_truncated": true
+          "trace_hash_sample_truncated": false
+        },
+        "conditional_frozen_v2:multi_turn_long_context": {
+          "failure_label_counts": {
+            "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)": 3
+          },
+          "issue_count": 3,
+          "latency_present_count": 7,
+          "policy_hit_count": 0,
+          "raw_material_absent": true,
+          "repair_kind_counts": {
+            "strip_assistant_content_with_tool_calls": 1
+          },
+          "request_patch_counts": {
+            "abhe_v0_runtime_candidate_adapter_guidance:state_tracking_v0": 7,
+            "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.": 7,
+            "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.": 7,
+            "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.": 7,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: ./student_record.txt, student_record.txt, 91.67": 1,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: find": 1,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: find, ./student_record.txt": 1,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: find, ./student_record.txt, student_record.txt": 3,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: find, ./student_record.txt, student_record.txt, 91.67": 1,
+            "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.": 7
+          },
+          "safe_trace_fields_only": true,
+          "trace_file_count": 7,
+          "trace_file_hashes": [
+            "sha256:e79f84a1ca7edc44739c015b0ace9a6c6b1059ba5539c29fb92bcf5cdd66a4ed",
+            "sha256:c090406127692ba3a47dcffe3e835d411b90f232184ce5d89cc407261c0f4a30",
+            "sha256:0b0c535dff851151d0127e883f0aedb4166fc4ef107ab4b40959c398980de161",
+            "sha256:20b120719ef6ceedfb4b6c0bcd4ffdb9aa29b0fc9e002885fc185553f8077c49",
+            "sha256:187681a44562db795dbdea7d0ac2db0b48ee67844e2713f3dcca48f80052a1ad",
+            "sha256:9c8de6a6dd899f11004a2e19170df9120d4ccc1ae2d3aa0e4c9cb4eb66f7c38f",
+            "sha256:ce8a7b96b054c7e799be6440b2e477ed4d1200fdf244258d6939e86984ab58d3"
+          ],
+          "trace_hash_sample_truncated": false
+        },
+        "conditional_frozen_v2:multi_turn_miss_func": {
+          "failure_label_counts": {},
+          "issue_count": 0,
+          "latency_present_count": 0,
+          "policy_hit_count": 0,
+          "raw_material_absent": true,
+          "repair_kind_counts": {},
+          "request_patch_counts": {},
+          "safe_trace_fields_only": true,
+          "trace_file_count": 0,
+          "trace_file_hashes": [],
+          "trace_hash_sample_truncated": false
         },
         "conditional_frozen_v2:multi_turn_miss_param": {
           "failure_label_counts": {
@@ -3812,22 +3843,22 @@
             "prompt_injector:Known explicit context values you can reuse exactly if relevant: locked": 1,
             "prompt_injector:Known explicit context values you can reuse exactly if relevant: locked, pressed": 1,
             "prompt_injector:Known explicit context values you can reuse exactly if relevant: locked, pressed, running": 2,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: locked, pressed, running, fitness_reader, #CarCare, #Maintenance, #Safety": 1,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: locked, pressed, running, fitness_reader, #CarCare, #Maintenance, #Safety, mike53": 1,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: pressed, running, fitness_reader, #CarCare, #Maintenance, #Safety, mike53, #TireHealth": 1,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: locked, pressed, running, fitness_reader, #CarCare, #Maintenance, #PerfectRide": 1,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: locked, pressed, running, fitness_reader, #CarCare, #Maintenance, #PerfectRide, mike53": 1,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: pressed, running, fitness_reader, #CarCare, #Maintenance, #PerfectRide, mike53, #TireHealth": 1,
             "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.": 8
           },
           "safe_trace_fields_only": true,
           "trace_file_count": 8,
           "trace_file_hashes": [
-            "sha256:6b89a91428636e36eac29908e468d5676c51989a5089853231febbf18cacfe84",
-            "sha256:4fd544dffc8bedcbc68067cf4d78d33175bc96f25a9d45db9b1a3ee9ab12791c",
-            "sha256:616f28c2d79fc7c840f36a2845b9b63cf8c0047f97b27051b8efab0d15b0c77a",
-            "sha256:81b011aa6ee4d0de1fdf6b1470d1adea7dad31d0d4afb3b1701c11c22cc1627d",
-            "sha256:0a94d4247a3f7293822a9f653889fb45c01bb9c07d421efc1cfb88833b6636bb",
-            "sha256:42875fe60033ff0f1526355eb7bcdad071807325734d5370973b2f2a173de5fb",
-            "sha256:5e8bd7fb409131de4000fabb95db108aad2a38c400640b798dcc76734f249a2e",
-            "sha256:7ab54b825dc430522444579bdd0985f4b3ed4bd6464056a05aee36531e390c31"
+            "sha256:501a9eec16739f18f3fd391484cf758c4fc37c0c5f9919b3a040794509b01bee",
+            "sha256:30a8e42e2a009cf1ea4099e712bd9e3349a7501de2010e2b0185eb94239e2f31",
+            "sha256:936e8d9ce1f72d5fa5ea12d577e07114d7c097ab65564faeedc0b7d565a13597",
+            "sha256:e90b49528926b7e898231b24234c425b26ff9c0299087ac5be7cfb6cbc627495",
+            "sha256:57fb1530e9acd40e719212721391a45a1a408dcc06fb799e25b9ca79cece34b4",
+            "sha256:6a4d0615715159c3c1f2301237afb940096ad31a933700df00998cf4c389b4dd",
+            "sha256:aad8d94c97b0f08f3f7527aca7a27b26e21b62c237b6355b2d00dad4f5c3877f",
+            "sha256:51d9200bd15bc0566c90ca1178e51f3e8ea38fb7cc079e3a81eb9d59be6ef6ee"
           ],
           "trace_hash_sample_truncated": false
         },
@@ -3851,7 +3882,7 @@
           "safe_trace_fields_only": true,
           "trace_file_count": 1,
           "trace_file_hashes": [
-            "sha256:d7646aac0ddcef13d3c07210e3c5bd3f595cec653bb0b70b27f4b4b39fea548a"
+            "sha256:a42c3b6d405e83691685603cac3fcb0e642da00b43ceb93dbca39c35eefedef1"
           ],
           "trace_hash_sample_truncated": false
         },
@@ -3873,48 +3904,53 @@
           "safe_trace_fields_only": true,
           "trace_file_count": 1,
           "trace_file_hashes": [
-            "sha256:6999e699f6082c2d0fa8f1b3d8f8f440de93f2603345cb1741cd9555638fb1a0"
+            "sha256:ba04b9c5291d797d541dd1c6d85531a2a24441f1e8b2bc1548c1ba5f9e490700"
           ],
           "trace_hash_sample_truncated": false
         },
         "runtime_slot_controller_v2:multi_turn_base": {
           "failure_label_counts": {
-            "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)": 2
+            "(POST_TOOL,CLARIFICATION_REQUEST)": 1,
+            "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)": 1
           },
           "issue_count": 2,
-          "latency_present_count": 13,
+          "latency_present_count": 16,
           "policy_hit_count": 0,
           "raw_material_absent": true,
           "repair_kind_counts": {
-            "resolve_contextual_string_arg": 8
+            "resolve_contextual_string_arg": 3
           },
           "request_patch_counts": {
-            "abhe_v0_runtime_candidate_adapter_guidance:state_tracking_v0": 13,
-            "abhe_v0_runtime_slot_controller_v2:enabled": 13,
-            "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.": 13,
-            "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.": 13,
-            "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.": 13,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: ./initial_directory/notes": 1,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: Alice, Bob, Catherine, Daniel": 1,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: Alice, Bob, Catherine, Daniel, ./initial_directory/notes": 5,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: notes, initial_directory/notes": 5,
-            "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.": 13
+            "abhe_v0_runtime_candidate_adapter_guidance:state_tracking_v0": 16,
+            "abhe_v0_runtime_slot_controller_v2:enabled": 16,
+            "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.": 16,
+            "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.": 16,
+            "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.": 16,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: ./initial_directory/notes": 5,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: ./initial_directory/notes, notes, initial_directory/notes": 1,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: Meeting notes and project details., USR002, No user is currently logged in.": 1,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: initial_directory, notes, other_file.txt, Meeting notes and project details., USR002": 1,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: notes, ./initial_directory/notes, initial_directory/notes, initial_directory": 1,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: notes, ./initial_directory/notes, initial_directory/notes, initial_directory, other_file.txt": 3,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: notes, ./initial_directory/notes, initial_directory/notes, initial_directory, other_file.txt, Meeting notes and project details.": 1,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: notes, other_file.txt, Meeting notes and project details., USR002, No user is currently logged in.": 2,
+            "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.": 16
           },
           "safe_trace_fields_only": true,
-          "trace_file_count": 13,
+          "trace_file_count": 16,
           "trace_file_hashes": [
-            "sha256:0f0e227aa1d36ec77311b00fd5153eafb695708a76ea1a44cb3ef7f5c124bdeb",
-            "sha256:9975ad753c88bad49c72a04a7e9b2afa0494d972521ecf95fdb30a1ab10532fa",
-            "sha256:786f5410dc811eabd845c4123f9d4bbffa1aafa93625f7f6cf7b60306e930dcb",
-            "sha256:6ba5894090cdbc3274b3561ef4c87e5475e7a3ceda083dece97834144778cdc6",
-            "sha256:765ab9603f554a5aa626c582e65a9c3be37f5520ce450695e8c3ab5dfeee2536",
-            "sha256:fd2b2b0d468836c8223b45c1304e77029fca0057fb56ea8ee9c76c0a9f652f4e",
-            "sha256:860a82a951ac45e0977347d86a324b4153d2dad32eb2ab1410e62277223c63aa",
-            "sha256:d2915d7ebe85dc4a95aac57b72b6ead206fe9a085c6aa92b18596a01a1b7d3fb",
-            "sha256:b0e3f4508a220813a4b3c3dc550ec1027b633913ef7a8ef10c366a4f916e7375",
-            "sha256:42d3939dfcb7e16c7e98341e2028b30ddf2903803006ed44ee32ea5308d0dc0a",
-            "sha256:7942787fea484e46eaebf14e772f27cd8dcc749c6e2bd9ed116acf72e870cbd5",
-            "sha256:59d095f3c47d4d0d756c176dbef02b47fd3fdd2548b3179064356a158a2daa2f"
+            "sha256:51981c3c16f4b966a3fc7303ef12877c8b4d19572df5605571ab0ad74da90605",
+            "sha256:8ceadf6b5f05c7c4f612975bd6594262c8c846c3675845b8e48eee4dffd7e8c1",
+            "sha256:40baaecaa35f76a99ef03631ad81a8d58ce6dc3ced8df9c6fb430a781f1727d0",
+            "sha256:0df3a34f3d1c0e5b5b2a48288f7cb1b35a602c746305393a17bfc132aae9d6ec",
+            "sha256:5399f1d236daaa2c8e2bf670a03e8477d638a3688c5b97fd18f7c3af5b482cde",
+            "sha256:e339308c30c0021d4a9f66f77ea404784ea70d9141b0637aad8610ea17118d74",
+            "sha256:9743534078560fc558816af6ef2b48fbd751fa1ac536f3b785e9500e4ce49124",
+            "sha256:ed5a1dd6b94df4e7253024b6779fd3a4f7cfeae959a2957c064b816171a04d70",
+            "sha256:23130e245650da32e6a07e0cc569228878682a45f294db623ecd95a2dd13945e",
+            "sha256:cdd867d38dcc9b531a59f0e46ceb9c2f731c91ed3cae251b910e16bf4cbbe232",
+            "sha256:08fb82f0ea83084a5b5763edc886cae7973ce0f615b50d97010641fbfd2831f6",
+            "sha256:a119116493ceca3260dc9fbf91218a8f6991194fc452e6ae0801b5ed99889daa"
           ],
           "trace_hash_sample_truncated": true
         },
@@ -3923,73 +3959,48 @@
             "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)": 3
           },
           "issue_count": 3,
-          "latency_present_count": 8,
+          "latency_present_count": 7,
           "policy_hit_count": 0,
           "raw_material_absent": true,
           "repair_kind_counts": {},
           "request_patch_counts": {
-            "abhe_v0_runtime_candidate_adapter_guidance:state_tracking_v0": 8,
-            "abhe_v0_runtime_slot_controller_v2:enabled": 8,
-            "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.": 8,
-            "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.": 8,
-            "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.": 8,
+            "abhe_v0_runtime_candidate_adapter_guidance:state_tracking_v0": 7,
+            "abhe_v0_runtime_slot_controller_v2:enabled": 7,
+            "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.": 7,
+            "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.": 7,
+            "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.": 7,
             "prompt_injector:Known explicit context values you can reuse exactly if relevant: ./student_record.txt, student_record.txt, 91.67": 1,
             "prompt_injector:Known explicit context values you can reuse exactly if relevant: find": 1,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: find, student_record.txt, image_344822349461074042.jpg, image_8219547643081662353.jpg, image_5421509146842474663.jpg, image_185391401034246046.jpg, image_6824007961180780019.jpg, image_2994974694593273051.jpg": 5,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: student_record.txt, image_344822349461074042.jpg, image_8219547643081662353.jpg, image_5421509146842474663.jpg, image_185391401034246046.jpg, image_6824007961180780019.jpg, image_2994974694593273051.jpg, image_2537728455072851196.jpg": 1,
-            "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.": 8
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: find, ./student_record.txt": 1,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: find, ./student_record.txt, student_record.txt": 3,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: find, ./student_record.txt, student_record.txt, 91.67": 1,
+            "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.": 7
           },
           "safe_trace_fields_only": true,
-          "trace_file_count": 8,
+          "trace_file_count": 7,
           "trace_file_hashes": [
-            "sha256:2aece8866b780e14adad729ab1b453238c617fcd35e567a606196db212f4fa4f",
-            "sha256:3e152001736e8d3cf3e78c8e70faffad6a21505709abe679bdcdc6d9efaab319",
-            "sha256:4b6618fe29daf682c47add4072be32e230affdcbf3f29d4fed02dcb7e7786b9e",
-            "sha256:71af3565ceb092f67b7fde7c64e2d5b75d272a26cabb5c0c0be495c0109bb030",
-            "sha256:d7f9e129284828a6a63c564b222b38bd983d83103edac160a442bbe6ed33dd12",
-            "sha256:02202aff13872bd197a6ad018b5432343300d88daaee1e8900d51b42251353fe",
-            "sha256:7062950bbc11a022f8b09bb3f7fdf99a0795f662db2cfb815463cf7bbbdb19ed",
-            "sha256:ccc6e06d754ba14a5fefdd84adb21726a5e20e575f3eb45da2815a3f0452aae9"
+            "sha256:3e9f0088a26a00520b852380889387e52ecd888c3d706ab9dfdc93d9fde32102",
+            "sha256:c54242bf50d69174061b0a916dc84d7ce754dcee51c001c669ddaf944041d337",
+            "sha256:08d61a72a99810a8f14292a5f8850e94f9a9ceb191f0edc3b1200e6216e5bca6",
+            "sha256:b9fa7f00f66278e78743defac6f1eb1992105850138dc9ae051ba24a232d52d6",
+            "sha256:1df9be8a916469959ef858f2d2831166c290beda19e1534d440f6b2f45597a37",
+            "sha256:fa3b1baa4a5eb06eb730bb345d965839eb866c95188f6dab6a0a37ca3f765c6c",
+            "sha256:c4ff29b7d46943afe96bf18ec3b5b0b0af564f029abb7aa0c15c5f25a673e728"
           ],
           "trace_hash_sample_truncated": false
         },
         "runtime_slot_controller_v2:multi_turn_miss_func": {
-          "failure_label_counts": {
-            "(POST_TOOL,ACTIONABLE_NO_TOOL_DECISION)": 1,
-            "(POST_TOOL,POST_TOOL_PROSE_SUMMARY)": 3
-          },
-          "issue_count": 4,
-          "latency_present_count": 13,
+          "failure_label_counts": {},
+          "issue_count": 0,
+          "latency_present_count": 0,
           "policy_hit_count": 0,
           "raw_material_absent": true,
           "repair_kind_counts": {},
-          "request_patch_counts": {
-            "abhe_v0_runtime_candidate_adapter_guidance:state_tracking_v0": 13,
-            "abhe_v0_runtime_slot_controller_v2:enabled": 13,
-            "prompt_injector:Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.": 13,
-            "prompt_injector:Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.": 13,
-            "prompt_injector:For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.": 13,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: Lectures, Notes2023.txt": 12,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: Notes2023.txt, Lectures, characters": 1,
-            "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.": 13
-          },
+          "request_patch_counts": {},
           "safe_trace_fields_only": true,
-          "trace_file_count": 13,
-          "trace_file_hashes": [
-            "sha256:2c01fe90a4abf3dacc8786e16d7646370666773d9385547871e7f466cb7173a2",
-            "sha256:3ac62d97149bad7f1638c3c03bb9d902b923238fed245af970f8b9512d264b73",
-            "sha256:cb9c5aca1952b82b6c75977585c8962cb1d18b2cb125863ea49b7dba1935eae5",
-            "sha256:47d4d65704257eb14a69cfae7f883d3b3c00dfc4179addde55dbb2c59bfe103c",
-            "sha256:bc642af3eaf6c5c5ff0f2e53ce3069f531ec7d3397e43e085c99b5f76d3581f9",
-            "sha256:2ad642d72ce0818b79d819b973c7490cae49ec9fd2a88f09fe73f7dc9c53d543",
-            "sha256:99ff384e8b55173d87f7b52cbb7b1327dd7fc6d6b346c2cf02a2c969e2077669",
-            "sha256:3815bc97a6b0b0a0983e3c2d2c9e3e69927a0f4013b90503ec82b38c4e31311d",
-            "sha256:6a8477d53ff2414ae5016523cf8016866037365f9f6849ba28452cc31b825eb9",
-            "sha256:f01de823c34afe9704766a8ea13715bbff69f69e49c9afe2d698b46ff5fe59b1",
-            "sha256:54e6cc8b2a946ee8c4d7b1d31bd99a9e1b027aa0bdd465e5be8ad55f542f90ac",
-            "sha256:60a1bf9fd8c47e7fc1f12c8f66600140e8a9552cfbc6dab0944e8d88f45028c4"
-          ],
-          "trace_hash_sample_truncated": true
+          "trace_file_count": 0,
+          "trace_file_hashes": [],
+          "trace_hash_sample_truncated": false
         },
         "runtime_slot_controller_v2:multi_turn_miss_param": {
           "failure_label_counts": {
@@ -4009,22 +4020,22 @@
             "prompt_injector:Known explicit context values you can reuse exactly if relevant: locked": 1,
             "prompt_injector:Known explicit context values you can reuse exactly if relevant: locked, pressed": 1,
             "prompt_injector:Known explicit context values you can reuse exactly if relevant: locked, pressed, running": 2,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: locked, pressed, running, fitness_reader, #TireCheck, #PerfectPressure": 1,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: locked, pressed, running, fitness_reader, #TireCheck, #PerfectPressure, mike53": 1,
-            "prompt_injector:Known explicit context values you can reuse exactly if relevant: pressed, running, fitness_reader, #TireCheck, #PerfectPressure, mike53, #CarCare, #TireHealth": 1,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: locked, pressed, running, fitness_reader, #Tires, #Maintenance, #ReadyToRoll": 1,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: locked, pressed, running, fitness_reader, #Tires, #Maintenance, #ReadyToRoll, mike53": 1,
+            "prompt_injector:Known explicit context values you can reuse exactly if relevant: pressed, running, fitness_reader, #Tires, #Maintenance, #ReadyToRoll, mike53, #CarCare": 1,
             "prompt_injector:When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.": 8
           },
           "safe_trace_fields_only": true,
           "trace_file_count": 8,
           "trace_file_hashes": [
-            "sha256:f4c961b497723be9d5b3d8eb64b937a2ce884f43a5a0efd38b4719e0fa69f673",
-            "sha256:3214604ab3275b44a5865a5b0ad5ae185882c8c2535228d68c0cf8e517b0f46c",
-            "sha256:4f963cee1a4b6da746a1c5c6b03847528e8b1165407999606a4dc687ec601571",
-            "sha256:9ad4425678675738f898161ea9ddf4fca46a824c6ea4ff51d26bc32073e90997",
-            "sha256:83d6f28f22591ba93329cdc35a1df06d6769b80b3403679122a3767543220b9a",
-            "sha256:55cdbcf8ff52ab2e6c33bc0664248e6d4aaf641e79d1d3719c7c2981749924de",
-            "sha256:ff926e505abda81d03a2d26f47527914158b8c13a02886644213fc483b2cde23",
-            "sha256:b220eaa836e1e5dcf888d16e9403565a7b09b4c7d0482334942195dee933078d"
+            "sha256:977de8dae0ae19d48aa2f1ebcf3cab3e92df01ba6bddc88d31dfccc449671d75",
+            "sha256:7659c7ec6fb895641c786f544abd061873e949bf98273026197fd4fc49ce3e8e",
+            "sha256:d97f3e299cedd806da1703d8afabbd8d632d9a2df56abc81a17f45d8ee42339a",
+            "sha256:213c9b5bca1c4446edb9fedc9372ff1e50f2eccb859c4d632eff3fecc4d3f7fe",
+            "sha256:871af6c309cc2e9620c9f79a3af49069345feae62165f7e9c62bc78369b833b0",
+            "sha256:d7452779602efa5b40ed15ec4fe1ac115dbe959fbb64b8f5ae58114115252101",
+            "sha256:dcea4280aa447e1d03b5e2d006e6fd82985e2d1ccfcbf0b9a94f8775d959f432",
+            "sha256:af55dbdb39a727045dced0b3d5762a749438f583de2294c1ffb9aadea1bec29b"
           ],
           "trace_hash_sample_truncated": false
         }
@@ -4038,10 +4049,13 @@
       "performance_evidence": false,
       "report_scope": "abhe_v0_runtime_slot_controller_per_selected_id_matrix_check",
       "selected_row_count": 48,
+      "target_compact_to_observed_score_record_factor": 24.0,
       "target_compact_to_scorer_unit_factor": 24.0,
+      "target_observed_score_record_count": 1,
       "target_pass_is_scorer_unit_inherited": true,
       "target_per_selected_id_pass_available": false,
       "target_selected_compact_case_count": 24,
+      "target_selected_scorer_unit_count": 24,
       "target_unique_scorer_unit_count": 1
     },
     "abhe_v0_runtime_slot_residual_archive_transition": {
@@ -4051,7 +4065,7 @@
       "fresh_slice_hash": "sha256:9b26ba3d24c54562f6a5058877a24f15d2e4ef71ee9ea781bcae168307f7d14c",
       "full_suite_touched": false,
       "holdout_touched": false,
-      "next_required_action": "build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl",
+      "next_required_action": "fix_score_output_contract_or_enable_true_per_selected_or_per_turn_scoring_before_more_bfcl",
       "performance_evidence": false,
       "planned_transitions": [
         {
@@ -4076,7 +4090,7 @@
           "entry_id": "runtime_slot_controller_v2",
           "from_status": "candidate_redesign",
           "reason": "targeted_residual_stress_vs_conditional_frozen_v2",
-          "to_status": "demoted_no_independent_signal"
+          "to_status": "narrow_router_requested_regression"
         },
         {
           "entry_id": "long_context_state_retrieval_v0",
@@ -4103,27 +4117,30 @@
       },
       "key_findings": [
         "runtime_slot_controller_v2_no_independent_miss_param_signal",
+        "runtime_slot_controller_v2_has_non_target_regression",
         "target_traces_do_not_present_missing_required_args_before_repair",
         "runtime_slot_controller_v2_enabled_but_noop_on_target_traces"
       ],
       "measurement_diagnosis": {
-        "next_required_action": "build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl",
+        "next_required_action": "fix_score_output_contract_or_enable_true_per_selected_or_per_turn_scoring_before_more_bfcl",
         "root_cause_hypotheses": [
-          "selected_compact_rows_collapse_to_few_bfcl_scorer_units",
+          "selected_distinct_scorer_units_collapse_to_category_level_score_records",
           "miss_param_failure_not_exposed_as_missing_required_argument_in_post_decode_traces",
           "runtime_slot_controller_v2_marker_is_noop_without_bindable_missing_slots",
           "remaining_failures_include_post_tool_or_function_shape_semantics_not_slot_binding"
         ],
         "runtime_slot_bind_repair_count": 0,
-        "runtime_slot_controller_enabled_patch_count": 42,
+        "runtime_slot_controller_enabled_patch_count": 31,
         "selected_compact_case_count": 48,
         "strict_per_compact_case_paired_available": false,
         "strict_scorer_unit_paired_available": true,
         "target_argument_keyset_changed_by_repair_count": 0,
+        "target_observed_score_record_count": 1,
         "target_post_decode_missing_required_arg_count_before_repair": 0,
         "target_provider_generated_valid_call_proxy_count": 5,
         "target_sampled_trace_artifact_count": 8,
         "target_selected_compact_case_count": 24,
+        "target_selected_scorer_unit_count": 24,
         "target_unique_scorer_unit_count": 1
       },
       "performance_evidence": false,
@@ -4164,29 +4181,29 @@
           "target_bucket": "regression_control"
         },
         {
-          "baseline_accuracy_pct": 100.0,
-          "baseline_passed_count": 6,
+          "baseline_accuracy_pct": 0.0,
+          "baseline_passed_count": 0,
           "baseline_unique_scorer_unit_count": 1,
           "bfcl_category": "multi_turn_base",
-          "conditional_frozen_v2_accuracy_pct": 0.0,
-          "conditional_frozen_v2_delta_vs_baseline": "regressed",
-          "conditional_frozen_v2_passed_count": 0,
+          "conditional_frozen_v2_accuracy_pct": 100.0,
+          "conditional_frozen_v2_delta_vs_baseline": "fixed",
+          "conditional_frozen_v2_passed_count": 6,
           "conditional_frozen_v2_unique_scorer_unit_count": 1,
           "forbidden_raw_material_absent": true,
           "runtime_slot_controller_v2_accuracy_pct": 0.0,
-          "runtime_slot_controller_v2_delta_vs_conditional_frozen_v2": "unchanged_fail",
+          "runtime_slot_controller_v2_delta_vs_conditional_frozen_v2": "regressed",
           "runtime_slot_controller_v2_passed_count": 0,
           "runtime_slot_controller_v2_unique_scorer_unit_count": 1,
           "selected_compact_case_count": 6,
           "target_bucket": "regression_control"
         },
         {
-          "baseline_accuracy_pct": 0.0,
-          "baseline_passed_count": 0,
+          "baseline_accuracy_pct": 100.0,
+          "baseline_passed_count": 4,
           "baseline_unique_scorer_unit_count": 1,
           "bfcl_category": "multi_turn_long_context",
           "conditional_frozen_v2_accuracy_pct": 0.0,
-          "conditional_frozen_v2_delta_vs_baseline": "unchanged_fail",
+          "conditional_frozen_v2_delta_vs_baseline": "regressed",
           "conditional_frozen_v2_passed_count": 0,
           "conditional_frozen_v2_unique_scorer_unit_count": 1,
           "forbidden_raw_material_absent": true,
@@ -4233,19 +4250,19 @@
         }
       ],
       "summary": {
-        "baseline_passed_count": 6,
-        "conditional_frozen_v2_delta_vs_baseline": -2,
-        "conditional_frozen_v2_passed_count": 4,
+        "baseline_passed_count": 4,
+        "conditional_frozen_v2_delta_vs_baseline": 6,
+        "conditional_frozen_v2_passed_count": 10,
         "false_ask_count": 0,
         "fixed_count": 0,
         "hallucinated_param_count": 0,
         "multi_turn_miss_param_delta_vs_conditional_frozen_v2": 0,
-        "non_target_regression_count": 0,
-        "regressed_count": 0,
-        "runtime_slot_controller_v2_delta_vs_conditional_frozen_v2": 0,
+        "non_target_regression_count": 6,
+        "regressed_count": 6,
+        "runtime_slot_controller_v2_delta_vs_conditional_frozen_v2": -6,
         "runtime_slot_controller_v2_passed_count": 4,
         "slot_bind_repair_count": 0,
-        "slot_controller_enabled_patch_count": 42,
+        "slot_controller_enabled_patch_count": 31,
         "target_argument_keyset_changed_by_repair_count": 0,
         "target_bucket_reduction": 0,
         "target_post_decode_missing_required_arg_count_before_repair": 0,
@@ -5027,6 +5044,14 @@
       "target_unique_scorer_unit_count": 24,
       "true_per_selected_id_scoring_enabled": false
     },
+    "abhe_v0_runtime_slot_scoring_contract_audit": {
+      "artifact_kind": "abhe_v0_runtime_slot_controller_scoring_contract_audit",
+      "blockers": [],
+      "full_suite_touched": false,
+      "holdout_touched": false,
+      "next_required_action": "fix_score_output_contract_or_enable_true_per_selected_or_per_turn_scoring_before_more_bfcl",
+      "performance_evidence": false
+    },
     "approval_chain": {
       "abhe_approval_chain_ready_for_review": true,
       "abhe_v0_bfcl_candidate_case_hash_count": 20,
@@ -5246,7 +5271,7 @@
               "next_required_action": "check_execution_readiness",
               "performance_evidence": false,
               "preflight_error_class": null,
-              "preflight_latency_ms": 3681.018,
+              "preflight_latency_ms": 3026.315,
               "preflight_status_code_class": "2xx",
               "profile": "toolcallingfunction",
               "profile_loaded": true,
@@ -5308,7 +5333,7 @@
             "next_required_action": "check_execution_readiness",
             "performance_evidence": false,
             "preflight_error_class": null,
-            "preflight_latency_ms": 3681.018,
+            "preflight_latency_ms": 3026.315,
             "preflight_status_code_class": "2xx",
             "profile": "toolcallingfunction",
             "profile_loaded": true,
@@ -5609,7 +5634,7 @@
                   "next_required_action": "check_execution_readiness",
                   "performance_evidence": false,
                   "preflight_error_class": null,
-                  "preflight_latency_ms": 3681.018,
+                  "preflight_latency_ms": 3026.315,
                   "preflight_status_code_class": "2xx",
                   "profile": "toolcallingfunction",
                   "profile_loaded": true,
@@ -5671,7 +5696,7 @@
                 "next_required_action": "check_execution_readiness",
                 "performance_evidence": false,
                 "preflight_error_class": null,
-                "preflight_latency_ms": 3681.018,
+                "preflight_latency_ms": 3026.315,
                 "preflight_status_code_class": "2xx",
                 "profile": "toolcallingfunction",
                 "profile_loaded": true,
@@ -6054,7 +6079,7 @@
               "next_required_action": "check_execution_readiness",
               "performance_evidence": false,
               "preflight_error_class": null,
-              "preflight_latency_ms": 3681.018,
+              "preflight_latency_ms": 3026.315,
               "preflight_status_code_class": "2xx",
               "profile": "toolcallingfunction",
               "profile_loaded": true,
@@ -6116,7 +6141,7 @@
             "next_required_action": "check_execution_readiness",
             "performance_evidence": false,
             "preflight_error_class": null,
-            "preflight_latency_ms": 3681.018,
+            "preflight_latency_ms": 3026.315,
             "preflight_status_code_class": "2xx",
             "profile": "toolcallingfunction",
             "profile_loaded": true,
@@ -6365,7 +6390,7 @@
   "fresh_dev_slice_authorized": false,
   "fresh_dev_slice_request_ready": true,
   "huawei_acceptance_ready": false,
-  "next_required_action": "request_explicit_distinct_residual_bounded_rerun_approval",
+  "next_required_action": "fix_score_output_contract_or_enable_true_per_selected_or_per_turn_scoring_before_more_bfcl",
   "no_leakage_status": true,
   "performance_evidence": false,
   "planning_readiness_ready": true,

@@ -76,17 +76,17 @@
       "score_record_count": 1,
       "score_summary_by_arm": {
         "baseline": {
-          "accuracy": 1.0,
-          "correct_count": 1,
-          "score_available": true,
-          "score_jsonl_line_count": 1,
-          "total_count": 1
-        },
-        "conditional_frozen_v2": {
           "accuracy": 0.0,
           "correct_count": 0,
           "score_available": true,
           "score_jsonl_line_count": 2,
+          "total_count": 1
+        },
+        "conditional_frozen_v2": {
+          "accuracy": 1.0,
+          "correct_count": 1,
+          "score_available": true,
+          "score_jsonl_line_count": 1,
           "total_count": 1
         },
         "runtime_slot_controller_v2": {
@@ -107,10 +107,10 @@
       "score_record_count": 1,
       "score_summary_by_arm": {
         "baseline": {
-          "accuracy": 0.0,
-          "correct_count": 0,
+          "accuracy": 1.0,
+          "correct_count": 1,
           "score_available": true,
-          "score_jsonl_line_count": 2,
+          "score_jsonl_line_count": 1,
           "total_count": 1
         },
         "conditional_frozen_v2": {
@@ -197,7 +197,7 @@
   "full_suite_touched": false,
   "gold_expected_committed": false,
   "holdout_touched": false,
-  "next_required_action": "redesign_residual_slice_at_scorer_unit_level_or_enable_per_turn_scoring_before_more_bfcl",
+  "next_required_action": "fix_score_output_contract_or_enable_true_per_selected_or_per_turn_scoring_before_more_bfcl",
   "performance_evidence": false,
   "prompt_literal_committed": false,
   "provider_calls_made": false,
@@ -277,7 +277,7 @@
     },
     {
       "arm_outcomes": {
-        "conditional_frozen_v2": {
+        "baseline": {
           "error_type_class": "multi_turn:instance_state_mismatch",
           "inference_log_count": 5,
           "model_result_decoded_count": 2,
@@ -310,18 +310,6 @@
     },
     {
       "arm_outcomes": {
-        "baseline": {
-          "error_type_class": "multi_turn:execution_response_mismatch",
-          "inference_log_count": 7,
-          "model_result_decoded_count": 3,
-          "model_result_shape_count": 3,
-          "prompt_initial_config_count": 2,
-          "prompt_question_turn_count": 3,
-          "raw_material_absent": true,
-          "scorer_unit_hash": "sha256:aec30dd74ab1be75bea71f75de1bac178a98b661e694930e9d1748070a264e5d",
-          "test_category": "multi_turn_long_context",
-          "valid": false
-        },
         "conditional_frozen_v2": {
           "error_type_class": "multi_turn:execution_response_mismatch",
           "inference_log_count": 7,
@@ -446,13 +434,18 @@
   ],
   "summary": {
     "more_bfcl_before_alignment_recommended": false,
+    "observed_score_record_row_count": 6,
     "scorer_unit_row_count": 6,
     "selected_case_ids_hash": "sha256:9b26ba3d24c54562f6a5058877a24f15d2e4ef71ee9ea781bcae168307f7d14c",
     "selected_compact_case_count": 48,
     "target_category": "multi_turn_miss_param",
+    "target_compact_to_observed_score_record_factor": 24.0,
     "target_compact_to_score_record_factor": 24.0,
+    "target_observed_score_record_count": 1,
     "target_score_record_count": 1,
     "target_selected_compact_case_count": 24,
-    "target_strict_per_compact_case_pairing_available": false
+    "target_selected_scorer_unit_count": 24,
+    "target_strict_per_compact_case_pairing_available": false,
+    "target_true_per_selected_or_per_turn_scoring_available": false
   }
 }

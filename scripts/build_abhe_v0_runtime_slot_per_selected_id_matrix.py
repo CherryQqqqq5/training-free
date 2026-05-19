@@ -24,12 +24,12 @@ from scripts.check_abhe_no_leakage_boundary import scan_value
 
 ROOT = Path("outputs/artifacts/stage1_bfcl_acceptance")
 RUN_ROOT = Path("/tmp/abhe_v0_runtime_slot_controller_residual_dev_smoke")
-MANIFEST = ROOT / "abhe_v0_runtime_slot_controller_residual_stress_slice_manifest.json"
+MANIFEST = ROOT / "abhe_v0_runtime_slot_controller_scorer_unit_distinct_slice_plan.json"
 OUTPUT = ROOT / "abhe_v0_runtime_slot_controller_per_selected_id_matrix.json"
 MODEL_ALIAS = "gpt-4o-mini-2024-07-18-FC"
 ARMS = ["baseline", "conditional_frozen_v2", "runtime_slot_controller_v2"]
 TARGET_CATEGORY = "multi_turn_miss_param"
-NEXT_ACTION = "build_scorer_unit_distinct_residual_slice_or_enable_true_per_turn_scoring_before_more_bfcl"
+NEXT_ACTION = "fix_score_output_contract_or_enable_true_per_selected_or_per_turn_scoring_before_more_bfcl"
 FALSE_FIELDS = [
     "prompt_literal_committed",
     "argument_values_committed",
@@ -350,30 +350,42 @@ def build() -> Dict[str, Any]:
 
     target_selected = [row for row in selected_rows if row["bfcl_category"] == TARGET_CATEGORY]
     target_units = sorted({row["scorer_unit_hash"] for row in target_selected})
+    selected_scorer_units_by_category = manifest.get("scorer_unit_count_by_category") if isinstance(manifest.get("scorer_unit_count_by_category"), dict) else {}
     category_summaries: List[Dict[str, Any]] = []
     for category, rows in sorted(selected_by_category.items()):
-        units = sorted({row["scorer_unit_hash"] for row in rows})
+        observed_units = sorted({row["scorer_unit_hash"] for row in rows})
+        selected_scorer_unit_count = int(selected_scorer_units_by_category.get(category) or len(rows))
         category_summaries.append({
             "bfcl_category": category,
             "selected_compact_case_count": len(rows),
-            "unique_scorer_unit_count": len(units),
-            "compact_to_scorer_unit_factor": round(len(rows) / max(1, len(units)), 6),
-            "strict_per_selected_id_pairing_available": len(rows) == len(units),
+            "selected_scorer_unit_count": selected_scorer_unit_count,
+            "observed_score_record_count": len(observed_units),
+            "unique_scorer_unit_count": len(observed_units),
+            "compact_to_observed_score_record_factor": round(len(rows) / max(1, len(observed_units)), 6),
+            "compact_to_scorer_unit_factor": round(len(rows) / max(1, len(observed_units)), 6),
+            "strict_per_selected_id_pairing_available": len(rows) == len(observed_units),
             "raw_material_absent": True,
         })
 
+    target_selected_scorer_unit_count = int(selected_scorer_units_by_category.get(TARGET_CATEGORY) or manifest.get("target_unique_scorer_unit_count") or len(target_selected))
+    target_observed_score_record_count = len(target_units)
     summary = {
         "selected_case_ids_hash": manifest.get("selected_case_ids_hash"),
         "selected_compact_case_count": manifest.get("selected_case_count"),
         "selected_row_count": len(selected_rows),
+        "observed_score_record_row_count": len(scorer_unit_rows),
         "scorer_unit_row_count": len(scorer_unit_rows),
         "per_turn_shape_row_count": len(per_turn_shape_rows),
         "target_category": TARGET_CATEGORY,
         "target_selected_compact_case_count": len(target_selected),
-        "target_unique_scorer_unit_count": len(target_units),
-        "target_compact_to_scorer_unit_factor": round(len(target_selected) / max(1, len(target_units)), 6),
+        "target_selected_scorer_unit_count": target_selected_scorer_unit_count,
+        "target_observed_score_record_count": target_observed_score_record_count,
+        "target_unique_scorer_unit_count": target_observed_score_record_count,
+        "target_compact_to_observed_score_record_factor": round(len(target_selected) / max(1, target_observed_score_record_count), 6),
+        "target_compact_to_scorer_unit_factor": round(len(target_selected) / max(1, target_observed_score_record_count), 6),
         "target_per_selected_id_pass_available": False,
         "target_pass_is_scorer_unit_inherited": True,
+        "target_true_per_selected_or_per_turn_scoring_available": False,
         "strict_per_selected_id_pairing_available": all(row["strict_per_selected_id_pairing_available"] for row in category_summaries),
         "more_bfcl_before_alignment_recommended": False,
     }

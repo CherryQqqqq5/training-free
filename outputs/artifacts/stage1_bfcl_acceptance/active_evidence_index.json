@@ -537,58 +537,83 @@
     "archive_updated": false,
     "arm_compact_metrics": {
       "baseline": {
-        "accuracy": 0.125,
-        "case_count": 48,
-        "cost": 0.0,
-        "latency": 30047.43676185608,
-        "passed_count": 6
-      },
-      "conditional_frozen_v2": {
         "accuracy": 0.083333,
         "case_count": 48,
         "cost": 0.0,
-        "latency": 22351.49179458618,
+        "latency": 17657.47657775879,
         "passed_count": 4
+      },
+      "conditional_frozen_v2": {
+        "accuracy": 0.208333,
+        "case_count": 48,
+        "cost": 0.0,
+        "latency": 15646.786918640137,
+        "passed_count": 10
       },
       "runtime_slot_controller_v2": {
         "accuracy": 0.083333,
         "case_count": 48,
         "cost": 0.0,
-        "latency": 21513.773260116577,
+        "latency": 25327.0703125,
         "passed_count": 4
       }
     },
-    "controller_enabled_patch_count": 42,
+    "controller_enabled_patch_count": 31,
+    "distinct_rerun_result_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_result.json",
     "full_suite_touched": false,
     "holdout_touched": false,
     "measurement_diagnosis": {
-      "next_required_action": "build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl",
+      "next_required_action": "fix_score_output_contract_or_enable_true_per_selected_or_per_turn_scoring_before_more_bfcl",
       "root_cause_hypotheses": [
-        "selected_compact_rows_collapse_to_few_bfcl_scorer_units",
+        "selected_distinct_scorer_units_collapse_to_category_level_score_records",
         "miss_param_failure_not_exposed_as_missing_required_argument_in_post_decode_traces",
         "runtime_slot_controller_v2_marker_is_noop_without_bindable_missing_slots",
         "remaining_failures_include_post_tool_or_function_shape_semantics_not_slot_binding"
       ],
       "runtime_slot_bind_repair_count": 0,
-      "runtime_slot_controller_enabled_patch_count": 42,
+      "runtime_slot_controller_enabled_patch_count": 31,
       "selected_compact_case_count": 48,
       "strict_per_compact_case_paired_available": false,
       "strict_scorer_unit_paired_available": true,
       "target_argument_keyset_changed_by_repair_count": 0,
+      "target_observed_score_record_count": 1,
       "target_post_decode_missing_required_arg_count_before_repair": 0,
       "target_provider_generated_valid_call_proxy_count": 5,
       "target_sampled_trace_artifact_count": 8,
       "target_selected_compact_case_count": 24,
+      "target_selected_scorer_unit_count": 24,
       "target_unique_scorer_unit_count": 1
     },
-    "mechanism_attribution": "no_independent_score_signal_no_bind_repair_observed",
-    "next_required_action": "build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl",
+    "mechanism_attribution": "no_independent_miss_param_signal_runtime_controller_noop_on_target_traces",
+    "next_required_action": "fix_score_output_contract_or_enable_true_per_selected_or_per_turn_scoring_before_more_bfcl",
+    "non_target_regression_count": 6,
     "performance_evidence": false,
     "selected_case_count": 48,
     "selected_case_ids_hash": "sha256:9b26ba3d24c54562f6a5058877a24f15d2e4ef71ee9ea781bcae168307f7d14c",
     "slot_bind_repair_count": 0,
+    "target_bucket_reduction": 0,
     "target_delta_vs_conditional_frozen_v2": 0,
-    "target_post_decode_missing_required_arg_count_before_repair": 0
+    "target_observed_score_record_count": 1,
+    "target_post_decode_missing_required_arg_count_before_repair": 0,
+    "target_selected_scorer_unit_count": 24
+  },
+  "abhe_v0_runtime_slot_distinct_rerun_approval_status": {
+    "approval_scope": "scorer_unit_distinct_bounded_residual_dev_smoke_only",
+    "approval_status": "approved",
+    "artifact_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_approval_packet.json",
+    "authorized": true,
+    "full_suite_authorized": false,
+    "holdout_authorized": false,
+    "performance_claim_authorized": false,
+    "selected_case_ids_hash": "sha256:9b26ba3d24c54562f6a5058877a24f15d2e4ef71ee9ea781bcae168307f7d14c"
+  },
+  "abhe_v0_runtime_slot_distinct_rerun_command_status": {
+    "artifact_kind": "abhe_v0_runtime_slot_controller_distinct_rerun_command_manifest",
+    "artifact_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_command_manifest.json",
+    "command_manifest_approved": false,
+    "performance_evidence": false,
+    "runner_manifest_compatible": false,
+    "selected_case_count": null
   },
   "abhe_v0_runtime_slot_distinct_rerun_dry_run_status": {
     "arm": "baseline",
@@ -615,6 +640,132 @@
     "scorer_authorized": false,
     "selected_case_ids_hash": "sha256:9b26ba3d24c54562f6a5058877a24f15d2e4ef71ee9ea781bcae168307f7d14c",
     "target_compact_to_scorer_unit_factor": 1.0
+  },
+  "abhe_v0_runtime_slot_distinct_rerun_result_status": {
+    "archive_updated": false,
+    "arm_compact_metrics": {
+      "baseline": {
+        "accuracy": 0.083333,
+        "case_count": 48,
+        "cost": 0.0,
+        "latency": 17657.47657775879,
+        "passed_count": 4
+      },
+      "conditional_frozen_v2": {
+        "accuracy": 0.208333,
+        "case_count": 48,
+        "cost": 0.0,
+        "latency": 15646.786918640137,
+        "passed_count": 10
+      },
+      "runtime_slot_controller_v2": {
+        "accuracy": 0.083333,
+        "case_count": 48,
+        "cost": 0.0,
+        "latency": 25327.0703125,
+        "passed_count": 4
+      }
+    },
+    "arms_complete": {
+      "baseline": true,
+      "conditional_frozen_v2": true,
+      "runtime_slot_controller_v2": true
+    },
+    "artifact_kind": "abhe_v0_runtime_slot_controller_residual_dev_smoke_result",
+    "artifact_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_result.json",
+    "full_suite_touched": false,
+    "holdout_touched": false,
+    "key_findings": [
+      "runtime_slot_controller_v2_no_independent_miss_param_signal",
+      "runtime_slot_controller_v2_has_non_target_regression",
+      "target_traces_do_not_present_missing_required_args_before_repair",
+      "runtime_slot_controller_v2_enabled_but_noop_on_target_traces"
+    ],
+    "measurement_diagnosis": {
+      "next_required_action": "fix_score_output_contract_or_enable_true_per_selected_or_per_turn_scoring_before_more_bfcl",
+      "root_cause_hypotheses": [
+        "selected_distinct_scorer_units_collapse_to_category_level_score_records",
+        "miss_param_failure_not_exposed_as_missing_required_argument_in_post_decode_traces",
+        "runtime_slot_controller_v2_marker_is_noop_without_bindable_missing_slots",
+        "remaining_failures_include_post_tool_or_function_shape_semantics_not_slot_binding"
+      ],
+      "runtime_slot_bind_repair_count": 0,
+      "runtime_slot_controller_enabled_patch_count": 31,
+      "selected_compact_case_count": 48,
+      "strict_per_compact_case_paired_available": false,
+      "strict_scorer_unit_paired_available": true,
+      "target_argument_keyset_changed_by_repair_count": 0,
+      "target_observed_score_record_count": 1,
+      "target_post_decode_missing_required_arg_count_before_repair": 0,
+      "target_provider_generated_valid_call_proxy_count": 5,
+      "target_sampled_trace_artifact_count": 8,
+      "target_selected_compact_case_count": 24,
+      "target_selected_scorer_unit_count": 24,
+      "target_unique_scorer_unit_count": 1
+    },
+    "next_required_action": "fix_score_output_contract_or_enable_true_per_selected_or_per_turn_scoring_before_more_bfcl",
+    "per_selected_id_status": {
+      "more_bfcl_before_alignment_recommended": false,
+      "per_turn_shape_row_count": 44,
+      "scorer_unit_row_count": 18,
+      "selected_case_ids_hash": "sha256:9b26ba3d24c54562f6a5058877a24f15d2e4ef71ee9ea781bcae168307f7d14c",
+      "selected_compact_case_count": 48,
+      "selected_row_count": 48,
+      "strict_per_selected_id_pairing_available": false,
+      "target_category": "multi_turn_miss_param",
+      "target_compact_to_scorer_unit_factor": 24.0,
+      "target_pass_is_scorer_unit_inherited": true,
+      "target_per_selected_id_pass_available": false,
+      "target_selected_compact_case_count": 24,
+      "target_unique_scorer_unit_count": 1
+    },
+    "performance_evidence": false,
+    "scorer_unit_status": {
+      "more_bfcl_before_alignment_recommended": false,
+      "scorer_unit_row_count": 6,
+      "selected_case_ids_hash": "sha256:9b26ba3d24c54562f6a5058877a24f15d2e4ef71ee9ea781bcae168307f7d14c",
+      "selected_compact_case_count": 48,
+      "target_category": "multi_turn_miss_param",
+      "target_compact_to_score_record_factor": 24.0,
+      "target_score_record_count": 1,
+      "target_selected_compact_case_count": 24,
+      "target_strict_per_compact_case_pairing_available": false
+    },
+    "scoring_contract_audit": {
+      "distinct_selection_gate_claimed_target_scorer_units": 24,
+      "more_bfcl_before_contract_fix_recommended": false,
+      "score_output_contract_satisfied_for_target": false,
+      "selected_case_ids_hash": "sha256:9b26ba3d24c54562f6a5058877a24f15d2e4ef71ee9ea781bcae168307f7d14c",
+      "selected_compact_case_count": 48,
+      "target_category": "multi_turn_miss_param",
+      "target_observed_score_record_count": 1,
+      "target_selected_compact_case_count": 24,
+      "target_selected_scorer_unit_count": 24,
+      "target_selected_scorer_unit_to_observed_score_record_factor": 24.0,
+      "true_per_selected_or_per_turn_scoring_available": false
+    },
+    "selected_case_ids_hash": "sha256:9b26ba3d24c54562f6a5058877a24f15d2e4ef71ee9ea781bcae168307f7d14c",
+    "summary": {
+      "baseline_passed_count": 4,
+      "conditional_frozen_v2_delta_vs_baseline": 6,
+      "conditional_frozen_v2_passed_count": 10,
+      "false_ask_count": 0,
+      "fixed_count": 0,
+      "hallucinated_param_count": 0,
+      "multi_turn_miss_param_delta_vs_conditional_frozen_v2": 0,
+      "non_target_regression_count": 6,
+      "regressed_count": 6,
+      "runtime_slot_controller_v2_delta_vs_conditional_frozen_v2": -6,
+      "runtime_slot_controller_v2_passed_count": 4,
+      "slot_bind_repair_count": 0,
+      "slot_controller_enabled_patch_count": 31,
+      "target_argument_keyset_changed_by_repair_count": 0,
+      "target_bucket_reduction": 0,
+      "target_post_decode_missing_required_arg_count_before_repair": 0,
+      "target_provider_generated_valid_call_proxy_count": 5,
+      "target_sampled_trace_artifact_count": 8,
+      "valid_tool_call_suppression_count": 0
+    }
   },
   "abhe_v0_runtime_slot_observability_fixture_status": {
     "artifact_kind": "abhe_v0_runtime_slot_observability_fixture",
@@ -723,6 +874,19 @@
     "target_selected_compact_case_count": 24,
     "target_strict_per_compact_case_pairing_available": false
   },
+  "abhe_v0_runtime_slot_scoring_contract_audit_status": {
+    "archive_updated": false,
+    "artifact_kind": "abhe_v0_runtime_slot_controller_scoring_contract_audit",
+    "artifact_path": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_scoring_contract_audit.json",
+    "full_suite_touched": false,
+    "holdout_touched": false,
+    "next_required_action": "fix_score_output_contract_or_enable_true_per_selected_or_per_turn_scoring_before_more_bfcl",
+    "performance_evidence": false,
+    "score_output_contract_satisfied_for_target": false,
+    "target_observed_score_record_count": 1,
+    "target_selected_scorer_unit_count": 24,
+    "true_per_selected_or_per_turn_scoring_available": false
+  },
   "active_diagnostic_evidence": {
     "bfcl_proxy_preflight_failure_telemetry_local_stub_approved_v2": {
       "artifact_path": "outputs/artifacts/stage1_bfcl_acceptance/bfcl_proxy_preflight_failure_telemetry_local_stub_approved_v2_compact.json",
@@ -819,8 +983,14 @@
     "abhe_v0_runtime_slot_controller_archive_transition_dry_run": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_archive_transition_dry_run.json",
     "abhe_v0_runtime_slot_controller_bindability_audit_doc": "docs/stage1_abhe_v0_runtime_slot_controller_bindability_audit.md",
     "abhe_v0_runtime_slot_controller_bindability_audit_v1": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_bindability_audit_v1.json",
+    "abhe_v0_runtime_slot_controller_distinct_rerun_approval_packet": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_approval_packet.json",
+    "abhe_v0_runtime_slot_controller_distinct_rerun_baseline_arm_compact": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_baseline_arm_compact.json",
+    "abhe_v0_runtime_slot_controller_distinct_rerun_command_manifest": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_command_manifest.json",
+    "abhe_v0_runtime_slot_controller_distinct_rerun_conditional_frozen_v2_arm_compact": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_conditional_frozen_v2_arm_compact.json",
     "abhe_v0_runtime_slot_controller_distinct_rerun_dry_run_manifest": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_dry_run_manifest.json",
     "abhe_v0_runtime_slot_controller_distinct_rerun_request": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_request.json",
+    "abhe_v0_runtime_slot_controller_distinct_rerun_result": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_result.json",
+    "abhe_v0_runtime_slot_controller_distinct_rerun_runtime_slot_controller_v2_arm_compact": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_runtime_slot_controller_v2_arm_compact.json",
     "abhe_v0_runtime_slot_controller_per_selected_id_matrix": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_per_selected_id_matrix.json",
     "abhe_v0_runtime_slot_controller_residual_analysis_doc": "docs/stage1_abhe_v0_runtime_slot_controller_residual_analysis.md",
     "abhe_v0_runtime_slot_controller_residual_failure_analysis": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_residual_failure_analysis.json",
@@ -829,6 +999,7 @@
     "abhe_v0_runtime_slot_controller_residual_stress_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_residual_stress_plan.json",
     "abhe_v0_runtime_slot_controller_sanitized_trace_audit": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_sanitized_trace_audit.json",
     "abhe_v0_runtime_slot_controller_scorer_unit_distinct_slice_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_scorer_unit_distinct_slice_plan.json",
+    "abhe_v0_runtime_slot_controller_scoring_contract_audit": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_scoring_contract_audit.json",
     "abhe_v0_runtime_slot_observability_fixture": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_observability_fixture.json",
     "abhe_v0_runtime_slot_observability_fixture_doc": "docs/stage1_abhe_v0_runtime_slot_observability_fixture.md",
     "abhe_v0_runtime_slot_observability_plan": "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_observability_plan.json",
@@ -1066,7 +1237,7 @@
   "index_updated_for_evidence_through_commit": "61611b98",
   "index_updated_for_evidence_through_commit_note": "61611b98 is the latest referenced evidence/documentation commit indexed here: it added the negative evidence report and aligned performance readiness. Later provenance-only commits are intentionally not recorded as current index commits to avoid self-referential churn.",
   "latest_committed_cleanup": "see git HEAD",
-  "latest_conclusion": "runtime_slot_controller_v2_no_independent_miss_param_signal; scorer-unit aligned residual diagnostic required before more BFCL",
+  "latest_conclusion": "distinct residual rerun completed; runtime_slot_controller_v2 has no independent miss_param signal and causes non-target regression; selected target has 24 scorer-unit candidates but current score output exposes only 1 target score record, so true per-selected/per-turn scoring contract must be fixed before more BFCL",
   "latest_hygiene_source_head": "b94855e0",
   "main_merge_completed": true,
   "negative_evidence_report": "docs/stage1_bfcl_negative_evidence_report.md",
