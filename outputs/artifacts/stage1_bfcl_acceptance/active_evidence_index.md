@@ -492,3 +492,15 @@ Status: bounded dev smoke only. Frozen v2 generalizes on the new fresh balanced 
 - raw ids / raw prompts / provider payloads / gold / scorer diffs persisted: `false`.
 - performance_evidence: `false`.
 - next_required_action: `request_bounded_rerun_after_run_id_mapping_fix`
+
+## ABHE-v0 Runtime Slot Mapping-Fixed Rerun Failure
+
+- Artifact: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_failure.json`
+- Scope: scorer-unit-distinct bounded residual dev smoke only.
+- Status: baseline arm entered approved provider/BFCL generate for `multi_turn_miss_param` but stopped fail-closed after provider 504 / generate timeout-failure.
+- Tmp-only partial trace file count: `111`
+- BFCL evaluate called: `false`
+- scorer called: `false`
+- holdout/full suite/archive update: `false`
+- performance_evidence: `false`
+- next_required_action: `stabilize_provider_or_reduce_target_category_batch_before_mapping_fixed_bounded_rerun`

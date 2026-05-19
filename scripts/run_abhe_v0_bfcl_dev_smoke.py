@@ -361,8 +361,24 @@ def _bfcl_env(port: int) -> Dict[str, str]:
     return env
 
 
+def _coerce_timeout_output(value: Any) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, bytes):
+        return value.decode("utf-8", errors="replace")
+    return str(value)
+
+
 def _run_command(cmd: List[str], env: Dict[str, str], cwd: Path) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(cmd, cwd=cwd, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=False, timeout=1800)
+    timeout_s = int(os.environ.get("ABHE_BFCL_SUBPROCESS_TIMEOUT_SECONDS", "1800"))
+    try:
+        return subprocess.run(cmd, cwd=cwd, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=False, timeout=timeout_s)
+    except subprocess.TimeoutExpired as exc:
+        stdout = _coerce_timeout_output(exc.stdout)
+        stderr = _coerce_timeout_output(exc.stderr)
+        timeout_marker = f"abhe_bfcl_subprocess_timeout_after_{timeout_s}s"
+        stderr = (stderr + "\n" + timeout_marker).strip()
+        return subprocess.CompletedProcess(cmd, 124, stdout=stdout, stderr=stderr)
 
 
 def _generate_command(run_root: Path, categories: str) -> List[str]:

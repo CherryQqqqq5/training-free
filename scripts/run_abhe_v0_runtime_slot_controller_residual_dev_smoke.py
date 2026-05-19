@@ -41,16 +41,26 @@ def _write(path: Path, data: Dict[str, Any]) -> None:
     path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
-def _failure(arm: str, blockers: List[str], distinct: bool = False) -> Dict[str, Any]:
+def _failure(
+    arm: str,
+    blockers: List[str],
+    distinct: bool = False,
+    *,
+    execution_started: bool = False,
+    provider_calls_made: bool = False,
+    bfcl_generate_called: bool = False,
+    bfcl_evaluate_called: bool = False,
+    scorer_called: bool = False,
+) -> Dict[str, Any]:
     data = {
         "artifact_kind": "abhe_v0_runtime_slot_controller_residual_dev_smoke_failure",
         "schema_version": "abhe_v0_runtime_slot_controller_residual_dev_smoke_failure_v0",
         "arm": arm,
-        "execution_started": False,
-        "provider_calls_made": False,
-        "bfcl_generate_called": False,
-        "bfcl_evaluate_called": False,
-        "scorer_called": False,
+        "execution_started": execution_started,
+        "provider_calls_made": provider_calls_made,
+        "bfcl_generate_called": bfcl_generate_called,
+        "bfcl_evaluate_called": bfcl_evaluate_called,
+        "scorer_called": scorer_called,
         "raw_material_absent": True,
         "raw_provider_payload_committed": False,
         "raw_bfcl_result_tree_committed": False,
@@ -258,7 +268,18 @@ def execute_arm(arm: str, manifest_path: Path = MANIFEST, run_root_override: Pat
                 activation_entry=activation_entry,
             )
             if blockers:
-                return _failure(arm, blockers, distinct)
+                generate_failed = any(str(item).startswith("bfcl_generate_failed:") for item in blockers)
+                evaluate_started = not generate_failed
+                return _failure(
+                    arm,
+                    blockers,
+                    distinct,
+                    execution_started=True,
+                    provider_calls_made=True,
+                    bfcl_generate_called=True,
+                    bfcl_evaluate_called=evaluate_started,
+                    scorer_called=evaluate_started,
+                )
             metrics = base._aggregate_metrics(category_root, category_root / "traces", arm, category)
             total_latency += float(metrics.get("latency") or 0.0)
             status_by_category.update(base._category_status_from_score(category_root, {category: ids}))

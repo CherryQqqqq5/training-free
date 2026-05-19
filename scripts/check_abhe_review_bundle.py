@@ -46,6 +46,7 @@ from scripts.check_abhe_v0_runtime_slot_alignment_sidecar import check as check_
 from scripts.check_abhe_v0_runtime_slot_run_id_mapping_audit import check as check_runtime_slot_run_id_mapping_audit
 from scripts.check_abhe_v0_runtime_slot_scorer_unit_distinct_slice import check as check_runtime_slot_scorer_unit_distinct_slice
 from scripts.check_abhe_v0_runtime_slot_distinct_rerun_request import check as check_runtime_slot_distinct_rerun_request
+from scripts.check_abhe_v0_runtime_slot_distinct_rerun_failure import check as check_runtime_slot_distinct_rerun_failure
 from scripts.plan_abhe_v0_bfcl_archive_transition import build_plan as build_bfcl_archive_transition
 from scripts.plan_abhe_v0_bfcl_archive_transition import synthetic_feedback as bfcl_synthetic_feedback
 
@@ -78,6 +79,7 @@ RUNTIME_SLOT_DISTINCT_RERUN_DRY_RUN_PATH = Path("outputs/artifacts/stage1_bfcl_a
 RUNTIME_SLOT_DISTINCT_RERUN_APPROVAL_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_approval_packet.json")
 RUNTIME_SLOT_DISTINCT_RERUN_COMMAND_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_command_manifest.json")
 RUNTIME_SLOT_DISTINCT_RERUN_RESULT_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_result.json")
+RUNTIME_SLOT_DISTINCT_RERUN_FAILURE_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_failure.json")
 RUNTIME_SLOT_OBSERVABILITY_PLAN_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_observability_plan.json")
 RUNTIME_SLOT_OBSERVABILITY_FIXTURE_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_observability_fixture.json")
 RUNTIME_SLOT_OBSERVABILITY_REVIEW_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_observability_review.json")
@@ -177,6 +179,7 @@ def build_bundle() -> Dict[str, Any]:
     runtime_slot_distinct_rerun_approval = _load_json(RUNTIME_SLOT_DISTINCT_RERUN_APPROVAL_PATH)
     runtime_slot_distinct_rerun_command = _load_json(RUNTIME_SLOT_DISTINCT_RERUN_COMMAND_PATH)
     runtime_slot_distinct_rerun_result = _load_json(RUNTIME_SLOT_DISTINCT_RERUN_RESULT_PATH)
+    runtime_slot_distinct_rerun_failure = _load_json(RUNTIME_SLOT_DISTINCT_RERUN_FAILURE_PATH)
     runtime_slot_scorer_unit_check = check_runtime_slot_scorer_unit_diagnostic()
     runtime_slot_scorer_unit_matrix_check = check_runtime_slot_scorer_unit_matrix()
     runtime_slot_per_selected_id_matrix_check = check_runtime_slot_per_selected_id_matrix()
@@ -185,6 +188,7 @@ def build_bundle() -> Dict[str, Any]:
     runtime_slot_run_id_mapping_audit_check = check_runtime_slot_run_id_mapping_audit()
     runtime_slot_scorer_unit_distinct_slice_check = check_runtime_slot_scorer_unit_distinct_slice()
     runtime_slot_distinct_rerun_request_check = check_runtime_slot_distinct_rerun_request()
+    runtime_slot_distinct_rerun_failure_check = check_runtime_slot_distinct_rerun_failure()
     runtime_slot_observability_plan = check_runtime_slot_observability_plan()
     runtime_slot_observability_fixture = check_runtime_slot_observability_fixture()
     runtime_slot_observability_review = check_runtime_slot_observability_review()
@@ -285,6 +289,9 @@ def build_bundle() -> Dict[str, Any]:
         "abhe_v0_runtime_slot_distinct_rerun_approval_present": runtime_slot_distinct_rerun_approval.get("artifact_kind") == "abhe_v0_runtime_slot_controller_distinct_rerun_approval_packet",
         "abhe_v0_runtime_slot_distinct_rerun_command_manifest_present": runtime_slot_distinct_rerun_command.get("artifact_kind") == "abhe_v0_runtime_slot_controller_distinct_rerun_command_manifest",
         "abhe_v0_runtime_slot_distinct_rerun_result_ready": runtime_slot_distinct_rerun_result.get("artifact_kind") == "abhe_v0_runtime_slot_controller_residual_dev_smoke_result",
+        "abhe_v0_runtime_slot_distinct_rerun_failure_present": runtime_slot_distinct_rerun_failure.get("artifact_kind") == "abhe_v0_runtime_slot_controller_distinct_rerun_failure",
+        "abhe_v0_runtime_slot_distinct_rerun_failure_check_passed": runtime_slot_distinct_rerun_failure_check.get("distinct_rerun_failure_check_passed") is True,
+        "abhe_v0_runtime_slot_distinct_rerun_failure_next_required_action": runtime_slot_distinct_rerun_failure_check.get("next_required_action"),
         "abhe_v0_runtime_slot_target_score_record_count": runtime_slot_scorer_unit_matrix_check.get("target_score_record_count"),
         "abhe_v0_runtime_slot_target_per_selected_id_pass_available": runtime_slot_per_selected_id_matrix_check.get("target_per_selected_id_pass_available"),
         "abhe_v0_runtime_slot_distinct_slice_target_units": runtime_slot_scorer_unit_distinct_slice_check.get("target_unique_scorer_unit_count"),
@@ -364,6 +371,7 @@ def build_bundle() -> Dict[str, Any]:
             "abhe_v0_runtime_slot_controller_distinct_rerun_approval_packet": str(RUNTIME_SLOT_DISTINCT_RERUN_APPROVAL_PATH),
             "abhe_v0_runtime_slot_controller_distinct_rerun_command_manifest": str(RUNTIME_SLOT_DISTINCT_RERUN_COMMAND_PATH),
             "abhe_v0_runtime_slot_controller_distinct_rerun_result": str(RUNTIME_SLOT_DISTINCT_RERUN_RESULT_PATH),
+            "abhe_v0_runtime_slot_controller_distinct_rerun_failure": str(RUNTIME_SLOT_DISTINCT_RERUN_FAILURE_PATH),
         },
         "component_summaries": {
             "planning_ready": _summary(planning_ready, [
@@ -463,12 +471,13 @@ def build_bundle() -> Dict[str, Any]:
             "abhe_v0_runtime_slot_distinct_rerun_approval": _summary(runtime_slot_distinct_rerun_approval, ["approval_status", "authorized", "approval_scope", "performance_evidence", "holdout_authorized", "full_suite_authorized"]),
             "abhe_v0_runtime_slot_distinct_rerun_command_manifest": _summary(runtime_slot_distinct_rerun_command, ["command_manifest_approved", "runner_manifest_compatible", "selected_case_count", "performance_evidence"]),
             "abhe_v0_runtime_slot_distinct_rerun_result": _summary(runtime_slot_distinct_rerun_result, ["selected_case_ids_hash", "arms_complete", "archive_updated", "performance_evidence", "holdout_touched", "full_suite_touched"]),
+            "abhe_v0_runtime_slot_distinct_rerun_failure": runtime_slot_distinct_rerun_failure_check,
             "abhe_v0_runtime_slot_residual_archive_transition": runtime_slot_residual_transition,
             "abhe_v0_bfcl_archive_transition": bfcl_archive_transition,
             "no_leakage": _summary(leakage, ["abhe_no_leakage_boundary_passed", "report_scope"]),
         },
         "commit": _current_commit(),
-        "next_required_action": runtime_slot_run_id_mapping_audit.get("next_required_action") or runtime_slot_alignment_sidecar.get("next_required_action") or runtime_slot_score_output_contract_gap_audit.get("next_required_action") or (runtime_slot_residual_failure.get("measurement_diagnosis") or {}).get("next_required_action") or runtime_slot_scorer_unit_matrix.get("next_required_action") or runtime_slot_per_selected_id_matrix.get("next_required_action") or runtime_slot_scorer_unit_diagnostic.get("next_required_action") or runtime_slot_scorer_unit_distinct_slice.get("next_required_action") or runtime_slot_distinct_rerun_request.get("next_required_action") or "build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl",
+        "next_required_action": runtime_slot_distinct_rerun_failure_check.get("next_required_action") or runtime_slot_run_id_mapping_audit.get("next_required_action") or runtime_slot_alignment_sidecar.get("next_required_action") or runtime_slot_score_output_contract_gap_audit.get("next_required_action") or (runtime_slot_residual_failure.get("measurement_diagnosis") or {}).get("next_required_action") or runtime_slot_scorer_unit_matrix.get("next_required_action") or runtime_slot_per_selected_id_matrix.get("next_required_action") or runtime_slot_scorer_unit_diagnostic.get("next_required_action") or runtime_slot_scorer_unit_distinct_slice.get("next_required_action") or runtime_slot_distinct_rerun_request.get("next_required_action") or "build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl",
     }
     blockers = validate_bundle(bundle)
     bundle["abhe_review_bundle_ready"] = not blockers

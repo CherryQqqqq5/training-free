@@ -391,3 +391,18 @@ def test_runtime_slot_run_id_mapping_audit_artifact_passes():
     assert report["mapped_run_id_count"] == 48
     assert report["unique_run_id_hash_count"] == 48
     assert report["performance_evidence"] is False
+
+def test_runtime_slot_distinct_rerun_failure_artifact_passes():
+    from scripts.check_abhe_v0_runtime_slot_distinct_rerun_failure import check
+
+    report = check()
+    assert report["distinct_rerun_failure_check_passed"] is True
+    assert report["execution_started"] is True
+    assert report["provider_calls_made"] is True
+    assert report["bfcl_generate_called"] is True
+    assert report["bfcl_evaluate_called"] is False
+    assert report["scorer_called"] is False
+    assert report["selected_case_count"] == 48
+    assert report["failed_category"] == "multi_turn_miss_param"
+    assert report["performance_evidence"] is False
+    assert report["next_required_action"] == "stabilize_provider_or_reduce_target_category_batch_before_mapping_fixed_bounded_rerun"
