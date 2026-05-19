@@ -1,0 +1,92 @@
+{
+  "artifact_kind": "abhe_v0_per_case_scorer_slicer_approval_packet",
+  "schema_version": "abhe_v0_per_case_scorer_slicer_approval_packet_v0",
+  "approval_status": "draft_pending_signature",
+  "approval_scope": "per_case_scorer_slicer_bounded_residual_dev_smoke_only",
+  "approval_packet_purpose": "Authorize per-case scorer invocation slicing on the bounded multi_turn_miss_param dev slice ONLY, to produce one scorer_unit per selected compact case (post-slicing target: unique_scorer_unit_count == 24), thereby making the P1 score-output contract probe (target_per_selected_pass_unavailable:0/24_promoted) honestly satisfiable.",
+
+  "authorized": false,
+  "provider_calls_authorized": false,
+  "bfcl_generate_authorized": false,
+  "bfcl_evaluate_authorized": false,
+  "scorer_authorized": false,
+  "per_case_scorer_invocation_authorized": false,
+
+  "holdout_authorized": false,
+  "full_suite_authorized": false,
+  "archive_update_authorized": false,
+  "performance_claim_authorized": false,
+  "performance_evidence": false,
+  "sota_3pp_claim_ready": false,
+  "huawei_acceptance_ready": false,
+
+  "raw_outputs_committed": false,
+  "raw_provider_payload_committed": false,
+  "raw_bfcl_result_tree_committed": false,
+  "gold_expected_committed": false,
+  "scorer_diff_committed": false,
+  "prompt_literal_committed": false,
+  "argument_values_committed": false,
+
+  "approved_selected_case_ids_hash": "sha256:9b26ba3d24c54562f6a5058877a24f15d2e4ef71ee9ea781bcae168307f7d14c",
+  "approved_selected_case_count": 48,
+  "approved_target_category": "multi_turn_miss_param",
+  "approved_target_selected_compact_case_count": 24,
+  "approved_target_unique_scorer_unit_count_post_slicing": 24,
+  "approved_target_compact_to_scorer_unit_factor_post_slicing": 1.0,
+  "current_target_unique_scorer_unit_count_pre_slicing": 1,
+
+  "approved_provider": "ToolCallingFunction/OpenAICompatible",
+  "approved_profile": "toolcallingfunction",
+  "approved_model": "gpt-4.1",
+  "approved_provider_route_policy": "toolcallingfunction_openai_compatible_only_openrouter_disabled",
+  "approved_protocol": "bfcl_v4_abhe_v0_per_case_scorer_slicer_bounded_residual_dev_smoke_toolcallingfunction",
+  "approved_arms": ["baseline", "conditional_frozen_v2", "runtime_slot_controller_v2"],
+  "approved_runtime_config_path": "configs/runtime_bfcl_structured.yaml",
+
+  "stop_loss": [
+    "raw_leakage",
+    "provider_model_protocol_mismatch",
+    "case_list_hash_mismatch",
+    "scorer_unit_alignment_mismatch",
+    "runner_manifest_incompatible",
+    "runtime_config_missing_or_mismatch",
+    "cost_latency_cap_exceeded",
+    "regression_cap_exceeded",
+    "scorer_artifact_schema_failure",
+    "per_case_scorer_call_count_mismatch",
+    "provider_504_rate_exceeded"
+  ],
+
+  "artifact_boundary": {
+    "compact_only": true,
+    "raw_outputs_committed": false,
+    "raw_provider_payload_committed": false,
+    "raw_bfcl_result_tree_committed": false,
+    "gold_expected_committed": false,
+    "scorer_diff_committed": false,
+    "prompt_literal_committed": false,
+    "argument_values_committed": false
+  },
+
+  "pre_rerun_dependencies": {
+    "p2_v3_skeleton_merged": true,
+    "p3_backoff_policy_declarative_only_merged": true,
+    "p3_backoff_policy_wired_into_proxy": false,
+    "same_case_id_hash_as_p1": true,
+    "p1_score_adapter_artifact_present": true
+  },
+
+  "honest_expectation_note": "Even if the slicer works, the contract probe will become satisfiable for multi_turn_miss_param. This does NOT mean any arm beats baseline. It only means the measurement instrument can express per-case outcomes. Reporting of arm-level outcomes still requires P1.5a-style aggregate matrix; per-case signal does not by itself imply +3pp or any claim.",
+
+  "signature_block": {
+    "signed_by": "<unsigned>",
+    "signed_at_iso8601_utc": "<unsigned>",
+    "signed_at_commit_sha": "<unsigned>",
+    "cost_latency_cap_token_budget": null,
+    "cost_latency_cap_wall_clock_s": null,
+    "regression_cap_error_class_delta_max_cases": null,
+    "cost_amplification_cap_factor": null,
+    "provider_504_rate_cap_pct": null
+  }
+}
