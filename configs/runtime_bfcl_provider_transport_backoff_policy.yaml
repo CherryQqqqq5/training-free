@@ -1,0 +1,71 @@
+# Provider transport backoff/retry policy — DECLARATIVE-ONLY SPEC
+# ================================================================
+#
+# Status: NOT WIRED. enabled=false until P1.5b (or a sibling) packet
+# signs off on actually consuming this policy in the proxy.
+#
+# This file is a *spec*. It is read by:
+#   scripts/build_abhe_v0_provider_transport_backoff_policy.py
+# which emits a validation artifact under
+#   outputs/artifacts/stage1_bfcl_acceptance/
+# It is NOT consumed by any provider/proxy/runtime call.
+#
+# Source for backoff defaults (literature):
+#   - Exponential backoff with jitter is industry-standard for upstream
+#     5xx mitigation (AWS Architecture Blog 2015, "Exponential Backoff
+#     and Jitter"). Full Jitter pattern chosen over Equal/Decorrelated
+#     for simplicity + low coordination overhead.
+#   - 504 retries SHOULD be bounded to avoid cost amplification (see
+#     "Beyond Max Tokens: Stealthy Resource Amplification via Tool
+#     Calling Chains in LLM Agents", arxiv 2025 — confirms multi-turn
+#     chains can amplify cost 100x+; we cap conservatively).
+#   - per-request timeout chosen below runtime.timeout_sec (=120) so
+#     each retry has headroom inside the run-level budget.
+
+provider_transport_backoff_policy:
+  schema_version: provider_transport_backoff_policy_v0
+
+  # MASTER SWITCH. MUST remain false until packet signoff.
+  enabled: false
+
+  # Retry envelope
+  max_retries: 3
+  initial_delay_ms: 500
+  max_delay_ms: 8000
+  multiplier: 2.0
+  jitter_strategy: full_jitter   # one of: none, equal_jitter, full_jitter, decorrelated_jitter
+
+  # Per-request timeout MUST be < runtime.timeout_sec (=120s). Picked
+  # 45s to leave room for ~2-3 retry attempts inside the run-level
+  # budget without violating it.
+  per_request_timeout_sec: 45
+
+  # Status codes that trigger a retry. Conservative whitelist: only
+  # transient-class upstream failures. NOT 4xx (client errors).
+  retry_on_status_codes:
+  - 502
+  - 503
+  - 504
+
+  # Hard caps (defense in depth against cost amplification)
+  hard_caps:
+    max_total_retry_time_sec: 60         # across all retries for one logical request
+    max_concurrent_in_flight_requests: 4 # reduces upstream pressure on miss_param batch
+    abort_run_after_consecutive_504s: 5
+
+  # Bound to the bounded dev smoke slice ONLY. NOT general-purpose.
+  applies_to:
+  - bounded_residual_dev_smoke_target_category_multi_turn_miss_param
+  - reduced_batch_retry_after_provider_504s
+
+  # Boundary attestations (the policy itself attests its own bounds)
+  provider_calls_authorized_by_this_policy: false
+  bfcl_generate_authorized_by_this_policy: false
+  bfcl_evaluate_authorized_by_this_policy: false
+  scorer_authorized_by_this_policy: false
+  performance_evidence_authorized_by_this_policy: false
+  archive_update_authorized_by_this_policy: false
+  holdout_authorized_by_this_policy: false
+  full_suite_authorized_by_this_policy: false
+  huawei_acceptance_authorized_by_this_policy: false
+  sota_3pp_claim_authorized_by_this_policy: false
