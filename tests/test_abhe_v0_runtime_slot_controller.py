@@ -346,3 +346,23 @@ def test_runtime_slot_score_output_contract_gap_audit_artifact_passes():
     assert report["per_selected_labels_recoverable"] is False
     assert report["per_turn_labels_recoverable"] is False
     assert report["performance_evidence"] is False
+
+
+def test_runtime_slot_alignment_sidecar_artifact_passes():
+    from pathlib import Path
+    from scripts.build_abhe_v0_runtime_slot_alignment_sidecar import DEFAULT_OUTPUT, build
+    from scripts.check_abhe_v0_runtime_slot_alignment_sidecar import check
+
+    before = Path(DEFAULT_OUTPUT).read_text(encoding="utf-8")
+    artifact = build(write=False)
+    assert Path(DEFAULT_OUTPUT).read_text(encoding="utf-8") == before
+    assert artifact["performance_evidence"] is False
+    assert artifact["summary"]["alignment_sidecar_ready"] is True
+    assert artifact["summary"]["selected_count"] == 48
+    assert artifact["summary"]["row_count"] == 144
+    assert artifact["summary"]["per_selected_valid_labels_available"] is False
+    assert artifact["summary"]["per_turn_valid_labels_available"] is False
+    report = check()
+    assert report["alignment_sidecar_check_passed"] is True
+    assert report["alignment_sidecar_ready"] is True
+    assert report["performance_evidence"] is False

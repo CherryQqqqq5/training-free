@@ -456,3 +456,13 @@ Status: bounded dev smoke only. Frozen v2 generalizes on the new fresh balanced 
 - More BFCL before contract fix recommended: false
 - Current next action: `instrument_runner_scorer_to_emit_compact_alignment_sidecar_before_more_bfcl`
 - Boundary: compact-only diagnostic; provider/BFCL/scorer are not authorized for further runs; performance_evidence=false; holdout/full suite untouched.
+
+### ABHE-v0 Runtime Slot Alignment Sidecar
+- Artifact: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_alignment_sidecar.json`
+- alignment_sidecar_ready: true
+- selected_count: 48
+- row_count: 144
+- per_selected_valid_labels_available: false
+- per_turn_valid_labels_available: false
+- performance_evidence: false
+- next_required_action: `request_bounded_rerun_with_compact_alignment_sidecar_enabled`
