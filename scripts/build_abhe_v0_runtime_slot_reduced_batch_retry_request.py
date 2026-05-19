@@ -9,6 +9,7 @@ from typing import Any, Dict, List
 
 from scripts.build_abhe_v0_bfcl_fresh_dev_slice import selected_case_ids_hash
 from scripts.check_abhe_no_leakage_boundary import scan_value
+from scripts.check_abhe_v0_runtime_slot_retry_stabilization_plan import check as check_stabilization
 
 ROOT = Path("outputs/artifacts/stage1_bfcl_acceptance")
 FULL_PLAN = ROOT / "abhe_v0_runtime_slot_controller_scorer_unit_distinct_slice_plan.json"
@@ -98,7 +99,12 @@ def build() -> Dict[str, Any]:
         ],
         "next_required_action": NEXT_ACTION,
     }
-    request["blockers"] = scan_value(request, label="abhe_v0_runtime_slot_controller_reduced_batch_retry_request")
+    drift_blockers: List[str] = []
+    if full.get("selected_case_ids_hash") != PARENT_HASH:
+        drift_blockers.append("parent_distinct_slice_hash_mismatch")
+    if check_stabilization().get("retry_stabilization_plan_passed") is not True:
+        drift_blockers.append("stabilization_plan_not_passed")
+    request["blockers"] = sorted(set(drift_blockers + scan_value(request, label="abhe_v0_runtime_slot_controller_reduced_batch_retry_request")))
     return request
 
 

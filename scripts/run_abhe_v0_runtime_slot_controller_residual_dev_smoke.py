@@ -18,6 +18,9 @@ RESULT = ROOT / "abhe_v0_runtime_slot_controller_residual_dev_smoke_result.json"
 FAILURE = ROOT / "abhe_v0_runtime_slot_controller_residual_dev_smoke_failure.json"
 DISTINCT_RESULT = ROOT / "abhe_v0_runtime_slot_controller_distinct_rerun_result.json"
 DISTINCT_FAILURE = ROOT / "abhe_v0_runtime_slot_controller_distinct_rerun_failure.json"
+REDUCED_BATCH_DRY_RUN = ROOT / "abhe_v0_runtime_slot_controller_reduced_batch_retry_dry_run_manifest.json"
+REDUCED_BATCH_FAILURE = ROOT / "abhe_v0_runtime_slot_controller_reduced_batch_retry_failure.json"
+REDUCED_BATCH_MANIFEST_NAME = "abhe_v0_runtime_slot_controller_reduced_batch_slice_manifest.json"
 RUN_ROOT = Path("/tmp/abhe_v0_runtime_slot_controller_residual_dev_smoke")
 APPROVAL_PACKET = ROOT / "abhe_v0_runtime_slot_controller_distinct_rerun_approval_packet.json"
 ARMS = ["baseline", "conditional_frozen_v2", "runtime_slot_controller_v2"]
@@ -27,6 +30,28 @@ NO_TOOL_CATEGORIES = {"irrelevance", "live_irrelevance"}
 
 def _is_distinct_manifest(path: Path) -> bool:
     return path.name == "abhe_v0_runtime_slot_controller_scorer_unit_distinct_slice_plan.json"
+
+
+def _is_reduced_batch_manifest(path: Path) -> bool:
+    return path.name == REDUCED_BATCH_MANIFEST_NAME
+
+
+def _failure_output_path(distinct: bool = False, reduced_batch: bool = False) -> Path:
+    if reduced_batch:
+        return REDUCED_BATCH_FAILURE
+    return DISTINCT_FAILURE if distinct else FAILURE
+
+
+def _dry_run_output_path(manifest_path: Path) -> Path:
+    if _is_reduced_batch_manifest(manifest_path):
+        return REDUCED_BATCH_DRY_RUN
+    return ROOT / "abhe_v0_runtime_slot_controller_distinct_rerun_dry_run_manifest.json"
+
+
+def _dry_run_kind(manifest_path: Path) -> str:
+    if _is_reduced_batch_manifest(manifest_path):
+        return "abhe_v0_runtime_slot_controller_reduced_batch_retry_dry_run_manifest"
+    return "abhe_v0_runtime_slot_controller_distinct_rerun_dry_run_manifest"
 
 
 def _load(path: Path) -> Dict[str, Any]:
@@ -46,6 +71,7 @@ def _failure(
     blockers: List[str],
     distinct: bool = False,
     *,
+    reduced_batch: bool = False,
     execution_started: bool = False,
     provider_calls_made: bool = False,
     bfcl_generate_called: bool = False,
@@ -72,7 +98,7 @@ def _failure(
         "archive_updated": False,
         "blockers": sorted(set(blockers)),
     }
-    _write(DISTINCT_FAILURE if distinct else FAILURE, data)
+    _write(_failure_output_path(distinct=distinct, reduced_batch=reduced_batch), data)
     return data
 
 
@@ -235,17 +261,20 @@ def _validate_approval_packet(approval_packet: Path, manifest_path: Path, arm: s
         blockers.append("approval_scope_invalid_for_runner")
     return sorted(set(blockers))
 
-def execute_arm(arm: str, manifest_path: Path = MANIFEST, run_root_override: Path = RUN_ROOT) -> Dict[str, Any]:
+def execute_arm(arm: str, manifest_path: Path = MANIFEST, run_root_override: Path = RUN_ROOT, fresh_run_root_required: bool = False) -> Dict[str, Any]:
     distinct = _is_distinct_manifest(manifest_path)
+    reduced_batch = _is_reduced_batch_manifest(manifest_path)
     if arm not in ARMS:
-        return _failure(arm, ["arm_invalid"], distinct)
+        return _failure(arm, ["arm_invalid"], distinct, reduced_batch=reduced_batch)
     try:
         cfg = _configure(manifest_path, run_root_override)
         selected_hash = cfg["selected_hash"]
         case_count = cfg["case_count"]
         ids_by_category, _, entry_by_category = base._selected_raw_ids()
     except Exception as exc:
-        return _failure(arm, [f"configure_failed:{exc.__class__.__name__}"], distinct)
+        return _failure(arm, [f"configure_failed:{exc.__class__.__name__}"], distinct, reduced_batch=reduced_batch)
+    if fresh_run_root_required and run_root_override.exists():
+        return _failure(arm, ["fresh_run_root_not_empty"], distinct, reduced_batch=reduced_batch)
     run_root = run_root_override / arm
     if run_root.exists():
         shutil.rmtree(run_root)
@@ -274,6 +303,7 @@ def execute_arm(arm: str, manifest_path: Path = MANIFEST, run_root_override: Pat
                     arm,
                     blockers,
                     distinct,
+                    reduced_batch=reduced_batch,
                     execution_started=True,
                     provider_calls_made=True,
                     bfcl_generate_called=True,
@@ -287,23 +317,31 @@ def execute_arm(arm: str, manifest_path: Path = MANIFEST, run_root_override: Pat
         _write_result(selected_hash, distinct)
         return {"report_scope": "abhe_v0_runtime_slot_controller_residual_dev_smoke_execute", "arm": arm, "execution_started": True, "provider_calls_made": True, "bfcl_generate_called": True, "bfcl_evaluate_called": True, "scorer_called": True, "compact_only": True, "raw_material_absent": True, "performance_evidence": False, "arm_compact": compact, "blockers": []}
     except Exception as exc:
-        return _failure(arm, [f"runner_exception:{exc.__class__.__name__}"], distinct)
+        return _failure(arm, [f"runner_exception:{exc.__class__.__name__}"], distinct, reduced_batch=reduced_batch)
 
 
 
-def dry_run_arm(arm: str, manifest_path: Path = MANIFEST) -> Dict[str, Any]:
+def dry_run_arm(arm: str, manifest_path: Path = MANIFEST, run_root: Path = RUN_ROOT, fresh_run_root_required: bool = False) -> Dict[str, Any]:
     distinct = _is_distinct_manifest(manifest_path)
+    reduced_batch = _is_reduced_batch_manifest(manifest_path)
     if arm not in ARMS:
-        return _failure(arm, ["arm_invalid"], distinct)
+        return _failure(arm, ["arm_invalid"], distinct, reduced_batch=reduced_batch)
     try:
-        cfg = _configure(manifest_path, RUN_ROOT)
+        cfg = _configure(manifest_path, run_root)
         ids_by_category, _, entry_by_category = base._selected_raw_ids()
     except Exception as exc:
-        return _failure(arm, [f"dry_run_configure_failed:{exc.__class__.__name__}"], distinct)
+        return _failure(arm, [f"dry_run_configure_failed:{exc.__class__.__name__}"], distinct, reduced_batch=reduced_batch)
     category_counts = {category: len(ids) for category, ids in ids_by_category.items()}
+    source_manifest = cfg["manifest"]
+    blockers: List[str] = []
+    if sum(category_counts.values()) != cfg["case_count"]:
+        blockers.append("runner_case_count_mismatch")
+    if fresh_run_root_required and run_root.exists():
+        blockers.append("fresh_run_root_not_empty")
+    artifact_kind = _dry_run_kind(manifest_path)
     manifest = {
-        "artifact_kind": "abhe_v0_runtime_slot_controller_distinct_rerun_dry_run_manifest",
-        "schema_version": "abhe_v0_runtime_slot_controller_distinct_rerun_dry_run_manifest_v0",
+        "artifact_kind": artifact_kind,
+        "schema_version": artifact_kind + "_v0",
         "arm": arm,
         "dry_run": True,
         "manifest_path": str(manifest_path),
@@ -311,7 +349,15 @@ def dry_run_arm(arm: str, manifest_path: Path = MANIFEST) -> Dict[str, Any]:
         "selected_case_count": cfg["case_count"],
         "category_counts": category_counts,
         "entry_by_category": entry_by_category,
+        "mapped_run_id_count": source_manifest.get("mapped_run_id_count"),
+        "unique_run_id_count": source_manifest.get("unique_run_id_count"),
+        "duplicate_run_id_count": source_manifest.get("duplicate_run_id_count"),
+        "raw_run_ids_persisted": source_manifest.get("raw_run_ids_persisted"),
+        "raw_run_id_hashes_persisted": source_manifest.get("raw_run_id_hashes_persisted"),
         "runner_manifest_compatible": sum(category_counts.values()) == cfg["case_count"],
+        "fresh_run_root_required": bool(fresh_run_root_required),
+        "run_root_path": str(run_root),
+        "run_root_exists": run_root.exists(),
         "execution_started": False,
         "provider_calls_made": False,
         "bfcl_generate_called": False,
@@ -326,9 +372,10 @@ def dry_run_arm(arm: str, manifest_path: Path = MANIFEST) -> Dict[str, Any]:
         "full_suite_touched": False,
         "archive_updated": False,
         "performance_evidence": False,
-        "blockers": [] if sum(category_counts.values()) == cfg["case_count"] else ["runner_case_count_mismatch"],
+        "next_required_action": "request_reduced_batch_retry_approval_packet_after_provider_stability_preflight_and_dry_run_review",
+        "blockers": sorted(set(blockers)),
     }
-    _write(ROOT / "abhe_v0_runtime_slot_controller_distinct_rerun_dry_run_manifest.json", manifest)
+    _write(_dry_run_output_path(manifest_path), manifest)
     return manifest
 
 def main(argv: Any = None) -> int:
@@ -339,25 +386,27 @@ def main(argv: Any = None) -> int:
     parser.add_argument("--approval-packet", type=Path)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--compact-only", action="store_true")
+    parser.add_argument("--run-root", type=Path, default=RUN_ROOT)
+    parser.add_argument("--fresh-run-root-required", action="store_true")
     args = parser.parse_args(argv)
     if args.dry_run:
-        payload = dry_run_arm(args.arm, args.manifest)
+        payload = dry_run_arm(args.arm, args.manifest, args.run_root, args.fresh_run_root_required)
         print(json.dumps(payload, sort_keys=True))
         return 0 if not payload.get("blockers") else 2
     if not args.execute_approved or not args.compact_only:
-        payload = _failure(args.arm, ["execute_approved_and_compact_only_required"], _is_distinct_manifest(args.manifest))
+        payload = _failure(args.arm, ["execute_approved_and_compact_only_required"], _is_distinct_manifest(args.manifest), reduced_batch=_is_reduced_batch_manifest(args.manifest))
         print(json.dumps(payload, sort_keys=True))
         return 2
     if args.approval_packet is None:
-        payload = _failure(args.arm, ["approval_packet_argument_required"], _is_distinct_manifest(args.manifest))
+        payload = _failure(args.arm, ["approval_packet_argument_required"], _is_distinct_manifest(args.manifest), reduced_batch=_is_reduced_batch_manifest(args.manifest))
         print(json.dumps(payload, sort_keys=True))
         return 2
     approval_blockers = _validate_approval_packet(args.approval_packet, args.manifest, args.arm)
     if approval_blockers:
-        payload = _failure(args.arm, approval_blockers, _is_distinct_manifest(args.manifest))
+        payload = _failure(args.arm, approval_blockers, _is_distinct_manifest(args.manifest), reduced_batch=_is_reduced_batch_manifest(args.manifest))
         print(json.dumps(payload, sort_keys=True))
         return 2
-    payload = execute_arm(args.arm, args.manifest)
+    payload = execute_arm(args.arm, args.manifest, args.run_root, args.fresh_run_root_required)
     print(json.dumps(payload, sort_keys=True))
     return 0 if not payload.get("blockers") else 2
 

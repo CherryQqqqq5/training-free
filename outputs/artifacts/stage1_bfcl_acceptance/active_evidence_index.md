@@ -525,4 +525,15 @@ Status: bounded dev smoke only. Frozen v2 generalizes on the new fresh balanced 
 - Fresh run root required: `true`
 - authorized / provider / BFCL / scorer: `false`
 - holdout/full suite/archive/performance evidence: `false`
-- next_required_action: `request_reduced_batch_retry_approval_packet_with_fresh_run_root`
+- next_required_action: `request_reduced_batch_retry_approval_packet_after_provider_stability_preflight_and_dry_run_review`
+
+### ABHE Runtime Slot Reduced Batch Dry-Run Gate
+
+- Slice manifest: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_reduced_batch_slice_manifest.json`
+- Dry-run manifest: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_reduced_batch_retry_dry_run_manifest.json`
+- selected_case_ids_hash: `sha256:aa341bfc1d78a406f9f3a25967a03d88849dc42fc64e49625eae1993f33ddece`
+- selected_case_count: `6`
+- target_category: `multi_turn_miss_param`
+- provider_calls_made / bfcl_generate_called / bfcl_evaluate_called / scorer_called: `false`
+- performance_evidence: `false`
+- next_required_action: `request_reduced_batch_retry_approval_packet_after_provider_stability_preflight_and_dry_run_review`

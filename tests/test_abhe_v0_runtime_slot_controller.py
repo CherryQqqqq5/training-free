@@ -441,3 +441,46 @@ def test_runtime_slot_reduced_batch_retry_request_artifact_passes():
     assert report["target_category"] == "multi_turn_miss_param"
     assert report["performance_evidence"] is False
     assert report["next_required_action"] == "request_reduced_batch_retry_approval_packet_with_fresh_run_root"
+
+
+def test_runtime_slot_reduced_batch_slice_manifest_artifact_passes():
+    from pathlib import Path
+    from scripts.build_abhe_v0_runtime_slot_reduced_batch_slice_manifest import OUTPUT, build
+    from scripts.check_abhe_v0_runtime_slot_reduced_batch_slice_manifest import check
+
+    before = Path(OUTPUT).read_text(encoding="utf-8")
+    artifact = build()
+    assert Path(OUTPUT).read_text(encoding="utf-8") == before
+    assert artifact["authorized"] is False
+    assert artifact["selected_case_count"] == 6
+    assert artifact["selected_case_ids_hash"] == "sha256:aa341bfc1d78a406f9f3a25967a03d88849dc42fc64e49625eae1993f33ddece"
+    assert artifact["case_count_by_category"] == {"multi_turn_miss_param": 6}
+    assert artifact["provider_calls_made"] is False
+    assert artifact["bfcl_generate_called"] is False
+    assert artifact["scorer_called"] is False
+    assert artifact["performance_evidence"] is False
+    report = check()
+    assert report["reduced_batch_slice_manifest_passed"] is True
+    assert report["authorized"] is False
+    assert report["performance_evidence"] is False
+
+
+def test_runtime_slot_reduced_batch_runner_dry_run_stays_non_executing(tmp_path):
+    from pathlib import Path
+    from scripts.run_abhe_v0_runtime_slot_controller_residual_dev_smoke import dry_run_arm
+    from scripts.check_abhe_v0_runtime_slot_reduced_batch_dry_run_manifest import check
+
+    manifest_path = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_reduced_batch_slice_manifest.json")
+    report = dry_run_arm("baseline", manifest_path, tmp_path / "fresh_run_root", True)
+    assert report["runner_manifest_compatible"] is True
+    assert report["selected_case_count"] == 6
+    assert report["category_counts"] == {"multi_turn_miss_param": 6}
+    assert report["provider_calls_made"] is False
+    assert report["bfcl_generate_called"] is False
+    assert report["bfcl_evaluate_called"] is False
+    assert report["scorer_called"] is False
+    assert report["performance_evidence"] is False
+    check_report = check()
+    assert check_report["reduced_batch_dry_run_manifest_passed"] is True
+    assert check_report["provider_calls_made"] is False
+    assert check_report["performance_evidence"] is False

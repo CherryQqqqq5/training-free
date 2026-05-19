@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 from scripts.check_abhe_no_leakage_boundary import scan_value
+from scripts.build_abhe_v0_bfcl_fresh_dev_slice import selected_case_ids_hash
 from scripts.check_abhe_v0_runtime_slot_retry_stabilization_plan import check as check_stabilization
 
 DEFAULT = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_reduced_batch_retry_request.json")
@@ -74,6 +75,8 @@ def validate(data: Dict[str, Any]) -> List[str]:
     rows = data.get("selected_compact_case_identifiers") if isinstance(data.get("selected_compact_case_identifiers"), list) else []
     if len(rows) != 6:
         blockers.append("selected_identifier_count_invalid")
+    if rows and selected_case_ids_hash(rows) != data.get("reduced_batch_case_ids_hash"):
+        blockers.append("reduced_batch_case_ids_hash_recomputed_mismatch")
     for index, row in enumerate(rows):
         if not isinstance(row, dict):
             blockers.append(f"selected_identifier_not_object:{index}")
