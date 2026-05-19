@@ -41,6 +41,7 @@ from scripts.check_abhe_v0_runtime_slot_observability_review import check as che
 from scripts.check_abhe_v0_runtime_slot_scorer_unit_diagnostic import check as check_runtime_slot_scorer_unit_diagnostic
 from scripts.check_abhe_v0_runtime_slot_scorer_unit_matrix import check as check_runtime_slot_scorer_unit_matrix
 from scripts.check_abhe_v0_runtime_slot_per_selected_id_matrix import check as check_runtime_slot_per_selected_id_matrix
+from scripts.check_abhe_v0_runtime_slot_score_output_contract_gap_audit import check as check_runtime_slot_score_output_contract_gap_audit
 from scripts.check_abhe_v0_runtime_slot_scorer_unit_distinct_slice import check as check_runtime_slot_scorer_unit_distinct_slice
 from scripts.check_abhe_v0_runtime_slot_distinct_rerun_request import check as check_runtime_slot_distinct_rerun_request
 from scripts.plan_abhe_v0_bfcl_archive_transition import build_plan as build_bfcl_archive_transition
@@ -66,6 +67,7 @@ RUNTIME_SLOT_SCORER_UNIT_DIAGNOSTIC_PATH = Path("outputs/artifacts/stage1_bfcl_a
 RUNTIME_SLOT_SCORER_UNIT_MATRIX_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_scorer_unit_matrix.json")
 RUNTIME_SLOT_PER_SELECTED_ID_MATRIX_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_per_selected_id_matrix.json")
 RUNTIME_SLOT_SCORING_CONTRACT_AUDIT_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_scoring_contract_audit.json")
+RUNTIME_SLOT_SCORE_OUTPUT_CONTRACT_GAP_AUDIT_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_score_output_contract_gap_audit.json")
 RUNTIME_SLOT_SCORER_UNIT_DISTINCT_SLICE_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_scorer_unit_distinct_slice_plan.json")
 RUNTIME_SLOT_DISTINCT_RERUN_REQUEST_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_request.json")
 RUNTIME_SLOT_DISTINCT_RERUN_DRY_RUN_PATH = Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_dry_run_manifest.json")
@@ -162,6 +164,7 @@ def build_bundle() -> Dict[str, Any]:
     runtime_slot_scorer_unit_matrix = _load_json(RUNTIME_SLOT_SCORER_UNIT_MATRIX_PATH)
     runtime_slot_per_selected_id_matrix = _load_json(RUNTIME_SLOT_PER_SELECTED_ID_MATRIX_PATH)
     runtime_slot_scoring_contract_audit = _load_json(RUNTIME_SLOT_SCORING_CONTRACT_AUDIT_PATH)
+    runtime_slot_score_output_contract_gap_audit = _load_json(RUNTIME_SLOT_SCORE_OUTPUT_CONTRACT_GAP_AUDIT_PATH)
     runtime_slot_scorer_unit_distinct_slice = _load_json(RUNTIME_SLOT_SCORER_UNIT_DISTINCT_SLICE_PATH)
     runtime_slot_distinct_rerun_request = _load_json(RUNTIME_SLOT_DISTINCT_RERUN_REQUEST_PATH)
     runtime_slot_distinct_rerun_dry_run = _load_json(RUNTIME_SLOT_DISTINCT_RERUN_DRY_RUN_PATH)
@@ -171,6 +174,7 @@ def build_bundle() -> Dict[str, Any]:
     runtime_slot_scorer_unit_check = check_runtime_slot_scorer_unit_diagnostic()
     runtime_slot_scorer_unit_matrix_check = check_runtime_slot_scorer_unit_matrix()
     runtime_slot_per_selected_id_matrix_check = check_runtime_slot_per_selected_id_matrix()
+    runtime_slot_score_output_contract_gap_audit_check = check_runtime_slot_score_output_contract_gap_audit()
     runtime_slot_scorer_unit_distinct_slice_check = check_runtime_slot_scorer_unit_distinct_slice()
     runtime_slot_distinct_rerun_request_check = check_runtime_slot_distinct_rerun_request()
     runtime_slot_observability_plan = check_runtime_slot_observability_plan()
@@ -256,6 +260,8 @@ def build_bundle() -> Dict[str, Any]:
         "abhe_v0_runtime_slot_scorer_unit_matrix_ready": runtime_slot_scorer_unit_matrix_check.get("scorer_unit_matrix_check_passed") is True,
         "abhe_v0_runtime_slot_per_selected_id_matrix_ready": runtime_slot_per_selected_id_matrix_check.get("per_selected_id_matrix_check_passed") is True,
         "abhe_v0_runtime_slot_scoring_contract_audit_ready": runtime_slot_scoring_contract_audit.get("artifact_kind") == "abhe_v0_runtime_slot_controller_scoring_contract_audit",
+        "abhe_v0_runtime_slot_score_output_contract_gap_audit_ready": runtime_slot_score_output_contract_gap_audit_check.get("score_output_contract_gap_audit_passed") is True,
+        "abhe_v0_runtime_slot_score_output_contract_gap_confirmed": runtime_slot_score_output_contract_gap_audit_check.get("contract_gap_confirmed") is True,
         "abhe_v0_runtime_slot_target_selected_scorer_unit_count": (runtime_slot_scoring_contract_audit.get("summary") or {}).get("target_selected_scorer_unit_count"),
         "abhe_v0_runtime_slot_target_observed_score_record_count": (runtime_slot_scoring_contract_audit.get("summary") or {}).get("target_observed_score_record_count"),
         "abhe_v0_runtime_slot_scorer_unit_distinct_slice_ready": runtime_slot_scorer_unit_distinct_slice_check.get("scorer_unit_distinct_slice_check_passed") is True,
@@ -428,6 +434,7 @@ def build_bundle() -> Dict[str, Any]:
             "abhe_v0_runtime_slot_observability_review": runtime_slot_observability_review,
             "abhe_v0_runtime_slot_per_selected_id_matrix": runtime_slot_per_selected_id_matrix,
             "abhe_v0_runtime_slot_scoring_contract_audit": _summary(runtime_slot_scoring_contract_audit, ["artifact_kind", "next_required_action", "performance_evidence", "holdout_touched", "full_suite_touched"]),
+            "abhe_v0_runtime_slot_score_output_contract_gap_audit": runtime_slot_score_output_contract_gap_audit_check,
             "abhe_v0_runtime_slot_per_selected_id_matrix_check": runtime_slot_per_selected_id_matrix_check,
             "abhe_v0_runtime_slot_scorer_unit_distinct_slice": runtime_slot_scorer_unit_distinct_slice,
             "abhe_v0_runtime_slot_scorer_unit_distinct_slice_check": runtime_slot_scorer_unit_distinct_slice_check,
@@ -442,7 +449,7 @@ def build_bundle() -> Dict[str, Any]:
             "no_leakage": _summary(leakage, ["abhe_no_leakage_boundary_passed", "report_scope"]),
         },
         "commit": _current_commit(),
-        "next_required_action": (runtime_slot_residual_failure.get("measurement_diagnosis") or {}).get("next_required_action") or runtime_slot_scorer_unit_matrix.get("next_required_action") or runtime_slot_per_selected_id_matrix.get("next_required_action") or runtime_slot_scorer_unit_diagnostic.get("next_required_action") or runtime_slot_scorer_unit_distinct_slice.get("next_required_action") or runtime_slot_distinct_rerun_request.get("next_required_action") or "build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl",
+        "next_required_action": runtime_slot_score_output_contract_gap_audit.get("next_required_action") or (runtime_slot_residual_failure.get("measurement_diagnosis") or {}).get("next_required_action") or runtime_slot_scorer_unit_matrix.get("next_required_action") or runtime_slot_per_selected_id_matrix.get("next_required_action") or runtime_slot_scorer_unit_diagnostic.get("next_required_action") or runtime_slot_scorer_unit_distinct_slice.get("next_required_action") or runtime_slot_distinct_rerun_request.get("next_required_action") or "build_scorer_unit_aligned_residual_diagnostic_before_more_bfcl",
     }
     blockers = validate_bundle(bundle)
     bundle["abhe_review_bundle_ready"] = not blockers
@@ -489,6 +496,7 @@ def validate_bundle(bundle: Dict[str, Any]) -> List[str]:
         "abhe_v0_runtime_slot_observability_fixture_ready",
         "abhe_v0_runtime_slot_observability_review_ready",
         "abhe_v0_runtime_slot_per_selected_id_matrix_ready",
+        "abhe_v0_runtime_slot_score_output_contract_gap_audit_ready",
         "abhe_v0_runtime_slot_scorer_unit_distinct_slice_ready",
         "abhe_v0_runtime_slot_distinct_rerun_request_ready",
         "approval_chain_ready_for_review",

@@ -126,6 +126,7 @@ DEFAULT_PATHS = [
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_scorer_unit_matrix.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_per_selected_id_matrix.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_scoring_contract_audit.json"),
+    Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_score_output_contract_gap_audit.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_scorer_unit_distinct_slice_plan.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_dry_run_manifest.json"),
     Path("outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_distinct_rerun_request.json"),

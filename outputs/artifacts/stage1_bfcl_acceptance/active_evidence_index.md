@@ -447,3 +447,12 @@ Status: bounded dev smoke only. Frozen v2 generalizes on the new fresh balanced 
 - Contract finding: the slice selected 24 target scorer-unit candidates, but the current compact score output exposes only 1 target score record; do not interpret target movement as true per-selected-id or per-turn pass/fail.
 - Current next action: `fix_score_output_contract_or_enable_true_per_selected_or_per_turn_scoring_before_more_bfcl`; do not run more BFCL before score-output contract alignment.
 - Boundaries: `performance_evidence=false`, `archive_updated=false`, `holdout_touched=false`, `full_suite_touched=false`.
+## ABHE-v0 Runtime Slot Score Output Contract Gap
+
+- Artifact: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_score_output_contract_gap_audit.json`
+- Finding: target `multi_turn_miss_param` has 24 selected compact identifiers but current BFCL score output exposes 1 score-total/result record per arm for the target category.
+- Per-selected labels recoverable: false
+- Per-turn labels recoverable: false
+- More BFCL before contract fix recommended: false
+- Current next action: `instrument_runner_scorer_to_emit_compact_alignment_sidecar_before_more_bfcl`
+- Boundary: compact-only diagnostic; provider/BFCL/scorer are not authorized for further runs; performance_evidence=false; holdout/full suite untouched.

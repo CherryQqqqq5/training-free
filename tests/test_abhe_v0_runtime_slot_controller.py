@@ -325,3 +325,24 @@ def test_runtime_slot_distinct_runner_dry_run_stays_non_executing():
     assert report["bfcl_evaluate_called"] is False
     assert report["scorer_called"] is False
     assert report["performance_evidence"] is False
+
+
+def test_runtime_slot_score_output_contract_gap_audit_artifact_passes():
+    from pathlib import Path
+    from scripts.build_abhe_v0_runtime_slot_score_output_contract_gap_audit import OUTPUT, build
+    from scripts.check_abhe_v0_runtime_slot_score_output_contract_gap_audit import check
+
+    before = Path(OUTPUT).read_text(encoding="utf-8")
+    artifact = build(write=False)
+    assert Path(OUTPUT).read_text(encoding="utf-8") == before
+    assert artifact["performance_evidence"] is False
+    assert artifact["summary"]["contract_gap_confirmed"] is True
+    assert artifact["summary"]["per_selected_labels_recoverable"] is False
+    assert artifact["summary"]["per_turn_labels_recoverable"] is False
+    assert artifact["summary"]["target_selected_to_score_total_factor"] > 1
+    report = check()
+    assert report["score_output_contract_gap_audit_passed"] is True
+    assert report["contract_gap_confirmed"] is True
+    assert report["per_selected_labels_recoverable"] is False
+    assert report["per_turn_labels_recoverable"] is False
+    assert report["performance_evidence"] is False
