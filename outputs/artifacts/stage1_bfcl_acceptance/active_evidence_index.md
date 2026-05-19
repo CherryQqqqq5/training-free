@@ -504,3 +504,13 @@ Status: bounded dev smoke only. Frozen v2 generalizes on the new fresh balanced 
 - holdout/full suite/archive update: `false`
 - performance_evidence: `false`
 - next_required_action: `stabilize_provider_or_reduce_target_category_batch_before_mapping_fixed_bounded_rerun`
+
+## ABHE-v0 Runtime Slot Retry Stabilization Plan
+
+- Artifact: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_retry_stabilization_plan.json`
+- Basis: mapping-fixed rerun failure at provider/BFCL generate for `multi_turn_miss_param`.
+- Required before any next provider run: provider stability preflight, fresh run root, and reduced first batch.
+- Proposed first batch: `multi_turn_miss_param`, max selected case count `6`, no case-list expansion.
+- authorized / provider / BFCL / scorer: `false`
+- holdout/full suite/archive/performance evidence: `false`
+- next_required_action: `request_reduced_batch_retry_approval_after_provider_stability_preflight`

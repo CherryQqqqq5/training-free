@@ -406,3 +406,17 @@ def test_runtime_slot_distinct_rerun_failure_artifact_passes():
     assert report["failed_category"] == "multi_turn_miss_param"
     assert report["performance_evidence"] is False
     assert report["next_required_action"] == "stabilize_provider_or_reduce_target_category_batch_before_mapping_fixed_bounded_rerun"
+
+def test_runtime_slot_retry_stabilization_plan_artifact_passes():
+    from scripts.check_abhe_v0_runtime_slot_retry_stabilization_plan import check
+
+    report = check()
+    assert report["retry_stabilization_plan_passed"] is True
+    assert report["provider_stability_required"] is True
+    assert report["fresh_run_root_required"] is True
+    assert report["reduced_batch_retry_required"] is True
+    assert report["max_selected_case_count"] == 6
+    assert report["target_category"] == "multi_turn_miss_param"
+    assert report["authorized"] is False
+    assert report["performance_evidence"] is False
+    assert report["next_required_action"] == "request_reduced_batch_retry_approval_after_provider_stability_preflight"
