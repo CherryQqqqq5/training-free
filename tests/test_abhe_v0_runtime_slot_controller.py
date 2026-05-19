@@ -368,3 +368,26 @@ def test_runtime_slot_alignment_sidecar_artifact_passes():
     assert report["alignment_sidecar_ready"] is True
     assert report["selected_case_ids_hash"] == artifact["selected_case_ids_hash"]
     assert report["performance_evidence"] is False
+
+
+def test_runtime_slot_run_id_mapping_audit_artifact_passes():
+    from pathlib import Path
+    from scripts.build_abhe_v0_runtime_slot_run_id_mapping_audit import DEFAULT_OUTPUT, build
+    from scripts.check_abhe_v0_runtime_slot_run_id_mapping_audit import check
+
+    before = Path(DEFAULT_OUTPUT).read_text(encoding="utf-8")
+    artifact = build(write=False)
+    assert Path(DEFAULT_OUTPUT).read_text(encoding="utf-8") == before
+    assert artifact["performance_evidence"] is False
+    assert artifact["run_id_mapping_ready"] is True
+    assert artifact["selected_case_count"] == 48
+    assert artifact["mapped_run_id_count"] == 48
+    assert artifact["unique_run_id_hash_count"] == 48
+    assert artifact["category_summaries"]["multi_turn_miss_param"]["unique_run_id_hash_count"] == 24
+    assert artifact["category_summaries"]["multi_turn_miss_param"]["mapping_is_one_to_one"] is True
+    report = check()
+    assert report["run_id_mapping_audit_passed"] is True
+    assert report["run_id_mapping_ready"] is True
+    assert report["mapped_run_id_count"] == 48
+    assert report["unique_run_id_hash_count"] == 48
+    assert report["performance_evidence"] is False

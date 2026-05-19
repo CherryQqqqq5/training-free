@@ -214,23 +214,27 @@ def _selected_raw_ids() -> Tuple[Dict[str, List[str]], Dict[str, str], Dict[str,
     compact_rows = manifest.get("selected_compact_case_identifiers")
     if not isinstance(compact_rows, list) or len(compact_rows) != EXPECTED_CASE_COUNT:
         raise RuntimeError("selected_compact_case_identifier_count_invalid")
-    wanted = {
-        (row["entry_id"], row["bfcl_category"], row["source_file_hash"], row["case_stable_hash"], row["case_row_index_hash"]): row
-        for row in compact_rows
-        if isinstance(row, dict)
-    }
     ids_by_category: Dict[str, List[str]] = {}
     entry_by_run_id: Dict[str, str] = {}
     entry_by_category: Dict[str, str] = {}
     for row in compact_rows:
+        if not isinstance(row, dict):
+            raise RuntimeError("selected_compact_case_identifier_invalid")
         category = row["bfcl_category"]
         source_path = _category_file(dataset_path, category)
         source_hash = _source_file_hash(source_path)
+        expected_key = (
+            row["entry_id"],
+            row["bfcl_category"],
+            row["source_file_hash"],
+            row["case_stable_hash"],
+            row["case_row_index_hash"],
+        )
         matched = None
         for row_index, raw in _iter_json_rows(source_path):
             compact = _compact_case(row["entry_id"], category, source_hash, row_index, raw)
             key = (compact["entry_id"], compact["bfcl_category"], compact["source_file_hash"], compact["case_stable_hash"], compact["case_row_index_hash"])
-            if key in wanted:
+            if key == expected_key:
                 raw_id = raw.get("id") if isinstance(raw, dict) else None
                 if not isinstance(raw_id, str) or not raw_id:
                     raise RuntimeError("selected_case_raw_id_missing")

@@ -478,3 +478,17 @@ Status: bounded dev smoke only. Frozen v2 generalizes on the new fresh balanced 
 - Sidecar rows: 144 across 3 arms; per-selected labels available: `false`; per-turn labels available: `false`.
 - Next required action: `fix_score_output_contract_or_enable_true_per_selected_or_per_turn_scoring_before_more_bfcl`.
 - Boundaries: `performance_evidence=false`, `archive_updated=false`, `holdout_touched=false`, `full_suite_touched=false`; no raw prompt/gold/scorer diff/provider payload/BFCL result tree is committed.
+
+## ABHE-v0 Runtime Slot Run-ID Mapping Audit
+
+- Artifact: `outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_runtime_slot_controller_run_id_mapping_audit.json`
+- Scope: no-provider / no-BFCL / no-scorer selected-row mapping audit.
+- selected_case_ids_hash: `sha256:9b26ba3d24c54562f6a5058877a24f15d2e4ef71ee9ea781bcae168307f7d14c`
+- selected compact rows: `48`
+- mapped raw run ids: `48`
+- unique raw run-id count: `48`
+- category uniqueness: `{'irrelevance': 4, 'live_irrelevance': 4, 'multi_turn_base': 6, 'multi_turn_long_context': 4, 'multi_turn_miss_func': 6, 'multi_turn_miss_param': 24}`
+- conclusion: previous distinct rerun collapsed because selected rows were mapped with category-level membership instead of exact compact-row identity; the runner now uses exact compact key matching.
+- raw ids / raw prompts / provider payloads / gold / scorer diffs persisted: `false`.
+- performance_evidence: `false`.
+- next_required_action: `request_bounded_rerun_after_run_id_mapping_fix`
