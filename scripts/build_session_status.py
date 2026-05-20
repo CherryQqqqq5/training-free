@@ -73,6 +73,8 @@ APPROVED_RUN_EVIDENCE_ARTIFACTS = {
     "abhe_v0_baseline_vs_cf2_per_case_comparison.json",
     # 3-way target-category comparison (gpt-4.1 baseline, cf2_partial, gpt-4o baseline)
     "abhe_v0_target_category_three_way_comparison.json",
+    # baseline arm complete run on gpt-4o (all 6 categories, 0/48)
+    "abhe_v0_baseline_gpt4o_per_case_diagnostic.json",
 }
 
 # Boundary fields that MUST remain false even for approved-run-evidence
