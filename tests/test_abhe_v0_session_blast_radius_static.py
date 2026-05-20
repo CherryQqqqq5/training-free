@@ -36,7 +36,7 @@ def test_checker_strict_passes_on_current_state():
     assert p.returncode == 0, f"rc={p.returncode}\n{p.stdout}\n{p.stderr}"
     out = json.loads(p.stdout.strip().splitlines()[-1])
     assert out["abhe_v0_session_blast_radius_static_passed"] is True
-    assert out["guarded_file_count"] == 13  # G6b-1 added executor scaffolding  # G6a added 2 more guarded scripts
+    assert out["guarded_file_count"] == 15  # G7-revised added v2 score adapter + checker  # G6b-1 added executor scaffolding  # G6a added 2 more guarded scripts
     assert out["guarded_files_with_forbidden_imports"] == 0
     assert out["blockers"] == []
 
@@ -115,6 +115,7 @@ def test_guarded_files_cover_session_work_stream():
         "check_abhe_v0_per_case_scorer_slicer_approval_packet.py",    # G1
         "abhe_v0_runtime_slot_controller_v3_wire_stub.py",            # G2
         "build_abhe_v0_per_case_scorer_slicer_rerun_manifest.py",     # G6a
+        "build_abhe_v0_per_selected_id_score_adapter_v2.py",        # G7-revised
     ]
     for f in must_include:
         assert f in src, f"missing_from_guard_list:{f}"
