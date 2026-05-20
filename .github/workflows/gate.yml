@@ -1,0 +1,101 @@
+name: ABHE-v0 stage1 gate
+
+on:
+  push:
+    branches:
+      - stage1-bfcl-performance-sprint
+      - 'feat/**'
+  pull_request:
+    branches:
+      - stage1-bfcl-performance-sprint
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ runner.os }}-${{ hashFiles('**/requirements*.txt', '**/pyproject.toml') }}
+
+      - name: Install deps (best-effort)
+        run: |
+          set -o pipefail
+          python -m pip install --upgrade pip
+          # Install only what tests need; expand as required.
+          pip install pytest pyyaml || true
+          if [ -f requirements.txt ]; then pip install -r requirements.txt || true; fi
+          if [ -f pyproject.toml ]; then pip install -e . || true; fi
+
+      - name: Read-only checkers (fail-closed allowed)
+        env:
+          PYTHONPATH: .:src
+        run: |
+          set -uo pipefail
+          fail_closed_allowed="check_abhe_score_output_contract_satisfied"
+          checkers=(
+            check_abhe_no_leakage_boundary
+            check_abhe_review_bundle
+            check_abhe_approval_chain
+            check_abhe_planning_ready
+            check_abhe_score_output_contract_satisfied
+            check_abhe_category_arm_error_signal
+            check_abhe_runtime_slot_controller_v3_skeleton_ready
+            check_abhe_provider_transport_backoff_policy_ready
+            check_abhe_v0_session_blast_radius_static
+          )
+          any_unexpected_fail=0
+          for c in "${checkers[@]}"; do
+            f="scripts/${c}.py"
+            [ -f "$f" ] || { echo "::warning::missing $f (skipped)"; continue; }
+            python "$f" --strict --compact >/tmp/${c}.out 2>&1
+            rc=$?
+            if [ "$rc" -ne 0 ] && [ "$c" != "$fail_closed_allowed" ]; then
+              echo "::error::$c exited $rc (unexpected)"
+              cat /tmp/${c}.out
+              any_unexpected_fail=1
+            else
+              echo "$c EXIT=$rc"
+            fi
+          done
+          exit $any_unexpected_fail
+
+      - name: Pytest (all ABHE tests)
+        env:
+          PYTHONPATH: .:src
+        run: |
+          set -o pipefail
+          if compgen -G "tests/test_abhe*.py" > /dev/null; then
+            pytest tests/test_abhe*.py -q
+          else
+            echo "::warning::no abhe test files matched"
+          fi
+
+      - name: Session status snapshot
+        if: always()
+        env:
+          PYTHONPATH: .:src
+        run: |
+          if [ -f scripts/build_session_status.py ]; then
+            python scripts/build_session_status.py --compact || true
+          fi
+
+      - name: Upload STATUS.md
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: status-md-${{ github.run_id }}
+          path: |
+            STATUS.md
+            outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_session_status.json
+          if-no-files-found: ignore
