@@ -63,6 +63,19 @@ PRE_SPRINT_BASELINE_ARTIFACTS = {
 # OTHER boundary attestations (raw_*, holdout, full_suite, archive,
 # performance, sota, huawei) = false, AND must NOT contain raw material.
 # Review when a new approved-run evidence artifact lands.
+
+# Artifacts explicitly authorized by the user to contain raw prompts,
+# argument values, or gold state for debug purposes. These ARE allowed
+# to have raw_prompt_committed=true, argument_values_committed=true,
+# prompt_literal_committed=true, raw_material_absent=false. They MUST
+# still have raw_provider_payload_committed=false,
+# raw_bfcl_result_tree_committed=false, scorer_diff_committed=false,
+# performance_evidence=false, holdout_touched=false, etc.
+USER_AUTHORIZED_DIAGNOSTIC_EXTRACTION_ARTIFACTS = {
+    "abhe_v0_e9_debug_extended_with_raw_traces.json",
+    "abhe_v0_e9_final_root_cause_with_raw_extraction.json",
+}
+
 APPROVED_RUN_EVIDENCE_ARTIFACTS = {
     # G6b-2: live baseline arm residual smoke under signed P1.5b packet
     "abhe_v0_baseline_arm_residual_smoke_per_case_diagnostic.json",
@@ -227,6 +240,7 @@ def collect_boundary_attestation() -> dict:
             continue
         is_baseline = jf.name in PRE_SPRINT_BASELINE_ARTIFACTS
         is_approved_evidence = jf.name in APPROVED_RUN_EVIDENCE_ARTIFACTS
+        is_user_authorized_extraction = jf.name in USER_AUTHORIZED_DIAGNOSTIC_EXTRACTION_ARTIFACTS
         for f in BOUNDARY_FIELDS:
             v = d.get(f)
             if v is not True:
@@ -234,6 +248,10 @@ def collect_boundary_attestation() -> dict:
             if is_baseline:
                 baseline_state[f].append(jf.name)
             elif is_approved_evidence:
+                approved_evidence_state[f].append(jf.name)
+                if f in NEVER_TRUE_FIELDS:
+                    approved_evidence_violations[f].append(jf.name)
+            elif is_user_authorized_extraction:
                 approved_evidence_state[f].append(jf.name)
                 if f in NEVER_TRUE_FIELDS:
                     approved_evidence_violations[f].append(jf.name)
