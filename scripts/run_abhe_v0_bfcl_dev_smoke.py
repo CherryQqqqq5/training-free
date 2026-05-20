@@ -294,7 +294,7 @@ def _start_proxy(port: int, trace_dir: Path, runtime_config: Path, adapter_enabl
     env = dict(provider_env)
     env["PYTHONPATH"] = str(REPO_ROOT / "src") + ((":" + env["PYTHONPATH"]) if env.get("PYTHONPATH") else "")
     env["GRC_UPSTREAM_PROFILE"] = "toolcallingfunction"
-    env["GRC_UPSTREAM_MODEL"] = "gpt-4.1"
+    env["GRC_UPSTREAM_MODEL"] = os.environ.get("GRC_UPSTREAM_MODEL_OVERRIDE", "gpt-4.1")
     env["GRC_UPSTREAM_API_KEY_ENV"] = "TOOLCALLINGFUNCTION_API_KEY"
     endpoint = _provider_endpoint(env)
     if endpoint:

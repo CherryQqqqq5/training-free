@@ -66,6 +66,11 @@ PRE_SPRINT_BASELINE_ARTIFACTS = {
 APPROVED_RUN_EVIDENCE_ARTIFACTS = {
     # G6b-2: live baseline arm residual smoke under signed P1.5b packet
     "abhe_v0_baseline_arm_residual_smoke_per_case_diagnostic.json",
+    # cf2-partial: conditional_frozen_v2 arm under signed packet (subprocess
+    # timeout after 19/24 cases; partial result preserved for arm comparison)
+    "abhe_v0_cf2_partial_per_case_diagnostic.json",
+    # candidate-vs-baseline comparison artifact (read-only of the above two)
+    "abhe_v0_baseline_vs_cf2_per_case_comparison.json",
 }
 
 # Boundary fields that MUST remain false even for approved-run-evidence
