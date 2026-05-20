@@ -63,6 +63,10 @@ GUARDED_FILES = [
     # G6a — per-case scorer slicer rerun manifest (planning-only)
     "scripts/build_abhe_v0_per_case_scorer_slicer_rerun_manifest.py",
     "scripts/check_abhe_v0_per_case_scorer_slicer_rerun_manifest_ready.py",
+    # G6b-1 — executor scaffolding (dry-run; execute path is fail-closed
+    # NotImplementedError until a follow-up commit wires the live chain
+    # and extends this guard list accordingly).
+    "scripts/run_abhe_v0_per_case_scorer_slicer_bounded_residual_dev_smoke.py",
 ]
 
 FORBIDDEN_IMPORT_SUBSTRINGS = (
