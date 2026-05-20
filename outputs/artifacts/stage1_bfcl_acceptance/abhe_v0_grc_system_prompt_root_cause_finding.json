@@ -1,0 +1,70 @@
+{
+  "archive_updated": false,
+  "argument_values_committed": false,
+  "artifact_kind": "abhe_v0_grc_system_prompt_root_cause_finding",
+  "behavior_outcome_per_arm": {
+    "baseline_gpt4_1": {
+      "miss_param_accuracy": 0.292,
+      "pass_count_of_24": 7,
+      "text_content_emission_rate_in_traces": 0.419
+    },
+    "baseline_gpt4o": {
+      "miss_param_accuracy": 0.0,
+      "pass_count_of_24": 0,
+      "text_content_emission_rate_in_traces": 0.0
+    },
+    "conditional_frozen_v2_gpt4_1": {
+      "is_partial": true,
+      "miss_param_accuracy": 0.0,
+      "pass_count_of_24_partial19": 0,
+      "text_content_emission_rate_in_traces": 0.0
+    }
+  },
+  "bfcl_evaluate_called": false,
+  "bfcl_generate_called": false,
+  "cf2_developer_message_excerpt_OUR_OWN_CONFIG": "ABHE-v0 bounded dev smoke candidate guidance. For selected multi-turn state carryover cases, preserve prior-turn entities, constraints, selected options, and tool-observed state across turns. After any tool observation, check whether the current user turn still has an executable pending action or prerequisite action; continue with the needed tool call instead of ending with a prose summary when the tool set can satisfy the request. Only finalize once required tool actions are complete or no available tool can proceed. Do not mutate state, do not activate on single-turn cases, and do not activate for search or memory watch behavior.",
+  "developer_message_present_on_which_arms": {
+    "baseline_gpt4_1": false,
+    "baseline_gpt4o": false,
+    "conditional_frozen_v2_gpt4_1": true
+  },
+  "full_suite_touched": false,
+  "gold_expected_committed": false,
+  "grc_system_prompt_excerpt_OUR_OWN_CONFIG": "[Golden Rule Compiler]\n- For tool-enabled turns, emit the next tool call instead of explanatory prose whenever the next action is already supported by the available tools.\n- Do not ask for values that are already explicit in prior user turns, tool outputs, or the current working state.\n- Before using path-sensitive tools, ground the current working directory and existing file or directory names from prior tool outputs instead of assuming the root directory.\n- When emitting tool calls, keep assistant content empty and avoid adding a free-form status summary in the same message.",
+  "holdout_touched": false,
+  "honest_finding": "The GRC system prompt explicitly biases the model AWAY from emitting text-content turns. It tells the model: 'do not ask for values'; 'emit tool call instead of prose'; 'keep assistant content empty'. This prompt is injected on ALL THREE ARMS, identically. gpt-4.1 baseline partially ignores it (41.9% of turns are still text-content, sufficient to pass 7/24 = 29.2% on multi_turn_miss_param). gpt-4o-2024-11-20 strictly follows it (0% text-content turns) -> 100% multi_turn:force_terminated -> 0/24 = 0%. cf2 (conditional_frozen_v2) on gpt-4.1 adds a DEVELOPER message that reinforces 'continue with tool call instead of prose summary' -> pushes gpt-4.1 to gpt-4o-like behavior (0% text-content, 0/19 partial).",
+  "huawei_acceptance_ready": false,
+  "intervention_priorities_reordered_by_root_cause": [
+    {
+      "estimated_recovery_potential_on_target_category": "high (could recover 0-17 cases on gpt-4o, 0-19 on cf2)",
+      "id": "P1_GRC_PROMPT_REVISION",
+      "rationale": "Modify the GRC system prompt to ALLOW ask-user-when-truly-missing. Add an explicit carve-out: 'DO ask the user a clarifying question via a text-content turn when a required parameter is missing AND cannot be inferred from prior user turns, tool outputs, or state.' This is ONE config edit that could fix BOTH the gpt-4o regression (100% of cases) AND the cf2 regression (assuming developer msg is also revised or removed for multi_turn_miss_param cases).",
+      "scope": "config_edit_to_rules_or_runtime_prompt_block"
+    },
+    {
+      "estimated_recovery_potential": "medium for cf2 only (gpt-4o needs different fix)",
+      "id": "P2_E8_PROXY_LAYER_REWRITE",
+      "rationale": "Compensatory fix at proxy output stage. When model emits only tool_calls (no text content) AND at least one tool_call is a display_log with a coherent ask-user message, rewrite the response to emit the ask-user message as text content instead. Per offline E8 v1 detection: would fire on 42/406 cf2 traces (10.3%) and only 3/504 gpt-4o traces (gpt-4o display_log is mostly word salad and fails the coherence guard).",
+      "scope": "proxy_layer_runtime_rule_runtime_wired_into_proxy_false_until_packet"
+    },
+    {
+      "id": "P3_GPT4O_HANDLER_INVESTIGATION",
+      "rationale": "Separate from the GRC prompt issue, gpt-4o produces incoherent display_log messages (word salad like 'Mapping-key Layerpoints Externally retained Possitional wide context Propose council-identitative locality to alternate...'). This is NOT typical gpt-4o-2024-11-20 behavior. Investigate: (a) is the endpoint actually serving gpt-4o-2024-11-20? (b) does the BFCL handler for gpt-4o-mini-FC alias mis-format prompts for full gpt-4o? (c) is the proxy's tool_schema injection too large for gpt-4o's context window relative to gpt-4.1's?",
+      "scope": "endpoint_or_handler_or_tool_schema_debugging"
+    }
+  ],
+  "performance_evidence": false,
+  "prompt_literal_committed": false,
+  "provider_calls_made": false,
+  "raw_bfcl_result_tree_committed": false,
+  "raw_material_absent": true,
+  "raw_prompt_committed": false,
+  "raw_provider_payload_committed": false,
+  "raw_response_committed": false,
+  "schema_version": "abhe_v0_grc_system_prompt_root_cause_finding_v0",
+  "scope": "offline_trace_inspection_finds_shared_system_prompt_anti_ask_user_bias",
+  "scorer_called": false,
+  "scorer_diff_committed": false,
+  "sota_3pp_claim_ready": false,
+  "system_prompt_identical_across_all_arms": true
+}

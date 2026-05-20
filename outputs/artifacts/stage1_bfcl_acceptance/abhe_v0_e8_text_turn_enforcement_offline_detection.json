@@ -1,0 +1,105 @@
+{
+  "archive_updated": false,
+  "argument_values_committed": false,
+  "artifact_kind": "abhe_v0_e8_text_turn_enforcement_offline_detection",
+  "bfcl_evaluate_called": false,
+  "bfcl_generate_called": false,
+  "e8_rule_version": "v1_placeholder_or_ask_pattern_or_question_mark_with_coherence_guard",
+  "full_suite_touched": false,
+  "gold_expected_committed": false,
+  "holdout_touched": false,
+  "honest_finding": "On the existing /tmp traces from gpt-4.1 baseline (248 traces, 7/24 cases pass), cf2-gpt-4.1 (406 traces, 0/19 cases pass), and gpt-4o baseline (504 traces, 0/24 cases pass): E8 v1 fires on 0/248 baseline traces (correctly: baseline already uses text-content turns), 39+/406 cf2 traces (~10%, mostly coherent ask-user display_log), and only ~4/504 gpt-4o traces because gpt-4o display_log messages are mostly word salad (coherence guard filters them out). Conclusion: E8 v1 targets cf2-style failures effectively (the model EMITS ask-user messages but via display_log instead of text-turn); E8 is NOT a fix for gpt-4o, whose underlying issue is degraded text generation (P2 handler-config investigation needed).",
+  "huawei_acceptance_ready": false,
+  "per_arm_e8_detection": {
+    "cf2 (gpt-4.1)": {
+      "e8_fire_count": 42,
+      "e8_fire_reason_counts": {
+        "ask_user_display_log": 40,
+        "placeholder_in_tool_args": 2
+      },
+      "label": "cf2 (gpt-4.1)",
+      "samples": [
+        {
+          "display_text_sample": "I need your departure city or location to estimate the road distance to Stonebrook (zip 74532).",
+          "reason": "ask_user_display_log",
+          "trace_id_short": "00b465f7-cab"
+        },
+        {
+          "display_text_sample": "The fuel tank is now topped off to 40 gallons. Please provide the mileage or distance of your planned road trip so I can check if your car can make the stretch without a pit stop.",
+          "reason": "ask_user_display_log",
+          "trace_id_short": "04d9c8fb-026"
+        },
+        {
+          "display_text_sample": "Distance to Stonebrook (74532) cannot be determined. Please specify your current city or location for further assistance.",
+          "reason": "ask_user_display_log",
+          "trace_id_short": "08b29ad9-201"
+        },
+        {
+          "display_text_sample": "The fuel tank is now topped off to 40 gallons. Please provide the mileage or distance of your planned road trip so I can check if your car can make the stretch without a pit stop.",
+          "reason": "ask_user_display_log",
+          "trace_id_short": "0be3a38b-522"
+        },
+        {
+          "display_text_sample": "The fuel tank is now topped off to 40 gallons. Please provide the mileage or distance of your planned road trip so I can check if your car can make the stretch without a pit stop.",
+          "reason": "ask_user_display_log",
+          "trace_id_short": "0dd2c299-81b"
+        },
+        {
+          "display_text_sample": "The fuel tank is now topped off to 40 gallons. Please provide the mileage or distance of your planned road trip so I can check if your car can make the stretch without a pit stop.",
+          "reason": "ask_user_display_log",
+          "trace_id_short": "1954c4fe-ebd"
+        }
+      ],
+      "tool_only_traces": 406,
+      "total_traces": 406
+    },
+    "gpt-4.1 baseline": {
+      "e8_fire_count": 0,
+      "e8_fire_reason_counts": {},
+      "label": "gpt-4.1 baseline",
+      "samples": [],
+      "tool_only_traces": 144,
+      "total_traces": 248
+    },
+    "gpt-4o baseline": {
+      "e8_fire_count": 3,
+      "e8_fire_reason_counts": {
+        "ask_user_display_log": 3
+      },
+      "label": "gpt-4o baseline",
+      "samples": [
+        {
+          "display_text_sample": "Distance information for Greenway (ZIP: 74532) is unavailable. Please provide another location or try alternative resources for planning your visit.",
+          "reason": "ask_user_display_log",
+          "trace_id_short": "b7c4dfec-8df"
+        },
+        {
+          "display_text_sample": "Unable to determine any direct mapping/tracking from ZIP74352 in context Greenway lookup fails.",
+          "reason": "ask_user_display_log",
+          "trace_id_short": "c7263037-0af"
+        },
+        {
+          "display_text_sample": "No accurate estimation has been found! Would you like to provide any neighboring town zip codes for an alternate approach?",
+          "reason": "ask_user_display_log",
+          "trace_id_short": "d98b5808-9bf"
+        }
+      ],
+      "tool_only_traces": 504,
+      "total_traces": 504
+    }
+  },
+  "performance_evidence": false,
+  "prompt_literal_committed": false,
+  "provider_calls_made": false,
+  "raw_bfcl_result_tree_committed": false,
+  "raw_material_absent": true,
+  "raw_prompt_committed": false,
+  "raw_provider_payload_committed": false,
+  "raw_response_committed": false,
+  "runtime_wired_into_proxy": false,
+  "schema_version": "abhe_v0_e8_text_turn_enforcement_offline_detection_v0",
+  "scope": "offline_detection_only_on_existing_trace_cards_no_provider_call",
+  "scorer_called": false,
+  "scorer_diff_committed": false,
+  "sota_3pp_claim_ready": false
+}
