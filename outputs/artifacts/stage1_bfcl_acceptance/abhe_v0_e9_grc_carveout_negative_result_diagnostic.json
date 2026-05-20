@@ -1,0 +1,136 @@
+{
+  "archive_updated": false,
+  "argument_values_committed": false,
+  "artifact_kind": "abhe_v0_e9_grc_carveout_negative_result_diagnostic",
+  "bfcl_evaluate_called": true,
+  "bfcl_generate_called": true,
+  "categories_completed": [
+    {
+      "accuracy_pct": 0.0,
+      "case_count": 6,
+      "category": "multi_turn_base",
+      "failed_ids": [
+        "multi_turn_base_41",
+        "multi_turn_base_42",
+        "multi_turn_base_43",
+        "multi_turn_base_44",
+        "multi_turn_base_45",
+        "multi_turn_base_46"
+      ],
+      "failure_mode_counts": {
+        "multi_turn:inference_error": 6
+      },
+      "passed_count": 0,
+      "passed_ids": []
+    },
+    {
+      "accuracy_pct": 0.0,
+      "case_count": 6,
+      "category": "multi_turn_miss_func",
+      "failed_ids": [
+        "multi_turn_miss_func_42",
+        "multi_turn_miss_func_43",
+        "multi_turn_miss_func_44",
+        "multi_turn_miss_func_45",
+        "multi_turn_miss_func_46",
+        "multi_turn_miss_func_47"
+      ],
+      "failure_mode_counts": {
+        "multi_turn:inference_error": 6
+      },
+      "passed_count": 0,
+      "passed_ids": []
+    },
+    {
+      "accuracy_pct": 0.0,
+      "case_count": 24,
+      "category": "multi_turn_miss_param",
+      "failed_ids": [
+        "multi_turn_miss_param_76",
+        "multi_turn_miss_param_77",
+        "multi_turn_miss_param_78",
+        "multi_turn_miss_param_79",
+        "multi_turn_miss_param_86",
+        "multi_turn_miss_param_87",
+        "multi_turn_miss_param_88",
+        "multi_turn_miss_param_89",
+        "multi_turn_miss_param_90",
+        "multi_turn_miss_param_91",
+        "multi_turn_miss_param_92",
+        "multi_turn_miss_param_93",
+        "multi_turn_miss_param_94",
+        "multi_turn_miss_param_95",
+        "multi_turn_miss_param_96",
+        "multi_turn_miss_param_97",
+        "multi_turn_miss_param_98",
+        "multi_turn_miss_param_99",
+        "multi_turn_miss_param_100",
+        "multi_turn_miss_param_101",
+        "multi_turn_miss_param_102",
+        "multi_turn_miss_param_103",
+        "multi_turn_miss_param_104",
+        "multi_turn_miss_param_105"
+      ],
+      "failure_mode_counts": {
+        "multi_turn:force_terminated": 22,
+        "multi_turn:instance_state_mismatch": 2
+      },
+      "passed_count": 0,
+      "passed_ids": []
+    }
+  ],
+  "comparison_target_category": {
+    "all_baseline_passes_lost": true,
+    "baseline_gpt4_1": {
+      "acc_pct": 29.17,
+      "passed": 7,
+      "passed_ids": [
+        "multi_turn_miss_param_77",
+        "multi_turn_miss_param_88",
+        "multi_turn_miss_param_94",
+        "multi_turn_miss_param_97",
+        "multi_turn_miss_param_100",
+        "multi_turn_miss_param_103",
+        "multi_turn_miss_param_105"
+      ],
+      "total": 24
+    },
+    "e9_gpt4_1": {
+      "acc_pct": 0.0,
+      "passed": 0,
+      "passed_ids": [],
+      "total": 24
+    },
+    "regression_pass_to_fail": 7
+  },
+  "e9_intervention": "added_5th_fragment_to_grc_system_prompt_about_ask_user_carveout",
+  "e9_source_change_path": "src/grc/runtime/engine.py:714-717 (REVERTED after negative result)",
+  "full_suite_touched": false,
+  "gold_expected_committed": false,
+  "holdout_touched": false,
+  "honest_finding": "E9 (additive carve-out to GRC system prompt) REGRESSED multi_turn_miss_param from 7/24 baseline gpt-4.1 to 0/24 E9 gpt-4.1. All 7 baseline-passing cases flipped to FAIL. Failure mode: 22/24 multi_turn:force_terminated, 2/24 instance_state_mismatch. The 5th fragment did NOT cause the model to ask the user FIRST as intended; instead the model uses tools first and only emits text as a post-tool status/fallback. The added fragment also seemed to make the model MORE tool-greedy (case 77 turn 1 had 19 tool calls in E9 vs 4 in baseline). Conclusion: ADDITIVE interventions to GRC prompts do not help; the original 4 fragments are themselves harmful for multi_turn_miss_param. Next step is SUBTRACTIVE (E10): disable structured tool guidance OR remove fragments 2+4 specifically.",
+  "huawei_acceptance_ready": false,
+  "next_iteration_proposed_e10": "SUBTRACTIVE intervention: set inject_structured_tool_guidance=false for the runtime config, OR remove fragments 2+4 specifically (the 'do not ask for values' and 'keep assistant content empty' rules). Hypothesis: removing the anti-ask-user anchors gives the model freedom to emit text-clarifying-question turns when needed.",
+  "performance_evidence": false,
+  "prompt_literal_committed": false,
+  "provider_calls_made": true,
+  "raw_bfcl_result_tree_committed": false,
+  "raw_material_absent": true,
+  "raw_prompt_committed": false,
+  "raw_provider_payload_committed": false,
+  "raw_response_committed": false,
+  "schema_version": "abhe_v0_e9_grc_carveout_negative_result_diagnostic_v0",
+  "scope": "e9_ran_partial_killed_after_target_category_complete_to_save_cost",
+  "scorer_called": true,
+  "scorer_diff_committed": false,
+  "sota_3pp_claim_ready": false,
+  "structural_diff_from_baseline_case_77": {
+    "amplification_factor": 4.75,
+    "baseline_turn_0_first_element": "TEXT_clarifying_question",
+    "baseline_turn_1_tool_call_count": 4,
+    "baseline_turn_3_pattern": "1_tool_call_plus_text_summary",
+    "e9_turn_0_first_element": "TOOL_CALL_then_text_as_fallback",
+    "e9_turn_1_tool_call_count": 19,
+    "e9_turn_3_pattern": "20_plus_display_log_spiral"
+  }
+}
