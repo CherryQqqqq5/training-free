@@ -56,9 +56,85 @@ PRE_SPRINT_BASELINE_ARTIFACTS = {
     "abhe_v0_provider_preflight.json",
 }
 
+# Sprint-scope artifacts that document a real, signed-packet-authorized
+# run. These ARE allowed to have provider_calls_made / bfcl_*_called /
+# scorer_called = true because that is the honest record of what
+# happened under the signed packet. Such artifacts must still have all
+# OTHER boundary attestations (raw_*, holdout, full_suite, archive,
+# performance, sota, huawei) = false, AND must NOT contain raw material.
+# Review when a new approved-run evidence artifact lands.
+APPROVED_RUN_EVIDENCE_ARTIFACTS = {
+    # G6b-2: live baseline arm residual smoke under signed P1.5b packet
+    "abhe_v0_baseline_arm_residual_smoke_per_case_diagnostic.json",
+}
+
+# Boundary fields that MUST remain false even for approved-run-evidence
+# artifacts. These are the true "never-touched" invariants. Different
+# from BOUNDARY_FIELDS which includes runtime-execution markers that are
+# legitimately true for evidence artifacts.
+NEVER_TRUE_FIELDS = [
+    "archive_updated", "argument_values_committed", "full_suite_touched",
+    "gold_expected_committed", "holdout_touched", "huawei_acceptance_ready",
+    "performance_evidence", "prompt_literal_committed",
+    "raw_bfcl_result_tree_committed", "raw_provider_payload_committed",
+    "runtime_wired_into_proxy", "scorer_diff_committed",
+    "sota_3pp_claim_ready",
+]
+
+# Files written BY this builder; excluded from the self-dirty check
+# so that running the builder doesn't make its own next run report
+# "working_tree_dirty".
+SELF_OUTPUT_FILES = {
+    "STATUS.md",
+    "outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_session_status.json",
+}
+
 
 def sh(cmd: list[str]) -> str:
     return subprocess.run(cmd, capture_output=True, text=True, check=False).stdout.strip()
+
+
+def _dirty_excluding_self_outputs() -> bool:
+    """Return True iff the working tree has any uncommitted changes
+    other than the builder's own output files (STATUS.md +
+    abhe_v0_session_status.json). Running the builder dirties those by
+    design; we don't want it to flag itself.
+
+    Note: must NOT use sh() here because sh() strips leading whitespace,
+    which breaks position-based parsing of " M PATH" (single-space-prefix
+    indicates work-tree-modified-only). Use subprocess directly with -z
+    or split-from-first-whitespace to avoid the strip issue.
+    """
+    # Use subprocess directly (without .strip) for robust parsing.
+    raw = subprocess.run(
+        ["git", "status", "--short"],
+        capture_output=True, text=True, check=False
+    ).stdout
+    if not raw.strip():
+        return False
+    for line in raw.splitlines():
+        if not line:
+            continue
+        # First two columns are X (index) and Y (worktree) status codes,
+        # then one space, then the path (which may contain spaces).
+        # If a path is renamed, format is "R<old> -> <new>"; we handle that
+        # by taking the substring after the first " " at index >= 2.
+        if len(line) < 3:
+            return True
+        path = line[3:]
+        # Strip quoting if git --short quoted the path
+        if path.startswith('"') and path.endswith('"'):
+            path = path[1:-1]
+        # Rename detection: "old -> new" — check both sides
+        if " -> " in path:
+            old_p, new_p = path.split(" -> ", 1)
+            paths = (old_p.strip(), new_p.strip())
+        else:
+            paths = (path,)
+        for p in paths:
+            if p not in SELF_OUTPUT_FILES:
+                return True
+    return False
 
 
 def collect_git() -> dict:
@@ -73,7 +149,7 @@ def collect_git() -> dict:
         "origin_head": origin_head,
         "origin_synced": bool(origin_head) and origin_head == head,
         "branch_published": bool(origin_head),
-        "dirty": bool(sh(["git", "status", "--short"])),
+        "dirty": _dirty_excluding_self_outputs(),
         "last_commit": sh(["git", "log", "-1", "--format=%h %s"]),
     }
 
@@ -113,27 +189,55 @@ def collect_packet_status() -> dict:
 
 
 def collect_boundary_attestation() -> dict:
-    """Scope-aware boundary scan.
+    """Scope-aware boundary scan with three categories:
 
-    Only artifacts NOT in PRE_SPRINT_BASELINE_ARTIFACTS count as drift.
-    Pre-sprint baselines having these fields = true is expected and recorded
-    separately as `pre_sprint_baseline_state` (informational only).
+    1. PRE_SPRINT_BASELINE_ARTIFACTS — pre-sprint historical evidence.
+       Allowed to have any BOUNDARY_FIELDS = true. Recorded as
+       `pre_sprint_baseline_state` (informational only).
+
+    2. APPROVED_RUN_EVIDENCE_ARTIFACTS — sprint artifacts that document
+       a real run authorized by a signed packet. Allowed to have
+       provider_calls_made / bfcl_*_called / scorer_called = true (the
+       honest record of what the signed packet authorized). Must still
+       have NEVER_TRUE_FIELDS = false. Recorded as
+       `approved_run_evidence_state` (informational) + drift if any
+       NEVER_TRUE_FIELDS is true.
+
+    3. All other sprint artifacts (policy / declarative / dry-run /
+       skeleton) — MUST have ALL BOUNDARY_FIELDS = false. Any true
+       value counts as `sprint_violations` -> drift blocker.
     """
     sprint_violations: dict[str, list[str]] = {f: [] for f in BOUNDARY_FIELDS}
     baseline_state: dict[str, list[str]] = {f: [] for f in BOUNDARY_FIELDS}
+    approved_evidence_state: dict[str, list[str]] = {f: [] for f in BOUNDARY_FIELDS}
+    approved_evidence_violations: dict[str, list[str]] = {f: [] for f in NEVER_TRUE_FIELDS}
     for jf in ARTIFACT_DIR.glob("*.json"):
         try:
             d = json.loads(jf.read_text())
         except Exception:
             continue
         is_baseline = jf.name in PRE_SPRINT_BASELINE_ARTIFACTS
+        is_approved_evidence = jf.name in APPROVED_RUN_EVIDENCE_ARTIFACTS
         for f in BOUNDARY_FIELDS:
             v = d.get(f)
-            if v is True:
-                (baseline_state if is_baseline else sprint_violations)[f].append(jf.name)
+            if v is not True:
+                continue
+            if is_baseline:
+                baseline_state[f].append(jf.name)
+            elif is_approved_evidence:
+                approved_evidence_state[f].append(jf.name)
+                if f in NEVER_TRUE_FIELDS:
+                    approved_evidence_violations[f].append(jf.name)
+            else:
+                sprint_violations[f].append(jf.name)
     return {
-        "sprint_scope_all_false": all(len(v) == 0 for v in sprint_violations.values()),
+        "sprint_scope_all_false": (
+            all(len(v) == 0 for v in sprint_violations.values())
+            and all(len(v) == 0 for v in approved_evidence_violations.values())
+        ),
         "sprint_violations": {k: v for k, v in sprint_violations.items() if v},
+        "approved_evidence_violations": {k: v for k, v in approved_evidence_violations.items() if v},
+        "approved_evidence_state": {k: v for k, v in approved_evidence_state.items() if v},
         "pre_sprint_baseline_state": {k: v for k, v in baseline_state.items() if v},
     }
 
