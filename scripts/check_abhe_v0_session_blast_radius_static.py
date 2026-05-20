@@ -67,6 +67,10 @@ GUARDED_FILES = [
     # NotImplementedError until a follow-up commit wires the live chain
     # and extends this guard list accordingly).
     "scripts/run_abhe_v0_per_case_scorer_slicer_bounded_residual_dev_smoke.py",
+    # G7-revised — v2 score adapter that parses BFCL batched score JSON
+    # via the sanitized per-case diagnostic. Pure offline; no provider.
+    "scripts/build_abhe_v0_per_selected_id_score_adapter_v2.py",
+    "scripts/check_abhe_v0_per_selected_id_score_adapter_v2_ready.py",
 ]
 
 FORBIDDEN_IMPORT_SUBSTRINGS = (
