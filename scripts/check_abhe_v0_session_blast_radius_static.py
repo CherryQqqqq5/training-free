@@ -60,6 +60,9 @@ GUARDED_FILES = [
     "scripts/check_abhe_v0_per_case_scorer_slicer_approval_packet.py",
     # G2 — wire stub (no-op unless authorized)
     "scripts/abhe_v0_runtime_slot_controller_v3_wire_stub.py",
+    # G6a — per-case scorer slicer rerun manifest (planning-only)
+    "scripts/build_abhe_v0_per_case_scorer_slicer_rerun_manifest.py",
+    "scripts/check_abhe_v0_per_case_scorer_slicer_rerun_manifest_ready.py",
 ]
 
 FORBIDDEN_IMPORT_SUBSTRINGS = (
