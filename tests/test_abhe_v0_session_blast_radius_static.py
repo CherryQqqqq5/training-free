@@ -36,7 +36,7 @@ def test_checker_strict_passes_on_current_state():
     assert p.returncode == 0, f"rc={p.returncode}\n{p.stdout}\n{p.stderr}"
     out = json.loads(p.stdout.strip().splitlines()[-1])
     assert out["abhe_v0_session_blast_radius_static_passed"] is True
-    assert out["guarded_file_count"] == 12  # G6a added 2 more guarded scripts
+    assert out["guarded_file_count"] == 13  # G6b-1 added executor scaffolding  # G6a added 2 more guarded scripts
     assert out["guarded_files_with_forbidden_imports"] == 0
     assert out["blockers"] == []
 
