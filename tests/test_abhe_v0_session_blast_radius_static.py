@@ -36,7 +36,7 @@ def test_checker_strict_passes_on_current_state():
     assert p.returncode == 0, f"rc={p.returncode}\n{p.stdout}\n{p.stderr}"
     out = json.loads(p.stdout.strip().splitlines()[-1])
     assert out["abhe_v0_session_blast_radius_static_passed"] is True
-    assert out["guarded_file_count"] == 10
+    assert out["guarded_file_count"] == 12  # G6a added 2 more guarded scripts
     assert out["guarded_files_with_forbidden_imports"] == 0
     assert out["blockers"] == []
 
@@ -108,12 +108,13 @@ def test_guarded_files_cover_session_work_stream():
     work stream merged this session: P1, P1.5a, P2, P3, G1, G2."""
     src = CHECKER.read_text(encoding="utf-8")
     must_include = [
-        "build_abhe_v0_true_per_selected_id_score_adapter.py",      # P1
-        "build_abhe_v0_category_arm_error_class_matrix.py",          # P1.5a
-        "build_abhe_v0_runtime_slot_controller_v3_skeleton.py",      # P2
-        "build_abhe_v0_provider_transport_backoff_policy.py",        # P3
-        "check_abhe_v0_per_case_scorer_slicer_approval_packet.py",   # G1
-        "abhe_v0_runtime_slot_controller_v3_wire_stub.py",           # G2
+        "build_abhe_v0_true_per_selected_id_score_adapter.py",       # P1
+        "build_abhe_v0_category_arm_error_class_matrix.py",           # P1.5a
+        "build_abhe_v0_runtime_slot_controller_v3_skeleton.py",       # P2
+        "build_abhe_v0_provider_transport_backoff_policy.py",         # P3
+        "check_abhe_v0_per_case_scorer_slicer_approval_packet.py",    # G1
+        "abhe_v0_runtime_slot_controller_v3_wire_stub.py",            # G2
+        "build_abhe_v0_per_case_scorer_slicer_rerun_manifest.py",     # G6a
     ]
     for f in must_include:
         assert f in src, f"missing_from_guard_list:{f}"
