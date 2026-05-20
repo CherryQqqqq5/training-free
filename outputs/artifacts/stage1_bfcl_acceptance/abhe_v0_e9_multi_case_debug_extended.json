@@ -1,0 +1,245 @@
+{
+  "archive_updated": false,
+  "argument_values_committed": false,
+  "artifact_kind": "abhe_v0_e9_multi_case_debug_extended",
+  "bfcl_evaluate_called": false,
+  "bfcl_generate_called": false,
+  "full_suite_touched": false,
+  "gold_expected_committed": false,
+  "holdout_touched": false,
+  "honest_finding_two_distinct_mechanisms": {
+    "mechanism_A_miss_param": "On multi_turn_miss_param 7 baseline-PASS cases: E9 made the model NEVER emit text in turn 0 (all 7 had TOOL_LIST first element under E9, vs 3 of 7 had TEXT under baseline). 6 of 7 collapsed to 1 mega-turn with exactly 21 calls (matches cf2 pattern). Case 77 kept 4 turns but tool calls amplified 4 -> 19. The carve-out fragment did not trigger ask-user behavior; it instead PUSHED the model into more aggressive tool-calling (similar to how cf2's developer message amplified the GRC bias).",
+    "mechanism_B_multi_turn_base": "On multi_turn_base 6 cases (none miss_param): E9 caused the model to emit ZERO content for 41 consecutive turns (BFCL's max-turn cap). Error: 'Model did not output a list of model responses'. The model was paralysed by conflicting fragments: (a) fragment 5 says 'don't use display_log to ask'; (b) fragment 4 says 'keep assistant content empty when emitting tool calls'; (c) fragment 1 says 'emit tool call instead of prose'. When the model interpreted the situation as 'ask user via text' (due to fragment 5 priming), it could neither use display_log (fragment 5 forbade) nor emit text (fragment 4 forbade) nor emit any tool call (fragment 5 forbade 'tool' as ask method). Net: empty response.",
+    "shared_root_cause": "The 4 GRC fragments are individually plausible but COLLECTIVELY form an over-constrained instruction set. Adding a 5th fragment with an override clause creates more conflict than relief. The model can either (a) ignore fragment 5 and stay in tool-call mode (miss_param mechanism A) or (b) try to comply with all 5 fragments simultaneously and emit nothing (mechanism B)."
+  },
+  "huawei_acceptance_ready": false,
+  "intervention_options_with_predicted_outcomes": [
+    {
+      "id": "E10_FULL_DISABLE",
+      "intervention": "set inject_structured_tool_guidance=false in runtime_bfcl_structured.yaml",
+      "net_signal_uncertainty": "high - could be wash",
+      "predicted_miss_param": "potentially up from 7/24 (no anti-ask anchor)",
+      "predicted_multi_turn_base": "potentially DOWN from 4/6 (no tool-call guidance)"
+    },
+    {
+      "id": "E11_REMOVE_FRAGMENT_2_AND_4",
+      "intervention": "remove fragments 2 ('do not ask for values...') and 4 ('keep assistant content empty') from src/grc/runtime/engine.py:714-717; keep fragments 1 and 3",
+      "net_signal_uncertainty": "medium - surgical edit, less risk than full disable",
+      "predicted_miss_param": "likely UP (model can ask when needed; still nudged toward tool calls when info present)",
+      "predicted_multi_turn_base": "should stay similar (fragment 1 still guides tool calls)"
+    },
+    {
+      "id": "E12_SOFTEN_FRAGMENT_2",
+      "intervention": "modify fragment 2 to 'Do not ask for values that ARE already explicit. DO ask via assistant text content when a required value is genuinely missing.' (single-sentence carve-out vs the long 5th fragment)",
+      "net_signal_uncertainty": "medium - smaller wording change, easier for model to follow",
+      "predicted_miss_param": "potentially up (clearer instruction to ask when missing)",
+      "predicted_multi_turn_base": "should stay similar"
+    },
+    {
+      "id": "E13_PROXY_LAYER_REWRITE_E8",
+      "intervention": "implement E8 at proxy output stage: detect tool-call-only response with display_log asking user; rewrite to text-content turn before passing to BFCL",
+      "net_signal_uncertainty": "low - additive output transform, doesn't disturb model behavior",
+      "predicted_gpt4o": "no change (gpt-4o display_log is gibberish, E8 coherence guard filters out)",
+      "predicted_miss_param": "potentially up (compensates for model not asking via text)",
+      "predicted_multi_turn_base": "no change (doesn't fire when display_log isn't ask-pattern)"
+    }
+  ],
+  "multi_turn_base_6_inference_error_cases_under_e9": [
+    {
+      "baseline_turn0": "TOOL_LIST",
+      "case_id": "multi_turn_base_41",
+      "e9_call_count_per_turn": "all_zero",
+      "e9_error_message": "Model did not output a list of model responses",
+      "e9_failure": "multi_turn:inference_error",
+      "e9_turn0": "EMPTY",
+      "e9_turns_count": 41
+    },
+    {
+      "baseline_turn0": "TOOL_LIST",
+      "case_id": "multi_turn_base_42",
+      "e9_call_count_per_turn": "all_zero",
+      "e9_error_message": "Model did not output a list of model responses",
+      "e9_failure": "multi_turn:inference_error",
+      "e9_turn0": "EMPTY",
+      "e9_turns_count": 41
+    },
+    {
+      "baseline_turn0": "TOOL_LIST",
+      "case_id": "multi_turn_base_43",
+      "e9_call_count_per_turn": "all_zero",
+      "e9_error_message": "Model did not output a list of model responses",
+      "e9_failure": "multi_turn:inference_error",
+      "e9_turn0": "EMPTY",
+      "e9_turns_count": 41
+    },
+    {
+      "baseline_turn0": "TOOL_LIST",
+      "case_id": "multi_turn_base_44",
+      "e9_call_count_per_turn": "all_zero",
+      "e9_error_message": "Model did not output a list of model responses",
+      "e9_failure": "multi_turn:inference_error",
+      "e9_turn0": "EMPTY",
+      "e9_turns_count": 41
+    },
+    {
+      "baseline_turn0": "TOOL_LIST",
+      "case_id": "multi_turn_base_45",
+      "e9_call_count_per_turn": "all_zero",
+      "e9_error_message": "Model did not output a list of model responses",
+      "e9_failure": "multi_turn:inference_error",
+      "e9_turn0": "EMPTY",
+      "e9_turns_count": 41
+    },
+    {
+      "baseline_turn0": "TOOL_LIST",
+      "case_id": "multi_turn_base_46",
+      "e9_call_count_per_turn": "all_zero",
+      "e9_error_message": "Model did not output a list of model responses",
+      "e9_failure": "multi_turn:inference_error",
+      "e9_turn0": "EMPTY",
+      "e9_turns_count": 41
+    }
+  ],
+  "multi_turn_miss_param_7_baseline_pass_cases_under_e9": [
+    {
+      "baseline_call_counts": [
+        0,
+        4,
+        1,
+        1
+      ],
+      "baseline_turn0": "TEXT",
+      "baseline_turns": 4,
+      "case_id": "multi_turn_miss_param_77",
+      "e9_call_counts": [
+        2,
+        19,
+        3,
+        21
+      ],
+      "e9_failure": "instance_state_mismatch",
+      "e9_turn0": "TOOL_LIST",
+      "e9_turns": 4
+    },
+    {
+      "baseline_call_counts": [
+        1,
+        1,
+        1,
+        2
+      ],
+      "baseline_turn0": "TOOL_LIST",
+      "baseline_turns": 4,
+      "case_id": "multi_turn_miss_param_88",
+      "e9_call_counts": [
+        21
+      ],
+      "e9_failure": "force_terminated",
+      "e9_turn0": "TOOL_LIST",
+      "e9_turns": 1
+    },
+    {
+      "baseline_call_counts": [
+        1,
+        2,
+        3,
+        3
+      ],
+      "baseline_turn0": "TOOL_LIST",
+      "baseline_turns": 4,
+      "case_id": "multi_turn_miss_param_94",
+      "e9_call_counts": [
+        21
+      ],
+      "e9_failure": "force_terminated",
+      "e9_turn0": "TOOL_LIST",
+      "e9_turns": 1
+    },
+    {
+      "baseline_call_counts": [
+        2,
+        1,
+        3,
+        0,
+        5,
+        2,
+        1
+      ],
+      "baseline_turn0": "TOOL_LIST",
+      "baseline_turns": 7,
+      "case_id": "multi_turn_miss_param_97",
+      "e9_call_counts": [
+        6,
+        21
+      ],
+      "e9_failure": "force_terminated",
+      "e9_turn0": "TOOL_LIST",
+      "e9_turns": 2
+    },
+    {
+      "baseline_call_counts": [
+        0,
+        2,
+        2
+      ],
+      "baseline_turn0": "TEXT",
+      "baseline_turns": 3,
+      "case_id": "multi_turn_miss_param_100",
+      "e9_call_counts": [
+        21
+      ],
+      "e9_failure": "force_terminated",
+      "e9_turn0": "TOOL_LIST",
+      "e9_turns": 1
+    },
+    {
+      "baseline_call_counts": [
+        0,
+        2,
+        1,
+        2,
+        1,
+        2
+      ],
+      "baseline_turn0": "TEXT",
+      "baseline_turns": 6,
+      "case_id": "multi_turn_miss_param_103",
+      "e9_call_counts": [
+        21
+      ],
+      "e9_failure": "force_terminated",
+      "e9_turn0": "TOOL_LIST",
+      "e9_turns": 1
+    },
+    {
+      "baseline_call_counts": [
+        2,
+        0,
+        2
+      ],
+      "baseline_turn0": "TOOL_LIST",
+      "baseline_turns": 3,
+      "case_id": "multi_turn_miss_param_105",
+      "e9_call_counts": [
+        21
+      ],
+      "e9_failure": "force_terminated",
+      "e9_turn0": "TOOL_LIST",
+      "e9_turns": 1
+    }
+  ],
+  "performance_evidence": false,
+  "prompt_literal_committed": false,
+  "provider_calls_made": false,
+  "raw_bfcl_result_tree_committed": false,
+  "raw_material_absent": true,
+  "raw_prompt_committed": false,
+  "raw_provider_payload_committed": false,
+  "raw_response_committed": false,
+  "recommendation": "Given E9 demonstrated that ADDITIVE interventions backfire, the next experiment should be SURGICAL SUBTRACTION (E11 or E12) rather than full disable (E10). E11 removes the explicit anti-ask-user clauses while keeping the still-useful tool-call guidance. E12 is even more surgical (single-sentence carve-out replacing fragment 2). E13 (E8 proxy rewrite) is safest because it doesn't change model behavior at all, just transforms output. Pause to choose ONE of these before another paid run.",
+  "schema_version": "abhe_v0_e9_multi_case_debug_extended_v0",
+  "scope": "deeper_debug_of_e9_regression_across_7_pass_cases_and_6_inference_error_cases",
+  "scorer_called": false,
+  "scorer_diff_committed": false,
+  "sota_3pp_claim_ready": false
+}
