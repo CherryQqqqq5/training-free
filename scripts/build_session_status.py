@@ -71,6 +71,8 @@ APPROVED_RUN_EVIDENCE_ARTIFACTS = {
     "abhe_v0_cf2_partial_per_case_diagnostic.json",
     # candidate-vs-baseline comparison artifact (read-only of the above two)
     "abhe_v0_baseline_vs_cf2_per_case_comparison.json",
+    # 3-way target-category comparison (gpt-4.1 baseline, cf2_partial, gpt-4o baseline)
+    "abhe_v0_target_category_three_way_comparison.json",
 }
 
 # Boundary fields that MUST remain false even for approved-run-evidence

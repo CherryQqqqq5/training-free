@@ -225,3 +225,73 @@ matching the G6b-2 diagnostic format exactly.
 4. **E5 + E3 interventions**: as recommended in §5, these are now the more attractive paths since cf2 is regressing.
 
 After (1) baseline-gpt4o completes, a follow-up commit will add gpt-4o numbers and update §1.
+
+---
+
+## §9 UPDATE (post-original-commit) — gpt-4o baseline finished miss_param
+
+After this report was originally committed, the in-flight `baseline` arm
+running on gpt-4o (full, gpt-4o-2024-11-20) completed its miss_param category.
+
+### Three-way comparison on multi_turn_miss_param target category
+
+| arm | model | cases | passed | acc | result_turn_count avg | all-fail-mode |
+|---|---|---|---|---|---|---|
+| baseline | gpt-4.1-2025-04-14 | 24 | **7** | **29.2%** | 4.3 | mixed (state_mismatch + empty_turn) |
+| conditional_frozen_v2 (cf2) | gpt-4.1-2025-04-14 | 19 (partial) | 0 | 0.0% | 1.0 | 100% multi_turn:force_terminated |
+| baseline | gpt-4o-2024-11-20 | 24 | **0** | **0.0%** | (TBD; almost certainly 1) | 100% multi_turn:force_terminated |
+
+### Key finding (overturns user's gpt-4o hypothesis)
+
+The user's hypothesis "gpt-4o would do 40-50% on miss_param" was **incorrect**.
+**gpt-4o scores 0% — WORSE than gpt-4.1**.
+
+But more importantly, the SHARED FAILURE MODE between cf2-on-gpt-4.1 AND
+gpt-4o-baseline reveals the underlying mechanism:
+
+  - Both produce 1-turn outputs (vs gpt-4.1's 4.3-turn average)
+  - Both trigger BFCL `force_terminate` due to "result turns != ground truth turns"
+  - Both bypass the "ask user a clarifying question" step
+
+For case 77 specifically (which gpt-4.1 baseline passes):
+- **gpt-4.1 turn 0 first element**: a STRING (the model's clarifying question text — "To help determine the road distance to Stonebrook, could you please provide your starting city or ZIP code?")
+- **gpt-4o turn 0 first element**: a LIST (a tool call). Same structural pattern as cf2.
+
+So the question becomes: **what training/post-training difference between gpt-4.1 and gpt-4o makes gpt-4.1 willing to emit a text question turn for miss_param, while gpt-4o defaults to brute-forcing through tool calls?**
+
+Possibilities (not investigated in this commit):
+1. **BFCL model_handler config**: the BFCL benchmark has model-specific
+   handler classes. The handler for `gpt-4o-mini-2024-07-18-FC` (which our
+   BFCL_MODEL_ALIAS uses, irrespective of actual upstream) may differ in
+   how it formats prompts and parses responses for newer-vs-older gpt-4
+   API formats. **Verify this first**: change BFCL_MODEL_ALIAS to a more
+   appropriate gpt-4.1-compatible handler and re-run gpt-4o.
+2. **System-prompt biasing**: gpt-4o post-training may bias toward
+   "complete the task with tools" while gpt-4.1 keeps the "ask user when
+   missing info" reflex. Possibly addressable via system-prompt patches.
+3. **API response format**: gpt-4o's tool-call format may differ from
+   gpt-4.1's in subtle ways the proxy/BFCL doesn't translate correctly.
+   Trace inspection of raw_response.choices[0] would tell.
+
+### Implications for L3 intervention selection
+
+This is actually a positive signal for the **E5 (irrelevance abstain)** intervention,
+which is structurally similar: detect "model wants to emit a tool call when
+it should not" and override. For miss_param, the analogous intervention
+is: detect "model is brute-forcing with placeholder strings" and override
+to "ask user a clarifying question".
+
+Proposed **E7 (NEW)**: A proxy-layer rule that:
+- Watches model output for placeholder strings (e.g., `"CURRENT_LOCATION"`,
+  `"UNKNOWN"`, regex like `"\\bCURRENT_\\w+\\b"`)
+- If detected within an argument value of a tool call on a multi_turn_miss_param
+  case, override the response to emit a clarifying-question text turn instead.
+
+This would potentially help BOTH cf2-on-gpt-4.1 AND gpt-4o-baseline cases
+recover (since both share the placeholder-string failure mode).
+
+### Updated three-way comparison artifact
+
+`outputs/artifacts/stage1_bfcl_acceptance/abhe_v0_target_category_three_way_comparison.json`
+— sanitized 24-row per-case table with all three arms' outcomes side-by-side.
+
